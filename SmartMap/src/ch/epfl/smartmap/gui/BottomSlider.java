@@ -3,12 +3,11 @@
  */
 package ch.epfl.smartmap.gui;
 
-import android.R;
+import ch.epfl.smartmap.R;
 import android.content.Context;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.widget.LinearLayout;
 
 /**
@@ -39,9 +38,8 @@ public class BottomSlider extends LinearLayout {
        switch(newState){
            case HIDDEN:
                this.setVisibility(View.VISIBLE);
-               // animation = AnimationUtils.loadAnimation(this.getContext(),
-               // R.string.
-               // this.startAnimation(animation);
+               animation = AnimationUtils.loadAnimation(this.getContext(), R.animator.bottom_slider_hidden_to_discrete);
+               this.startAnimation(animation);
                
                break;
            case DISCRETE:
