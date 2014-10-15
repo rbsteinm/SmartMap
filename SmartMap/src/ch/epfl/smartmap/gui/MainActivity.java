@@ -1,8 +1,6 @@
 package ch.epfl.smartmap.gui;
 
-import ch.epfl.smartmap.R;
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,8 +8,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
+import ch.epfl.smartmap.R;
 
+/**
+ * @author rbsteinm
+ * 
+ */
 public class MainActivity extends Activity {
 
     @Override
@@ -19,8 +21,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                .add(R.id.container, new PlaceholderFragment()).commit();
+            getFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
         }
     }
 
@@ -52,10 +53,8 @@ public class MainActivity extends Activity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_map, container,
-                false);
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_map, container, false);
             return rootView;
         }
     }
