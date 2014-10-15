@@ -1,14 +1,36 @@
 <?php
 
-namespace SmartApp\Control;
+namespace SmartMap\Control;
 
 /*
  * @author Pamoi
  * 
- * This class contains a method containing the code to be executed for
- * each possible request of the client.
+ * This interface contains the methods needed to process server requests.
+ * 
  */
-class Controller
+interface Controller
 {
+    public function authenticate();
     
+    public function listFriendsPos();
+    
+    public function followFriend();
+    
+    public function unfollowFriend();
+    
+    public function allowFriend();
+    
+    public function disallowFriend();
+    
+    public function allowFriendList();
+    
+    public function disallowFriendList();
+    
+    public function inviteFriend();
+    
+    public function getInvitations();
+    
+    public function acceptInvitation();
+    
+    public function getUserInfo();
 }

@@ -4,6 +4,7 @@ namespace SmartMap\Routing;
 
 use SmartMap\Control\Context;
 use SmartMap\Control\PHPContext;
+use SmartMap\Control\Controller;
 
 /*
  * @author Pamoi
@@ -14,78 +15,78 @@ use SmartMap\Control\PHPContext;
 class DefaultRouter implements Router
 {
     private $mContext;
+    private $mController;
     
     /* Constructs the Router with needed global variables
      * 
      * @param $context 
      */
-    public function __construct($context)
+    public function __construct($context, $controller)
     {
         $this->mContext = $context;
+        $this->mController = $controller;
     }
     
     /* @see getResponse($uri)
      */
     public function getResponse($uri)
     {
-        $controller = new DefaultController();
-        
         // We look for a matching route
         switch ($uri) 
         {
             // Authentication route
             case "/auth":
-                return $controller->authenticate();
+                return $this->mController->authenticate();
                 break;
             
             // Friend management routes
-            case "/listFriendPos"
-                return $controller->listFriendsPos();
+            case "/listFriendsPos":
+                return $this->mController->listFriendsPos();
                 break;
             
             case "/followFriend":
-                return $controller->followFriend();
+                return $this->mController->followFriend();
                 break;
             
             case "/unfollowFriend":
-                return $controller->unfollowFriend();
+                return $this->mController->unfollowFriend();
                 break;
             
             case "/allowFriend":
-                return $controller->allowFriend();
+                return $this->mController->allowFriend();
                 break;
             
             case "/disallowFriend":
-                return $controller->disallowFriend();
+                return $this->mController->disallowFriend();
                 break;
             
             case "/allowFriendList":
-                return $controller->allowFriendList();
+                return $this->mController->allowFriendList();
                 break;
             
-            case "/disallowFriendList"
-                return $controller->disallowFriendList();
+            case "/disallowFriendList":
+                return $this->mController->disallowFriendList();
                 break;
             
             // Friend invitations routes
-            case "/inviteFriend"
-                return $controller->inviteFriend();
+            case "/inviteFriend":
+                return $this->mController->inviteFriend();
                 break;
             
-            case "/getInvitations"
-                return $controller->getInvitations();
+            case "/getInvitations":
+                return $this->mController->getInvitations();
                 break;
             
-            case "/acceptInvitation"
-                return $controller->acceptInvitation();
+            case "/acceptInvitation":
+                return $this->mController->acceptInvitation();
                 break;
             
-            case "/getUserInfo"
-                return $controller->getUserInfo();
+            case "/getUserInfo":
+                return $this->mController->getUserInfo();
                 break;
             
             default:
-                echo 'ERROR: no route found !';
+                return 'ERROR: no route found !';
         }
     }
 }

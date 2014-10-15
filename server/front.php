@@ -10,6 +10,8 @@ use SmartMap\Control\PHPContext;
 
 $context = new PHPContext($_POST, $_SESSION);
 
-$router = new DefaultRouter($context);
+$controller = null; // TODO
+
+$router = new DefaultRouter($context, $controller);
 
 echo $router->getResponse($_SERVER['REQUEST_URI']);

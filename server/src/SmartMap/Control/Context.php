@@ -17,7 +17,7 @@ interface Context
     
     /* Gives the id of the current user.
      * 
-     * @throw ContextException if the user is not authenticated
+     * @throws ContextException if the user is not authenticated
      */
     public function getUserId();
     
@@ -25,7 +25,7 @@ interface Context
      * 
      * @return The value of the post parameter
      * 
-     * @throw ContextException if the field is not set.
+     * @throws ContextException if the field is not set.
      */
-    public function getPost($fieldName) throw ContextException;
+    public function getPost($fieldName);
 }

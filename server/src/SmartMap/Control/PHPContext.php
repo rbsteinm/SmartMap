@@ -7,7 +7,7 @@ namespace SmartMap\Control;
  * 
  * This class implements the Context interface using PHP global variables.
  */
-class PHPContext implemets Context
+class PHPContext implements Context
 {
     private $mPost;
     private $mSession;
@@ -23,7 +23,7 @@ class PHPContext implemets Context
      */
     public function isAuthenticated()
     {
-        return isset($this->mSession['authenticated']) AND $this->mSession['authenticated'] == true)
+        return isset($this->mSession['authenticated']) AND $this->mSession['authenticated'] == true;
     }
     
     /*
