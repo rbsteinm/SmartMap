@@ -5,6 +5,11 @@ require 'vendor/autoload.php';
 use SmartMap\Routing\Router;
 use SmartMap\Routing\DefaultRouter;
 
-$router = new DefaultRouter($_SESSION, $_POST);
+use SmartMap\Control\Context;
+use SmartMap\Control\PHPContext;
+
+$context = new PHPContext($_POST, $_SESSION);
+
+$router = new DefaultRouter($context);
 
 echo $router->getResponse($_SERVER['REQUEST_URI']);
