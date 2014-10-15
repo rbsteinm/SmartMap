@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="Assert">
+        <ignore path="src/ch/epfl/smartmap/gui/InformationSlider.java" />
+        <ignore path="src/ch/epfl/smartmap/gui/InformationSlider.java" />
+    </issue>
+</lint>
