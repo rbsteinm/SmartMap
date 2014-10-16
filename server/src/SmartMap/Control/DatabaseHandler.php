@@ -33,6 +33,13 @@ class DatabaseHandler implements Handler
         }
     }
     
+    public function updatePos()
+    {
+        // TODO
+        
+        return 'OK !';
+    }
+    
     public function listFriendsPos()
     {
         // TODO

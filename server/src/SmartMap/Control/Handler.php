@@ -12,6 +12,8 @@ interface Handler
 {
     public function authenticate();
     
+    public function updatePos();
+    
     public function listFriendsPos();
     
     public function followFriend();

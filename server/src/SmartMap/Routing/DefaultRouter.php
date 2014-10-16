@@ -36,6 +36,11 @@ class DefaultRouter implements Router
             case "/auth":
                 return $this->mHandler->authenticate();
                 break;
+                
+            // PositionUpdating
+            case "/updatePos":
+                return $this->mHandler->updatePos();
+                break;
             
             // Friend management routes
             case "/listFriendsPos":

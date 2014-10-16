@@ -12,6 +12,9 @@ class DefaultRouterTest extends PHPUnit_Framework_TestCase
         $handler->method('authenticate')
              ->willReturn('1');
              
+        $handler->method('updatePos')
+             ->willReturn('100');
+             
         $handler->method('listFriendsPos')
              ->willReturn('2');
              
@@ -46,10 +49,13 @@ class DefaultRouterTest extends PHPUnit_Framework_TestCase
              ->willReturn('12');
         
         
-        $router = new SmartMap\Routing\DefaultRouter($context, $handler);
+        $router = new SmartMap\Routing\DefaultRouter($handler);
         
         echo 'Testing authentication route' . PHP_EOL;
         $this->AssertEquals('1', $router->getResponse("/auth"));
+        
+        echo 'Testing updatePos route' . PHP_EOL;
+        $this->AssertEquals('100', $router->getResponse("/updatePos"));
         
         echo 'Testing listFriendsPos route' . PHP_EOL;
         $this->AssertEquals('2', $router->getResponse("/listFriendsPos"));
