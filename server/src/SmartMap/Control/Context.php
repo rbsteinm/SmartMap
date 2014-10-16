@@ -18,8 +18,9 @@ interface Context
     /* Gives the id of the current user.
      * 
      * @throws ContextException if the user is not authenticated
+     * or the field is not in the list.
      */
-    public function getUserId();
+    public function getSession($fieldname);
     
     /* Gets the post parameter for a given name. 
      * 
@@ -28,4 +29,12 @@ interface Context
      * @throws ContextException if the field is not set.
      */
     public function getPost($fieldName);
+    
+    /* Gets the value of an option
+     * 
+     * @return The value of the option
+     * 
+     * @throws ContextException if the option is not set.
+     */
+    public function getOption($optionName);
 }

@@ -7,46 +7,46 @@ class DefaultRouterTest extends PHPUnit_Framework_TestCase
         echo PHP_EOL . "====> Routing <====" . PHP_EOL . PHP_EOL;
         $context = $this->getMock('SmartMap\Control\Context');
         
-        $controller = $this->getMock('SmartMap\Control\Controller');
+        $handler = $this->getMock('SmartMap\Control\Controller');
         
-        $controller->method('authenticate')
+        $handler->method('authenticate')
              ->willReturn('1');
              
-        $controller->method('listFriendsPos')
+        $handler->method('listFriendsPos')
              ->willReturn('2');
              
-        $controller->method('followFriend')
+        $handler->method('followFriend')
              ->willReturn('3');
              
-        $controller->method('unfollowFriend')
+        $handler->method('unfollowFriend')
              ->willReturn('4');
              
-        $controller->method('allowFriend')
+        $handler->method('allowFriend')
              ->willReturn('5');
              
-        $controller->method('disallowFriend')
+        $handler->method('disallowFriend')
              ->willReturn('6');
              
-        $controller->method('allowFriendList')
+        $handler->method('allowFriendList')
              ->willReturn('7');
              
-        $controller->method('disallowFriendList')
+        $handler->method('disallowFriendList')
              ->willReturn('8');
              
-        $controller->method('inviteFriend')
+        $handler->method('inviteFriend')
              ->willReturn('9');
              
-        $controller->method('getInvitations')
+        $handler->method('getInvitations')
              ->willReturn('10');
              
-        $controller->method('acceptInvitation')
+        $handler->method('acceptInvitation')
              ->willReturn('11');
              
-        $controller->method('getUserInfo')
+        $handler->method('getUserInfo')
              ->willReturn('12');
         
         
-        $router = new SmartMap\Routing\DefaultRouter($context, $controller);
+        $router = new SmartMap\Routing\DefaultRouter($context, $handler);
         
         echo 'Testing authentication route' . PHP_EOL;
         $this->AssertEquals('1', $router->getResponse("/auth"));

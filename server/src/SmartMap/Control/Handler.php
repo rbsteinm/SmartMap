@@ -8,7 +8,7 @@ namespace SmartMap\Control;
  * This interface contains the methods needed to process server requests.
  * 
  */
-interface Controller
+interface Handler
 {
     public function authenticate();
     

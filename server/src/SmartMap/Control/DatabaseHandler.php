@@ -8,7 +8,7 @@ namespace SmartMapp\Control;
  * This class implements the Controller interface and uses the database
  * to process the requests.
  */
-class DatabaseController implements Controller
+class DatabaseHandler implements Handler
 {
     
 }

@@ -12,10 +12,11 @@ class PHPContext implements Context
     private $mPost;
     private $mSession;
     
-    function __construct($post, $session)
+    function __construct($post, $session, $options)
     {
         $this->mPost = $post;
         $this->mSession = $session;
+        $this->mOptions = $options;
     }
     
     /*
@@ -42,11 +43,32 @@ class PHPContext implements Context
     }
     
     /*
-     * @see getUserId()
+     * @see getSession($fieldname)
      */
-    public function getUserId()
+    public function getSession($fieldname)
     {
-        // TODO
-        return 14;
+        if (!$this->isAuthenticated OR !isset($this->mSession[$fieldname]))
+        {
+            throw new ContextExeption("Session variable " . $fieldname . "is not available.");
+        }
+        else
+        {
+            return $this->mPost[$fieldname];
+        }
     }
+    
+    /*
+     * @see getOption($optionName)
+     */
+     public function getOption($optionName)
+     {
+         if (!isset($this->mOptions[$option]))
+         {
+             throw new ContextException("Option " . $optionName . " is not set.");
+         }
+         else
+         {
+             return $this->mOption[$optionName];
+         }
+     }
 }

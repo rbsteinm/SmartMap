@@ -7,11 +7,12 @@ use SmartMap\Routing\DefaultRouter;
 
 use SmartMap\Control\Context;
 use SmartMap\Control\PHPContext;
+use SmartMap\Control\Handler;
 
 $context = new PHPContext($_POST, $_SESSION);
 
-$controller = null; // TODO
+$handler = null; // TODO
 
-$router = new DefaultRouter($context, $controller);
+$router = new DefaultRouter($context, $handler);
 
 echo $router->getResponse($_SERVER['REQUEST_URI']);
