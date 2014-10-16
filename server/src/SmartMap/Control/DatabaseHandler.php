@@ -26,6 +26,7 @@ class DatabaseHandler implements Handler
         else
         {
             // TODO
+            
             $this->mContext->setSession('authenticated', true);
             
             return 'Authenticated succesfully !';

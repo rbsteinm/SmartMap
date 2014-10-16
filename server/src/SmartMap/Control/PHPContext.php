@@ -31,7 +31,7 @@ class PHPContext implements Context
     {
         if (!isset($_POST[$fieldname]))
         {
-            throw new ContextException("POST parameter " . $fieldname . "is not set.");
+            throw new ContextException("POST parameter " . $fieldname . " is not set.");
         }
         else
         {
@@ -46,7 +46,7 @@ class PHPContext implements Context
     {
         if (!isset($_SESSION[$fieldname]))
         {
-            throw new ContextException("Session variable " . $fieldname . "is not available.");
+            throw new ContextException("Session variable " . $fieldname . " is not set.");
         }
         else
         {
@@ -67,13 +67,13 @@ class PHPContext implements Context
      */
      public function getOption($optionName)
      {
-         if (!isset($this->mOptions[$option]))
+         if (!isset($this->mOptions[$optionName]))
          {
              throw new ContextException("Option " . $optionName . " is not set.");
          }
          else
          {
-             return $this->mOption[$optionName];
+             return $this->mOptions[$optionName];
          }
      }
 }

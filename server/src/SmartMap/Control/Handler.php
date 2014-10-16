@@ -5,7 +5,7 @@ namespace SmartMap\Control;
 /*
  * @author Pamoi
  * 
- * This interface contains the methods needed to process server requests.
+ * This interface contains the methods needed to process client requests.
  * 
  */
 interface Handler
