@@ -1,8 +1,30 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/ch.epfl.smartmap"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="ch.epfl.smartmap.gui.MainActivity"
-    tools:ignore="MergeRootFrame" />
+    android:layout_height="match_parent" >
+    
+    <ch.epfl.smartmap.gui.BottomSlider
+        
+        android:id="@+id/bottom_slider"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"  
+        android:orientation="vertical"
+        android:background="#AAAAAA"
+        custom:state="hidden" >
+        
+        <TextView
+            android:id="@+id/textview"
+            android:value="test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        
+    </ch.epfl.smartmap.gui.BottomSlider>
+
+    
+</RelativeLayout>
 
