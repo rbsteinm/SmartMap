@@ -30,4 +30,9 @@ public interface UserList {
 	 * @return The user's ID
 	 */
 	int getID(int n);
+	
+	/**
+	 * @return The size of the list
+	 */
+	int getSize();
 }
