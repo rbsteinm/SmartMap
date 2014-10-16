@@ -22,6 +22,8 @@ interface Context
      */
     public function getSession($fieldname);
     
+    public function setSession($fieldname, $value);
+    
     /* Gets the post parameter for a given name. 
      * 
      * @return The value of the post parameter

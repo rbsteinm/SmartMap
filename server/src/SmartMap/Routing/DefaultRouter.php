@@ -14,16 +14,14 @@ use SmartMap\Control\Handler;
  */
 class DefaultRouter implements Router
 {
-    private $mContext;
     private $mHandler;
     
     /* Constructs the Router with needed global variables
      * 
      * @param $context 
      */
-    public function __construct($context, $handler)
+    public function __construct($handler)
     {
-        $this->mContext = $context;
         $this->mHandler = $handler;
     }
     

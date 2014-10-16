@@ -7,7 +7,7 @@ class DefaultRouterTest extends PHPUnit_Framework_TestCase
         echo PHP_EOL . "====> Routing <====" . PHP_EOL . PHP_EOL;
         $context = $this->getMock('SmartMap\Control\Context');
         
-        $handler = $this->getMock('SmartMap\Control\Controller');
+        $handler = $this->getMock('SmartMap\Control\Handler');
         
         $handler->method('authenticate')
              ->willReturn('1');
@@ -83,5 +83,10 @@ class DefaultRouterTest extends PHPUnit_Framework_TestCase
         
         echo 'Testing getUserInfo route' . PHP_EOL;
         $this->AssertEquals('12', $router->getResponse("/getUserInfo"));
+        
+        echo 'Testing invalid route' . PHP_EOL;
+        $this->AssertEquals('ERROR: no route found !', $router->getResponse("/invalidRoute"));
+        
+        echo PHP_EOL . "====> Routing tests passed ! <====" . PHP_EOL . PHP_EOL;
     }
 }

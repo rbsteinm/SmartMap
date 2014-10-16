@@ -9,13 +9,10 @@ namespace SmartMap\Control;
  */
 class PHPContext implements Context
 {
-    private $mPost;
-    private $mSession;
+    private $mOptions;
     
-    function __construct($post, $session, $options)
+    function __construct($options)
     {
-        $this->mPost = $post;
-        $this->mSession = $session;
         $this->mOptions = $options;
     }
     
@@ -24,7 +21,7 @@ class PHPContext implements Context
      */
     public function isAuthenticated()
     {
-        return isset($this->mSession['authenticated']) AND $this->mSession['authenticated'] == true;
+        return (isset($_SESSION['authenticated']) AND $_SESSION['authenticated'] == true);
     }
     
     /*
@@ -32,13 +29,13 @@ class PHPContext implements Context
      */
     public function getPost($fieldname)
     {
-        if (!isset($this->mPost[$fieldname]))
+        if (!isset($_POST[$fieldname]))
         {
-            throw new ContextExeption("POST parameter " . $fieldname . "is not set.");
+            throw new ContextException("POST parameter " . $fieldname . "is not set.");
         }
         else
         {
-            return $this->mPost[$fieldname];
+            return $_POST[$fieldname];
         }
     }
     
@@ -47,14 +44,22 @@ class PHPContext implements Context
      */
     public function getSession($fieldname)
     {
-        if (!$this->isAuthenticated OR !isset($this->mSession[$fieldname]))
+        if (!isset($_SESSION[$fieldname]))
         {
-            throw new ContextExeption("Session variable " . $fieldname . "is not available.");
+            throw new ContextException("Session variable " . $fieldname . "is not available.");
         }
         else
         {
-            return $this->mPost[$fieldname];
+            return $_SESSION[$fieldname];
         }
+    }
+    
+    /*
+     * @see setSession($fieldname, $value)
+     */
+    public function setSession($fieldname, $value)
+    {
+        $_SESSION[$fieldname] = $value;
     }
     
     /*

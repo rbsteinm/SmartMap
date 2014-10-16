@@ -8,11 +8,15 @@ use SmartMap\Routing\DefaultRouter;
 use SmartMap\Control\Context;
 use SmartMap\Control\PHPContext;
 use SmartMap\Control\Handler;
+use SmartMap\Control\DatabaseHandler;
 
-$context = new PHPContext($_POST, $_SESSION);
 
-$handler = null; // TODO
+$options = array();
 
-$router = new DefaultRouter($context, $handler);
+$context = new PHPContext($options);
+
+$handler = new DatabaseHandler($context);
+
+$router = new DefaultRouter($handler);
 
 echo $router->getResponse($_SERVER['REQUEST_URI']);

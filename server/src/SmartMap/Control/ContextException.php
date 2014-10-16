@@ -1,8 +1,8 @@
 <?php
 
-namespace SmartMap\Context;
+namespace SmartMap\Control;
 
-class ContextException extends Exception
+class ContextException extends \Exception
 {
     function __construct($message)
     {
