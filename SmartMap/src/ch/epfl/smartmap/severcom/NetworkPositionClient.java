@@ -1,5 +1,7 @@
 package ch.epfl.smartmap.severcom;
 
+import ch.epfl.smartmap.cache.Point;
+
 /**
  * @author marion-S
  *
@@ -38,7 +40,7 @@ public class NetworkPositionClient implements SmartMapPositionClient {
 	 * @see ch.epfl.smartmap.severcom.SmartMapPositionClient#updatePos()
 	 */
 	@Override
-	public void updatePos() throws SmartMapClientException {
+	public void updatePos(Point position) throws SmartMapClientException {
 		// TODO Auto-generated method stub
 
 	}
