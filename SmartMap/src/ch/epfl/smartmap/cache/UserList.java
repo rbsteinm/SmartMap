@@ -1,7 +1,9 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.List;
+
 /**
- * A list of users (typically a friendlist/custom group)
+ * A list of user IDs
  * @author ritterni
  */
 public interface UserList {
@@ -11,6 +13,11 @@ public interface UserList {
 	 */
 	String getListName();
 	
+	/**
+	 * Renames the list
+     * @param newName The new name of the list
+     */
+    void setListName(String newName);	
 	
 	/**
 	 * Adds a user to the list
@@ -25,14 +32,12 @@ public interface UserList {
 	void removeUser(int id);
 	
 	/**
-	 * Gets the nth user on the list
-	 * @param n The user's index
-	 * @return The user's ID
+	 * @return The whole list of IDs
 	 */
-	int getID(int n);
+	List<Integer> getList();
 	
 	/**
-	 * @return The size of the list
+	 * @return The whole list of users sorted alphabetically
 	 */
-	int getSize();
+	List<User> getUserList();
 }

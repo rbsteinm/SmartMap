@@ -14,8 +14,9 @@ public class Friend implements User {
 	
 	/**
 	 * Friend constructor
-	 * @param friendID the id of the contact we're creating
-	 * @param friendName the name of the friend
+	 * @param userID The id of the contact we're creating
+	 * @param userName The name of the friend
+	 * @param userNumber The friend's phone number
 	 * @author ritterni
 	 */
 	public Friend(int userID, String userName, String userNumber) {
