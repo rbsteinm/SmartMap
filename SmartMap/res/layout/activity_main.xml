@@ -31,8 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/googlemapmockbackground"
-                android:scaleType="fitXY"
-                />
+                android:scaleType="fitXY" />
         </RelativeLayout>
 
         <!-- SLIDING LAYOUT -->
@@ -65,7 +64,7 @@
         android:id="@+id/searchBarLayout"
         android:background="@color/bottomSliderBackground"
         android:alpha="0.5"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent" 
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
@@ -73,6 +72,13 @@
         android:layout_marginRight="20dp"
         android:padding="5dp" >
         
+        <ImageView
+            android:id="@+id/searchBarIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/searchicon"
+            android:adjustViewBounds="true" />
+         
         <EditText
             android:id="@+id/searchBarEditText"
             android:inputType="text"
@@ -84,6 +90,10 @@
             android:imeOptions="actionSearch"
             android:descendantFocusability="beforeDescendants"
             android:textSize="16sp"
-            android:clickable="true" />
+            android:clickable="true"
+            android:paddingStart="5dp"
+            android:paddingEnd="0dp" />
+        
+       
     </LinearLayout>
 </FrameLayout>
