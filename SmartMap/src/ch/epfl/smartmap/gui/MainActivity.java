@@ -15,6 +15,7 @@ import android.view.animation.AnimationSet;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * 
@@ -32,7 +33,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		ImageView logoImage = (ImageView) findViewById(R.id.logo);
-		//TextView welcomeText = (TextView) findViewById(R.id.welcome);
+		TextView welcomeText = (TextView) findViewById(R.id.welcome);
 
 		// LOGO ANIMATION
 
@@ -59,6 +60,7 @@ public class MainActivity extends Activity {
 		animation.setFillAfter(true);
 
 		logoImage.setAnimation(animation);
+		
 		/**
 		// WELCOME ANIMATION
 
@@ -74,12 +76,13 @@ public class MainActivity extends Activity {
 		
 
 		welcomeText.setAnimation(welcomeAnimation);
-
+		*/
+		
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new PlaceholderFragment()).commit();
 		}
-		*/
+		
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
