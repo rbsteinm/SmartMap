@@ -1,12 +1,12 @@
 package ch.epfl.smartmap.test;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import android.test.AndroidTestCase;
 
 import ch.epfl.smartmap.cache.Point;
 
-public class PointTest {
+public class PointTest extends AndroidTestCase {
 
     private final double x = 1.23;
     private final double y = 3.21;

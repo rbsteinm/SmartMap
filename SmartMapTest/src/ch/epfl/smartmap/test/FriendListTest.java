@@ -1,16 +1,15 @@
 package ch.epfl.smartmap.test;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
+import android.test.AndroidTestCase;
 import android.util.SparseArray;
 
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.FriendList;
 import ch.epfl.smartmap.cache.User;
 
-public class FriendListTest {
+public class FriendListTest extends AndroidTestCase {
 
     private final String listName = "Name List";
     private final String newListName = "New Name";
@@ -49,6 +48,9 @@ public class FriendListTest {
         array.put(0, b);
         array.put(9909, c);
         FriendList fl = new FriendList(listName, array);
+        fl.addUser(a.getID());
+        fl.addUser(b.getID());
+        fl.addUser(c.getID());
         assertTrue(fl.getUserList().get(0).equals(c));
     }
 }

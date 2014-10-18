@@ -23,6 +23,7 @@ public class Friend implements User {
 		id = userID;
 		name = userName;
 		phoneNumber = userNumber;
+		position = new Point(0, 0);
 	}
 
 	@Override

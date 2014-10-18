@@ -2,10 +2,11 @@ package ch.epfl.smartmap.test;
 
 import org.junit.Test;
 
-import ch.epfl.smartmap.cache.Friend;
-import junit.framework.TestCase;
+import android.test.AndroidTestCase;
 
-public class FriendTest extends TestCase {
+import ch.epfl.smartmap.cache.Friend;
+
+public class FriendTest extends AndroidTestCase {
     private final int id = 1111;
     private final String name = "test name";
     private final String name2 = "other name";
@@ -42,7 +43,7 @@ public class FriendTest extends TestCase {
     @Test
     public void testSetY() {
         Friend friend = new Friend(id, name, number);
-        friend.setY(x);
+        friend.setY(y);
         assertTrue(friend.getPosition().getY() == y); 
     }
     
