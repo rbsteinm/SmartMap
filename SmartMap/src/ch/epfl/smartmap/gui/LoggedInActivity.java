@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 
-
 /**
  * This activity is created when the user successfully logged in to SmartMap (using facebook, sms, or other methods).
  *
@@ -24,9 +23,9 @@ public class LoggedInActivity extends Activity {
 
         // get Intent that started this Activity
         Intent startingIntent = getIntent();
-
         // get the value of the user string
-        String userName = startingIntent.getStringExtra(MainFragment.class.getName());
+        String userName = startingIntent.getExtras().getString("name");
+        // String userName = startingIntent.getStringExtra("name");
         Toast.makeText(this, "You logged in successfully, " + userName, Toast.LENGTH_LONG).show();
     }
 

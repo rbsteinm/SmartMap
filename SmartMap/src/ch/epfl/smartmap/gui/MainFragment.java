@@ -138,13 +138,19 @@ public class MainFragment extends Fragment {
             @Override
             public void onCompleted(GraphUser user, Response response) {
                 if (user != null) {
+
+                    String userName = user.getName();
+                    // This portable token can be used by the server
+                    String facebookToken = Session.getActiveSession().getAccessToken();
+
                     // Create a JSON object to hold the profile info
                     try {
 
                         // Populate the JSON object
                         userProfile.put("facebookId", user.getId());
-                        userProfile.put("name", user.getName());
-                        // userProfile.put("friends", user.getProperty("friends"));
+                        userProfile.put("name", userName);
+                        userProfile.put("facebookToken", facebookToken);
+                        //userProfile.put("friends", user.getProperty("friends"));
 
                         Log.i(TAG, "user name in json (async): " + userProfile.getString("name"));
                         Log.i(TAG, "user ID in json (async): " + userProfile.getString("facebookId"));
@@ -153,17 +159,19 @@ public class MainFragment extends Fragment {
                         Log.e(TAG, "Error parsing returned user data.");
                     }
 
+                    // TODO store userProfile locally (see with Nicolas?)
+
                     // Send user's infos to SmartMap server
                     Map<String, Object> params = new LinkedHashMap<String, Object>();
                     params.put("facebookId", user.getId());
-                    params.put("name", user.getName());
+                    params.put("name", userName);
+                    params.put("facebookToken", facebookToken);
                     //params.put("friends", user.getProperty("friends"));
                     sendDataToServer(params);
 
                     // Create and start the next activity
                     Intent intent = new Intent(getActivity(), LoggedInActivity.class);
-                    String userName = "Robich";
-                    intent.putExtra(this.getClass().getName(), userName);
+                    intent.putExtra("name", userName);
                     startActivity(intent);
 
                 } else if (response.getError() != null) {
