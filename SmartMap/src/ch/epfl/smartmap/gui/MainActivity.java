@@ -3,13 +3,11 @@ package ch.epfl.smartmap.gui;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
 
@@ -19,9 +17,7 @@ import ch.epfl.smartmap.R;
  */
 public class MainActivity extends Activity {
 
-    private DrawerLayout sideDrawerLayout;
-    private String[] sideLayoutElements;
-    private ListView drawerListView;
+    private SideMenu sideMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +26,8 @@ public class MainActivity extends Activity {
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
         }
-        initializeDrawerLayout();
+        sideMenu = new SideMenu(this, (ListView) findViewById(R.id.left_drawer));
+        sideMenu.initializeDrawerLayout();
     }
 
     @Override
@@ -50,18 +47,6 @@ public class MainActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void initializeDrawerLayout() {
-        sideLayoutElements = getResources().getStringArray(R.array.sideMenuElements);
-        sideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerListView = (ListView) findViewById(R.id.left_drawer);
-
-        // Set the adapter for the listView
-        drawerListView.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item,
-                sideLayoutElements));
-        // sideDrawerLayout.setOnItemClickListener(new OnItemClickListener);
-        // TODO implement class OnItemClickListener
     }
 
     /**
