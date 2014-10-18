@@ -33,6 +33,20 @@ class DatabaseHandler implements Handler
         }
     }
     
+    public function registerUser()
+    {
+        // TODO
+        
+        return 'OK !';
+    }
+    
+    public function verifySMS()
+    {
+        // TODO
+        
+        return 'OK !';
+    }
+    
     public function updatePos()
     {
         // TODO

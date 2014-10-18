@@ -4,13 +4,19 @@ class DefaultRouterTest extends PHPUnit_Framework_TestCase
 {
     public function testRoute()
     {
-        echo PHP_EOL . "====> Routing <====" . PHP_EOL . PHP_EOL;
+        echo PHP_EOL . "====> Routing tests <====" . PHP_EOL . PHP_EOL;
         $context = $this->getMock('SmartMap\Control\Context');
         
         $handler = $this->getMock('SmartMap\Control\Handler');
         
         $handler->method('authenticate')
              ->willReturn('1');
+             
+        $handler->method('registerUser')
+             ->willReturn('101');
+             
+        $handler->method('verifySMS')
+             ->willReturn('102');
              
         $handler->method('updatePos')
              ->willReturn('100');
@@ -54,6 +60,12 @@ class DefaultRouterTest extends PHPUnit_Framework_TestCase
         echo 'Testing authentication route' . PHP_EOL;
         $this->AssertEquals('1', $router->getResponse("/auth"));
         
+        echo 'Testing registerUser route' . PHP_EOL;
+        $this->AssertEquals('101', $router->getResponse("/registerUser"));
+        
+        echo 'Testing verifySMS route' . PHP_EOL;
+        $this->AssertEquals('102', $router->getResponse("/verifySMS"));
+        
         echo 'Testing updatePos route' . PHP_EOL;
         $this->AssertEquals('100', $router->getResponse("/updatePos"));
         
@@ -91,7 +103,8 @@ class DefaultRouterTest extends PHPUnit_Framework_TestCase
         $this->AssertEquals('12', $router->getResponse("/getUserInfo"));
         
         echo 'Testing invalid route' . PHP_EOL;
-        $this->AssertEquals('ERROR: no route found !', $router->getResponse("/invalidRoute"));
+        $this->AssertEquals('{"status": "error", "message": "No route found for URI /invalidRoute."}',
+            $router->getResponse("/invalidRoute"));
         
         echo PHP_EOL . "====> Routing tests passed ! <====" . PHP_EOL . PHP_EOL;
     }

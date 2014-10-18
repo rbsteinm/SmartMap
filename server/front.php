@@ -10,6 +10,7 @@ use SmartMap\Control\PHPContext;
 use SmartMap\Control\Handler;
 use SmartMap\Control\DatabaseHandler;
 
+header('Content-type: application/json');
 
 $options = array();
 

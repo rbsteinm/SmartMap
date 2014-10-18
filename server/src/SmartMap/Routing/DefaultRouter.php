@@ -36,8 +36,16 @@ class DefaultRouter implements Router
             case "/auth":
                 return $this->mHandler->authenticate();
                 break;
+            
+            case "/registerUser":
+                return $this->mHandler->registerUser();
+                break;
                 
-            // PositionUpdating
+            case "/verifySMS":
+                return $this->mHandler->verifySMS();
+                break;
+                
+            // Position updating
             case "/updatePos":
                 return $this->mHandler->updatePos();
                 break;
@@ -89,7 +97,7 @@ class DefaultRouter implements Router
                 break;
             
             default:
-                return 'ERROR: no route found !';
+                return '{"status": "error", "message": "No route found for URI ' . $uri . '."}';
         }
     }
 }
