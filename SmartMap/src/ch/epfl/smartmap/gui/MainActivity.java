@@ -25,17 +25,16 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	private static final float TRANSLATEY = -0.4f;
 	private static final int TRANS_DURATION = 2000;
-	private static final int FADE_DURATION = 1000;
+	private static final int FADE_DURATION = 2000;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
 		ImageView logoImage = (ImageView) findViewById(R.id.logo);
 		TextView welcomeText = (TextView) findViewById(R.id.welcome);
 
-		// LOGO ANIMATION
+		// --- LOGO ANIMATION ---
 
 		// Creation of translate animation
 		TranslateAnimation translationY = new TranslateAnimation(
@@ -50,40 +49,67 @@ public class MainActivity extends Activity {
 		translationY.setStartOffset(FADE_DURATION);
 
 		// Creation and edit of fade-in animation
-		Animation fadeIn = new AlphaAnimation(0.0f, 1.0f);
-		fadeIn.setDuration(FADE_DURATION);
+		Animation fadeInLogo = new AlphaAnimation(0.0f, 1.0f);
+		fadeInLogo.setDuration(FADE_DURATION);
 
 		// Creation of the image's animation set
-		AnimationSet animation = new AnimationSet(true);
-		animation.addAnimation(translationY);
-		animation.addAnimation(fadeIn);
-		animation.setFillAfter(true);
+		AnimationSet logoAnimation = new AnimationSet(true);
+		logoAnimation.addAnimation(translationY);
+		logoAnimation.addAnimation(fadeInLogo);
+		logoAnimation.setFillAfter(true);
+		logoImage.setAnimation(logoAnimation);
 
-		logoImage.setAnimation(animation);
-		
-		/**
-		// WELCOME ANIMATION
+		// --- WELCOME ANIMATION ---
 
 		// Creation and edit of fade-in animation
-		Animation fadeOut = new AlphaAnimation(1.0f, 0.0f);
-		fadeOut.setDuration(FADE_DURATION);
+		Animation fadeInText = new AlphaAnimation(0.0f, 1.0f);
+		fadeInText.setDuration(FADE_DURATION);
+
+		// Creation and edit of fade-out animation
+		Animation fadeOutText = new AlphaAnimation(1.0f, 0.0f);
+		fadeOutText.setStartOffset(FADE_DURATION);
+		fadeOutText.setDuration(FADE_DURATION);
 
 		// Creation of the image's animation set
 		AnimationSet welcomeAnimation = new AnimationSet(true);
-		welcomeAnimation.setStartOffset(TRANS_DURATION + FADE_DURATION);
-		welcomeAnimation.addAnimation(fadeIn);
-		welcomeAnimation.addAnimation(fadeOut);
-		
-
+		welcomeAnimation.addAnimation(fadeInText);
+		welcomeAnimation.addAnimation(fadeOutText);
+		welcomeAnimation.setFillAfter(true);
+		welcomeAnimation.setStartOffset(logoAnimation.computeDurationHint());
 		welcomeText.setAnimation(welcomeAnimation);
+
+		/**
+		// --- FACEBOOK ANIMATION ---
+
+		// Creation and edit of fade-in animation
+		Animation fadeInFB = new AlphaAnimation(0.0f, 1.0f);
+		fadeInFB.setDuration(FADE_DURATION);
+
+		// Creation of the image's animation set
+		AnimationSet animationFB = new AnimationSet(true);
+		welcomeAnimation.addAnimation(fadeInFB);
+		welcomeAnimation.setFillAfter(true);
+		welcomeAnimation.setStartOffset(logoAnimation.computeDurationHint()
+				+ welcomeAnimation.computeDurationHint());
+		//TO ADD
+		//facebookFragment.setAnimation(animationFB);
+
 		*/
-		
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new PlaceholderFragment()).commit();
 		}
-		
 	}
+
+	/**
+	 * Methods that test if it's the first visit on the app
+	 * 
+	 * @param view
+	 */
+	public void authentication(View view) {
+		// TODO
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -107,7 +133,6 @@ public class MainActivity extends Activity {
 	 * A placeholder fragment containing a simple view.
 	 */
 	public static class PlaceholderFragment extends Fragment {
-
 		public PlaceholderFragment() {
 		}
 
@@ -119,5 +144,4 @@ public class MainActivity extends Activity {
 			return rootView;
 		}
 	}
-
 }
