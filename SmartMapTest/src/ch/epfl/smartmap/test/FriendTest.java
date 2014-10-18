@@ -17,46 +17,47 @@ public class FriendTest extends AndroidTestCase {
     
     @Test
     public void testGetID() {
-        Friend friend = new Friend(id, name, number);
+        Friend friend = new Friend(id, name);
         assertTrue(friend.getID() == id);
     }
     
     @Test
     public void testGetName() {
-        Friend friend = new Friend(id, name, number);
+        Friend friend = new Friend(id, name);
         assertTrue(friend.getName().equals(name)); 
     }
     
     @Test
-    public void testGetNumber() {
-        Friend friend = new Friend(id, name, number);
+    public void testSetNumber() {
+        Friend friend = new Friend(id, name);
+        friend.setNumber(number);
         assertTrue(friend.getNumber().equals(number)); 
     }
     
     @Test
     public void testSetX() {
-        Friend friend = new Friend(id, name, number);
+        Friend friend = new Friend(id, name);
         friend.setX(x);
         assertTrue(friend.getPosition().getX() == x); 
     }
     
     @Test
     public void testSetY() {
-        Friend friend = new Friend(id, name, number);
+        Friend friend = new Friend(id, name);
         friend.setY(y);
         assertTrue(friend.getPosition().getY() == y); 
     }
     
     @Test
     public void testSetName() {
-        Friend friend = new Friend(id, name, number);
+        Friend friend = new Friend(id, name);
         friend.setName(name2);
         assertTrue(friend.getName().equals(name2)); 
     }
     
     @Test
     public void testSetEmail() {
-        Friend friend = new Friend(id, name, number);
+        Friend friend = new Friend(id, name);
         friend.setEmail(email);
         assertTrue(friend.getEmail().equals(email)); 
     }

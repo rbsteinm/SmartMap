@@ -14,9 +14,9 @@ public class FriendListTest extends AndroidTestCase {
     private final String listName = "Name List";
     private final String newListName = "New Name";
     private SparseArray<User> array = new SparseArray<User>();
-    private Friend a = new Friend(1234, "qwertz uiop", "834076");
-    private Friend b = new Friend(0, "hcjkehfkl", "999999");
-    private Friend c = new Friend(9909, "Abc Def", "456842");
+    private Friend a = new Friend(1234, "qwertz uiop");
+    private Friend b = new Friend(0, "hcjkehfkl");
+    private Friend c = new Friend(9909, "Abc Def");
     
     
     @Test
