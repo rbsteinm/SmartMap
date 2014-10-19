@@ -4,6 +4,7 @@
     <string name="app_name">SmartMap</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
     <string-array name="sideMenuElements">
         <item>Profile</item>
         <item>Friends</item>
@@ -11,5 +12,7 @@
         <item>Filters</item>
         <item>Settings</item>
     </string-array>
+
+    <string name="title_activity_friends">FriendsActivity</string>
 
 </resources>
