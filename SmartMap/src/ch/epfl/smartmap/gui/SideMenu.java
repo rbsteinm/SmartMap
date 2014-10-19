@@ -12,14 +12,14 @@ import ch.epfl.smartmap.R;
  */
 public class SideMenu extends DrawerLayout {
 
-    private final DrawerLayout mSideDrawerLayout;
+    // private final DrawerLayout mSideDrawerLayout;
     private final String[] mSideLayoutElements;
     private ListView mDrawerListView;
     private final Context mContext;
 
     public SideMenu(Context context, ListView drawerListView) {
         super(context);
-        mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        // mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mSideLayoutElements = getResources().getStringArray(R.array.sideMenuElements);
         mDrawerListView = drawerListView;
         mContext = context;

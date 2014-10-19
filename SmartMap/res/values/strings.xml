@@ -5,10 +5,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string-array name="sideMenuElements">
+        <item>Profile</item>
         <item>Friends</item>
-        <item>Tags</item>
-        <item>Groups</item>
-        <item>Favorites</item>
+        <item>Events</item>
+        <item>Filters</item>
         <item>Settings</item>
     </string-array>
 
