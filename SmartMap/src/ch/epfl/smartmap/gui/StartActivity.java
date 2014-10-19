@@ -2,7 +2,7 @@ package ch.epfl.smartmap.gui;
 
 /*<<<<<<< HEAD
  import java.security.MessageDigest;
- import java.security.NoSuchAlgorithmException;
+ import java.security.NoSuchAlgorithmException;;
 
  import android.content.pm.PackageInfo;
  import android.content.pm.PackageManager;
