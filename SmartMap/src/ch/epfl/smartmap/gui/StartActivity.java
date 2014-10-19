@@ -76,86 +76,107 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 
 /**
- *
+ * 
  * @author Alain
  * @author SpicyCH
- *
+ * 
  */
 public class StartActivity extends FragmentActivity {
 
-    private MainFragment mainFragment;
+	private MainFragment mainFragment;
+	private ImageView mLogoImage;
+	private TextView mWelcomeText;
+	private com.facebook.widget.LoginButton mFacebookButton;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
 
-        // Displays the facebook app hash in LOG.d
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo("ch.epfl.smartmap", PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (NameNotFoundException e) {
+		// Displays the facebook app hash in LOG.d
+		try {
+			PackageInfo info = getPackageManager().getPackageInfo(
+					"ch.epfl.smartmap", PackageManager.GET_SIGNATURES);
+			for (Signature signature : info.signatures) {
+				MessageDigest md = MessageDigest.getInstance("SHA");
+				md.update(signature.toByteArray());
+				Log.d("KeyHash:",
+						Base64.encodeToString(md.digest(), Base64.DEFAULT));
+			}
+		} catch (NameNotFoundException e) {
 
-        } catch (NoSuchAlgorithmException e) {
+		} catch (NoSuchAlgorithmException e) {
 
-        }
+		}
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_start);
 
-        ImageView logoImage = (ImageView) findViewById(R.id.logo);
-        TextView welcomeText = (TextView) findViewById(R.id.welcome);
+		mLogoImage = (ImageView) findViewById(R.id.logo);
+		mWelcomeText = (TextView) findViewById(R.id.welcome);
+		mFacebookButton = (com.facebook.widget.LoginButton) findViewById(R.id.authButton);
 
-        logoImage.startAnimation(AnimationUtils.loadAnimation(this, R.anim.logo_anim));
-        welcomeText.startAnimation(AnimationUtils.loadAnimation(this, R.anim.welcome_anim));
+		mLogoImage.startAnimation(AnimationUtils.loadAnimation(this,
+				R.anim.logo_anim));
+		mWelcomeText.startAnimation(AnimationUtils.loadAnimation(this,
+				R.anim.welcome_anim));
+		mFacebookButton.startAnimation(AnimationUtils.loadAnimation(this,
+				R.anim.face_anim));
+		
+		if (mFacebookButton.getAnimation().hasEnded()) {
+			if (savedInstanceState == null) {
+				getFragmentManager().beginTransaction()
+						.add(R.id.container, new PlaceholderFragment())
+						.commit();
 
-        if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
+				// Login button (Robin)
+				mainFragment = new MainFragment();
+				// TODO exécuter cette ligne après l'animation de bienvenue. OU
+				// on
+				// choisit d'ouvrir une nouvelle Activity
+				// dès que l'anim est terminée
+				getSupportFragmentManager().beginTransaction()
+						.add(android.R.id.content, mainFragment).commit();
+				// Alain tu peux commenter cette ligne pour voir le login button
+				// en-haut à gauche avec ton animation
+			} else {
+				// Or set the fragment from restored state info
+				mainFragment = (MainFragment) getSupportFragmentManager()
+						.findFragmentById(android.R.id.content);
+			}
+		}
+	}
 
-            // Login button (Robin)
-            mainFragment = new MainFragment();
-            // TODO exécuter cette ligne après l'animation de bienvenue. OU on choisit d'ouvrir une nouvelle Activity
-            // dès que l'anim est terminée
-            getSupportFragmentManager().beginTransaction().add(android.R.id.content, mainFragment).commit(); // Alain
-            // tu peux commenter cette ligne pour voir le login button en-haut à gauche avec ton animation
-        } else {
-            // Or set the fragment from restored state info
-            mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(android.R.id.content);
-        }
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+	/**
+	 * A placeholder fragment containing a simple view.
+	 */
+	public static class PlaceholderFragment extends Fragment {
+		public PlaceholderFragment() {
+		}
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-            return rootView;
-        }
-    }
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_map, container,
+					false);
+			return rootView;
+		}
+	}
 }
