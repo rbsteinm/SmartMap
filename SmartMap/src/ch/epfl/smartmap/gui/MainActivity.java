@@ -31,6 +31,21 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		authentication(null);
+		
+		if (savedInstanceState == null) {
+			getFragmentManager().beginTransaction()
+					.add(R.id.container, new PlaceholderFragment()).commit();
+		}
+	}
+
+	/**
+	 * Methods that test if it's the first visit on the app
+	 * 
+	 * @param view
+	 */
+	public void authentication(View view) {
 		ImageView logoImage = (ImageView) findViewById(R.id.logo);
 		TextView welcomeText = (TextView) findViewById(R.id.welcome);
 
@@ -95,19 +110,6 @@ public class MainActivity extends Activity {
 		//facebookFragment.setAnimation(animationFB);
 
 		*/
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
-	}
-
-	/**
-	 * Methods that test if it's the first visit on the app
-	 * 
-	 * @param view
-	 */
-	public void authentication(View view) {
-		// TODO
 	}
 
 	@Override
