@@ -7,5 +7,7 @@
     <string name="app_id">305881779616905</string>
     <string name="title_activity_logged_in">LoggedInActivity</string>
     <string name="greet_user">Log In successful!</string>
+    <string name="logo_description">Logo</string>
+    <string name="welcome">W E L C O M E</string>
 
 </resources>
