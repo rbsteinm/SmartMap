@@ -3,10 +3,11 @@ package ch.epfl.smartmap.cache;
 import java.util.Comparator;
 
 /**
- * Compares two users based on their name
+ * A comparator to sort users by alphabetical order
  * @author ritterni
  */
 public class UserComparator implements Comparator<User> {
+    
     @Override
     public int compare(User a, User b) {
         return a.getName().compareToIgnoreCase(b.getName());

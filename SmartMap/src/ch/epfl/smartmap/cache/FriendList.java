@@ -62,12 +62,8 @@ public class FriendList implements UserList {
             uList.add(friends.get(id));
         }
         
-        Collections.sort(uList, new Comparator<User>() {            
-            @Override
-            public int compare(User a, User b) {
-                return a.getName().compareToIgnoreCase(b.getName());
-            } 
-        });
+        Collections.sort(uList, new UserComparator());
+        
         return uList;
     }
 }

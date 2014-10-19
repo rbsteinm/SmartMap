@@ -11,8 +11,8 @@ public class Friend implements User {
 	private String phoneNumber;
 	private String email;
 	private Point position;
-	public final static String NO_NUMBER = "No phone number specified";
-	public final static String NO_EMAIL = "No email address specified";
+	public static final String NO_NUMBER = "No phone number specified";
+	public static final String NO_EMAIL = "No email address specified";
 	
 	/**
 	 * Friend constructor
