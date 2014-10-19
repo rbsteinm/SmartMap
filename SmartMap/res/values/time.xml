@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="alpha_duration" >2000</integer>
+    <integer name="trans_duration" >2000</integer>
+    <integer name="offset" >4000</integer>
+</resources>

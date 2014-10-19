@@ -9,11 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,93 +19,24 @@ import android.widget.TextView;
  * 
  */
 public class MainActivity extends Activity {
-	private static final float TRANSLATEY = -0.4f;
-	private static final int TRANS_DURATION = 2000;
-	private static final int FADE_DURATION = 2000;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		authentication(null);
-		
+
+		ImageView logoImage = (ImageView) findViewById(R.id.logo);
+		TextView welcomeText = (TextView) findViewById(R.id.welcome);
+
+		logoImage.startAnimation(AnimationUtils.loadAnimation(this,
+				R.anim.logo_anim));
+		welcomeText.startAnimation(AnimationUtils.loadAnimation(this,
+				R.anim.welcome_anim));
+
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new PlaceholderFragment()).commit();
 		}
-	}
-
-	/**
-	 * Methods that test if it's the first visit on the app
-	 * 
-	 * @param view
-	 */
-	public void authentication(View view) {
-		ImageView logoImage = (ImageView) findViewById(R.id.logo);
-		TextView welcomeText = (TextView) findViewById(R.id.welcome);
-
-		// --- LOGO ANIMATION ---
-
-		// Creation of translate animation
-		TranslateAnimation translationY = new TranslateAnimation(
-				TranslateAnimation.RELATIVE_TO_PARENT, 0.0f,
-				TranslateAnimation.RELATIVE_TO_PARENT, 0.0f,
-				TranslateAnimation.RELATIVE_TO_PARENT, 0.0f,
-				TranslateAnimation.RELATIVE_TO_PARENT, TRANSLATEY);
-
-		// Edit of translate animation's behavior
-		translationY.setInterpolator(new LinearInterpolator());
-		translationY.setDuration(TRANS_DURATION);
-		translationY.setStartOffset(FADE_DURATION);
-
-		// Creation and edit of fade-in animation
-		Animation fadeInLogo = new AlphaAnimation(0.0f, 1.0f);
-		fadeInLogo.setDuration(FADE_DURATION);
-
-		// Creation of the image's animation set
-		AnimationSet logoAnimation = new AnimationSet(true);
-		logoAnimation.addAnimation(translationY);
-		logoAnimation.addAnimation(fadeInLogo);
-		logoAnimation.setFillAfter(true);
-		logoImage.setAnimation(logoAnimation);
-
-		// --- WELCOME ANIMATION ---
-
-		// Creation and edit of fade-in animation
-		Animation fadeInText = new AlphaAnimation(0.0f, 1.0f);
-		fadeInText.setDuration(FADE_DURATION);
-
-		// Creation and edit of fade-out animation
-		Animation fadeOutText = new AlphaAnimation(1.0f, 0.0f);
-		fadeOutText.setStartOffset(FADE_DURATION);
-		fadeOutText.setDuration(FADE_DURATION);
-
-		// Creation of the image's animation set
-		AnimationSet welcomeAnimation = new AnimationSet(true);
-		welcomeAnimation.addAnimation(fadeInText);
-		welcomeAnimation.addAnimation(fadeOutText);
-		welcomeAnimation.setFillAfter(true);
-		welcomeAnimation.setStartOffset(logoAnimation.computeDurationHint());
-		welcomeText.setAnimation(welcomeAnimation);
-
-		/**
-		// --- FACEBOOK ANIMATION ---
-
-		// Creation and edit of fade-in animation
-		Animation fadeInFB = new AlphaAnimation(0.0f, 1.0f);
-		fadeInFB.setDuration(FADE_DURATION);
-
-		// Creation of the image's animation set
-		AnimationSet animationFB = new AnimationSet(true);
-		welcomeAnimation.addAnimation(fadeInFB);
-		welcomeAnimation.setFillAfter(true);
-		welcomeAnimation.setStartOffset(logoAnimation.computeDurationHint()
-				+ welcomeAnimation.computeDurationHint());
-		//TO ADD
-		//facebookFragment.setAnimation(animationFB);
-
-		*/
 	}
 
 	@Override
