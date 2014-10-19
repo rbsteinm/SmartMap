@@ -11,6 +11,8 @@ public class Friend implements User {
 	private String phoneNumber;
 	private String email;
 	private Point position;
+	public final static String NO_NUMBER = "No phone number specified";
+	public final static String NO_EMAIL = "No email address specified";
 	
 	/**
 	 * Friend constructor
@@ -19,10 +21,12 @@ public class Friend implements User {
 	 * @param userNumber The friend's phone number
 	 * @author ritterni
 	 */
-	public Friend(int userID, String userName, String userNumber) {
+	public Friend(int userID, String userName) {
 		id = userID;
 		name = userName;
-		phoneNumber = userNumber;
+		phoneNumber = NO_NUMBER;
+		email = NO_EMAIL;
+		position = new Point(0, 0);
 	}
 
 	@Override
@@ -54,6 +58,11 @@ public class Friend implements User {
 	public void setName(String newName) {
 		name = newName;
 	}
+	
+    @Override
+    public void setNumber(String newNumber) {
+        phoneNumber = newNumber;        
+    }
 	
 	@Override
 	public void setEmail(String newEmail) {

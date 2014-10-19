@@ -12,26 +12,12 @@ import ch.epfl.smartmap.cache.Point;
  * {@link NetworkProvider} to communicate with a SmartMap server.
  * 
  */
-public class NetworkPositionClient implements SmartMapPositionClient {
+public class NetworkPositionClient extends SmartMapClient implements
+		SmartMapPositionClient {
 
-	private String mServerUrl;
-	private NetworkProvider mNetworkProvider;
-
-	/**
-	 * Creates a new NetworkPositionClient instance that communicates with a
-	 * SmartMap server at a given location, through a {@link NetworkProvider}
-	 * object.
-	 * 
-	 * @param serverUrl
-	 *            the base URL of the SmartMap
-	 * @param networkProvider
-	 *            a NetworkProvider object through which to channel the server
-	 *            communication.
-	 */
 	public NetworkPositionClient(String serverUrl,
 			NetworkProvider networkProvider) {
-		this.mServerUrl = serverUrl;
-		this.mNetworkProvider = networkProvider;
+		super(serverUrl, networkProvider);
 	}
 
 	/*

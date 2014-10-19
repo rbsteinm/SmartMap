@@ -12,27 +12,12 @@ import java.util.List;
  * {@link NetworkProvider} to communicate with a SmartMap server.
  * 
  */
-public class NetworkFriendsClient implements SmartMapFriendsClient {
+public class NetworkFriendsClient extends SmartMapClient implements
+		SmartMapFriendsClient {
 
-	private String mServerUrl;
-	private NetworkProvider mNetworkProvider;
-
-	/**
-	 * Creates a new NetworkFriendsClient instance that communicates with a
-	 * SmartMap server at a given location, through a {@link NetworkProvider}
-	 * object.
-	 * 
-	 * @param serverUrl
-	 *            the base URL of the SmartMap
-	 * @param networkProvider
-	 *            a NetworkProvider object through which to channel the server
-	 *            communication.
-	 */
 	public NetworkFriendsClient(String serverUrl,
 			NetworkProvider networkProvider) {
-		this.mServerUrl = serverUrl;
-		this.mNetworkProvider = networkProvider;
-
+		super(serverUrl, networkProvider);
 	}
 
 	/*
@@ -98,7 +83,8 @@ public class NetworkFriendsClient implements SmartMapFriendsClient {
 	 * util.List)
 	 */
 	@Override
-	public void allowFriendList(List<Integer> ids) throws SmartMapClientException {
+	public void allowFriendList(List<Integer> ids)
+			throws SmartMapClientException {
 		// TODO Auto-generated method stub
 
 	}
@@ -111,7 +97,8 @@ public class NetworkFriendsClient implements SmartMapFriendsClient {
 	 * .util.List)
 	 */
 	@Override
-	public void disallowFriendList(List<Integer> ids) throws SmartMapClientException {
+	public void disallowFriendList(List<Integer> ids)
+			throws SmartMapClientException {
 		// TODO Auto-generated method stub
 
 	}

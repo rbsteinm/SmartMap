@@ -14,26 +14,12 @@ import ch.epfl.smartmap.cache.User;
  * {@link NetworkProvider} to communicate with a SmartMap server.
  * 
  */
-public class NetworkInvitationsClient implements SmartMapInvitationsClient {
+public class NetworkInvitationsClient extends SmartMapClient implements
+		SmartMapInvitationsClient {
 
-	private String mServerUrl;
-	private NetworkProvider mNetworkProvider;
-
-	/**
-	 * Creates a new NetworkInvitationsClient instance that communicates with a
-	 * SmartMap server at a given location, through a {@link NetworkProvider}
-	 * object.
-	 * 
-	 * @param serverUrl
-	 *            the base URL of the SmartMap
-	 * @param networkProvider
-	 *            a NetworkProvider object through which to channel the server
-	 *            communication.
-	 */
 	public NetworkInvitationsClient(String serverUrl,
 			NetworkProvider networkProvider) {
-		this.mServerUrl = serverUrl;
-		this.mNetworkProvider = networkProvider;
+		super(serverUrl, networkProvider);
 	}
 
 	/*

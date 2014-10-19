@@ -21,7 +21,6 @@ public interface User {
 	 */
 	String getNumber();
 	
-	
 	/**
 	 * @return The user's email address
 	 */
@@ -36,7 +35,13 @@ public interface User {
 	 * Sets the user's name
 	 * @param newName The new name
 	 */
-	void setName(String newName);	
+	void setName(String newName);
+	
+	/**
+	 * Sets the user's phone number
+     * @param newNumber The new phone number
+     */
+    void setNumber(String newNumber);
 	
 	/**
 	 * Sets the user's email
