@@ -2,7 +2,6 @@ package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import android.util.SparseArray;
@@ -14,16 +13,14 @@ import android.util.SparseArray;
 public class FriendList implements UserList {
 
     private List<Integer> idList; //list of the friends' IDs
-    private SparseArray<User> friends; //contains every friend, mapped to their ID
     private String listName;
     
     /**
      * @param name The name of the friend list
      * @param friendsDatabase Whole database of friends referenced by the friendlist
      */
-    public FriendList(String name, SparseArray<User> friendsDatabase) {
+    public FriendList(String name) {
         //The friendlist needs a reference to the whole friend database in order to find users from their ID
-        friends = friendsDatabase;
         listName = name;
         idList = new ArrayList<Integer>();
     }
@@ -56,7 +53,7 @@ public class FriendList implements UserList {
     }
 
     @Override
-    public List<User> getUserList() {
+    public List<User> getUserList(SparseArray<User> friends) {
         List<User> uList = new ArrayList<User>();
         for (int id : idList) {
             uList.add(friends.get(id));

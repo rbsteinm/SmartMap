@@ -21,21 +21,21 @@ public class FriendListTest extends AndroidTestCase {
     
     @Test
     public void testSetListName() {
-        FriendList fl = new FriendList(listName, array);
+        FriendList fl = new FriendList(listName);
         fl.setListName(newListName);
         assertTrue(fl.getListName().equals(newListName));
     }
 
     @Test
     public void testAddUser() {
-        FriendList fl = new FriendList(listName, array);
+        FriendList fl = new FriendList(listName);
         fl.addUser(a.getID());
         assertTrue(fl.getList().get(0) == a.getID());
     }
 
     @Test
     public void testRemoveUser() {
-        FriendList fl = new FriendList(listName, array);
+        FriendList fl = new FriendList(listName);
         fl.addUser(b.getID());
         fl.addUser(a.getID());
         fl.removeUser(b.getID());
@@ -47,10 +47,10 @@ public class FriendListTest extends AndroidTestCase {
         array.put(1234, a);
         array.put(0, b);
         array.put(9909, c);
-        FriendList fl = new FriendList(listName, array);
+        FriendList fl = new FriendList(listName);
         fl.addUser(a.getID());
         fl.addUser(b.getID());
         fl.addUser(c.getID());
-        assertTrue(fl.getUserList().get(0).equals(c));
+        assertTrue(fl.getUserList(array).get(0).equals(c));
     }
 }

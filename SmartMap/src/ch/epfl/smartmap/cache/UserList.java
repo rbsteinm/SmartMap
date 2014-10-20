@@ -2,6 +2,8 @@ package ch.epfl.smartmap.cache;
 
 import java.util.List;
 
+import android.util.SparseArray;
+
 /**
  * A list of user IDs
  * @author ritterni
@@ -37,7 +39,9 @@ public interface UserList {
 	List<Integer> getList();
 	
 	/**
-	 * @return The whole list of users sorted alphabetically
+	 * Given a SparseArray of Users (mapped to their ID), returns a filtered list of Users
+	 * @param friends The array of Users
+	 * @return The list of users sorted alphabetically
 	 */
-	List<User> getUserList();
+	List<User> getUserList(SparseArray<User> friends);
 }
