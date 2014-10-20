@@ -88,7 +88,6 @@ public class StartActivity extends FragmentActivity {
     private ImageView mLogoImage;
     private TextView mWelcomeText;
     private com.facebook.widget.LoginButton mFacebookButton;
-    private Context mContext;
     private static final String TAG = StartActivity.class.getSimpleName();
 
     @Override
@@ -109,7 +108,6 @@ public class StartActivity extends FragmentActivity {
             Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
         }
 
-        mContext = this;
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
@@ -120,17 +118,19 @@ public class StartActivity extends FragmentActivity {
 
         mLogoImage.startAnimation(AnimationUtils.loadAnimation(this, R.anim.logo_anim));
         mWelcomeText.startAnimation(AnimationUtils.loadAnimation(this, R.anim.welcome_anim));
-        mWelcomeText.setVisibility(View.GONE);
+        
+        // Start animation on facebook Button ( IL APPARAITERA DE TOUTE FACON.. PROBLEME ? )
         mFacebookButton.startAnimation(AnimationUtils.loadAnimation(this, R.anim.face_anim));
 
+        // We set a time out to use postDelayed method
+        int timeOut = this.getResources().getInteger(R.integer.offset_runnable);
 
-        // Still the same bug :(
-        int timeOut = mContext.getResources().getInteger(R.integer.offset_long);
-
-        mWelcomeText.postDelayed(new Runnable() {
+        // Wait for the end of facebook animation before testing if already logged in or not
+        mFacebookButton.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mMainFragment == null) { //TODO savedInstanceState ?
+                if (mMainFragment == null) { //TODO savedInstanceState ? -> (Alain) pour moi on peut l'enlever le TODO
+                	                    
                     getFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
 
                     // Login button
@@ -143,6 +143,10 @@ public class StartActivity extends FragmentActivity {
             }
         }, timeOut);
         // TODO http://stackoverflow.com/questions/5321344/android-animation-wait-until-finished
+    }
+    
+    public Context getContext() {
+    	return this;
     }
 
     @Override

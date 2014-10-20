@@ -4,4 +4,5 @@
     <integer name="trans_duration" >2000</integer>
     <integer name="offset" >4000</integer>
     <integer name="offset_long" >8000</integer>
+    <integer name="offset_runnable" >10000</integer>
 </resources>
