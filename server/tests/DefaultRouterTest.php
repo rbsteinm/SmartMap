@@ -15,9 +15,6 @@ class DefaultRouterTest extends PHPUnit_Framework_TestCase
         $handler->method('registerUser')
              ->willReturn('101');
              
-        $handler->method('verifySMS')
-             ->willReturn('102');
-             
         $handler->method('updatePos')
              ->willReturn('100');
              
@@ -62,9 +59,6 @@ class DefaultRouterTest extends PHPUnit_Framework_TestCase
         
         echo 'Testing registerUser route' . PHP_EOL;
         $this->AssertEquals('101', $router->getResponse("/registerUser"));
-        
-        echo 'Testing verifySMS route' . PHP_EOL;
-        $this->AssertEquals('102', $router->getResponse("/verifySMS"));
         
         echo 'Testing updatePos route' . PHP_EOL;
         $this->AssertEquals('100', $router->getResponse("/updatePos"));

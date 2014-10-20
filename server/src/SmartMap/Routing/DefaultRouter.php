@@ -41,10 +41,6 @@ class DefaultRouter implements Router
                 return $this->mHandler->registerUser();
                 break;
                 
-            case "/verifySMS":
-                return $this->mHandler->verifySMS();
-                break;
-                
             // Position updating
             case "/updatePos":
                 return $this->mHandler->updatePos();

@@ -14,8 +14,6 @@ interface Handler
     
     public function registerUser();
     
-    public function verifySMS();
-    
     public function updatePos();
     
     public function listFriendsPos();

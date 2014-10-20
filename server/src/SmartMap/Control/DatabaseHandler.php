@@ -40,13 +40,6 @@ class DatabaseHandler implements Handler
         return 'OK !';
     }
     
-    public function verifySMS()
-    {
-        // TODO
-        
-        return 'OK !';
-    }
-    
     public function updatePos()
     {
         // TODO
