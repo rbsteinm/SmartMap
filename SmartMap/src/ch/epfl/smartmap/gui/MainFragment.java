@@ -50,6 +50,7 @@ public class MainFragment extends Fragment {
 
     public MainFragment() {
         // We will need to access the user's friends list
+        Log.d(TAG, "Instanciating the FB Login MainFragment");
         mPermissions = Arrays.asList("user_status", "user_friends");
     }
 
@@ -111,6 +112,7 @@ public class MainFragment extends Fragment {
     }
 
     private void onSessionStateChange(Session session, SessionState state, Exception exception) {
+        Log.i(TAG, "Checking FB log in status...");
         if (state.isOpened()) {
             Log.i(TAG, "Logged in...");
 
