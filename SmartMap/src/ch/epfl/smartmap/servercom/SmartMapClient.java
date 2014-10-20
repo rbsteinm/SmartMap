@@ -75,7 +75,7 @@ public abstract class SmartMapClient {
 	 * @throws SmartMapClientException
 	 */
 	public void checkServerErrorFromJSON(JSONObject jsonObject)
-			throws JSONException, SmartMapClientException {
+		throws JSONException, SmartMapClientException {
 		String status = jsonObject.getString("status");
 		String message = jsonObject.getString("message");
 
@@ -174,5 +174,4 @@ public abstract class SmartMapClient {
 		return response.toString();
 
 	}
-
 }

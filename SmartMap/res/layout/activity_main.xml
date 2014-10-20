@@ -1,53 +1,162 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_layout"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frame_layout_main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    tools:context=".DemoActivity" >
 
-    <!-- The main content view -->
-
-    <FrameLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/container"
+    
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="top"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:clickable="true" >
+            
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/googlemapmockbackground"
+                android:scaleType="fitXY" />
+    </RelativeLayout>
+    
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/lib/com.sothree.slidinguppanel"
+        android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="ch.epfl.smartmap.gui.MainActivity" >
+        android:gravity="bottom"
+        sothree:panelHeight="68dp"
+        sothree:shadowHeight="4dp"
+        sothree:paralaxOffset="0dp"
+        sothree:dragView="@+id/dragView"
+        sothree:overlay="true"
+        sothree:flingVelocity="0" >
 
+        <!-- MAIN CONTENT -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clickable="true"
+            android:gravity="top"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:gravity="top" >
+            android:clickable="true" >
+        </RelativeLayout>
 
+        <!-- SLIDING LAYOUT -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/bottomSliderBackground"
+            android:alpha="1"
+            android:orientation="vertical"
+            android:id="@+id/dragView"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:clickable="true" >
+            
             <TextView
-                android:id="@+id/tv_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <!-- <fragment xmlns:android="http://schemas.android.com/apk/res/android" -->
-
-            <fragment
-                android:id="@+id/map"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:id="@+id/searchBar2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true" />
-        </RelativeLayout>
-    </FrameLayout>
+                android:gravity="center"
+                android:text="[Search results]"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+    
+    <android.support.v4.widget.DrawerLayout 
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-    <!-- The navigation drawer -->
+        <!-- The main content view -->
 
-    <ListView
-        android:id="@+id/left_drawer"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="#111"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp" />
+		<FrameLayout
+		    xmlns:android="http://schemas.android.com/apk/res/android"
+		    xmlns:tools="http://schemas.android.com/tools"
+		    android:id="@+id/container"
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+		    tools:context="ch.epfl.smartmap.gui.MainActivity" >
+		
+		    <RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="match_parent"
+		        android:clickable="true"
+		        android:focusable="true"
+		        android:focusableInTouchMode="true"
+		        android:gravity="top" >
+		
+		        <TextView
+		            android:id="@+id/tv_location"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content" />
+		
+		        <!-- <fragment xmlns:android="http://schemas.android.com/apk/res/android" -->
+		
+		        <fragment
+		            android:id="@+id/map"
+		            android:name="com.google.android.gms.maps.SupportMapFragment"
+		            android:layout_width="match_parent"
+		            android:layout_height="match_parent"
+		            android:layout_alignParentLeft="true"
+		            android:layout_alignParentTop="true" />
+		    </RelativeLayout>
+		</FrameLayout>
 
-</android.support.v4.widget.DrawerLayout>
+	    <!-- The navigation drawer -->
+	
+	    <ListView
+	        android:id="@+id/left_drawer"
+	        android:layout_width="240dp"
+	        android:layout_height="match_parent"
+	        android:layout_gravity="start"
+	        android:background="#111"
+	        android:choiceMode="singleChoice"
+	        android:divider="@android:color/transparent"
+	        android:dividerHeight="0dp" />
+
+    </android.support.v4.widget.DrawerLayout>
+    <LinearLayout
+        android:id="@+id/searchBarLayout"
+        android:background="@color/bottomSliderBackground"
+        android:alpha="0.5"
+        android:orientation="horizontal"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:padding="5dp" >
+        
+        <ImageView
+            android:id="@+id/searchBarIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/searchicon"
+            android:adjustViewBounds="true" />
+         
+        <EditText
+            android:id="@+id/searchBarEditText"
+            android:inputType="text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:hint="@string/searchBar"
+            android:background="@null"
+            android:imeOptions="actionSearch"
+            android:descendantFocusability="beforeDescendants"
+            android:textSize="16sp"
+            android:clickable="true"
+            android:paddingStart="5dp"
+            android:paddingEnd="0dp" />
+        
+       
+    </LinearLayout>
+</FrameLayout>

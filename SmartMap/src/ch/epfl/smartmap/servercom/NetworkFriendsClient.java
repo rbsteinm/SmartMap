@@ -108,7 +108,7 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 */
 	@Override
 	public void allowFriendList(List<Integer> ids)
-			throws SmartMapClientException {
+	    throws SmartMapClientException {
 		// TODO Auto-generated method stub
 
 	}
@@ -122,7 +122,7 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 */
 	@Override
 	public void disallowFriendList(List<Integer> ids)
-			throws SmartMapClientException {
+		throws SmartMapClientException {
 		// TODO Auto-generated method stub
 
 	}

@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.gui;
 
+
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -14,13 +15,22 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
+import android.view.KeyEvent;
 import android.support.v4.widget.DrawerLayout;
-
 import android.view.LayoutInflater;
+
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -28,9 +38,12 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-
 import com.google.android.gms.maps.model.LatLng;
 
+/**
+ * @author jfperren
+ *
+ */
 public class MainActivity extends FragmentActivity implements LocationListener {
 	private GoogleMap mGoogleMap;
 	private DrawerLayout mSideDrawerLayout;
@@ -41,13 +54,49 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new PlaceholderFragment()).commit();
 			displayMap();
 
 		}
+		
 		initializeDrawerLayout();
+		
+		final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
+        final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        mBottomSlider.setCoveredFadeColor(0);
+        mBottomSlider.hidePanel();
+        
+        mSearchBarEditText.setOnEditorActionListener(new OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean handled = false;
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    Log.d("searchBar", "Search Request Finished");
+                    handled = true;
+                }
+                return handled;
+            }
+        });
+        
+        mSearchBarEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    mBottomSlider.expandPanel();
+                    Log.d("SearchBar", "Got focus");
+                } else {
+                    mBottomSlider.hidePanel();
+                    Log.d("SearchBar", "Lost focus");
+                    InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+        });
 	}
 
 	@Override
@@ -68,6 +117,17 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	@Override
+    public void onBackPressed() {
+        final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+
+        if (mBottomSlider != null && mBottomSlider.isPanelExpanded() || mBottomSlider.isPanelAnchored()) {
+            mBottomSlider.collapsePanel();
+        } else {
+            super.onBackPressed();
+        }
+    }
 
 	public void initializeDrawerLayout() {
 		// Get ressources
@@ -241,8 +301,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			default:
 				break;
 			}
-
 		}
-
 	}
 }

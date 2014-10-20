@@ -17,6 +17,7 @@ import java.util.Map;
  * @author SpicyCH
  *
  */
+
 public class NetworkSmartMapClient implements ServerLoginProtocol {
 
     private static final String SERVER_SUCCESS = "OK"; // the positive server's response

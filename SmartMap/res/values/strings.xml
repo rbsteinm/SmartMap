@@ -19,5 +19,7 @@
     </string-array>
 
     <string name="title_activity_friends">FriendsActivity</string>
+    <string name="searchBar">Search...</string>
+
 
 </resources>

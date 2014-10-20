@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.servercom;
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -50,5 +51,4 @@ public class DefaultNetworkProvider implements NetworkProvider {
 
         return sb.toString();
     }
-
 }
