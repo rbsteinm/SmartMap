@@ -1,6 +1,11 @@
 package ch.epfl.smartmap.severcom;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * @author marion-S
@@ -38,7 +43,17 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 */
 	@Override
 	public void followFriend(int id) throws SmartMapClientException {
-		// TODO Auto-generated method stub
+
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("friend_id", Integer.toString(id));
+		String textResult = sendViaPost(params, "/followFriend");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(textResult);
+			checkServerErrorFromJSON(jsonObject);
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
 
 	}
 
@@ -49,7 +64,16 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 */
 	@Override
 	public void unfollowFriend(int id) throws SmartMapClientException {
-		// TODO Auto-generated method stub
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("friend_id", Integer.toString(id));
+		String textResult = sendViaPost(params, "/unfollowFriend");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(textResult);
+			checkServerErrorFromJSON(jsonObject);
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
 
 	}
 

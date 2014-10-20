@@ -99,7 +99,8 @@ public abstract class SmartMapClient {
 	 */
 	public String sendViaPost(Map<String, String> params, String uri)
 			throws SmartMapClientException {
-
+		
+		//Get the HttpURLConnection
 		URL serverURL = null;
 		HttpURLConnection connection = null;
 		try {
