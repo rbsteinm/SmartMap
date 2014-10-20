@@ -1,0 +1,18 @@
+{
+    "name": "team9/smartmap",
+    "description": "Server side logic for the SmartMap app.",
+    "authors": [
+        {
+            "name": "Matthieu Girod",
+            "email": "matthieu.girod@epfl.ch"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SmartMap\\Routing\\": "src/SmartMap/Routing/",
+            "SmartMap\\Control\\": "src/SmartMap/Control/",
+            "SmartMap\\DBInterface\\": "src/SmartMap/DBInterface"
+        }
+    },
+    "require": {}
+}
