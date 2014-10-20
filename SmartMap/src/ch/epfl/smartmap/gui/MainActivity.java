@@ -5,12 +5,15 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import ch.epfl.smartmap.R;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -30,13 +33,17 @@ public class MainActivity extends Activity {
         
         final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
         final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        mBottomSlider.setCoveredFadeColor(0);
+        mBottomSlider.hidePanel();
         
         mSearchBarEditText.setOnEditorActionListener(new OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
-                    Log.d("searchBar", "Search Request Sent");
+                    InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    Log.d("searchBar", "Search Request Finished");
                     handled = true;
                 }
                 return handled;
@@ -52,6 +59,8 @@ public class MainActivity extends Activity {
                 } else {
                     mBottomSlider.hidePanel();
                     Log.d("SearchBar", "Lost focus");
+                    InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                 }
             }
         });
