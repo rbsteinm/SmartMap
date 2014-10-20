@@ -4,6 +4,11 @@
     <string name="app_name">SmartMap</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="app_id">305881779616905</string>
+    <string name="title_activity_logged_in">LoggedInActivity</string>
+    <string name="greet_user">Log In successful!</string>
+    <string name="logo_description">Logo</string>
+    <string name="welcome">W E L C O M E</string>
 
     <string-array name="sideMenuElements">
         <item>Profile</item>
