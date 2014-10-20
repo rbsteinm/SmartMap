@@ -1,19 +1,27 @@
 package ch.epfl.smartmap.gui;
 
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import ch.epfl.smartmap.R;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.content.Context;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+
+import android.support.v4.widget.DrawerLayout;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import ch.epfl.smartmap.R;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -25,6 +33,9 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends FragmentActivity implements LocationListener {
 	private GoogleMap mGoogleMap;
+	private DrawerLayout mSideDrawerLayout;
+	private String[] mSideLayoutElements;
+	private ListView mDrawerListView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +47,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			displayMap();
 
 		}
+		initializeDrawerLayout();
 	}
 
 	@Override
@@ -57,21 +69,20 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		return super.onOptionsItemSelected(item);
 	}
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
+	public void initializeDrawerLayout() {
+		// Get ressources
+		mSideLayoutElements = getResources().getStringArray(
+				R.array.sideMenuElements);
+		mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerListView = (ListView) findViewById(R.id.left_drawer);
+		// Set the adapter for the listView
+		mDrawerListView.setAdapter(new ArrayAdapter<String>(this,
+				R.layout.drawer_list_item, mSideLayoutElements));
+		mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
+	}
 
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_map, container,
-					false);
-			return rootView;
-		}
+	public Context getContext() {
+		return this;
 	}
 
 	/*
@@ -184,9 +195,54 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		}
 
 	}
-	/*
-	 * @Override public boolean onCreateOptionsMenu(Menu menu) { // Inflate the
-	 * menu; this adds items to the action bar if it is present.
-	 * getMenuInflater().inflate(R.menu.main, menu); return true; }
+
+	/**
+	 * A placeholder fragment containing a simple view.
 	 */
+	public static class PlaceholderFragment extends Fragment {
+
+		public PlaceholderFragment() {
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_map, container,
+					false);
+			return rootView;
+		}
+	}
+
+	public class DrawerItemClickListener implements
+			ListView.OnItemClickListener {
+
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			switch (position) {
+			case 0:
+				// profile
+				break;
+			case 1:
+				// friends
+				Intent displayActivityIntent = new Intent(getContext(),
+						FriendsActivity.class);
+				startActivity(displayActivityIntent);
+				break;
+			case 2:
+				// Events
+				break;
+			case 3:
+				// Filters
+				break;
+			case 4:
+				// Settings
+				break;
+			default:
+				break;
+			}
+
+		}
+
+	}
 }
