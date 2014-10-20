@@ -8,9 +8,10 @@
         }
     ],
     "autoload": {
-        "psr-4": {"SmartMap\\": "src/SmartMap/",
+        "psr-4": {
             "SmartMap\\Routing\\": "src/SmartMap/Routing/",
-            "SmartMap\\Control\\": "src/SmartMap/Control/"
+            "SmartMap\\Control\\": "src/SmartMap/Control/",
+            "SmartMap\\DBInterface\\": "src/SmartMap/DBInterface"
         }
     },
     "require": {}

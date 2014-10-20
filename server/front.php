@@ -1,13 +1,23 @@
-<?php
+<?php session_start();
 
 require 'vendor/autoload.php';
 
 use SmartMap\Routing\Router;
+use SmartMap\Routing\DefaultRouter;
 
-$router = new Router($_SERVER['REQUEST_URI'], $_SESSION, $_POST);
+use SmartMap\Control\Context;
+use SmartMap\Control\PHPContext;
+use SmartMap\Control\Handler;
+use SmartMap\Control\DatabaseHandler;
 
-echo $router->route();
+header('Content-type: application/json');
 
-echo 'Done';
+$options = array();
 
-?>
+$context = new PHPContext($options);
+
+$handler = new DatabaseHandler($context);
+
+$router = new DefaultRouter($handler);
+
+echo $router->getResponse($_SERVER['REQUEST_URI']);
