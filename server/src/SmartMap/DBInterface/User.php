@@ -11,14 +11,12 @@ class User
     private $mLongitude;
     private $mLatitude;
     
-    function __construct(int $id, 
-                         string $hash, 
-                         string $name, 
-                         string $visibility,
-                         double $longitude,
-                         double $latitude,
-                        )
+    function __construct($id, $hash, $name, $visibility, $longitude, $latitude)
     {
+        // Checking for validity
+        $this->checkId($id);
+        $this->checkVisibility($visibility);
+        
         $this->mId = $id;
         $this->mHash = $hash;
         $this->mName = $name;
@@ -29,7 +27,16 @@ class User
     
     public function getId()
     {
-        return $this->mId();
+        return $this->mId;
+    }
+    
+    public function setId($id)
+    {
+        $this->checkId($id);
+        
+        $this->mId = $id;
+        
+        return $this;
     }
     
     public function getHash()
@@ -39,10 +46,10 @@ class User
     
     public function getName()
     {
-        return $this->mName();
+        return $this->mName;
     }
     
-    public function setName(string $name)
+    public function setName($name)
     {
         $this->mName = $name;
         
@@ -54,18 +61,13 @@ class User
         return $this->mVisibility;
     }
     
-    public function setVisibility(string $visibility)
+    public function setVisibility($visibility)
     {
-        if (!($visiblity == 'visible' OR $visiblity == 'invisible'))
-        {
-            // Exception or nothing...
-        }
-        else
-        {
-            $this->mVisibility = $visibility;
-            
-            return $this;
-        }
+        $this->checkVisibility($visibility);
+        
+        $this->mVisibility = $visibility;
+        
+        return $this;
     }
     
     public function getLongitude()
@@ -73,7 +75,7 @@ class User
         return $this->mLongitude;
     }
     
-    public function setLongitude(double $longitude)
+    public function setLongitude($longitude)
     {
         $this->mLongitude = $longitude;
         
@@ -85,10 +87,26 @@ class User
         return $this->mLatitude;
     }
     
-    public function setLatitude(double $latitude)
+    public function setLatitude($latitude)
     {
         $this->mLatitude = $latitude;
         
         return $this;
+    }
+    
+    private function checkId($id)
+    {
+        if ($id <= 0)
+        {
+            throw new \InvalidArgumentException('id must be greater than 0');
+        }
+    }
+    
+    private function checkVisibility($visibility)
+    {
+        if (!($visibility == 'VISIBLE' OR $visibility == 'INVISIBLE'))
+        {
+            throw new \InvalidArgumentException('Visibility must be VISIBLE or INVISIBLE.');
+        }
     }
 }

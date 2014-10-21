@@ -13,19 +13,23 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
         'driver' => 'pdo_mysql',
         'host' => 'localhost',
-        'dbname' => 'smartmap',
+        'dbname' => 'SmartMapDataBase',
         'user' => 'smartmap',
         'password' => 'salut23',
         'charset' => 'utf8'
     )
 ));
 
+// Injecting repositories
+$app['user.repository'] = $app->share(function() use($app) {
+    return new SmartMap\DBInterface\UserRepository($app['db']);
+});
 
 // Injecting controllers
 $app->register(new Silex\Provider\ServiceControllerServiceProvider());
 
 $app['authentication.controller'] = $app->share(function() use($app) {
-    return new SmartMap\Control\AuthenticationController();
+    return new SmartMap\Control\AuthenticationController($app['user.repository']);
 });
 
 $app['authorization.controller'] = $app->share(function() use($app) {
@@ -33,7 +37,7 @@ $app['authorization.controller'] = $app->share(function() use($app) {
 });
 
 $app['data.controller'] = $app->share(function() use($app) {
-    return new SmartMap\Control\DataController();
+    return new SmartMap\Control\DataController($app['user.repository']);
 });
 
 
