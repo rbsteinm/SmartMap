@@ -13,4 +13,9 @@ class AuthenticationController
         // TODO by Robin
         return new JsonResponse(array('request' => 'OK'));
     }
+    
+    public function registerUser(Request $request, Application $app)
+    {
+        // TODO by Robin
+    }
 }

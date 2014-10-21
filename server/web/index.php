@@ -7,6 +7,7 @@ $app = new Silex\Application();
 // Options
 $app['debug'] = true;
 
+
 // Injecting controllers
 $app->register(new Silex\Provider\ServiceControllerServiceProvider());
 
@@ -25,10 +26,29 @@ $app['data.controller'] = $app->share(function() use($app) {
 
 // Routing
 
-$app->get('/auth', 'authentication.controller:authenticate');
+$app->post('/auth', 'authentication.controller:authenticate');
 
+$app->post('/registerUser', 'authentication.controller:registerUser');
 
+$app->post('/allowFriend', 'authorization.controller:allowFriend');
 
+$app->post('/disallowFriend', 'authorization.controller:disallowFriend');
+
+$app->post('/allowFriendList', 'authorization.controller:allowFriendList');
+
+$app->post('/disallowFriendList', 'authorization.controller:disallowFriendList');
+
+$app->post('/followFriend', 'authorization.controller:followFriend');
+
+$app->post('/unfollowFriend', 'authorization.controller:unfollowFriend');
+
+$app->post('/getUserInfo', 'data.controller:getUserInfo');
+
+$app->post('/inviteFriend', 'data.controller:inviteFriend');
+
+$app->post('/getInvitations', 'data.controller:getInvitations');
+
+$app->post('/acceptInvitation', 'data.controller:acceptInvitation');
 
 
 $app->run();
