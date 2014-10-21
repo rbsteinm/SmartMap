@@ -14,5 +14,7 @@
             "SmartMap\\DBInterface\\": "src/SmartMap/DBInterface"
         }
     },
-    "require": {}
+    "require": {
+        "silex/silex": "~1.2"
+    }
 }
