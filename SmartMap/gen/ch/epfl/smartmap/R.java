@@ -827,7 +827,7 @@ containing a value of this type.
         public static final int com_facebook_usersettingsfragment_login_button=0x7f06004b;
         public static final int com_facebook_usersettingsfragment_logo_image=0x7f060049;
         public static final int com_facebook_usersettingsfragment_profile_name=0x7f06004a;
-        public static final int container=0x7f060028;
+        public static final int container=0x7f06002e;
         public static final int dragView=0x7f060025;
         public static final int drawer_layout=0x7f060027;
         public static final int expanded=0x7f060000;
@@ -841,9 +841,9 @@ containing a value of this type.
         public static final int inline=0x7f06001e;
         public static final int large=0x7f060019;
         public static final int left=0x7f060021;
-        public static final int left_drawer=0x7f06002b;
+        public static final int left_drawer=0x7f060028;
         public static final int logo=0x7f06002f;
-        public static final int map=0x7f06002a;
+        public static final int map=0x7f06002d;
         public static final int match_parent=0x7f060010;
         public static final int monochrome=0x7f060017;
         public static final int none=0x7f060004;
@@ -854,9 +854,9 @@ containing a value of this type.
         public static final int sandbox=0x7f06000c;
         public static final int satellite=0x7f060006;
         public static final int searchBar2=0x7f060026;
-        public static final int searchBarEditText=0x7f06002e;
-        public static final int searchBarIcon=0x7f06002d;
-        public static final int searchBarLayout=0x7f06002c;
+        public static final int searchBarEditText=0x7f06002b;
+        public static final int searchBarIcon=0x7f06002a;
+        public static final int searchBarLayout=0x7f060029;
         public static final int selectionDetails=0x7f06000f;
         public static final int sliding_layout=0x7f060024;
         public static final int small=0x7f060018;
@@ -864,7 +864,7 @@ containing a value of this type.
         public static final int strict_sandbox=0x7f06000d;
         public static final int terrain=0x7f060007;
         public static final int top=0x7f06001f;
-        public static final int tv_location=0x7f060029;
+        public static final int tv_location=0x7f06002c;
         public static final int welcome=0x7f060030;
         public static final int wrap_content=0x7f060011;
     }
@@ -1049,6 +1049,7 @@ containing a value of this type.
         public static final int store_picture_title=0x7f080000;
         public static final int title_activity_friends=0x7f080047;
         public static final int title_activity_logged_in=0x7f080043;
+        public static final int title_activity_map_fragment=0x7f080049;
         /**  Text on a placeholder buy button when Google Play services is not
          available or up-to-date 
          */

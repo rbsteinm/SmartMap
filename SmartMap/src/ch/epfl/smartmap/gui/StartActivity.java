@@ -84,7 +84,7 @@ import ch.epfl.smartmap.R;
  */
 public class StartActivity extends FragmentActivity {
 
-    private MainFragment mMainFragment;
+    private FacebookFragment mFacebookFragment;
     private ImageView mLogoImage;
     private TextView mWelcomeText;
     private com.facebook.widget.LoginButton mFacebookButton;
@@ -129,16 +129,14 @@ public class StartActivity extends FragmentActivity {
         mFacebookButton.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mMainFragment == null) { //TODO savedInstanceState ? -> (Alain) pour moi on peut l'enlever le TODO
-                	                    
-                    getFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
+                if (mFacebookFragment == null) { //TODO savedInstanceState ? -> (Alain) pour moi on peut l'enlever le TODO
 
                     // Login button
-                    mMainFragment = new MainFragment();
-                    getSupportFragmentManager().beginTransaction().add(android.R.id.content, mMainFragment).commit();
+                    mFacebookFragment = new FacebookFragment();
+                    getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment).commit();
                 } else {
                     // Or set the fragment from restored state info
-                    mMainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(android.R.id.content);
+                    mFacebookFragment = (FacebookFragment) getSupportFragmentManager().findFragmentById(android.R.id.content);
                 }
             }
         }, timeOut);
@@ -166,19 +164,5 @@ public class StartActivity extends FragmentActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-            return rootView;
-        }
     }
 }

@@ -1,12 +1,7 @@
 package ch.epfl.smartmap.gui;
 
 
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import ch.epfl.smartmap.R;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -15,23 +10,22 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
-import android.view.KeyEvent;
 import android.support.v4.widget.DrawerLayout;
-import android.view.LayoutInflater;
-
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
-import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
+import ch.epfl.smartmap.R;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -39,35 +33,39 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 /**
  * @author jfperren
  *
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
-	private GoogleMap mGoogleMap;
+    
+    @SuppressWarnings("unused")
 	private DrawerLayout mSideDrawerLayout;
 	private String[] mSideLayoutElements;
 	private ListView mDrawerListView;
+	private static final String TAG = "GoogleMap";
+	
+	private GoogleMap mGoogleMap;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-			displayMap();
-
-		}
-		
 		initializeDrawerLayout();
-		
+		if (savedInstanceState == null) {
+            displayMap();
+        }
+
+		/*
+		 * BELOW GOES SEARCHBAR & SLIDINGUPPANEL INIT
+		 */
 		final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
         final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         mBottomSlider.setCoveredFadeColor(0);
-        mBottomSlider.hidePanel();
+        mBottomSlider.collapsePanel();
         
         mSearchBarEditText.setOnEditorActionListener(new OnEditorActionListener() {
             @Override
@@ -118,6 +116,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		return super.onOptionsItemSelected(item);
 	}
 	
+    @Override
+    public void onLocationChanged(Location location) {
+        zoomMap(location);
+    }
+	
 	@Override
     public void onBackPressed() {
         final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
@@ -144,135 +147,78 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public Context getContext() {
 		return this;
 	}
+	
+    /**
+     * Zoom on the location "location"
+     * 
+     * @param location
+     */
+    public void zoomMap(Location location) {
+        Log.d(TAG, "zoomMap called");
+        LatLng latLng1 = new LatLng(location.getLatitude(),
+                location.getLongitude());
+        Log.d(TAG, "1");
+        // Zoom in the Google Map
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
+        Log.d(TAG, "1");
+        mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        Log.d(TAG, "1");
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.location.LocationListener#onLocationChanged(android.location.
-	 * Location)
-	 */
-	@Override
-	public void onLocationChanged(Location location) {
+    /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        Log.d(TAG, "displayMap called");
+        int status = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+                                                    // not available
+            Log.d(TAG, "no Google Play Services");
+            
+            int requestCode = 10;
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
+                    requestCode);
+            dialog.show();
 
-		zoomMap(location);
+        } else { // Google Play Services are available
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.location.LocationListener#onStatusChanged(java.lang.String,
-	 * int, android.os.Bundle)
-	 */
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.location.LocationListener#onProviderEnabled(java.lang.String)
-	 */
-	@Override
-	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.location.LocationListener#onProviderDisabled(java.lang.String)
-	 */
-	@Override
-	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * Zoom on the location "location"
-	 * 
-	 * @param location
-	 */
-	public void zoomMap(Location location) {
-		LatLng latLng1 = new LatLng(location.getLatitude(),
-				location.getLongitude());
-		// Zoom in the Google Map
-		mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
-		mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-	}
-
-	/**
-	 * Display the map with the current location
-	 */
-	public void displayMap() {
-		int status = GooglePlayServicesUtil
-				.isGooglePlayServicesAvailable(getBaseContext());
-		// Showing status
-		if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-													// not available
-			int requestCode = 10;
-			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
-					requestCode);
-			dialog.show();
-
-		} else { // Google Play Services are available
-
-			// Getting reference to the SupportMapFragment of activity_main.xml
-			SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager()
-					.findFragmentById(R.id.map);
-			// Getting GoogleMap object from the fragment
-			mGoogleMap = fm.getMap();
-
-			// Enabling MyLocation Layer of Google Map
-			mGoogleMap.setMyLocationEnabled(true);
-
-			// Getting LocationManager object from System Service
-			// LOCATION_SERVICE
-			LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-			// Creating a criteria object to retrieve provider
-			Criteria criteria = new Criteria();
-
-			// Getting the name of the best provider
-			String provider = locationManager.getBestProvider(criteria, true);
-
-			// Getting Current Location
-			Location location = locationManager.getLastKnownLocation(provider);
-
-			if (location != null) {
-				onLocationChanged(location);
-			}
-
-			zoomMap(location);
-			locationManager.requestLocationUpdates(provider, 20000, 0, this);
-		}
-
-	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_map, container,
-					false);
-			return rootView;
-		}
-	}
-
+            Log.d(TAG, "Google Play Services OK");
+            
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = fm.getMap();
+            // Enabling MyLocation Layer of Google Map
+            mGoogleMap.setMyLocationEnabled(true);
+            // Getting LocationManager object from System Service
+            // LOCATION_SERVICE
+            LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+            // Creating a criteria object to retrieve provider
+            Criteria criteria = new Criteria();
+            // Getting the name of the best provider
+            String provider = locationManager.getBestProvider(criteria, true);
+            Log.d(TAG, "provider : " + provider);
+            // Getting Current Location
+            Location location = locationManager.getLastKnownLocation(provider);
+            boolean isGPSEnabled = locationManager
+                .isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if(isGPSEnabled) {
+                Log.d(TAG, "gps enabled");
+            }
+            
+            if (location != null) {
+                onLocationChanged(location);
+                zoomMap(location);
+                locationManager.requestLocationUpdates(provider, 20000, 0, this);
+            } else {
+                
+            }
+        }
+    }
+    
 	public class DrawerItemClickListener implements
 			ListView.OnItemClickListener {
 
@@ -303,4 +249,31 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			}
 		}
 	}
+
+    /* (non-Javadoc)
+     * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
+     */
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
+     */
+    @Override
+    public void onProviderEnabled(String provider) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
+     */
+    @Override
+    public void onProviderDisabled(String provider) {
+        // TODO Auto-generated method stub
+        
+    }
 }
