@@ -8,6 +8,19 @@ $app = new Silex\Application();
 $app['debug'] = true;
 
 
+// Database connection
+$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
+    'db.options' => array(
+        'driver' => 'pdo_mysql',
+        'host' => 'localhost',
+        'dbname' => 'smartmap',
+        'user' => 'smartmap',
+        'password' => 'salut23',
+        'charset' => 'utf8'
+    )
+));
+
+
 // Injecting controllers
 $app->register(new Silex\Provider\ServiceControllerServiceProvider());
 
@@ -25,7 +38,6 @@ $app['data.controller'] = $app->share(function() use($app) {
 
 
 // Routing
-
 $app->post('/auth', 'authentication.controller:authenticate');
 
 $app->post('/registerUser', 'authentication.controller:registerUser');
