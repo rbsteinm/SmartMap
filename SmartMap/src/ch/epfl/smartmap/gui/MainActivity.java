@@ -38,11 +38,15 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
 
+    private static final String TAG = "GoogleMap";
+    private static final int LOCATION_UPDATE_TIMEOUT = 20000;
+    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+    private static final int GMAP_ZOOM_LEVEL = 15;
+    
     @SuppressWarnings("unused")
     private DrawerLayout mSideDrawerLayout;
     private String[] mSideLayoutElements;
     private ListView mDrawerListView;
-    private static final String TAG = "GoogleMap";
 
     private GoogleMap mGoogleMap;
 
@@ -64,34 +68,37 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         mBottomSlider.setCoveredFadeColor(0);
         mBottomSlider.collapsePanel();
 
-        mSearchBarEditText.setOnEditorActionListener(new OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_SEND) {
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    Log.d("searchBar", "Search Request Finished");
-                    handled = true;
+        mSearchBarEditText
+            .setOnEditorActionListener(new OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId,
+                    KeyEvent event) {
+                    boolean handled = false;
+                    if (actionId == EditorInfo.IME_ACTION_SEND) {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                        Log.d("searchBar", "Search Request Finished");
+                        handled = true;
+                    }
+                    return handled;
                 }
-                return handled;
-            }
-        });
+            });
 
-        mSearchBarEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    mBottomSlider.expandPanel();
-                    Log.d("SearchBar", "Got focus");
-                } else {
-                    mBottomSlider.hidePanel();
-                    Log.d("SearchBar", "Lost focus");
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        mSearchBarEditText
+            .setOnFocusChangeListener(new OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (hasFocus) {
+                        mBottomSlider.expandPanel();
+                        Log.d("SearchBar", "Got focus");
+                    } else {
+                        mBottomSlider.hidePanel();
+                        Log.d("SearchBar", "Lost focus");
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
                 }
-            }
-        });
+            });
     }
 
     @Override
@@ -122,21 +129,26 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     public void onBackPressed() {
         final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 
-        if (mBottomSlider != null && mBottomSlider.isPanelExpanded() || mBottomSlider.isPanelAnchored()) {
+        if (mBottomSlider != null && mBottomSlider.isPanelExpanded()
+            || mBottomSlider.isPanelAnchored()) {
             mBottomSlider.collapsePanel();
         } else {
             super.onBackPressed();
         }
     }
-
-    public void initializeDrawerLayout() {
+    
+    /**
+     * Called to set up the left side menu. Supposedly called only once.
+     */
+    private void initializeDrawerLayout() {
         // Get ressources
-        mSideLayoutElements = getResources().getStringArray(R.array.sideMenuElements);
+        mSideLayoutElements = getResources().getStringArray(
+            R.array.sideMenuElements);
         mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerListView = (ListView) findViewById(R.id.left_drawer);
         // Set the adapter for the listView
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item,
-                mSideLayoutElements));
+        mDrawerListView.setAdapter(new ArrayAdapter<String>(this,
+            R.layout.drawer_list_item, mSideLayoutElements));
         mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
     }
 
@@ -151,12 +163,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      */
     public void zoomMap(Location location) {
         Log.d(TAG, "zoomMap called");
-        LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
+        LatLng latLng1 = new LatLng(location.getLatitude(),
+            location.getLongitude());
         Log.d(TAG, "1");
         // Zoom in the Google Map
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
         Log.d(TAG, "1");
-        mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(GMAP_ZOOM_LEVEL));
         Log.d(TAG, "1");
     }
 
@@ -165,14 +178,15 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      */
     public void displayMap() {
         Log.d(TAG, "displayMap called");
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
+        int status = GooglePlayServicesUtil
+            .isGooglePlayServicesAvailable(getBaseContext());
         // Showing status
         if (status != ConnectionResult.SUCCESS) { // Google Play Services are
                                                   // not available
             Log.d(TAG, "no Google Play Services");
 
-            int requestCode = 10;
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
+                GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
 
         } else { // Google Play Services are available
@@ -180,8 +194,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             Log.d(TAG, "Google Play Services OK");
 
             // Getting reference to the SupportMapFragment of activity_main.xml
-            SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(
-                    R.id.map);
+            SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
             // Getting GoogleMap object from the fragment
             mGoogleMap = fm.getMap();
             // Enabling MyLocation Layer of Google Map
@@ -196,7 +210,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             Log.d(TAG, "provider : " + provider);
             // Getting Current Location
             Location location = locationManager.getLastKnownLocation(provider);
-            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            boolean isGPSEnabled = locationManager
+                .isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (isGPSEnabled) {
                 Log.d(TAG, "gps enabled");
             }
@@ -204,9 +219,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             if (location != null) {
                 onLocationChanged(location);
                 zoomMap(location);
-                locationManager.requestLocationUpdates(provider, 20000, 0, this);
+                locationManager.requestLocationUpdates(provider,
+                    LOCATION_UPDATE_TIMEOUT, 0, this);
             } else {
-
+                Log.d(TAG, "Error retrieving location from GoogleMap Servers.");
             }
         }
     }
@@ -214,8 +230,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     /*
      * (non-Javadoc)
      * 
-     * @see android.location.LocationListener#onStatusChanged(java.lang.String,
-     * int, android.os.Bundle)
+     * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
      */
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -226,8 +241,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * android.location.LocationListener#onProviderEnabled(java.lang.String)
+     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
      */
     @Override
     public void onProviderEnabled(String provider) {
@@ -238,8 +252,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * android.location.LocationListener#onProviderDisabled(java.lang.String)
+     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
      */
     @Override
     public void onProviderDisabled(String provider) {

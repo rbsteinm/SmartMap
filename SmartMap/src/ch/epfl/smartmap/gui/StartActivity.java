@@ -75,10 +75,12 @@ public class StartActivity extends FragmentActivity {
 
                     // Login button
                     mFacebookFragment = new FacebookFragment();
-                    getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment).commit();
+                    getSupportFragmentManager().beginTransaction().
+                        add(android.R.id.content, mFacebookFragment).commit();
                 } else {
                     // Or set the fragment from restored state info
-                    mFacebookFragment = (FacebookFragment) getSupportFragmentManager().findFragmentById(android.R.id.content);
+                    mFacebookFragment = (FacebookFragment) getSupportFragmentManager().
+                        findFragmentById(android.R.id.content);
                 }
             }
         }, timeOut);

@@ -28,8 +28,8 @@ public abstract class SmartMapClient {
 
 	public static final String USER_AGENT = "Mozilla/5.0"; // latest firefox's
 															// user agent
-	protected String mServerUrl;
-	protected NetworkProvider mNetworkProvider;
+	private String mServerUrl;
+	private NetworkProvider mNetworkProvider;
 
 	/**
 	 * Creates a new SmartMapClient instance that communicates with a SmartMap
@@ -98,7 +98,7 @@ public abstract class SmartMapClient {
 	 *             external to the application (network failure etc.)
 	 */
 	public String sendViaPost(Map<String, String> params, String uri)
-			throws SmartMapClientException {
+		throws SmartMapClientException {
 		
 		//Get the HttpURLConnection
 		URL serverURL = null;

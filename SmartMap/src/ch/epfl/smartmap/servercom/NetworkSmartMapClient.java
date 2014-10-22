@@ -20,11 +20,13 @@ import java.util.Map;
 
 public class NetworkSmartMapClient implements ServerLoginProtocol {
 
+    @SuppressWarnings("unused")
     private static final String SERVER_SUCCESS = "OK"; // the positive server's response
     private static final String SERVER_ERROR = "ERROR"; // the positive server's response
     private static final String USER_AGENT = "Mozilla/5.0"; // latest firefox's user agent
     private URL mServerUrl;
     private HttpURLConnection mHttpURLConnection;
+    @SuppressWarnings("unused")
     private final NetworkProvider mNetworkProvider;
 
     public NetworkSmartMapClient(final String serverUrl, final NetworkProvider networkProvider) {
