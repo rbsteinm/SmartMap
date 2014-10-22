@@ -8,3 +8,7 @@ local.properties
 *~
 .checkstyle
 .DS_Store
+server/vendor/
+server/composer.lock
+SmartMap/bin/
+SmartMap/.classpath
