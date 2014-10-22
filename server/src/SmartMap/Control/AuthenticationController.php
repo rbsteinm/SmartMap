@@ -22,7 +22,8 @@ class AuthenticationController
     public function authenticate(Request $request, Application $app)
     {
         // TODO by Robin
-        return new JsonResponse(array('request' => 'OK'));
+        
+        return new JsonResponse();
     }
     
     public function registerUser(Request $request, Application $app)
