@@ -1,9 +1,7 @@
 package ch.epfl.smartmap.gui;
 
-
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -19,7 +17,6 @@ import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -37,42 +34,42 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 /**
  * @author jfperren
- *
+ * 
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
-    
-    @SuppressWarnings("unused")
-	private DrawerLayout mSideDrawerLayout;
-	private String[] mSideLayoutElements;
-	private ListView mDrawerListView;
-	private static final String TAG = "GoogleMap";
-	
-	private GoogleMap mGoogleMap;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		
-		initializeDrawerLayout();
-		if (savedInstanceState == null) {
+    @SuppressWarnings("unused")
+    private DrawerLayout mSideDrawerLayout;
+    private String[] mSideLayoutElements;
+    private ListView mDrawerListView;
+    private static final String TAG = "GoogleMap";
+
+    private GoogleMap mGoogleMap;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        initializeDrawerLayout();
+        if (savedInstanceState == null) {
             displayMap();
         }
 
-		/*
-		 * BELOW GOES SEARCHBAR & SLIDINGUPPANEL INIT
-		 */
-		final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
+        /*
+         * BELOW GOES SEARCHBAR & SLIDINGUPPANEL INIT
+         */
+        final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
         final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         mBottomSlider.setCoveredFadeColor(0);
         mBottomSlider.collapsePanel();
-        
+
         mSearchBarEditText.setOnEditorActionListener(new OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
-                    InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                     Log.d("searchBar", "Search Request Finished");
                     handled = true;
@@ -80,7 +77,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 return handled;
             }
         });
-        
+
         mSearchBarEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -90,38 +87,38 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 } else {
                     mBottomSlider.hidePanel();
                     Log.d("SearchBar", "Lost focus");
-                    InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                 }
             }
         });
-	}
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-	
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         zoomMap(location);
     }
-	
-	@Override
+
+    @Override
     public void onBackPressed() {
         final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 
@@ -132,22 +129,21 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         }
     }
 
-	public void initializeDrawerLayout() {
-		// Get ressources
-		mSideLayoutElements = getResources().getStringArray(
-				R.array.sideMenuElements);
-		mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerListView = (ListView) findViewById(R.id.left_drawer);
-		// Set the adapter for the listView
-		mDrawerListView.setAdapter(new ArrayAdapter<String>(this,
-				R.layout.drawer_list_item, mSideLayoutElements));
-		mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
-	}
+    public void initializeDrawerLayout() {
+        // Get ressources
+        mSideLayoutElements = getResources().getStringArray(R.array.sideMenuElements);
+        mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerListView = (ListView) findViewById(R.id.left_drawer);
+        // Set the adapter for the listView
+        mDrawerListView.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item,
+                mSideLayoutElements));
+        mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
+    }
 
-	public Context getContext() {
-		return this;
-	}
-	
+    public Context getContext() {
+        return this;
+    }
+
     /**
      * Zoom on the location "location"
      * 
@@ -155,8 +151,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      */
     public void zoomMap(Location location) {
         Log.d(TAG, "zoomMap called");
-        LatLng latLng1 = new LatLng(location.getLatitude(),
-                location.getLongitude());
+        LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
         Log.d(TAG, "1");
         // Zoom in the Google Map
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
@@ -170,32 +165,30 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      */
     public void displayMap() {
         Log.d(TAG, "displayMap called");
-        int status = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(getBaseContext());
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
         // Showing status
         if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-                                                    // not available
+                                                  // not available
             Log.d(TAG, "no Google Play Services");
-            
+
             int requestCode = 10;
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
-                    requestCode);
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, requestCode);
             dialog.show();
 
         } else { // Google Play Services are available
 
             Log.d(TAG, "Google Play Services OK");
-            
+
             // Getting reference to the SupportMapFragment of activity_main.xml
-            SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
+            SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(
+                    R.id.map);
             // Getting GoogleMap object from the fragment
             mGoogleMap = fm.getMap();
             // Enabling MyLocation Layer of Google Map
             mGoogleMap.setMyLocationEnabled(true);
             // Getting LocationManager object from System Service
             // LOCATION_SERVICE
-            LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             // Creating a criteria object to retrieve provider
             Criteria criteria = new Criteria();
             // Getting the name of the best provider
@@ -203,77 +196,54 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             Log.d(TAG, "provider : " + provider);
             // Getting Current Location
             Location location = locationManager.getLastKnownLocation(provider);
-            boolean isGPSEnabled = locationManager
-                .isProviderEnabled(LocationManager.GPS_PROVIDER);
-            if(isGPSEnabled) {
+            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if (isGPSEnabled) {
                 Log.d(TAG, "gps enabled");
             }
-            
+
             if (location != null) {
                 onLocationChanged(location);
                 zoomMap(location);
                 locationManager.requestLocationUpdates(provider, 20000, 0, this);
             } else {
-                
+
             }
         }
     }
-    
-	public class DrawerItemClickListener implements
-			ListView.OnItemClickListener {
 
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
-				long id) {
-			switch (position) {
-			case 0:
-				// profile
-				break;
-			case 1:
-				// friends
-				Intent displayActivityIntent = new Intent(getContext(),
-						FriendsActivity.class);
-				startActivity(displayActivityIntent);
-				break;
-			case 2:
-				// Events
-				break;
-			case 3:
-				// Filters
-				break;
-			case 4:
-				// Settings
-				break;
-			default:
-				break;
-			}
-		}
-	}
-
-    /* (non-Javadoc)
-     * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see android.location.LocationListener#onStatusChanged(java.lang.String,
+     * int, android.os.Bundle)
      */
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    /* (non-Javadoc)
-     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * android.location.LocationListener#onProviderEnabled(java.lang.String)
      */
     @Override
     public void onProviderEnabled(String provider) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    /* (non-Javadoc)
-     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * android.location.LocationListener#onProviderDisabled(java.lang.String)
      */
     @Override
     public void onProviderDisabled(String provider) {
         // TODO Auto-generated method stub
-        
+
     }
 }
