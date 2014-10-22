@@ -42,7 +42,7 @@ $app['data.controller'] = $app->share(function() use($app) {
 
 
 // Routing
-$app->get('/auth', 'authentication.controller:authenticate');
+$app->post('/auth', 'authentication.controller:authenticate');
 
 $app->post('/registerUser', 'authentication.controller:registerUser');
 
