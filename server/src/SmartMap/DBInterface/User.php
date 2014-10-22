@@ -2,6 +2,8 @@
 
 namespace SmartMap\DBInterface;
 
+use Symfony\Component\HttpFoundation\Request;
+
 class User
 {
     private $mId;
@@ -23,6 +25,25 @@ class User
         $this->mVisibility = $visibility;
         $this->mLongitude = $longitude;
         $this->mLatitude = $latitude;
+    }
+    
+    public static function getIdFromRequest(Request $request)
+    {
+        if (!$request->hasSession())
+        {
+            throw new \Exception('Trying to access session but the session is not started');
+        }
+        
+        $session = $request->getSession();
+        
+        $id = $session->get('userId');
+        
+        if ($id == null)
+        {
+            throw new \Exception('The user is not authenticated.');
+        }
+        
+        return $id;
     }
     
     /* Get the user's id

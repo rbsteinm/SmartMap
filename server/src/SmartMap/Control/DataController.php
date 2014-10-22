@@ -19,11 +19,27 @@ class DataController
         $this->mRepo = $repo;
     }
     
-    public function getUserInfo(Request $request, Application $app)
+    public function getUserInfo(Request $request)
     {
-        $user = $this->mRepo->getUser(4);
+        $id = $request->request->get('user_id');
+        if ($id === null)
+        {
+            throw new \InvalidArgumentException('Post parameter user_id not set !');
+        }
         
-        return $user->getName();
+        $user = $this->mRepo->getUser($id);
+        
+        $response = array(
+            'status' => 'Ok',
+            'message' => '',
+            'id' => $user->getId(),
+            'name' => $user->getName(),
+            'visibility' => $user->getVisibility(),
+            'longitude' => $user->getLongitude(),
+            'latitude' => $user->getLatitude()
+        );
+        
+        return new JsonResponse($response);
     }
     
     public function inviteFriend(Request $request, Application $app)
