@@ -11,6 +11,8 @@ class UserRepository
     
     private $mApp;
     
+    /* Constructs a UserRepository with a Doctrine\DBAL\Connection object.
+     */
     function __construct(Connection $db)
     {
         $this->mDb = $db;
@@ -108,6 +110,7 @@ class UserRepository
                                         );
         
         $ids = array();
+        
         while ($id = $stmt->fetch())
         {
             $ids[] = $id['id2'];
