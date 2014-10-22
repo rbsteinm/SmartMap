@@ -99,7 +99,7 @@ class UserRepository
         }
         
         $req = "SELECT id2 FROM " . UserRepository::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND ".
-        "stauts IN (?) AND follow IN (?)";
+        "status IN (?) AND follow IN (?)";
         $stmt = $this->mDb->executeQuery($req, array((int) $userId, $status, $follow),
                                          array(
                                                \PDO::PARAM_INT,

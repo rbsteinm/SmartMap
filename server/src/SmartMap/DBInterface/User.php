@@ -25,11 +25,15 @@ class User
         $this->mLatitude = $latitude;
     }
     
+    /* Get the user's id
+     */
     public function getId()
     {
         return $this->mId;
     }
     
+    /* Set the user's id
+     */
     public function setId($id)
     {
         $this->checkId($id);
@@ -39,16 +43,31 @@ class User
         return $this;
     }
     
+    /* Get the user's hash
+     */
     public function getHash()
     {
         return $this->mHash;
     }
     
+    /* Set the user's hash
+     */
+    public function setHash($hash)
+    {
+        $this->mHash = $hash;
+        
+        return $this;
+    }
+    
+    /* Get the user's name
+     */
     public function getName()
     {
         return $this->mName;
     }
     
+    /* Set the user's name
+     */
     public function setName($name)
     {
         $this->mName = $name;
@@ -56,11 +75,15 @@ class User
         return $this;
     }
     
+    /* Get the user's visibility
+     */
     public function getVisibility()
     {
         return $this->mVisibility;
     }
     
+    /* Set the user's visibility
+     */
     public function setVisibility($visibility)
     {
         $this->checkVisibility($visibility);
@@ -70,11 +93,15 @@ class User
         return $this;
     }
     
+    /* Get the user's longitude coordinate
+     */
     public function getLongitude()
     {
         return $this->mLongitude;
     }
     
+    /* Set the user's longitude coordinate
+     */
     public function setLongitude($longitude)
     {
         $this->mLongitude = $longitude;
@@ -82,11 +109,15 @@ class User
         return $this;
     }
     
+    /* Get the user's latitude coordinate
+     */
     public function getLatitude()
     {
         return $this->mLatitude;
     }
     
+    /* Set the user's latitude coordinate
+     */
     public function setLatitude($latitude)
     {
         $this->mLatitude = $latitude;
