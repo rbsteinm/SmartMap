@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.servercom.DefaultNetworkProvider;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
@@ -172,8 +173,8 @@ public class FacebookFragment extends Fragment {
                     sendDataToServer(params);
 
                     // Create and start the next activity
-                    Intent intent = new Intent(getActivity(), LoggedInActivity.class);
-                    intent.putExtra("name", userName);
+                    Toast.makeText(getActivity(), "You logged in successfully, " + userName, Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
                     startActivity(intent);
 
                 } else if (response.getError() != null) {
