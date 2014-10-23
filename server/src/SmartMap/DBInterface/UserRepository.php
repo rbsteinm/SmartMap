@@ -8,6 +8,7 @@ class UserRepository
 {
     private static $TABLE_USER = 'users';
     private static $TABLE_FRIENDSHIP = 'friendships';
+    private static $TABLE_INVITATIONS = 'invitations';
     
     private $mApp;
     
@@ -22,8 +23,13 @@ class UserRepository
      */
     public function getUser($id)
     {
-        $req = "SELECT * FROM " . UserRepository::$TABLE_USER . " WHERE idusers = ?";
+        $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE idusers = ?";
         $userData = $this->mDb->fetchAssoc($req, array((int) $id));
+        
+        if (!$userData)
+        {
+            throw new \Exception('No user found with id ' . $id);
+        }
         
         $user = new User($userData['idusers'], 
                          $userData['hash'],
@@ -40,7 +46,7 @@ class UserRepository
      */
     public function getUsers($ids)
     {
-        $req = "SELECT * FROM " . UserRepository::$TABLE_USER . " WHERE idusers IN (?)";
+        $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE idusers IN (?)";
         $stmt = $this->mDb->executeQuery($req, array($ids),
                                          array(\Doctrine\DBAL\Connection::PARAM_INT_ARRAY));
         
@@ -59,7 +65,7 @@ class UserRepository
      */
     public function createUser(User $user)
     {
-        $this->mDb->insert(UserRepository::$TABLE_USER,
+        $this->mDb->insert(self::$TABLE_USER,
             array(
                 'hash' => $user->getHash(),
                 'name' => $user->getName(),
@@ -78,7 +84,7 @@ class UserRepository
      */
     public function updateUser(User $user)
     {
-        $this->mDb->update(UserRepository::$TABLE_USER, 
+        $this->mDb->update(self::$TABLE_USER, 
             array(
                 'name' => $user->getName(),
                 'visibility' => $user->getVisibility(),
@@ -100,7 +106,7 @@ class UserRepository
             throw new \InvalidArgumentException('Parameters $status and $follow must be arrays.');
         }
         
-        $req = "SELECT id2 FROM " . UserRepository::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND ".
+        $req = "SELECT id2 FROM " . self::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND ".
         "status IN (?) AND follow IN (?)";
         $stmt = $this->mDb->executeQuery($req, array((int) $userId, $status, $follow),
                                          array(
@@ -117,5 +123,57 @@ class UserRepository
         }
         
         return $ids;
+    }
+    
+    public function addFriendshipLink($idUser, $idFriend)
+    {
+        $this->mDb->insert($TABLE_FRIENDSHIP,
+                           array(
+                            'id1' => (int) $idUser,
+                            'id2' => (int) $idFriend,
+                            'status' => 'ALLOWED',
+                            'follow' => 'FOLLOWED'
+                          ));
+    }
+    
+    /* Gets a list of the ids of users who sent a friend invitation to 
+     * the user.
+     */
+    public function getInvitationIds($userId)
+    {
+        $req = "SELECT id1 FROM " . self::$TABLE_INVITATIONS .  " WHERE id2 = ?";
+        $stmt = $this->mDb->executeQuery($req, (int) $userId);
+        
+        $ids = array();
+        
+        while ($id = $stmt->fetch())
+        {
+            $ids[] = $id['id2'];
+        }
+        
+        return $ids;
+    }
+    
+    /* Adds an nvitation from the user with id $idUser to the user with
+     * id $idFriend.
+     */
+    public function addInvitation($idUser, $idFriend)
+    {
+        $this->mDb->insert(self::$TABLE_INVITATIONS,
+                          array(
+                            'id1' => (int) $idUser,
+                            'id2' => (int) $idFriend
+                         ));
+    }
+    
+    /* Removes the invitation from the user with id $idUser to the user
+     * with id $friendId.
+     */
+    public function removeInvitation($idUser, $idFriend)
+    {
+        $this->mDb->delete(self::$TABLE_INVITATIONS, array(
+                                'id1' => (int) $idUser,
+                                'id2' => (int) $idFriend
+                           ));
     }
 }

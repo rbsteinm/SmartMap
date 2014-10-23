@@ -2,8 +2,6 @@
 
 namespace SmartMap\Control;
 
-use Silex\Application;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -19,14 +17,14 @@ class AuthenticationController
         $this->mRepo = $repo;
     }
     
-    public function authenticate(Request $request, Application $app)
+    public function authenticate(Request $request)
     {
         // TODO by Robin
         
         return new JsonResponse();
     }
     
-    public function registerUser(Request $request, Application $app)
+    public function registerUser(Request $request)
     {
         // TODO by Robin
         
