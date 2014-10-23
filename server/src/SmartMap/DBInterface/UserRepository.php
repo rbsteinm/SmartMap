@@ -147,6 +147,36 @@ class UserRepository
                           ));
     }
     
+    /* Sets the status of a friendship link.
+     */
+    public setFriendshipStatus($idUser, $idFriend, $status)
+    {
+        if (!in_array($status, array('ALLOWED', 'DISALLOWED', 'BLOCKED')))
+        {
+            throw new \Exception('Invalid value for status');
+        }
+        
+        $this->mDb->update(self::$TABLE_FRIENDSHIP,
+                           array('status' => $status),
+                           array('id1' => (int) $idUser, 'id2' => (int) $idFriend)
+                          );
+    }
+    
+    /* Sets the follow status of a friendship link.
+     */
+    public setFriendshipFollow($idUser, $friendId, $follow)
+    {
+        if (!in_array($follow, array('FOLLOWED', 'UNFOLLOWED')))
+        {
+            throw new \Exception('Invalid value for follow status');
+        }
+        
+        $this->mDb->update(self::$TABLE_FRIENDSHIP,
+                           array('follow' => $follow),
+                           array('id1' => (int) $idUser, 'id2' => (int) $idFriend)
+                          );
+    }
+    
     /* Gets a list of the ids of users who sent a friend invitation to 
      * the user with id $userId.
      */
