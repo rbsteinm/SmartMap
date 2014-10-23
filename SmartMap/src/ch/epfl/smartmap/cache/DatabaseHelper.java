@@ -1,6 +1,8 @@
 package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -16,12 +18,13 @@ import android.util.SparseArray;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
     
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "SmartMapDB";
     
     public static final String TABLE_USER = "users";
     public static final String TABLE_FILTER = "filters";
     public static final String TABLE_FILTER_USER = "filter_users";
+    public static final String TABLE_EVENT = "events";
     
     private static final String KEY_USER_ID = "userID";
     private static final String KEY_NAME = "name";
@@ -36,13 +39,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     
     private static final String KEY_YEAR = "year";
     private static final String KEY_MONTH = "month";
-    private static final String KEY_DAY = "day";
+    private static final String KEY_DATE = "day";
     private static final String KEY_HOUR = "hour";
     private static final String KEY_MINUTE = "minute";
     
     private static final String KEY_ENDYEAR = "endYear";
     private static final String KEY_ENDMONTH = "endMonth";
-    private static final String KEY_ENDDAY = "endDay";
+    private static final String KEY_ENDDATE = "endDay";
     private static final String KEY_ENDHOUR = "endHour";
     private static final String KEY_ENDMINUTE = "endMinute";
     
@@ -64,8 +67,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //Columns for the Event table
     private static final String[] EVENT_COLUMNS = {
         KEY_ID, KEY_NAME, KEY_USER_ID,
-        KEY_YEAR, KEY_MONTH, KEY_DAY, KEY_HOUR, KEY_MINUTE,
-        KEY_ENDYEAR, KEY_ENDMONTH, KEY_ENDDAY, KEY_ENDHOUR, KEY_ENDMINUTE
+        KEY_YEAR, KEY_MONTH, KEY_DATE, KEY_HOUR, KEY_MINUTE,
+        KEY_ENDYEAR, KEY_ENDMONTH, KEY_ENDDATE, KEY_ENDHOUR, KEY_ENDMINUTE
     };
     
     //Table of users
@@ -95,6 +98,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_USER_ID + " INTEGER"
             + ")";
     
+    //Table of events
+    private static final String CREATE_TABLE_EVENT = "CREATE TABLE IF NOT EXISTS "
+            + TABLE_EVENT + "("
+            + KEY_ID + " INTEGER PRIMARY KEY,"
+            + KEY_NAME + " TEXT,"
+            + KEY_USER_ID + " INTEGER,"
+            + KEY_YEAR + " INTEGER,"
+            + KEY_MONTH + " INTEGER,"
+            + KEY_DATE + " INTEGER,"
+            + KEY_HOUR + " INTEGER,"
+            + KEY_MINUTE + " INTEGER,"
+            + KEY_ENDYEAR + " INTEGER,"
+            + KEY_ENDMONTH + " INTEGER,"
+            + KEY_ENDDATE + " INTEGER,"
+            + KEY_ENDHOUR + " INTEGER,"
+            + KEY_ENDMINUTE + " INTEGER"
+            + ")";
+    
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -104,6 +125,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_USER);
         db.execSQL(CREATE_TABLE_FILTER);
         db.execSQL(CREATE_TABLE_FILTER_USER);
+        db.execSQL(CREATE_TABLE_EVENT);
     }
 
     @Override
@@ -111,6 +133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
         
         onCreate(db);
     }
@@ -280,7 +303,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     /**
-     * Gets a specific filter by id
+     * Gets a specific filter by its id
      * @param name The filter's id
      * @return The filter as a FriendList object
      */
@@ -332,36 +355,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<UserList> getAllFilters() {
         
         ArrayList<UserList> filters = new ArrayList<UserList>();
+        
         String query = "SELECT  * FROM " + TABLE_FILTER;
+        
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
-     
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-        //Loops to get all the filters
-        int index = 0;
+        
         if (cursor.moveToFirst()) {
             do {
-                filters.add(new FriendList(cursor.getString(cursor.getColumnIndex(KEY_NAME))));
-                //Second query to get the list of ids
-                Cursor cursor2 = db.query(
-                        TABLE_FILTER_USER,
-                        FILTER_USER_COLUMNS,
-                        KEY_FILTER_ID + " = ?",
-                        new String[] {String.valueOf(cursor.getInt(cursor.getColumnIndex(KEY_ID)))},
-                        null,
-                        null,
-                        null,
-                        null);
-                    
-                if (cursor2.moveToFirst()) {
-                    do {
-                        filters.get(index).addUser(cursor2.getInt(cursor.getColumnIndex(KEY_USER_ID)));
-                    } while (cursor2.moveToNext());
-                }
-                index++;
-            } while (cursor.moveToNext()); 
+                //using getFilter to add this row's filter to the list
+                filters.add(getFilter(cursor.getColumnIndex(KEY_ID)));
+            } while (cursor.moveToNext());
         }
         return filters;
     }
@@ -387,7 +391,165 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close(); 
     }
     
+    /**
+     * Stores an event in the database.
+     * The event must have an ID (given by the server)!
+     * @param event The event to store
+     */
     public void addEvent(Event event) {
+        SQLiteDatabase db = this.getWritableDatabase();
         
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, event.getID());
+        values.put(KEY_NAME, event.getName());
+        values.put(KEY_USER_ID, event.getCreator());
+        values.put(KEY_YEAR, event.getStartDate().get(Calendar.YEAR));
+        values.put(KEY_MONTH, event.getStartDate().get(Calendar.MONTH));
+        values.put(KEY_DATE, event.getStartDate().get(Calendar.DATE));
+        values.put(KEY_HOUR, event.getStartDate().get(Calendar.HOUR));
+        values.put(KEY_MINUTE, event.getStartDate().get(Calendar.MINUTE));
+        values.put(KEY_ENDYEAR, event.getEndDate().get(Calendar.YEAR));
+        values.put(KEY_ENDMONTH, event.getEndDate().get(Calendar.MONTH));
+        values.put(KEY_ENDDATE, event.getEndDate().get(Calendar.DATE));
+        values.put(KEY_ENDHOUR, event.getEndDate().get(Calendar.HOUR));
+        values.put(KEY_ENDMINUTE, event.getEndDate().get(Calendar.MINUTE));
+     
+        db.insert(TABLE_EVENT, null, values);
+        
+        db.close();
+    }
+    
+    /**
+     * @param id The event's ID
+     * @return The event associated to this ID
+     */
+    public Event getEvent(int id) {
+        
+        SQLiteDatabase db = this.getReadableDatabase();
+        
+        Cursor cursor = db.query(
+                TABLE_EVENT,
+                EVENT_COLUMNS,
+                KEY_ID + " = ?",
+                new String[] {String.valueOf(id)},
+                null,
+                null,
+                null,
+                null);
+     
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+     
+        GregorianCalendar startDate = new GregorianCalendar(cursor.getInt(cursor.getColumnIndex(KEY_YEAR)),
+                cursor.getInt(cursor.getColumnIndex(KEY_MONTH)),
+                cursor.getInt(cursor.getColumnIndex(KEY_DATE)),
+                cursor.getInt(cursor.getColumnIndex(KEY_HOUR)),
+                cursor.getInt(cursor.getColumnIndex(KEY_MINUTE)));
+        
+        GregorianCalendar endDate = new GregorianCalendar(cursor.getInt(cursor.getColumnIndex(KEY_ENDYEAR)),
+                cursor.getInt(cursor.getColumnIndex(KEY_ENDMONTH)),
+                cursor.getInt(cursor.getColumnIndex(KEY_ENDDATE)),
+                cursor.getInt(cursor.getColumnIndex(KEY_ENDHOUR)),
+                cursor.getInt(cursor.getColumnIndex(KEY_ENDMINUTE)));
+        
+        UserEvent event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
+                cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)),
+                startDate,
+                endDate);
+
+        event.setID(id);
+        
+        return event;
+    }
+    
+    /**
+     * @return The list of all events
+     */
+    public List<Event> getAllEvents() {
+        ArrayList<Event> events = new ArrayList<Event>();
+  
+        String query = "SELECT  * FROM " + TABLE_USER;
+        
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        
+        UserEvent event = null;
+        GregorianCalendar startDate = null;
+        GregorianCalendar endDate = null;
+        
+        if (cursor.moveToFirst()) {
+            do {
+                startDate = new GregorianCalendar(cursor.getInt(cursor.getColumnIndex(KEY_YEAR)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_MONTH)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_DATE)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_HOUR)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_MINUTE)));
+                
+                endDate = new GregorianCalendar(cursor.getInt(cursor.getColumnIndex(KEY_ENDYEAR)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_ENDMONTH)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_ENDDATE)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_ENDHOUR)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_ENDMINUTE)));
+                
+                event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
+                        cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)),
+                        startDate,
+                        endDate);
+  
+                event.setID(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+                events.add(event);
+            } while (cursor.moveToNext());
+        }
+        return events;
+    }
+    
+    /**
+     * Deletes an event from the database
+     * @param event The event to delete
+     */
+    public void deleteEvent(Event event) {
+        
+        SQLiteDatabase db = this.getWritableDatabase();
+ 
+        db.delete(TABLE_EVENT,
+                KEY_ID + " = ?",
+                new String[] {String.valueOf(event.getID())});
+                
+        db.close(); 
+    }
+    
+    /**
+     * Updates an event
+     * @param event The event to update
+     * @return The number of rows that were affected
+     */
+    public int updateEvent(Event event) {
+        
+        SQLiteDatabase db = this.getWritableDatabase();
+     
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, event.getID());
+        values.put(KEY_NAME, event.getName());
+        values.put(KEY_USER_ID, event.getCreator());
+        values.put(KEY_YEAR, event.getStartDate().get(Calendar.YEAR));
+        values.put(KEY_MONTH, event.getStartDate().get(Calendar.MONTH));
+        values.put(KEY_DATE, event.getStartDate().get(Calendar.DATE));
+        values.put(KEY_HOUR, event.getStartDate().get(Calendar.HOUR));
+        values.put(KEY_MINUTE, event.getStartDate().get(Calendar.MINUTE));
+        values.put(KEY_ENDYEAR, event.getEndDate().get(Calendar.YEAR));
+        values.put(KEY_ENDMONTH, event.getEndDate().get(Calendar.MONTH));
+        values.put(KEY_ENDDATE, event.getEndDate().get(Calendar.DATE));
+        values.put(KEY_ENDHOUR, event.getEndDate().get(Calendar.HOUR));
+        values.put(KEY_ENDMINUTE, event.getEndDate().get(Calendar.MINUTE));
+        
+        int rows = db.update(TABLE_EVENT,
+                values,
+                KEY_ID + " = ?",
+                new String[] {String.valueOf(event.getID())});
+     
+        db.close();
+     
+        return rows;
     }
 }
