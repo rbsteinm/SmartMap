@@ -21,12 +21,4 @@ public interface NetworkProvider {
      */
     HttpURLConnection getConnection(URL url) throws IOException;
 
-   /**
-    * Gets the content of the web page
-    * @param mServerUrl the page to read
-    * @return A String containing all the content from this URL
-    * @author SpicyCH
- * @throws IOException
-    */
-    String read(URL mServerUrl) throws IOException;
 }

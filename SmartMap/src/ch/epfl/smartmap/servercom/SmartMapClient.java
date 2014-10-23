@@ -75,9 +75,15 @@ public abstract class SmartMapClient {
 	 * @throws SmartMapClientException
 	 */
 	public void checkServerErrorFromJSON(JSONObject jsonObject)
-		throws JSONException, SmartMapClientException {
-		String status = jsonObject.getString("status");
-		String message = jsonObject.getString("message");
+			throws SmartMapClientException {
+		String status = null;
+		String message = null;
+		try {
+			status = jsonObject.getString("status");
+			message = jsonObject.getString("message");
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
 
 		if (status.equals("ERROR")) {
 			throw new SmartMapClientException(message);
@@ -98,9 +104,9 @@ public abstract class SmartMapClient {
 	 *             external to the application (network failure etc.)
 	 */
 	public String sendViaPost(Map<String, String> params, String uri)
-		throws SmartMapClientException {
-		
-		//Get the HttpURLConnection
+			throws SmartMapClientException {
+
+		// Get the HttpURLConnection
 		URL serverURL = null;
 		HttpURLConnection connection = null;
 		try {

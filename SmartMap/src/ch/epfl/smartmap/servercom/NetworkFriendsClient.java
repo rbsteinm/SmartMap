@@ -7,18 +7,17 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author marion-S
- *
- */
+import ch.epfl.smartmap.cache.User;
+
 
 /**
- * A {@link SmartMapFriendsClient} implementation that uses a
- * {@link NetworkProvider} to communicate with a SmartMap server.
+ * A {@link FriendsClient} implementation that uses a {@link NetworkProvider} to
+ * communicate with a SmartMap server.
  * 
+ * @author marion-S
  */
 public class NetworkFriendsClient extends SmartMapClient implements
-		SmartMapFriendsClient {
+		FriendsClient {
 
 	public NetworkFriendsClient(String serverUrl,
 			NetworkProvider networkProvider) {
@@ -31,9 +30,9 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#listFriendPos()
 	 */
 	@Override
-	public void listFriendPos() throws SmartMapClientException {
+	public List<User> listFriendPos() throws SmartMapClientException {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 	/*
@@ -107,8 +106,7 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 * util.List)
 	 */
 	@Override
-	public void allowFriendList(List<Integer> ids)
-	    throws SmartMapClientException {
+	public void allowFriendList(List<Integer> ids) throws SmartMapClientException {
 		// TODO Auto-generated method stub
 
 	}
@@ -121,8 +119,7 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 * .util.List)
 	 */
 	@Override
-	public void disallowFriendList(List<Integer> ids)
-		throws SmartMapClientException {
+	public void disallowFriendList(List<Integer> ids) throws SmartMapClientException {
 		// TODO Auto-generated method stub
 
 	}

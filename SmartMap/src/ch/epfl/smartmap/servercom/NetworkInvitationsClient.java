@@ -5,17 +5,14 @@ import java.util.List;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * @author marion-S
- *
- */
-
-/**
- * A {@link SmartMapInvitationsClient} implementation that uses a
+ * A {@link InvitationsClient} implementation that uses a
  * {@link NetworkProvider} to communicate with a SmartMap server.
+ * 
+ * @author marion-S
  * 
  */
 public class NetworkInvitationsClient extends SmartMapClient implements
-		SmartMapInvitationsClient {
+		InvitationsClient {
 
 	public NetworkInvitationsClient(String serverUrl,
 			NetworkProvider networkProvider) {

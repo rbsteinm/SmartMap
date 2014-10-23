@@ -1,19 +1,22 @@
 package ch.epfl.smartmap.servercom;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import ch.epfl.smartmap.cache.Point;
 
 /**
+ * A {@link PositionClient} implementation that uses a {@link NetworkProvider}
+ * to communicate with a SmartMap server.
+ * 
  * @author marion-S
- *
- */
-
-/**
- * A {@link SmartMapPositionClient} implementation that uses a
- * {@link NetworkProvider} to communicate with a SmartMap server.
  * 
  */
 public class NetworkPositionClient extends SmartMapClient implements
-		SmartMapPositionClient {
+		PositionClient {
 
 	public NetworkPositionClient(String serverUrl,
 			NetworkProvider networkProvider) {
@@ -27,7 +30,19 @@ public class NetworkPositionClient extends SmartMapClient implements
 	 */
 	@Override
 	public void updatePos(Point position) throws SmartMapClientException {
-		// TODO Auto-generated method stub
+
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("longitude", Double.toString(position.getX()));
+		params.put("latitude", Double.toString(position.getY()));
+
+		String response = sendViaPost(params, "/updatePos");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(response);
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
+		checkServerErrorFromJSON(jsonObject);
 
 	}
 
