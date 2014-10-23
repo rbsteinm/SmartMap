@@ -14,6 +14,7 @@ public class FriendList implements UserList {
 
     private List<Integer> idList; //list of the friends' IDs
     private String listName;
+    private long databaseID;
     
     /**
      * @param name The name of the friend list
@@ -62,5 +63,15 @@ public class FriendList implements UserList {
         Collections.sort(uList, new UserComparator());
         
         return uList;
+    }
+
+    @Override
+    public long getID() {
+        return databaseID;
+    }
+
+    @Override
+    public void setID(long newID) {
+        databaseID = newID;
     }
 }

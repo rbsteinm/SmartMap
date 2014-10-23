@@ -12,9 +12,11 @@ public class Friend implements User {
 	private String phoneNumber;
 	private String email;
 	private Point position;
+	private String positionName;
 
 	public static final String NO_NUMBER = "No phone number specified";
 	public static final String NO_EMAIL = "No email address specified";
+	public static final String POSITION_UNKNOWN = "Unknown position";
 
 	/**
 	 * Friend constructor
@@ -33,6 +35,7 @@ public class Friend implements User {
 		phoneNumber = NO_NUMBER;
 		email = NO_EMAIL;
 		position = new Point(0, 0);
+		positionName = POSITION_UNKNOWN;
 	}
 
 	@Override
@@ -85,4 +88,14 @@ public class Friend implements User {
 	public void setY(double y) {
 		position.setY(y);
 	}
+
+    @Override
+    public String getPositionName() {
+        return positionName;
+    }
+
+    @Override
+    public void setPositionName(String posName) {
+        positionName = posName;
+    }
 }

@@ -32,6 +32,17 @@ public interface User {
 	Point getPosition();
 	
 	/**
+	 * @return The user's position as a String (e.g. 'Lausanne')
+	 */
+	String getPositionName();
+	
+	/**
+	 * Sets the user position's name
+     * @param posName The user's position
+     */
+    void setPositionName(String posName);
+	
+	/**
 	 * Sets the user's name
 	 * @param newName The new name
 	 */

@@ -29,13 +29,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_EMAIL = "email";
     private static final String KEY_POSX = "posX";
     private static final String KEY_POSY = "posY";
+    private static final String KEY_POSNAME = "posName";
 
     private static final String KEY_ID = "id";
     private static final String KEY_FILTER_ID = "filterID";
     
+    private static final String KEY_YEAR = "year";
+    private static final String KEY_MONTH = "month";
+    private static final String KEY_DAY = "day";
+    private static final String KEY_HOUR = "hour";
+    private static final String KEY_MINUTE = "minute";
+    
+    private static final String KEY_ENDYEAR = "endYear";
+    private static final String KEY_ENDMONTH = "endMonth";
+    private static final String KEY_ENDDAY = "endDay";
+    private static final String KEY_ENDHOUR = "endHour";
+    private static final String KEY_ENDMINUTE = "endMinute";
+    
     //Columns for the User table
     private static final String[] USER_COLUMNS = {
-        KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL, KEY_POSX, KEY_POSY
+        KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL, KEY_POSX, KEY_POSY, KEY_POSNAME
     };
     
     //Columns for the Filter table
@@ -48,6 +61,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         KEY_ID, KEY_FILTER_ID, KEY_USER_ID
     };
     
+    //Columns for the Event table
+    private static final String[] EVENT_COLUMNS = {
+        KEY_ID, KEY_NAME, KEY_USER_ID,
+        KEY_YEAR, KEY_MONTH, KEY_DAY, KEY_HOUR, KEY_MINUTE,
+        KEY_ENDYEAR, KEY_ENDMONTH, KEY_ENDDAY, KEY_ENDHOUR, KEY_ENDMINUTE
+    };
+    
     //Table of users
     private static final String CREATE_TABLE_USER = "CREATE TABLE IF NOT EXISTS "
             + TABLE_USER + "("
@@ -56,7 +76,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_NUMBER + " TEXT,"
             + KEY_EMAIL + " TEXT,"
             + KEY_POSX + " DOUBLE,"
-            + KEY_POSY + " DOUBLE"
+            + KEY_POSY + " DOUBLE,"
+            + KEY_POSNAME + " TEXT"
             + ")";
     
     //Table of filters
@@ -117,6 +138,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_EMAIL, user.getEmail());
         values.put(KEY_POSX, user.getPosition().getX());
         values.put(KEY_POSY, user.getPosition().getY());
+        values.put(KEY_POSNAME, user.getPositionName());
      
         db.insert(TABLE_USER, null, values);
      
@@ -152,6 +174,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
         friend.setX(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
         friend.setY(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
+        friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
         
         return friend;
     }
@@ -177,6 +200,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
                 friend.setX(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
                 friend.setY(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
+                friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
   
                 friends.put(friend.getID(), friend);
             } while (cursor.moveToNext());
@@ -201,6 +225,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_EMAIL, user.getEmail());
         values.put(KEY_POSX, user.getPosition().getX());
         values.put(KEY_POSY, user.getPosition().getY());
+        values.put(KEY_POSNAME, user.getPositionName());
         
         int rows = db.update(TABLE_USER,
                 values,
@@ -228,7 +253,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     /**
-     * Adds a filter/userlist/friendlist to the database
+     * Adds a filter/userlist/friendlist to the database, and gives an ID to the filter
      * @param filter The filter/list to add
      * @return The ID of the newly added filter in the filter database
      */
@@ -250,14 +275,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.insert(TABLE_FILTER_USER, null, pairValues);
         }
         db.close();
+        filter.setID(filterID); //sets an ID so the filter can be easily accessed
         return filterID;
     }
     
-/**
- * Gets a specific filter by id
- * @param name The filter's id
- * @return The filter as a FriendList object
- */
+    /**
+     * Gets a specific filter by id
+     * @param name The filter's id
+     * @return The filter as a FriendList object
+     */
     public UserList getFilter(long id) {
         
         SQLiteDatabase db = this.getWritableDatabase();
@@ -278,6 +304,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         
         FriendList filter = new FriendList(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+        filter.setID(id);
         
         //Second query to get the associated list of IDs
         cursor = db.query(
@@ -298,10 +325,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return filter;
     }
     
-/**
- * Method to get all the filters from the database
- * @return A list of FriendLists
- */
+    /**
+     * Method to get all the filters from the database
+     * @return A list of FriendLists
+     */
     public List<UserList> getAllFilters() {
         
         ArrayList<UserList> filters = new ArrayList<UserList>();
@@ -337,5 +364,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext()); 
         }
         return filters;
+    }
+    
+    /**
+     * Deletes a filter from the database
+     * @param filter The filter to delete
+     */
+    public void deleteFilter(UserList filter) {
+        
+        SQLiteDatabase db = this.getWritableDatabase();
+ 
+        //delete the filter from the table of filters
+        db.delete(TABLE_FILTER,
+                KEY_ID + " = ?",
+                new String[] {String.valueOf(filter.getID())});
+        
+        //then delete all the rows that reference this filter in the filter-user table
+        db.delete(TABLE_FILTER_USER,
+                KEY_FILTER_ID + " = ?",
+                new String[] {String.valueOf(filter.getID())});
+                
+        db.close(); 
+    }
+    
+    public void addEvent(Event event) {
+        
     }
 }

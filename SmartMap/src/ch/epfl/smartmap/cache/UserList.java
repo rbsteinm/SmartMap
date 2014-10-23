@@ -19,7 +19,19 @@ public interface UserList {
 	 * Renames the list
      * @param newName The new name of the list
      */
-    void setListName(String newName);	
+    void setListName(String newName);
+    
+    /**
+     * Returns the list's ID for storing/loading purposes. Only gets a value when the UserList is stored.
+     * @return The ID
+     */
+    long getID();
+    
+    /**
+     * Sets the list's ID
+     * @param id The ID
+     */
+    void setID(long id);
 	
 	/**
 	 * Adds a user to the list
