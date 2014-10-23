@@ -53,16 +53,20 @@ class DataController
             throw new \InvalidArgumentException('Post parameter friend_id is not set !');
         }
         
-        // Check if blocked
+        // Check if the user  blocked or already invited or already inviting
         $blockedIds = $this->mRepo->getFriendsIds(
                                                     $userId,
                                                     array('BLOCKED'),
                                                     array('FOLLOWED', 'UNFOLLOWED')
                                                  );
         
-        if (!in_array($firendId, $blockedIds))
+        $userInvitingIds = $this->mRepo->getInvitationIds($userId);
+        $friendInvitingIds = $this->mRepo->getInvitationIds($friendId);
+        
+        if (!in_array($friendId, $blockedIds) AND !in_array($friendId, $userInvitingIds) AND
+            !in_array($userId, $friendInvitingIds))
         {
-            $this->mRepo->inviteFriend($userId, $friendId);
+            $this->mRepo->addInvitation($userId, $friendId);
         }
         
         $response = array('status' => 'Ok', 'message' => 'Invited friend !');
@@ -85,7 +89,7 @@ class DataController
         
         foreach ($inviters as $inviter)
         {
-            $inviterList[] = array('id' => $inviter->getId(), 'name' => $inviter->getName());
+            $invitersList[] = array('id' => $inviter->getId(), 'name' => $inviter->getName());
         }
         
         $response = array(
@@ -111,13 +115,14 @@ class DataController
         }
         
         // We check that the friend invited the user
-        $invitersIdds = $this->mRepo->getInvitationIds($userId);
-        if (!in_array($userId, $invitersIds))
+        $invitersIds = $this->mRepo->getInvitationIds($userId);
+        
+        if (!in_array($friendId, $invitersIds))
         {
             throw new \Exception('Not invited by user with id ' . $friendId .' !');
         }
         
-        $this->mRepo->removeInvitation($userId, $friendId);
+        $this->mRepo->removeInvitation($friendId, $userId);
         
         $this->mRepo->addFriendshipLink($userId, $friendId);
         $this->mRepo->addFriendshipLink($friendId, $userId);

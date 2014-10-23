@@ -27,6 +27,9 @@ class User
         $this->mLatitude = $latitude;
     }
     
+    /* Gets the current user id from the server request. Throws an exception
+     * if the session parameter userId is not set.
+     */
     public static function getIdFromRequest(Request $request)
     {
         if (!$request->hasSession())

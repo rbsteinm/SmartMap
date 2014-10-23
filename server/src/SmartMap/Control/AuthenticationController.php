@@ -37,4 +37,22 @@ class AuthenticationController
         // Should be replaced by Json
         return $user->getId();
     }
+    
+    /* Development method used to simplify tests
+     * 
+     */
+    public function fakeAuth(Request $request)
+    {
+        $id = $request->request->get('user_id');
+        if ($id === null)
+        {
+            throw new \Exception('Field user_id is not set !');
+        }
+        
+        $session = $request->getSession();
+        
+        $session->set('userId', $id);
+        
+        return new JsonResponse(array('status' => 'Ok', 'message' => 'Fakeauthentified as id '. $id));
+    }
 }

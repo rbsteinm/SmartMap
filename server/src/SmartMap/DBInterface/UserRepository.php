@@ -31,12 +31,13 @@ class UserRepository
             throw new \Exception('No user found with id ' . $id);
         }
         
-        $user = new User($userData['idusers'], 
-                         $userData['hash'],
-                         $userData['name'],
-                         $userData['visibility'],
-                         $userData['longitude'],
-                         $userData['latitude']
+        $user = new User(
+                            $userData['idusers'], 
+                            $userData['hash'],
+                            $userData['name'],
+                            $userData['visibility'],
+                            $userData['longitude'],
+                            $userData['latitude']
                         );
                         
         return $user;
@@ -52,9 +53,16 @@ class UserRepository
         
         $users = array();
         
-        while ($user = $stmt->fetch())
+        while ($userData = $stmt->fetch())
         {
-            $users[] = $user;
+            $users[] = new User(
+                                    $userData['idusers'], 
+                                    $userData['hash'],
+                                    $userData['name'],
+                                    $userData['visibility'],
+                                    $userData['longitude'],
+                                    $userData['latitude']
+                                );
         }
         
         return $users;
@@ -125,9 +133,12 @@ class UserRepository
         return $ids;
     }
     
+    /* Add a friendship link between two users, with status set to ALLOWED
+     * and follow to FOLLOWED.
+     */
     public function addFriendshipLink($idUser, $idFriend)
     {
-        $this->mDb->insert($TABLE_FRIENDSHIP,
+        $this->mDb->insert(self::$TABLE_FRIENDSHIP,
                            array(
                             'id1' => (int) $idUser,
                             'id2' => (int) $idFriend,
@@ -137,18 +148,18 @@ class UserRepository
     }
     
     /* Gets a list of the ids of users who sent a friend invitation to 
-     * the user.
+     * the user with id $userId.
      */
     public function getInvitationIds($userId)
     {
         $req = "SELECT id1 FROM " . self::$TABLE_INVITATIONS .  " WHERE id2 = ?";
-        $stmt = $this->mDb->executeQuery($req, (int) $userId);
+        $stmt = $this->mDb->executeQuery($req, array((int) $userId));
         
         $ids = array();
         
         while ($id = $stmt->fetch())
         {
-            $ids[] = $id['id2'];
+            $ids[] = $id['id1'];
         }
         
         return $ids;
