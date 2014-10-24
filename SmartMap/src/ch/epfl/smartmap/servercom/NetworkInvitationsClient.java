@@ -1,6 +1,11 @@
 package ch.epfl.smartmap.servercom;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import ch.epfl.smartmap.cache.User;
 
@@ -27,9 +32,18 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 	 * .lang.String)
 	 */
 	@Override
-	public int inviteFriend(String num) throws SmartMapClientException {
-		// TODO Auto-generated method stub
-		return 0;
+	public void inviteFriend(int id) throws SmartMapClientException {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("friend_id", Integer.toString(id));
+		String textResult = sendViaPost(params, "/inviteFriend");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(textResult);
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
+		checkServerErrorFromJSON(jsonObject);
+
 	}
 
 	/*
@@ -51,8 +65,19 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 	 */
 	@Override
 	public User acceptInvitation(int id) throws SmartMapClientException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("friend_id", Integer.toString(id));
+		String textResult = sendViaPost(params, "/acceptInvitation");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(textResult);
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
+		checkServerErrorFromJSON(jsonObject);
+		User acceptedUser = parseUserfromJSON(jsonObject);
+		return acceptedUser;
 	}
 
 	/*
@@ -62,8 +87,19 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 	 */
 	@Override
 	public User getUserInfo(int id) throws SmartMapClientException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("user_id", Integer.toString(id));
+		String textResult = sendViaPost(params, "/getUserInfo");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(textResult);
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
+		checkServerErrorFromJSON(jsonObject);
+		User acceptedUser = parseUserfromJSON(jsonObject);
+		return acceptedUser;
 	}
 
 }

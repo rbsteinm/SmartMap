@@ -14,15 +14,12 @@ import ch.epfl.smartmap.cache.User;
 public interface InvitationsClient {
 
 	/**
-	 * Sends an invitation to the server; the invited friend is identified by
-	 * his phone number
+	 * Sends an invitation to the server for the friend with id "id"
 	 * 
-	 * @param invite_num
-	 *            : the phone number of the friend to invite
-	 * @return the id of the invite user
+	 * @param id the id of the frien to invite
 	 * @throws SmartMapClientException
 	 */
-	int inviteFriend(String num) throws SmartMapClientException;
+	void inviteFriend(int id) throws SmartMapClientException;
 
 	/**
 	 * Retrieve the invitations from the server

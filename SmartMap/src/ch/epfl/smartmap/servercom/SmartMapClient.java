@@ -57,9 +57,16 @@ public abstract class SmartMapClient {
 	 * @throws JSONException
 	 *             JSONException in case of malformed JSON.
 	 */
-	public User parseUserfromJSON(JSONObject jsonObject) throws JSONException {
-		int userId = jsonObject.getInt("userId");
-		String userName = jsonObject.getString("userName");
+	public User parseUserfromJSON(JSONObject jsonObject)
+			throws SmartMapClientException {
+		int userId = 0;
+		String userName = null;
+		try {
+			userId = jsonObject.getInt("userId");
+			userName = jsonObject.getString("userName");
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
 
 		return new Friend(userId, userName);
 	}

@@ -26,6 +26,7 @@ public class NetworkAuthenticationClient extends SmartMapClient implements
 			throws SmartMapClientException {
 		// TODO Auto-generated method stub
 		
+		
 	}
 
 }
