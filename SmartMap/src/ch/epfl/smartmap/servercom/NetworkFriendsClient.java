@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import ch.epfl.smartmap.cache.User;
 
-
 /**
  * A {@link FriendsClient} implementation that uses a {@link NetworkProvider} to
  * communicate with a SmartMap server.
@@ -44,15 +43,15 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	public void followFriend(int id) throws SmartMapClientException {
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("friend_id", Integer.toString(id));
+		params.put("id_friend", Integer.toString(id));
 		String textResult = sendViaPost(params, "/followFriend");
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);
-			checkServerErrorFromJSON(jsonObject);
 		} catch (JSONException e) {
 			throw new SmartMapClientException(e);
 		}
+		checkServerErrorFromJSON(jsonObject);
 
 	}
 
@@ -64,7 +63,7 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	@Override
 	public void unfollowFriend(int id) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("friend_id", Integer.toString(id));
+		params.put("id_friend", Integer.toString(id));
 		String textResult = sendViaPost(params, "/unfollowFriend");
 		JSONObject jsonObject = null;
 		try {
@@ -83,7 +82,16 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 */
 	@Override
 	public void allowFriend(int id) throws SmartMapClientException {
-		// TODO Auto-generated method stub
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("id_friend", Integer.toString(id));
+		String textResult = sendViaPost(params, "/allowFriend");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(textResult);
+			checkServerErrorFromJSON(jsonObject);
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
 
 	}
 
@@ -94,7 +102,16 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 */
 	@Override
 	public void disallowFriend(int id) throws SmartMapClientException {
-		// TODO Auto-generated method stub
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("id_friend", Integer.toString(id));
+		String textResult = sendViaPost(params, "/disallowFriend");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(textResult);
+			checkServerErrorFromJSON(jsonObject);
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
 
 	}
 
@@ -106,8 +123,18 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 * util.List)
 	 */
 	@Override
-	public void allowFriendList(List<Integer> ids) throws SmartMapClientException {
-		// TODO Auto-generated method stub
+	public void allowFriendList(List<Integer> ids)
+			throws SmartMapClientException {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("friend_ids", intListToString(ids));
+		String textResult = sendViaPost(params, "/disallowFriend");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(textResult);
+			checkServerErrorFromJSON(jsonObject);
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
 
 	}
 
@@ -119,9 +146,29 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 * .util.List)
 	 */
 	@Override
-	public void disallowFriendList(List<Integer> ids) throws SmartMapClientException {
-		// TODO Auto-generated method stub
+	public void disallowFriendList(List<Integer> ids)
+			throws SmartMapClientException {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("friend_ids", intListToString(ids));
+		String textResult = sendViaPost(params, "/disallowFriend");
+		JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(textResult);
+			checkServerErrorFromJSON(jsonObject);
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
 
+	}
+
+	private String intListToString(List<Integer> list) {
+		String listString = "";
+
+		for (int n : list) {
+			listString += n + ",";
+		}
+
+		return listString;
 	}
 
 }
