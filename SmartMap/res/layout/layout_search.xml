@@ -68,7 +68,8 @@
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="SAMPLE TEXT" />
+                    android:text="SAMPLE TEXT" 
+                    android:id="@+id/testid"/>
 
                 <TextView
                     android:layout_width="fill_parent"

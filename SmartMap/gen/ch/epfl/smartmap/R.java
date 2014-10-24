@@ -789,7 +789,7 @@ containing a value of this type.
         public static final int searchicon=0x7f020056;
     }
     public static final class id {
-        public static final int action_settings=0x7f06004c;
+        public static final int action_settings=0x7f06004d;
         public static final int anchored=0x7f060002;
         public static final int authButton=0x7f06002d;
         public static final int book_now=0x7f060014;
@@ -831,7 +831,7 @@ containing a value of this type.
         public static final int dragView=0x7f060029;
         public static final int drawer_layout=0x7f060026;
         public static final int expanded=0x7f060000;
-        public static final int fade_in=0x7f06004b;
+        public static final int fade_in=0x7f06004c;
         public static final int frame_layout_main=0x7f060023;
         public static final int grayscale=0x7f060016;
         public static final int hidden=0x7f060003;
@@ -862,6 +862,7 @@ containing a value of this type.
         public static final int standard=0x7f06001a;
         public static final int strict_sandbox=0x7f06000d;
         public static final int terrain=0x7f060007;
+        public static final int testid=0x7f06004b;
         public static final int top=0x7f06001f;
         public static final int tv_location=0x7f060024;
         public static final int welcome=0x7f06002c;

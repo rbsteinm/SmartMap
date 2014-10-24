@@ -54,6 +54,7 @@ public class SmartMapSlidingUpPanel extends SlidingUpPanelLayout {
             mSlidingLayout.removeAllViews();
             mSlidingLayout.addView(mSearchLayout);
             mCurrentState = LayoutState.SEARCH;
+            mSearchLayout.initSearchLayout();
         }
         
         // When searching, panel must be fully expanded
