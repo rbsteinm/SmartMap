@@ -19,10 +19,13 @@ class UserRepository
         $this->mDb = $db;
     }
     
+    /* Gets a user id given it's facebook id, or returns false if such user
+     * does not exist.
+     */
     public function getUserIdFromFb($fbId)
     {
         $req = "SELECT idusers FROM " . self::$TABLE_USER . " WHERE fbid = ?";
-        $userData = $this->mDb->fetchAssoc($req, array((int) $fbId);
+        $userData = $this->mDb->fetchAssoc($req, array((int) $fbId));
         
         if (!$userData)
         {
@@ -48,7 +51,7 @@ class UserRepository
         
         $user = new User(
                             $userData['idusers'], 
-                            $userData['hash'],
+                            $userData['fbid'],
                             $userData['name'],
                             $userData['visibility'],
                             $userData['longitude'],
@@ -84,7 +87,7 @@ class UserRepository
         {
             $users[] = new User(
                                     $userData['idusers'], 
-                                    $userData['hash'],
+                                    $userData['fbid'],
                                     $userData['name'],
                                     $userData['visibility'],
                                     $userData['longitude'],
@@ -102,7 +105,8 @@ class UserRepository
     {
         $this->mDb->insert(self::$TABLE_USER,
             array(
-                'hash' => $user->getHash(),
+                'fbid' => $user->getFbId(),
+                'fbid' => $user->getFbid(),
                 'name' => $user->getName(),
                 'visibility' => $user->getVisibility(),
                 'longitude' => $user->getVisibility(),
@@ -208,8 +212,8 @@ class UserRepository
         
         $req = "UPDATE " . self::$TABLE_FRIENDSHIP .
                " SET status = ? WHERE id1 IN (?) AND id2 = ?";
-        $stmt = $this->executeQuery($req,
-                                    array($status, $idFriends, $idUser),
+        $stmt = $this->mDb->executeQuery($req,
+                                    array($status, $idsFriends, $idUser),
                                     array(\PDO::PARAM_STR,
                                           \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
                                           \PDO::PARAM_INT,));
@@ -226,7 +230,7 @@ class UserRepository
         
         $this->mDb->update(self::$TABLE_FRIENDSHIP,
                            array('follow' => $follow),
-                           array('id1' => (int) $idUser, 'id2' => (int) $idFriend)
+                           array('id1' => (int) $idUser, 'id2' => (int) $friendId)
                           );
     }
     

@@ -3,8 +3,12 @@
 namespace SmartMap\Control;
 
 use Silex\Application;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
+use SmartMap\DBInterface\UserRepository;
+use SmartMap\DBInterface\User;
 
 class AuthorizationController
 {
@@ -22,10 +26,10 @@ class AuthorizationController
         $friendId = $request->request->get('friend_id');
         if ($friendId === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
-        $this->mRepo->setFriendshipStatus($userId, $friendId, 'ALLOW');
+        $this->mRepo->setFriendshipStatus($userId, $friendId, 'ALLOWED');
         
         $response = array('status' => 'Ok', 'message' => 'Allowed friend !');
         
@@ -39,10 +43,10 @@ class AuthorizationController
         $friendId = $request->request->get('friend_id');
         if ($friendId === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
-        $this->mRepo->setFriendshipStatus($userId, $friendId, 'DISALLOW');
+        $this->mRepo->setFriendshipStatus($userId, $friendId, 'DISALLOWED');
         
         $response = array('status' => 'Ok', 'message' => 'Disallowed friend !');
         
@@ -56,12 +60,12 @@ class AuthorizationController
         $friendsIds = $request->request->get('friend_ids');
         if ($friendsIds === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
         $friendsIds = explode(',', $friendsIds);
         
-        $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'ALLOW');
+        $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'ALLOWED');
         
         $response = array('status' => 'Ok', 'message' => 'Allowed friend list !');
         
@@ -75,12 +79,12 @@ class AuthorizationController
         $friendsIds = $request->request->get('friend_ids');
         if ($friendsIds === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
         $friendsIds = explode(',', $friendsIds);
         
-        $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'DISALLOW');
+        $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'DISALLOWED');
         
         $response = array('status' => 'Ok', 'message' => 'Disallowed friend list !');
         
@@ -94,10 +98,10 @@ class AuthorizationController
         $friendId = $request->request->get('friend_id');
         if ($friendId === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
-        $this->mRepo->setFriendshipFollow($userId, $friendId, 'FOLLOW');
+        $this->mRepo->setFriendshipFollow($userId, $friendId, 'FOLLOWED');
         
         $response = array('status' => 'Ok', 'message' => 'Followed friend !');
         
@@ -111,12 +115,12 @@ class AuthorizationController
         $friendId = $request->request->get('friend_id');
         if ($friendId === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
-        $this->mRepo->setFriendshipFollow($userId, $friendId, 'UNFOLLOW');
+        $this->mRepo->setFriendshipFollow($userId, $friendId, 'UNFOLLOWED');
         
-        $response = array('status' => 'Ok', 'message' => 'Unfollowed');
+        $response = array('status' => 'Ok', 'message' => 'Unfollowed friend !');
         
         return new JsonResponse($response);
     }

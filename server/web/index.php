@@ -2,6 +2,8 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+
 $app = new Silex\Application();
 
 // Options
@@ -36,11 +38,23 @@ $app['authentication.controller'] = $app->share(function() use($app) {
 });
 
 $app['authorization.controller'] = $app->share(function() use($app) {
-    return new SmartMap\Control\AuthorizationController();
+    return new SmartMap\Control\AuthorizationController($app['user.repository']);
 });
 
 $app['data.controller'] = $app->share(function() use($app) {
     return new SmartMap\Control\DataController($app['user.repository']);
+});
+
+// Error management
+$app->error(function (SmartMap\Control\ControlException $e, $code) use ($app) {
+    return new JsonResponse(array('status' => 'error', 'message' => $e->getMessage()));
+});
+
+$app->error(function (\Exception $e, $code) use ($app) {
+    if ($app['debug'] == true) {
+        return;
+    }
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occured'));
 });
 
 
