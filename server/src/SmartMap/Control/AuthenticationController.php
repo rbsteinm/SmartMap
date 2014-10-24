@@ -98,17 +98,17 @@ class AuthenticationController {
             // if user exist from fb id: get id and update DB
              // else create new user in DB
 
-            $userId = $this->mRepo->getUserIdFromFb($facebookId);
+            /*$userId = $this->mRepo->getUserIdFromFb($facebookId);
             if (!$userId) {
                 $user = new User ( 1, $facebookId, $name, 'VISIBLE', 0.0, 0.0 );
                 $user = $this->mRepo->createUser($user);
                 $session->set('userId', $user->getId());
             } else {
                 $session->set('userId', $userId);
-            }
+            }*/
             
             // TODO check if we can retrieve the user using his id. if not, create a new one in DB
-            $user0 = $this->mRepo->getUser($facebookId);
+            //$user0 = $this->mRepo->getUser($facebookId);
             
             return new JsonResponse (array('status' => "OK", 'message' => "Sucessfully authenticated"));
             
@@ -117,7 +117,7 @@ class AuthenticationController {
                             "POST parameters: name, facebookId and facebookToken"));
         } catch (\Exception $e1) {
             return new JsonResponse (array('status' => "Error", 'message' =>  "An internal error occured (" . 
-                            "SQL correctly configured?"));
+                            "SQL correctly configured?" . $e1->getMessage()));
         }
 
     }
