@@ -19,6 +19,21 @@ class UserRepository
         $this->mDb = $db;
     }
     
+    public function getUserIdFromFb($fbId)
+    {
+        $req = "SELECT idusers FROM " . self::$TABLE_USER . " WHERE fbid = ?";
+        $userData = $this->mDb->fetchAssoc($req, array((int) $fbId);
+        
+        if (!$userData)
+        {
+            return false;
+        }
+        else
+        {
+            return $userData['idusers'];
+        }
+    }
+    
     /* Gets a user from the database, given it's id.
      */
     public function getUser($id)

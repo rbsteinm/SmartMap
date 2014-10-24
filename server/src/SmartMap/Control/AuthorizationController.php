@@ -15,7 +15,7 @@ class AuthorizationController
         $this->mRepo = $repo;
     }
     
-    public function allowFriend(Request $request, Application $app)
+    public function allowFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
@@ -32,7 +32,7 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    public function disallowFriend(Request $request, Application $app)
+    public function disallowFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
@@ -49,7 +49,7 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    public function allowFriendList(Request $request, Application $app)
+    public function allowFriendList(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
@@ -68,7 +68,7 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    public function disallowFriendList(Request $request, Application $app)
+    public function disallowFriendList(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
@@ -87,7 +87,7 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    public function followFriend(Request $request, Application $app)
+    public function followFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
@@ -104,7 +104,7 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    public function unfollowFriend(Request $request, Application $app)
+    public function unfollowFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
