@@ -45,11 +45,23 @@ class UserRepository
     
     /* Gets a list of users, given a list of ids.
      */
-    public function getUsers($ids)
+    public function getUsers($ids, $visibility = array('VISIBLE', 'INVISIBLE'))
     {
-        $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE idusers IN (?)";
-        $stmt = $this->mDb->executeQuery($req, array($ids),
-                                         array(\Doctrine\DBAL\Connection::PARAM_INT_ARRAY));
+        if (!is_array($ids) OR !is_array($visibility))
+        {
+            throw new \InvalidArgumentException('$ids and $visibility must be arrays');
+        }
+        
+        // If $ids is empty, we will find no user
+        if (count($ids) == 0)
+        {
+            return array();
+        }
+        
+        $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE idusers IN (?) AND visibility in (?)";
+        $stmt = $this->mDb->executeQuery($req, array($ids, $visibility),
+                                         array(\Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
+                                               \Doctrine\DBAL\Connection::PARAM_STR_ARRAY));
         
         $users = array();
         
@@ -98,7 +110,7 @@ class UserRepository
                 'visibility' => $user->getVisibility(),
                 'longitude' => $user->getLongitude(),
                 'latitude' => $user->getLatitude()
-            ), array('id' => $user->getId()));
+            ), array('idusers' => $user->getId()));
     }
     
     /* Gets the ids of the friends of the user with id $userId,
@@ -107,7 +119,9 @@ class UserRepository
      * and the following stauts in the array $follow (can be
      * 'FOLLOWED' or 'UNFOLLOWED').
      */
-    public function getFriendsIds($userId, $status, $follow)
+    public function getFriendsIds($userId,
+                                  $status = array('ALLOWED', 'DISALLOWED'),
+                                  $follow = array('FOLLOWED', 'UNFOLLOWED'))
     {
         if (!is_array($status) OR !is_array($follow))
         {
@@ -116,7 +130,8 @@ class UserRepository
         
         $req = "SELECT id2 FROM " . self::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND ".
         "status IN (?) AND follow IN (?)";
-        $stmt = $this->mDb->executeQuery($req, array((int) $userId, $status, $follow),
+        $stmt = $this->mDb->executeQuery($req,
+                                         array((int) $userId, $status, $follow),
                                          array(
                                                \PDO::PARAM_INT,
                                                \Doctrine\DBAL\Connection::PARAM_STR_ARRAY, 
@@ -149,7 +164,7 @@ class UserRepository
     
     /* Sets the status of a friendship link.
      */
-    public setFriendshipStatus($idUser, $idFriend, $status)
+    public function setFriendshipStatus($idUser, $idFriend, $status)
     {
         if (!in_array($status, array('ALLOWED', 'DISALLOWED', 'BLOCKED')))
         {
@@ -158,13 +173,36 @@ class UserRepository
         
         $this->mDb->update(self::$TABLE_FRIENDSHIP,
                            array('status' => $status),
-                           array('id1' => (int) $idUser, 'id2' => (int) $idFriend)
+                           array('id1' => (int) $idFriend, 'id2' => (int) $idUser)
                           );
+    }
+    
+    /* Sets the status of a list of friendship links.
+     */
+    public function setFriendshipsStatus($idUser, $idsFriends, $status)
+    {
+        if (!in_array($status, array('ALLOWED', 'DISALLOWED', 'BLOCKED')))
+        {
+            throw new \Exception('Invalid value for status');
+        }
+        
+        if (!is_array($idsFriends))
+        {
+            throw new \Exception('Parameter $idsFriends must be an array !');
+        }
+        
+        $req = "UPDATE " . self::$TABLE_FRIENDSHIP .
+               " SET status = ? WHERE id1 IN (?) AND id2 = ?";
+        $stmt = $this->executeQuery($req,
+                                    array($status, $idFriends, $idUser),
+                                    array(\PDO::PARAM_STR,
+                                          \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
+                                          \PDO::PARAM_INT,));
     }
     
     /* Sets the follow status of a friendship link.
      */
-    public setFriendshipFollow($idUser, $friendId, $follow)
+    public function setFriendshipFollow($idUser, $friendId, $follow)
     {
         if (!in_array($follow, array('FOLLOWED', 'UNFOLLOWED')))
         {

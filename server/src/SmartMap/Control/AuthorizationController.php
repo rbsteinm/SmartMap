@@ -51,12 +51,40 @@ class AuthorizationController
     
     public function allowFriendList(Request $request, Application $app)
     {
-        // TODO
+        $userId = User::getIdFromRequest($request);
+        
+        $friendsIds = $request->request->get('friend_ids');
+        if ($friendsIds === null)
+        {
+            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+        }
+        
+        $friendsIds = explode(',', $friendsIds);
+        
+        $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'ALLOW');
+        
+        $response = array('status' => 'Ok', 'message' => 'Allowed friend list !');
+        
+        return new JsonResponse($response);
     }
     
     public function disallowFriendList(Request $request, Application $app)
     {
-        // TODO
+        $userId = User::getIdFromRequest($request);
+        
+        $friendsIds = $request->request->get('friend_ids');
+        if ($friendsIds === null)
+        {
+            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+        }
+        
+        $friendsIds = explode(',', $friendsIds);
+        
+        $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'DISALLOW');
+        
+        $response = array('status' => 'Ok', 'message' => 'Disallowed friend list !');
+        
+        return new JsonResponse($response);
     }
     
     public function followFriend(Request $request, Application $app)

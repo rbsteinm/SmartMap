@@ -69,6 +69,10 @@ $app->post('/getInvitations', 'data.controller:getInvitations');
 
 $app->post('/acceptInvitation', 'data.controller:acceptInvitation');
 
+$app->post('/listFriendsPos', 'data.controller:listFriendsPos');
+
+$app->post('/updatePos', 'data.controller:updatePos');
+
 // Testing
 $app->post('/fakeAuth', 'authentication.controller:fakeAuth');
 

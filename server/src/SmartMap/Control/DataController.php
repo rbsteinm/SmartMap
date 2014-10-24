@@ -17,6 +17,66 @@ class DataController
         $this->mRepo = $repo;
     }
     
+    /* Updates the user's position.
+     */
+    public function updatePos(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+        
+        $longitude = $request->request->get('longitude');
+        if ($longitude === null)
+        {
+            throw new \InvalidArgumentException('Post parameter longitude is not set !');
+        }
+        
+        $latitude = $request->request->get('latitude');
+        if ($latitude === null)
+        {
+            throw new \InvalidArgumentException('Post parameter latitude is not set !');
+        }
+        
+        $user = $this->mRepo->getUser($userId);
+        
+        $user->setLongitude($longitude);
+        $user->setLatitude($latitude);
+        
+        $this->mRepo->updateUser($user);
+        
+        $response = array('status' => 'Ok', 'message' => 'Updated position !');
+        
+        return new JsonResponse($response);
+    }
+    
+    /* Gets the position of followed friends allowing it.
+     */
+    public function listFriendsPos(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+        
+        $friendIds = $this->mRepo->getFriendsIds($userId, array('ALLOWED'), array('FOLLOWED'));
+        
+        $friends = $this->mRepo->getUsers($friendIds, array('VISIBLE'));
+        
+        $list = array();
+        
+        foreach ($friends as $friend)
+        {
+            $list[] = array(
+                                'id' => $friend->getId(),
+                                'longitude' => $friend->getLongitude(),
+                                'latitude' => $friend->getLatitude()
+                            );
+        }
+        
+        $response = array(
+                            'status' => 'Ok',
+                            'message' => 'Fetched friends positions',
+                            'positions' => $list
+                         );
+        
+        return new JsonResponse($response);
+    }
+    
     /* Gets the information for the user whose id is passed in user_id
      * POST parameter.
      */
@@ -53,12 +113,14 @@ class DataController
             throw new \InvalidArgumentException('Post parameter friend_id is not set !');
         }
         
+        if ($userId == $friendId)
+        {
+            throw new \Exception('You cannot invite yourself !');
+        }
+        
         // Check if the user  blocked or already invited or already inviting
-        $blockedIds = $this->mRepo->getFriendsIds(
-                                                    $userId,
-                                                    array('BLOCKED'),
-                                                    array('FOLLOWED', 'UNFOLLOWED')
-                                                 );
+        $blockedIds = $this->mRepo->getFriendsIds($userId,
+                                                  array('BLOCKED'));
         
         $userInvitingIds = $this->mRepo->getInvitationIds($userId);
         $friendInvitingIds = $this->mRepo->getInvitationIds($friendId);
