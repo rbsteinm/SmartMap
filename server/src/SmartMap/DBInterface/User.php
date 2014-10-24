@@ -4,6 +4,8 @@ namespace SmartMap\DBInterface;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use SmartMap\Control\ControlException;
+
 class User
 {
     private $mId;

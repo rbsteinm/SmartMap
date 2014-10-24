@@ -4,6 +4,8 @@ namespace SmartMap\DBInterface;
 
 use Doctrine\DBAL\Connection;
 
+use SmartMap\Control\ControlException;
+
 class UserRepository
 {
     private static $TABLE_USER = 'users';
