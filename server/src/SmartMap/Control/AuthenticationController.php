@@ -50,7 +50,7 @@ class AuthenticationController {
         
         // Check if function called with proper parameters
         if($name == null OR $facebookToken == null OR $facebookId == null) {
-            throw new ControlException('Missing POSt parameter.');
+            throw new ControlException('Missing POST parameter.');
         }
         
         // Check if token is valid and matches name + ID
