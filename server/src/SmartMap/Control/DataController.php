@@ -26,13 +26,13 @@ class DataController
         $longitude = $request->request->get('longitude');
         if ($longitude === null)
         {
-            throw new \InvalidArgumentException('Post parameter longitude is not set !');
+            throw new ControlException('Post parameter longitude is not set !');
         }
         
         $latitude = $request->request->get('latitude');
         if ($latitude === null)
         {
-            throw new \InvalidArgumentException('Post parameter latitude is not set !');
+            throw new ControlException('Post parameter latitude is not set !');
         }
         
         $user = $this->mRepo->getUser($userId);
@@ -85,7 +85,7 @@ class DataController
         $id = $request->request->get('user_id');
         if ($id === null)
         {
-            throw new \InvalidArgumentException('Post parameter user_id is not set !');
+            throw new ControlException('Post parameter user_id is not set !');
         }
         
         $user = $this->mRepo->getUser($id);
@@ -110,12 +110,12 @@ class DataController
         $friendId = $request->request->get('friend_id');
         if ($friendId === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
         if ($userId == $friendId)
         {
-            throw new \Exception('You cannot invite yourself !');
+            throw new ControlException('You cannot invite yourself !');
         }
         
         // Check if the user  blocked or already invited or already inviting
@@ -173,7 +173,7 @@ class DataController
         $friendId = $request->request->get('friend_id');
         if ($friendId === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
         // We check that the friend invited the user
@@ -181,7 +181,7 @@ class DataController
         
         if (!in_array($friendId, $invitersIds))
         {
-            throw new \Exception('Not invited by user with id ' . $friendId .' !');
+            throw new ControlException('Not invited by user with id ' . $friendId .' !');
         }
         
         $this->mRepo->removeInvitation($friendId, $userId);

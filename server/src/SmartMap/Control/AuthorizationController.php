@@ -22,7 +22,7 @@ class AuthorizationController
         $friendId = $request->request->get('friend_id');
         if ($friendId === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
         $this->mRepo->setFriendshipStatus($userId, $friendId, 'ALLOW');
@@ -39,7 +39,7 @@ class AuthorizationController
         $friendId = $request->request->get('friend_id');
         if ($friendId === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
         $this->mRepo->setFriendshipStatus($userId, $friendId, 'DISALLOW');
@@ -56,7 +56,7 @@ class AuthorizationController
         $friendsIds = $request->request->get('friend_ids');
         if ($friendsIds === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
         $friendsIds = explode(',', $friendsIds);
@@ -75,7 +75,7 @@ class AuthorizationController
         $friendsIds = $request->request->get('friend_ids');
         if ($friendsIds === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
         $friendsIds = explode(',', $friendsIds);
@@ -94,7 +94,7 @@ class AuthorizationController
         $friendId = $request->request->get('friend_id');
         if ($friendId === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
         $this->mRepo->setFriendshipFollow($userId, $friendId, 'FOLLOW');
@@ -111,7 +111,7 @@ class AuthorizationController
         $friendId = $request->request->get('friend_id');
         if ($friendId === null)
         {
-            throw new \InvalidArgumentException('Post parameter friend_id is not set !');
+            throw new ControlException('Post parameter friend_id is not set !');
         }
         
         $this->mRepo->setFriendshipFollow($userId, $friendId, 'UNFOLLOW');

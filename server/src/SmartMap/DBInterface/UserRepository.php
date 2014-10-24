@@ -19,6 +19,9 @@ class UserRepository
         $this->mDb = $db;
     }
     
+    /* Gets a user id given it's facebook id, or returns false if such user
+     * does not exist.
+     */
     public function getUserIdFromFb($fbId)
     {
         $req = "SELECT idusers FROM " . self::$TABLE_USER . " WHERE fbid = ?";
@@ -48,7 +51,7 @@ class UserRepository
         
         $user = new User(
                             $userData['idusers'], 
-                            $userData['hash'],
+                            $userData['fbid'],
                             $userData['name'],
                             $userData['visibility'],
                             $userData['longitude'],
@@ -84,7 +87,7 @@ class UserRepository
         {
             $users[] = new User(
                                     $userData['idusers'], 
-                                    $userData['hash'],
+                                    $userData['fbid'],
                                     $userData['name'],
                                     $userData['visibility'],
                                     $userData['longitude'],
@@ -102,7 +105,8 @@ class UserRepository
     {
         $this->mDb->insert(self::$TABLE_USER,
             array(
-                'hash' => $user->getHash(),
+                'fbid' => $user->getFbId(),
+                'fbid' => $user->getFbid(),
                 'name' => $user->getName(),
                 'visibility' => $user->getVisibility(),
                 'longitude' => $user->getVisibility(),

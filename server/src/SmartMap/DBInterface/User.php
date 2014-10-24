@@ -7,20 +7,21 @@ use Symfony\Component\HttpFoundation\Request;
 class User
 {
     private $mId;
-    private $mHash;
+    private $mFbId;
     private $mName;
     private $mVisibility;
     private $mLongitude;
     private $mLatitude;
     
-    function __construct($id, $hash, $name, $visibility, $longitude, $latitude)
+    function __construct($id, $fbId, $name, $visibility, $longitude, $latitude)
     {
         // Checking for validity
         $this->checkId($id);
+        $this->checkId($fbId);
         $this->checkVisibility($visibility);
         
         $this->mId = $id;
-        $this->mHash = $hash;
+        $this->mHash = $fbId;
         $this->mName = $name;
         $this->mVisibility = $visibility;
         $this->mLongitude = $longitude;
@@ -34,7 +35,7 @@ class User
     {
         if (!$request->hasSession())
         {
-            throw new \Exception('Trying to access session but the session is not started');
+            throw new ControlException('Trying to access session but the session is not started');
         }
         
         $session = $request->getSession();
@@ -43,7 +44,7 @@ class User
         
         if ($id == null)
         {
-            throw new \Exception('The user is not authenticated.');
+            throw new ControlException('The user is not authenticated.');
         }
         
         return $id;
@@ -67,18 +68,18 @@ class User
         return $this;
     }
     
-    /* Get the user's hash
+    /* Get the user's facebook id
      */
-    public function getHash()
+    public function getFbId()
     {
-        return $this->mHash;
+        return $this->mFbId;
     }
     
-    /* Set the user's hash
+    /* Set the user's facebook id
      */
-    public function setHash($hash)
+    public function setFbId($fbId)
     {
-        $this->mHash = $hash;
+        $this->mFbId = $fbId;
         
         return $this;
     }
