@@ -1,5 +1,10 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.GregorianCalendar;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+
 /**
  * Describes a generic user of the app
  * @author ritterni
@@ -9,7 +14,7 @@ public interface User {
 	/**
 	 * @return The user's ID
 	 */
-	int getID();
+	long getID();
 	
 	/**
 	 * @return The user's name
@@ -30,6 +35,32 @@ public interface User {
 	 * @return The user's position
 	 */
 	Point getPosition();
+	
+	/**
+	 * @return The user's position as a String (e.g. 'Lausanne')
+	 */
+	String getPositionName();
+	
+	/**
+	 * @return A user picture to display
+	 */
+	Bitmap getPicture(Context context);
+	
+	/**
+	 * @return The date/hour at which the user was last seen
+	 */
+	GregorianCalendar getLastSeen();
+	
+	/**
+	 * @return True if the user is online
+	 */
+	boolean isOnline();
+	
+	/**
+	 * Sets the user position's name
+     * @param posName The user's position
+     */
+    void setPositionName(String posName);
 	
 	/**
 	 * Sets the user's name
@@ -60,4 +91,20 @@ public interface User {
 	 * @param y The latitude
 	 */
 	void setY(double y);
+	   
+    /**
+     * Stores a new profile picture for the user
+     * @param pic The picture as a Bitmap object
+     */
+    void setPicture(Bitmap pic, Context context);
+    
+    /**
+     * @param date The date/hour at which the user was last seen
+     */
+    void setLastSeen(GregorianCalendar date);
+    
+    /**
+     * Sets whether or not the user is online
+     */
+    void setOnline(boolean status);
 }

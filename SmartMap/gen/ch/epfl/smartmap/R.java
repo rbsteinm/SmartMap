@@ -789,7 +789,7 @@ containing a value of this type.
         public static final int searchicon=0x7f020056;
     }
     public static final class id {
-        public static final int action_settings=0x7f06004d;
+        public static final int action_settings=0x7f060050;
         public static final int anchored=0x7f060002;
         public static final int authButton=0x7f060031;
         public static final int book_now=0x7f060014;
@@ -831,7 +831,7 @@ containing a value of this type.
         public static final int dragView=0x7f060025;
         public static final int drawer_layout=0x7f060029;
         public static final int expanded=0x7f060000;
-        public static final int fade_in=0x7f06004c;
+        public static final int fade_in=0x7f06004f;
         public static final int frame_layout_main=0x7f060023;
         public static final int grayscale=0x7f060016;
         public static final int hidden=0x7f060003;
@@ -839,6 +839,7 @@ containing a value of this type.
         public static final int holo_light=0x7f06000a;
         public static final int hybrid=0x7f060008;
         public static final int inline=0x7f06001e;
+        public static final int label=0x7f06004e;
         public static final int large=0x7f060019;
         public static final int left=0x7f060021;
         public static final int left_drawer=0x7f06002a;
@@ -846,6 +847,7 @@ containing a value of this type.
         public static final int map=0x7f060028;
         public static final int match_parent=0x7f060010;
         public static final int monochrome=0x7f060017;
+        public static final int name=0x7f06004c;
         public static final int none=0x7f060004;
         public static final int normal=0x7f060005;
         public static final int picker_subtitle=0x7f060041;
@@ -865,6 +867,7 @@ containing a value of this type.
         public static final int terrain=0x7f060007;
         public static final int top=0x7f06001f;
         public static final int tv_location=0x7f060027;
+        public static final int value=0x7f06004d;
         public static final int welcome=0x7f060030;
         public static final int wrap_content=0x7f060011;
     }
@@ -899,6 +902,7 @@ containing a value of this type.
         public static final int drawer_list_item=0x7f030013;
         public static final int fragment_map=0x7f030014;
         public static final int fragment_navigation_drawer=0x7f030015;
+        public static final int gui_friend_list_item=0x7f030016;
     }
     public static final class menu {
         public static final int friends=0x7f0d0000;
