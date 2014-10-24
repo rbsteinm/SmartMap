@@ -10,3 +10,6 @@ server/vendor/
 server/composer.lock
 SmartMap/bin/
 SmartMap/.classpath
+SmartMap/gen/
+*.class
+

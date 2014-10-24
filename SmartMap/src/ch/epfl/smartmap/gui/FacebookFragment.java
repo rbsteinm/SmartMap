@@ -155,8 +155,9 @@ public class FacebookFragment extends Fragment {
                         userProfile.put("facebookToken", facebookToken);
                         //userProfile.put("friends", user.getProperty("friends"));
 
-                        Log.i(TAG, "user name in json (async): " + userProfile.getString("name"));
-                        Log.i(TAG, "user ID in json (async): " + userProfile.getString("facebookId"));
+                        Log.i(TAG, "user name (async): " + userProfile.getString("name"));
+                        Log.i(TAG, "user ID (async): " + userProfile.getString("facebookId"));
+                        Log.i(TAG, "user's facebook access token (async): " + userProfile.getString("facebookToken"));
 
                     } catch (JSONException e) {
                         Log.e(TAG, "Error parsing returned user data.");

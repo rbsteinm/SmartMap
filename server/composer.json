@@ -15,6 +15,9 @@
     },
     "require": {
         "silex/silex": "~1.2",
-        "doctrine/dbal": "2.2.*"
+        "doctrine/dbal": "2.2.*",
+		"facebook/php-sdk-v4" : "4.0.*",
+		"phpunit/phpunit": "4.3.*",
+		"doctrine/orm": "*"
     }
 }
