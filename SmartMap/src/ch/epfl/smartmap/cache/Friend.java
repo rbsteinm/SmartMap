@@ -1,5 +1,18 @@
 package ch.epfl.smartmap.cache;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+import ch.epfl.smartmap.R;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 /**
  * A class to represent the user's friends
  * 
@@ -13,10 +26,15 @@ public class Friend implements User {
 	private String email;
 	private Point position;
 	private String positionName;
+	private GregorianCalendar lastSeen;
+	private boolean online;
 
 	public static final String NO_NUMBER = "No phone number specified";
 	public static final String NO_EMAIL = "No email address specified";
 	public static final String POSITION_UNKNOWN = "Unknown position";
+	public static final String DEFAULT_PICTURE = "default.png";
+	public static final int IMAGE_QUALITY = 100;
+    public static final String IMAGE_DIR = "userpics";
 
 	/**
 	 * Friend constructor
@@ -34,8 +52,9 @@ public class Friend implements User {
 		name = userName;
 		phoneNumber = NO_NUMBER;
 		email = NO_EMAIL;
-		position = new Point(0, 0);
+		position = new Point(0, 0); //needs to be updated by the server
 		positionName = POSITION_UNKNOWN;
+		lastSeen = new GregorianCalendar();
 	}
 
 	@Override
@@ -97,5 +116,63 @@ public class Friend implements User {
     @Override
     public void setPositionName(String posName) {
         positionName = posName;
+    }
+
+    @Override
+    public Bitmap getPicture(Context context) {
+        File folder = new File(context.getApplicationContext().getFilesDir(), IMAGE_DIR);
+        File file = new File(folder, id + ".png");
+        
+        Bitmap pic = null;
+        
+        if (file.exists()) {
+            pic = BitmapFactory.decodeFile(file.getPath());
+        } else {
+            pic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher); //placeholder
+        }
+        return pic;
+    }
+
+    @Override
+    public void setPicture(Bitmap pic, Context context) {
+        File folder = new File(context.getApplicationContext().getFilesDir(), IMAGE_DIR);
+        File file = new File(folder, id + ".png");
+        if (file.exists()) {
+            file.delete();
+        }
+        
+        try {
+            FileOutputStream out = context.openFileOutput(id + ".png", Context.MODE_PRIVATE);
+            pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public GregorianCalendar getLastSeen() {
+        return lastSeen;
+    }
+
+    @Override
+    public boolean isOnline() {
+        return online;
+    }
+
+    @Override
+    public void setLastSeen(GregorianCalendar date) {
+        lastSeen.set(date.get(Calendar.YEAR),
+                date.get(Calendar.MONTH),
+                date.get(Calendar.DATE),
+                date.get(Calendar.HOUR),
+                date.get(Calendar.MINUTE));
+    }
+
+    @Override
+    public void setOnline(boolean status) {
+        online = status;
     }
 }

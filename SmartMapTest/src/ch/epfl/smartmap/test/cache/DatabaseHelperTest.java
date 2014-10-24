@@ -81,4 +81,15 @@ public class DatabaseHelperTest extends AndroidTestCase {
         assertTrue(dbh.getFilter(id).getListName().equals(filter.getListName())
                 && dbh.getFilter(id).getList().contains(b.getID()));
     }
+    
+    @Test
+    public void testDeleteFilter() {
+        FriendList filter = new FriendList(name);
+        filter.addUser(a.getID());
+        filter.addUser(b.getID());
+        filter.addUser(c.getID());
+        dbh.addFilter(filter);
+        dbh.deleteFilter(filter.getID());
+        assertTrue(dbh.getAllFilters().isEmpty());
+    }
 }
