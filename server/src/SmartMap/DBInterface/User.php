@@ -17,7 +17,7 @@ class User
     {
         // Checking for validity
         $this->checkId($id);
-        $this->checkId($fbId);
+        //$this->checkId($fbId);
         $this->checkVisibility($visibility);
         
         $this->mId = $id;

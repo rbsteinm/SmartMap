@@ -25,7 +25,7 @@ class UserRepository
     public function getUserIdFromFb($fbId)
     {
         $req = "SELECT idusers FROM " . self::$TABLE_USER . " WHERE fbid = ?";
-        $userData = $this->mDb->fetchAssoc($req, array((int) $fbId);
+        $userData = $this->mDb->fetchAssoc($req, array((int) $fbId));
         
         if (!$userData)
         {
@@ -212,8 +212,8 @@ class UserRepository
         
         $req = "UPDATE " . self::$TABLE_FRIENDSHIP .
                " SET status = ? WHERE id1 IN (?) AND id2 = ?";
-        $stmt = $this->executeQuery($req,
-                                    array($status, $idFriends, $idUser),
+        $stmt = $this->mDb->executeQuery($req,
+                                    array($status, $idsFriends, $idUser),
                                     array(\PDO::PARAM_STR,
                                           \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
                                           \PDO::PARAM_INT,));
@@ -230,7 +230,7 @@ class UserRepository
         
         $this->mDb->update(self::$TABLE_FRIENDSHIP,
                            array('follow' => $follow),
-                           array('id1' => (int) $idUser, 'id2' => (int) $idFriend)
+                           array('id1' => (int) $idUser, 'id2' => (int) $friendId)
                           );
     }
     
