@@ -63,42 +63,43 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         /*
          * BELOW GOES SEARCHBAR & SLIDINGUPPANEL INIT
          */
-        final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
-        final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        //final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
+        final SmartMapSlidingUpPanel mBottomSlider = (SmartMapSlidingUpPanel) findViewById(R.id.sliding_layout);
         mBottomSlider.setCoveredFadeColor(0);
         mBottomSlider.collapsePanel();
+        mBottomSlider.openSearchView();
 
-        mSearchBarEditText
-            .setOnEditorActionListener(new OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId,
-                    KeyEvent event) {
-                    boolean handled = false;
-                    if (actionId == EditorInfo.IME_ACTION_SEND) {
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                        Log.d("searchBar", "Search Request Finished");
-                        handled = true;
-                    }
-                    return handled;
-                }
-            });
-
-        mSearchBarEditText
-            .setOnFocusChangeListener(new OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if (hasFocus) {
-                        mBottomSlider.expandPanel();
-                        Log.d("SearchBar", "Got focus");
-                    } else {
-                        mBottomSlider.hidePanel();
-                        Log.d("SearchBar", "Lost focus");
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    }
-                }
-            });
+//        mSearchBarEditText
+//            .setOnEditorActionListener(new OnEditorActionListener() {
+//                @Override
+//                public boolean onEditorAction(TextView v, int actionId,
+//                    KeyEvent event) {
+//                    boolean handled = false;
+//                    if (actionId == EditorInfo.IME_ACTION_SEND) {
+//                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+//                        Log.d("searchBar", "Search Request Finished");
+//                        handled = true;
+//                    }
+//                    return handled;
+//                }
+//            });
+//
+//        mSearchBarEditText
+//            .setOnFocusChangeListener(new OnFocusChangeListener() {
+//                @Override
+//                public void onFocusChange(View v, boolean hasFocus) {
+//                    if (hasFocus) {
+//                        mBottomSlider.expandPanel();
+//                        Log.d("SearchBar", "Got focus");
+//                    } else {
+//                        mBottomSlider.hidePanel();
+//                        Log.d("SearchBar", "Lost focus");
+//                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+//                    }
+//                }
+//            });
     }
 
     @Override

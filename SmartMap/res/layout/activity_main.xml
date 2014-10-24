@@ -5,58 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".DemoActivity" >
 
-
-
-    <com.sothree.slidinguppanel.SlidingUpPanelLayout
-        xmlns:sothree="http://schemas.android.com/lib/com.sothree.slidinguppanel"
-        android:id="@+id/sliding_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom"
-        sothree:dragView="@+id/dragView"
-        sothree:flingVelocity="0"
-        sothree:overlay="true"
-        sothree:panelHeight="68dp"
-        sothree:paralaxOffset="0dp"
-        sothree:shadowHeight="4dp" >
-
-        <!-- MAIN CONTENT -->
-
-        <RelativeLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-        </RelativeLayout>
-        
-         
-    
-        <!-- SLIDING LAYOUT -->
-
-        <LinearLayout
-            android:id="@+id/dragView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="1"
-            android:background="@color/bottomSliderBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/searchBar2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clickable="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:gravity="center"
-                android:text="[Search results]"
-                android:textSize="16sp" />
-        </LinearLayout>
-    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -98,40 +46,36 @@
             android:dividerHeight="0dp" />
     </android.support.v4.widget.DrawerLayout>
     
-    <LinearLayout
-        android:id="@+id/searchBarLayout"
+    <ch.epfl.smartmap.gui.SmartMapSlidingUpPanel
+        xmlns:sothree="http://schemas.android.com/lib/com.sothree.slidinguppanel"
+        xmlns:custom="http://schemas.android.com/apk/res/ch.epfl.smartmap.gui"
+        android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="30dp"
-        android:alpha="0.5"
-        android:background="@color/bottomSliderBackground"
-        android:orientation="horizontal"
-        android:padding="5dp" >
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:dragView="@+id/dragView"
+        sothree:flingVelocity="0"
+        sothree:overlay="true"
+        sothree:panelHeight="68dp"
+        sothree:paralaxOffset="0dp"
+        sothree:shadowHeight="4dp" >
 
-        <ImageView
-            android:id="@+id/searchBarIcon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:adjustViewBounds="true"
-            android:src="@drawable/searchicon" />
+        <!-- MAIN CONTENT -->
 
-        <EditText
-            android:id="@+id/searchBarEditText"
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:clickable="true"
-            android:descendantFocusability="beforeDescendants"
-            android:hint="@string/searchBar"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:paddingEnd="0dp"
-            android:paddingStart="5dp"
-            android:singleLine="true"
-            android:textSize="16sp" />
-    </LinearLayout>
-   
+            android:layout_height="match_parent" >
+        </RelativeLayout>
+       
+        <!-- SLIDING LAYOUT -->
 
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </RelativeLayout>       
+    </ch.epfl.smartmap.gui.SmartMapSlidingUpPanel>
 </FrameLayout>
