@@ -6,12 +6,10 @@ package ch.epfl.smartmap.gui;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.R;
 import android.content.Context;
-import android.util.AttributeSet;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.LinearLayout.LayoutParams;
 
 /**
  * @author jfperren
@@ -31,8 +29,9 @@ public class FriendSearchResultView extends SearchResultView {
      * @param context
      * @param attrs
      */
-    public FriendSearchResultView(Context context, AttributeSet attrs, Friend friend) {
-        super(context, attrs);
+    public FriendSearchResultView(Context context, Friend friend) {
+        super(context);
+        
         mFriend = friend;
         
         // Creates mPhotoView
@@ -63,7 +62,6 @@ public class FriendSearchResultView extends SearchResultView {
         
         this.addView(mInfoLayout);
         this.addView(mMoreInfoButton);
-        
     }
     
     /**
@@ -73,9 +71,5 @@ public class FriendSearchResultView extends SearchResultView {
     public void update(){
         // TODO
         // 1) Update last connection info
-    }
-   
-    public void onTouch(){
-        
     }
 }

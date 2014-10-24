@@ -39,9 +39,7 @@ public class SmartMapSlidingUpPanel extends SlidingUpPanelLayout {
         
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mSearchLayout = (SearchLayout) mInflater.inflate(R.layout.layout_search, (ViewGroup) this, false);
-        mCurrentState = LayoutState.NONE;
-        
-        
+        mCurrentState = LayoutState.NONE;   
     }
     
     public void openSearchView(){
@@ -53,10 +51,14 @@ public class SmartMapSlidingUpPanel extends SlidingUpPanelLayout {
             // Clean it and display mSearchLayout
             mSlidingLayout.removeAllViews();
             mSlidingLayout.addView(mSearchLayout);
+            // Initialize mSearchLayout if needed
+            if (!mSearchLayout.isInitialized()){
+                mSearchLayout.initSearchLayout();
+            }
+            
+            // Switch state
             mCurrentState = LayoutState.SEARCH;
-            mSearchLayout.initSearchLayout();
         }
-        
         // When searching, panel must be fully expanded
         this.expandPanel();
     }

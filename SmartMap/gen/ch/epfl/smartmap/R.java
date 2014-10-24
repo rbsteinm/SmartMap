@@ -611,7 +611,7 @@ containing a value of this type.
         public static final int zOrderOnTop=0x7f010019;
     }
     public static final class color {
-        public static final int bottomSliderBackground=0x7f090022;
+        public static final int bottomSliderBackground=0x7f090023;
         public static final int com_facebook_blue=0x7f090019;
         public static final int com_facebook_likeboxcountview_border_color=0x7f090020;
         public static final int com_facebook_likeboxcountview_text_color=0x7f090021;
@@ -635,8 +635,9 @@ containing a value of this type.
         public static final int common_signin_btn_light_text_disabled=0x7f090006;
         public static final int common_signin_btn_light_text_focused=0x7f090007;
         public static final int common_signin_btn_light_text_pressed=0x7f090005;
-        public static final int common_signin_btn_text_dark=0x7f090023;
-        public static final int common_signin_btn_text_light=0x7f090024;
+        public static final int common_signin_btn_text_dark=0x7f090024;
+        public static final int common_signin_btn_text_light=0x7f090025;
+        public static final int searchResultBackground=0x7f090022;
         public static final int wallet_bright_foreground_disabled_holo_light=0x7f09000f;
         /** 
          Wallet colors to support consistent Wallet fragment holo dark UI in client application
@@ -655,8 +656,8 @@ containing a value of this type.
         public static final int wallet_hint_foreground_holo_light=0x7f090011;
         public static final int wallet_holo_blue_light=0x7f090015;
         public static final int wallet_link_text_light=0x7f090016;
-        public static final int wallet_primary_text_holo_light=0x7f090025;
-        public static final int wallet_secondary_text_holo_dark=0x7f090026;
+        public static final int wallet_primary_text_holo_light=0x7f090026;
+        public static final int wallet_secondary_text_holo_dark=0x7f090027;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -856,13 +857,13 @@ containing a value of this type.
         public static final int searchBarEditText=0x7f06004a;
         public static final int searchBarIcon=0x7f060049;
         public static final int searchBarLayout=0x7f060048;
+        public static final int search_result_list=0x7f06004b;
         public static final int selectionDetails=0x7f06000f;
         public static final int sliding_layout=0x7f060028;
         public static final int small=0x7f060018;
         public static final int standard=0x7f06001a;
         public static final int strict_sandbox=0x7f06000d;
         public static final int terrain=0x7f060007;
-        public static final int testid=0x7f06004b;
         public static final int top=0x7f06001f;
         public static final int tv_location=0x7f060024;
         public static final int welcome=0x7f06002c;

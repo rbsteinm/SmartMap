@@ -14,8 +14,6 @@ public class MockSearchEngine implements SearchEngine {
 
     private ArrayList<Friend> database;
     
-    
-    
     private Friend Julien = new Friend(0, "Julien Perrenoud");
     private Friend Alain = new Friend(1, "Alain Milliet");
     private Friend Robin = new Friend(2, "Robin Genolet");
@@ -42,12 +40,18 @@ public class MockSearchEngine implements SearchEngine {
      */
     @Override
     public List<Friend> sendQuery(String query) {
+        if(query == ""){
+            return new ArrayList<Friend>();
+        }
+        query = query.toLowerCase();
         ArrayList<Friend> result = new ArrayList<Friend>();
+        
         for (Friend f : database){
-            if(f.getName().contains(query)){
+            if(f.getName().toLowerCase().contains(query)){
                 result.add(f);
             }
         }
+        
         return result;
     }
 

@@ -11,6 +11,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.text.TextWatcher;
@@ -22,7 +23,10 @@ import android.text.Editable;
  */
 public class SearchLayout extends RelativeLayout {
 
-    final private static String TAG = "SearchLayout";
+    private final static String TAG = "SearchLayout";
+    private final Context mContext;
+    public enum State {NOT_INITIALIZED, INITIALIZED};
+    private State mState;
     private SearchEngine mSearchEngine = new MockSearchEngine();
     
     /**
@@ -31,11 +35,17 @@ public class SearchLayout extends RelativeLayout {
      */
     public SearchLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
+        mState = State.NOT_INITIALIZED;
+    }
+    
+    public boolean isInitialized(){
+        return mState == State.INITIALIZED;
     }
     
     public void initSearchLayout(){
       final EditText  mSearchBarEditText = (EditText) this.findViewById(R.id.searchBarEditText);
-      final TextView mTestTextView = (TextView) this.findViewById(R.id.testid);
+      
       mSearchBarEditText.addTextChangedListener(new TextWatcher(){
           @Override
           public void afterTextChanged(Editable s) {
@@ -49,15 +59,21 @@ public class SearchLayout extends RelativeLayout {
               Log.d(TAG, "onTextChanged");
           }
       }); 
+      
+      mState = State.INITIALIZED;
     }
     private void updateSearchPanel(){
-        // Gets search query
+        
+        // Get Views
+        final LinearLayout mSearchResultList = (LinearLayout) this.findViewById(R.id.search_result_list);
         final EditText  mSearchBarEditText = (EditText) this.findViewById(R.id.searchBarEditText);
+        // Get search query
         String query = mSearchBarEditText.getText().toString();
         List<Friend> result = mSearchEngine.sendQuery(query);
-        
+        // Clean list
+        mSearchResultList.removeAllViews();
         for(Friend f : result){
-            
+            mSearchResultList.addView(new FriendSearchResultView(mContext, f));
         }
         
     }
