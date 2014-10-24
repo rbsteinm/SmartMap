@@ -20,93 +20,99 @@ import android.graphics.BitmapFactory;
  */
 public class Friend implements User {
 
-	private long id; // the user's unique ID
-	private String name; // the user's name as it will be displayed
-	private String phoneNumber;
-	private String email;
-	private Point position;
-	private String positionName;
-	private GregorianCalendar lastSeen;
-	private boolean online;
-
-	public static final String NO_NUMBER = "No phone number specified";
-	public static final String NO_EMAIL = "No email address specified";
-	public static final String POSITION_UNKNOWN = "Unknown position";
-	public static final String DEFAULT_PICTURE = "default.png";
-	public static final int IMAGE_QUALITY = 100;
+    private long id; // the user's unique ID
+    private String name; // the user's name as it will be displayed
+    private String phoneNumber;
+    private String email;
+    private Point position;
+    private String positionName;
+    private GregorianCalendar lastSeen;
+    private boolean online;
+    
+    public static final String NO_NUMBER = "No phone number specified";
+    public static final String NO_EMAIL = "No email address specified";
+    public static final String POSITION_UNKNOWN = "Unknown position";
+    public static final String DEFAULT_PICTURE = "default.png";
+    public static final int IMAGE_QUALITY = 100;
     public static final String IMAGE_DIR = "userpics";
 
-	/**
-	 * Friend constructor
-	 * 
-	 * @param userID
-	 *            The id of the contact we're creating
-	 * @param userName
-	 *            The name of the friend
-	 * @param userNumber
-	 *            The friend's phone number
-	 * @author ritterni
-	 */
-	public Friend(long userID, String userName) {
-		id = userID;
-		name = userName;
-		phoneNumber = NO_NUMBER;
-		email = NO_EMAIL;
-		position = new Point(0, 0); //needs to be updated by the server
-		positionName = POSITION_UNKNOWN;
-		lastSeen = new GregorianCalendar();
-	}
+    /**
+     * Friend constructor
+     * 
+     * @param userID
+     *            The id of the contact we're creating
+     * @param userName
+     *            The name of the friend
+     * @param userNumber
+     *            The friend's phone number
+     * @author ritterni
+     */
+    public Friend(long userID, String userName) {
+        id = userID;
+        name = userName;
+        phoneNumber = NO_NUMBER;
+        email = NO_EMAIL;
+        position = new Point(0, 0); //needs to be updated by the server
+        positionName = POSITION_UNKNOWN;
+        lastSeen = new GregorianCalendar();
+    }
 
-	@Override
-	public long getID() {
-		return id;
-	}
+    @Override
+    public long getID() {
+        return id;
+    }
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public String getNumber() {
-		return phoneNumber;
-	}
+    @Override
+    public String getNumber() {
+        return phoneNumber;
+    }
 
-	@Override
-	public String getEmail() {
-		return email;
-	}
+    @Override
+    public String getEmail() {
+        return email;
+    }
 
-	@Override
-	public Point getPosition() {
-		return position;
-	}
+    @Override
+    public Point getPosition() {
+        return position;
+    }
 
-	@Override
-	public void setName(String newName) {
-		name = newName;
-	}
+    @Override
+    public void setName(String newName) {
+        name = newName;
+    }
 
-	@Override
-	public void setNumber(String newNumber) {
-		phoneNumber = newNumber;
-	}
+    @Override
+    public void setNumber(String newNumber) {
+        phoneNumber = newNumber;
+    }
 
-	@Override
-	public void setEmail(String newEmail) {
-		email = newEmail;
-	}
+    @Override
+    public void setEmail(String newEmail) {
+        email = newEmail;
+    }
 
-	@Override
-	public void setX(double x) {
-		position.setX(x);
+    @Override
+    public void setX(double x) {
+        position.setX(x);
 
-	}
+    }
 
-	@Override
-	public void setY(double y) {
-		position.setY(y);
-	}
+    @Override
+    public void setY(double y) {
+        position.setY(y);
+    }
+    
+    @Override
+    public void setPosition(Point p) {
+        position.setX(p.getX());
+        position.setY(p.getY());
+    }
 
     @Override
     public String getPositionName() {

@@ -9,14 +9,14 @@ import android.util.LongSparseArray;
  * @author ritterni
  */
 public interface UserList {
-	
-	/**
-	 * @return The name of the list
-	 */
-	String getListName();
-	
-	/**
-	 * Renames the list
+    
+    /**
+     * @return The name of the list
+     */
+    String getListName();
+    
+    /**
+     * Renames the list
      * @param newName The new name of the list
      */
     void setListName(String newName);
@@ -32,28 +32,28 @@ public interface UserList {
      * @param id The ID
      */
     void setID(long id);
-	
-	/**
-	 * Adds a user to the list
-	 * @param id The user's ID
-	 */
-	void addUser(long id);
-	
-	/**
-	 * Removes a user from the list
-	 * @param id The user's ID
-	 */
-	void removeUser(long id);
-	
-	/**
-	 * @return The whole list of IDs
-	 */
-	List<Long> getList();
-	
-	/**
-	 * Given a SparseArray of Users (mapped to their ID), returns a filtered list of Users
-	 * @param friends The array of Users
-	 * @return The list of users sorted alphabetically
-	 */
-	List<User> getUserList(LongSparseArray<User> friends);
+    
+    /**
+     * Adds a user to the list
+     * @param id The user's ID
+     */
+    void addUser(long id);
+    
+    /**
+     * Removes a user from the list
+     * @param id The user's ID
+     */
+    void removeUser(long id);
+    
+    /**
+     * @return The whole list of IDs
+     */
+    List<Long> getList();
+    
+    /**
+     * Given a SparseArray of Users (mapped to their ID), returns a filtered list of Users
+     * @param friends The array of Users
+     * @return The list of users sorted alphabetically
+     */
+    List<User> getUserList(LongSparseArray<User> friends);
 }
