@@ -71,12 +71,13 @@ public class FacebookFragment extends Fragment {
 		View view = inflater.inflate(R.layout.activity_start, container, false);
 
 		// Get the login button by id from the view
-		LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
+		LoginButton authButton = (LoginButton) view.findViewById(R.id.loginButton);
 		
 		// Set other view's component to invisible
 		view.findViewById(R.id.loadingBar).setVisibility(View.INVISIBLE);
 		view.findViewById(R.id.logo).setVisibility(View.INVISIBLE);
 		view.findViewById(R.id.welcome).setVisibility(View.INVISIBLE);
+		view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 		
 		// Start animation and set login button
 		authButton.startAnimation(AnimationUtils.loadAnimation(this
@@ -131,10 +132,16 @@ public class FacebookFragment extends Fragment {
 		Log.i(TAG, "Checking FB log in status...");
 		if (state.isOpened()) {
 			Log.i(TAG, "Logged in...");
+			
+			// Display the loading Bar and Text
+			getView().findViewById(R.id.loadingBar).setVisibility(View.VISIBLE);
+			getView().findViewById(R.id.loadingTextView).setVisibility(View.VISIBLE);
 
+			// TODO Don't display LogOut Button
+			
 			// Display the authenticated UI here
 			makeMeRequest();
-			// TODO display a loading message while makeMeRequest() is loading
+			
 
 		} else if (state.isClosed()) {
 			Log.i(TAG, "Logged out...");
@@ -156,8 +163,9 @@ public class FacebookFragment extends Fragment {
 				new Request.GraphUserCallback() {
 					@Override
 					public void onCompleted(GraphUser user, Response response) {
+												
 						if (user != null) {
-
+							
 							String userName = user.getName();
 							// This portable token can be used by the server
 							String facebookToken = Session.getActiveSession()

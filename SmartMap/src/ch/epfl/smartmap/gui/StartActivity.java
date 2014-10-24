@@ -35,8 +35,14 @@ public class StartActivity extends FragmentActivity {
 	private ImageView mLogoImage;
 	private TextView mWelcomeText;
 	private ProgressBar mProgressBar;
+	private TextView mProgressText;
+	/*
+	 * // TEST private ProgressDialog mProgressDialog; private int mProgress =
+	 * 0; private Handler mProgressHandler;
+	 */
+
 	private FragmentActivity mActivity;
-	private com.facebook.widget.LoginButton mFacebookButton;
+	private com.facebook.widget.LoginButton mLoginButton;
 	private static final String TAG = StartActivity.class.getSimpleName();
 
 	@Override
@@ -66,12 +72,13 @@ public class StartActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
 
-		mLogoImage = (ImageView) findViewById(R.id.logo);
-		mWelcomeText = (TextView) findViewById(R.id.welcome);
-		mFacebookButton = (com.facebook.widget.LoginButton) findViewById(R.id.authButton);
-		mProgressBar = (ProgressBar) findViewById(R.id.loadingBar);
 		mActivity = this;
 		
+		mLogoImage = (ImageView) findViewById(R.id.logo);
+		mWelcomeText = (TextView) findViewById(R.id.welcome);
+		mLoginButton = (com.facebook.widget.LoginButton) findViewById(R.id.loginButton);
+		mProgressBar = (ProgressBar) findViewById(R.id.loadingBar);
+		mProgressText = (TextView) findViewById(R.id.loadingTextView); 
 		
 		// Start logo and text animation
 		mLogoImage.startAnimation(AnimationUtils.loadAnimation(this,
@@ -79,38 +86,40 @@ public class StartActivity extends FragmentActivity {
 		mWelcomeText.startAnimation(AnimationUtils.loadAnimation(this,
 				R.anim.welcome_anim));
 
-		// Set facebook button's and progress bar's visibility to invisible
-		mFacebookButton.setVisibility(View.INVISIBLE);
+		// Set facebook button's, progress bar's and progress text's visibility to invisible
+		mLoginButton.setVisibility(View.INVISIBLE);
 		mProgressBar.setVisibility(View.INVISIBLE);
+		mProgressText.setVisibility(View.INVISIBLE);
 
 		// We set a time out to use postDelayed method
 		int timeOut = this.getResources().getInteger(R.integer.offset_runnable);
 
 		// Wait for the end of facebook animation before testing if already
 		// logged in or not
-		mFacebookButton.postDelayed(new Runnable() {
+		mWelcomeText.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (Session.getActiveSession() == null) {
-					Log.d(TAG, "facebook session is open");
-					// Start animation on facebook Button (button always
-					// appear.. ISSUE #9)
+				if (Session.getActiveSession() == null || Session.getActiveSession().getPermissions().isEmpty()) {
+					Log.d(TAG, "facebook session is close or does not have permission to use smartmap");
+
 					// Login button
 					mFacebookFragment = new FacebookFragment();
 					getSupportFragmentManager().beginTransaction()
 							.add(android.R.id.content, mFacebookFragment)
 							.commit();
 				} else {
-					Log.d(TAG, "facebook session is closed");
+					Log.d(TAG, "facebook session is open");
+					
+					// Add loading bar and text
 					mProgressBar.setVisibility(View.VISIBLE);
+					mProgressText.setVisibility(View.VISIBLE);
 					
 					// Or set the fragment from restored state info
 					mFacebookFragment = (FacebookFragment) getSupportFragmentManager()
 							.findFragmentById(android.R.id.content);
-					
+
 					// start the next activity (MainActivity)
-					Intent intent = new Intent(mActivity,
-							MainActivity.class);
+					Intent intent = new Intent(mActivity, MainActivity.class);
 					startActivity(intent);
 				}
 			}
