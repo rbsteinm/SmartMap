@@ -1,9 +1,11 @@
 package ch.epfl.smartmap.servercom;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,8 +55,24 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 	 */
 	@Override
 	public List<User> getInvitations() throws SmartMapClientException {
-		// TODO Auto-generated method stub
-		return null;
+
+		String textResult = sendViaPost(null, "/getInvitation");
+
+		List<User> inviters = new ArrayList<User>();
+
+		try {
+			JSONObject jsonObject = new JSONObject(textResult);
+			checkServerErrorFromJSON(jsonObject);
+			JSONArray usersArray = jsonObject.getJSONArray("list");
+			for (int i = 0; i < usersArray.length(); i++) {
+				JSONObject userJSON = usersArray.getJSONObject(i);
+				inviters.add(parseFriendfromJSON(userJSON));
+			}
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		return inviters;
 	}
 
 	/*
@@ -65,7 +83,7 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 	 */
 	@Override
 	public User acceptInvitation(int id) throws SmartMapClientException {
-		
+
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_id", Integer.toString(id));
 		String textResult = sendViaPost(params, "/acceptInvitation");
@@ -76,7 +94,7 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 			throw new SmartMapClientException(e);
 		}
 		checkServerErrorFromJSON(jsonObject);
-		User acceptedUser = parseUserfromJSON(jsonObject);
+		User acceptedUser = parseFriendfromJSON(jsonObject);
 		return acceptedUser;
 	}
 
@@ -87,7 +105,7 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 	 */
 	@Override
 	public User getUserInfo(int id) throws SmartMapClientException {
-		
+
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("user_id", Integer.toString(id));
 		String textResult = sendViaPost(params, "/getUserInfo");
@@ -98,7 +116,7 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 			throw new SmartMapClientException(e);
 		}
 		checkServerErrorFromJSON(jsonObject);
-		User acceptedUser = parseUserfromJSON(jsonObject);
+		User acceptedUser = parseFriendfromJSON(jsonObject);
 		return acceptedUser;
 	}
 

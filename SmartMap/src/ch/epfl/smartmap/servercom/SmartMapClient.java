@@ -57,13 +57,13 @@ public abstract class SmartMapClient {
 	 * @throws JSONException
 	 *             JSONException in case of malformed JSON.
 	 */
-	public User parseUserfromJSON(JSONObject jsonObject)
+	public Friend parseFriendfromJSON(JSONObject jsonObject)
 			throws SmartMapClientException {
 		int userId = 0;
 		String userName = null;
 		try {
-			userId = jsonObject.getInt("userId");
-			userName = jsonObject.getString("userName");
+			userId = jsonObject.getInt("id");
+			userName = jsonObject.getString("name");
 		} catch (JSONException e) {
 			throw new SmartMapClientException(e);
 		}
@@ -126,45 +126,49 @@ public abstract class SmartMapClient {
 			throw new SmartMapClientException(e);
 		}
 
-		// Build the request
-		StringBuilder postData = new StringBuilder();
-		for (Map.Entry<String, String> param : params.entrySet()) {
-			if (postData.length() != 0) {
-				postData.append('&');
+		if (params != null) {
+
+			// Build the request
+			StringBuilder postData = new StringBuilder();
+			for (Map.Entry<String, String> param : params.entrySet()) {
+				if (postData.length() != 0) {
+					postData.append('&');
+				}
+				try {
+					postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+					postData.append('=');
+					postData.append(URLEncoder.encode(
+							String.valueOf(param.getValue()), "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					throw new SmartMapClientException(e);
+				}
 			}
+
+			connection.setDoOutput(true); // To be able to send data
+
+			// Add request header
+
 			try {
-				postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
-				postData.append('=');
-				postData.append(URLEncoder.encode(
-						String.valueOf(param.getValue()), "UTF-8"));
-			} catch (UnsupportedEncodingException e) {
+				connection.setRequestMethod("POST");
+				connection.setRequestProperty("User-Agent", USER_AGENT);
+				connection.setRequestProperty("Accept-Language",
+						"en-US,en;q=0.5");
+			} catch (ProtocolException e) {
 				throw new SmartMapClientException(e);
 			}
-		}
 
-		connection.setDoOutput(true); // To be able to send data
+			// Send post request
 
-		// Add request header
-		// TODO TO DISCUSS
-		try {
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("User-Agent", USER_AGENT);
-			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		} catch (ProtocolException e) {
-			throw new SmartMapClientException(e);
-		}
+			DataOutputStream wr;
 
-		// Send post request
-		connection.setDoOutput(true);
-		DataOutputStream wr;
-
-		try {
-			wr = new DataOutputStream(connection.getOutputStream());
-			wr.writeBytes(postData.toString());
-			wr.flush();
-			wr.close();
-		} catch (IOException e) {
-			throw new SmartMapClientException(e);
+			try {
+				wr = new DataOutputStream(connection.getOutputStream());
+				wr.writeBytes(postData.toString());
+				wr.flush();
+				wr.close();
+			} catch (IOException e) {
+				throw new SmartMapClientException(e);
+			}
 		}
 
 		// Get response

@@ -1,12 +1,15 @@
 package ch.epfl.smartmap.servercom;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -31,7 +34,27 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	@Override
 	public List<User> listFriendPos() throws SmartMapClientException {
 		// TODO Auto-generated method stub
-		return null;
+		String textResult = sendViaPost(null, "/listFriendPos");
+
+		List<User> friends = new ArrayList<User>();
+
+		try {
+			JSONObject jsonObject = new JSONObject(textResult);
+			checkServerErrorFromJSON(jsonObject);
+			JSONArray usersArray = jsonObject.getJSONArray("positions");
+			for (int i = 0; i < usersArray.length(); i++) {
+				JSONObject userJSON = usersArray.getJSONObject(i);
+				Friend friend = parseFriendfromJSON(userJSON);
+				// x=latitude, y=longitude??
+				friend.setX(userJSON.getDouble("latitude"));
+				friend.setY(userJSON.getDouble("latitude"));
+				friends.add(friend);
+			}
+		} catch (JSONException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		return friends;
 	}
 
 	/*
