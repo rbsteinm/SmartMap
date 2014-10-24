@@ -3,7 +3,7 @@ package ch.epfl.smartmap.test.cache;
 import org.junit.Test;
 
 import android.test.AndroidTestCase;
-import android.util.SparseArray;
+import android.util.LongSparseArray;
 
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.FriendList;
@@ -13,7 +13,7 @@ public class FriendListTest extends AndroidTestCase {
 
     private final String listName = "Name List";
     private final String newListName = "New Name";
-    private SparseArray<User> array = new SparseArray<User>();
+    private LongSparseArray<User> array = new LongSparseArray<User>();
     private Friend a = new Friend(1234, "qwertz uiop");
     private Friend b = new Friend(0, "hcjkehfkl");
     private Friend c = new Friend(9909, "Abc Def");
