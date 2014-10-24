@@ -20,6 +20,9 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     )
 ));
 
+// Enabling sessions
+$app->register(new Silex\Provider\SessionServiceProvider());
+
 // Injecting repositories
 $app['user.repository'] = $app->share(function() use($app) {
     return new SmartMap\DBInterface\UserRepository($app['db']);
@@ -65,6 +68,13 @@ $app->post('/inviteFriend', 'data.controller:inviteFriend');
 $app->post('/getInvitations', 'data.controller:getInvitations');
 
 $app->post('/acceptInvitation', 'data.controller:acceptInvitation');
+
+$app->post('/listFriendsPos', 'data.controller:listFriendsPos');
+
+$app->post('/updatePos', 'data.controller:updatePos');
+
+// Testing
+$app->post('/fakeAuth', 'authentication.controller:fakeAuth');
 
 
 $app->run();

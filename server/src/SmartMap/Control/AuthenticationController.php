@@ -2,9 +2,6 @@
 
 /**
  * /!\ This file must stay private. Making it public enables any one to impersonate SmartMap FB app
- * Time spent: 
- * -Installing composer + wamp: 1h (so you can't access localhost if skype is opened... wtf)
- * 
  */
 
 namespace SmartMap\Control;
@@ -122,5 +119,24 @@ class AuthenticationController {
             return new JsonResponse (array('status' => "Error", 'message' =>  "An internal error occured (" . 
                             "SQL correctly configured?"));
         }
+
+    }
+    
+    /* Development method used to simplify tests
+     * 
+     */
+    public function fakeAuth(Request $request)
+    {
+        $id = $request->request->get('user_id');
+        if ($id === null)
+        {
+            throw new \Exception('Field user_id is not set !');
+        }
+        
+        $session = $request->getSession();
+        
+        $session->set('userId', $id);
+        
+        return new JsonResponse(array('status' => 'Ok', 'message' => 'Fakeauthentified as id '. $id));
     }
 }
