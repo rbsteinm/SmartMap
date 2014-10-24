@@ -13,8 +13,9 @@ public class UserEvent implements Event {
     private GregorianCalendar mStartDate;
     private GregorianCalendar mEndDate;
     private int evtID;
+    private Point position;
     
-    public UserEvent(String name, int creator, GregorianCalendar startDate, GregorianCalendar endDate) {
+    public UserEvent(String name, int creator, GregorianCalendar startDate, GregorianCalendar endDate, Point p) {
         evtName = name;
         evtCreator = creator;
         mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR),
@@ -28,6 +29,9 @@ public class UserEvent implements Event {
                 endDate.get(Calendar.DATE),
                 endDate.get(Calendar.HOUR),
                 endDate.get(Calendar.MINUTE));
+        
+        position.setX(p.getX());
+        position.setY(p.getY());
     }
     
     @Override
@@ -81,5 +85,26 @@ public class UserEvent implements Event {
     @Override
     public void setID(int newID) {
         evtID = newID;
+    }
+
+    @Override
+    public Point getPosition() {
+        return position;
+    }
+
+    @Override
+    public void setPosition(Point p) {
+        position.setX(p.getX());
+        position.setY(p.getY());
+    }
+
+    @Override
+    public void setX(double x) {
+        position.setX(x);
+    }
+
+    @Override
+    public void setY(double y) {
+        position.setY(y);
     }
 }

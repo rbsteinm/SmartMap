@@ -9,6 +9,29 @@ import java.util.GregorianCalendar;
 public interface Event {
     
     /**
+     * @return The event's position
+     */
+    Point getPosition();
+    
+    /**
+     * Sets the event's position
+     * @param p The new position
+     */
+    void setPosition(Point p);
+    
+    /**
+     * Sets the events's longitude
+     * @param x The longitude
+     */
+    void setX(double x);
+    
+    /**
+     * Sets the event's latitude
+     * @param y The latitude
+     */
+    void setY(double y);
+    
+    /**
      * @return The event's name
      */
     String getName();

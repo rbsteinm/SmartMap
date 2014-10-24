@@ -66,7 +66,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     
     //Columns for the Event table
     private static final String[] EVENT_COLUMNS = {
-        KEY_ID, KEY_NAME, KEY_USER_ID,
+        KEY_ID, KEY_NAME, KEY_USER_ID, KEY_POSX, KEY_POSY,
         KEY_YEAR, KEY_MONTH, KEY_DATE, KEY_HOUR, KEY_MINUTE,
         KEY_ENDYEAR, KEY_ENDMONTH, KEY_ENDDATE, KEY_ENDHOUR, KEY_ENDMINUTE
     };
@@ -104,6 +104,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ID + " INTEGER PRIMARY KEY,"
             + KEY_NAME + " TEXT,"
             + KEY_USER_ID + " INTEGER,"
+            + KEY_POSX + " DOUBLE,"
+            + KEY_POSY + " DOUBLE,"
             + KEY_YEAR + " INTEGER,"
             + KEY_MONTH + " INTEGER,"
             + KEY_DATE + " INTEGER,"
@@ -349,7 +351,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     /**
-     * Method to get all the filters from the database
+     * Gets all the filters from the database
      * @return A list of FriendLists
      */
     public List<UserList> getAllFilters() {
@@ -403,6 +405,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_ID, event.getID());
         values.put(KEY_NAME, event.getName());
         values.put(KEY_USER_ID, event.getCreator());
+        values.put(KEY_POSX, event.getPosition().getX());
+        values.put(KEY_POSY, event.getPosition().getY());
         values.put(KEY_YEAR, event.getStartDate().get(Calendar.YEAR));
         values.put(KEY_MONTH, event.getStartDate().get(Calendar.MONTH));
         values.put(KEY_DATE, event.getStartDate().get(Calendar.DATE));
@@ -456,7 +460,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         UserEvent event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                 cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)),
                 startDate,
-                endDate);
+                endDate,
+                new Point(cursor.getColumnIndex(KEY_POSX), cursor.getColumnIndex(KEY_POSY)));
 
         event.setID(id);
         
@@ -495,7 +500,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                         cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)),
                         startDate,
-                        endDate);
+                        endDate,
+                        new Point(cursor.getColumnIndex(KEY_POSX), cursor.getColumnIndex(KEY_POSY)));
   
                 event.setID(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
                 events.add(event);
@@ -532,6 +538,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_ID, event.getID());
         values.put(KEY_NAME, event.getName());
         values.put(KEY_USER_ID, event.getCreator());
+        values.put(KEY_POSX, event.getPosition().getX());
+        values.put(KEY_POSY, event.getPosition().getY());
         values.put(KEY_YEAR, event.getStartDate().get(Calendar.YEAR));
         values.put(KEY_MONTH, event.getStartDate().get(Calendar.MONTH));
         values.put(KEY_DATE, event.getStartDate().get(Calendar.DATE));
