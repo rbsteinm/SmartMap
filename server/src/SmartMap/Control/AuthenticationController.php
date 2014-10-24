@@ -64,10 +64,10 @@ class AuthenticationController {
                 $session->validate();
             } catch (FacebookRequestException $ex) {
                 // Session not valid, Graph API returned an exception with the reason.
-                return new JsonResponse (array('status' => "ERROR: " . $ex->getMessage()));
+                return new JsonResponse (array('status' => "Error", 'message' => $ex->getMessage()));
             } catch (\Exception $ex) {
                 // Graph API returned info, but it may mismatch the current app or have expired.
-                return new JsonResponse (array('status' => "ERROR: " . $ex->getMessage()));
+                return new JsonResponse (array('status' => "Error", 'message' => $ex->getMessage()));
             }
             
             // At this point the session is valid. We check the session is associated with the user name and id.
@@ -83,50 +83,44 @@ class AuthenticationController {
                 
             
             } catch(FacebookRequestException $e) {
-                return new JsonResponse (array('status' => "ERROR: " . $e->getMessage()));
+                return new JsonResponse (array('status' => "Error" . $e->getMessage()));
             } catch (\UnexpectedValueException $e) {
-                return new JsonResponse (array('status' => "ERROR: the name or the id associated with this token is " .
+                return new JsonResponse (array('status' => "Error", 'message' => "the name or the id associated with this token is " .
                                 "not the one received via POST"));
             }
             
             // OK, user is successfully authenticated!
             
             // Configure the $_SESSION
-            $session = new Session();
-            $session->start();
-            $session->set('LOGGED_IN', 'TRUE');
-            
-            // Refresh user's info in DB (TODO, rm $facebookToken)
-            $user = new User ( $facebookId, $facebookToken, $name, 'VISIBLE', 0.0, 0.0 );
+            $session = $request->getSession();
+            if ($session == null) {
+                throw \Exception("Session is null");
+            }
             
             // Update DB
+            // if user exist from fb id: get id and update DB
+             // else create new user in DB
+
+            $userId = $this->mRepo->getUserIdFromFb($facebookId);
+            if (!$userId) {
+                $user = new User ( 1, $facebookId, $name, 'VISIBLE', 0.0, 0.0 );
+                $user = $this->mRepo->createUser($user);
+                $session->set('userId', $user->getId());
+            } else {
+                $session->set('userId', $userId);
+            }
+            
             // TODO check if we can retrieve the user using his id. if not, create a new one in DB
             $user0 = $this->mRepo->getUser($facebookId);
             
-            return new JsonResponse (array('status' => "OK"));
+            return new JsonResponse (array('status' => "OK", 'message' => "Sucessfully authenticated"));
             
         } catch (\InvalidArgumentException $e0) {
-            return new JsonResponse (array('status' => "ERROR: to authenticate, please send the following " .
+            return new JsonResponse (array('status' => "Error", 'message' => "to authenticate, please send the following " .
                             "POST parameters: name, facebookId and facebookToken"));
         } catch (\Exception $e1) {
-            return new JsonResponse (array('status' => "ERROR: " . $e1->getMessage()));
+            return new JsonResponse (array('status' => "Error", 'message' =>  "An internal error occured (" . 
+                            "SQL correctly configured?"));
         }
-    }
-    public function registerUser(Request $request, Application $app) {
-        // TODO by Robin
-        
-
-        // Here you should create a user (id does not matter but must be > 0)
-        $user = new User ( 1, 'hahahahastayinalive123', 'Julien', 'VISIBLE', 1.0, 2.0 );
-        
-        // This creates the user in the database
-        $user = $this->mRepo->createUser ( $user );
-        
-        // Should be replaced by Json
-        return $user->getId ();
-    }
-    
-    private function checkToken(User $user) {
-        
     }
 }

@@ -18,6 +18,13 @@ use Facebook\GraphObject;
 
 use Doctrine\Tests\Mocks\ConnectionMock;
 
+/**
+ * The mock fb account is robin.genolet@epfl.ch hackerinside
+ * name: Swag Sweng
+ * ID: 
+ * @author SpicyCH
+ *
+ */
 class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
     public $test;
     
@@ -39,6 +46,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
         );
         
         $conn = null; // TODO find a way to instanciate the Connection
+        $conn = Doctrine_Manager::connection('mysql://smartmap:salut123@localhost/test', 'connection 1');
         $userRepo = new UserRepository($conn);
         $authContr = new AuthenticationController($userRepo);
         
