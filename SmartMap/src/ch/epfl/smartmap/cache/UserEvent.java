@@ -9,13 +9,13 @@ import java.util.GregorianCalendar;
  */
 public class UserEvent implements Event {
     private String evtName;
-    private int evtCreator; //the user who created the event
+    private long evtCreator; //the user who created the event
     private GregorianCalendar mStartDate;
     private GregorianCalendar mEndDate;
     private long evtID;
     private Point position;
     
-    public UserEvent(String name, int creator, GregorianCalendar startDate, GregorianCalendar endDate, Point p) {
+    public UserEvent(String name, long creator, GregorianCalendar startDate, GregorianCalendar endDate, Point p) {
         evtName = name;
         evtCreator = creator;
         mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR),
@@ -40,7 +40,7 @@ public class UserEvent implements Event {
     }
     
     @Override
-    public int getCreator() {
+    public long getCreator() {
         return evtCreator;
     }
     

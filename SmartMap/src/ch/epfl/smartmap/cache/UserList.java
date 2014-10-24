@@ -2,7 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import java.util.List;
 
-import android.util.SparseArray;
+import android.util.LongSparseArray;
 
 /**
  * A list of user IDs
@@ -37,23 +37,23 @@ public interface UserList {
 	 * Adds a user to the list
 	 * @param id The user's ID
 	 */
-	void addUser(int id);
+	void addUser(long id);
 	
 	/**
 	 * Removes a user from the list
 	 * @param id The user's ID
 	 */
-	void removeUser(int id);
+	void removeUser(long id);
 	
 	/**
 	 * @return The whole list of IDs
 	 */
-	List<Integer> getList();
+	List<Long> getList();
 	
 	/**
 	 * Given a SparseArray of Users (mapped to their ID), returns a filtered list of Users
 	 * @param friends The array of Users
 	 * @return The list of users sorted alphabetically
 	 */
-	List<User> getUserList(SparseArray<User> friends);
+	List<User> getUserList(LongSparseArray<User> friends);
 }

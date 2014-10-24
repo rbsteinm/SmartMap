@@ -39,7 +39,7 @@ public interface Event {
     /**
      * @return The ID of the user who created the event
      */
-    int getCreator();
+    long getCreator();
     
     /**
      * @return The event's ID

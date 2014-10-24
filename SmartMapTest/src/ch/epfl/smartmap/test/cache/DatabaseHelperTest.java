@@ -8,7 +8,7 @@ import ch.epfl.smartmap.cache.FriendList;
 import ch.epfl.smartmap.cache.User;
 
 import android.test.AndroidTestCase;
-import android.util.SparseArray;
+import android.util.LongSparseArray;
 
 /**
  * Tests for the DatabaseHelper class
@@ -48,7 +48,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(a);
         dbh.addUser(b);
         dbh.addUser(c);
-        SparseArray<User> list = dbh.getAllUsers();
+        LongSparseArray<User> list = dbh.getAllUsers();
         assertTrue(list.get(c.getID()).getID() == c.getID());
     }
     
@@ -67,7 +67,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(b);
         dbh.addUser(c);
         dbh.deleteUser(b.getID());
-        SparseArray<User> list = dbh.getAllUsers();
+        LongSparseArray<User> list = dbh.getAllUsers();
         assertTrue(list.size() == 2 && list.get(a.getID()).getID() == a.getID());
     }
     

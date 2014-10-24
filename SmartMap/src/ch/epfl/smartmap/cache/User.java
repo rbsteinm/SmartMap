@@ -9,7 +9,7 @@ public interface User {
 	/**
 	 * @return The user's ID
 	 */
-	int getID();
+	long getID();
 	
 	/**
 	 * @return The user's name

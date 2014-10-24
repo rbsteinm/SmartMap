@@ -10,7 +10,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.SparseArray;
+import android.util.LongSparseArray;
 
 /**
  * SQLite helper
@@ -175,7 +175,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param id The user's unique ID
      * @return The user as a Friend object
      */
-    public User getUser(int id) {
+    public User getUser(long id) {
         
         SQLiteDatabase db = this.getReadableDatabase();
         
@@ -193,7 +193,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
         }
      
-        Friend friend = new Friend(cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)),
+        Friend friend = new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
                 cursor.getString(cursor.getColumnIndex(KEY_NAME)));
         friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
         friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
@@ -205,11 +205,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     /**
-     * Creates a SparseArray containing all users in the database, mapped to their ID
-     * @return A SparseArray of all users
+     * Creates a LongSparseArray containing all users in the database, mapped to their ID
+     * @return A LongSparseArray of all users
      */
-    public SparseArray<User> getAllUsers() {
-        SparseArray<User> friends = new SparseArray<User>();
+    public LongSparseArray<User> getAllUsers() {
+        LongSparseArray<User> friends = new LongSparseArray<User>();
   
         String query = "SELECT  * FROM " + TABLE_USER;
         
@@ -219,7 +219,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Friend friend = null;
         if (cursor.moveToFirst()) {
             do {
-                friend = new Friend(cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)),
+                friend = new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
                         cursor.getString(cursor.getColumnIndex(KEY_NAME)));
                 friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
                 friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
@@ -266,7 +266,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Deletes a user from the database
      * @param id The user's id
      */
-    public void deleteUser(int id) {
+    public void deleteUser(long id) {
         
         SQLiteDatabase db = this.getWritableDatabase();
  
@@ -293,7 +293,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         
         //Then we add the filter-user pairs to another table
         ContentValues pairValues = null;
-        for (int id : filter.getList()) {
+        for (long id : filter.getList()) {
             pairValues = new ContentValues();
             pairValues.put(KEY_FILTER_ID, filterID);
             pairValues.put(KEY_USER_ID, id);
@@ -344,7 +344,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             
         if (cursor.moveToFirst()) {
             do {
-                filter.addUser(cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)));
+                filter.addUser(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
             } while (cursor.moveToNext());
         }
         return filter;
@@ -498,12 +498,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getInt(cursor.getColumnIndex(KEY_ENDMINUTE)));
                 
                 event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)),
+                        cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
                         startDate,
                         endDate,
                         new Point(cursor.getColumnIndex(KEY_POSX), cursor.getColumnIndex(KEY_POSY)));
   
-                event.setID(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+                event.setID(cursor.getLong(cursor.getColumnIndex(KEY_ID)));
                 events.add(event);
             } while (cursor.moveToNext());
         }
