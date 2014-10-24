@@ -107,7 +107,6 @@ class UserRepository
     {
         $this->mDb->insert(self::$TABLE_USER,
             array(
-                'fbid' => $user->getFbId(),
                 'fbid' => $user->getFbid(),
                 'name' => $user->getName(),
                 'visibility' => $user->getVisibility(),
