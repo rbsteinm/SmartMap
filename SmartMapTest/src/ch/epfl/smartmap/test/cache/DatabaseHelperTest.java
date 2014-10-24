@@ -66,7 +66,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(a);
         dbh.addUser(b);
         dbh.addUser(c);
-        dbh.deleteUser(b);
+        dbh.deleteUser(b.getID());
         SparseArray<User> list = dbh.getAllUsers();
         assertTrue(list.size() == 2 && list.get(a.getID()).getID() == a.getID());
     }

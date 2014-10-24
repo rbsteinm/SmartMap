@@ -264,15 +264,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     
     /**
      * Deletes a user from the database
-     * @param user The user to delete
+     * @param id The user's id
      */
-    public void deleteUser(User user) {
+    public void deleteUser(int id) {
         
         SQLiteDatabase db = this.getWritableDatabase();
  
         db.delete(TABLE_USER,
                 KEY_USER_ID + " = ?",
-                new String[] {String.valueOf(user.getID())});
+                new String[] {String.valueOf(id)});
                 
         db.close(); 
     }
@@ -376,19 +376,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Deletes a filter from the database
      * @param filter The filter to delete
      */
-    public void deleteFilter(UserList filter) {
+    public void deleteFilter(long id) {
         
         SQLiteDatabase db = this.getWritableDatabase();
  
         //delete the filter from the table of filters
         db.delete(TABLE_FILTER,
                 KEY_ID + " = ?",
-                new String[] {String.valueOf(filter.getID())});
+                new String[] {String.valueOf(id)});
         
         //then delete all the rows that reference this filter in the filter-user table
         db.delete(TABLE_FILTER_USER,
                 KEY_FILTER_ID + " = ?",
-                new String[] {String.valueOf(filter.getID())});
+                new String[] {String.valueOf(id)});
                 
         db.close(); 
     }
@@ -427,7 +427,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param id The event's ID
      * @return The event associated to this ID
      */
-    public Event getEvent(int id) {
+    public Event getEvent(long id) {
         
         SQLiteDatabase db = this.getReadableDatabase();
         
@@ -514,13 +514,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Deletes an event from the database
      * @param event The event to delete
      */
-    public void deleteEvent(Event event) {
+    public void deleteEvent(long id) {
         
         SQLiteDatabase db = this.getWritableDatabase();
  
         db.delete(TABLE_EVENT,
                 KEY_ID + " = ?",
-                new String[] {String.valueOf(event.getID())});
+                new String[] {String.valueOf(id)});
                 
         db.close(); 
     }

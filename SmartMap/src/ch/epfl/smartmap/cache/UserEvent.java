@@ -12,7 +12,7 @@ public class UserEvent implements Event {
     private int evtCreator; //the user who created the event
     private GregorianCalendar mStartDate;
     private GregorianCalendar mEndDate;
-    private int evtID;
+    private long evtID;
     private Point position;
     
     public UserEvent(String name, int creator, GregorianCalendar startDate, GregorianCalendar endDate, Point p) {
@@ -78,12 +78,12 @@ public class UserEvent implements Event {
     }
 
     @Override
-    public int getID() {
+    public long getID() {
         return evtID;
     }
 
     @Override
-    public void setID(int newID) {
+    public void setID(long newID) {
         evtID = newID;
     }
 

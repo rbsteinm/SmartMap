@@ -44,7 +44,7 @@ public interface Event {
     /**
      * @return The event's ID
      */
-    int getID();
+    long getID();
     
     /**
      * @return The date (year, month, day, hour, minute) at which the event starts
@@ -79,5 +79,5 @@ public interface Event {
      * Sets the event's ID
      * @param newID The new ID
      */
-    void setID(int newID);
+    void setID(long newID);
 }
