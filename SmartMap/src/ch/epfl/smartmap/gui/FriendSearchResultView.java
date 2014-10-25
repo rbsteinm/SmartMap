@@ -6,10 +6,13 @@ package ch.epfl.smartmap.gui;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.R;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout.LayoutParams;
 
 /**
  * @author jfperren
@@ -17,6 +20,9 @@ import android.widget.TextView;
  */
 public class FriendSearchResultView extends SearchResultView {
 
+    private static int PHOTO_RIGHT_MARGIN = 40;
+    private static int NAME_VIEW_BOTTOM_PADDING = 5;
+    
     private Friend mFriend;
     private ImageView mPhotoView;
     private TextView mNameView;
@@ -37,31 +43,42 @@ public class FriendSearchResultView extends SearchResultView {
         // Creates mPhotoView
         mPhotoView = new ImageView(context);
         mPhotoView.setAdjustViewBounds(true);
-        mPhotoView.setImageResource(R.drawable.ic_launcher);
+        mPhotoView.setImageResource(R.drawable.default_user_icon);
+        LayoutParams mPhotoViewLayoutParams = new LayoutParams(150, 150);
+        mPhotoViewLayoutParams.setMargins(0, 0, PHOTO_RIGHT_MARGIN, 0);
+        mPhotoView.setLayoutParams(mPhotoViewLayoutParams);
+        mPhotoView.setScaleType(ScaleType.FIT_XY);
         
         // Creates mNameView
         mNameView = new TextView(context);
         mNameView.setText(mFriend.getName());
+        mNameView.setTextSize(17f);
+        mNameView.setTypeface(null, Typeface.BOLD);
+        mNameView.setPadding(0, 0, 0, NAME_VIEW_BOTTOM_PADDING);
         
         // Creates mLastConnectionView
         mLastConnectionView = new TextView(context); 
-        mLastConnectionView.setText("last seen ...");
+        mLastConnectionView.setText("last seen " + friend.getLastConnection()+ ".");
+        mLastConnectionView.setTextColor(getResources().getColor(R.color.lastSeenConnectionTextColor));
         
         // Create mInfoLayout
         mInfoLayout = new LinearLayout(context);
         mInfoLayout.setOrientation(VERTICAL);
         
         // Creates mMoreInfoButton
-        mMoreInfoButton = new Button(context);
+//        mMoreInfoButton = new Button(context);
+//        mMoreInfoButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 9f));
+//        mMoreInfoButton.setText("Infos");
+//        mMoreInfoButton.setBackground(null);
+//        mMainLayout.addView(mMoreInfoButton, 1);
         
         // Adds all view into the ResultView
-        this.addView(mPhotoView);
+        mMainLayout.addView(mPhotoView);
         mInfoLayout.addView(mNameView);
         mInfoLayout.addView(mLastConnectionView);
         mInfoLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         
-        this.addView(mInfoLayout);
-        this.addView(mMoreInfoButton);
+        mMainLayout.addView(mInfoLayout);
     }
     
     /**

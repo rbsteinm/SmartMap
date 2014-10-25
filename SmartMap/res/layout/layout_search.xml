@@ -20,43 +20,38 @@
             android:id="@+id/searchBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="30dp"
-            android:alpha="0.5"
-            android:background="@color/bottomSliderBackground"
-            android:orientation="horizontal"
-            android:padding="5dp" >
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="0dp"
+            android:padding="8dp"
+            android:paddingLeft="0dp"
+            android:alpha="1"
+            android:background="@color/searchResultBackground"
+            android:orientation="horizontal" > 
 
-            <ImageView
-                android:id="@+id/searchBarIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:adjustViewBounds="true"
-                android:src="@drawable/searchicon" />
-
-            <EditText
-                android:id="@+id/searchBarEditText"
+            <SearchView
+                android:id="@+id/searchBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:clickable="true"
                 android:descendantFocusability="beforeDescendants"
-                android:hint="@string/searchBar"
+                android:queryHint="@string/search_bar_hint"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:paddingEnd="0dp"
-                android:paddingStart="10dp"
                 android:singleLine="true"
-                android:textSize="16sp" />
+                android:textSize="25sp" 
+                android:actionViewClass="ch.epfl.smartmap.gui.SearchLayout"
+                android:iconifiedByDefault="false" />
         </LinearLayout>
 
         <ScrollView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:orientation="vertical"
             android:overScrollMode="never" >
 

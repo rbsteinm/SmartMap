@@ -13,6 +13,8 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import android.text.TextWatcher;
 import android.text.Editable;
@@ -44,19 +46,20 @@ public class SearchLayout extends RelativeLayout {
     }
     
     public void initSearchLayout(){
-      final EditText  mSearchBarEditText = (EditText) this.findViewById(R.id.searchBarEditText);
+      final SearchView  mSearchBarEditText = (SearchView) this.findViewById(R.id.searchBar);
       
-      mSearchBarEditText.addTextChangedListener(new TextWatcher(){
+      mSearchBarEditText.setOnQueryTextListener(new OnQueryTextListener(){
+
+          public boolean onQueryTextSubmit(String query) {
+              // Do something when user his enter on keyboard
+              mSearchBarEditText.clearFocus();
+              return false;
+          }
+          
           @Override
-          public void afterTextChanged(Editable s) {
+          public boolean onQueryTextChange(String newText) {
               updateSearchPanel();
-              Log.d(TAG, "afterTextChanged");
-          }
-          public void beforeTextChanged(CharSequence s, int start, int count, int after){
-              Log.d(TAG, "beforeTextChanged");
-          }
-          public void onTextChanged(CharSequence s, int start, int before, int count){
-              Log.d(TAG, "onTextChanged");
+              return false;
           }
       }); 
       
@@ -66,16 +69,17 @@ public class SearchLayout extends RelativeLayout {
         
         // Get Views
         final LinearLayout mSearchResultList = (LinearLayout) this.findViewById(R.id.search_result_list);
-        final EditText  mSearchBarEditText = (EditText) this.findViewById(R.id.searchBarEditText);
+        final SearchView  mSearchBarEditText = (SearchView) this.findViewById(R.id.searchBar);
         // Get search query
-        String query = mSearchBarEditText.getText().toString();
+        String query = mSearchBarEditText.getQuery().toString();
         List<Friend> result = mSearchEngine.sendQuery(query);
         // Clean list
         mSearchResultList.removeAllViews();
         for(Friend f : result){
-            mSearchResultList.addView(new FriendSearchResultView(mContext, f));
+            FriendSearchResultView friendView = new FriendSearchResultView(mContext, f);
+
+            mSearchResultList.addView(friendView);
         }
-        
     }
     
 }

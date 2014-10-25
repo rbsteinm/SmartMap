@@ -611,7 +611,7 @@ containing a value of this type.
         public static final int zOrderOnTop=0x7f010019;
     }
     public static final class color {
-        public static final int bottomSliderBackground=0x7f090023;
+        public static final int bottomSliderBackground=0x7f090025;
         public static final int com_facebook_blue=0x7f090019;
         public static final int com_facebook_likeboxcountview_border_color=0x7f090020;
         public static final int com_facebook_likeboxcountview_text_color=0x7f090021;
@@ -635,9 +635,12 @@ containing a value of this type.
         public static final int common_signin_btn_light_text_disabled=0x7f090006;
         public static final int common_signin_btn_light_text_focused=0x7f090007;
         public static final int common_signin_btn_light_text_pressed=0x7f090005;
-        public static final int common_signin_btn_text_dark=0x7f090024;
-        public static final int common_signin_btn_text_light=0x7f090025;
+        public static final int common_signin_btn_text_dark=0x7f090027;
+        public static final int common_signin_btn_text_light=0x7f090028;
+        public static final int lastSeenConnectionTextColor=0x7f090026;
         public static final int searchResultBackground=0x7f090022;
+        public static final int searchResultBorder=0x7f090023;
+        public static final int searchResultShadow=0x7f090024;
         public static final int wallet_bright_foreground_disabled_holo_light=0x7f09000f;
         /** 
          Wallet colors to support consistent Wallet fragment holo dark UI in client application
@@ -656,8 +659,8 @@ containing a value of this type.
         public static final int wallet_hint_foreground_holo_light=0x7f090011;
         public static final int wallet_holo_blue_light=0x7f090015;
         public static final int wallet_link_text_light=0x7f090016;
-        public static final int wallet_primary_text_holo_light=0x7f090026;
-        public static final int wallet_secondary_text_holo_dark=0x7f090027;
+        public static final int wallet_primary_text_holo_light=0x7f090029;
+        public static final int wallet_secondary_text_holo_dark=0x7f09002a;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -725,7 +728,7 @@ containing a value of this type.
         public static final int com_facebook_list_section_header_background=0x7f020016;
         public static final int com_facebook_loginbutton_silver=0x7f020017;
         public static final int com_facebook_logo=0x7f020018;
-        public static final int com_facebook_picker_default_separator_color=0x7f020057;
+        public static final int com_facebook_picker_default_separator_color=0x7f020059;
         public static final int com_facebook_picker_item_background=0x7f020019;
         public static final int com_facebook_picker_list_focused=0x7f02001a;
         public static final int com_facebook_picker_list_longpressed=0x7f02001b;
@@ -776,21 +779,23 @@ containing a value of this type.
         public static final int common_signin_btn_text_normal_light=0x7f020048;
         public static final int common_signin_btn_text_pressed_dark=0x7f020049;
         public static final int common_signin_btn_text_pressed_light=0x7f02004a;
-        public static final int drawer_shadow=0x7f02004b;
-        public static final int googlemapmockbackground=0x7f02004c;
-        public static final int ic_drawer=0x7f02004d;
-        public static final int ic_launcher=0x7f02004e;
-        public static final int ic_plusone_medium_off_client=0x7f02004f;
-        public static final int ic_plusone_small_off_client=0x7f020050;
-        public static final int ic_plusone_standard_off_client=0x7f020051;
-        public static final int ic_plusone_tall_off_client=0x7f020052;
-        public static final int logo=0x7f020053;
-        public static final int powered_by_google_dark=0x7f020054;
-        public static final int powered_by_google_light=0x7f020055;
-        public static final int searchicon=0x7f020056;
+        public static final int default_user_icon=0x7f02004b;
+        public static final int drawer_shadow=0x7f02004c;
+        public static final int googlemapmockbackground=0x7f02004d;
+        public static final int ic_drawer=0x7f02004e;
+        public static final int ic_launcher=0x7f02004f;
+        public static final int ic_plusone_medium_off_client=0x7f020050;
+        public static final int ic_plusone_small_off_client=0x7f020051;
+        public static final int ic_plusone_standard_off_client=0x7f020052;
+        public static final int ic_plusone_tall_off_client=0x7f020053;
+        public static final int logo=0x7f020054;
+        public static final int powered_by_google_dark=0x7f020055;
+        public static final int powered_by_google_light=0x7f020056;
+        public static final int searchicon=0x7f020057;
+        public static final int shape=0x7f020058;
     }
     public static final class id {
-        public static final int action_settings=0x7f06004d;
+        public static final int action_settings=0x7f06004c;
         public static final int anchored=0x7f060002;
         public static final int authButton=0x7f06002d;
         public static final int book_now=0x7f060014;
@@ -832,7 +837,7 @@ containing a value of this type.
         public static final int dragView=0x7f060029;
         public static final int drawer_layout=0x7f060026;
         public static final int expanded=0x7f060000;
-        public static final int fade_in=0x7f06004c;
+        public static final int fade_in=0x7f06004b;
         public static final int frame_layout_main=0x7f060023;
         public static final int grayscale=0x7f060016;
         public static final int hidden=0x7f060003;
@@ -854,10 +859,9 @@ containing a value of this type.
         public static final int right=0x7f060022;
         public static final int sandbox=0x7f06000c;
         public static final int satellite=0x7f060006;
-        public static final int searchBarEditText=0x7f06004a;
-        public static final int searchBarIcon=0x7f060049;
+        public static final int searchBar=0x7f060049;
         public static final int searchBarLayout=0x7f060048;
-        public static final int search_result_list=0x7f06004b;
+        public static final int search_result_list=0x7f06004a;
         public static final int selectionDetails=0x7f06000f;
         public static final int sliding_layout=0x7f060028;
         public static final int small=0x7f060018;
@@ -1046,7 +1050,7 @@ containing a value of this type.
         public static final int greet_user=0x7f080044;
         public static final int hello_world=0x7f080040;
         public static final int logo_description=0x7f080045;
-        public static final int searchBar=0x7f080048;
+        public static final int search_bar_hint=0x7f080048;
         public static final int store_picture_message=0x7f080001;
         public static final int store_picture_title=0x7f080000;
         public static final int title_activity_friends=0x7f080047;

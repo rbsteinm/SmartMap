@@ -69,6 +69,10 @@ public class Friend implements User {
 	public void setNumber(String newNumber) {
 		phoneNumber = newNumber;
 	}
+	
+	public String getLastConnection(){
+	    return "8 hours ago";
+	}
 
 	@Override
 	public void setEmail(String newEmail) {

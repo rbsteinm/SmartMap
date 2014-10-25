@@ -5,14 +5,8 @@ package ch.epfl.smartmap.gui;
 
 import ch.epfl.smartmap.R;
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.text.Layout;
-import android.util.AttributeSet;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 /**
  * @author jfperren
@@ -20,28 +14,54 @@ import android.widget.RelativeLayout;
  */
 public abstract class SearchResultView extends LinearLayout {
 
+    public static final int PADDING_BOTTOM = 20;
+    public static final int PADDING_RIGHT = 20;
+    public static final int PADDING_LEFT = 20;
+    public static final int PADDING_TOP = 20;
+    
+    public static final int BORDER_SIZE = 2;
+    
+    private Button mMoreInfoButton;
+    protected LinearLayout mMainLayout;
+    private LinearLayout mBorderLayout;
+    
     /**
      * @param context
      * @param attrs
      */
-    
-    private Button mMoreInfoButton;
-    private RelativeLayout mMainLayout;
-    
     public SearchResultView(Context context) {
         super(context);
         
+        // Creates shadow layout
+        this.setBackgroundResource(R.color.searchResultShadow);
         this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        this.setOrientation(HORIZONTAL);
-        this.setWeightSum(10f);
-        //this.setBackgroundColor(this.getResources().getColor(R.color.bottomSliderBackground));
-        this.setBackgroundResource(R.color.searchResultBackground);
-        mMoreInfoButton = new Button(context);
-        mMoreInfoButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 9f));
-        mMoreInfoButton.setText("Infos");
+        this.setPadding(0,0,0,4);
         
-        mMainLayout = new RelativeLayout(context);
-        mMainLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 1f));
+        LinearLayout.LayoutParams layout = (LinearLayout.LayoutParams) this.getLayoutParams();
+        layout.setMargins(0,  0, 0, 10);
+        this.setLayoutParams(layout);
+        
+        // Creates border layout
+        mBorderLayout = new LinearLayout(context);
+        mBorderLayout.setBackgroundResource(R.color.searchResultBorder);
+        mBorderLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        mBorderLayout.setPadding(1,1,1,4);
+        
+        //this.setBackgroundResource(R.drawable.shape);
+        
+        this.addView(mBorderLayout);
+        // Creates mMainLayout
+        mMainLayout = new LinearLayout(context);
+        mMainLayout.setOrientation(HORIZONTAL);
+        mMainLayout.setWeightSum(10f);
+        
+        // Parameters
+        mMainLayout.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
+        mMainLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        mMainLayout.setBackgroundResource(R.color.searchResultBackground);
+        
+        mBorderLayout.addView(mMainLayout);
+        
     }
 
     public abstract void update();
