@@ -4,6 +4,8 @@ namespace SmartMap\DBInterface;
 
 use Doctrine\DBAL\Connection;
 
+use SmartMap\Control\ControlException;
+
 class UserRepository
 {
     private static $TABLE_USER = 'users';
@@ -105,7 +107,6 @@ class UserRepository
     {
         $this->mDb->insert(self::$TABLE_USER,
             array(
-                'fbid' => $user->getFbId(),
                 'fbid' => $user->getFbid(),
                 'name' => $user->getName(),
                 'visibility' => $user->getVisibility(),

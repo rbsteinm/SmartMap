@@ -4,6 +4,8 @@ namespace SmartMap\DBInterface;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use SmartMap\Control\ControlException;
+
 class User
 {
     private $mId;
@@ -21,7 +23,7 @@ class User
         $this->checkVisibility($visibility);
         
         $this->mId = $id;
-        $this->mHash = $fbId;
+        $this->mFbId = $fbId;
         $this->mName = $name;
         $this->mVisibility = $visibility;
         $this->mLongitude = $longitude;

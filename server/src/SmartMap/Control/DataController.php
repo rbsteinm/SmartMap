@@ -118,20 +118,23 @@ class DataController
             throw new ControlException('You cannot invite yourself !');
         }
         
-        // Check if the user  blocked or already invited or already inviting
-        $blockedIds = $this->mRepo->getFriendsIds($userId,
-                                                  array('BLOCKED'));
+        // Check if the user is already friend or already invited or already inviting
+        $friendsIds = $this->mRepo->getFriendsIds($userId,
+                                                  array('BLOCKED', 'ALLOWED', 'DISALLOWED'));
         
         $userInvitingIds = $this->mRepo->getInvitationIds($userId);
         $friendInvitingIds = $this->mRepo->getInvitationIds($friendId);
         
-        if (!in_array($friendId, $blockedIds) AND !in_array($friendId, $userInvitingIds) AND
+        if (!in_array($friendId, $friendsIds) AND !in_array($friendId, $userInvitingIds) AND
             !in_array($userId, $friendInvitingIds))
         {
             $this->mRepo->addInvitation($userId, $friendId);
+            $response = array('status' => 'Ok', 'message' => 'Invited friend !');
         }
-        
-        $response = array('status' => 'Ok', 'message' => 'Invited friend !');
+        else
+        {
+            $response = array('status' => 'error', 'message' => 'You are already friends or invited.');
+        }
         
         return new JsonResponse($response);
     }
