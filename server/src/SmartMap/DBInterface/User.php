@@ -23,7 +23,7 @@ class User
         $this->checkVisibility($visibility);
         
         $this->mId = $id;
-        $this->mHash = $fbId;
+        $this->mFbId = $fbId;
         $this->mName = $name;
         $this->mVisibility = $visibility;
         $this->mLongitude = $longitude;
