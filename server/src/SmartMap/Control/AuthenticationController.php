@@ -22,7 +22,7 @@ use Facebook\GraphObject;
 use Facebook\GraphUser;
 
 /**
- * This class handles client-server authentication
+ * This class handles client-server authentication.
  *
  * @author SpicyCH
  *        
@@ -36,6 +36,16 @@ class AuthenticationController {
     function __construct(UserRepository $repo) {
         $this->mRepo = $repo;
     }
+    
+    /**
+     * Authenticates the caller to the SmartMap server.
+     * 
+     * @param Request $request
+     *            This must include the $_POST parameters: name, facebookId, facebookToken.
+     * @throws ControlException When something goes wrong during the authentication procedure.
+     * @return \Symfony\Component\HttpFoundation\JsonResponse A json with the field "status": [OK] or [Error] and
+     *  a field "message" giving details about the status.
+     */
     public function authenticate(Request $request) {
         FacebookSession::setDefaultApplication ( self::$APP_ID, self::$APP_SECRET );
         $name = $request->request->get ( 'name' );
@@ -99,9 +109,9 @@ class AuthenticationController {
             }
             return new JsonResponse ( array (
                             'status' => "OK",
-                            'message' => "Sucessfully authenticated"
+                            'message' => "Sucessfully authenticated" 
             ) );
-        } catch (\PDOException $ex) {
+        } catch ( \PDOException $ex ) {
             throw new ControlException ( 'An error occured while dealing with the database' );
         }
     }
