@@ -1,7 +1,7 @@
 <?php
 
 /**
-* /!\ This file must stay private. Making it public enables any one to impersonate SmartMap FB app
+* /!\ This file must stay private. Making it public enables anyone to impersonate SmartMap FB app
 */
 namespace SmartMap\Control;
 
@@ -43,11 +43,13 @@ class AuthenticationController {
      * @param Request $request
      *            This must include the $_POST parameters: name, facebookId, facebookToken.
      * @throws ControlException When something goes wrong during the authentication procedure.
-     * @return \Symfony\Component\HttpFoundation\JsonResponse A json with the field "status": [OK] or [Error] and
+     * @return \Symfony\Component\HttpFoundation\JsonResponse A json with the field "status": "OK" or "error" and
      *  a field "message" giving details about the status.
      */
     public function authenticate(Request $request) {
+        
         FacebookSession::setDefaultApplication ( self::$APP_ID, self::$APP_SECRET );
+        
         $name = $request->request->get ( 'name' );
         $facebookToken = $request->request->get ( 'facebookToken' );
         $facebookId = $request->request->get ( 'facebookId' );
@@ -79,15 +81,7 @@ class AuthenticationController {
                 throw new ControlException ( "Id and name do not match the fb access token" );
             }
         } catch ( FacebookRequestException $e ) {
-            return new JsonResponse ( array (
-                            'status' => "Error",
-                            'message' => 'Error during facebook request.' 
-            ) );
-        } catch ( \UnexpectedValueException $e ) {
-            return new JsonResponse ( array (
-                            'status' => "Error",
-                            'message' => "the name or the id associated with this token is " . "not the one received via POST" 
-            ) );
+            throw new ControlException ( $e->getMessage() );
         }
         
         // OK, at this point user is successfully authenticated!
@@ -101,16 +95,19 @@ class AuthenticationController {
         try {
             $userId = $this->mRepo->getUserIdFromFb ( $facebookId );
             if (! $userId) {
-                $user = new User ( 1, $facebookId, $name, 'VISIBLE', 0.0, 0.0 );
+                // Since the DB increments the id by one for each new user, the first param is not relevant
+                $user = new User ( 1 , $facebookId, $name, 'VISIBLE', 0.0, 0.0 );
                 $user = $this->mRepo->createUser ( $user );
                 $session->set ( 'userId', $user->getId () );
             } else {
                 $session->set ( 'userId', $userId );
             }
+            
             return new JsonResponse ( array (
                             'status' => "OK",
                             'message' => "Sucessfully authenticated" 
             ) );
+            
         } catch ( \PDOException $ex ) {
             throw new ControlException ( 'An error occured while dealing with the database' );
         }
