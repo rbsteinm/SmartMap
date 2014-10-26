@@ -7,5 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Alain/Desktop/EPFL/3rdyear/1stsemester/SoftwareEngineering/Development/espresso-1.1-bundled.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
