@@ -1,0 +1,90 @@
+package ch.epfl.smartmap.test.cache;
+
+import org.junit.Test;
+
+import android.graphics.BitmapFactory;
+import android.test.AndroidTestCase;
+
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Friend;
+
+public class FriendTest extends AndroidTestCase {
+    private final int id = 1111;
+    private final String name = "test name";
+    private final String name2 = "other name";
+    private final String number = "0790000000";
+    private final String email = "test@test.com";
+    private final double x = 1.23;
+    private final double y = 3.21;
+    private Friend friend;
+    
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        friend = new Friend(id, name);
+    }
+    
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        friend.deletePicture(getContext());
+    }
+    
+    @Test
+    public void testGetID() {
+        assertTrue(friend.getID() == id);
+    }
+    
+    @Test
+    public void testGetName() {
+        assertTrue(friend.getName().equals(name)); 
+    }
+    
+    @Test
+    public void testSetNumber() {
+        friend.setNumber(number);
+        assertTrue(friend.getNumber().equals(number)); 
+    }
+    
+    @Test
+    public void testSetX() {
+        friend.setX(x);
+        assertTrue(friend.getPosition().getX() == x);
+    }
+    
+    @Test
+    public void testSetY() {
+        friend.setY(y);
+        assertTrue(friend.getPosition().getY() == y); 
+    }
+    
+    @Test
+    public void testSetName() {
+        friend.setName(name2);
+        assertTrue(friend.getName().equals(name2)); 
+    }
+    
+    @Test
+    public void testSetEmail() {
+        friend.setEmail(email);
+        assertTrue(friend.getEmail().equals(email)); 
+    }
+    
+    @Test
+    public void testGetDefaultPic() {
+        assertTrue(friend.getPicture(getContext()).sameAs(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.ic_launcher))); 
+    }
+    
+    @Test
+    public void testSetPic() {
+        friend.setPicture(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.searchicon), getContext());
+        assertTrue(friend.getPicture(getContext()).sameAs(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.searchicon))); 
+    }
+    
+    @Test
+    public void testDeletePic() {
+        friend.setPicture(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.searchicon), getContext());
+        friend.deletePicture(getContext());
+        assertTrue(friend.getPicture(getContext()).sameAs(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.ic_launcher)));
+    }
+}

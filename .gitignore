@@ -1,6 +1,13 @@
 SmartMap/.metadata/
+<<<<<<< HEAD
 SmartMap/.project
 SmartMap/.settings
+=======
+SmartMap/.classpath
+SmartMap/.project
+SmartMap/.settings
+SmartMap/bin/
+>>>>>>> localStorage2
 SmartMap/gen/
 SmartMap/local.properties
 *~
