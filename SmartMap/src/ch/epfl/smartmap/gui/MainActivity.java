@@ -14,10 +14,12 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -54,52 +56,30 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Log.d(TAG, "11");
         initializeDrawerLayout();
         if (savedInstanceState == null) {
             displayMap();
         }
+        Log.d(TAG, "12");
 
         /*
          * BELOW GOES SEARCHBAR & SLIDINGUPPANEL INIT
          */
         //final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
         final SmartMapSlidingUpPanel mBottomSlider = (SmartMapSlidingUpPanel) findViewById(R.id.sliding_layout);
-        mBottomSlider.setCoveredFadeColor(0);
-        mBottomSlider.collapsePanel();
-        mBottomSlider.openSearchView();
-
-//        mSearchBarEditText
-//            .setOnEditorActionListener(new OnEditorActionListener() {
-//                @Override
-//                public boolean onEditorAction(TextView v, int actionId,
-//                    KeyEvent event) {
-//                    boolean handled = false;
-//                    if (actionId == EditorInfo.IME_ACTION_SEND) {
-//                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-//                        Log.d("searchBar", "Search Request Finished");
-//                        handled = true;
-//                    }
-//                    return handled;
-//                }
-//            });
-//
-//        mSearchBarEditText
-//            .setOnFocusChangeListener(new OnFocusChangeListener() {
-//                @Override
-//                public void onFocusChange(View v, boolean hasFocus) {
-//                    if (hasFocus) {
-//                        mBottomSlider.expandPanel();
-//                        Log.d("SearchBar", "Got focus");
-//                    } else {
-//                        mBottomSlider.hidePanel();
-//                        Log.d("SearchBar", "Lost focus");
-//                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-//                    }
-//                }
-//            });
+        final Button mSearchButton = (Button) findViewById(R.id.searchButton);
+        
+        mBottomSlider.initComponents();
+        mBottomSlider.hidePanel();
+        
+        mSearchButton.setOnClickListener(new OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                mBottomSlider.displaySearchView();
+                mBottomSlider.expandPanel();
+            }
+        });
     }
 
     @Override
@@ -128,13 +108,15 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     @Override
     public void onBackPressed() {
-        final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        final SmartMapSlidingUpPanel mBottomSlider = (SmartMapSlidingUpPanel) findViewById(R.id.sliding_layout);
 
         if (mBottomSlider != null && mBottomSlider.isPanelExpanded()
             || mBottomSlider.isPanelAnchored()) {
-            mBottomSlider.collapsePanel();
-        } else {
-            super.onBackPressed();
+            if(mBottomSlider.isInSearchLayout()){
+                mBottomSlider.hidePanel();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
     
@@ -145,6 +127,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         // Get ressources
         mSideLayoutElements = getResources().getStringArray(
             R.array.sideMenuElements);
+        
         mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerListView = (ListView) findViewById(R.id.left_drawer);
         // Set the adapter for the listView
@@ -169,30 +152,24 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         Log.d(TAG, "1");
         // Zoom in the Google Map
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
-        Log.d(TAG, "1");
         mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(GMAP_ZOOM_LEVEL));
-        Log.d(TAG, "1");
     }
 
     /**
      * Display the map with the current location
      */
     public void displayMap() {
-        Log.d(TAG, "displayMap called");
         int status = GooglePlayServicesUtil
             .isGooglePlayServicesAvailable(getBaseContext());
         // Showing status
         if (status != ConnectionResult.SUCCESS) { // Google Play Services are
                                                   // not available
-            Log.d(TAG, "no Google Play Services");
-
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
                 GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
 
-        } else { // Google Play Services are available
-
-            Log.d(TAG, "Google Play Services OK");
+        } else {
+            // Google Play Services are available
 
             // Getting reference to the SupportMapFragment of activity_main.xml
             SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager()

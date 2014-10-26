@@ -10,6 +10,7 @@ import ch.epfl.smartmap.cache.SearchEngine;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -46,7 +47,8 @@ public class SearchLayout extends RelativeLayout {
     }
     
     public void initSearchLayout(){
-      final SearchView  mSearchBarEditText = (SearchView) this.findViewById(R.id.searchBar);
+      final SearchView  mSearchBarEditText = (SearchView) findViewById(R.id.searchBar);
+      final SmartMapSlidingUpPanel mBottomSlider = (SmartMapSlidingUpPanel) findViewById(R.id.sliding_layout);
       
       mSearchBarEditText.setOnQueryTextListener(new OnQueryTextListener(){
 
@@ -61,10 +63,18 @@ public class SearchLayout extends RelativeLayout {
               updateSearchPanel();
               return false;
           }
-      }); 
+      });
+      
+      mSearchBarEditText.setOnClickListener(new OnClickListener(){
+        @Override
+        public void onClick(View v) {
+              mBottomSlider.expandPanel();
+        }
+      });
       
       mState = State.INITIALIZED;
     }
+    
     private void updateSearchPanel(){
         
         // Get Views

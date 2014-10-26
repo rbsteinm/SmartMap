@@ -42,25 +42,32 @@ public class SmartMapSlidingUpPanel extends SlidingUpPanelLayout {
         mCurrentState = LayoutState.NONE;   
     }
     
-    public void openSearchView(){
-        if (mCurrentState == LayoutState.SEARCH) {
-            // No need to change layout
-        } else {
+    public boolean isInSearchLayout(){
+        return mCurrentState == LayoutState.SEARCH;
+    }
+    
+    /**
+     * Switch to the layout that allows the user to search through the database
+     */
+    public void displaySearchView(){
+        assert(mSearchLayout.isInitialized());
+
+        if (mCurrentState != LayoutState.SEARCH) {
             // Get the layout container
             ViewGroup mSlidingLayout = (ViewGroup) this.getChildAt(1);
             // Clean it and display mSearchLayout
             mSlidingLayout.removeAllViews();
             mSlidingLayout.addView(mSearchLayout);
-            // Initialize mSearchLayout if needed
-            if (!mSearchLayout.isInitialized()){
-                mSearchLayout.initSearchLayout();
-            }
             
             // Switch state
             mCurrentState = LayoutState.SEARCH;
         }
-        // When searching, panel must be fully expanded
-        this.expandPanel();
+    }
+    
+    public void initComponents(){
+        if (!mSearchLayout.isInitialized()){
+            mSearchLayout.initSearchLayout();
+        }
     }
 
     public void closeSearchView(){
