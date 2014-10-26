@@ -2,6 +2,8 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+
 $app = new Silex\Application();
 
 // Options
@@ -20,6 +22,9 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     )
 ));
 
+// Enabling sessions
+$app->register(new Silex\Provider\SessionServiceProvider());
+
 // Injecting repositories
 $app['user.repository'] = $app->share(function() use($app) {
     return new SmartMap\DBInterface\UserRepository($app['db']);
@@ -33,11 +38,23 @@ $app['authentication.controller'] = $app->share(function() use($app) {
 });
 
 $app['authorization.controller'] = $app->share(function() use($app) {
-    return new SmartMap\Control\AuthorizationController();
+    return new SmartMap\Control\AuthorizationController($app['user.repository']);
 });
 
 $app['data.controller'] = $app->share(function() use($app) {
     return new SmartMap\Control\DataController($app['user.repository']);
+});
+
+// Error management
+$app->error(function (SmartMap\Control\ControlException $e, $code) use ($app) {
+    return new JsonResponse(array('status' => 'error', 'message' => $e->getMessage()));
+});
+
+$app->error(function (\Exception $e, $code) use ($app) {
+    if ($app['debug'] == true) {
+        return;
+    }
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occured'));
 });
 
 
@@ -65,6 +82,15 @@ $app->post('/inviteFriend', 'data.controller:inviteFriend');
 $app->post('/getInvitations', 'data.controller:getInvitations');
 
 $app->post('/acceptInvitation', 'data.controller:acceptInvitation');
+
+$app->post('/listFriendsPos', 'data.controller:listFriendsPos');
+
+$app->post('/updatePos', 'data.controller:updatePos');
+
+$app->post('/findUsers', 'data.controller:findUsers');
+
+// Testing
+$app->post('/fakeAuth', 'authentication.controller:fakeAuth');
 
 
 $app->run();

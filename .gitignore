@@ -1,13 +1,12 @@
 SmartMap/.metadata/
-<<<<<<< HEAD
 SmartMap/.project
 SmartMap/.settings
-=======
 SmartMap/.classpath
 SmartMap/.project
 SmartMap/.settings
 SmartMap/bin/
->>>>>>> localStorage2
+SmartMap/.project
+SmartMap/.settings
 SmartMap/gen/
 SmartMap/local.properties
 *~
@@ -18,12 +17,10 @@ server/composer.lock
 SmartMap/bin/
 SmartMap/gen/
 SmartMap/.classpath
-<<<<<<< HEAD
-
-=======
 SmartMap/.project
 SmartMap/.properties
 SmartMap/.metadata/
 SmartMap/.settings
 SmartMap/local.properties
->>>>>>> loadingScreen
+SmartMap/gen/
+*.class
