@@ -8,6 +8,7 @@ import ch.epfl.smartmap.cache.FriendList;
 import ch.epfl.smartmap.cache.User;
 
 import android.test.AndroidTestCase;
+import android.test.RenamingDelegatingContext;
 import android.util.LongSparseArray;
 
 /**
@@ -25,8 +26,10 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        dbh = new DatabaseHelper(getContext());
-        dbh.getWritableDatabase();
+        dbh = new DatabaseHelper(new RenamingDelegatingContext(getContext(), "test_")); 
+        //to avoid erasing the actual database
+        
+        //dbh.getWritableDatabase();
         dbh.clearAll();
     }
 

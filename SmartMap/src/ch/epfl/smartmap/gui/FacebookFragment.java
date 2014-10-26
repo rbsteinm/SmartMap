@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.servercom.DefaultNetworkProvider;
@@ -33,211 +34,251 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 
 /**
- * The fragment for the "Login with Facebook" button, that is used in scrim (1) - Welcome
- *
+ * The fragment for the "Login with Facebook" button, that is used in scrim (1)
+ * - Welcome
+ * 
  * @author SpicyCH
- *
+ * 
  */
 public class FacebookFragment extends Fragment {
 
-    private static final String TAG = FacebookFragment.class.getSimpleName();
+	private static final String TAG = FacebookFragment.class.getSimpleName();
 
-    protected static final String CONNECT_USER_URL = "http://swissgen.net/smartmap/connectUser.php";
+	protected static final String CONNECT_USER_URL = "http://swissgen.net/smartmap/connectUser.php";
 
-    protected static final String SERVER_CONFIRMATION = "OK";
+	protected static final String SERVER_CONFIRMATION = "OK";
 
-    private UiLifecycleHelper mUiHelper;
+	private UiLifecycleHelper mUiHelper;
 
-    private final List<String> mPermissions;
+	private final List<String> mPermissions;
 
-    public FacebookFragment() {
-        // We will need to access the user's friends list
-        Log.d(TAG, "Instanciating the FB Login MainFragment");
-        mPermissions = Arrays.asList("user_status", "user_friends");
-    }
+	public FacebookFragment() {
+		// We will need to access the user's friends list
+		Log.d(TAG, "Instanciating the FB Login MainFragment");
+		mPermissions = Arrays.asList("user_status", "user_friends");
+	}
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mUiHelper = new UiLifecycleHelper(getActivity(), callback);
-        mUiHelper.onCreate(savedInstanceState);
-    }
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		mUiHelper = new UiLifecycleHelper(getActivity(), callback);
+		mUiHelper.onCreate(savedInstanceState);
+	}
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_start, container, false);
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.activity_start, container, false);
 
-        LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
-        authButton.setFragment(this);
-        authButton.setReadPermissions(mPermissions);
+		// Get the login button by id from the view
+		LoginButton authButton = (LoginButton) view
+				.findViewById(R.id.loginButton);
 
-        return view;
-    }
+		// Set other view's component to invisible
+		view.findViewById(R.id.loadingBar).setVisibility(View.INVISIBLE);
+		view.findViewById(R.id.logo).setVisibility(View.INVISIBLE);
+		view.findViewById(R.id.welcome).setVisibility(View.INVISIBLE);
+		view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 
-    @Override
-    public void onResume() {
-        super.onResume();
+		// Start animation and set login button
+		authButton.startAnimation(AnimationUtils.loadAnimation(this
+				.getActivity().getBaseContext(), R.anim.face_anim));
+		authButton.setFragment(this);
+		authButton.setReadPermissions(mPermissions);
 
-        // For scenarios where the main activity is launched and user
-        // session is not null, the session state change notification
-        // may not be triggered. Trigger it if it's open/closed.
-        Session session = Session.getActiveSession();
-        if (session != null && (session.isOpened() || session.isClosed())) {
-            onSessionStateChange(session, session.getState(), null);
-        }
+		return view;
+	}
 
-        mUiHelper.onResume();
-    }
+	@Override
+	public void onResume() {
+		super.onResume();
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mUiHelper.onActivityResult(requestCode, resultCode, data);
-    }
+		// For scenarios where the main activity is launched and user
+		// session is not null, the session state change notification
+		// may not be triggered. Trigger it if it's open/closed.
+		Session session = Session.getActiveSession();
+		if (session != null && (session.isOpened() || session.isClosed())) {
+			onSessionStateChange(session, session.getState(), null);
+		}
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        mUiHelper.onPause();
-    }
+		mUiHelper.onResume();
+	}
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mUiHelper.onDestroy();
-    }
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		mUiHelper.onActivityResult(requestCode, resultCode, data);
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mUiHelper.onSaveInstanceState(outState);
-    }
+	}
 
-    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
-        Log.i(TAG, "Checking FB log in status...");
-        if (state.isOpened()) {
-            Log.i(TAG, "Logged in...");
+	@Override
+	public void onPause() {
+		super.onPause();
+		mUiHelper.onPause();
+	}
 
-            // Display the authenticated UI here
-            makeMeRequest();
-            // TODO display a loading message while makeMeRequest() is loading
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		mUiHelper.onDestroy();
+	}
 
-        } else if (state.isClosed()) {
-            Log.i(TAG, "Logged out...");
-            // Display the non-authenticated UI here
-        }
-    }
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		mUiHelper.onSaveInstanceState(outState);
+	}
 
-    private final Session.StatusCallback callback = new Session.StatusCallback() {
-        @Override
-        public void call(Session session, SessionState state, Exception exception) {
-            onSessionStateChange(session, state, exception);
-        }
-    };
+	private void onSessionStateChange(Session session, SessionState state,
+			Exception exception) {
+		Log.i(TAG, "Checking FB log in status...");
+		if (state.isOpened()) {
+			Log.i(TAG, "Logged in...");
 
-    private void makeMeRequest() {
-        final JSONObject userProfile = new JSONObject();
-        Request request = Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
-            @Override
-            public void onCompleted(GraphUser user, Response response) {
-                if (user != null) {
+			// Display the loading Bar and Text
+			getView().findViewById(R.id.loadingBar).setVisibility(View.VISIBLE);
+			getView().findViewById(R.id.loadingTextView).setVisibility(
+					View.VISIBLE);
+			
+			// Disable facebook log out button (CLOSE ISSUE #16)
+			getView().findViewById(R.id.loginButton).setAlpha(0f);
 
-                    String userName = user.getName();
-                    // This portable token can be used by the server
-                    String facebookToken = Session.getActiveSession().getAccessToken();
+			// Display the authenticated UI here
+			makeMeRequest();
 
-                    // Create a JSON object to hold the profile info
-                    try {
+		} else if (state.isClosed()) {
+			Log.i(TAG, "Logged out...");
+			// Display the non-authenticated UI here
+		}
+	}
 
-                        // Populate the JSON object
-                        userProfile.put("facebookId", user.getId());
-                        userProfile.put("name", userName);
-                        userProfile.put("facebookToken", facebookToken);
-                        //userProfile.put("friends", user.getProperty("friends"));
+	private final Session.StatusCallback callback = new Session.StatusCallback() {
+		@Override
+		public void call(Session session, SessionState state,
+				Exception exception) {
+			onSessionStateChange(session, state, exception);
+		}
+	};
 
-                        Log.i(TAG, "user name in json (async): " + userProfile.getString("name"));
-                        Log.i(TAG, "user ID in json (async): " + userProfile.getString("facebookId"));
+	private void makeMeRequest() {
+		final JSONObject userProfile = new JSONObject();
+		Request request = Request.newMeRequest(Session.getActiveSession(),
+				new Request.GraphUserCallback() {
+					@Override
+					public void onCompleted(GraphUser user, Response response) {
 
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Error parsing returned user data.");
-                    }
+						if (user != null) {
 
-                    // TODO store userProfile locally (see with Nicolas?)
+							String userName = user.getName();
+							// This portable token can be used by the server
+							String facebookToken = Session.getActiveSession()
+									.getAccessToken();
 
-                    // Send user's infos to SmartMap server
-                    Map<String, Object> params = new LinkedHashMap<String, Object>();
-                    params.put("facebookId", user.getId());
-                    params.put("name", userName);
-                    params.put("facebookToken", facebookToken);
-                    //params.put("friends", user.getProperty("friends"));
-                    sendDataToServer(params);
+							// Create a JSON object to hold the profile info
+							try {
 
-                    // Create and start the next activity
-                    Toast.makeText(getActivity(), "You logged in successfully, " + userName, Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                    startActivity(intent);
+								// Populate the JSON object
+								userProfile.put("facebookId", user.getId());
+								userProfile.put("name", userName);
+								userProfile.put("facebookToken", facebookToken);
+								// userProfile.put("friends",
+								// user.getProperty("friends"));
 
-                } else if (response.getError() != null) {
-                    Log.e(TAG, "The user is null");
-                }
-            }
-        });
+								Log.i(TAG, "user name in json (async): "
+										+ userProfile.getString("name"));
+								Log.i(TAG, "user ID in json (async): "
+										+ userProfile.getString("facebookId"));
 
-        request.executeAsync();
-    }
+							} catch (JSONException e) {
+								Log.e(TAG, "Error parsing returned user data.");
+							}
 
-    private boolean sendDataToServer(Map<String, Object> params) {
+							// TODO store userProfile locally (see with
+							// Nicolas?)
 
-        ConnectivityManager connMgr = (ConnectivityManager) getActivity()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            // Send data
-            SendDataTask task = new SendDataTask(params);
-            task.execute();
-            return true;
-        } else {
-            // An error occured
-            Log.e(TAG, "Could not send user's data to server. Net down?");
-            return false;
-        }
+							// Send user's infos to SmartMap server
+							Map<String, Object> params = new LinkedHashMap<String, Object>();
+							params.put("facebookId", user.getId());
+							params.put("name", userName);
+							params.put("facebookToken", facebookToken);
+							// params.put("friends",
+							// user.getProperty("friends"));
+							sendDataToServer(params);
 
-    }
+							// Create and start the next activity
+							Toast.makeText(getActivity(),
+									"You logged in successfully, " + userName,
+									Toast.LENGTH_LONG).show();
+							Intent intent = new Intent(getActivity(),
+									MainActivity.class);
+							startActivity(intent);
 
-    /**
-     * An AsyncTask to send the facebook user data to the SmartMap server asynchronously
-     * @author SpicyCH
-     *
-     */
-    private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
+						} else if (response.getError() != null) {
+							Log.e(TAG, "The user is null");
+						}
+					}
+				});
 
-        private final Map<String, Object> mParams;
-        /**
-         * @param params
-         */
-        public SendDataTask(Map<String, Object> params) {
-            mParams = params;
-        }
+		request.executeAsync();
+	}
 
+	private boolean sendDataToServer(Map<String, Object> params) {
 
-        /* (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            DefaultNetworkProvider provider = new DefaultNetworkProvider();
-            NetworkSmartMapClient networkClient = new NetworkSmartMapClient(CONNECT_USER_URL, provider);
+		ConnectivityManager connMgr = (ConnectivityManager) getActivity()
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		if (networkInfo != null && networkInfo.isConnected()) {
+			// Send data
+			SendDataTask task = new SendDataTask(params);
+			task.execute();
+			return true;
+		} else {
+			// An error occured
+			Log.e(TAG, "Could not send user's data to server. Net down?");
+			return false;
+		}
 
-            String serverAnswer = networkClient.sendViaPost(mParams);
+	}
 
-            if (SERVER_CONFIRMATION.equals(serverAnswer)) {
-                Log.i(TAG, "User's data sent to SmartMap server");
-                return true;
-            } else {
-                Log.e(TAG, "Couldn't send user's data to server");
-                return false;
-            }
-        }
+	/**
+	 * An AsyncTask to send the facebook user data to the SmartMap server
+	 * asynchronously
+	 * 
+	 * @author SpicyCH
+	 * 
+	 */
+	private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
 
-    }
+		private final Map<String, Object> mParams;
+
+		/**
+		 * @param params
+		 */
+		public SendDataTask(Map<String, Object> params) {
+			mParams = params;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see android.os.AsyncTask#doInBackground(Params[])
+		 */
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			DefaultNetworkProvider provider = new DefaultNetworkProvider();
+			NetworkSmartMapClient networkClient = new NetworkSmartMapClient(
+					CONNECT_USER_URL, provider);
+
+			String serverAnswer = networkClient.sendViaPost(mParams);
+
+			if (SERVER_CONFIRMATION.equals(serverAnswer)) {
+				Log.i(TAG, "User's data sent to SmartMap server");
+				return true;
+			} else {
+				Log.e(TAG, "Couldn't send user's data to server");
+				return false;
+			}
+		}
+
+	}
 }
