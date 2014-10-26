@@ -27,6 +27,12 @@ use Doctrine\DBAL\Configuration;
 
 
 /**
+ * 
+ * To run theses tests, you need to
+ *  -Have a db named smartmap live on localhost, that has the user root with no pwd
+ *  -Set these settings in web/index.php
+ *  -Set the bootstrap to autoload.php : php phpunit.phar --bootstrap ..\..\vendor\autoload.php [TESTS TO RUN]
+ * 
  * The mock fb account is robin.genolet@epfl.ch hackerinside
  * name: Swag Sweng
  * ID: 1482245642055847
