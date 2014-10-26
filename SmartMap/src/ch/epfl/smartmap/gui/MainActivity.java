@@ -56,28 +56,23 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d(TAG, "11");
+        
         initializeDrawerLayout();
         if (savedInstanceState == null) {
             displayMap();
         }
-        Log.d(TAG, "12");
 
         /*
          * BELOW GOES SEARCHBAR & SLIDINGUPPANEL INIT
          */
         //final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
-        final SmartMapSlidingUpPanel mBottomSlider = (SmartMapSlidingUpPanel) findViewById(R.id.sliding_layout);
         final Button mSearchButton = (Button) findViewById(R.id.searchButton);
-        
-        mBottomSlider.initComponents();
-        mBottomSlider.hidePanel();
-        
+        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+        mSearchLayout.initSearchLayout();
         mSearchButton.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View v) {
-                mBottomSlider.displaySearchView();
-                mBottomSlider.expandPanel();
+                mSearchLayout.open();
             }
         });
     }
@@ -108,16 +103,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     @Override
     public void onBackPressed() {
-        final SmartMapSlidingUpPanel mBottomSlider = (SmartMapSlidingUpPanel) findViewById(R.id.sliding_layout);
-
-        if (mBottomSlider != null && mBottomSlider.isPanelExpanded()
-            || mBottomSlider.isPanelAnchored()) {
-            if(mBottomSlider.isInSearchLayout()){
-                mBottomSlider.hidePanel();
-            } else {
-                super.onBackPressed();
-            }
+        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+        if (mSearchLayout.isShown()) {
+            mSearchLayout.close();
+        } else {
+            super.onBackPressed();
         }
+
     }
     
     /**

@@ -4,78 +4,118 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".DemoActivity" >
-
-    <ch.epfl.smartmap.gui.SmartMapSlidingUpPanel
-        xmlns:sothree="http://schemas.android.com/lib/com.sothree.slidinguppanel"
-        xmlns:custom="http://schemas.android.com/apk/res/ch.epfl.smartmap.gui"
-        android:id="@+id/sliding_layout"
+    
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="bottom"
-        sothree:dragView="@+id/dragView"
-        sothree:flingVelocity="0"
-        sothree:overlay="true"
-        sothree:panelHeight="68dp"
-        sothree:paralaxOffset="0dp"
-        sothree:shadowHeight="4dp" >
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="top" >
 
-        <!-- MAIN CONTENT -->
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:gravity="top" >
-
-            <android.support.v4.widget.DrawerLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/drawer_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-
-                <ListView
-                    android:id="@+id/left_drawer"
-                    android:layout_width="240dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="start"
-                    android:background="#111"
-                    android:choiceMode="singleChoice"
-                    android:divider="@android:color/transparent"
-                    android:dividerHeight="0dp" />
-            </android.support.v4.widget.DrawerLayout>
-
-            <TextView
-                android:id="@+id/tv_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <!-- <fragment xmlns:android="http://schemas.android.com/apk/res/android" -->
-            
-            <fragment
-                android:id="@+id/map"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true" />
-            
-            <Button
-                android:id="@+id/searchButton"
-                android:text="Search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </RelativeLayout>
-
-        <!-- SLIDING LAYOUT -->
-
-        <RelativeLayout
+        <android.support.v4.widget.DrawerLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/drawer_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
-        </RelativeLayout>
-    </ch.epfl.smartmap.gui.SmartMapSlidingUpPanel>
 
+            <ListView
+                android:id="@+id/left_drawer"
+                android:layout_width="240dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:background="#111"
+                android:choiceMode="singleChoice"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="0dp" />
+        </android.support.v4.widget.DrawerLayout>
+
+        <TextView
+            android:id="@+id/tv_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- <fragment xmlns:android="http://schemas.android.com/apk/res/android" -->
+        
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true" />
+        
+        <Button
+            android:id="@+id/searchButton"
+            android:text="Search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+<ch.epfl.smartmap.gui.SearchLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/searchLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="1"
+        android:background="@color/bottomSliderBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/searchBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="0dp"
+            android:padding="8dp"
+            android:paddingLeft="0dp"
+            android:alpha="1"
+            android:background="@color/searchResultBackground"
+            android:orientation="horizontal" > 
+
+            <SearchView
+                android:id="@+id/searchBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:clickable="true"
+                android:descendantFocusability="beforeDescendants"
+                android:queryHint="@string/search_bar_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:paddingEnd="0dp"
+                android:singleLine="true"
+                android:textSize="25sp" 
+                android:actionViewClass="ch.epfl.smartmap.gui.SearchLayout"
+                android:iconifiedByDefault="false" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:orientation="vertical"
+            android:overScrollMode="never" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/search_result_list"
+                android:orientation="vertical" >
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</ch.epfl.smartmap.gui.SearchLayout>
 </FrameLayout>
