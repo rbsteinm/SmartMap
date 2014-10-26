@@ -35,8 +35,7 @@ public class NetworkAuthenticationClient extends SmartMapClient implements
 	 * .cache.User, java.lang.String)
 	 */
 	@Override
-	public void authServer(User user, String fbAccessToken)
-			throws SmartMapClientException {
+	public void authServer(User user, String fbAccessToken) throws SmartMapClientException {
 		Log.d("authServer", "begin");
 		Map<String, String> params = new HashMap<String, String>();
 

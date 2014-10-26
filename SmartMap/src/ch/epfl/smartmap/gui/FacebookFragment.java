@@ -252,7 +252,7 @@ public class FacebookFragment extends Fragment {
 
 			try {
 				HttpURLConnection conn=networkClient.getHttpURLConnection("");
-				networkClient.sendViaPost(mParams,conn);
+				networkClient.sendViaPost(mParams, conn);
 			} catch (SmartMapClientException e) {
 				// TODO Auto-generated catch block
 				Log.e(TAG, "Couldn't send user's data to server");

@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import ch.epfl.smartmap.cache.Point;
 import ch.epfl.smartmap.servercom.DefaultNetworkProvider;
-import ch.epfl.smartmap.servercom.NetworkAuthenticationClient;
+
 import ch.epfl.smartmap.servercom.NetworkPositionClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 

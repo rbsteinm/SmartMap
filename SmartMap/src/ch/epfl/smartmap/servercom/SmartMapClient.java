@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpCookie;
@@ -23,7 +23,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.User;
+
 
 /**
  * A class that contains methods that all SmartMap clients have in common
@@ -91,8 +91,7 @@ public abstract class SmartMapClient {
 	 * @throws JSONException
 	 * @throws SmartMapClientException
 	 */
-	public void checkServerErrorFromJSON(JSONObject jsonObject)
-			throws SmartMapClientException {
+	public void checkServerErrorFromJSON(JSONObject jsonObject) throws SmartMapClientException {
 		String status = null;
 		String message = null;
 		try {
@@ -211,8 +210,7 @@ public abstract class SmartMapClient {
 		return response.toString();
 	}
 
-	public HttpURLConnection getHttpURLConnection(String uri)
-			throws SmartMapClientException {
+	public HttpURLConnection getHttpURLConnection(String uri) throws SmartMapClientException {
 		URL serverURL = null;
 		HttpURLConnection connection = null;
 		try {

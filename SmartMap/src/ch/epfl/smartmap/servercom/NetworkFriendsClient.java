@@ -152,8 +152,7 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 * util.List)
 	 */
 	@Override
-	public void allowFriendList(List<Integer> ids)
-			throws SmartMapClientException {
+	public void allowFriendList(List<Integer> ids) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_ids", intListToString(ids));
 		HttpURLConnection conn=getHttpURLConnection("/allowFriendList");
@@ -176,8 +175,7 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	 * .util.List)
 	 */
 	@Override
-	public void disallowFriendList(List<Integer> ids)
-			throws SmartMapClientException {
+	public void disallowFriendList(List<Integer> ids) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_ids", intListToString(ids));
 		HttpURLConnection conn=getHttpURLConnection("/disallowFriendList");
