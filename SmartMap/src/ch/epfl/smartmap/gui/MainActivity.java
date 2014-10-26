@@ -65,7 +65,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         /*
          * BELOW GOES SEARCHBAR & SLIDINGUPPANEL INIT
          */
-        //final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
+
         final Button mSearchButton = (Button) findViewById(R.id.searchButton);
         final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
         mSearchLayout.initSearchLayout();

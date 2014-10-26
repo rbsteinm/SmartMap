@@ -70,13 +70,15 @@ public class SearchLayout extends RelativeLayout {
     public void initSearchLayout() {
         assert (mInitState == InitState.NOT_INITIALIZED);
 
-        final SearchView mSearchBarEditText = (SearchView) findViewById(R.id.searchBar);
-
-        mSearchBarEditText.setOnQueryTextListener(new OnQueryTextListener() {
+        // Get Views
+        final SearchView mSearchView = (SearchView) findViewById(R.id.searchBar);
+        final LinearLayout mSearchResultList = (LinearLayout) findViewById(R.id.search_result_list);
+        
+        mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 
             public boolean onQueryTextSubmit(String query) {
                 // Do something when user his enter on keyboard
-                mSearchBarEditText.clearFocus();
+                mSearchView.clearFocus();
                 return false;
             }
 
@@ -84,6 +86,13 @@ public class SearchLayout extends RelativeLayout {
             public boolean onQueryTextChange(String newText) {
                 updateSearchResults();
                 return false;
+            }
+        });
+        
+        mSearchResultList.setOnClickListener(new OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                mSearchView.clearFocus();
             }
         });
 
