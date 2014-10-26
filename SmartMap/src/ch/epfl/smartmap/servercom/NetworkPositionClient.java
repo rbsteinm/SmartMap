@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.servercom;
 
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,8 @@ public class NetworkPositionClient extends SmartMapClient implements
 		params.put("longitude", Double.toString(position.getX()));
 		params.put("latitude", Double.toString(position.getY()));
 
-		String response = sendViaPost(params, "/updatePos");
+		HttpURLConnection conn=getHttpURLConnection("/updatePos");
+		String response = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(response);

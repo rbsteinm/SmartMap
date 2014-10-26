@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.servercom;
 
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +40,8 @@ public class NetworkAuthenticationClient extends SmartMapClient implements
 		params.put("user_id", Integer.toString(user.getID()));
 		params.put("user_name", user.getName());
 		params.put("fb_access_token", fbAccessToken);
-		String textResult = sendViaPost(params, "/index.php/auth");
+		HttpURLConnection conn=getHttpURLConnection("/index.php/auth");
+		String textResult = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);

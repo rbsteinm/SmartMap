@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.gui;
 
+import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -250,7 +251,8 @@ public class FacebookFragment extends Fragment {
 					CONNECT_USER_URL, provider);
 
 			try {
-				networkClient.sendViaPost(mParams, "");
+				HttpURLConnection conn=networkClient.getHttpURLConnection("");
+				networkClient.sendViaPost(mParams,conn);
 			} catch (SmartMapClientException e) {
 				// TODO Auto-generated catch block
 				Log.e(TAG, "Couldn't send user's data to server");

@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.servercom;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +35,8 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	@Override
 	public List<User> listFriendPos() throws SmartMapClientException {
 		// TODO Auto-generated method stub
-		String textResult = sendViaPost(null, "/listFriendPos");
+		HttpURLConnection conn=getHttpURLConnection("/listFriendPos");
+		String textResult = sendViaPost(null, conn);
 
 		List<User> friends = new ArrayList<User>();
 
@@ -67,7 +69,8 @@ public class NetworkFriendsClient extends SmartMapClient implements
 
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("id_friend", Integer.toString(id));
-		String textResult = sendViaPost(params, "/followFriend");
+		HttpURLConnection conn=getHttpURLConnection("/followFriend");
+		String textResult = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);
@@ -87,7 +90,8 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	public void unfollowFriend(int id) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("id_friend", Integer.toString(id));
-		String textResult = sendViaPost(params, "/unfollowFriend");
+		HttpURLConnection conn=getHttpURLConnection("/unfollowFriend");
+		String textResult = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);
@@ -107,7 +111,8 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	public void allowFriend(int id) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("id_friend", Integer.toString(id));
-		String textResult = sendViaPost(params, "/allowFriend");
+		HttpURLConnection conn=getHttpURLConnection("/allowFriend");
+		String textResult = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);
@@ -127,7 +132,8 @@ public class NetworkFriendsClient extends SmartMapClient implements
 	public void disallowFriend(int id) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("id_friend", Integer.toString(id));
-		String textResult = sendViaPost(params, "/disallowFriend");
+		HttpURLConnection conn=getHttpURLConnection("/disallowFriend");
+		String textResult = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);
@@ -150,7 +156,8 @@ public class NetworkFriendsClient extends SmartMapClient implements
 			throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_ids", intListToString(ids));
-		String textResult = sendViaPost(params, "/disallowFriend");
+		HttpURLConnection conn=getHttpURLConnection("/allowFriendList");
+		String textResult = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);
@@ -173,7 +180,8 @@ public class NetworkFriendsClient extends SmartMapClient implements
 			throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_ids", intListToString(ids));
-		String textResult = sendViaPost(params, "/disallowFriend");
+		HttpURLConnection conn=getHttpURLConnection("/disallowFriendList");
+		String textResult = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);

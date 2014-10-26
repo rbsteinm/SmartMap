@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.servercom;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,8 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 	public void inviteFriend(int id) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_id", Integer.toString(id));
-		String textResult = sendViaPost(params, "/inviteFriend");
+		HttpURLConnection conn=getHttpURLConnection("/inviteFriend");
+		String textResult = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);
@@ -56,7 +58,8 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 	@Override
 	public List<User> getInvitations() throws SmartMapClientException {
 
-		String textResult = sendViaPost(null, "/getInvitation");
+		HttpURLConnection conn=getHttpURLConnection("/getInvitations");
+		String textResult = sendViaPost(null, conn);
 
 		List<User> inviters = new ArrayList<User>();
 
@@ -86,7 +89,8 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_id", Integer.toString(id));
-		String textResult = sendViaPost(params, "/acceptInvitation");
+		HttpURLConnection conn=getHttpURLConnection("/acceptInvitation");
+		String textResult = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);
@@ -108,7 +112,8 @@ public class NetworkInvitationsClient extends SmartMapClient implements
 
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("user_id", Integer.toString(id));
-		String textResult = sendViaPost(params, "/getUserInfo");
+		HttpURLConnection conn=getHttpURLConnection("/getUserInfo");
+		String textResult = sendViaPost(params, conn);
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(textResult);

@@ -5,15 +5,22 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.text.TextUtils;
+import android.util.Log;
 
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
@@ -28,8 +35,10 @@ public abstract class SmartMapClient {
 
 	public static final String USER_AGENT = "Mozilla/5.0"; // latest firefox's
 															// user agent
+	static final String COOKIES_HEADER = "Set-Cookie";
 	private String mServerUrl;
 	private NetworkProvider mNetworkProvider;
+	private static CookieManager mCookieManager;
 
 	/**
 	 * Creates a new SmartMapClient instance that communicates with a SmartMap
@@ -44,6 +53,9 @@ public abstract class SmartMapClient {
 	public SmartMapClient(String serverUrl, NetworkProvider networkProvider) {
 		this.mServerUrl = serverUrl;
 		this.mNetworkProvider = networkProvider;
+		mCookieManager = new CookieManager();
+		Log.d("cookieManger inst", "cookieManger inst");
+		CookieHandler.setDefault(mCookieManager);
 
 	}
 
@@ -110,10 +122,96 @@ public abstract class SmartMapClient {
 	 *             in case the response could not be retrieved for any reason
 	 *             external to the application (network failure etc.)
 	 */
-	public String sendViaPost(Map<String, String> params, String uri)
-			throws SmartMapClientException {
+	public String sendViaPost(Map<String, String> params,
+			HttpURLConnection connection) throws SmartMapClientException {
+		StringBuffer response = null;
 
-		// Get the HttpURLConnection
+		try {
+
+			// Get Cookies form response header and load them to cookieManager
+
+//			Map<String, List<String>> headerFields = connection
+//					.getHeaderFields();
+			
+		
+//			List<String> cookiesHeader = headerFields.get(COOKIES_HEADER);
+//			Log.d("cookHeaders", "cookHeaders OK");
+
+//			if (cookiesHeader != null) {
+//				Log.d("add cookies", "cookies were sent");
+//				for (String cookie : cookiesHeader) {
+//					mCookieManager.getCookieStore().add(null,
+//							HttpCookie.parse(cookie).get(0));
+//				}
+//			}
+
+			// Add request header
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("User-Agent", USER_AGENT);
+			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+			// Get Cookies form cookieManager and load them to connection
+//			if (mCookieManager.getCookieStore().getCookies().size() > 0) {
+//				Log.d("send cookies", "send cookies");
+//				connection.setRequestProperty("Cookie", TextUtils.join(",",
+//						mCookieManager.getCookieStore().getCookies()));
+//			}
+
+			if (params != null) {
+
+				// Build the request
+				StringBuilder postData = new StringBuilder();
+				for (Map.Entry<String, String> param : params.entrySet()) {
+					if (postData.length() != 0) {
+						postData.append('&');
+					}
+
+					postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+					postData.append('=');
+					postData.append(URLEncoder.encode(
+							String.valueOf(param.getValue()), "UTF-8"));
+
+				}
+
+				connection.setDoOutput(true); // To be able to send data
+
+				// Send post request
+
+				DataOutputStream wr;
+
+				wr = new DataOutputStream(connection.getOutputStream());
+				wr.writeBytes(postData.toString());
+				wr.flush();
+				wr.close();
+
+			}
+
+			// Get response
+			String inputLine;
+			response = new StringBuffer();
+			BufferedReader in;
+
+			in = new BufferedReader(new InputStreamReader(
+					connection.getInputStream()));
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+		} catch (ProtocolException e) {
+			throw new SmartMapClientException(e);
+		} catch (IOException e) {
+			throw new SmartMapClientException(e);
+		} finally {
+			connection.disconnect();
+		}
+		// Finally give result to caller
+		return response.toString();
+	}
+
+	public HttpURLConnection getHttpURLConnection(String uri)
+			throws SmartMapClientException {
 		URL serverURL = null;
 		HttpURLConnection connection = null;
 		try {
@@ -125,70 +223,6 @@ public abstract class SmartMapClient {
 		} catch (IOException e) {
 			throw new SmartMapClientException(e);
 		}
-
-		if (params != null) {
-
-			// Build the request
-			StringBuilder postData = new StringBuilder();
-			for (Map.Entry<String, String> param : params.entrySet()) {
-				if (postData.length() != 0) {
-					postData.append('&');
-				}
-				try {
-					postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
-					postData.append('=');
-					postData.append(URLEncoder.encode(
-							String.valueOf(param.getValue()), "UTF-8"));
-				} catch (UnsupportedEncodingException e) {
-					throw new SmartMapClientException(e);
-				}
-			}
-
-			connection.setDoOutput(true); // To be able to send data
-
-			// Add request header
-
-			try {
-				connection.setRequestMethod("POST");
-				connection.setRequestProperty("User-Agent", USER_AGENT);
-				connection.setRequestProperty("Accept-Language",
-						"en-US,en;q=0.5");
-			} catch (ProtocolException e) {
-				throw new SmartMapClientException(e);
-			}
-
-			// Send post request
-
-			DataOutputStream wr;
-
-			try {
-				wr = new DataOutputStream(connection.getOutputStream());
-				wr.writeBytes(postData.toString());
-				wr.flush();
-				wr.close();
-			} catch (IOException e) {
-				throw new SmartMapClientException(e);
-			}
-		}
-
-		// Get response
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-		BufferedReader in;
-		try {
-			in = new BufferedReader(new InputStreamReader(
-					connection.getInputStream()));
-
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-		} catch (IOException e) {
-			throw new SmartMapClientException(e);
-		}
-
-		// Finally give result to caller
-		return response.toString();
-
+		return connection;
 	}
 }
