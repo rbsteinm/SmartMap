@@ -32,9 +32,8 @@ public class Friend implements User {
     public static final String NO_NUMBER = "No phone number specified";
     public static final String NO_EMAIL = "No email address specified";
     public static final String POSITION_UNKNOWN = "Unknown position";
-    public static final String DEFAULT_PICTURE = "default.png";
+    public static final int DEFAULT_PICTURE = R.drawable.ic_launcher; //placeholder
     public static final int IMAGE_QUALITY = 100;
-    public static final String IMAGE_DIR = "userpics";
 
     /**
      * Friend constructor
@@ -126,23 +125,24 @@ public class Friend implements User {
 
     @Override
     public Bitmap getPicture(Context context) {
-        File folder = new File(context.getApplicationContext().getFilesDir(), IMAGE_DIR);
-        File file = new File(folder, id + ".png");
+        File file = new File(context.getFilesDir(), id + ".png");
         
         Bitmap pic = null;
         
+        System.out.println(file.getAbsolutePath());
+        
         if (file.exists()) {
-            pic = BitmapFactory.decodeFile(file.getPath());
+            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
         } else {
-            pic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher); //placeholder
+            pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE); //placeholder
         }
         return pic;
     }
 
     @Override
     public void setPicture(Bitmap pic, Context context) {
-        File folder = new File(context.getApplicationContext().getFilesDir(), IMAGE_DIR);
-        File file = new File(folder, id + ".png");
+        File file = new File(context.getFilesDir(), id + ".png");
+        
         if (file.exists()) {
             file.delete();
         }
@@ -175,10 +175,18 @@ public class Friend implements User {
                 date.get(Calendar.DATE),
                 date.get(Calendar.HOUR),
                 date.get(Calendar.MINUTE));
-    }
+    }    
 
     @Override
     public void setOnline(boolean status) {
         online = status;
+    }
+
+    @Override
+    public void deletePicture(Context context) {
+        File file = new File(context.getFilesDir(), id + ".png");
+        if (file.exists()) {
+            file.delete();
+        }
     }
 }

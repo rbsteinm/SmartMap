@@ -1,10 +1,10 @@
-.metadata/
-.classpath
-.project
-.settings
-bin/
-gen/
-local.properties
+SmartMap/.metadata/
+SmartMap/.classpath
+SmartMap/.project
+SmartMap/.settings
+SmartMap/bin/
+SmartMap/gen/
+SmartMap/local.properties
 *~
 .checkstyle
 .DS_Store

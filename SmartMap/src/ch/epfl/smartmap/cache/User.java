@@ -105,6 +105,11 @@ public interface User {
     void setPicture(Bitmap pic, Context context);
     
     /**
+     * Removes the user's picture from internal storage
+     */
+    void deletePicture(Context context);
+    
+    /**
      * @param date The date/hour at which the user was last seen
      */
     void setLastSeen(GregorianCalendar date);
