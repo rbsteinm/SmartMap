@@ -144,8 +144,6 @@ public class SearchLayout extends RelativeLayout {
             R.anim.bottom_up);
         this.startAnimation(bottomUp);
         updateSearchResults();
-        final SearchView mSearchView = (SearchView) findViewById(R.id.searchBar);
-        mSearchView.requestFocus();
     }
     
     /**
