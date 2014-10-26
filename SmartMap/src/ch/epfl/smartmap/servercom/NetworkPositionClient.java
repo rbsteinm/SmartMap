@@ -7,6 +7,8 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import ch.epfl.smartmap.cache.Point;
 
 /**
@@ -31,7 +33,7 @@ public class NetworkPositionClient extends SmartMapClient implements
 	 */
 	@Override
 	public void updatePos(Point position) throws SmartMapClientException {
-
+		Log.d("updatePos", "start");
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("longitude", Double.toString(position.getX()));
 		params.put("latitude", Double.toString(position.getY()));

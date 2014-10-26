@@ -38,7 +38,7 @@ public abstract class SmartMapClient {
 	static final String COOKIES_HEADER = "Set-Cookie";
 	private String mServerUrl;
 	private NetworkProvider mNetworkProvider;
-	private static CookieManager mCookieManager;
+	private static CookieManager mCookieManager = new CookieManager();
 
 	/**
 	 * Creates a new SmartMapClient instance that communicates with a SmartMap
@@ -53,8 +53,6 @@ public abstract class SmartMapClient {
 	public SmartMapClient(String serverUrl, NetworkProvider networkProvider) {
 		this.mServerUrl = serverUrl;
 		this.mNetworkProvider = networkProvider;
-		mCookieManager = new CookieManager();
-		Log.d("cookieManger inst", "cookieManger inst");
 		CookieHandler.setDefault(mCookieManager);
 
 	}
@@ -71,10 +69,10 @@ public abstract class SmartMapClient {
 	 */
 	public Friend parseFriendfromJSON(JSONObject jsonObject)
 			throws SmartMapClientException {
-		int userId = 0;
+		long userId = 0;
 		String userName = null;
 		try {
-			userId = jsonObject.getInt("id");
+			userId = jsonObject.getLong("id");
 			userName = jsonObject.getString("name");
 		} catch (JSONException e) {
 			throw new SmartMapClientException(e);
@@ -100,11 +98,14 @@ public abstract class SmartMapClient {
 		try {
 			status = jsonObject.getString("status");
 			message = jsonObject.getString("message");
+			Log.d("serverMessage", message);
+			Log.d("serverAnswer", status);
+			
 		} catch (JSONException e) {
 			throw new SmartMapClientException(e);
 		}
 
-		if (status.equals("ERROR")) {
+		if (status.equals("Error")) {
 			throw new SmartMapClientException(message);
 		}
 
@@ -125,6 +126,7 @@ public abstract class SmartMapClient {
 	public String sendViaPost(Map<String, String> params,
 			HttpURLConnection connection) throws SmartMapClientException {
 		StringBuffer response = null;
+		Log.d("sendViaPost", "start");
 
 		try {
 
@@ -135,8 +137,9 @@ public abstract class SmartMapClient {
 			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 			// Get Cookies form cookieManager and load them to connection
+			Log.d("cookies number", Integer.toString(mCookieManager.getCookieStore().getCookies().size()));
 			if (mCookieManager.getCookieStore().getCookies().size() > 0) {
-				Log.d("send cookies", "send cookies");
+				Log.d("add cookies", "add stored cookies to the headers ");
 				connection.setRequestProperty("Cookie", TextUtils.join(",",
 						mCookieManager.getCookieStore().getCookies()));
 			}
@@ -189,12 +192,13 @@ public abstract class SmartMapClient {
 			List<String> cookiesHeader = headerFields.get(COOKIES_HEADER);
 
 			if (cookiesHeader != null) {
-
+				Log.d("store cookies", "store cookies");
 				for (String cookie : cookiesHeader) {
 					mCookieManager.getCookieStore().add(null,
 							HttpCookie.parse(cookie).get(0));
 				}
 			}
+			Log.d("cookies number", Integer.toString(mCookieManager.getCookieStore().getCookies().size()));
 			in.close();
 		} catch (ProtocolException e) {
 			throw new SmartMapClientException(e);

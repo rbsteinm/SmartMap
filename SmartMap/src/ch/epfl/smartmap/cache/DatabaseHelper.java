@@ -128,7 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param id The user's unique ID
      * @return The user as a Friend object
      */
-    public User getUser(int id) {
+    public User getUser(long id) {
         
         SQLiteDatabase db = this.getReadableDatabase();
         
@@ -178,7 +178,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 friend.setX(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
                 friend.setY(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
   
-                friends.put(friend.getID(), friend);
+               // friends.put(friend.getID(), friend);
             } while (cursor.moveToNext());
         }
         

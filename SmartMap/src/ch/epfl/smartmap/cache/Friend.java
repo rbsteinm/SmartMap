@@ -7,7 +7,7 @@ package ch.epfl.smartmap.cache;
  */
 public class Friend implements User {
 
-	private int id; // the user's unique ID
+	private long id; // the user's unique ID
 	private String name; // the user's name as it will be displayed
 	private String phoneNumber;
 	private String email;
@@ -27,7 +27,7 @@ public class Friend implements User {
 	 *            The friend's phone number
 	 * @author ritterni
 	 */
-	public Friend(int userID, String userName) {
+	public Friend(long userID, String userName) {
 		id = userID;
 		name = userName;
 		phoneNumber = NO_NUMBER;
@@ -36,7 +36,7 @@ public class Friend implements User {
 	}
 
 	@Override
-	public int getID() {
+	public long getID() {
 		return id;
 	}
 
