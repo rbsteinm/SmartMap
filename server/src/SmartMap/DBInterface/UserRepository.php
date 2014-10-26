@@ -21,6 +21,8 @@ class UserRepository
         $this->mDb = $db;
     }
     
+    // Authentication
+    
     /* Gets a user id given it's facebook id, or returns false if such user
      * does not exist.
      */
@@ -38,6 +40,8 @@ class UserRepository
             return $userData['idusers'];
         }
     }
+    
+    // Users management
     
     /* Gets a user from the database, given it's id.
      */
@@ -83,21 +87,21 @@ class UserRepository
                                          array(\Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
                                                \Doctrine\DBAL\Connection::PARAM_STR_ARRAY));
         
-        $users = array();
+        return $this->userArrayFromStmt($stmt);
+    }
+    
+    /* Gets a list of users whose name is starting by $partialName
+     */
+    public function findUsersByPartialName($partialName)
+    {
+        $length = strlen($partialName);
         
-        while ($userData = $stmt->fetch())
-        {
-            $users[] = new User(
-                                    $userData['idusers'], 
-                                    $userData['fbid'],
-                                    $userData['name'],
-                                    $userData['visibility'],
-                                    $userData['longitude'],
-                                    $userData['latitude']
-                                );
-        }
+        $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE SUBSTR(LOWER(name), 1, ?) = ? LIMIT 10";
+        $stmt = $this->mDb->executeQuery($req,
+                                         array($length, strtolower($partialName)),
+                                         array(\PDO::PARAM_INT, \PDO::PARAM_STR));
         
-        return $users;
+        return $this->userArrayFromStmt($stmt);
     }
     
     /* Adds a new user in the database. The id value from the parameter
@@ -132,6 +136,8 @@ class UserRepository
                 'latitude' => $user->getLatitude()
             ), array('idusers' => $user->getId()));
     }
+    
+    // Friendship management
     
     /* Gets the ids of the friends of the user with id $userId,
      * where the status of their friendhsip is in the array $status
@@ -235,6 +241,8 @@ class UserRepository
                           );
     }
     
+    // Invitations management
+    
     /* Gets a list of the ids of users who sent a friend invitation to 
      * the user with id $userId.
      */
@@ -274,5 +282,25 @@ class UserRepository
                                 'id1' => (int) $idUser,
                                 'id2' => (int) $idFriend
                            ));
+    }
+    
+    // Utility functions
+    private function userArrayFromStmt($stmt)
+    {
+        $users = array();
+        
+        while ($userData = $stmt->fetch())
+        {
+            $users[] = new User(
+                                    $userData['idusers'], 
+                                    $userData['fbid'],
+                                    $userData['name'],
+                                    $userData['visibility'],
+                                    $userData['longitude'],
+                                    $userData['latitude']
+                                );
+        }
+        
+        return $users;
     }
 }

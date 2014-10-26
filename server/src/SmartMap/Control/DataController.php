@@ -205,4 +205,28 @@ class DataController
         
         return new JsonResponse($response);
     }
+    
+    /* Gets a list of user names and ids where name begins with post parameter
+     * search_text (ignores case). 
+     */
+    public function findUsers(Request $request)
+    {
+        $partialName = $request->request->get('search_text');
+        if ($partialName === null)
+        {
+            throw new ControlException('Post parameter search_text is not set !');
+        }
+        
+        $users = $this->mRepo->findUsersByPartialName($partialName);
+        
+        $data = array();
+        foreach ($users as $user)
+        {
+            $data[] = array('id' => $user->getId(), 'name' => $user->getName());
+        }
+        
+        $response = array('status' => 'Ok', 'message' => 'Fetched users !', 'list' => $data);
+        
+        return new JsonResponse($response);
+    }
 }
