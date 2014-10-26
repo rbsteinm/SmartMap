@@ -128,23 +128,6 @@ public abstract class SmartMapClient {
 
 		try {
 
-			// Get Cookies form response header and load them to cookieManager
-
-//			Map<String, List<String>> headerFields = connection
-//					.getHeaderFields();
-			
-		
-//			List<String> cookiesHeader = headerFields.get(COOKIES_HEADER);
-//			Log.d("cookHeaders", "cookHeaders OK");
-
-//			if (cookiesHeader != null) {
-//				Log.d("add cookies", "cookies were sent");
-//				for (String cookie : cookiesHeader) {
-//					mCookieManager.getCookieStore().add(null,
-//							HttpCookie.parse(cookie).get(0));
-//				}
-//			}
-
 			// Add request header
 
 			connection.setRequestMethod("POST");
@@ -152,11 +135,11 @@ public abstract class SmartMapClient {
 			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 			// Get Cookies form cookieManager and load them to connection
-//			if (mCookieManager.getCookieStore().getCookies().size() > 0) {
-//				Log.d("send cookies", "send cookies");
-//				connection.setRequestProperty("Cookie", TextUtils.join(",",
-//						mCookieManager.getCookieStore().getCookies()));
-//			}
+			if (mCookieManager.getCookieStore().getCookies().size() > 0) {
+				Log.d("send cookies", "send cookies");
+				connection.setRequestProperty("Cookie", TextUtils.join(",",
+						mCookieManager.getCookieStore().getCookies()));
+			}
 
 			if (params != null) {
 
@@ -197,6 +180,20 @@ public abstract class SmartMapClient {
 
 			while ((inputLine = in.readLine()) != null) {
 				response.append(inputLine);
+			}
+			// Get Cookies form response header and load them to cookieManager
+
+			Map<String, List<String>> headerFields = connection
+					.getHeaderFields();
+
+			List<String> cookiesHeader = headerFields.get(COOKIES_HEADER);
+
+			if (cookiesHeader != null) {
+
+				for (String cookie : cookiesHeader) {
+					mCookieManager.getCookieStore().add(null,
+							HttpCookie.parse(cookie).get(0));
+				}
 			}
 			in.close();
 		} catch (ProtocolException e) {
