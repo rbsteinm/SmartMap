@@ -15,10 +15,16 @@ import android.util.Log;
 /**
  * A provisional class to retrieve friend's pics from the cache
  * 
- * @author hugo
+ * @author hugo-S
  * 
  */
 public class MockPictureProvider {
+
+	public static final int BITMAP_WIDTH = 100;
+	public static final int BITMAP_HEIGHT = 100;
+	public static final float CANVAS_ORIGIN_X = 30;
+	public static final float CANVAS_ORIGIN_Y = 40;
+	public static final float PAINT_TEXT_SIZE = 35;
 
 	public MockPictureProvider() {
 
@@ -26,40 +32,30 @@ public class MockPictureProvider {
 
 	public Bitmap getImage(int id) {
 		Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-		Bitmap bmp = Bitmap.createBitmap(100, 100, conf);
+		Bitmap bmp = Bitmap.createBitmap(BITMAP_WIDTH, BITMAP_HEIGHT, conf);
 		Canvas canvas1 = new Canvas(bmp);
 
 		String path = "/storage/emulated/0/Android/data/ch.epfl.smartmap"
 				+ "/cache/medias/";
 		File f = new File(path, id + ".png");
-		if (!f.exists())
+		if (!f.exists()) {
 			f = new File(path, "unknown.png");
-
+		}
 		Paint color = new Paint();
-		color.setTextSize(35);
+		color.setTextSize(PAINT_TEXT_SIZE);
 		color.setColor(Color.BLACK);
 
-		try {
-			// modify canvas
-			canvas1.drawBitmap(BitmapFactory.decodeFile(f.getPath()), 0, 0,
-					color);
-			canvas1.drawText("User Name!", 30, 40, color);
-			bmp = BitmapFactory.decodeFile(f.getPath());
-			if (bmp != null) {
-				// Toast.makeText(this, f.getAbsoluteFile()+ " found",
-				// Toast.LENGTH_SHORT).show();
-				Log.d("search image:", path + id + ".png" + "  found");
-			} else {
-				Log.d("search image:", path + id + ".png" + "  not found");
-			}
-			// Bitmap bMap = BitmapFactory.decodeFile(f.getAbsolutePath());
-			return bmp;
-		} catch (Exception e) {
-			// Toast.makeText(this, f.getPath()+" not accible",
-			// Toast.LENGTH_SHORT).show();
-			Log.d("search image:", path + id + ".png" + " not accessible");
+		// modify canvas
+		canvas1.drawBitmap(BitmapFactory.decodeFile(f.getPath()), 0, 0, color);
+		canvas1.drawText("User Name!", CANVAS_ORIGIN_X, CANVAS_ORIGIN_Y, color);
+		bmp = BitmapFactory.decodeFile(f.getPath());
+		if (bmp != null) {
 
+			Log.d("search image:", path + id + ".png" + "  found");
+		} else {
+			Log.d("search image:", path + id + ".png" + "  not found");
 		}
+
 		return bmp;
 	}
 

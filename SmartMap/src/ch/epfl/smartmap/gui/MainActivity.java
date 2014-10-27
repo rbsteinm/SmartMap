@@ -65,9 +65,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	private String[] mSideLayoutElements;
 	private ListView mDrawerListView;
 
-	MockDB mockDB = new MockDB();
-	List<Friend> mListOfFriends;
+	private MockDB mockDB = new MockDB();
+	private List<Friend> mListOfFriends;
 	private GoogleMap mGoogleMap;
+	private ProfilePictureFriendMarker mFriendMarker = new ProfilePictureFriendMarker();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +82,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		if (mGoogleMap != null) {
 			mListOfFriends = mockDB.getMockFriends();
 			// = listFriendPos();
-			FriendMarker friendMarker = new FriendMarker();
-			friendMarker.setMarkersToMaps(this, mGoogleMap, mListOfFriends);
+			mFriendMarker.setMarkersToMaps(this, mGoogleMap, mListOfFriends);
 			zoomAccordingToMarkers();
 
 		}
@@ -151,7 +151,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	@Override
 	public void onLocationChanged(Location location) {
 		zoomMap(location);
-		//updatePos
+		// updatePos
+		// mListOfFriends = = listFriendPos();
+		// mFriendMarker.setMarkersToMaps(this, mGoogleMap, mListOfFriends);
+		// zoomAccordingToMarkers();
 	}
 
 	@Override
@@ -185,8 +188,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		return this;
 	}
 
-	// this part concerns the set bound and zoom with regards to all marker
-	// positions on the map
+	
+	/**
+	 *  set bound and zoom with regards to all markers positions on the map
+	 */
 	void zoomAccordingToMarkers() {
 		final View mapView = getSupportFragmentManager().findFragmentById(
 				R.id.map).getView();

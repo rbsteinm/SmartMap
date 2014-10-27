@@ -38,13 +38,15 @@ public class Friend implements User {
 		position = new Point(0, 0);
 	}
 
-	// TODO how to initialize the location field
-	public Friend(int userID, String userName, String provider) {
+	// TODO
+	public Friend(int userID, String userName, double latitude, double longitude) {
 		id = userID;
 		name = userName;
 		phoneNumber = NO_NUMBER;
 		email = NO_EMAIL;
-		this.location = new Location(provider);
+		location = new Location("");
+		setLatitude(latitude);
+		setLongitude(longitude);
 	}
 
 	@Override
