@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="FriendBottomSliderHeader">
-        
-    </declare-styleable>
+   <declare-styleable name="SearchResultView">
+       
+   </declare-styleable>
+   <declare-styleable name="SmartMapSlidingUpPanel">
+       
+   </declare-styleable>
+   <declare-styleable name="SearchLayout">
+       
+   </declare-styleable>
 </resources>

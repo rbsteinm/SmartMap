@@ -1,21 +1,47 @@
 package ch.epfl.smartmap.gui;
 
-import android.app.Activity;
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.User;
 
 /**
  * @author rbsteinm
  * 
  */
-public class FriendsActivity extends Activity {
+public class FriendsActivity extends ListActivity {
+    // Mock stuff
+    private List<User> mockUsersList;
+    private Friend julien;
+    private Friend robin;
+    private Friend alain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
+
+        // Filling up mock stuff
+        mockUsersList = new ArrayList<User>();
+        julien = new Friend(1, "Julien Perrenoud");
+        julien.setOnline(true);
+        mockUsersList.add(julien);
+        robin = new Friend(2, "Robin Genolet");
+        robin.setOnline(false);
+        mockUsersList.add(robin);
+        alain = new Friend(2, "Alain Milliet");
+        alain.setOnline(false);
+        mockUsersList.add(alain);
+
+        // Create custom Adapter and pass it to the Activity
+        FriendListItemAdapter adapter = new FriendListItemAdapter(this, mockUsersList);
+        setListAdapter(adapter);
     }
 
     @Override

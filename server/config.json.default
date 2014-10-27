@@ -1,0 +1,15 @@
+{
+    "debug": false,
+    "db": {
+        "driver": "pdo_mysql",
+        "host": "localhost",
+        "dbname": "smartmap",
+        "user": "smartmap",
+        "password": "password",
+        "charset": "utf8"
+    },
+    "facebook": {
+        "appId": "appId",
+        "appSecret": "appSecret"
+    }
+}

@@ -9,10 +9,13 @@
     ],
     "autoload": {
         "psr-4": {
-            "SmartMap\\Routing\\": "src/SmartMap/Routing/",
             "SmartMap\\Control\\": "src/SmartMap/Control/",
-            "SmartMap\\DBInterface\\": "src/SmartMap/DBInterface"
+            "SmartMap\\DBInterface\\": "src/SmartMap/DBInterface/"
         }
     },
-    "require": {}
+    "require": {
+        "silex/silex": "~1.2",
+        "doctrine/dbal": "2.2.*",
+	"facebook/php-sdk-v4" : "4.0.*"
+    }
 }
