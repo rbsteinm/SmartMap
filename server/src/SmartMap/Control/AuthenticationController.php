@@ -6,11 +6,14 @@
 namespace SmartMap\Control;
 
 use Silex\Application;
+
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 use SmartMap\DBInterface\User;
 use SmartMap\DBInterface\UserRepository;
+
 use Facebook\FacebookSession;
 use Facebook\FacebookRedirectLoginHelper;
 use Facebook\FacebookRequest;
@@ -28,13 +31,19 @@ use Facebook\GraphUser;
  *        
  *        
  */
-class AuthenticationController {
+class AuthenticationController
+{
     private static $APP_ID = '305881779616905';
     // This is the APP_SECRET, which is highly confidential as it could enable someone to impersonate the app
     private static $APP_SECRET = 'b851a1eb3edcaf637f92fbb2af2b3b47';
+    private $mAppSecret;
+    private $mAppId;
     private $mRepo;
-    function __construct(UserRepository $repo) {
+    
+    function __construct(UserRepository $repo, $appId, $appSecret) {
         $this->mRepo = $repo;
+        $this->mAppId = $appId;
+        $this->mAppSecret = $appSecret;
     }
     
     /**
@@ -112,6 +121,7 @@ class AuthenticationController {
             throw new ControlException ( 'An error occured while dealing with the database' );
         }
     }
+    
     /*
      * Development method used to simplify tests
      */
@@ -121,10 +131,14 @@ class AuthenticationController {
             throw new \Exception ( 'Field user_id is not set !' );
         }
         $session = $request->getSession ();
-        $session->set ( 'userId', $id );
-        return new JsonResponse ( array (
+        if ($session == null)
+        {
+            throw new \Exception('Session is not set.');
+        }
+        $session->set('userId', $id);
+        return new JsonResponse (array(
                         'status' => 'Ok',
-                        'message' => 'Fakeauthentified as id ' . $id 
-        ) );
+                        'message' => 'Fakeauthentified as id ' . $session->get('userId')
+        ));
     }
 }
