@@ -14,13 +14,8 @@ SmartMap/.checkstyle
 SmartMap/.DS_Store
 server/vendor/
 server/composer.lock
-SmartMap/bin/
-SmartMap/gen/
-SmartMap/.classpath
-SmartMap/.project
-SmartMap/.properties
-SmartMap/.metadata/
-SmartMap/.settings
-SmartMap/local.properties
-SmartMap/gen/
+server/.buildpath
+server/.project
+server/.checksytle
+server/.settings
 *.class
