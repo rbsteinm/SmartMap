@@ -48,7 +48,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(a);
         dbh.addUser(b);
         dbh.addUser(c);
-        SparseArray<User> list = dbh.getAllUsers();
+        //SparseArray<User> list = dbh.getAllUsers();
         //assertTrue(list.get(c.getID()).getID() == c.getID());
     }
     
@@ -67,7 +67,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(b);
         dbh.addUser(c);
         dbh.deleteUser(b);
-        SparseArray<User> list = dbh.getAllUsers();
+        //SparseArray<User> list = dbh.getAllUsers();
        // assertTrue(list.size() == 2 && list.get(a.getID()).getID() == a.getID());
     }
     

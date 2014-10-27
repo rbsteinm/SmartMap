@@ -18,6 +18,6 @@ public interface AuthenticationClient {
 	 * @param fbAccessToken
 	 * @throws SmartMapClientException
 	 */
-	void authServer (User user, String fbAccessToken) throws SmartMapClientException;
+	void authServer(User user, String fbAccessToken) throws SmartMapClientException;
 
 }
