@@ -12,6 +12,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import ch.epfl.smartmap.R;
 
+import android.location.Location;
+
 /**
  * A class to represent the user's friends
  * 
@@ -19,173 +21,200 @@ import ch.epfl.smartmap.R;
  */
 public class Friend implements User {
 
+	private long id; // the user's unique ID
+	private String name; // the user's name as it will be displayed
+	private String phoneNumber;
+	private String email;
+	private Point position;
+	private String positionName;
+	private GregorianCalendar lastSeen;
+	private boolean online;
+	private Location location;
 
-    private long id; // the user's unique ID
-    private String name; // the user's name as it will be displayed
-    private String phoneNumber;
-    private String email;
-    private Point position;
-    private String positionName;
-    private GregorianCalendar lastSeen;
-    private boolean online;
+	public static final String NO_NUMBER = "No phone number specified";
+	public static final String NO_EMAIL = "No email address specified";
+	public static final String POSITION_UNKNOWN = "Unknown position";
+	public static final int DEFAULT_PICTURE = R.drawable.ic_launcher; // placeholder
+	public static final int IMAGE_QUALITY = 100;
 
-    public static final String NO_NUMBER = "No phone number specified";
-    public static final String NO_EMAIL = "No email address specified";
-    public static final String POSITION_UNKNOWN = "Unknown position";
-    public static final int DEFAULT_PICTURE = R.drawable.ic_launcher; // placeholder
-    public static final int IMAGE_QUALITY = 100;
+	/**
+	 * Friend constructor
+	 * 
+	 * @param userID
+	 *            The id of the contact we're creating
+	 * @param userName
+	 *            The name of the friend
+	 * @param userNumber
+	 *            The friend's phone number
+	 * @author ritterni
+	 */
+	public Friend(long userID, String userName) {
+		id = userID;
+		name = userName;
+		phoneNumber = NO_NUMBER;
+		email = NO_EMAIL;
+		position = new Point(0, 0); // needs to be updated by the server
+		positionName = POSITION_UNKNOWN;
+		lastSeen = new GregorianCalendar();
+	}
 
-    /**
-     * Friend constructor
-     * 
-     * @param userID
-     *            The id of the contact we're creating
-     * @param userName
-     *            The name of the friend
-     * @param userNumber
-     *            The friend's phone number
-     * @author ritterni
-     */
-    public Friend(long userID, String userName) {
-        id = userID;
-        name = userName;
-        phoneNumber = NO_NUMBER;
-        email = NO_EMAIL;
-        position = new Point(0, 0); // needs to be updated by the server
-        positionName = POSITION_UNKNOWN;
-        lastSeen = new GregorianCalendar();
-    }
+	// TODO
+	public Friend(int userID, String userName, double latitude, double longitude) {
+		id = userID;
+		name = userName;
+		phoneNumber = NO_NUMBER;
+		email = NO_EMAIL;
+		location = new Location("");
+		setLatitude(latitude);
+		setLongitude(longitude);
+	}
 
-    @Override
-    public long getID() {
-        return id;
-    }
+	@Override
+	public long getID() {
+		return id;
+	}
 
-    @Override
-    public String getName() {
-        return name;
-    }
+	@Override
+	public String getName() {
+		return name;
+	}
 
-    @Override
-    public String getNumber() {
-        return phoneNumber;
-    }
+	@Override
+	public String getNumber() {
+		return phoneNumber;
+	}
 
-    @Override
-    public String getEmail() {
-        return email;
-    }
+	@Override
+	public String getEmail() {
+		return email;
+	}
 
-    @Override
-    public Point getPosition() {
-        return position;
-    }
+	@Override
+	public Point getPosition() {
+		return position;
+	}
 
-    @Override
-    public void setName(String newName) {
-        name = newName;
-    }
+	public Location getLocation() {
+		return location;
+	}
 
-    @Override
-    public void setNumber(String newNumber) {
-        phoneNumber = newNumber;
-    }
+	@Override
+	public void setName(String newName) {
+		name = newName;
+	}
 
-    @Override
-    public void setEmail(String newEmail) {
-        email = newEmail;
-    }
+	@Override
+	public void setNumber(String newNumber) {
+		phoneNumber = newNumber;
+	}
 
-    @Override
-    public void setX(double x) {
-        position.setX(x);
+	@Override
+	public void setEmail(String newEmail) {
+		email = newEmail;
+	}
 
-    }
+	@Override
+	public void setX(double x) {
+		position.setX(x);
 
-    @Override
-    public void setY(double y) {
-        position.setY(y);
-    }
+	}
 
-    @Override
-    public void setPosition(Point p) {
-        position.setX(p.getX());
-        position.setY(p.getY());
-    }
+	@Override
+	public void setY(double y) {
+		position.setY(y);
+	}
 
-    @Override
-    public String getPositionName() {
-        return positionName;
-    }
+	@Override
+	public void setPosition(Point p) {
+		position.setX(p.getX());
+		position.setY(p.getY());
+	}
 
-    @Override
-    public void setPositionName(String posName) {
-        positionName = posName;
-    }
+	@Override
+	public String getPositionName() {
+		return positionName;
+	}
 
-    @Override
-    public Bitmap getPicture(Context context) {
+	@Override
+	public void setPositionName(String posName) {
+		positionName = posName;
+	}
 
-        File file = new File(context.getFilesDir(), id + ".png");
+	public void setLatitude(double latitude) {
+		location.setLatitude(latitude);
 
-        Bitmap pic = null;
+	}
 
-        if (file.exists()) {
-            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
-        } else {
-            pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE); // placeholder
-        }
-        return pic;
-    }
+	public void setLongitude(double latitude) {
+		location.setLongitude(latitude);
 
-    @Override
-    public void setPicture(Bitmap pic, Context context) {
+	}
 
-        File file = new File(context.getFilesDir(), id + ".png");
+	@Override
+	public Bitmap getPicture(Context context) {
 
-        if (file.exists()) {
-            file.delete();
-        }
+		File file = new File(context.getFilesDir(), id + ".png");
 
-        try {
-            FileOutputStream out = context.openFileOutput(id + ".png", Context.MODE_PRIVATE);
-            pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+		Bitmap pic = null;
 
-    @Override
-    public GregorianCalendar getLastSeen() {
-        return lastSeen;
-    }
+		if (file.exists()) {
+			pic = BitmapFactory.decodeFile(file.getAbsolutePath());
+		} else {
+			pic = BitmapFactory.decodeResource(context.getResources(),
+					DEFAULT_PICTURE); // placeholder
+		}
+		return pic;
+	}
 
-    @Override
-    public boolean isOnline() {
-        return online;
-    }
+	@Override
+	public void setPicture(Bitmap pic, Context context) {
 
-    @Override
-    public void setLastSeen(GregorianCalendar date) {
-        lastSeen.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE),
-                date.get(Calendar.HOUR), date.get(Calendar.MINUTE));
-    }
+		File file = new File(context.getFilesDir(), id + ".png");
 
-    @Override
-    public void setOnline(boolean status) {
-        online = status;
-    }
+		if (file.exists()) {
+			file.delete();
+		}
 
-    @Override
-    public void deletePicture(Context context) {
-        File file = new File(context.getFilesDir(), id + ".png");
-        if (file.exists()) {
-            file.delete();
-        }
-    }
+		try {
+			FileOutputStream out = context.openFileOutput(id + ".png",
+					Context.MODE_PRIVATE);
+			pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
+	@Override
+	public GregorianCalendar getLastSeen() {
+		return lastSeen;
+	}
+
+	@Override
+	public boolean isOnline() {
+		return online;
+	}
+
+	@Override
+	public void setLastSeen(GregorianCalendar date) {
+		lastSeen.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH),
+				date.get(Calendar.DATE), date.get(Calendar.HOUR),
+				date.get(Calendar.MINUTE));
+	}
+
+	@Override
+	public void setOnline(boolean status) {
+		online = status;
+	}
+
+	@Override
+	public void deletePicture(Context context) {
+		File file = new File(context.getFilesDir(), id + ".png");
+		if (file.exists()) {
+			file.delete();
+		}
+	}
 
 }

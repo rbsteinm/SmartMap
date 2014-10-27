@@ -834,9 +834,16 @@ containing a value of this type.
         public static final int main=0x7f0d0003;
     }
     public static final class string {
+        public static final int IO_Exception_getFromLocation=0x7f070059;
         public static final int accept=0x7f070002;
         public static final int action_settings=0x7f070041;
-        public static final int app_id=0x7f070042;
+        public static final int action_showfriends=0x7f070042;
+        public static final int address=0x7f07004f;
+        /**  User interface labels and strings 
+ Address format 
+         */
+        public static final int address_output_string=0x7f07004c;
+        public static final int app_id=0x7f070043;
         public static final int app_name=0x7f07003f;
         public static final int com_facebook_choose_friends=0x7f070034;
         public static final int com_facebook_dialogloginactivity_ok_button=0x7f070023;
@@ -965,24 +972,61 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f070020;
+        /**  Messages 
+         */
+        public static final int connected=0x7f070050;
+        public static final int connection_error_code_unknown=0x7f070051;
+        public static final int connection_failed=0x7f070052;
         public static final int create_calendar_message=0x7f070005;
         public static final int create_calendar_title=0x7f070004;
         public static final int decline=0x7f070003;
-        public static final int greet_user=0x7f070044;
+        public static final int disconnected=0x7f070053;
+        public static final int get_address=0x7f070054;
+        public static final int get_location=0x7f070055;
+        public static final int greet_user=0x7f070045;
         public static final int hello_world=0x7f070040;
-        public static final int loading_text=0x7f070047;
-        public static final int logo_description=0x7f070045;
-        public static final int search_bar_hint=0x7f070049;
+        public static final int illegal_argument_exception=0x7f070056;
+        public static final int invalid_action=0x7f070057;
+        public static final int invalid_integer_id=0x7f070058;
+        /**  Latitude, longitude format 
+         */
+        public static final int latitude_longitude=0x7f07004d;
+        /**  Labels 
+         */
+        public static final int latlng=0x7f07004e;
+        public static final int loading_text=0x7f070048;
+        public static final int location_requested=0x7f07005a;
+        public static final int location_update_error=0x7f07005c;
+        public static final int location_update_error_detail=0x7f07005d;
+        public static final int location_update_missing_update=0x7f07005e;
+        public static final int location_updated=0x7f07005b;
+        public static final int location_updates_stopped=0x7f07005f;
+        public static final int log_new_location=0x7f070060;
+        public static final int logo_description=0x7f070046;
+        public static final int no_address_found=0x7f070061;
+        public static final int no_connection=0x7f070062;
+        public static final int no_geocoder_available=0x7f070063;
+        public static final int no_location_available=0x7f070064;
+        public static final int no_resolution=0x7f070066;
+        public static final int periodic_update_stop=0x7f070067;
+        public static final int play_services_available=0x7f070068;
+        public static final int request_location_updates_in_progress=0x7f070069;
+        public static final int resolved=0x7f070065;
+        public static final int search_bar_hint=0x7f07004a;
+        public static final int start_updates=0x7f07006a;
+        public static final int stop_updates=0x7f07006b;
         public static final int store_picture_message=0x7f070001;
         public static final int store_picture_title=0x7f070000;
-        public static final int title_activity_friends=0x7f070048;
-        public static final int title_activity_logged_in=0x7f070043;
-        public static final int title_activity_map_fragment=0x7f07004a;
+        public static final int title_activity_friends=0x7f070049;
+        public static final int title_activity_logged_in=0x7f070044;
+        public static final int title_activity_map_fragment=0x7f07004b;
+        public static final int unknown=0x7f07006c;
+        public static final int unknown_activity_request_code=0x7f07006d;
         /**  Text on a placeholder buy button when Google Play services is not
          available or up-to-date 
          */
         public static final int wallet_buy_button_place_holder=0x7f070022;
-        public static final int welcome=0x7f070046;
+        public static final int welcome=0x7f070047;
     }
     public static final class style {
         /** 
