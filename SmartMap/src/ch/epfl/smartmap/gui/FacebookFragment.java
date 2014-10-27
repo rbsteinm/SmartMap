@@ -38,9 +38,9 @@ import com.facebook.widget.LoginButton;
 /**
  * The fragment for the "Login with Facebook" button, that is used in scrim (1)
  * - Welcome
- * 
+ *
  * @author SpicyCH
- * 
+ *
  */
 public class FacebookFragment extends Fragment {
 
@@ -245,9 +245,9 @@ public class FacebookFragment extends Fragment {
 	/**
 	 * An AsyncTask to send the facebook user data to the SmartMap server
 	 * asynchronously
-	 * 
+	 *
 	 * @author SpicyCH
-	 * 
+	 *
 	 */
 	private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -262,7 +262,7 @@ public class FacebookFragment extends Fragment {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see android.os.AsyncTask#doInBackground(Params[])
 		 */
 		@Override
@@ -280,7 +280,6 @@ public class FacebookFragment extends Fragment {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			;
 
 			if (SERVER_CONFIRMATION.equals(serverAnswer)) {
 				Log.i(TAG, "User's data sent to SmartMap server");

@@ -25,6 +25,9 @@ public class SearchLayout extends RelativeLayout {
 
     private final static String TAG = "SEARCH_LAYOUT";
 
+    /**
+     * The initialisation state of the {@code SearchLayout}
+     */
     public enum InitState {
         NOT_INITIALIZED, INITIALIZED
     };
@@ -68,14 +71,15 @@ public class SearchLayout extends RelativeLayout {
      * Initializes the searchLayout, setting all listeners needed
      */
     public void initSearchLayout() {
-        assert (mInitState == InitState.NOT_INITIALIZED);
+        assert mInitState == InitState.NOT_INITIALIZED;
 
         // Get Views
         final SearchView mSearchView = (SearchView) findViewById(R.id.searchBar);
         final LinearLayout mSearchResultList = (LinearLayout) findViewById(R.id.search_result_list);
-        
+
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 
+            @Override
             public boolean onQueryTextSubmit(String query) {
                 // Do something when user his enter on keyboard
                 mSearchView.clearFocus();
@@ -88,7 +92,7 @@ public class SearchLayout extends RelativeLayout {
                 return false;
             }
         });
-        
+
         mSearchResultList.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -98,7 +102,7 @@ public class SearchLayout extends RelativeLayout {
 
         mInitState = InitState.INITIALIZED;
 
-        assert (mInitState == InitState.INITIALIZED);
+        assert mInitState == InitState.INITIALIZED;
     }
 
     /**
@@ -145,11 +149,11 @@ public class SearchLayout extends RelativeLayout {
         this.startAnimation(bottomUp);
         updateSearchResults();
     }
-    
+
     /**
      * Opens the panel and display it full screen
      */
-    public void open(){
+    public void open() {
         open("");
     }
 
