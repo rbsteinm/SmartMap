@@ -15,5 +15,6 @@ server/.checksytle
 server/.settings
 server/config.json
 server/tests/phpunit.phar
+server/.checkstyle
 *.class
 *~
