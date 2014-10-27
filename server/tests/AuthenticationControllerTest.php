@@ -61,7 +61,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
         $conn = DriverManager::getConnection ( $connectionParams, $config );
         
         $userRepo = new UserRepository ( $conn );
-        $authContr = new AuthenticationController ( $userRepo );
+        $authContr = new AuthenticationController ( $userRepo, '305881779616905', 'b851a1eb3edcaf637f92fbb2af2b3b47' );
         
         $this->authController = $authContr;
         
@@ -88,17 +88,23 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
     
     }
     
+    /**
+     * @expectedException        SmartMap\Control\ControlException
+     * @expectedExceptionMessage Session is null.
+     */
     public function testNoSessionYieldsException() {
-        $this->setExpectedException ( 'SmartMap\Control\ControlException' );
         $request = new Request ( $getRequest = array (), $this->validPostRequest );
         $serverResponse = $this->authController->authenticate ( $request );
     }
     
-    public function testCannotLoginWithBadRequestParams() {
-        $this->setExpectedException ( 'SmartMap\Control\ControlException' );
+    /**
+     * @expectedException        SmartMap\Control\ControlException
+     * @expectedExceptionMessage Bad fb session
+     */
+    public function testCannotLoginWithBadSession() {
         $postReq = array (
-                        "name" => "Robich",
-                        "facebookId" => "123",
+                        "name" => "SmartMap SwEng",
+                        "facebookId" => "1482245642055847",
                         "facebookToken" => "ehf h e ue" 
         );
         $request = new Request ( $getRequest = array (), $postReq );
@@ -110,6 +116,98 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
         $json = json_decode ( $serverResponse->getContent () );
         
         $this->assertEquals ( "error", $json->status );
+    }
+    
+    /**
+     * @expectedException        SmartMap\Control\ControlException
+     * @expectedExceptionMessage do not match the fb access token
+     */
+    public function testCannotLoginWithGoodSessionButBadName() {
+        $postReq = array (
+                        "name" => "Robich",
+                        "facebookId" => "1482245642055847",
+                        "facebookToken" => "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7" .
+                        "FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQ" .
+                        "NWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy" 
+        );
+        $request = new Request ( $getRequest = array (), $postReq );
+        
+        $session = new Session ( new MockFileSessionStorage () );
+        $request->setSession ( $session );
+        
+        $serverResponse = $this->authController->authenticate ( $request );
+        $json = json_decode ( $serverResponse->getContent () );
+        
+        $this->assertEquals ( "error", $json->status );
+    }
+    
+    /**
+     * @expectedException        SmartMap\Control\ControlException
+     * @expectedExceptionMessage do not match the fb access token
+     */
+    public function testCannotLoginWithGoodSessionButBadId() {
+        $postReq = array (
+                        "name" => "SmartMap SwEng",
+                        "facebookId" => "1337",
+                        "facebookToken" => "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7" .
+                        "FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQ" .
+                        "NWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy"
+        );
+        $request = new Request ( $getRequest = array (), $postReq );
+        
+        $session = new Session ( new MockFileSessionStorage () );
+        $request->setSession ( $session );
+        
+        $serverResponse = $this->authController->authenticate ( $request );
+        $json = json_decode ( $serverResponse->getContent () );
+        
+        $this->assertEquals ( "error", $json->status );
+    }
+    
+    /**
+     * @expectedException        SmartMap\Control\ControlException
+     * @expectedExceptionMessage An error occured while dealing with the database
+     */
+    public function testDatabaseErrorYieldsRightExceptionMessage() {
+        $config = new Configuration ();
+        $connectionParams = array (
+                        'dbname' => 'smartmap',
+                        'user' => 'Robich',
+                        'password' => 'LetMeIn',
+                        'host' => 'localhost',
+                        'driver' => 'pdo_mysql'
+        );
+        
+        $conn = DriverManager::getConnection ( $connectionParams, $config );
+        
+        $userRepo = new UserRepository ( $conn );
+        $authContr = new AuthenticationController ( $userRepo, '305881779616905', 'b851a1eb3edcaf637f92fbb2af2b3b47' );
+        
+        $request = new Request ( $getRequest = array (), $this->validPostRequest );
+        
+        $session = new Session ( new MockFileSessionStorage () );
+        $request->setSession ( $session );
+        
+        $serverResponse = $authContr->authenticate ( $request );
+        $json = json_decode ( $serverResponse->getContent () );
+        
+        $this->assertEquals ( "Some text, shouldn't matter!", $json->status );
+    }
+    
+    /**
+     * @expectedException        SmartMap\Control\ControlException
+     * @expectedExceptionMessage Missing POST parameter
+     */
+    public function testNoPostParamsYieldException() {
+        $request = new Request ( $getRequest = array (), $postParams = array () );
+        
+        $session = new Session ( new MockFileSessionStorage () );
+        $request->setSession ( $session );
+        
+        $serverResponse = $this->authController->authenticate ( $request );
+        $json = json_decode ( $serverResponse->getContent () );
+        
+        $this->assertEquals ( "OK", $json->status );
     }
     
     public function testSessionUserIdIsSetAfterLogin() {
