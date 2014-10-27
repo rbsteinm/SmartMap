@@ -7,18 +7,19 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 $app = new Silex\Application();
 
 // Options
-$app['debug'] = true;
+$options = json_decode(file_get_contents(__DIR__ . '/../config.json'), true);
 
+$app['debug'] = $options['debug'];
 
 // Database connection
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
-        'driver' => 'pdo_mysql',
-        'host' => 'localhost',
-        'dbname' => 'SmartMapDataBase',
-        'user' => 'smartmap',
-        'password' => 'salut23',
-        'charset' => 'utf8'
+        'driver' => $options['db']['driver'],
+        'host' => $options['db']['host'],
+        'dbname' => $options['db']['dbname'],
+        'user' => $options['db']['user'],
+        'password' => $options['db']['password'],
+        'charset' => $options['db']['charset']
     )
 ));
 
@@ -33,8 +34,10 @@ $app['user.repository'] = $app->share(function() use($app) {
 // Injecting controllers
 $app->register(new Silex\Provider\ServiceControllerServiceProvider());
 
-$app['authentication.controller'] = $app->share(function() use($app) {
-    return new SmartMap\Control\AuthenticationController($app['user.repository']);
+$app['authentication.controller'] = $app->share(function() use($app, $options) {
+    return new SmartMap\Control\AuthenticationController($app['user.repository'],
+                                                         $options['facebook']['appId'],
+                                                         $options['facebook']['appSecret']);
 });
 
 $app['authorization.controller'] = $app->share(function() use($app) {
