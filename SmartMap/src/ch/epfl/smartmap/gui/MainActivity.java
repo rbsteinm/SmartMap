@@ -10,18 +10,13 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import ch.epfl.smartmap.R;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -30,7 +25,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 /**
  * @author jfperren
@@ -54,7 +48,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
         initializeDrawerLayout();
         if (savedInstanceState == null) {
             displayMap();
@@ -63,42 +57,16 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         /*
          * BELOW GOES SEARCHBAR & SLIDINGUPPANEL INIT
          */
-        final EditText mSearchBarEditText = (EditText) findViewById(R.id.searchBarEditText);
-        final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        mBottomSlider.setCoveredFadeColor(0);
-        mBottomSlider.collapsePanel();
 
-        mSearchBarEditText
-            .setOnEditorActionListener(new OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId,
-                    KeyEvent event) {
-                    boolean handled = false;
-                    if (actionId == EditorInfo.IME_ACTION_SEND) {
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                        Log.d("searchBar", "Search Request Finished");
-                        handled = true;
-                    }
-                    return handled;
-                }
-            });
-
-        mSearchBarEditText
-            .setOnFocusChangeListener(new OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if (hasFocus) {
-                        mBottomSlider.expandPanel();
-                        Log.d("SearchBar", "Got focus");
-                    } else {
-                        mBottomSlider.hidePanel();
-                        Log.d("SearchBar", "Lost focus");
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    }
-                }
-            });
+        final Button mSearchButton = (Button) findViewById(R.id.searchButton);
+        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+        mSearchLayout.initSearchLayout();
+        mSearchButton.setOnClickListener(new OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                mSearchLayout.open();
+            }
+        });
     }
 
     @Override
@@ -127,14 +95,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     @Override
     public void onBackPressed() {
-        final SlidingUpPanelLayout mBottomSlider = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-
-        if (mBottomSlider != null && mBottomSlider.isPanelExpanded()
-            || mBottomSlider.isPanelAnchored()) {
-            mBottomSlider.collapsePanel();
+        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+        if (mSearchLayout.isShown()) {
+            mSearchLayout.close();
         } else {
             super.onBackPressed();
         }
+
     }
     
     /**
@@ -144,6 +111,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         // Get ressources
         mSideLayoutElements = getResources().getStringArray(
             R.array.sideMenuElements);
+        
         mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerListView = (ListView) findViewById(R.id.left_drawer);
         // Set the adapter for the listView
@@ -168,30 +136,24 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         Log.d(TAG, "1");
         // Zoom in the Google Map
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
-        Log.d(TAG, "1");
         mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(GMAP_ZOOM_LEVEL));
-        Log.d(TAG, "1");
     }
 
     /**
      * Display the map with the current location
      */
     public void displayMap() {
-        Log.d(TAG, "displayMap called");
         int status = GooglePlayServicesUtil
             .isGooglePlayServicesAvailable(getBaseContext());
         // Showing status
         if (status != ConnectionResult.SUCCESS) { // Google Play Services are
                                                   // not available
-            Log.d(TAG, "no Google Play Services");
-
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
                 GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
 
-        } else { // Google Play Services are available
-
-            Log.d(TAG, "Google Play Services OK");
+        } else {
+            // Google Play Services are available
 
             // Getting reference to the SupportMapFragment of activity_main.xml
             SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager()

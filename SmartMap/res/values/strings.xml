@@ -20,7 +20,7 @@
     </string-array>
 
     <string name="title_activity_friends">FriendsActivity</string>
-    <string name="searchBar">Search...</string>
+    <string name="search_bar_hint">Search...</string>
     <string name="title_activity_map_fragment">MapFragment</string>
 
 </resources>

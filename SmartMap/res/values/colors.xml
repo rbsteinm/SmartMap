@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bottomSliderBackground">#ffffff</color>
-    
+    <color name="searchResultBackground">#ffffff</color>
+    <color name="searchResultBorder">#A4A4A4</color>
+    <color name="searchResultShadow">#DDDDDD</color>
+    <color name="bottomSliderBackground">#D8D8D8</color>
+    <color name="lastSeenConnectionTextColor">#999999</color>
 </resources>
