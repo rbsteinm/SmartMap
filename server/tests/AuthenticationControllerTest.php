@@ -27,12 +27,15 @@ use Doctrine\DBAL\Configuration;
 
 
 /**
- * 
+ *
  * To run theses tests, you need to
- *  -Have a db named smartmap live on localhost, that has the user root with no pwd
- *  -Set these settings in web/index.php
- *  -Set the bootstrap to autoload.php : php phpunit.phar --bootstrap ..\..\vendor\autoload.php [TESTS TO RUN]
- * 
+ * -Have a db named smartmap live on localhost, that has the user root with no pwd
+ * -Set these settings in web/index.php
+ * -Set the bootstrap to autoload.php : php phpunit.phar --bootstrap ..\..\vendor\autoload.php [TESTS TO RUN]
+ *
+ * In the case that some tests fail in the future, try connecting to SmartMap app with the mock user. It might need to
+ * reaccept the permissions.
+ *
  * The mock fb account is robin.genolet@epfl.ch hackerinside
  * name: Swag Sweng
  * ID: 1482245642055847
@@ -47,6 +50,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
     
     private $authController;
     private $validPostRequest;
+    private $validFbToken;
     
     public function setUp() {
         $config = new Configuration ();
@@ -65,16 +69,18 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
         
         $this->authController = $authContr;
         
+        $this->validFbToken = "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7" .
+                        "FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQ" .
+                        "NWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
+        
         $this->validPostRequest = array (
                         "name" => "SmartMap SwEng",
                         "facebookId" => "1482245642055847",
-                        "facebookToken" => "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7" .
-                        "FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQ" .
-                        "NWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy" 
+                        "facebookToken" => $this->validFbToken
         );
     }
     
-    
+
     public function testCanLoginWithGoodRequestParams() {
         $request = new Request ( $getRequest = array (), $this->validPostRequest );
         
@@ -89,7 +95,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @expectedException        SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\ControlException
      * @expectedExceptionMessage Session is null.
      */
     public function testNoSessionYieldsException() {
@@ -98,7 +104,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @expectedException        SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\ControlException
      * @expectedExceptionMessage Bad fb session
      */
     public function testCannotLoginWithBadSession() {
@@ -119,16 +125,14 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @expectedException        SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\ControlException
      * @expectedExceptionMessage do not match the fb access token
      */
     public function testCannotLoginWithGoodSessionButBadName() {
         $postReq = array (
                         "name" => "Robich",
                         "facebookId" => "1482245642055847",
-                        "facebookToken" => "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7" .
-                        "FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQ" .
-                        "NWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy" 
+                        "facebookToken" => $this->validFbToken 
         );
         $request = new Request ( $getRequest = array (), $postReq );
         
@@ -142,16 +146,14 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @expectedException        SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\ControlException
      * @expectedExceptionMessage do not match the fb access token
      */
     public function testCannotLoginWithGoodSessionButBadId() {
         $postReq = array (
                         "name" => "SmartMap SwEng",
                         "facebookId" => "1337",
-                        "facebookToken" => "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7" .
-                        "FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQ" .
-                        "NWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy"
+                        "facebookToken" => $this->validFbToken 
         );
         $request = new Request ( $getRequest = array (), $postReq );
         
@@ -165,7 +167,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @expectedException        SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\ControlException
      * @expectedExceptionMessage An error occured while dealing with the database
      */
     public function testDatabaseErrorYieldsRightExceptionMessage() {
@@ -175,7 +177,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
                         'user' => 'Robich',
                         'password' => 'LetMeIn',
                         'host' => 'localhost',
-                        'driver' => 'pdo_mysql'
+                        'driver' => 'pdo_mysql' 
         );
         
         $conn = DriverManager::getConnection ( $connectionParams, $config );
@@ -195,7 +197,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @expectedException        SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\ControlException
      * @expectedExceptionMessage Missing POST parameter
      */
     public function testNoPostParamsYieldException() {
@@ -216,14 +218,12 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
         $session = new Session ( new MockFileSessionStorage () );
         $request->setSession ( $session );
         
-        $this->assertTrue($session->get('userId') == null);
+        $this->assertTrue ( $session->get ( 'userId' ) == null );
         
         $serverResponse = $this->authController->authenticate ( $request );
         
-        $this->assertTrue($session->get('userId') > 0);
+        $this->assertTrue ( $session->get ( 'userId' ) > 0 );
     }
 
 }
-
-
 ?>
