@@ -1,3 +1,4 @@
+
 package ch.epfl.smartmap.test.cache;
 
 import org.junit.Test;
@@ -54,3 +55,5 @@ public class FriendListTest extends AndroidTestCase {
         assertTrue(fl.getUserList(array).get(0).equals(c));
     }
 }
+
+

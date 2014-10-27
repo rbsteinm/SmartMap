@@ -19,6 +19,7 @@ import ch.epfl.smartmap.R;
  */
 public class Friend implements User {
 
+
     private long id; // the user's unique ID
     private String name; // the user's name as it will be displayed
     private String phoneNumber;
@@ -185,4 +186,6 @@ public class Friend implements User {
             file.delete();
         }
     }
+
+
 }

@@ -227,7 +227,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 friend.setY(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
                 friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
   
-                friends.put(friend.getID(), friend);
+               // friends.put(friend.getID(), friend);
             } while (cursor.moveToNext());
         }
         
