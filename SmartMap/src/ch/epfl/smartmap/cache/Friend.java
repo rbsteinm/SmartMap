@@ -1,5 +1,7 @@
 package ch.epfl.smartmap.cache;
 
+import android.location.Location;
+
 /**
  * A class to represent the user's friends
  * 
@@ -12,6 +14,7 @@ public class Friend implements User {
 	private String phoneNumber;
 	private String email;
 	private Point position;
+	private Location location;
 
 	public static final String NO_NUMBER = "No phone number specified";
 	public static final String NO_EMAIL = "No email address specified";
@@ -33,6 +36,15 @@ public class Friend implements User {
 		phoneNumber = NO_NUMBER;
 		email = NO_EMAIL;
 		position = new Point(0, 0);
+	}
+
+	// TODO how to initialize the location field
+	public Friend(int userID, String userName, String provider) {
+		id = userID;
+		name = userName;
+		phoneNumber = NO_NUMBER;
+		email = NO_EMAIL;
+		this.location = new Location(provider);
 	}
 
 	@Override
@@ -60,6 +72,10 @@ public class Friend implements User {
 		return position;
 	}
 
+	public Location getLocation() {
+		return location;
+	}
+
 	@Override
 	public void setName(String newName) {
 		name = newName;
@@ -84,5 +100,15 @@ public class Friend implements User {
 	@Override
 	public void setY(double y) {
 		position.setY(y);
+	}
+
+	public void setLatitude(double latitude) {
+		location.setLatitude(latitude);
+
+	}
+
+	public void setLongitude(double latitude) {
+		location.setLongitude(latitude);
+
 	}
 }
