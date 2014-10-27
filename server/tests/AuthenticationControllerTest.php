@@ -29,9 +29,9 @@ use Doctrine\DBAL\Configuration;
 /**
  *
  * To run theses tests, you need to
- * -Have a db named smartmap live on localhost, that has the user root with no pwd
- * -Set these settings in web/index.php
- * -Set the bootstrap to autoload.php : php phpunit.phar --bootstrap ..\..\vendor\autoload.php [TESTS TO RUN]
+ *  -Have a db named smartmap live on localhost, that has the user root with no pwd
+ *  -Set these settings in web/index.php
+ *  -Set the bootstrap to autoload.php : php phpunit.phar --bootstrap ..\..\vendor\autoload.php [TESTS TO RUN]
  *
  * In the case that some tests fail in the future, try connecting to SmartMap app with the mock user. It might need to
  * reaccept the permissions.

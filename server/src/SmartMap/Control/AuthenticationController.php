@@ -65,7 +65,7 @@ class AuthenticationController
         
         // Check if function called with proper parameters
         if ($name == null or $facebookToken == null or $facebookId == null) {
-            throw new ControlException ( 'Missing POST parameter.' );
+            throw new ControlException ( 'Missing POST parameter(s). Please set name, facebookId and facebookToken' );
         }
         
         // Check if token is valid and matches name + ID
@@ -76,10 +76,10 @@ class AuthenticationController
             $session->validate ();
         } catch ( FacebookRequestException $ex ) {
             // Session not valid, Graph API returned an exception with the reason.
-            throw new ControlException ( 'Invalid Facebook session' );
+            throw new ControlException ( 'Bad fb session: Invalid Facebook session' );
         } catch ( \Exception $ex ) {
             // Graph API returned info, but it may mismatch the current app or have expired.
-            throw new ControlException ( 'Mismatch or expired facebook data.' );
+            throw new ControlException ( 'Bad fb session: Mismatch or expired facebook data.' );
         }
         
         // At this point the session is valid. We check the session is associated with the user name and id.
@@ -133,7 +133,7 @@ class AuthenticationController
         $session = $request->getSession ();
         if ($session == null)
         {
-            throw new \Exception('Session is not set.');
+            throw new \Exception('Session is null.');
         }
         $session->set('userId', $id);
         return new JsonResponse (array(
