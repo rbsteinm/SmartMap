@@ -16,5 +16,11 @@ server/.settings
 server/config.json
 server/tests/phpunit.phar
 server/.checkstyle
+Libraries/google-play-services_lib/local.propetries
+Libraries/facebook/local.properties
+Libraries/facebook/bin/
+Libraries/facebook/gen/
+Libraries/google-play-services_lib/bin/
+Libraries/google-play-services_lib/gen/
 *.class
 *~
