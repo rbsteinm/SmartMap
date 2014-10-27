@@ -4,7 +4,6 @@ SmartMap/bin/
 SmartMap/.settings
 SmartMap/gen/
 SmartMap/local.properties
-*~
 SmartMap/.checkstyle
 SmartMap/.DS_Store
 server/vendor/
@@ -13,4 +12,7 @@ server/.buildpath
 server/.project
 server/.checksytle
 server/.settings
+server/config.json
+server/tests/phpunit.phar
 *.class
+*~
