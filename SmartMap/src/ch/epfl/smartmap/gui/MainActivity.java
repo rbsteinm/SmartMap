@@ -49,7 +49,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	private static final String TAG = "GoogleMap";
 	private static final int LOCATION_UPDATE_TIMEOUT = 20000;
 	private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-	private static final int GMAP_ZOOM_LEVEL = 15;
+	private static final int GMAP_FOCUSED_ZOOM_LEVEL = 15;
+	private static final double CENTRE_LATITUDE=47.20380010;
+	private static final double CENTRE_LONGITUDE=2.00168440;
+	private static final int GMAP_GLOBAL_ZOOM_LEVEL=5;
+	private static final int CAMERA_PADDING=50;
 
 	@SuppressWarnings("unused")
 	private DrawerLayout mSideDrawerLayout;
@@ -164,7 +168,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		Log.d(TAG, "1");
 		// Zoom in the Google Map
 		mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
-		mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(GMAP_ZOOM_LEVEL));
+		mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(GMAP_FOCUSED_ZOOM_LEVEL));
 	}
 
 	/**
@@ -230,7 +234,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 						// We check which build version we are using.
 						@Override
 						public void onGlobalLayout() {
-							LatLng centre = new LatLng(47.20380010, 2.00168440);
+							LatLng centre = new LatLng(CENTRE_LATITUDE, CENTRE_LONGITUDE);
 							LatLngBounds bounds = new LatLngBounds.Builder()
 									.include(centre).build();
 							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
@@ -241,9 +245,9 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 										.removeOnGlobalLayoutListener(this);
 							}
 							mGoogleMap.moveCamera(CameraUpdateFactory
-									.newLatLngBounds(bounds, 50));
+									.newLatLngBounds(bounds, CAMERA_PADDING));
 							mGoogleMap.animateCamera(CameraUpdateFactory
-									.zoomTo(5));
+									.zoomTo(GMAP_GLOBAL_ZOOM_LEVEL));
 
 						}
 					});
