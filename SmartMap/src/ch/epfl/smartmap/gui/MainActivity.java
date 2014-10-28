@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -56,10 +57,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	private String[] mSideLayoutElements;
 	private ListView mDrawerListView;
 
-	private MockDB mockDB = new MockDB();
-	private List<Friend> mListOfFriends;
 	private GoogleMap mGoogleMap;
-	private ProfilePictureFriendMarker mFriendMarker = new ProfilePictureFriendMarker();
+	private ProfilePictureFriendMarkerDisplayer mFriendMarkerDisplayer;
+	
+	private MockDB mMockDB;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,11 +72,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			displayMap();
 		}
 		if (mGoogleMap != null) {
-			mListOfFriends = mockDB.getMockFriends();
-			// = listFriendPos();
-			mFriendMarker.setMarkersToMaps(this, mGoogleMap, mListOfFriends);
+		    mMockDB = new MockDB();
+		    mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
+			mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, mMockDB.FRIENDS_LIST);
 			zoomAccordingToMarkers();
-
 		}
 
 		/*
