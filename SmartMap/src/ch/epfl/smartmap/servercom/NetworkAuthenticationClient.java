@@ -9,12 +9,10 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import ch.epfl.smartmap.cache.User;
-
 /**
  * A {@link AuthenticationClient} implementation that uses a
  * {@link NetworkProvider} to communicate with a SmartMap server.
- * 
+ *
  * @author marion-S
  */
 
@@ -29,18 +27,18 @@ public class NetworkAuthenticationClient extends SmartMapClient implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * ch.epfl.smartmap.servercom.AuthenticationClient#authServer(ch.epfl.smartmap
 	 * .cache.User, java.lang.String)
 	 */
 	@Override
-	public void authServer(User user, String fbAccessToken) throws SmartMapClientException {
+	public void authServer(String name, long facebookId, String fbAccessToken) throws SmartMapClientException {
 		Log.d("authServer", "begin");
 		Map<String, String> params = new HashMap<String, String>();
 
-		params.put("name", user.getName());
-		params.put("facebookId", Long.toString(user.getID()));
+		params.put("name", name);
+		params.put("facebookId", Long.toString(facebookId));
 		params.put("facebookToken", fbAccessToken);
 		HttpURLConnection conn = getHttpURLConnection("/auth");
 		String textResult = sendViaPost(params, conn);
