@@ -16,7 +16,7 @@ import com.google.android.gms.maps.GoogleMap;
  * @author hugo-S
  * 
  */
-public interface FriendMarker {
+public interface FriendMarkerDisplayer {
 
 	/**
 	 * Set markers on the map for the friends in the list listOfFriends
@@ -29,5 +29,4 @@ public interface FriendMarker {
 	 */
 	void setMarkersToMaps(Context context, GoogleMap mGoogleMap,
 			List<Friend> listOfFriends);
-
 }
