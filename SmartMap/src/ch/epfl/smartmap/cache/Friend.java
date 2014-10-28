@@ -27,7 +27,6 @@ public class Friend implements User {
 	private String mName; // the user's name as it will be displayed
 	private String mPhoneNumber;
 	private String mEmail;
-	private Point mPosition;
 	private String mPositionName;
 	private GregorianCalendar mLastSeen;
 	private boolean mOnline;
@@ -56,7 +55,6 @@ public class Friend implements User {
 		mName = userName;
 		mPhoneNumber = NO_NUMBER;
 		mEmail = NO_EMAIL;
-		mPosition = new Point(0, 0); // needs to be updated by the server
 		mPositionName = POSITION_UNKNOWN;
 		mLastSeen = new GregorianCalendar();
 		mLocation = new Location(PROVIDER_NAME);
@@ -90,10 +88,6 @@ public class Friend implements User {
 	}
 
 	@Override
-	public Point getPosition() {
-		return mPosition;
-	}
-
 	public Location getLocation() {
 		return mLocation;
 	}
@@ -114,20 +108,9 @@ public class Friend implements User {
 	}
 
 	@Override
-	public void setX(double x) {
-		mPosition.setX(x);
-
-	}
-
-	@Override
-	public void setY(double y) {
-		mPosition.setY(y);
-	}
-
-	@Override
-	public void setPosition(Point p) {
-		mPosition.setX(p.getX());
-		mPosition.setY(p.getY());
+	public void setLocation(Location p) {
+		mLocation.setLatitude(p.getLatitude());
+		mLocation.setLongitude(p.getLongitude());
 	}
 
 	@Override
@@ -140,17 +123,20 @@ public class Friend implements User {
 		mPositionName = posName;
 	}
 
+	@Override
 	public void setLatitude(double latitude) {
 		mLocation.setLatitude(latitude);
 
 	}
 
+	@Override
 	public void setLongitude(double longitude) {
 		mLocation.setLongitude(longitude);
 
 	}
 	
-	public LatLng getLatLng(){
+	@Override
+	public LatLng getLatLng() {
 	    return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
 	}
 

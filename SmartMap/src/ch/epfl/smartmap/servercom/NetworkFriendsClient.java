@@ -48,8 +48,8 @@ public class NetworkFriendsClient extends SmartMapClient implements
 				JSONObject userJSON = usersArray.getJSONObject(i);
 				Friend friend = parseFriendfromJSON(userJSON);
 				// x=latitude, y=longitude??
-				friend.setX(userJSON.getDouble("latitude"));
-				friend.setY(userJSON.getDouble("latitude"));
+				friend.setLongitude(userJSON.getDouble("latitude"));
+				friend.setLatitude(userJSON.getDouble("latitude"));
 				friends.add(friend);
 			}
 		} catch (JSONException e) {

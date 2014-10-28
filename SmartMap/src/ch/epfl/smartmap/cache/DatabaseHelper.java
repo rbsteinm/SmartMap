@@ -161,8 +161,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_NAME, user.getName());
         values.put(KEY_NUMBER, user.getNumber());
         values.put(KEY_EMAIL, user.getEmail());
-        values.put(KEY_POSX, user.getPosition().getX());
-        values.put(KEY_POSY, user.getPosition().getY());
+        values.put(KEY_POSX, user.getLocation().getLongitude());
+        values.put(KEY_POSY, user.getLocation().getLatitude());
         values.put(KEY_POSNAME, user.getPositionName());
      
         db.insert(TABLE_USER, null, values);
@@ -197,8 +197,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.getString(cursor.getColumnIndex(KEY_NAME)));
         friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
         friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
-        friend.setX(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
-        friend.setY(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
+        friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
+        friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
         friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
         
         return friend;
@@ -223,8 +223,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex(KEY_NAME)));
                 friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
                 friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
-                friend.setX(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
-                friend.setY(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
+                friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
+                friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
                 friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
   
                // friends.put(friend.getID(), friend);
@@ -248,8 +248,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_NAME, user.getName());
         values.put(KEY_NUMBER, user.getNumber());
         values.put(KEY_EMAIL, user.getEmail());
-        values.put(KEY_POSX, user.getPosition().getX());
-        values.put(KEY_POSY, user.getPosition().getY());
+        values.put(KEY_POSX, user.getLocation().getLongitude());
+        values.put(KEY_POSY, user.getLocation().getLatitude());
         values.put(KEY_POSNAME, user.getPositionName());
         
         int rows = db.update(TABLE_USER,
