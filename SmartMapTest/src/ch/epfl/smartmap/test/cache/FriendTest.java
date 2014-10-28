@@ -48,14 +48,14 @@ public class FriendTest extends AndroidTestCase {
     
     @Test
     public void testSetX() {
-        friend.setX(x);
-        assertTrue(friend.getPosition().getX() == x);
+        friend.setLongitude(x);
+        assertTrue(friend.getLocation().getLongitude() == x);
     }
     
     @Test
     public void testSetY() {
-        friend.setY(y);
-        assertTrue(friend.getPosition().getY() == y); 
+        friend.setLatitude(y);
+        assertTrue(friend.getLocation().getLatitude() == y); 
     }
     
     @Test
