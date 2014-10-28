@@ -1,20 +1,17 @@
 package ch.epfl.smartmap.test.severcom;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
-import ch.epfl.smartmap.cache.Friend;
+import android.test.AndroidTestCase;
 import ch.epfl.smartmap.servercom.DefaultNetworkProvider;
 import ch.epfl.smartmap.servercom.NetworkAuthenticationClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
-import android.test.AndroidTestCase;
-
 public class NetworkAuthenticationClientTest extends AndroidTestCase {
 	private static String SERVER_URL = "http://smartmap.ddns.net";
-	private Friend user = new Friend(1482245642055847L, "SmartMap SwEng");
-	private String fbAccessToken = "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
+	private final long facebookId = 1482245642055847L;
+	private final String name = "SmartMap SwEng";
+	private final String fbAccessToken = "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
 
 	public NetworkAuthenticationClientTest() {
 		super();
@@ -26,7 +23,7 @@ public class NetworkAuthenticationClientTest extends AndroidTestCase {
 		NetworkAuthenticationClient networkAuthClient = new NetworkAuthenticationClient(
 				SERVER_URL, provider);
 
-		networkAuthClient.authServer(user, fbAccessToken);
+		networkAuthClient.authServer(name, facebookId, fbAccessToken);
 
 	}
 
