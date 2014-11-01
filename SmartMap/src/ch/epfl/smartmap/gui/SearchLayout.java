@@ -176,8 +176,8 @@ public class SearchLayout extends RelativeLayout {
 
     /**
      * Checks that the Representation Invariant is not violated.
-     * @param depth Represents how deep the audit check is done (use 1 to check this object only)
-     * @return
+     * @param depth represents how deep the audit check is done (use 1 to check this object only)
+     * @return The number of audit errors in this object
      */
     public int auditErrors(int depth) {
         // TODO : Decomment when auditErrors coded for other classes
