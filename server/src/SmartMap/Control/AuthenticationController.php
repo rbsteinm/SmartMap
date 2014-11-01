@@ -26,7 +26,7 @@ use Facebook\GraphUser;
  *
  * @author SpicyCH
  *        
- * @author - Code review: reviewed by Pamoi on 01.11.2014
+ * @author Pamoi (code reviewed - 01.11.2014)
  */
 class AuthenticationController
 {
@@ -74,7 +74,7 @@ class AuthenticationController
         catch (FacebookRequestException $ex)
         {
             // Session not valid, Graph API returned an exception with the reason.
-            throw new ControlException('Invalid Facebook session');
+            throw new ControlException('Invalid Facebook session.');
         }
         catch (\Exception $ex)
         {
@@ -89,7 +89,7 @@ class AuthenticationController
                              GraphUser::className());
             if ($name != $user_profile->getName() OR $facebookId != $user_profile->getId())
             {
-                throw new ControlException('Id and name do not match the fb access token');
+                throw new ControlException('Id and name do not match the fb access token.');
             }
         }
         catch (FacebookRequestException $e)

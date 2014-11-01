@@ -45,7 +45,7 @@ use Doctrine\DBAL\Configuration;
  *
  * @author SpicyCH
  * 
- * @author - Code review: reviewed by Pamoi on 01.11.2014
+ * @author Pamoi (code reviewed - 01.11.2014)
  *        
  */
 class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
@@ -110,7 +110,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
     
     /**
      * @expectedException SmartMap\Control\ControlException
-     * @expectedExceptionMessage Bad fb session
+     * @expectedExceptionMessage Mismatch or expired facebook data
      */
     public function testCannotLoginWithBadSession()
     {
