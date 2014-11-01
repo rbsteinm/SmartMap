@@ -1,8 +1,5 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
@@ -15,35 +12,29 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.MockDB;
-import ch.epfl.smartmap.cache.Friend;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-
 import com.google.android.gms.maps.model.LatLng;
-
 import com.google.android.gms.maps.model.LatLngBounds;
 
 /**
- * @author jfperren
+ * This Activity displays the core features of the App. It displays the map and the whole menu.
  * 
+ * @author jfperren
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
 
@@ -66,11 +57,19 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		
+		// Get needed Views
+		final Button mSearchButton = (Button) findViewById(R.id.searchButton);
+        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+		
+        // FIXME : Should be done in DrawerLayout class
 		initializeDrawerLayout();
+		mSearchLayout.initSearchLayout();
+		
 		if (savedInstanceState == null) {
 			displayMap();
 		}
+		
 		if (mGoogleMap != null) {
 		    mMockDB = new MockDB();
 		    mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
@@ -78,13 +77,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			zoomAccordingToMarkers();
 		}
 
-		/*
-		 * BELOW GOES SEARCHBAR & SLIDINGUPPANEL INIT
-		 */
-
-		final Button mSearchButton = (Button) findViewById(R.id.searchButton);
-		final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
-		mSearchLayout.initSearchLayout();
 		mSearchButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -124,24 +116,24 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	@Override
 	public void onBackPressed() {
 		final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+		
 		if (mSearchLayout.isShown()) {
 			mSearchLayout.close();
 		} else {
 			super.onBackPressed();
 		}
-
 	}
 
 	/**
 	 * Called to set up the left side menu. Supposedly called only once.
 	 */
 	private void initializeDrawerLayout() {
-		// Get ressources
+		// Get needed Ressources & Views
 		mSideLayoutElements = getResources().getStringArray(
 				R.array.sideMenuElements);
-
 		mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerListView = (ListView) findViewById(R.id.left_drawer);
+		
 		// Set the adapter for the listView
 		mDrawerListView.setAdapter(new ArrayAdapter<String>(this,
 				R.layout.drawer_list_item, mSideLayoutElements));
@@ -181,8 +173,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			dialog.show();
 
 		} else {
-			// Google Play Services are available
-
+			// Google Play Services are available.
 			// Getting reference to the SupportMapFragment of activity_main.xml
 			SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.map);
@@ -259,8 +250,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 */
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-
+		// nothing
 	}
 
 	/*
@@ -271,8 +261,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 */
 	@Override
 	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-
+	    // nothing
 	}
 
 	/*
@@ -283,7 +272,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 */
 	@Override
 	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
-
+		// nothing
 	}
 }

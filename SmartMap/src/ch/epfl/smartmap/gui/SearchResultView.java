@@ -8,8 +8,9 @@ import android.widget.LinearLayout;
 import ch.epfl.smartmap.R;
 
 /**
+ * This class is a basic Layout that will be used to display search results in {@code SearchLayout}.
+ * 
  * @author jfperren
- *
  */
 public abstract class SearchResultView extends LinearLayout {
 
@@ -20,15 +21,17 @@ public abstract class SearchResultView extends LinearLayout {
 
     public static final int BORDER_SIZE = 2;
 
-    protected LinearLayout mMainLayout;
-    private LinearLayout mBorderLayout;
+    protected final LinearLayout mMainLayout;
+    private final LinearLayout mBorderLayout;
 
-    /**
-     * @param context
-     * @param attrs
+    /** 
+     * Constructor 
+     * 
+     * @param context Context of the Application
      */
     public SearchResultView(Context context) {
         super(context);
+        // TODO : Decide what to put here and what needs to be done in subclasses.
 
         // Creates shadow layout
         this.setBackgroundResource(R.color.searchResultShadow);
@@ -66,5 +69,8 @@ public abstract class SearchResultView extends LinearLayout {
         mBorderLayout.addView(mMainLayout);
     }
 
+    /** 
+     * Called when a change is performed on the item this object displays.
+     */
     public abstract void update();
 }
