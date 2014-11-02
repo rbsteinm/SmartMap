@@ -4,7 +4,8 @@ import org.junit.Test;
 
 import android.test.AndroidTestCase;
 import ch.epfl.smartmap.servercom.DefaultNetworkProvider;
-import ch.epfl.smartmap.servercom.NetworkAuthenticationClient;
+
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 public class NetworkAuthenticationClientTest extends AndroidTestCase {
@@ -20,9 +21,9 @@ public class NetworkAuthenticationClientTest extends AndroidTestCase {
     @Test
     public void test() throws SmartMapClientException {
         DefaultNetworkProvider provider = new DefaultNetworkProvider();
-        NetworkAuthenticationClient networkAuthClient = new NetworkAuthenticationClient(SERVER_URL, provider);
+        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
 
-        networkAuthClient.authServer(name, facebookId, fbAccessToken);
+        networkClient.authServer(name, facebookId, fbAccessToken);
 
     }
 

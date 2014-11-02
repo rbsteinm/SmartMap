@@ -20,7 +20,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.servercom.DefaultNetworkProvider;
-import ch.epfl.smartmap.servercom.NetworkAuthenticationClient;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 import com.facebook.Request;
@@ -237,9 +237,8 @@ public class FacebookFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            DefaultNetworkProvider provider = new DefaultNetworkProvider();
-            NetworkAuthenticationClient networkAuthenticationClient = new NetworkAuthenticationClient(CONNECT_USER_URL,
-                    provider);
+           
+            NetworkSmartMapClient networkAuthenticationClient = NetworkSmartMapClient.getInstance();
 
             try {
                 networkAuthenticationClient.authServer(mParams.get("name"),
