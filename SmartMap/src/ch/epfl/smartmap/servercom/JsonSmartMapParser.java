@@ -8,21 +8,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
-
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 
 /**
  * A {@link SmartMapParser} implementation that parses objects from Json format
- * 
+ *
  * @author marion-S
- * 
+ *
+ * @author SpicyCH (code reviewed 02.11.2014) : changed Error to error as the server uses a lowercase e.
  */
 public class JsonSmartMapParser implements SmartMapParser {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * ch.epfl.smartmap.servercom.SmartMapParser#parseFriend(java.lang.String)
 	 */
@@ -43,7 +43,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * ch.epfl.smartmap.servercom.SmartMapParser#checkServerError(java.lang.
 	 * String)
@@ -63,7 +63,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 		} catch (JSONException e) {
 			throw new SmartMapParseException();
 		}
-		if (status.equals("Error")) {
+		if (status.equals("error")) {
 			throw new SmartMapClientException(message);
 		}
 
