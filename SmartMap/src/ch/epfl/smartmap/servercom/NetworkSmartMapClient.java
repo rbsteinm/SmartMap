@@ -35,25 +35,25 @@ import android.util.Log;
  * 
  */
 
-public class NetworkSmartMapClient implements SmartMapClient {
+final public class NetworkSmartMapClient implements SmartMapClient {
 
-	private String mServerUrl="http://smartmap.ddns.net";
-	private NetworkProvider mNetworkProvider=new DefaultNetworkProvider();
+	private static final String SERVER_URL = "http://smartmap.ddns.net";
+	private static final NetworkProvider NETWORK_PROVIDER = new DefaultNetworkProvider();
 	static final String COOKIES_HEADER = "Set-Cookie";
 	public static final String USER_AGENT = "Mozilla/5.0"; // latest firefox's
 															// user agent
 	private String mSessionId;
 
-	private static final NetworkSmartMapClient oneInstance = new NetworkSmartMapClient();
+	private static final NetworkSmartMapClient ONE_INSTANCE = new NetworkSmartMapClient();
 
 	private NetworkSmartMapClient() {
-		if (oneInstance != null) {
+		if (ONE_INSTANCE != null) {
 			throw new IllegalStateException("Already instantiated");
 		}
 	}
 
 	public static NetworkSmartMapClient getInstance() {
-		return oneInstance;
+		return ONE_INSTANCE;
 	}
 
 	// TODO
@@ -75,14 +75,21 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		params.put("facebookId", Long.toString(facebookId));
 		params.put("facebookToken", fbAccessToken);
 		HttpURLConnection conn = getHttpURLConnection("/auth");
-		String textResult = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(textResult);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
 			throw new SmartMapClientException(e);
 		}
-		checkServerErrorFromJSON(jsonObject);
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
 
 	}
 
@@ -93,25 +100,28 @@ public class NetworkSmartMapClient implements SmartMapClient {
 	 */
 	@Override
 	public List<User> listFriendPos() throws SmartMapClientException {
-		// TODO Auto-generated method stub
-		HttpURLConnection conn = getHttpURLConnection("/listFriendPos");
-		String textResult = sendViaPost(null, conn);
 
-		List<User> friends = new ArrayList<User>();
+		HttpURLConnection conn = getHttpURLConnection("/listFriendPos");
+		String response = sendViaPost(null, conn);
+
+		SmartMapParser parser = null;
+		try {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
+			throw new SmartMapClientException(e);
+		}
 
 		try {
-			JSONObject jsonObject = new JSONObject(textResult);
-			checkServerErrorFromJSON(jsonObject);
-			JSONArray usersArray = jsonObject.getJSONArray("positions");
-			for (int i = 0; i < usersArray.length(); i++) {
-				JSONObject userJSON = usersArray.getJSONObject(i);
-				Friend friend = parseFriendfromJSON(userJSON);
-				// x=latitude, y=longitude??
-				friend.setLongitude(userJSON.getDouble("latitude"));
-				friend.setLatitude(userJSON.getDouble("latitude"));
-				friends.add(friend);
-			}
-		} catch (JSONException e) {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		List<User> friends = null;
+		try {
+			friends = parser.parseFriends(response);
+		} catch (SmartMapParseException e) {
 			throw new SmartMapClientException(e);
 		}
 
@@ -129,14 +139,21 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("id_friend", Integer.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/followFriend");
-		String textResult = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(textResult);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
 			throw new SmartMapClientException(e);
 		}
-		checkServerErrorFromJSON(jsonObject);
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
 
 	}
 
@@ -150,12 +167,19 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("id_friend", Integer.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/unfollowFriend");
-		String textResult = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(textResult);
-			checkServerErrorFromJSON(jsonObject);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
 			throw new SmartMapClientException(e);
 		}
 
@@ -171,15 +195,21 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("id_friend", Integer.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/allowFriend");
-		String textResult = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(textResult);
-			checkServerErrorFromJSON(jsonObject);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
 			throw new SmartMapClientException(e);
 		}
 
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
 	}
 
 	/*
@@ -192,12 +222,19 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("id_friend", Integer.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/disallowFriend");
-		String textResult = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(textResult);
-			checkServerErrorFromJSON(jsonObject);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
 			throw new SmartMapClientException(e);
 		}
 
@@ -216,12 +253,19 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_ids", intListToString(ids));
 		HttpURLConnection conn = getHttpURLConnection("/allowFriendList");
-		String textResult = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(textResult);
-			checkServerErrorFromJSON(jsonObject);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
 			throw new SmartMapClientException(e);
 		}
 
@@ -240,12 +284,19 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_ids", intListToString(ids));
 		HttpURLConnection conn = getHttpURLConnection("/disallowFriendList");
-		String textResult = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(textResult);
-			checkServerErrorFromJSON(jsonObject);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
 			throw new SmartMapClientException(e);
 		}
 
@@ -260,14 +311,21 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_id", Integer.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/inviteFriend");
-		String textResult = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(textResult);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
 			throw new SmartMapClientException(e);
 		}
-		checkServerErrorFromJSON(jsonObject);
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
 
 	}
 
@@ -280,19 +338,26 @@ public class NetworkSmartMapClient implements SmartMapClient {
 	public List<User> getInvitations() throws SmartMapClientException {
 
 		HttpURLConnection conn = getHttpURLConnection("/getInvitations");
-		String textResult = sendViaPost(null, conn);
+		String response = sendViaPost(null, conn);
 
-		List<User> inviters = new ArrayList<User>();
+		SmartMapParser parser = null;
+		try {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
+			throw new SmartMapClientException(e);
+		}
 
 		try {
-			JSONObject jsonObject = new JSONObject(textResult);
-			checkServerErrorFromJSON(jsonObject);
-			JSONArray usersArray = jsonObject.getJSONArray("list");
-			for (int i = 0; i < usersArray.length(); i++) {
-				JSONObject userJSON = usersArray.getJSONObject(i);
-				inviters.add(parseFriendfromJSON(userJSON));
-			}
-		} catch (JSONException e) {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		List<User> inviters = null;
+		try {
+			inviters = parser.parseFriends(response);
+		} catch (SmartMapParseException e) {
 			throw new SmartMapClientException(e);
 		}
 
@@ -311,15 +376,29 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("friend_id", Integer.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/acceptInvitation");
-		String textResult = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(textResult);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
 			throw new SmartMapClientException(e);
 		}
-		checkServerErrorFromJSON(jsonObject);
-		User acceptedUser = parseFriendfromJSON(jsonObject);
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		User acceptedUser = null;
+		try {
+			acceptedUser = parser.parseFriend(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+
 		return acceptedUser;
 	}
 
@@ -334,16 +413,30 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("user_id", Integer.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/getUserInfo");
-		String textResult = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(textResult);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
 			throw new SmartMapClientException(e);
 		}
-		checkServerErrorFromJSON(jsonObject);
-		User acceptedUser = parseFriendfromJSON(jsonObject);
-		return acceptedUser;
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		User friend = null;
+		try {
+			friend = parser.parseFriend(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		return friend;
 	}
 
 	/*
@@ -361,13 +454,20 @@ public class NetworkSmartMapClient implements SmartMapClient {
 
 		HttpURLConnection conn = getHttpURLConnection("/updatePos");
 		String response = sendViaPost(params, conn);
-		JSONObject jsonObject = null;
+
+		SmartMapParser parser = null;
 		try {
-			jsonObject = new JSONObject(response);
-		} catch (JSONException e) {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
 			throw new SmartMapClientException(e);
 		}
-		checkServerErrorFromJSON(jsonObject);
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
 
 	}
 
@@ -379,60 +479,6 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		}
 
 		return listString;
-	}
-
-	/**
-	 * Creates a new User object by parsing a JSON object in the format returned
-	 * by the SmartMap server.
-	 * 
-	 * @param jsonObject
-	 *            a {@link JSONObject} encoding.
-	 * @return a new User object
-	 * @throws JSONException
-	 *             JSONException in case of malformed JSON.
-	 */
-	private Friend parseFriendfromJSON(JSONObject jsonObject)
-			throws SmartMapClientException {
-		long userId = 0;
-		String userName = null;
-		try {
-			userId = jsonObject.getLong("id");
-			userName = jsonObject.getString("name");
-		} catch (JSONException e) {
-			throw new SmartMapClientException(e);
-		}
-
-		return new Friend(userId, userName);
-	}
-
-	/**
-	 * Checks in the JSONObject returned by the server if the server returned
-	 * ERROR, and if it is the case throws a SmartMapClientException with the
-	 * server's message
-	 * 
-	 * @param jsonObject
-	 *            a {@link JSONObject} encoding.
-	 * @throws JSONException
-	 * @throws SmartMapClientException
-	 */
-	private void checkServerErrorFromJSON(JSONObject jsonObject)
-			throws SmartMapClientException {
-		String status = null;
-		String message = null;
-		try {
-			status = jsonObject.getString("status");
-			message = jsonObject.getString("message");
-			Log.d("serverMessage", message);
-			Log.d("serverAnswer", status);
-
-		} catch (JSONException e) {
-			throw new SmartMapClientException(e);
-		}
-
-		if (status.equals("Error")) {
-			throw new SmartMapClientException(message);
-		}
-
 	}
 
 	/**
@@ -546,8 +592,8 @@ public class NetworkSmartMapClient implements SmartMapClient {
 		URL serverURL = null;
 		HttpURLConnection connection = null;
 		try {
-			serverURL = new URL(mServerUrl + uri);
-			connection = mNetworkProvider.getConnection(serverURL);
+			serverURL = new URL(SERVER_URL + uri);
+			connection = NETWORK_PROVIDER.getConnection(serverURL);
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 			throw new IllegalArgumentException();
