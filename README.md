@@ -10,3 +10,6 @@ Things we need to do before coding more classes :
 6) Read other people's code and understand it.
 7) Document all the custom exceptions, i.e. SmartMapClientException.
 ```
+
+Custom Exceptions:
+ch.epfl.smartmap.servercom.SmartMapClientException : description, usage, etc...
