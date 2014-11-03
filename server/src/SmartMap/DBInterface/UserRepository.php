@@ -6,6 +6,14 @@ use Doctrine\DBAL\Connection;
 
 use SmartMap\Control\ControlException;
 
+/**
+ * Models the user repo.
+ *
+ * @author Pamoi
+ *
+ * @author SpicyCH (code reviewed - 03.11.2014) : added javadoc, need to unit test, corrected a typo:
+ * it was getLatitude, it is now getLongitude.
+ */
 class UserRepository
 {
     private static $TABLE_USER = 'users';
@@ -14,7 +22,9 @@ class UserRepository
     
     private $mApp;
     
-    /* Constructs a UserRepository with a Doctrine\DBAL\Connection object.
+    /**
+     * Constructs a UserRepository with a Doctrine\DBAL\Connection object.
+     * @param Connection $db
      */
     function __construct(Connection $db)
     {
@@ -23,8 +33,11 @@ class UserRepository
     
     // Authentication
     
-    /* Gets a user id given it's facebook id, or returns false if such user
+    /**
+     * Gets a user id given it's facebook id, or returns false if such user
      * does not exist.
+     * @param Long $fbId
+     * @return false if we couldn't fetch the user's data and the user id otherwise.
      */
     public function getUserIdFromFb($fbId)
     {
@@ -43,7 +56,11 @@ class UserRepository
     
     // Users management
     
-    /* Gets a user from the database, given it's id.
+    /**
+     * Gets a user from the database, given it's id.
+     * @param Long $id
+     * @throws \Exception when the user is not found
+     * @return \SmartMap\DBInterface\User
      */
     public function getUser($id)
     {
@@ -67,7 +84,12 @@ class UserRepository
         return $user;
     }
     
-    /* Gets a list of users, given a list of ids.
+    /**
+     * Gets a list of users, given a list of ids.
+     * @param array $ids
+     * @param array $visibility
+     * @throws \InvalidArgumentException if $ids or $visibility is not of the right type
+     * @return multitype:|multitype:\SmartMap\DBInterface\User
      */
     public function getUsers($ids, $visibility = array('VISIBLE', 'INVISIBLE'))
     {
@@ -90,7 +112,10 @@ class UserRepository
         return $this->userArrayFromStmt($stmt);
     }
     
-    /* Gets a list of users whose name is starting by $partialName
+    /**
+     * Gets a list of users whose name is starting by $partialName
+     * @param String $partialName
+     * @return multitype:\SmartMap\DBInterface\User
      */
     public function findUsersByPartialName($partialName)
     {
@@ -104,8 +129,11 @@ class UserRepository
         return $this->userArrayFromStmt($stmt);
     }
     
-    /* Adds a new user in the database. The id value from the parameter
+    /**
+     * Adds a new user in the database. The id value from the parameter
      * is not used. Returns the created user with it's id properly set.
+     * @param User $user
+     * @return User
      */
     public function createUser(User $user)
     {
@@ -114,7 +142,7 @@ class UserRepository
                 'fbid' => $user->getFbid(),
                 'name' => $user->getName(),
                 'visibility' => $user->getVisibility(),
-                'longitude' => $user->getVisibility(),
+                'longitude' => $user->getLongitude(),
                 'latitude' => $user->getLatitude()
             ));
         
@@ -123,8 +151,10 @@ class UserRepository
         return $user;
     }
     
-    /* Updates an existing user in the database. Modifiable entries are
+    /**
+     * Updates an existing user in the database. Modifiable entries are
      * name, visibility, longitude and latitude.
+     * @param User $user
      */
     public function updateUser(User $user)
     {
@@ -139,11 +169,17 @@ class UserRepository
     
     // Friendship management
     
-    /* Gets the ids of the friends of the user with id $userId,
+    /**
+     * Gets the ids of the friends of the user with id $userId,
      * where the status of their friendhsip is in the array $status
      * (can be 'ALLOWED', 'DISALLOWED' or 'BLOCKED'),
      * and the following stauts in the array $follow (can be
      * 'FOLLOWED' or 'UNFOLLOWED').
+     * @param Long $userId
+     * @param array $status
+     * @param array $follow
+     * @throws \InvalidArgumentException
+     * @return multitype:unknown
      */
     public function getFriendsIds($userId,
                                   $status = array('ALLOWED', 'DISALLOWED'),
@@ -174,8 +210,11 @@ class UserRepository
         return $ids;
     }
     
-    /* Add a friendship link between two users, with status set to ALLOWED
+    /**
+     * Add a friendship link between two users, with status set to ALLOWED
      * and follow to FOLLOWED.
+     * @param Long $idUser
+     * @param Long $idFriend
      */
     public function addFriendshipLink($idUser, $idFriend)
     {
@@ -188,7 +227,12 @@ class UserRepository
                           ));
     }
     
-    /* Sets the status of a friendship link.
+    /**
+     * Sets the status of a friendship link.
+     * @param unknown $idUser
+     * @param unknown $idFriend
+     * @param unknown $status
+     * @throws \Exception when the status is invalid, i.e. not ALLOWED, DISALLOWED or BLOCKED
      */
     public function setFriendshipStatus($idUser, $idFriend, $status)
     {
@@ -203,7 +247,12 @@ class UserRepository
                           );
     }
     
-    /* Sets the status of a list of friendship links.
+    /**
+     * Sets the status of a list of friendship links.
+     * @param Long $idUser
+     * @param array $idsFriends
+     * @param array $status
+     * @throws \Exception when either $status or $idsFreinds is invalid.
      */
     public function setFriendshipsStatus($idUser, $idsFriends, $status)
     {
@@ -226,7 +275,12 @@ class UserRepository
                                           \PDO::PARAM_INT,));
     }
     
-    /* Sets the follow status of a friendship link.
+    /**
+     * Sets the follow status of a friendship link.
+     * @param unknown $idUser
+     * @param unknown $friendId
+     * @param unknown $follow
+     * @throws \Exception when $follow is invalid.
      */
     public function setFriendshipFollow($idUser, $friendId, $follow)
     {
@@ -243,8 +297,11 @@ class UserRepository
     
     // Invitations management
     
-    /* Gets a list of the ids of users who sent a friend invitation to 
+    /**
+     * Gets a list of the ids of users who sent a friend invitation to 
      * the user with id $userId.
+     * @param Long $userId
+     * @return an array of user ids who sent an invitation to the user $userId
      */
     public function getInvitationIds($userId)
     {
@@ -261,8 +318,11 @@ class UserRepository
         return $ids;
     }
     
-    /* Adds an nvitation from the user with id $idUser to the user with
+    /**
+     * Adds an nvitation from the user with id $idUser to the user with
      * id $idFriend.
+     * @param Long $idUser
+     * @param Long $idFriend
      */
     public function addInvitation($idUser, $idFriend)
     {
@@ -273,8 +333,11 @@ class UserRepository
                          ));
     }
     
-    /* Removes the invitation from the user with id $idUser to the user
+    /**
+     * Removes the invitation from the user with id $idUser to the user
      * with id $friendId.
+     * @param Long $idUser
+     * @param Long $idFriend
      */
     public function removeInvitation($idUser, $idFriend)
     {

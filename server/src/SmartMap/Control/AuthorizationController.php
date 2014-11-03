@@ -10,6 +10,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use SmartMap\DBInterface\UserRepository;
 use SmartMap\DBInterface\User;
 
+/**
+ * This class handles all the authorizations (allow, disallow friends, ...) between the users. 
+ *
+ * @author Pamoi
+ * 
+ * @author SpicyCH (code reviewed - 02.11.2014) : code looks fine, just added javadoc
+ */
 class AuthorizationController
 {
     private $mRepo;
