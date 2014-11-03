@@ -57,6 +57,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 			for (int i = 0; i < usersArray.length(); i++) {
 				JSONObject userJSON = usersArray.getJSONObject(i);
 				User friend = parseFriendFromJSON(userJSON);
+				friends.add(friend);
 			}
 		} catch (JSONException e) {
 			throw new SmartMapParseException();
