@@ -12,6 +12,7 @@ import android.util.Log;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 
+
 /**
  * A {@link SmartMapParser} implementation that parses objects from Json format
  * 
@@ -95,6 +96,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 
 	/**
 	 * Return the friend parsed from a jsonObject
+	 * 
 	 * @param jsonObject
 	 * @return a friend
 	 * @throws SmartMapParseException
@@ -112,8 +114,8 @@ public class JsonSmartMapParser implements SmartMapParser {
 		try {
 			id = jsonObject.getLong("id");
 			name = jsonObject.getString("name");
-			latitude=jsonObject.optDouble("latitude", -200);
-			longitude=jsonObject.optDouble("latitude", -200);
+			latitude = jsonObject.optDouble("latitude", -200);
+			longitude = jsonObject.optDouble("latitude", -200);
 			phoneNumber = jsonObject.optString("phoneNumber", null);
 			email = jsonObject.optString("email", null);
 			online = jsonObject.optInt("online", -1);
@@ -123,13 +125,17 @@ public class JsonSmartMapParser implements SmartMapParser {
 		}
 
 		Friend friend = new Friend(id, name);
-		
-		if(latitude!=-200){
-			// TODO latitude must be in [-90,90]
+
+		if (latitude != -200) {
+			if (!(-90 <= latitude && latitude <= 90)) {
+				throw new SmartMapParseException("invalid latitude");
+			}
 			friend.setLatitude(latitude);
 		}
-		if(longitude!=-200){
-			// TODO latitude must be in [-180,180]
+		if (longitude != -200) {
+			if (!(-180 <= latitude && latitude <= 180)) {
+				throw new SmartMapParseException("invalid longitude");
+			}
 			friend.setLongitude(longitude);
 		}
 
@@ -147,7 +153,8 @@ public class JsonSmartMapParser implements SmartMapParser {
 			} else if (online == 1) {
 				friend.setOnline(true);
 			} else {
-				// TODO
+				throw new SmartMapParseException(
+						"the value online must be either 0 or 1");
 			}
 		}
 
