@@ -28,17 +28,40 @@ public class JsonSmartMapParser implements SmartMapParser {
 	 */
 	@Override
 	public User parseFriend(String s) throws SmartMapParseException {
-		long userId = 0;
-		String userName = null;
+		JSONObject jsonObject = null;
 		try {
-			JSONObject jsonObject = new JSONObject(s);
-			userId = jsonObject.getLong("id");
-			userName = jsonObject.getString("name");
+			jsonObject = new JSONObject(s);
 		} catch (JSONException e) {
 			throw new SmartMapParseException();
 		}
+		return parseFriendFromJSON(jsonObject);
+	}
 
-		return new Friend(userId, userName);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.epfl.smartmap.servercom.SmartMapParser#parseFriends(java.lang.String)
+	 */
+	@Override
+	public List<User> parseFriends(String s) throws SmartMapParseException {
+
+		List<User> friends = new ArrayList<User>();
+
+		try {
+			JSONObject jsonObject = new JSONObject(s);
+
+			JSONArray usersArray = jsonObject.getJSONArray("positions"); // to
+																			// discuss
+
+			for (int i = 0; i < usersArray.length(); i++) {
+				JSONObject userJSON = usersArray.getJSONObject(i);
+				User friend = parseFriendFromJSON(userJSON);
+			}
+		} catch (JSONException e) {
+			throw new SmartMapParseException();
+		}
+		return friends;
 	}
 
 	/*
@@ -69,30 +92,65 @@ public class JsonSmartMapParser implements SmartMapParser {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see ch.epfl.smartmap.servercom.SmartMapParser#parseFriends(java.lang.String)
+	/**
+	 * Return the friend parsed from a jsonObject
+	 * @param jsonObject
+	 * @return a friend
+	 * @throws SmartMapParseException
 	 */
-	@Override
-	public List<User> parseFriends(String s) throws SmartMapParseException {
-
-		List<User> friends = new ArrayList<User>();
+	private User parseFriendFromJSON(JSONObject jsonObject)
+			throws SmartMapParseException {
+		long id = 0;
+		String name = null;
+		String phoneNumber = null;
+		String email = null;
+		int online = 0;
+		double latitude = -200;
+		double longitude = -200;
 
 		try {
-			JSONObject jsonObject = new JSONObject(s);
-
-			JSONArray usersArray = jsonObject.getJSONArray("positions");
-			for (int i = 0; i < usersArray.length(); i++) {
-				JSONObject userJSON = usersArray.getJSONObject(i);
-				Friend friend = new Friend(userJSON.getLong("id"),
-						userJSON.getString("name"));
-				friend.setLongitude(userJSON.getDouble("latitude"));
-				friend.setLatitude(userJSON.getDouble("latitude"));
-				friends.add(friend);
-			}
+			id = jsonObject.getLong("id");
+			name = jsonObject.getString("name");
+			latitude=jsonObject.optDouble("latitude", -200);
+			longitude=jsonObject.optDouble("latitude", -200);
+			phoneNumber = jsonObject.optString("phoneNumber", null);
+			email = jsonObject.optString("email", null);
+			online = jsonObject.optInt("online", -1);
+			// something else??
 		} catch (JSONException e) {
 			throw new SmartMapParseException();
 		}
-		return friends;
+
+		Friend friend = new Friend(id, name);
+		
+		if(latitude!=-200){
+			// TODO latitude must be in [-90,90]
+			friend.setLatitude(latitude);
+		}
+		if(longitude!=-200){
+			// TODO latitude must be in [-180,180]
+			friend.setLongitude(longitude);
+		}
+
+		if (phoneNumber != null) {
+			// TODO some verifications, don't accept invalid phoneNumber
+			friend.setNumber(phoneNumber);
+		}
+		if (email != null) {
+			// TODO some verifications, don't accept invalid email
+			friend.setEmail(email);
+		}
+		if (online != -1) {
+			if (online == 0) {
+				friend.setOnline(false);
+			} else if (online == 1) {
+				friend.setOnline(true);
+			} else {
+				// TODO
+			}
+		}
+
+		return friend;
 	}
 
 }
