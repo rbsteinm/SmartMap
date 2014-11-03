@@ -9,4 +9,16 @@ package ch.epfl.smartmap.servercom;
  * */
 public class SmartMapParseException extends Exception {
 	private static final long serialVersionUID = 1L;
+	
+	public SmartMapParseException() {
+		super();
+	}
+
+	public SmartMapParseException(String message) {
+		super(message);
+	}
+
+	public SmartMapParseException(Throwable throwable) {
+		super(throwable);
+	}
 }
