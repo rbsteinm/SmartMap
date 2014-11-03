@@ -162,7 +162,7 @@ public class FacebookFragment extends Fragment {
 		}
 	};
 
-	private void makeMeRequest() {
+	protected void makeMeRequest() {
 		final JSONObject userProfile = new JSONObject();
 		Request request = Request.newMeRequest(Session.getActiveSession(),
 				new Request.GraphUserCallback() {
@@ -280,7 +280,7 @@ public class FacebookFragment extends Fragment {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			;
+			
 
 			if (SERVER_CONFIRMATION.equals(serverAnswer)) {
 				Log.i(TAG, "User's data sent to SmartMap server");

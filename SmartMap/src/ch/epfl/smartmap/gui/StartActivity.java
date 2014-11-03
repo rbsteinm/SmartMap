@@ -3,7 +3,6 @@ package ch.epfl.smartmap.gui;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -41,7 +40,6 @@ public class StartActivity extends FragmentActivity {
 	 * 0; private Handler mProgressHandler;
 	 */
 
-	private FragmentActivity mActivity;
 	private com.facebook.widget.LoginButton mLoginButton;
 	private static final String TAG = StartActivity.class.getSimpleName();
 
@@ -71,8 +69,6 @@ public class StartActivity extends FragmentActivity {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
-
-		mActivity = this;
 		
 		mLogoImage = (ImageView) findViewById(R.id.logo);
 		mWelcomeText = (TextView) findViewById(R.id.welcome);
@@ -117,10 +113,9 @@ public class StartActivity extends FragmentActivity {
 					// Or set the fragment from restored state info
 					mFacebookFragment = (FacebookFragment) getSupportFragmentManager()
 							.findFragmentById(android.R.id.content);
-
-					// start the next activity (MainActivity)
-					Intent intent = new Intent(mActivity, MainActivity.class);
-					startActivity(intent);
+					
+					// Make the request to Facebook and send data to SmartMap Server
+					mFacebookFragment.makeMeRequest();
 				}
 			}
 		}, timeOut);
