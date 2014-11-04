@@ -10,24 +10,21 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.StartActivity;
 
 public class StartActivityTest extends
-		ActivityInstrumentationTestCase2<StartActivity> {
-	public StartActivityTest() {
-		super(StartActivity.class);
-	}
+    ActivityInstrumentationTestCase2<StartActivity> {
+    public StartActivityTest() {
+        super(StartActivity.class);
+    }
 
-	// The standard JUnit 3 setUp method run for for every test
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		getActivity(); // prevent error
-						// "No activities found. Did you forget to launch the activity by calling getActivity()"
-	}
+    // The standard JUnit 3 setUp method run for for every test
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        getActivity(); // prevent error
+                       // "No activities found. Did you forget to launch the activity by calling getActivity()"
+    }
 
-	public void testLogoClick() throws Exception {
-		onView(withId(R.id.logo)).perform(click());
-		onView(withId(R.id.logo)).check(matches(isDisplayed()));
-	}
-
-	// public void testWelcomeClick() throws Exception {
-	// }
+    public void testLogoClick() throws Exception {
+        onView(withId(R.id.logo)).perform(click());
+        onView(withId(R.id.logo)).check(matches(isDisplayed()));
+    }
 }

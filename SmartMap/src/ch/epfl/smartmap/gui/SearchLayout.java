@@ -18,13 +18,21 @@ import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
 
 /**
+ * Represents a Panel that can can be opened or closed from the bottom of the activity. It contains A search bar
+ * and a view that displays the queries sent using the search bar.
+ * 
  * @author jfperren
- * Provides a sliding up and down SearchPanel, containing a search bar and a layout displaying the results
  */
 public class SearchLayout extends RelativeLayout {
 
     private final static String TAG = "SEARCH_LAYOUT";
+    private final static String AUDIT_TAG = "AuditError : " + TAG;
 
+    /** 
+     * State of a SearchLayout. NOT_INITIALIZED implies that it is needed to call {@code initSearchLayout} first
+     * 
+     * @author jfperren
+     */
     public enum InitState {
         NOT_INITIALIZED, INITIALIZED
     };
@@ -38,7 +46,8 @@ public class SearchLayout extends RelativeLayout {
      * @param context The current context
      * @param searchEngine The searchEngine providing results for queries
      */
-    public SearchLayout(Context context, AttributeSet attrs, SearchEngine searchEngine) {
+    public SearchLayout(Context context, AttributeSet attrs,
+        SearchEngine searchEngine) {
         super(context, attrs);
 
         mContext = context;
@@ -68,12 +77,11 @@ public class SearchLayout extends RelativeLayout {
      * Initializes the searchLayout, setting all listeners needed
      */
     public void initSearchLayout() {
-        assert (mInitState == InitState.NOT_INITIALIZED);
 
         // Get Views
         final SearchView mSearchView = (SearchView) findViewById(R.id.searchBar);
         final LinearLayout mSearchResultList = (LinearLayout) findViewById(R.id.search_result_list);
-        
+
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 
             public boolean onQueryTextSubmit(String query) {
@@ -88,8 +96,8 @@ public class SearchLayout extends RelativeLayout {
                 return false;
             }
         });
-        
-        mSearchResultList.setOnClickListener(new OnClickListener(){
+
+        mSearchResultList.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSearchView.clearFocus();
@@ -97,8 +105,6 @@ public class SearchLayout extends RelativeLayout {
         });
 
         mInitState = InitState.INITIALIZED;
-
-        assert (mInitState == InitState.INITIALIZED);
     }
 
     /**
@@ -110,16 +116,14 @@ public class SearchLayout extends RelativeLayout {
             .findViewById(R.id.search_result_list);
         final SearchView mSearchBarEditText = (SearchView) this
             .findViewById(R.id.searchBar);
+
         // Get search query
         String query = mSearchBarEditText.getQuery().toString();
         List<Friend> result = mSearchEngine.sendQuery(query);
-        // Clean list
+
         clearSearchResults();
         for (Friend f : result) {
-            FriendSearchResultView friendView = new FriendSearchResultView(
-                mContext, f);
-
-            mSearchResultList.addView(friendView);
+            mSearchResultList.addView(SearchResultViewFactory.getSearchResultView(mContext, f));
         }
     }
 
@@ -134,30 +138,28 @@ public class SearchLayout extends RelativeLayout {
     }
 
     /**
-     * Opens the panel and display it full screen
+     * Opens the panel and displays it full screen
      * @param query Initial search query of search bar.
      */
     public void open(String query) {
-        Log.d(TAG, "method open called");
         this.setVisibility(View.VISIBLE);
         Animation bottomUp = AnimationUtils.loadAnimation(getContext(),
             R.anim.bottom_up);
         this.startAnimation(bottomUp);
         updateSearchResults();
     }
-    
+
     /**
-     * Opens the panel and display it full screen
+     * Opens the panel and displays it full screen
      */
-    public void open(){
+    public void open() {
         open("");
     }
 
     /**
-     * Closes the panel and hide it.
+     * Closes the panel and hides it.
      */
     public void close() {
-        Log.d(TAG, "method close called");
         Animation topDown = AnimationUtils.loadAnimation(getContext(),
             R.anim.top_down);
 
@@ -167,4 +169,24 @@ public class SearchLayout extends RelativeLayout {
         clearFocus();
     }
 
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * @param depth represents how deep the audit check is done (use 1 to check this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        // TODO : Decomment when auditErrors coded for other classes
+        if (depth == 0) {
+            return 0;
+        }
+
+        int auditErrors = 0;
+        // auditErrors += mSearchEngine.auditErrors(depth - 1);
+        if (mInitState != InitState.INITIALIZED) {
+            auditErrors++;
+            Log.e(AUDIT_TAG, "SearchLayout not initialized");
+        }
+
+        return auditErrors;
+    }
 }
