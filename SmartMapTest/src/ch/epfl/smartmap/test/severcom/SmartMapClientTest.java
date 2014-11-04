@@ -14,7 +14,8 @@ import org.junit.Test;
 import android.test.AndroidTestCase;
 
 import ch.epfl.smartmap.servercom.DefaultNetworkProvider;
-import ch.epfl.smartmap.servercom.NetworkAuthenticationClient;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 public class SmartMapClientTest extends AndroidTestCase {
@@ -37,7 +38,7 @@ public class SmartMapClientTest extends AndroidTestCase {
 	    @Test
 	    public void testSendViaPost() throws MalformedURLException, IOException {
 	        DefaultNetworkProvider provider = new DefaultNetworkProvider();
-	        NetworkAuthenticationClient networkClient = new NetworkAuthenticationClient(SWISSGEN_COUNTER_URL, provider);
+	        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
 
 	        Map<String, String> params = new LinkedHashMap<String, String>();
 	        params.put("push", "increment");

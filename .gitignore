@@ -7,6 +7,7 @@ SmartMap/gen/
 SmartMap/local.properties
 SmartMap/.checkstyle
 SmartMap/.DS_Store
+SmartMapTest/bin/
 server/vendor/
 server/composer.lock
 server/.buildpath
@@ -22,5 +23,8 @@ Libraries/facebook/bin/
 Libraries/facebook/gen/
 Libraries/google-play-services_lib/bin/
 Libraries/google-play-services_lib/gen/
+Libraries/facebook/.classpath
+Libraries/google-play-services_lib/.classpath
+
 *.class
 *~

@@ -7,7 +7,8 @@ import org.junit.Test;
 import ch.epfl.smartmap.cache.Point;
 import ch.epfl.smartmap.servercom.DefaultNetworkProvider;
 
-import ch.epfl.smartmap.servercom.NetworkPositionClient;
+
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 import android.test.AndroidTestCase;
@@ -27,8 +28,7 @@ public class NetworkPostionClientTest extends AndroidTestCase{
 	public void testUpdatePos() throws SmartMapClientException {
 		Log.d("test", "start");
 		DefaultNetworkProvider provider = new DefaultNetworkProvider();
-		NetworkPositionClient networkPosClient = new NetworkPositionClient(
-				SERVER_URL, provider);
+		NetworkSmartMapClient networkPosClient = NetworkSmartMapClient.getInstance();
 
 		networkPosClient.updatePos(position);
 	}

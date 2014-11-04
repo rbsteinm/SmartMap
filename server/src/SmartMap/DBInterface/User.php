@@ -6,6 +6,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 use SmartMap\Control\ControlException;
 
+/**
+ * Models a user.
+ *
+ * @author Pamoi
+ *
+ * @author SpicyCH (code reviewed - 03.11.2014) : added javadoc, need to unit test
+ */
 class User
 {
     private $mId;
@@ -15,6 +22,15 @@ class User
     private $mLongitude;
     private $mLatitude;
     
+    /**
+     * Constructor
+     * @param Long $id
+     * @param Long $fbId
+     * @param String $name
+     * @param enum $visibility
+     * @param double $longitude
+     * @param double $latitude
+     */
     function __construct($id, $fbId, $name, $visibility, $longitude, $latitude)
     {
         // Checking for validity
@@ -30,18 +46,24 @@ class User
         $this->mLatitude = $latitude;
     }
     
-    /* Gets the current user id from the server request. Throws an exception
+    /**
+     * Gets the current user id from the server request. Throws an exception
      * if the session parameter userId is not set.
+     * 
+     * @param Request $request
+     * @throws ControlException 
+     * @return a Long representing the user id
      */
     public static function getIdFromRequest(Request $request)
     {
         if (!$request->hasSession())
         {
-            throw new ControlException('Trying to access session but the session is not started');
+            throw new ControlException('Trying to access session but the session is not started.');
         }
         
         $session = $request->getSession();
         
+        // The userId is set in the $_SESSION when successfully authenticated
         $id = $session->get('userId');
         
         if ($id == null)
@@ -52,14 +74,19 @@ class User
         return $id;
     }
     
-    /* Get the user's id
+    /**
+     * Get the user's id
+     * @return a Long representing the user id
      */
     public function getId()
     {
         return $this->mId;
     }
     
-    /* Set the user's id
+    /**
+     * Set the user's id
+     * @param Long $id
+     * @return \SmartMap\DBInterface\User
      */
     public function setId($id)
     {
@@ -70,14 +97,19 @@ class User
         return $this;
     }
     
-    /* Get the user's facebook id
+    /**
+     * Get the user's facebook id
+     * @return the facebook id associated to this user
      */
     public function getFbId()
     {
         return $this->mFbId;
     }
     
-    /* Set the user's facebook id
+    /**
+     * Set the user's facebook id
+     * @param Long $fbId the facebook id to associate to the user
+     * @return \SmartMap\DBInterface\User
      */
     public function setFbId($fbId)
     {
@@ -86,14 +118,19 @@ class User
         return $this;
     }
     
-    /* Get the user's name
+    /**
+     * Get the user's name
+     * @return a String for the user's name
      */
     public function getName()
     {
         return $this->mName;
     }
     
-    /* Set the user's name
+    /**
+     * Set the user's name
+     * @param String $name
+     * @return \SmartMap\DBInterface\User
      */
     public function setName($name)
     {
@@ -102,14 +139,19 @@ class User
         return $this;
     }
     
-    /* Get the user's visibility
+    /**
+     * Get the user's visibility
+     * @return the visibility: VISIBLE or INVISIBLE
      */
     public function getVisibility()
     {
         return $this->mVisibility;
     }
     
-    /* Set the user's visibility
+    /**
+     * Set the user's visibility
+     * @param enum $visibility the visibility, VISIBLE or INVISIBLE
+     * @return \SmartMap\DBInterface\User
      */
     public function setVisibility($visibility)
     {
@@ -120,14 +162,19 @@ class User
         return $this;
     }
     
-    /* Get the user's longitude coordinate
+    /**
+     * Get the user's longitude coordinate
+     * @return the longitude
      */
     public function getLongitude()
     {
         return $this->mLongitude;
     }
     
-    /* Set the user's longitude coordinate
+    /**
+     * Set the user's longitude coordinate
+     * @param double $longitude the longitude to set
+     * @return \SmartMap\DBInterface\User
      */
     public function setLongitude($longitude)
     {
@@ -136,14 +183,19 @@ class User
         return $this;
     }
     
-    /* Get the user's latitude coordinate
+    /**
+     * Get the user's latitude coordinate
+     * @return the latitude
      */
     public function getLatitude()
     {
         return $this->mLatitude;
     }
     
-    /* Set the user's latitude coordinate
+    /**
+     * Set the user's latitude coordinate
+     * @param unknown $latitude the latitude
+     * @return \SmartMap\DBInterface\User
      */
     public function setLatitude($latitude)
     {
@@ -152,6 +204,10 @@ class User
         return $this;
     }
     
+    /**
+     * @param Long $id
+     * @throws \InvalidArgumentException if the id is below 1
+     */
     private function checkId($id)
     {
         if ($id <= 0)
@@ -160,6 +216,11 @@ class User
         }
     }
     
+    /**
+     * 
+     * @param enum $visibility
+     * @throws \InvalidArgumentException if the visibility is not VISIBLE or INVISIBLE
+     */
     private function checkVisibility($visibility)
     {
         if (!($visibility == 'VISIBLE' OR $visibility == 'INVISIBLE'))

@@ -11,37 +11,37 @@ import java.util.List;
  * 
  */
 public class MockDB {
+	
+    
+    public final List<Friend> FRIENDS_LIST;
+    
+    public final Friend JULIEN = new Friend(0, "Julien Perrenoud", 46.2547877,
+        3.2142577);
+    public final Friend ALAIN = new Friend(1, "Alain Milliet", 45.2547877,
+        7.2142577);
+    public final Friend ROBIN = new Friend(2, "Robin Genolet", 42.2547877,
+        5.214577);
+    public final Friend MATTHIEU = new Friend(3, "Matthieu Girod", 39.2547877,
+        5.214577);
+    public final Friend NICOLAS = new Friend(4, "Nicolas Ritter", 50.2547877,
+        2.004577);
+    public final Friend MARION = new Friend(5, "Marion Sbai", 41.5547877,
+        2.4255457);
+    public final Friend RAPHAEL = new Friend(6, "Raphael Steinmann", 39.5547877,
+        7.4255457);
+    public final Friend HUGO = new Friend(7, "Hugo Sbai", 47.5547877,
+        4.4255457);
 
-	private static Friend f1 = new Friend(6, "Cristophe Alain", 45.2547877,
-			7.2142577);
-	private static Friend f2 = new Friend(1, "Georges Smith", 46.2547877,
-			3.2142577);
-	private static Friend f3 = new Friend(2, "Marc Dupont", 42.2547877,
-			5.214577);
-	private static Friend f4 = new Friend(3, "Pierre-Yves Drap", 39.2547877,
-			5.214577);
-	private static Friend f5 = new Friend(4, "Catherine Joe", 50.2547877,
-			2.004577);
-	private static Friend f7 = new Friend(5, "Jean Emmanuel", 41.5547877,
-			2.4255457);
-	private static Friend f8 = new Friend(7, "Julia Syrano", 39.5547877,
-			7.4255457);
-
-	public MockDB() {
-
-	}
-
-	public List<Friend> getMockFriends() {
-
-		ArrayList<Friend> friends = new ArrayList<Friend>();
-		friends.add(f1);
-		friends.add(f2);
-		friends.add(f3);
-		friends.add(f4);
-		friends.add(f5);
-		friends.add(f7);
-		friends.add(f8);
-
-		return friends;
-	}
+    public MockDB(){
+      FRIENDS_LIST = new ArrayList<Friend>();
+      FRIENDS_LIST.add(JULIEN);
+      FRIENDS_LIST.add(ALAIN);
+      FRIENDS_LIST.add(ROBIN);
+      FRIENDS_LIST.add(MATTHIEU);
+      FRIENDS_LIST.add(MARION);
+      FRIENDS_LIST.add(NICOLAS);
+      FRIENDS_LIST.add(RAPHAEL);
+      FRIENDS_LIST.add(HUGO);
+    }
 }
+

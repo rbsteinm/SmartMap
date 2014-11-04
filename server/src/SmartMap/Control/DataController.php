@@ -8,6 +8,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use SmartMap\DBInterface\User;
 use SmartMap\DBInterface\UserRepository;
 
+/**
+ * 
+ *
+ * @author Pamoi
+ *
+ * @author SpicyCH (code reviewed - 03.11.2014) : good logic, but need unit testing!
+ */
 class DataController
 {
     private $mRepo;
@@ -17,7 +24,7 @@ class DataController
         $this->mRepo = $repo;
     }
     
-    /* Updates the user's position.
+    /** Updates the user's position.
      */
     public function updatePos(Request $request)
     {
@@ -77,7 +84,7 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /* Gets the information for the user whose id is passed in user_id
+    /** Gets the information for the user whose id is passed in user_id
      * POST parameter.
      */
     public function getUserInfo(Request $request)
@@ -101,7 +108,7 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /* Sets an invitation for user with friend_id POST parameter.
+    /** Sets an invitation for user with friend_id POST parameter.
      */
     public function inviteFriend(Request $request)
     {
@@ -139,7 +146,7 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /* Gets a list of user ids and names which are wanting to be friend
+    /** Gets a list of user ids and names which are wanting to be friend
      * with the current user.
      */
     public function getInvitations(Request $request)
@@ -166,7 +173,7 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /* Accpets the invitation from the user with in POST parameter 
+    /** Accpets the invitation from the user with in POST parameter 
      * friend_id.
      */
     public function acceptInvitation(Request $request)
@@ -206,7 +213,7 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /* Gets a list of user names and ids where name begins with post parameter
+    /** Gets a list of user names and ids where name begins with post parameter
      * search_text (ignores case). 
      */
     public function findUsers(Request $request)
