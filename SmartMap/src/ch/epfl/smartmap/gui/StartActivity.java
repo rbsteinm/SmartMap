@@ -140,4 +140,23 @@ public class StartActivity extends FragmentActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	/**
+     * Checks that the Representation Invariant is not violated.
+     * @param depth represents how deep the audit check is done (use 1 to check this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        // TODO : Decomment when auditErrors coded for other classes
+        if (depth == 0) {
+            return 0;
+        }
+
+        int auditErrors = 0;
+        // auditErrors += mSearchEngine.auditErrors(depth - 1);
+        // What are the rep invariants?
+        
+
+        return auditErrors;
+    }
 }
