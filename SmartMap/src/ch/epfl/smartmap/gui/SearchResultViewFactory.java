@@ -1,6 +1,3 @@
-/**
- * 
- */
 package ch.epfl.smartmap.gui;
 
 import ch.epfl.smartmap.cache.Friend;

@@ -121,13 +121,9 @@ public class SearchLayout extends RelativeLayout {
         String query = mSearchBarEditText.getQuery().toString();
         List<Friend> result = mSearchEngine.sendQuery(query);
 
-        //
         clearSearchResults();
         for (Friend f : result) {
-            FriendSearchResultView friendView = new FriendSearchResultView(
-                mContext, f);
-
-            mSearchResultList.addView(friendView);
+            mSearchResultList.addView(SearchResultViewFactory.getSearchResultView(mContext, f));
         }
     }
 
@@ -146,7 +142,6 @@ public class SearchLayout extends RelativeLayout {
      * @param query Initial search query of search bar.
      */
     public void open(String query) {
-        Log.d(TAG, "method open called");
         this.setVisibility(View.VISIBLE);
         Animation bottomUp = AnimationUtils.loadAnimation(getContext(),
             R.anim.bottom_up);
@@ -194,5 +189,4 @@ public class SearchLayout extends RelativeLayout {
 
         return auditErrors;
     }
-
 }
