@@ -58,6 +58,7 @@ public class Friend implements User {
 		mPositionName = POSITION_UNKNOWN;
 		mLastSeen = new GregorianCalendar();
 		mLocation = new Location(PROVIDER_NAME);
+		
 	}
 
 	// TODO

@@ -3,21 +3,25 @@ package ch.epfl.smartmap.cache;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import android.location.Location;
+
 /**
  * An event that can be seen on the map
  * @author ritterni
  */
 public class UserEvent implements Event {
-    private String evtName;
-    private long evtCreator; //the user who created the event
+    private String mEvtName;
+    private long mEvtCreator; //the user who created the event
     private GregorianCalendar mStartDate;
     private GregorianCalendar mEndDate;
     private long evtID;
-    private Point position;
+    private Location mLocation;
     
-    public UserEvent(String name, long creator, GregorianCalendar startDate, GregorianCalendar endDate, Point p) {
-        evtName = name;
-        evtCreator = creator;
+    public UserEvent(String name, long creator, GregorianCalendar startDate, GregorianCalendar endDate, Location p) {
+        mEvtName = name;
+        mEvtCreator = creator;
         mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR),
                 startDate.get(Calendar.MONTH),
                 startDate.get(Calendar.DATE),
@@ -30,18 +34,18 @@ public class UserEvent implements Event {
                 endDate.get(Calendar.HOUR),
                 endDate.get(Calendar.MINUTE));
         
-        position.setX(p.getX());
-        position.setY(p.getY());
+        mLocation.setLatitude(p.getLatitude());
+        mLocation.setLongitude(p.getLongitude());
     }
     
     @Override
     public String getName() {
-        return evtName;
+        return mEvtName;
     }
     
     @Override
     public long getCreator() {
-        return evtCreator;
+        return mEvtCreator;
     }
     
     @Override
@@ -56,7 +60,7 @@ public class UserEvent implements Event {
     
     @Override
     public void setName(String newName) {
-        evtName = newName;
+        mEvtName = newName;
     }
     
     @Override
@@ -88,23 +92,29 @@ public class UserEvent implements Event {
     }
 
     @Override
-    public Point getPosition() {
-        return position;
+    public Location getLocation() {
+        return mLocation;
     }
 
     @Override
-    public void setPosition(Point p) {
-        position.setX(p.getX());
-        position.setY(p.getY());
+    public void setLocation(Location p) {
+    	mLocation.setLatitude(p.getLatitude());
+        mLocation.setLongitude(p.getLongitude());
     }
 
-    @Override
-    public void setX(double x) {
-        position.setX(x);
-    }
+	@Override
+	public LatLng getLatLng() {
+		return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+	}
 
-    @Override
-    public void setY(double y) {
-        position.setY(y);
-    }
+	@Override
+	public void setLongitude(double x) {
+		mLocation.setLongitude(x);
+		
+	}
+
+	@Override
+	public void setLatitude(double y) {
+		mLocation.setLatitude(y);
+	}
 }

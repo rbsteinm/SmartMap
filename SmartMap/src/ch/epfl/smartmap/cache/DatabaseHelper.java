@@ -10,6 +10,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 import android.util.LongSparseArray;
 
 /**
@@ -405,8 +406,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_ID, event.getID());
         values.put(KEY_NAME, event.getName());
         values.put(KEY_USER_ID, event.getCreator());
-        values.put(KEY_POSX, event.getPosition().getX());
-        values.put(KEY_POSY, event.getPosition().getY());
+        values.put(KEY_POSX, event.getLocation().getLongitude());
+        values.put(KEY_POSY, event.getLocation().getLatitude());
         values.put(KEY_YEAR, event.getStartDate().get(Calendar.YEAR));
         values.put(KEY_MONTH, event.getStartDate().get(Calendar.MONTH));
         values.put(KEY_DATE, event.getStartDate().get(Calendar.DATE));
@@ -457,11 +458,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.getInt(cursor.getColumnIndex(KEY_ENDHOUR)),
                 cursor.getInt(cursor.getColumnIndex(KEY_ENDMINUTE)));
         
+        Location loc = new Location("");
+        loc.setLongitude(cursor.getColumnIndex(KEY_POSX));
+        loc.setLatitude(cursor.getColumnIndex(KEY_POSY));
+        
         UserEvent event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                 cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)),
                 startDate,
                 endDate,
-                new Point(cursor.getColumnIndex(KEY_POSX), cursor.getColumnIndex(KEY_POSY)));
+                loc);
 
         event.setID(id);
         
@@ -497,11 +502,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getInt(cursor.getColumnIndex(KEY_ENDHOUR)),
                         cursor.getInt(cursor.getColumnIndex(KEY_ENDMINUTE)));
                 
+                Location loc = new Location("");
+                loc.setLongitude(cursor.getColumnIndex(KEY_POSX));
+                loc.setLatitude(cursor.getColumnIndex(KEY_POSY));
+                
                 event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                         cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
                         startDate,
                         endDate,
-                        new Point(cursor.getColumnIndex(KEY_POSX), cursor.getColumnIndex(KEY_POSY)));
+                        loc);
   
                 event.setID(cursor.getLong(cursor.getColumnIndex(KEY_ID)));
                 events.add(event);
@@ -538,8 +547,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_ID, event.getID());
         values.put(KEY_NAME, event.getName());
         values.put(KEY_USER_ID, event.getCreator());
-        values.put(KEY_POSX, event.getPosition().getX());
-        values.put(KEY_POSY, event.getPosition().getY());
+        values.put(KEY_POSX, event.getLocation().getLongitude());
+        values.put(KEY_POSY, event.getLocation().getLatitude());
         values.put(KEY_YEAR, event.getStartDate().get(Calendar.YEAR));
         values.put(KEY_MONTH, event.getStartDate().get(Calendar.MONTH));
         values.put(KEY_DATE, event.getStartDate().get(Calendar.DATE));
