@@ -31,6 +31,7 @@ public class Friend implements User {
 	private GregorianCalendar mLastSeen;
 	private boolean mOnline;
 	private Location mLocation;
+	private boolean mVisible;
 
 	public static final String NO_NUMBER = "No phone number specified";
 	public static final String NO_EMAIL = "No email address specified";
@@ -58,6 +59,7 @@ public class Friend implements User {
 		mPositionName = POSITION_UNKNOWN;
 		mLastSeen = new GregorianCalendar();
 		mLocation = new Location(PROVIDER_NAME);
+		mVisible = true;
 		
 	}
 
@@ -207,5 +209,15 @@ public class Friend implements User {
 			file.delete();
 		}
 	}
+
+    @Override
+    public boolean isVisible() {
+        return mVisible;
+    }
+
+    @Override
+    public void setVisible(boolean isVisible) {
+        mVisible = isVisible;
+    }
 
 }
