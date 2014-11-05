@@ -35,6 +35,7 @@ public class UserEvent implements Event {
                 endDate.get(Calendar.HOUR),
                 endDate.get(Calendar.MINUTE));
         
+        mLocation = new Location("");
         mLocation.setLatitude(p.getLatitude());
         mLocation.setLongitude(p.getLongitude());
         mPositionName = "";
