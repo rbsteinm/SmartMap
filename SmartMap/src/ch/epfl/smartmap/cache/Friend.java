@@ -59,6 +59,7 @@ public class Friend implements User {
 		mLastSeen = new GregorianCalendar();
 		mLocation = new Location(PROVIDER_NAME);
 		mVisible = true;
+		mOnline = false;
 		
 	}
 
