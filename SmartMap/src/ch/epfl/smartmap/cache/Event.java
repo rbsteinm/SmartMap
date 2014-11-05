@@ -66,6 +66,11 @@ public interface Event {
     GregorianCalendar getEndDate();
     
     /**
+     * @return The event's position as a String (e.g. 'Lausanne')
+     */
+    String getPositionName();
+    
+    /**
      * Changes the event's name
      * @param newName The new name
      */
@@ -89,4 +94,12 @@ public interface Event {
      * @param newID The new ID
      */
     void setID(long newID);
+    
+    /**
+     * Sets the user position's name
+     * 
+     * @param posName
+     *            The event's position
+     */
+    void setPositionName(String posName);
 }
