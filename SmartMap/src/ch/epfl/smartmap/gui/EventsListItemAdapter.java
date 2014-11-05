@@ -41,13 +41,13 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         // TODO use Holder pattern for smoother scrolling
 
         // Get EventItem fields
-        TextView name = (TextView) convertView.findViewById(R.id.name);
-        TextView isOnline = (TextView) convertView.findViewById(R.id.isOnline);
+        TextView name = (TextView) convertView.findViewById(R.id.eventName);
+        TextView creatorTextView = (TextView) convertView.findViewById(R.id.eventCreator);
 
         // Set fields with event's attributes
         name.setText(mItemsArrayList.get(position).getName());
-        String status = "Status: ";
-        isOnline.setText(status);
+        String creator = "Creator: " + mItemsArrayList.get(position).getCreator();
+        creatorTextView.setText(creator);
 
         return convertView;
     }

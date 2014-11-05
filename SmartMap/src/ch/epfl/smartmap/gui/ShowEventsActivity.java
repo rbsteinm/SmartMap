@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.gui;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.ListActivity;
@@ -16,6 +17,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserEvent;
 
 /**
  * This activity shows the events and offers to filter them.
@@ -55,15 +57,12 @@ public class ShowEventsActivity extends ListActivity {
         mockUsersList.add(alain);
 
         mockEventsList = new ArrayList<Event>();
-        Location location = new Location("Robich");
-        location.setLatitude(2.0);
-        location.setLongitude(2.0);
-        // UserEvent e1 = new UserEvent("Swag party", 2, new GregorianCalendar(), new GregorianCalendar(2014, 12, 1),
-        // location);
-        // Event e2 = new UserEvent("Ranked gangbang", 3, new GregorianCalendar(), new GregorianCalendar(2014, 11, 1),
-        // new Point(2, 2));
-        // mockEventsList.add(e1);
-        // mockEventsList.add(e2);
+        UserEvent e1 = new UserEvent("Swag party", 2, new GregorianCalendar(), new GregorianCalendar(2014, 12, 1),
+                new Location("Robich provider"));
+        UserEvent e2 = new UserEvent("LOL Tournament", 1, new GregorianCalendar(), new GregorianCalendar(2014, 12, 1),
+                new Location("Robich provider"));
+        mockEventsList.add(e1);
+        mockEventsList.add(e2);
 
         // Create custom Adapter and pass it to the Activity
         EventsListItemAdapter adapter = new EventsListItemAdapter(this, mockEventsList);
