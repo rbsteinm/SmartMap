@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListActivity;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.SeekBar;
+import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
@@ -32,6 +37,11 @@ public class ShowEventsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_events);
 
+        // By default, the seek bar is disabled. This is done programmatically as android:enabled="false" doesn't work
+        // out in xml
+        SeekBar seekBar = (SeekBar) findViewById(R.id.showEventSeekBar);
+        seekBar.setEnabled(false);
+
         // Filling up mock stuff
         mockUsersList = new ArrayList<User>();
         julien = new Friend(1, "Julien Perrenoud");
@@ -45,13 +55,15 @@ public class ShowEventsActivity extends ListActivity {
         mockUsersList.add(alain);
 
         mockEventsList = new ArrayList<Event>();
-        //Point p = new Point(0, 0);
-        //Event e1 = new UserEvent("Swag party", 2, new GregorianCalendar(), new GregorianCalendar(2014, 12, 1),
-        //        p);
-        //Event e2 = new UserEvent("Ranked gangbang", 3, new GregorianCalendar(), new GregorianCalendar(2014, 11, 1),
-        //        new Point(2, 2));
-        //mockEventsList.add(e1);
-        //mockEventsList.add(e2);
+        Location location = new Location("Robich");
+        location.setLatitude(2.0);
+        location.setLongitude(2.0);
+        // UserEvent e1 = new UserEvent("Swag party", 2, new GregorianCalendar(), new GregorianCalendar(2014, 12, 1),
+        // location);
+        // Event e2 = new UserEvent("Ranked gangbang", 3, new GregorianCalendar(), new GregorianCalendar(2014, 11, 1),
+        // new Point(2, 2));
+        // mockEventsList.add(e1);
+        // mockEventsList.add(e2);
 
         // Create custom Adapter and pass it to the Activity
         EventsListItemAdapter adapter = new EventsListItemAdapter(this, mockEventsList);
@@ -75,5 +87,30 @@ public class ShowEventsActivity extends ListActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onCheckboxClicked(View v) {
+        CheckBox checkBox = (CheckBox) v;
+
+        switch (v.getId()) {
+            case R.id.ShowEventsCheckBoxNearMe:
+                SeekBar seekBar = (SeekBar) findViewById(R.id.showEventSeekBar);
+                if (checkBox.isChecked()) {
+                    // Show the seek bar
+                    seekBar.setEnabled(true);
+                } else {
+                    // Hide the seek bar
+                    seekBar.setEnabled(false);
+                }
+                break;
+            case R.id.ShowEventsCheckBoxMyEv:
+                Toast.makeText(this, "Near me", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.ShowEventscheckBoxStatus:
+                Toast.makeText(this, "Ongoing", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
     }
 }
