@@ -18,15 +18,15 @@ import com.google.android.gms.maps.GoogleMap;
  */
 public interface FriendMarkerDisplayer {
 
-	/**
-	 * Set markers on the map for the friends in the list listOfFriends
-	 * 
-	 * @param context
-	 * @param mGoogleMap
-	 *            the map where we want to add markers
-	 * @param listOfFriends
-	 *            the friends we want to display
-	 */
-	void setMarkersToMaps(Context context, GoogleMap mGoogleMap,
-			List<Friend> listOfFriends);
+    /**
+     * Set markers on the map for the friends in the list listOfFriends
+     * 
+     * @param context
+     * @param mGoogleMap
+     *            the map where we want to add markers
+     * @param listOfFriends
+     *            the friends we want to display
+     */
+    void setMarkersToMaps(Context context, GoogleMap mGoogleMap,
+        List<Friend> listOfFriends);
 }

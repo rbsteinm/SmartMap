@@ -7,14 +7,13 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import ch.epfl.smartmap.R;
 
-import android.location.Location;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * A class to represent the user's friends
@@ -63,7 +62,6 @@ public class Friend implements User {
 		
 	}
 
-	// TODO
 	public Friend(long userID, String userName, double latitude, double longitude) {
 		this(userID, userName);
 		setLatitude(latitude);

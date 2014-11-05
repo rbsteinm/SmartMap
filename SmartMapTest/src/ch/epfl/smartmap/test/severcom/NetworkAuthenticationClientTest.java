@@ -4,11 +4,11 @@ import org.junit.Test;
 
 import android.test.AndroidTestCase;
 import ch.epfl.smartmap.servercom.DefaultNetworkProvider;
-
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 public class NetworkAuthenticationClientTest extends AndroidTestCase {
+    @SuppressWarnings("unused")
     private static String SERVER_URL = "http://smartmap.ddns.net";
     private final long facebookId = 1482245642055847L;
     private final String name = "SmartMap SwEng";
@@ -20,8 +20,10 @@ public class NetworkAuthenticationClientTest extends AndroidTestCase {
 
     @Test
     public void test() throws SmartMapClientException {
+        @SuppressWarnings("unused")
         DefaultNetworkProvider provider = new DefaultNetworkProvider();
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+        NetworkSmartMapClient networkClient = NetworkSmartMapClient
+            .getInstance();
 
         networkClient.authServer(name, facebookId, fbAccessToken);
 
