@@ -2,6 +2,10 @@ package ch.epfl.smartmap.cache;
 
 import java.util.GregorianCalendar;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import android.location.Location;
+
 /**
  * Describes an event
  * @author ritterni
@@ -11,25 +15,30 @@ public interface Event {
     /**
      * @return The event's position
      */
-    Point getPosition();
+    Location getLocation();
+    
+    /**
+	 * @return The user's latitude and longitude
+	 */
+	LatLng getLatLng();
     
     /**
      * Sets the event's position
      * @param p The new position
      */
-    void setPosition(Point p);
+    void setLocation(Location p);
     
     /**
      * Sets the events's longitude
      * @param x The longitude
      */
-    void setX(double x);
+    void setLongitude(double x);
     
     /**
      * Sets the event's latitude
      * @param y The latitude
      */
-    void setY(double y);
+    void setLatitude(double y);
     
     /**
      * @return The event's name

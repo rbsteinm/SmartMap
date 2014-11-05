@@ -64,6 +64,11 @@ public interface User {
 	 * @return True if the user is online
 	 */
 	boolean isOnline();
+	
+	/**
+	 * @return True if the user's location is visible
+	 */
+	boolean isVisible();
 
 	/**
 	 * Sets the user position's name
@@ -144,6 +149,12 @@ public interface User {
 
 	/**
 	 * Sets whether or not the user is online
+	 * @param isOnline True if the user is online
 	 */
-	void setOnline(boolean status);
+	void setOnline(boolean isOnline);
+	
+	/**
+	 * @param isVisible True if the user is visible
+	 */
+	void setVisible(boolean isVisible);
 }
