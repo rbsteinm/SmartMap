@@ -8,6 +8,14 @@ SmartMap/local.properties
 SmartMap/.checkstyle
 SmartMap/.DS_Store
 SmartMapTest/bin/
+<<<<<<< HEAD
+=======
+SmartMapTest/gen/
+SmartMapTest/.settings
+SmartMapTest/.checkstyle
+SmartMapTest/.classpath
+SmartMapTest/local.properties
+>>>>>>> dev
 server/vendor/
 server/composer.lock
 server/.buildpath
@@ -25,6 +33,11 @@ Libraries/google-play-services_lib/bin/
 Libraries/google-play-services_lib/gen/
 Libraries/facebook/.classpath
 Libraries/google-play-services_lib/.classpath
+<<<<<<< HEAD
 
+=======
+>>>>>>> dev
 *.class
 *~
+*.checkstyle
+*.classpath

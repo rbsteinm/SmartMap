@@ -2,8 +2,11 @@ package ch.epfl.smartmap.cache;
 
 import java.util.GregorianCalendar;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.location.Location;
 
 /**
  * Describes a generic user of the app
@@ -35,8 +38,13 @@ public interface User {
 	/**
 	 * @return The user's position
 	 */
-	Point getPosition();
+	Location getLocation();
 
+	/**
+	 * @return The user's latitude and longitude
+	 */
+	LatLng getLatLng();
+	
 	/**
 	 * @return The user's position as a String (e.g. 'Lausanne')
 	 */
@@ -95,7 +103,7 @@ public interface User {
 	 * @param x
 	 *            The longitude
 	 */
-	void setX(double x);
+	void setLongitude(double x);
 
 	/**
 	 * Sets the user's latitude
@@ -103,7 +111,7 @@ public interface User {
 	 * @param y
 	 *            The latitude
 	 */
-	void setY(double y);
+	void setLatitude(double y);
 
 	/**
 	 * Sets the user's position (x and y)
@@ -111,7 +119,7 @@ public interface User {
 	 * @param p
 	 *            The new position
 	 */
-	void setPosition(Point p);
+	void setLocation(Location p);
 
 	/**
 	 * Stores a new profile picture for the user

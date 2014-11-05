@@ -1,13 +1,9 @@
 package ch.epfl.smartmap.gui;
 
-import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,8 +19,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.servercom.DefaultNetworkProvider;
-import ch.epfl.smartmap.servercom.NetworkAuthenticationClient;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 import com.facebook.Request;
@@ -36,19 +31,20 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 
 /**
- * The fragment for the "Login with Facebook" button, that is used in scrim (1)
- * - Welcome
- *
+ * <<<<<<< HEAD The fragment for the "Login with Facebook" button, that is used
+ * in scrim (1) - Welcome ======= The fragment for the "Login with Facebook"
+ * button, that is used in scrim (1) - Welcome >>>>>>> dev
+ * 
  * @author SpicyCH
- *
+ * 
  */
 public class FacebookFragment extends Fragment {
 
 	private static final String TAG = FacebookFragment.class.getSimpleName();
 
-	protected static final String CONNECT_USER_URL = "http://swissgen.net/smartmap/connectUser.php";
-
-	protected static final String SERVER_CONFIRMATION = "OK";
+	private static final String FACEBOOK_ID_POST_NAME = "facebookId";
+	private static final String FACEBOOK_TOKEN_POST_NAME = "facebookToken";
+	private static final String FACEBOOK_NAME_POST_NAME = "name";
 
 	private UiLifecycleHelper mUiHelper;
 
@@ -86,8 +82,14 @@ public class FacebookFragment extends Fragment {
 		authButton.startAnimation(AnimationUtils.loadAnimation(this
 				.getActivity().getBaseContext(), R.anim.face_anim));
 		authButton.setFragment(this);
-		authButton.setReadPermissions(mPermissions);
 
+		if (!Session.getActiveSession().isOpened()
+				|| Session.getActiveSession().getPermissions().isEmpty()) {
+			authButton.setReadPermissions(mPermissions);
+		} else {
+			view.findViewById(R.id.loadingTextView).setVisibility(View.VISIBLE);
+			view.findViewById(R.id.loadingBar).setVisibility(View.VISIBLE);
+		}
 		return view;
 	}
 
@@ -162,8 +164,7 @@ public class FacebookFragment extends Fragment {
 		}
 	};
 
-	private void makeMeRequest() {
-		final JSONObject userProfile = new JSONObject();
+	protected void makeMeRequest() {
 		Request request = Request.newMeRequest(Session.getActiveSession(),
 				new Request.GraphUserCallback() {
 					@Override
@@ -171,52 +172,43 @@ public class FacebookFragment extends Fragment {
 
 						if (user != null) {
 
-							String userName = user.getName();
-							// This portable token can be used by the server
+							// This portable token is used by the server
 							String facebookToken = Session.getActiveSession()
 									.getAccessToken();
 
-							// Create a JSON object to hold the profile info
-							try {
-
-								// Populate the JSON object
-								userProfile.put("facebookId", user.getId());
-								userProfile.put("name", userName);
-								userProfile.put("facebookToken", facebookToken);
-								// userProfile.put("friends",
-								// user.getProperty("friends"));
-
-								Log.i(TAG, "user name in json (async): "
-										+ userProfile.getString("name"));
-								Log.i(TAG, "user ID in json (async): "
-										+ userProfile.getString("facebookId"));
-
-							} catch (JSONException e) {
-								Log.e(TAG, "Error parsing returned user data.");
-							}
-
-							// TODO store userProfile locally (see with
-							// Nicolas?)
-
 							// Send user's infos to SmartMap server
 							Map<String, String> params = new LinkedHashMap<String, String>();
-							params.put("facebookId", user.getId());
-							params.put("name", userName);
-							params.put("facebookToken", facebookToken);
-							// params.put("friends",
-							// user.getProperty("friends"));
-							sendDataToServer(params);
+							params.put(FACEBOOK_ID_POST_NAME, user.getId());
+							params.put(FACEBOOK_NAME_POST_NAME, user.getName());
+							params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
+							// TODO put user's friends?
 
-							// Create and start the next activity
-							Toast.makeText(getActivity(),
-									"You logged in successfully, " + userName,
-									Toast.LENGTH_LONG).show();
-							Intent intent = new Intent(getActivity(),
-									MainActivity.class);
-							startActivity(intent);
+							// Debug
+							Log.i(TAG, "user name: " + params.get("name"));
+							Log.i(TAG,
+									"user facebookId: "
+											+ params.get(FACEBOOK_ID_POST_NAME));
+
+							if (!sendDataToServer(params)) {
+								Toast.makeText(
+										getActivity(),
+										"Failed to log in to the SmartMap server.",
+										Toast.LENGTH_LONG).show();
+							} else {
+								// Create and start the next activity
+								Toast.makeText(
+										getActivity(),
+										"You logged in successfully, "
+												+ user.getName(),
+										Toast.LENGTH_LONG).show();
+								Intent intent = new Intent(getActivity(),
+										MainActivity.class);
+								startActivity(intent);
+							}
 
 						} else if (response.getError() != null) {
-							Log.e(TAG, "The user is null");
+							Log.e(TAG,
+									"The user is null (authentication aborted?)");
 						}
 					}
 				});
@@ -237,6 +229,9 @@ public class FacebookFragment extends Fragment {
 		} else {
 			// An error occured
 			Log.e(TAG, "Could not send user's data to server. Net down?");
+			Toast.makeText(getActivity(),
+					"Your internet connection seems down. Please try again!",
+					Toast.LENGTH_LONG).show();
 			return false;
 		}
 
@@ -245,12 +240,13 @@ public class FacebookFragment extends Fragment {
 	/**
 	 * An AsyncTask to send the facebook user data to the SmartMap server
 	 * asynchronously
-	 *
+	 * 
 	 * @author SpicyCH
-	 *
+	 * 
 	 */
 	private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
 
+		private final static int FACEBOOK_ID_RADIX = 10;
 		private final Map<String, String> mParams;
 
 		/**
@@ -262,32 +258,33 @@ public class FacebookFragment extends Fragment {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see android.os.AsyncTask#doInBackground(Params[])
 		 */
 		@Override
 		protected Boolean doInBackground(Void... params) {
-			DefaultNetworkProvider provider = new DefaultNetworkProvider();
-			NetworkAuthenticationClient networkClient = new NetworkAuthenticationClient(
-					CONNECT_USER_URL, provider);
 
-			HttpURLConnection conn = null;
-			String serverAnswer = null;
+			NetworkSmartMapClient networkClient = NetworkSmartMapClient
+					.getInstance();
+
 			try {
-				conn = networkClient.getHttpURLConnection("");
-				serverAnswer = networkClient.sendViaPost(mParams, conn);
-			} catch (SmartMapClientException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			if (SERVER_CONFIRMATION.equals(serverAnswer)) {
-				Log.i(TAG, "User's data sent to SmartMap server");
-				return true;
-			} else {
-				Log.e(TAG, "Couldn't send user's data to server");
+				networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
+						Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME),
+								FACEBOOK_ID_RADIX), mParams
+								.get(FACEBOOK_TOKEN_POST_NAME));
+			} catch (NumberFormatException e1) {
+				Log.e(TAG, "Couldn't parse to Long: " + e1.getMessage());
+				e1.printStackTrace();
+				return false;
+			} catch (SmartMapClientException e1) {
+				Log.e(TAG, "Couldn't authenticate : " + e1.getMessage());
+				e1.printStackTrace();
 				return false;
 			}
+
+			Log.i(TAG, "User' infos sent to SmartMap server");
+			return true;
+
 		}
 	}
 }

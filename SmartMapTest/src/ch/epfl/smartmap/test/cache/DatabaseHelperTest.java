@@ -2,14 +2,13 @@ package ch.epfl.smartmap.test.cache;
 
 import org.junit.Test;
 
+import android.test.AndroidTestCase;
+import android.test.RenamingDelegatingContext;
+import android.util.LongSparseArray;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.FriendList;
 import ch.epfl.smartmap.cache.User;
-
-import android.test.AndroidTestCase;
-import android.test.RenamingDelegatingContext;
-import android.util.LongSparseArray;
 
 /**
  * Tests for the DatabaseHelper class
@@ -84,7 +83,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         assertTrue(dbh.getFilter(id).getListName().equals(filter.getListName())
                 && dbh.getFilter(id).getList().contains(b.getID()));
     }
-    
+
     @Test
     public void testDeleteFilter() {
         FriendList filter = new FriendList(name);
