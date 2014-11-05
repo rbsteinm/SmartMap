@@ -12,6 +12,7 @@ SmartMapTest/gen/
 SmartMapTest/.settings
 SmartMapTest/.checkstyle
 SmartMapTest/.classpath
+SmartMapTest/local.properties
 server/vendor/
 server/composer.lock
 server/.buildpath
