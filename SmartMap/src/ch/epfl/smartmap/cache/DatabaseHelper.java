@@ -26,7 +26,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_FILTER = "filters";
     public static final String TABLE_FILTER_USER = "filter_users";
     public static final String TABLE_EVENT = "events";
-    public static final String TABLE_SETTINGS = "settings";
     
     private static final String KEY_USER_ID = "userID";
     private static final String KEY_NAME = "name";
@@ -51,9 +50,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ENDHOUR = "endHour";
     private static final String KEY_ENDMINUTE = "endMinute";
     
-    private static final String KEY_COOKIE = "sessionCookie";
-    private static final String KEY_TOKEN = "facebookToken";
-    
     //Columns for the User table
     private static final String[] USER_COLUMNS = {
         KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL, KEY_POSX, KEY_POSY, KEY_POSNAME
@@ -74,11 +70,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         KEY_ID, KEY_NAME, KEY_USER_ID, KEY_POSX, KEY_POSY,
         KEY_YEAR, KEY_MONTH, KEY_DATE, KEY_HOUR, KEY_MINUTE,
         KEY_ENDYEAR, KEY_ENDMONTH, KEY_ENDDATE, KEY_ENDHOUR, KEY_ENDMINUTE
-    };
-    
-    //Columns for the settings/misc. info table
-    private static final String[] SETTINGS_COLUMNS = {
-        KEY_ID, KEY_USER_ID, KEY_NAME, KEY_COOKIE, KEY_TOKEN, KEY_NUMBER, KEY_EMAIL
     };
     
     //Table of users
@@ -127,19 +118,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ENDHOUR + " INTEGER,"
             + KEY_ENDMINUTE + " INTEGER"
             + ")";
-    
-  //Table of settings
-    private static final String CREATE_TABLE_SETTINGS = "CREATE TABLE IF NOT EXISTS "
-            + TABLE_SETTINGS + "("
-            + KEY_ID + " INTEGER PRIMARY KEY," //should always be 1 as there is only one local user
-            + KEY_USER_ID + " INTEGER,"
-            + KEY_NAME + " TEXT,"
-            + KEY_COOKIE + " TEXT,"
-            + KEY_TOKEN + " INTEGER,"
-            + KEY_NUMBER + " TEXT,"
-            + KEY_EMAIL + " TEXT,"
-            + ")";
-    
+      
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -150,8 +129,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_FILTER);
         db.execSQL(CREATE_TABLE_FILTER_USER);
         db.execSQL(CREATE_TABLE_EVENT);
-        db.execSQL(CREATE_TABLE_SETTINGS);
-        resetSettings();
     }
 
     @Override
@@ -160,7 +137,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
         
         onCreate(db);
     }
@@ -592,59 +568,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
      
         return rows;
-    }
-    
-    /**
-     * Resets the settings line in the database
-     * @param id The local user's id
-     * @
-     */
-    public void resetSettings() {
-        
-        SQLiteDatabase db = this.getWritableDatabase();
-        
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
-        db.execSQL(CREATE_TABLE_SETTINGS);
-     
-        ContentValues values = new ContentValues();
-        values.put(KEY_ID, 1);
-        values.put(KEY_USER_ID, 0);
-        values.put(KEY_NAME, "");
-        values.put(KEY_NUMBER, Friend.NO_NUMBER);
-        values.put(KEY_EMAIL, Friend.NO_EMAIL);
-        values.put(KEY_TOKEN, 0);
-        values.put(KEY_COOKIE, "");
-     
-        db.insert(TABLE_USER, null, values);
-     
-        db.close();
-    }
-    
-    public SettingsManager getSettings() {
-        
-        SQLiteDatabase db = this.getReadableDatabase();
-        
-        Cursor cursor = db.query(
-                TABLE_SETTINGS,
-                SETTINGS_COLUMNS,
-                KEY_ID + " = ?",
-                new String[] {String.valueOf(1)},
-                null,
-                null,
-                null,
-                null);
-     
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-     
-        SettingsManager manager = new SettingsManager(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
-                cursor.getString(cursor.getColumnIndex(KEY_NAME)),
-                cursor.getString(cursor.getColumnIndex(KEY_NUMBER)),
-                cursor.getString(cursor.getColumnIndex(KEY_EMAIL)),
-                cursor.getLong(cursor.getColumnIndex(KEY_TOKEN)),
-                cursor.getString(cursor.getColumnIndex(KEY_COOKIE)));
-        
-        return manager;
     }
 }
