@@ -16,6 +16,6 @@ public class UserEventTest extends AndroidTestCase {
         Location testLoc = new Location("");
         testLoc.setLatitude(1.123);
         testLoc.setLongitude(3.321);
-        UserEvent evt = new UserEvent("testname", 1234, new GregorianCalendar(), new GregorianCalendar(), testLoc);
+        UserEvent evt = new UserEvent("testname", 1234, "testUserName", new GregorianCalendar(), new GregorianCalendar(), testLoc);
     }
 }
