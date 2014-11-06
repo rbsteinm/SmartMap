@@ -35,8 +35,8 @@ public abstract class SearchResultView extends LinearLayout {
 
         // Creates shadow layout
         this.setBackgroundResource(R.color.searchResultShadow);
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this
-            .getLayoutParams();
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+            LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         layoutParams.setMargins(0, 0, 0, SHADOW_WIDTH);
         this.setLayoutParams(layoutParams);
 
@@ -45,7 +45,8 @@ public abstract class SearchResultView extends LinearLayout {
         mBorderLayout.setBackgroundResource(R.color.searchResultBorder);
         mBorderLayout.setLayoutParams(new LayoutParams(
             LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        mBorderLayout.setPadding(BORDER_WIDTH, BORDER_WIDTH, BORDER_WIDTH, BOTTOM_BORDER_WIDTH);
+        mBorderLayout.setPadding(BORDER_WIDTH, BORDER_WIDTH, BORDER_WIDTH,
+            BOTTOM_BORDER_WIDTH);
 
         // this.setBackgroundResource(R.drawable.shape);
 

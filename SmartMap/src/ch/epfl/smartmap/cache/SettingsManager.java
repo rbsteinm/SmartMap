@@ -15,12 +15,13 @@ public class SettingsManager {
     public static final String EMAIL = "Email";
     public static final String TOKEN = "Token";
     public static final String COOKIE = "Cookie";
+    public static final String HIDDEN = "Hidden";
     
-    public static final long DEFAULT_ID = 0;
+    public static final long DEFAULT_ID = -1;
     public static final String DEFAULT_NAME = "No name";
-    public static final String DEFAULT_NUMBER = "PhoneNumber";
-    public static final String DEFAULT_EMAIL = "Email";
-    public static final long DEFAULT_TOKEN = 0;
+    public static final String DEFAULT_NUMBER = "No number";
+    public static final String DEFAULT_EMAIL = "No email";
+    public static final long DEFAULT_TOKEN = -1;
     public static final String DEFAULT_COOKIE = "No cookie";
     
     private Context mContext;
@@ -80,50 +81,79 @@ public class SettingsManager {
     }
 	
 	/**
+	 * @return True if hidden mode is enabled
+	 */
+	public boolean isHidden() {
+        return mSharedPref.getBoolean(HIDDEN, false);
+    }
+	
+	/**
 	 * Stores the local user's name
 	 * @param newName The user's new name
+	 * @return True if the new value was successfully saved
 	 */
-	public void setUserName(String newName) {
+	public boolean setUserName(String newName) {
         mEditor.putString(USER_NAME, newName);
+        return mEditor.commit();
     }
     
     /**
      * Stores the user's ID
      * @param newID The user's new ID
+     * @return True if the new value was successfully saved
      */
-    public void setUserID(long newID) {
+    public boolean setUserID(long newID) {
         mEditor.putLong(USER_ID, newID);
+        return mEditor.commit();
     }
     
     /**
      * Stores the user's phone number
      * @param newNumber The user's new number
+     * @return True if the new value was successfully saved
      */
-    public void setUPhoneNumber(String newNumber) {
+    public boolean setUPhoneNumber(String newNumber) {
         mEditor.putString(PHONE_NUMBER, newNumber);
+        return mEditor.commit();
     }
     
     /**
      * Stores the user's email
      * @param newEmail The new email address
+     * @return True if the new value was successfully saved
      */
-    public void setEmail(String newEmail) {
+    public boolean setEmail(String newEmail) {
         mEditor.putString(EMAIL, newEmail);
+        return mEditor.commit();
     }
     
     /**
      * Stores the Facebook token
      * @param newToken The new token
+     * @return True if the new value was successfully saved
      */
-    public void setToken(long newToken) {
+    public boolean setToken(long newToken) {
         mEditor.putLong(TOKEN, newToken);
+        return mEditor.commit();
     }
     
     /**
      * Stores the session cookie
      * @param newCookie The new cookie
+     * @return True if the new value was successfully saved
      */
-    public void setCookie(String newCookie) {
+    public boolean setCookie(String newCookie) {
         mEditor.putString(COOKIE, newCookie);
+        return mEditor.commit();
+    }
+    
+    /**
+     * Sets whether or not the local user is in hidden mode
+     * @param isHidden True to enable hidden mode
+     * @return True if the new value was successfully saved
+     */
+    public boolean setHidden(boolean isHidden) {
+    	mEditor.putBoolean(HIDDEN, isHidden);
+    	return mEditor.commit();
     }
 }
