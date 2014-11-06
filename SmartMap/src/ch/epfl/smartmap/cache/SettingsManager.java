@@ -16,11 +16,11 @@ public class SettingsManager {
     public static final String TOKEN = "Token";
     public static final String COOKIE = "Cookie";
     
-    public static final long DEFAULT_ID = 0;
+    public static final long DEFAULT_ID = -1;
     public static final String DEFAULT_NAME = "No name";
     public static final String DEFAULT_NUMBER = "PhoneNumber";
     public static final String DEFAULT_EMAIL = "Email";
-    public static final long DEFAULT_TOKEN = 0;
+    public static final long DEFAULT_TOKEN = -1;
     public static final String DEFAULT_COOKIE = "No cookie";
     
     private Context mContext;
