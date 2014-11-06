@@ -18,8 +18,8 @@ public class SettingsManager {
     
     public static final long DEFAULT_ID = -1;
     public static final String DEFAULT_NAME = "No name";
-    public static final String DEFAULT_NUMBER = "PhoneNumber";
-    public static final String DEFAULT_EMAIL = "Email";
+    public static final String DEFAULT_NUMBER = "No number";
+    public static final String DEFAULT_EMAIL = "No email";
     public static final long DEFAULT_TOKEN = -1;
     public static final String DEFAULT_COOKIE = "No cookie";
     
