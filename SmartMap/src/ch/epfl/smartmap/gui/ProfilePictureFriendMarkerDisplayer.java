@@ -70,8 +70,8 @@ public class ProfilePictureFriendMarkerDisplayer implements
 		return displayedMarkers.containsValue(friend);
 	}
 
-	public boolean isDisplayedMarker(User friend) {
-		return displayedMarkers.containsValue(friend);
+	public boolean isDisplayedMarker(Marker marker) {
+		return displayedMarkers.containsKey(marker);
 	}
 
 	public List<Marker> getDisplayedMarkers() {

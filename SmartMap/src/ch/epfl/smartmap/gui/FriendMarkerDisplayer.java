@@ -3,7 +3,7 @@
  */
 package ch.epfl.smartmap.gui;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 import android.content.Context;
@@ -41,10 +41,10 @@ public interface FriendMarkerDisplayer {
 	public boolean isDisplayedFriend(User friend);
 
 	/**
-	 * @param friend
+	 * @param marker
 	 * @return true if the marker is displayed
 	 */
-	public boolean isDisplayedMarker(User friend);
+	public boolean isDisplayedMarker(Marker marker);
 
 	/**
 	 * @return the list of the markers that are displayed
