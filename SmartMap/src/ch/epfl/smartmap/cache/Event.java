@@ -46,9 +46,19 @@ public interface Event {
     String getName();
     
     /**
+     * @return The event's description
+     */
+    String getDescription();
+    
+    /**
      * @return The ID of the user who created the event
      */
     long getCreator();
+    
+    /**
+     * @return The name of the event creator
+     */
+    String getCreatorName();
     
     /**
      * @return The event's ID
@@ -77,6 +87,12 @@ public interface Event {
     void setName(String newName);
     
     /**
+     * Sets the event's description
+     * @param desc The new description
+     */
+    void setDescription(String desc);
+    
+    /**
      * Changes the event's start date
      * @param newDate The new start date (year, month, day, hour, minute)
      */
@@ -102,4 +118,10 @@ public interface Event {
      *            The event's position
      */
     void setPositionName(String posName);
+    
+    /**
+     * Sets the event creator's name
+     * @param name The event creator's name
+     */
+    void setCreatorName(String name);
 }

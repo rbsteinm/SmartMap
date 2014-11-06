@@ -50,6 +50,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ENDHOUR = "endHour";
     private static final String KEY_ENDMINUTE = "endMinute";
     
+    private static final String KEY_CREATOR_NAME = "creatorName";
+    private static final String KEY_EVTDESC = "eventDescription";
+    
     //Columns for the User table
     private static final String[] USER_COLUMNS = {
         KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL, KEY_POSX, KEY_POSY, KEY_POSNAME
@@ -67,7 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     
     //Columns for the Event table
     private static final String[] EVENT_COLUMNS = {
-        KEY_ID, KEY_NAME, KEY_USER_ID, KEY_POSX, KEY_POSY,
+        KEY_ID, KEY_NAME, KEY_EVTDESC, KEY_USER_ID, KEY_CREATOR_NAME, KEY_POSX, KEY_POSY, KEY_POSNAME,
         KEY_YEAR, KEY_MONTH, KEY_DATE, KEY_HOUR, KEY_MINUTE,
         KEY_ENDYEAR, KEY_ENDMONTH, KEY_ENDDATE, KEY_ENDHOUR, KEY_ENDMINUTE
     };
@@ -104,7 +107,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TABLE_EVENT + "("
             + KEY_ID + " INTEGER PRIMARY KEY,"
             + KEY_NAME + " TEXT,"
+            + KEY_EVTDESC + " TEXT,"
             + KEY_USER_ID + " INTEGER,"
+            + KEY_CREATOR_NAME + " TEXT,"
             + KEY_POSX + " DOUBLE,"
             + KEY_POSY + " DOUBLE,"
             + KEY_YEAR + " INTEGER,"
@@ -405,9 +410,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_ID, event.getID());
         values.put(KEY_NAME, event.getName());
+        values.put(KEY_EVTDESC, event.getDescription());
         values.put(KEY_USER_ID, event.getCreator());
+        values.put(KEY_CREATOR_NAME, event.getCreatorName());
         values.put(KEY_POSX, event.getLocation().getLongitude());
         values.put(KEY_POSY, event.getLocation().getLatitude());
+        values.put(KEY_POSNAME, event.getPositionName());
         values.put(KEY_YEAR, event.getStartDate().get(Calendar.YEAR));
         values.put(KEY_MONTH, event.getStartDate().get(Calendar.MONTH));
         values.put(KEY_DATE, event.getStartDate().get(Calendar.DATE));
@@ -463,12 +471,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         loc.setLatitude(cursor.getColumnIndex(KEY_POSY));
         
         UserEvent event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
-                cursor.getInt(cursor.getColumnIndex(KEY_USER_ID)),
+                cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
+                cursor.getString(cursor.getColumnIndex(KEY_CREATOR_NAME)),
                 startDate,
                 endDate,
                 loc);
 
         event.setID(id);
+        event.setDescription(cursor.getString(cursor.getColumnIndex(KEY_EVTDESC)));
+        event.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
         
         return event;
     }
@@ -508,11 +519,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 
                 event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                         cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
+                        cursor.getString(cursor.getColumnIndex(KEY_CREATOR_NAME)),
                         startDate,
                         endDate,
                         loc);
   
                 event.setID(cursor.getLong(cursor.getColumnIndex(KEY_ID)));
+                event.setDescription(cursor.getString(cursor.getColumnIndex(KEY_EVTDESC)));
+                event.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
+                
                 events.add(event);
             } while (cursor.moveToNext());
         }
@@ -546,9 +561,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_ID, event.getID());
         values.put(KEY_NAME, event.getName());
+        values.put(KEY_EVTDESC, event.getDescription());
         values.put(KEY_USER_ID, event.getCreator());
+        values.put(KEY_CREATOR_NAME, event.getCreatorName());
         values.put(KEY_POSX, event.getLocation().getLongitude());
         values.put(KEY_POSY, event.getLocation().getLatitude());
+        values.put(KEY_POSNAME, event.getPositionName());
         values.put(KEY_YEAR, event.getStartDate().get(Calendar.YEAR));
         values.put(KEY_MONTH, event.getStartDate().get(Calendar.MONTH));
         values.put(KEY_DATE, event.getStartDate().get(Calendar.DATE));

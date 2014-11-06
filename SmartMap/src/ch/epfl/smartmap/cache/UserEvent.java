@@ -19,8 +19,11 @@ public class UserEvent implements Event {
     private long evtID;
     private Location mLocation;
     private String mPositionName;
+    private String mCreatorName;
+    private String mDescription;
     
-    public UserEvent(String name, long creator, GregorianCalendar startDate, GregorianCalendar endDate, Location p) {
+    public UserEvent(String name, long creator, String creatorName,
+    		GregorianCalendar startDate, GregorianCalendar endDate, Location p) {
         mEvtName = name;
         mEvtCreator = creator;
         mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR),
@@ -39,6 +42,8 @@ public class UserEvent implements Event {
         mLocation.setLatitude(p.getLatitude());
         mLocation.setLongitude(p.getLongitude());
         mPositionName = "";
+        mCreatorName = creatorName;
+        mDescription = "";
     }
     
     @Override
@@ -130,4 +135,24 @@ public class UserEvent implements Event {
     public void setPositionName(String posName) {
         mPositionName = posName;
     }
+
+	@Override
+	public String getCreatorName() {
+		return mCreatorName;
+	}
+
+	@Override
+	public void setCreatorName(String name) {
+		mCreatorName = name;
+	}
+
+	@Override
+	public String getDescription() {
+		return mDescription;
+	}
+
+	@Override
+	public void setDescription(String desc) {
+		mDescription = desc;
+	}
 }
