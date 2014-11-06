@@ -38,9 +38,7 @@ public class UserEvent implements Event {
                 endDate.get(Calendar.HOUR),
                 endDate.get(Calendar.MINUTE));
         
-        mLocation = new Location("");
-        mLocation.setLatitude(p.getLatitude());
-        mLocation.setLongitude(p.getLongitude());
+        mLocation = new Location(p);
         mPositionName = "";
         mCreatorName = creatorName;
         mDescription = "";
@@ -106,8 +104,7 @@ public class UserEvent implements Event {
 
     @Override
     public void setLocation(Location p) {
-    	mLocation.setLatitude(p.getLatitude());
-        mLocation.setLongitude(p.getLongitude());
+    	mLocation.set(p);
     }
 
 	@Override

@@ -8,7 +8,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Friend;
 
 public class FriendTest extends AndroidTestCase {
-    private final int id = 1111;
+    private final long id = 1111;
     private final String name = "test name";
     private final String name2 = "other name";
     private final String number = "0790000000";
@@ -73,7 +73,7 @@ public class FriendTest extends AndroidTestCase {
     public void testGetDefaultPic() {
         assertTrue(friend.getPicture(getContext()).sameAs(
             BitmapFactory.decodeResource(getContext().getResources(),
-                R.drawable.ic_launcher)));
+            Friend.DEFAULT_PICTURE)));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class FriendTest extends AndroidTestCase {
             .getResources(), R.drawable.searchicon), getContext());
         assertTrue(friend.getPicture(getContext()).sameAs(
             BitmapFactory.decodeResource(getContext().getResources(),
-                R.drawable.searchicon)));
+            R.drawable.searchicon)));
     }
 
     @Test
@@ -92,6 +92,6 @@ public class FriendTest extends AndroidTestCase {
         friend.deletePicture(getContext());
         assertTrue(friend.getPicture(getContext()).sameAs(
             BitmapFactory.decodeResource(getContext().getResources(),
-                R.drawable.ic_launcher)));
+            Friend.DEFAULT_PICTURE)));
     }
 }

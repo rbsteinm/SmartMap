@@ -111,8 +111,7 @@ public class Friend implements User {
 
 	@Override
 	public void setLocation(Location p) {
-		mLocation.setLatitude(p.getLatitude());
-		mLocation.setLongitude(p.getLongitude());
+		mLocation.set(p);
 	}
 
 	@Override
