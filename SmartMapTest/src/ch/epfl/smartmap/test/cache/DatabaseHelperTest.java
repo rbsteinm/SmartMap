@@ -26,6 +26,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
     private Friend c = new Friend(9909, "Abc Def");
     private final UserEvent event = new UserEvent("A new event", 1234, "qwertz uiop",
             new GregorianCalendar(), new GregorianCalendar(), new Location("SmartMapProvider"));
+    private final UserEvent event2 = new UserEvent("Another new event", 4523, "abababab",
+            new GregorianCalendar(), new GregorianCalendar(), new Location("SmartMapProvider"));
     private DatabaseHelper dbh;
     private FriendList filter;
     private FriendList filter2;
@@ -33,7 +35,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        dbh = new DatabaseHelper(new RenamingDelegatingContext(getContext(), "test_")); 
+        dbh = new DatabaseHelper(new RenamingDelegatingContext(getContext(), "test_"));
         //to avoid erasing the actual database
         
         filter = new FriendList(name);
@@ -92,7 +94,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(c);
         dbh.deleteUser(b.getID());
         LongSparseArray<User> list = dbh.getAllUsers();
-        assertTrue(list.size() == 2 && list.get(a.getID()).getID() == a.getID());
+        assertTrue(list.size() == 2 && list.get(c.getID()).getID() == c.getID());
     }
     
     @Test
@@ -121,5 +123,14 @@ public class DatabaseHelperTest extends AndroidTestCase {
         event.setID(123123);
         dbh.addEvent(event);
         assertTrue(dbh.getEvent(event.getID()).getCreatorName().equals(event.getCreatorName()));
+    }
+    
+    @Test
+    public void testGetAllEvents() {
+    	event.setID(123123);
+    	event2.setID(456789);
+    	dbh.addEvent(event);
+    	dbh.addEvent(event2);
+    	assertTrue(dbh.getAllEvents().size() == 2);
     }
 }

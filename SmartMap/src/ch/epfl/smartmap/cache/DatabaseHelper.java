@@ -491,45 +491,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Event> getAllEvents() {
         ArrayList<Event> events = new ArrayList<Event>();
   
-        String query = "SELECT  * FROM " + TABLE_USER;
+        String query = "SELECT  * FROM " + TABLE_EVENT;
         
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         
-        UserEvent event = null;
-        GregorianCalendar startDate = null;
-        GregorianCalendar endDate = null;
-        
         if (cursor.moveToFirst()) {
             do {
-                startDate = new GregorianCalendar(cursor.getInt(cursor.getColumnIndex(KEY_YEAR)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_MONTH)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_DATE)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_HOUR)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_MINUTE)));
-                
-                endDate = new GregorianCalendar(cursor.getInt(cursor.getColumnIndex(KEY_ENDYEAR)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_ENDMONTH)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_ENDDATE)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_ENDHOUR)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_ENDMINUTE)));
-                
-                Location loc = new Location("");
-                loc.setLongitude(cursor.getColumnIndex(KEY_POSX));
-                loc.setLatitude(cursor.getColumnIndex(KEY_POSY));
-                
-                event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
-                        cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
-                        cursor.getString(cursor.getColumnIndex(KEY_CREATOR_NAME)),
-                        startDate,
-                        endDate,
-                        loc);
-  
-                event.setID(cursor.getLong(cursor.getColumnIndex(KEY_ID)));
-                event.setDescription(cursor.getString(cursor.getColumnIndex(KEY_EVTDESC)));
-                event.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
-                
-                events.add(event);
+            	events.add(getEvent(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
             } while (cursor.moveToNext());
         }
         return events;
