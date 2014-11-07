@@ -14,6 +14,7 @@ public class SettingsManager {
     public static final String PHONE_NUMBER = "PhoneNumber";
     public static final String EMAIL = "Email";
     public static final String TOKEN = "Token";
+    public final static String FB_ID = "FacebookID";
     public static final String COOKIE = "Cookie";
     public static final String HIDDEN = "Hidden";
     
@@ -21,7 +22,8 @@ public class SettingsManager {
     public static final String DEFAULT_NAME = "No name";
     public static final String DEFAULT_NUMBER = "No number";
     public static final String DEFAULT_EMAIL = "No email";
-    public static final long DEFAULT_TOKEN = -1;
+    public static final String DEFAULT_TOKEN = "No token";
+    public static final long DEFAULT_FB_ID = -1;
     public static final String DEFAULT_COOKIE = "No cookie";
     
     private Context mContext;
@@ -53,6 +55,13 @@ public class SettingsManager {
     }
 	
 	/**
+	 * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value otherwise
+	 */
+	public long getFacebookID() {
+        return mSharedPref.getLong(FB_ID, DEFAULT_FB_ID);
+    }
+	
+	/**
 	 * @return The local user's phone number if it is found, DEFAULT_NUMBER value otherwise
 	 */
 	public String getUPhoneNumber() {
@@ -69,8 +78,8 @@ public class SettingsManager {
 	/**
 	 * @return The local user's Facebook token if it is found, DEFAULT_TOKEN value otherwise
 	 */
-	public long getToken() {
-        return mSharedPref.getLong(TOKEN, DEFAULT_TOKEN);
+	public String getToken() {
+        return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);
     }
 	
 	/**
@@ -108,6 +117,16 @@ public class SettingsManager {
     }
     
     /**
+     * Stores the user's Facebook ID
+     * @param newID The user's new Facebook ID
+     * @return True if the new value was successfully saved
+     */
+    public boolean setFacebookID(long newID) {
+        mEditor.putLong(FB_ID, newID);
+        return mEditor.commit();
+    }
+    
+    /**
      * Stores the user's phone number
      * @param newNumber The user's new number
      * @return True if the new value was successfully saved
@@ -132,8 +151,8 @@ public class SettingsManager {
      * @param newToken The new token
      * @return True if the new value was successfully saved
      */
-    public boolean setToken(long newToken) {
-        mEditor.putLong(TOKEN, newToken);
+    public boolean setToken(String newToken) {
+        mEditor.putString(TOKEN, newToken);
         return mEditor.commit();
     }
     
