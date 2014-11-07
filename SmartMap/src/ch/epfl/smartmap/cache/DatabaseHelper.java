@@ -401,6 +401,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     /**
+     * Updates a filter
+     * @param filter The updated filter
+     */
+    public void updateFilter(UserList filter) {
+ 
+        deleteFilter(filter.getID());
+        addFilter(filter);
+        //not sure if there's a more efficient way
+    }
+    
+    /**
      * Stores an event in the database.
      * The event must have an ID (given by the server)!
      * @param event The event to store

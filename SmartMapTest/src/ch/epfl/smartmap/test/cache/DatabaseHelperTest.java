@@ -47,6 +47,9 @@ public class DatabaseHelperTest extends AndroidTestCase {
         filter.addUser(b.getID());
         filter.addUser(c.getID());
         
+        event.setID(123123);
+    	event2.setID(456789);
+        
         dbh.clearAll();
     }
 
@@ -120,15 +123,28 @@ public class DatabaseHelperTest extends AndroidTestCase {
     
     @Test
     public void testAddEvent() {
-        event.setID(123123);
         dbh.addEvent(event);
         assertTrue(dbh.getEvent(event.getID()).getCreatorName().equals(event.getCreatorName()));
     }
     
     @Test
+    public void testUpdateEvent() {
+    	dbh.addEvent(event);
+    	event.setName(name);
+    	long rows = dbh.updateEvent(event);
+    	assertTrue(dbh.getEvent(event.getID()).getName().equals(name) && rows == 1);
+    }
+    
+    @Test
+    public void testDeleteEvent() {
+    	dbh.addEvent(event);
+    	dbh.addEvent(event2);
+    	dbh.deleteEvent(event.getID());
+    	assertTrue(dbh.getAllEvents().size() == 1 && dbh.getAllEvents().get(0).getID() == event2.getID());
+    }
+    
+    @Test
     public void testGetAllEvents() {
-    	event.setID(123123);
-    	event2.setID(456789);
     	dbh.addEvent(event);
     	dbh.addEvent(event2);
     	assertTrue(dbh.getAllEvents().size() == 2);
