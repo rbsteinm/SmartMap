@@ -1,7 +1,10 @@
 package ch.epfl.smartmap.test.cache;
 
+import java.util.GregorianCalendar;
+
 import org.junit.Test;
 
+import android.location.Location;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 import android.util.LongSparseArray;
@@ -9,6 +12,7 @@ import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.FriendList;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserEvent;
 
 /**
  * Tests for the DatabaseHelper class
@@ -20,6 +24,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
     private Friend a = new Friend(1234, "qwertz uiop");
     private Friend b = new Friend(0, "hcjkehfkl");
     private Friend c = new Friend(9909, "Abc Def");
+    private final UserEvent event = new UserEvent("A new event", 1234, "qwertz uiop",
+            new GregorianCalendar(), new GregorianCalendar(), new Location("SmartMapProvider"));
     private DatabaseHelper dbh;
     
     @Override
@@ -93,5 +99,12 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addFilter(filter);
         dbh.deleteFilter(filter.getID());
         assertTrue(dbh.getAllFilters().isEmpty());
+    }
+    
+    @Test
+    public void testAddEvent() {
+        event.setID(123123);
+        dbh.addEvent(event);
+        assertTrue(dbh.getEvent(event.getID()).getCreatorName().equals(event.getCreatorName()));
     }
 }

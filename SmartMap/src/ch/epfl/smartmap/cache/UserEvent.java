@@ -22,6 +22,15 @@ public class UserEvent implements Event {
     private String mCreatorName;
     private String mDescription;
     
+    /**
+     * UserEvent constructor
+     * @param name The name of the event
+     * @param creator The id of the user who created the event
+     * @param creatorName The name of the user who created the event
+     * @param startDate The date at which the event starts
+     * @param endDate The date at which the event ends
+     * @param p The event's location on the map
+     */
     public UserEvent(String name, long creator, String creatorName,
     		GregorianCalendar startDate, GregorianCalendar endDate, Location p) {
         mEvtName = name;

@@ -156,4 +156,13 @@ public class SettingsManager {
     	mEditor.putBoolean(HIDDEN, isHidden);
     	return mEditor.commit();
     }
+    
+    /**
+     * Clears the settings
+     * @return True if the settings were cleared successfully
+     */
+    public boolean clearAll() {
+    	mEditor.clear();
+    	return mEditor.commit();
+    }
 }

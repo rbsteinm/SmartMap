@@ -112,6 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_CREATOR_NAME + " TEXT,"
             + KEY_POSX + " DOUBLE,"
             + KEY_POSY + " DOUBLE,"
+            + KEY_POSNAME + " TEXT,"
             + KEY_YEAR + " INTEGER,"
             + KEY_MONTH + " INTEGER,"
             + KEY_DATE + " INTEGER,"
@@ -233,7 +234,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
                 friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
   
-               // friends.put(friend.getID(), friend);
+                friends.put(friend.getID(), friend);
             } while (cursor.moveToNext());
         }
         
