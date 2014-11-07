@@ -7,6 +7,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
+/** Tests for the AuthorizationController class.
+ * To run them, run
+ * $> phpunit --bootstrap vendor/autoload.php tests/AuthorizationControllerTest.php
+ * from the server directory.
+ *
+ * @author Pamoi
+ *
+ */
 class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
 {
     public function testValidAllowFriend()

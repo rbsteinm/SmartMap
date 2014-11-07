@@ -6,6 +6,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
+/** Tests for the User class.
+ * To run them, run
+ * $> phpunit --bootstrap vendor/autoload.php tests/UserTest.php
+ * from the server directory.
+ *
+ * @author Pamoi
+ *
+ */
 class UserTest extends PHPUnit_Framework_TestCase
 {
     public function testGetters()

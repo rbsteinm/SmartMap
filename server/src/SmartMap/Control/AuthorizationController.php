@@ -24,6 +24,11 @@ class AuthorizationController
         $this->mRepo = $repo;
     }
     
+    /** Allow a friend to see the user's location.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function allowFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
@@ -37,6 +42,11 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** Disallow a friend to see the user's location.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function disallowFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
@@ -50,6 +60,12 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** Allow friends in a list of ids separated by commas to see
+     * the user's location.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function allowFriendList(Request $request)
     {
         $userId = User::getIdFromRequest($request);
@@ -65,6 +81,12 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** Disallow friends in a list of ids separaed by commas to see
+     * the user's location.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function disallowFriendList(Request $request)
     {
         $userId = User::getIdFromRequest($request);
@@ -80,6 +102,11 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** Follow a friend to be notified of his position.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function followFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
@@ -93,6 +120,11 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** Unfollow a friend to be no longer notified of his position.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function unfollowFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
@@ -106,6 +138,12 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** Utility function transforming a list of numbers separated by commas
+     * in an array of integers.
+     * 
+     * @param string $string
+     * @return array
+     */
     private function getIntArrayFromString($string)
     {
         $array = explode(',', $string);
@@ -118,13 +156,23 @@ class AuthorizationController
         return $array;
     }
     
+    /** Utility function getting a post parameter and throwing a ControlException
+     * if the parameter is not set in the request.
+     * 
+     * @param Request $request
+     * @param string $param
+     * @throws ControlException
+     * @return string
+     */
     private function getPostParam(Request $request, $param)
     {
         $value = $request->request->get($param);
+        
         if ($value === null)
         {
             throw new ControlException('Post parameter ' . $param . ' is not set !');
         }
+        
         return $value;
     }
 }
