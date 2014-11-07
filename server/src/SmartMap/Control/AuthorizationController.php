@@ -2,8 +2,6 @@
 
 namespace SmartMap\Control;
 
-use Silex\Application;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -21,7 +19,7 @@ class AuthorizationController
 {
     private $mRepo;
     
-    function __construct(UserRepository $repo)
+    function __construct($repo)
     {
         $this->mRepo = $repo;
     }
@@ -30,11 +28,7 @@ class AuthorizationController
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         $this->mRepo->setFriendshipStatus($userId, $friendId, 'ALLOWED');
         
@@ -47,11 +41,7 @@ class AuthorizationController
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         $this->mRepo->setFriendshipStatus($userId, $friendId, 'DISALLOWED');
         
@@ -64,13 +54,9 @@ class AuthorizationController
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendsIds = $request->request->get('friend_ids');
-        if ($friendsIds === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendsIds = $this->getPostParam($request, 'friend_ids');
         
-        $friendsIds = explode(',', $friendsIds);
+        $friendsIds = $this->getIntArrayFromString($friendsIds);
         
         $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'ALLOWED');
         
@@ -83,13 +69,9 @@ class AuthorizationController
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendsIds = $request->request->get('friend_ids');
-        if ($friendsIds === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendsIds = $this->getPostParam($request, 'friend_ids');
         
-        $friendsIds = explode(',', $friendsIds);
+        $friendsIds = $this->getIntArrayFromString($friendsIds);
         
         $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'DISALLOWED');
         
@@ -102,11 +84,7 @@ class AuthorizationController
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         $this->mRepo->setFriendshipFollow($userId, $friendId, 'FOLLOWED');
         
@@ -119,16 +97,34 @@ class AuthorizationController
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         $this->mRepo->setFriendshipFollow($userId, $friendId, 'UNFOLLOWED');
         
         $response = array('status' => 'Ok', 'message' => 'Unfollowed friend !');
         
         return new JsonResponse($response);
+    }
+    
+    private function getIntArrayFromString($string)
+    {
+        $array = explode(',', $string);
+        
+        for ($i = 0; $i < count($array); $i++)
+        {
+            $array[$i] = (int) $array[$i];
+        }
+        
+        return $array;
+    }
+    
+    private function getPostParam(Request $request, $param)
+    {
+        $value = $request->request->get($param);
+        if ($value === null)
+        {
+            throw new ControlException('Post parameter ' . $param . ' is not set !');
+        }
+        return $value;
     }
 }

@@ -203,7 +203,7 @@ class DataController
         }
         catch (\Exception $e)
         {
-            throw new ControlException('You are aloready friends !');
+            throw new ControlException('You are already friends !');
         }
         
         $user = $this->mRepo->getUser($friendId);
