@@ -416,7 +416,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * The event must have an ID (given by the server)!
      * @param event The event to store
      */
-    public void addEvent(Event event) {
+    public void addEvent(Event event) throws IllegalArgumentException {
+    	if (event.getID() < 0) {
+    		throw new IllegalArgumentException("Invalid event ID");
+    	}
+    	
         SQLiteDatabase db = this.getWritableDatabase();
         
         ContentValues values = new ContentValues();
