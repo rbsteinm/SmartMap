@@ -27,6 +27,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
     private final UserEvent event = new UserEvent("A new event", 1234, "qwertz uiop",
             new GregorianCalendar(), new GregorianCalendar(), new Location("SmartMapProvider"));
     private DatabaseHelper dbh;
+    private FriendList filter;
+    private FriendList filter2;
     
     @Override
     protected void setUp() throws Exception {
@@ -34,7 +36,15 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh = new DatabaseHelper(new RenamingDelegatingContext(getContext(), "test_")); 
         //to avoid erasing the actual database
         
-        //dbh.getWritableDatabase();
+        filter = new FriendList(name);
+        filter.addUser(a.getID());
+        filter.addUser(b.getID());
+        filter.addUser(c.getID());
+        
+        filter2 = new FriendList(name);
+        filter.addUser(b.getID());
+        filter.addUser(c.getID());
+        
         dbh.clearAll();
     }
 
@@ -48,7 +58,13 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Test
     public void testAddUser() {
         dbh.addUser(a);
-        assertTrue(dbh.getUser(a.getID()).getID() == a.getID() && dbh.getUser(a.getID()).getName().equals(a.getName()));
+        assertTrue(dbh.getUser(a.getID()).getID() == a.getID() 
+                && dbh.getUser(a.getID()).getName().equals(a.getName())
+                && dbh.getUser(a.getID()).getNumber().equals(a.getNumber())
+                && dbh.getUser(a.getID()).getEmail().equals(a.getEmail())
+                && dbh.getUser(a.getID()).getPositionName().equals(a.getPositionName())
+                && dbh.getUser(a.getID()).getLocation().getLongitude() == a.getLocation().getLongitude()
+                && dbh.getUser(a.getID()).getLocation().getLatitude() == a.getLocation().getLatitude());
     }
     
     @Test
@@ -81,21 +97,20 @@ public class DatabaseHelperTest extends AndroidTestCase {
     
     @Test
     public void testAddFilter() {
-        FriendList filter = new FriendList(name);
-        filter.addUser(a.getID());
-        filter.addUser(b.getID());
-        filter.addUser(c.getID());
         long id = dbh.addFilter(filter);
         assertTrue(dbh.getFilter(id).getListName().equals(filter.getListName())
                 && dbh.getFilter(id).getList().contains(b.getID()));
     }
+    
+    @Test
+    public void testGetAllFilters() {
+    	dbh.addFilter(filter);
+    	dbh.addFilter(filter2);
+    	assertTrue(dbh.getAllFilters().size() == 2);
+    }
 
     @Test
     public void testDeleteFilter() {
-        FriendList filter = new FriendList(name);
-        filter.addUser(a.getID());
-        filter.addUser(b.getID());
-        filter.addUser(c.getID());
         dbh.addFilter(filter);
         dbh.deleteFilter(filter.getID());
         assertTrue(dbh.getAllFilters().isEmpty());

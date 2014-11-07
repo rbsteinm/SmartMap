@@ -373,7 +373,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 //using getFilter to add this row's filter to the list
-                filters.add(getFilter(cursor.getColumnIndex(KEY_ID)));
+                filters.add(getFilter(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
             } while (cursor.moveToNext());
         }
         return filters;
