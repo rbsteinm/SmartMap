@@ -196,8 +196,15 @@ class DataController
         
         $this->mRepo->removeInvitation($friendId, $userId);
         
-        $this->mRepo->addFriendshipLink($userId, $friendId);
-        $this->mRepo->addFriendshipLink($friendId, $userId);
+        try
+        {
+            $this->mRepo->addFriendshipLink($userId, $friendId);
+            $this->mRepo->addFriendshipLink($friendId, $userId);
+        }
+        catch (\Exception $e)
+        {
+            throw new ControlException('You are aloready friends !');
+        }
         
         $user = $this->mRepo->getUser($friendId);
         

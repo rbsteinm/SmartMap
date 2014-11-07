@@ -69,7 +69,7 @@ class UserRepository
         
         if (!$userData)
         {
-            throw new \Exception('No user found with id ' . $id);
+            throw new \Exception('No user found with id ' . $id . '.');
         }
         
         $user = new User(
@@ -95,7 +95,7 @@ class UserRepository
     {
         if (!is_array($ids) OR !is_array($visibility))
         {
-            throw new \InvalidArgumentException('$ids and $visibility must be arrays');
+            throw new \InvalidArgumentException('Arguments $ids and $visibility must be arrays.');
         }
         
         // If $ids is empty, we will find no user
@@ -187,7 +187,7 @@ class UserRepository
     {
         if (!is_array($status) OR !is_array($follow))
         {
-            throw new \InvalidArgumentException('Parameters $status and $follow must be arrays.');
+            throw new \InvalidArgumentException('Arguments $status and $follow must be arrays.');
         }
         
         $req = "SELECT id2 FROM " . self::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND ".
@@ -215,9 +215,19 @@ class UserRepository
      * and follow to FOLLOWED.
      * @param Long $idUser
      * @param Long $idFriend
+     * @throws \Exception if the friendship link already exists.
      */
     public function addFriendshipLink($idUser, $idFriend)
     {
+        // We first check that there is not already a friendship link.
+        $req = "SELECT * FROM " . self::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND id2 = ?";
+        $data = $this->mDb->fetchAssoc($req, array((int) $idUser, (int) $idFriend));
+        
+        if ($data)
+        {
+            throw new \Exception('This friendship link already exists !');
+        }
+        
         $this->mDb->insert(self::$TABLE_FRIENDSHIP,
                            array(
                             'id1' => (int) $idUser,
@@ -238,7 +248,7 @@ class UserRepository
     {
         if (!in_array($status, array('ALLOWED', 'DISALLOWED', 'BLOCKED')))
         {
-            throw new \Exception('Invalid value for status');
+            throw new \Exception('Invalid value for status !');
         }
         
         $this->mDb->update(self::$TABLE_FRIENDSHIP,
@@ -258,12 +268,12 @@ class UserRepository
     {
         if (!in_array($status, array('ALLOWED', 'DISALLOWED', 'BLOCKED')))
         {
-            throw new \Exception('Invalid value for status');
+            throw new \Exception('Invalid value for status !');
         }
         
         if (!is_array($idsFriends))
         {
-            throw new \Exception('Parameter $idsFriends must be an array !');
+            throw new \Exception('Argument $idsFriends must be an array !');
         }
         
         $req = "UPDATE " . self::$TABLE_FRIENDSHIP .
@@ -286,7 +296,7 @@ class UserRepository
     {
         if (!in_array($follow, array('FOLLOWED', 'UNFOLLOWED')))
         {
-            throw new \Exception('Invalid value for follow status');
+            throw new \Exception('Invalid value for follow status !');
         }
         
         $this->mDb->update(self::$TABLE_FRIENDSHIP,
