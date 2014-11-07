@@ -3,7 +3,6 @@
  */
 package ch.epfl.smartmap.gui;
 
-
 import java.util.List;
 
 import android.content.Context;
@@ -30,30 +29,29 @@ public interface FriendMarkerDisplayer {
 	 * @param listOfFriends
 	 *            the friends we want to display
 	 */
-	void setMarkersToMaps(Context context, GoogleMap mGoogleMap,
-			List<Friend> listOfFriends);
+	void setMarkersToMaps(Context context, GoogleMap mGoogleMap, List<Friend> listOfFriends);
 
 	/**
 	 * 
 	 * @param friend
 	 * @return true if the friend is displayed
 	 */
-	public boolean isDisplayedFriend(User friend);
+	boolean isDisplayedFriend(User friend);
 
 	/**
 	 * @param marker
 	 * @return true if the marker is displayed
 	 */
-	public boolean isDisplayedMarker(Marker marker);
+	boolean isDisplayedMarker(Marker marker);
 
 	/**
 	 * @return the list of the markers that are displayed
 	 */
-	public List<Marker> getDisplayedMarkers();
+	List<Marker> getDisplayedMarkers();
 
 	/**
 	 * @param marker
 	 * @return the friend that the marker represents
 	 */
-	public User getFriendForMarker(Marker marker);
+	User getFriendForMarker(Marker marker);
 }
