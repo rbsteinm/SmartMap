@@ -34,4 +34,9 @@ public class SettingsManagerTest extends AndroidTestCase {
 		assertTrue(mManager.getEmail().equals(mEmail));
 	}
 
+	@Test
+	public void testGetFacebookID() {
+		//Checking if default values are returned
+		assertTrue(mManager.getFacebookID() == SettingsManager.DEFAULT_FB_ID);
+	}
 }

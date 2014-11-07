@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
  * @author ritterni
  */
 public class SettingsManager {
-    public static final String PREFS_NAME = "SettingsFile";
+    public static final String PREFS_NAME = "settings";
     public static final String USER_ID = "UserID";
     public static final String USER_NAME = "UserName";
     public static final String PHONE_NUMBER = "PhoneNumber";
