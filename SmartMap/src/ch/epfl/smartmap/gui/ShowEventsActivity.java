@@ -12,11 +12,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserEvent;
 
 /**
@@ -27,11 +27,12 @@ import ch.epfl.smartmap.cache.UserEvent;
  */
 public class ShowEventsActivity extends ListActivity {
 
+    private final static int SEEK_BAR_MIN_VALUE = 5;
+
+    private SeekBar mSeekBar;
+    private TextView mShowKilometers;
+
     // Mock
-    private List<User> mockUsersList;
-    private Friend julien;
-    private Friend robin;
-    private Friend alain;
     private List<Event> mockEventsList;
 
     @Override
@@ -39,28 +40,48 @@ public class ShowEventsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_events);
 
+        mShowKilometers = (TextView) findViewById(R.id.showEventKilometers);
         // By default, the seek bar is disabled. This is done programmatically as android:enabled="false" doesn't work
         // out in xml
-        SeekBar seekBar = (SeekBar) findViewById(R.id.showEventSeekBar);
-        seekBar.setEnabled(false);
+        mSeekBar = (SeekBar) findViewById(R.id.showEventSeekBar);
+        mSeekBar.setEnabled(false);
+        mSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
-        // Filling up mock stuff
-        mockUsersList = new ArrayList<User>();
-        julien = new Friend(1, "Julien Perrenoud");
-        julien.setOnline(true);
-        mockUsersList.add(julien);
-        robin = new Friend(2, "Robin Genolet");
-        robin.setOnline(false);
-        mockUsersList.add(robin);
-        alain = new Friend(2, "Alain Milliet");
-        alain.setOnline(false);
-        mockUsersList.add(alain);
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
+                    seekBar.setProgress(SEEK_BAR_MIN_VALUE);
+                }
+                mShowKilometers.setText(mSeekBar.getProgress() + " km");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+
+        });
 
         mockEventsList = new ArrayList<Event>();
-        UserEvent e1 = new UserEvent("Swag party", 2, new GregorianCalendar(), new GregorianCalendar(2014, 12, 1),
-                new Location("Robich provider"));
-        UserEvent e2 = new UserEvent("LOL Tournament", 1, new GregorianCalendar(), new GregorianCalendar(2014, 12, 1),
-                new Location("Robich provider"));
+
+        GregorianCalendar timeE1 = new GregorianCalendar();
+        timeE1.add(GregorianCalendar.DAY_OF_YEAR, 5);
+        GregorianCalendar timeEndE1 = new GregorianCalendar();
+        timeEndE1.add(GregorianCalendar.DAY_OF_YEAR, 10);
+
+        UserEvent e1 = new UserEvent("Swag party", 2, "Robich", timeE1, timeEndE1, new Location("Robich provider"));
+        e1.setPositionName("Lausanne");
+
+        GregorianCalendar timeE2 = new GregorianCalendar();
+        timeE2.add(GregorianCalendar.DAY_OF_YEAR, 1);
+        GregorianCalendar timeEndE2 = new GregorianCalendar();
+        timeEndE2.add(GregorianCalendar.DAY_OF_YEAR, 2);
+        UserEvent e2 = new UserEvent("LOL Tournament", 1, "Alain", timeE2, timeEndE2, new Location("Robich provider"));
+        e2.setPositionName("EPFL");
+
         mockEventsList.add(e1);
         mockEventsList.add(e2);
 

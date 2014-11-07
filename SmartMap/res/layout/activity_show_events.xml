@@ -51,6 +51,15 @@
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginTop="75dp" />
+        android:layout_marginTop="100dp" />
+
+    <TextView
+        android:id="@+id/showEventKilometers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@android:id/list"
+        android:layout_below="@+id/showEventSeekBar"
+        android:layout_marginLeft="14dp"
+        android:text="45 km" />
 
 </RelativeLayout>
