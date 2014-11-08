@@ -35,3 +35,5 @@ Libraries/google-play-services_lib/.classpath
 *~
 *.checkstyle
 *.classpath
+*.settings/
+*/bin/
