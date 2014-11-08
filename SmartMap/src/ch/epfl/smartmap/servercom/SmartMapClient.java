@@ -1,6 +1,9 @@
 package ch.epfl.smartmap.servercom;
 
 import java.util.List;
+import java.util.Map;
+
+import android.location.Location;
 
 import ch.epfl.smartmap.cache.Point;
 import ch.epfl.smartmap.cache.User;
@@ -18,8 +21,10 @@ public interface SmartMapClient {
 	/**
 	 * Send to the server the user's name, id and token
 	 * 
-	 * @param user
-	 *            the user who authenticates
+	 * @param name
+	 *            the name of the user who authenticates
+	 * @param facebookId
+	 *            the facebook id of the user
 	 * @param fbAccessToken
 	 * @throws SmartMapClientException
 	 */
@@ -29,10 +34,10 @@ public interface SmartMapClient {
 	/**
 	 * Asks to the server the friends positions
 	 * 
-	 * @return the list of friends (including their position)
+	 * @return a map that maps each friend id to a position
 	 * @throws SmartMapClientException
 	 */
-	List<User> listFriendPos() throws SmartMapClientException;
+	Map<Long, Location> listFriendPos() throws SmartMapClientException;
 
 	/**
 	 * Asks the server to follow the friend with id id
@@ -132,6 +137,6 @@ public interface SmartMapClient {
 	 * 
 	 * @throws SmartMapClientException
 	 */
-	void updatePos(Point position) throws SmartMapClientException;
+	void updatePos(Location location) throws SmartMapClientException;
 
 }

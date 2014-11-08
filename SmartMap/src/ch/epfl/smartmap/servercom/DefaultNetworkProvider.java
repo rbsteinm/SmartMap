@@ -32,20 +32,6 @@ public class DefaultNetworkProvider implements NetworkProvider {
 		return (HttpURLConnection) url.openConnection();
 	}
 	
-	public String read(URL url) throws IOException {
-
-
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-
-        String inputLine;
-        StringBuilder sb = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            sb.append(inputLine);
-        }
-        in.close();
-
-        return sb.toString();
-    }
+	
 
 }
