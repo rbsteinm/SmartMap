@@ -35,17 +35,9 @@ class DataController
     {
         $userId = User::getIdFromRequest($request);
         
-        $longitude = $request->request->get('longitude');
-        if ($longitude === null)
-        {
-            throw new ControlException('Post parameter longitude is not set !');
-        }
+        $longitude = $this->getPostParam($request, 'longitude');
         
-        $latitude = $request->request->get('latitude');
-        if ($latitude === null)
-        {
-            throw new ControlException('Post parameter latitude is not set !');
-        }
+        $latitude = $this->getPostParam($request, 'latitude');
         
         $user = $this->mRepo->getUser($userId);
         
@@ -86,7 +78,7 @@ class DataController
         
         $response = array(
                             'status' => 'Ok',
-                            'message' => 'Fetched friends positions',
+                            'message' => 'Fetched friends positions !',
                             'positions' => $list
                          );
         
@@ -102,11 +94,7 @@ class DataController
      */
     public function getUserInfo(Request $request)
     {
-        $id = $request->request->get('user_id');
-        if ($id === null)
-        {
-            throw new ControlException('Post parameter user_id is not set !');
-        }
+        $id = $this->getPostParam($request, 'user_id');
         
         $user = $this->mRepo->getUser($id);
         
@@ -132,11 +120,7 @@ class DataController
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         if ($userId == $friendId)
         {
@@ -188,7 +172,7 @@ class DataController
         
         $response = array(
                             'status' => 'Ok',
-                            'message' => 'Fetched invitations',
+                            'message' => 'Fetched invitations !',
                             'list' => $invitersList
                          );
         
@@ -206,11 +190,7 @@ class DataController
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         // We check that the friend invited the user
         $invitersIds = $this->mRepo->getInvitationIds($userId);
@@ -256,11 +236,10 @@ class DataController
      */
     public function findUsers(Request $request)
     {
-        $partialName = $request->request->get('search_text');
-        if ($partialName === null)
-        {
-            throw new ControlException('Post parameter search_text is not set !');
-        }
+        // We check that we are authenticated.
+        User::getIdFromRequest($request);
+        
+        $partialName = $this->getPostParam($request, 'search_text');
         
         $users = $this->mRepo->findUsersByPartialName($partialName);
         
@@ -273,5 +252,26 @@ class DataController
         $response = array('status' => 'Ok', 'message' => 'Fetched users !', 'list' => $data);
         
         return new JsonResponse($response);
+    }
+    
+    /**
+     * Utility function getting a post parameter and throwing a ControlException
+     * if the parameter is not set in the request.
+     *
+     * @param Request $request
+     * @param string $param
+     * @throws ControlException
+     * @return string
+     */
+    private function getPostParam(Request $request, $param)
+    {
+        $value = $request->request->get($param);
+        
+        if ($value === null)
+        {
+            throw new ControlException('Post parameter ' . $param . ' is not set !');
+        }
+        
+        return $value;
     }
 }
