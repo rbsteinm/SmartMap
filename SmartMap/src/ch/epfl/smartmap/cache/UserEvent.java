@@ -16,12 +16,12 @@ public class UserEvent implements Event {
     private final long mEvtCreator; //the user who created the event
     private final GregorianCalendar mStartDate;
     private final GregorianCalendar mEndDate;
-    private long evtID;
+    private long mID;
     private final Location mLocation;
     private String mPositionName;
     private String mCreatorName;
     private String mDescription;
-
+    public final static long DEFAULT_ID = -1;
     /**
      * UserEvent constructor
      * @param name The name of the event
@@ -55,6 +55,7 @@ public class UserEvent implements Event {
         mPositionName = "";
         mCreatorName = creatorName;
         mDescription = "";
+        mID = DEFAULT_ID;
     }
 
     @Override
@@ -102,12 +103,12 @@ public class UserEvent implements Event {
 
     @Override
     public long getID() {
-        return evtID;
+        return mID;
     }
 
     @Override
     public void setID(long newID) {
-        evtID = newID;
+        mID = newID;
     }
 
     @Override
