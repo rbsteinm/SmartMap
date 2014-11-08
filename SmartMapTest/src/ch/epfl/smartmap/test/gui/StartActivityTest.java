@@ -24,13 +24,11 @@ public class StartActivityTest extends
 	}
 
 	public void testLogoClick() throws Exception {
-		onView(withId(R.id.logo)).perform(click());
-		onView(withId(R.id.logo)).check(matches(isDisplayed()));
+		onView(withId(R.id.logo)).perform(click()).check(matches(isDisplayed()));
 	}
 	
 	public void testWelcomeClick() throws Exception {
-		onView(withId(R.id.welcome)).perform(click());
-		onView(withId(R.id.welcome)).check(matches(isDisplayed()));
+		onView(withId(R.id.welcome)).perform(click()).check(matches(isDisplayed()));
 	}
 
 }
