@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.SeekBar;
-import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
@@ -27,7 +26,9 @@ import ch.epfl.smartmap.cache.UserEvent;
  */
 public class ShowEventsActivity extends ListActivity {
 
-    private final static int SEEK_BAR_MIN_VALUE = 5;
+    private final static String TAG = ShowEventsActivity.class.getSimpleName();
+
+    private final static int SEEK_BAR_MIN_VALUE = 2;
 
     private SeekBar mSeekBar;
     private TextView mShowKilometers;
@@ -47,7 +48,9 @@ public class ShowEventsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_events);
 
-        mMyLocation = new Location("Mock location");
+        mMyLocation = new Location("Mock location Pully");
+        mMyLocation.setLatitude(46.509300);
+        mMyLocation.setLongitude(6.661600);
 
         mMyEventsChecked = false;
         mOngoingChecked = false;
@@ -66,6 +69,7 @@ public class ShowEventsActivity extends ListActivity {
                     seekBar.setProgress(SEEK_BAR_MIN_VALUE);
                 }
                 mShowKilometers.setText(mSeekBar.getProgress() + " km");
+                updateCurrentList();
             }
 
             @Override
@@ -84,32 +88,44 @@ public class ShowEventsActivity extends ListActivity {
         timeE0.add(GregorianCalendar.MINUTE, -5);
         GregorianCalendar timeEndE0 = new GregorianCalendar();
         timeEndE0.add(GregorianCalendar.HOUR_OF_DAY, 5);
+        Location lutry = new Location("Lutry");
+        lutry.setLatitude(46.506038);
+        lutry.setLongitude(6.685314);
 
-        UserEvent e0 = new UserEvent("Now Event", 2, "Robich", timeE0, timeEndE0, new Location("Robich provider"));
-        e0.setPositionName("Pully");
+        UserEvent e0 = new UserEvent("Now Event", 2, "Robich", timeE0, timeEndE0, lutry);
+        e0.setPositionName("Lutry");
 
         GregorianCalendar timeE1 = new GregorianCalendar();
         timeE1.add(GregorianCalendar.DAY_OF_YEAR, 5);
         GregorianCalendar timeEndE1 = new GregorianCalendar();
         timeEndE1.add(GregorianCalendar.DAY_OF_YEAR, 10);
+        Location lausanne = new Location("Lausanne");
+        lausanne.setLatitude(46.519962);
+        lausanne.setLongitude(6.633597);
 
-        UserEvent e1 = new UserEvent("Swag party", 2, "Robich", timeE1, timeEndE1, new Location("Robich provider"));
+        UserEvent e1 = new UserEvent("Swag party", 2, "Robich", timeE1, timeEndE1, lausanne);
         e1.setPositionName("Lausanne");
 
         GregorianCalendar timeE2 = new GregorianCalendar();
-        timeE2.add(GregorianCalendar.DAY_OF_YEAR, 1);
+        timeE2.add(GregorianCalendar.HOUR_OF_DAY, 3);
         GregorianCalendar timeEndE2 = new GregorianCalendar();
         timeEndE2.add(GregorianCalendar.DAY_OF_YEAR, 2);
+        Location epfl = new Location("EPFL");
+        epfl.setLatitude(46.526120);
+        epfl.setLongitude(6.563778);
 
-        UserEvent e2 = new UserEvent("LOL Tournament", 1, "Alain", timeE2, timeEndE2, new Location("Robich provider"));
+        UserEvent e2 = new UserEvent("LOL Tournament", 1, "Alain", timeE2, timeEndE2, epfl);
         e2.setPositionName("EPFL");
 
         GregorianCalendar timeE3 = new GregorianCalendar();
+        timeE3.add(GregorianCalendar.HOUR_OF_DAY, 1);
         GregorianCalendar timeEndE3 = new GregorianCalendar();
-        timeEndE3.add(GregorianCalendar.DAY_OF_YEAR, 1);
+        timeEndE3.add(GregorianCalendar.HOUR, 5);
+        Location verbier = new Location("Verbier");
+        verbier.setLatitude(46.096076);
+        verbier.setLongitude(7.228875);
 
-        UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Alain", timeE3, timeEndE3, new Location(
-                "Robich provider"));
+        UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Alain", timeE3, timeEndE3, verbier);
         e3.setPositionName("Verbier");
 
         mMockEventsList.add(e0);
@@ -118,7 +134,7 @@ public class ShowEventsActivity extends ListActivity {
         mMockEventsList.add(e3);
 
         // Create custom Adapter and pass it to the Activity
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mMockEventsList);
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mMockEventsList, mMyLocation);
         setListAdapter(adapter);
     }
 
@@ -209,20 +225,23 @@ public class ShowEventsActivity extends ListActivity {
             if (mNearMeChecked) {
                 double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
                         mMyLocation.getLatitude(), mMyLocation.getLongitude(), 'K');
-                Toast.makeText(this,
-                        "The distance between me and event " + e.getName() + " is " + distanceMeEvent + " km",
-                        Toast.LENGTH_LONG).show();
-                if (distanceMeEvent < (Double.parseDouble(mShowKilometers.getText().toString()))) {
-
+                /*
+                 * Toast.makeText( this, "The distance between me and event " + e.getName() + " @ " +
+                 * e.getPositionName() + " is " + distanceMeEvent + " km", Toast.LENGTH_LONG).show();
+                 */
+                String[] showKMContent = mShowKilometers.getText().toString().split(" ");
+                double distanceMax = Double.parseDouble(showKMContent[0]);
+                if (!(distanceMeEvent < distanceMax)) {
+                    mCurrentList.remove(e);
                 }
             }
         }
 
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mCurrentList);
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mCurrentList, mMyLocation);
         setListAdapter(adapter);
     }
 
-    private double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
+    protected static double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
         double theta = lon1 - lon2;
         double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1))
                 * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
@@ -237,11 +256,11 @@ public class ShowEventsActivity extends ListActivity {
         return (dist);
     }
 
-    private double deg2rad(double deg) {
+    private static double deg2rad(double deg) {
         return (deg * Math.PI / 180.0);
     }
 
-    private double rad2deg(double rad) {
+    private static double rad2deg(double rad) {
         return (rad * 180.0 / Math.PI);
     }
 

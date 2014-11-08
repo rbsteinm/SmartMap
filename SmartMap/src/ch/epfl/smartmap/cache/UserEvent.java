@@ -13,15 +13,15 @@ import android.location.Location;
  */
 public class UserEvent implements Event {
     private String mEvtName;
-    private long mEvtCreator; //the user who created the event
-    private GregorianCalendar mStartDate;
-    private GregorianCalendar mEndDate;
+    private final long mEvtCreator; //the user who created the event
+    private final GregorianCalendar mStartDate;
+    private final GregorianCalendar mEndDate;
     private long evtID;
-    private Location mLocation;
+    private final Location mLocation;
     private String mPositionName;
     private String mCreatorName;
     private String mDescription;
-    
+
     /**
      * UserEvent constructor
      * @param name The name of the event
@@ -40,44 +40,48 @@ public class UserEvent implements Event {
                 startDate.get(Calendar.DATE),
                 startDate.get(Calendar.HOUR),
                 startDate.get(Calendar.MINUTE));
-        
+
+        mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
+
         mEndDate = new GregorianCalendar(endDate.get(Calendar.YEAR),
                 endDate.get(Calendar.MONTH),
                 endDate.get(Calendar.DATE),
                 endDate.get(Calendar.HOUR),
                 endDate.get(Calendar.MINUTE));
-        
+
+        mEndDate.set(GregorianCalendar.HOUR_OF_DAY, endDate.get(GregorianCalendar.HOUR_OF_DAY));
+
         mLocation = new Location(p);
         mPositionName = "";
         mCreatorName = creatorName;
         mDescription = "";
     }
-    
+
     @Override
     public String getName() {
         return mEvtName;
     }
-    
+
     @Override
     public long getCreator() {
         return mEvtCreator;
     }
-    
+
     @Override
     public GregorianCalendar getStartDate() {
         return mStartDate;
     }
-    
+
     @Override
     public GregorianCalendar getEndDate() {
         return mEndDate;
     }
-    
+
     @Override
     public void setName(String newName) {
         mEvtName = newName;
     }
-    
+
     @Override
     public void setStartDate(GregorianCalendar newDate) {
         mStartDate.set(newDate.get(Calendar.YEAR),
@@ -86,7 +90,7 @@ public class UserEvent implements Event {
                 newDate.get(Calendar.HOUR),
                 newDate.get(Calendar.MINUTE));
     }
-    
+
     @Override
     public void setEndDate(GregorianCalendar newDate) {
         mEndDate.set(newDate.get(Calendar.YEAR),
@@ -124,7 +128,7 @@ public class UserEvent implements Event {
 	@Override
 	public void setLongitude(double x) {
 		mLocation.setLongitude(x);
-		
+
 	}
 
 	@Override
