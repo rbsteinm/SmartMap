@@ -24,7 +24,12 @@ class DataController
         $this->mRepo = $repo;
     }
     
-    /** Updates the user's position.
+    /**
+     * Updates the user's position.
+     * 
+     * @param Request $request
+     * @throws ControlException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function updatePos(Request $request)
     {
@@ -54,7 +59,11 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /* Gets the position of followed friends allowing it.
+    /**
+     * Gets the position of followed friends allowing it.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function listFriendsPos(Request $request)
     {
@@ -84,8 +93,12 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /** Gets the information for the user whose id is passed in user_id
-     * POST parameter.
+    /**
+     * Gets the information for the user whose id is passed in user_id POST parameter.
+     * 
+     * @param Request $request
+     * @throws ControlException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getUserInfo(Request $request)
     {
@@ -108,7 +121,12 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /** Sets an invitation for user with friend_id POST parameter.
+    /**
+     * Sets an invitation for user with friend_id POST parameter.
+     * 
+     * @param Request $request
+     * @throws ControlException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function inviteFriend(Request $request)
     {
@@ -146,8 +164,12 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /** Gets a list of user ids and names which are wanting to be friend
+    /**
+     * Gets a list of user ids and names which are wanting to be friend
      * with the current user.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getInvitations(Request $request)
     {
@@ -173,8 +195,12 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /** Accpets the invitation from the user with in POST parameter 
-     * friend_id.
+    /**
+     * Accpets the invitation from the user with in POST parameter friend_id.
+     * 
+     * @param Request $request
+     * @throws ControlException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function acceptInvitation(Request $request)
     {
@@ -220,8 +246,13 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /** Gets a list of user names and ids where name begins with post parameter
+    /**
+     * Gets a list of user names and ids where name begins with post parameter
      * search_text (ignores case). 
+     * 
+     * @param Request $request
+     * @throws ControlException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function findUsers(Request $request)
     {

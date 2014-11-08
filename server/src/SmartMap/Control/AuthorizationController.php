@@ -19,12 +19,13 @@ class AuthorizationController
 {
     private $mRepo;
     
-    function __construct($repo)
+    function __construct(UserRepository $repo)
     {
         $this->mRepo = $repo;
     }
     
-    /** Allow a friend to see the user's location.
+    /** 
+     * Allow a friend to see the user's location.
      * 
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -42,7 +43,8 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    /** Disallow a friend to see the user's location.
+    /** 
+     * Disallow a friend to see the user's location.
      * 
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -60,7 +62,8 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    /** Allow friends in a list of ids separated by commas to see
+    /** 
+     * Allow friends in a list of ids separated by commas to see
      * the user's location.
      * 
      * @param Request $request
@@ -81,7 +84,8 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    /** Disallow friends in a list of ids separaed by commas to see
+    /** 
+     * Disallow friends in a list of ids separaed by commas to see
      * the user's location.
      * 
      * @param Request $request
@@ -102,7 +106,8 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    /** Follow a friend to be notified of his position.
+    /** 
+     * Follow a friend to be notified of his position.
      * 
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -120,7 +125,8 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    /** Unfollow a friend to be no longer notified of his position.
+    /** 
+     * Unfollow a friend to be no longer notified of his position.
      * 
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -138,7 +144,8 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
-    /** Utility function transforming a list of numbers separated by commas
+    /** 
+     * Utility function transforming a list of numbers separated by commas
      * in an array of integers.
      * 
      * @param string $string
@@ -156,7 +163,8 @@ class AuthorizationController
         return $array;
     }
     
-    /** Utility function getting a post parameter and throwing a ControlException
+    /** 
+     * Utility function getting a post parameter and throwing a ControlException
      * if the parameter is not set in the request.
      * 
      * @param Request $request

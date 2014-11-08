@@ -1,13 +1,15 @@
 <?php
 
 use SmartMap\DBInterface\User;
+use SmartMap\Control\UserRepository;
 use SmartMap\Control\AuthorizationController;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
-/** Tests for the AuthorizationController class.
+/** 
+ * Tests for the AuthorizationController class.
  * To run them, run
  * $> phpunit --bootstrap vendor/autoload.php tests/AuthorizationControllerTest.php
  * from the server directory.
@@ -17,12 +19,20 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
 {
-    public function testValidAllowFriend()
+    private $mockRepo;
+    
+    public function setUp()
     {
-        $mockRepo = $this->getMock('UserRepository', array('setFriendshipStatus'));
-        $mockRepo->expects($this->once())
-                 ->method('setFriendshipStatus')
-                 ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('ALLOWED'));
+        $this->mockRepo = $this->getMockBuilder('SmartMap\DBInterface\UserRepository')
+                               ->disableOriginalConstructor()
+                               ->getMock();
+    }
+    
+    public function testValidAllowFriend()
+    {   
+        $this->mockRepo->expects($this->once())
+                       ->method('setFriendshipStatus')
+                       ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('ALLOWED'));
         
         $request = new Request($query = array(), $request = array('friend_id' => 15));
         
@@ -30,7 +40,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
         
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
         
         $response = $controller->allowFriend($request);
         
@@ -45,13 +55,11 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnauthenticatedAllowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository');
-        
         $request = new Request($query = array(), $request = array('friend_id' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $request->setSession($session);
         
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
         
         $controller->allowFriend($request);
     }
@@ -62,22 +70,19 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidParameterAllowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository');
-        
         $request = new Request($query = array(), $request = array('false_param' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $session->set('userId', 14);
         $request->setSession($session);
         
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
         
         $controller->allowFriend($request);
     }
     
     public function testValidDisallowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository', array('setFriendshipStatus'));
-        $mockRepo->expects($this->once())
+        $this->mockRepo->expects($this->once())
                  ->method('setFriendshipStatus')
                  ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('DISALLOWED'));
     
@@ -87,7 +92,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
     
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
     
         $response = $controller->disallowFriend($request);
     
@@ -102,13 +107,11 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnauthenticatedDisallowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository');
-    
         $request = new Request($query = array(), $request = array('friend_id' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $request->setSession($session);
     
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
     
         $controller->disallowFriend($request);
     }
@@ -119,22 +122,19 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidParameterDisallowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository');
-    
         $request = new Request($query = array(), $request = array('false_param' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $session->set('userId', 14);
         $request->setSession($session);
     
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
     
         $controller->disallowFriend($request);
     }
     
     public function testValidAllowFriendList()
     {
-        $mockRepo = $this->getMock('UserRepository', array('setFriendshipsStatus'));
-        $mockRepo->expects($this->once())
+        $this->mockRepo->expects($this->once())
                  ->method('setFriendshipsStatus')
                  ->with($this->equalTo(14), $this->equalTo(array(1,2,3,4,5)), $this->equalTo('ALLOWED'));
         
@@ -144,7 +144,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
         
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
         
         $response = $controller->allowFriendList($request);
         
@@ -159,13 +159,11 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnauthenticatedAllowFriendList()
     {
-        $mockRepo = $this->getMock('UserRepository');
-    
         $request = new Request($query = array(), $request = array('friend_id' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $request->setSession($session);
     
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
     
         $controller->allowFriendList($request);
     }
@@ -176,22 +174,19 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidParameterAllowFriendList()
     {
-        $mockRepo = $this->getMock('UserRepository');
-    
         $request = new Request($query = array(), $request = array('false_param' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $session->set('userId', 14);
         $request->setSession($session);
     
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
     
         $controller->allowFriend($request);
     }
     
     public function testValidDisallowFriendList()
     {
-        $mockRepo = $this->getMock('UserRepository', array('setFriendshipsStatus'));
-        $mockRepo->expects($this->once())
+        $this->mockRepo->expects($this->once())
         ->method('setFriendshipsStatus')
         ->with($this->equalTo(14), $this->equalTo(array(1,2,3,4,5)), $this->equalTo('DISALLOWED'));
     
@@ -201,7 +196,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
     
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
     
         $response = $controller->disallowFriendList($request);
     
@@ -216,13 +211,11 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnauthenticatedDisallowFriendList()
     {
-        $mockRepo = $this->getMock('UserRepository');
-    
         $request = new Request($query = array(), $request = array('friend_id' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $request->setSession($session);
     
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
     
         $controller->disallowFriendList($request);
     }
@@ -233,22 +226,19 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidParameterDisallowFriendList()
     {
-        $mockRepo = $this->getMock('UserRepository');
-    
         $request = new Request($query = array(), $request = array('false_param' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $session->set('userId', 14);
         $request->setSession($session);
     
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
     
         $controller->disallowFriendList($request);
     }
     
     public function testValidFollowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository', array('setFriendshipFollow'));
-        $mockRepo->expects($this->once())
+        $this->mockRepo->expects($this->once())
         ->method('setFriendshipFollow')
         ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('FOLLOWED'));
         
@@ -258,7 +248,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
         
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
         
         $response = $controller->followFriend($request);
         
@@ -273,13 +263,11 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnauthenticatedFollowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository');
-        
         $request = new Request($query = array(), $request = array('friend_id' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $request->setSession($session);
         
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
         
         $controller->followFriend($request);
     }
@@ -290,22 +278,19 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidParameterFollowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository');
-    
         $request = new Request($query = array(), $request = array('false_param' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $session->set('userId', 14);
         $request->setSession($session);
     
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
     
         $controller->followFriend($request);
     }
     
     public function testValidUnfollowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository', array('setFriendshipFollow'));
-        $mockRepo->expects($this->once())
+        $this->mockRepo->expects($this->once())
         ->method('setFriendshipFollow')
         ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('UNFOLLOWED'));
     
@@ -315,7 +300,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
     
-        $controller = new AuthorizationController($mockRepo);
+        $controller = new AuthorizationController($this->mockRepo);
     
         $response = $controller->unfollowFriend($request);
     
@@ -330,14 +315,12 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnauthenticatedUnfollowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository');
-    
         $request = new Request($query = array(), $request = array('friend_id' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $request->setSession($session);
-    
-        $controller = new AuthorizationController($mockRepo);
-    
+        
+        $controller = new AuthorizationController($this->mockRepo);
+        
         $controller->unfollowFriend($request);
     }
     
@@ -347,15 +330,13 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidParameterUnfollowFriend()
     {
-        $mockRepo = $this->getMock('UserRepository');
-    
         $request = new Request($query = array(), $request = array('false_param' => 15));
         $session =  new Session(new MockArraySessionStorage());
         $session->set('userId', 14);
         $request->setSession($session);
-    
-        $controller = new AuthorizationController($mockRepo);
-    
+        
+        $controller = new AuthorizationController($this->mockRepo);
+        
         $controller->unfollowFriend($request);
     }
 }
