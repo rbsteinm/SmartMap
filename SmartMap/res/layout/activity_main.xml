@@ -47,14 +47,15 @@
 
         <Button
             android:id="@+id/searchButton"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Search"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="12dp"
             android:alpha="0.7"
-            android:textColor="#222222" 
-            android:background="#ffffff" 
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp" />
+            android:background="#ffffff"
+            android:text="Search..."
+            android:padding="12dp"
+            android:textColor="#222222" />
     </RelativeLayout>
 
     <ch.epfl.smartmap.gui.SearchLayout
@@ -105,21 +106,15 @@
                     android:textSize="25sp" />
             </LinearLayout>
 
-            <ScrollView
+            <ListView
+                android:id="@+id/search_result_list"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:orientation="vertical"
-                android:overScrollMode="never" >
-
-                <LinearLayout
-                    android:id="@+id/search_result_list"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" >
-                </LinearLayout>
-            </ScrollView>
+                android:overScrollMode="never" />
         </LinearLayout>
     </ch.epfl.smartmap.gui.SearchLayout>
+
 </FrameLayout>

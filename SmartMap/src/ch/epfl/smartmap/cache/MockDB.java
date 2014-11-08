@@ -3,6 +3,7 @@
  */
 package ch.epfl.smartmap.cache;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

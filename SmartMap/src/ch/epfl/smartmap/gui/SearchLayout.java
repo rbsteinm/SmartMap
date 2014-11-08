@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -8,14 +9,16 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
+import ch.epfl.smartmap.cache.User;
 
 /**
  * Represents a Panel that can can be opened or closed from the bottom of the activity. It contains A search bar
@@ -40,6 +43,8 @@ public class SearchLayout extends RelativeLayout {
     private final Context mContext;
     private InitState mInitState;
     private final SearchEngine mSearchEngine;
+    private final SearchResultItemAdapter mSearchResultItemAdapter;
+    private final ArrayList<Friend> mSearchResultList;
 
     /**
      * Constructor
@@ -53,7 +58,8 @@ public class SearchLayout extends RelativeLayout {
         mContext = context;
         mInitState = InitState.NOT_INITIALIZED;
         mSearchEngine = searchEngine;
-
+        mSearchResultList = new ArrayList<Friend>();
+        mSearchResultItemAdapter = new SearchResultItemAdapter(context, MockDB.FRIENDS_LIST);
         this.setVisibility(View.GONE);
     }
 
@@ -80,8 +86,9 @@ public class SearchLayout extends RelativeLayout {
 
         // Get Views
         final SearchView mSearchView = (SearchView) findViewById(R.id.searchBar);
-        final LinearLayout mSearchResultList = (LinearLayout) findViewById(R.id.search_result_list);
+        final ListView mSearchResultListView = (ListView) findViewById(R.id.search_result_list);
 
+        mSearchResultListView.setAdapter(mSearchResultItemAdapter);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 
             public boolean onQueryTextSubmit(String query) {
@@ -97,12 +104,12 @@ public class SearchLayout extends RelativeLayout {
             }
         });
 
-        mSearchResultList.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSearchView.clearFocus();
-            }
-        });
+//        mSearchResultList.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mSearchView.clearFocus();
+//            }
+//        });
 
         mInitState = InitState.INITIALIZED;
     }
@@ -112,7 +119,7 @@ public class SearchLayout extends RelativeLayout {
      */
     private void updateSearchResults() {
         // Get needed Views
-        final LinearLayout mSearchResultList = (LinearLayout) this
+        final ListView mSearchResultList = (ListView) this
             .findViewById(R.id.search_result_list);
         final SearchView mSearchBarEditText = (SearchView) this
             .findViewById(R.id.searchBar);
@@ -121,21 +128,20 @@ public class SearchLayout extends RelativeLayout {
         String query = mSearchBarEditText.getQuery().toString();
         List<Friend> result = mSearchEngine.sendQuery(query);
 
-        clearSearchResults();
-        for (Friend f : result) {
-            mSearchResultList.addView(SearchResultViewFactory.getSearchResultView(mContext, f));
-        }
+        mSearchResultItemAdapter.clear();
+        mSearchResultItemAdapter.addAll(result);
+        mSearchResultItemAdapter.notifyDataSetChanged();
     }
 
     /**
      * Remove all search results.
      */
-    private void clearSearchResults() {
-        // Get needed Views
-        final LinearLayout mSearchResultList = (LinearLayout) this
-            .findViewById(R.id.search_result_list);
-        mSearchResultList.removeAllViews();
-    }
+    // private void clearSearchResults() {
+    // // Get needed Views
+    // final LinearLayout mSearchResultList = (LinearLayout) this
+    // .findViewById(R.id.search_result_list);
+    // mSearchResultList.removeAllViews();
+    // }
 
     /**
      * Opens the panel and displays it full screen
@@ -165,7 +171,7 @@ public class SearchLayout extends RelativeLayout {
 
         this.startAnimation(topDown);
         this.setVisibility(View.GONE);
-        clearSearchResults();
+        // clearSearchResults();
         clearFocus();
     }
 

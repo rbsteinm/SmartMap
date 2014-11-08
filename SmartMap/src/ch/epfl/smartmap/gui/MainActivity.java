@@ -1,5 +1,7 @@
 package ch.epfl.smartmap.gui;
 
+import java.util.Arrays;
+
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
@@ -46,7 +48,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private static final double CENTER_LONGITUDE = 2.00168440;
     private static final int LATLNG_BOUNDS = 50;
     private static final int MARKER_ZOOM = 5;
-    
+
     @SuppressWarnings("unused")
     private DrawerLayout mSideDrawerLayout;
     private String[] mSideLayoutElements;
@@ -79,7 +81,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             zoomAccordingToMarkers();
         }
 
-        mSearchButton.setOnClickListener(new OnClickListener() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+            android.R.layout.simple_dropdown_item_1line, Arrays.asList("Lol",
+                "MDR", "fag"));
+//        mSearchButton.setAdapter(adapter);
+        mSearchButton.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View v) {
                 mSearchLayout.open();
@@ -225,7 +231,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                         @Override
                         public
                         void onGlobalLayout() {
-                        LatLng centre = new LatLng(CENTER_LATTITUDE, CENTER_LONGITUDE);
+                        LatLng centre = new LatLng(CENTER_LATTITUDE,
+                            CENTER_LONGITUDE);
                         LatLngBounds bounds = new LatLngBounds.Builder()
                             .include(centre).build();
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
@@ -237,7 +244,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                         }
                         mGoogleMap.moveCamera(CameraUpdateFactory
                             .newLatLngBounds(bounds, LATLNG_BOUNDS));
-                        mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(MARKER_ZOOM));
+                        mGoogleMap.animateCamera(CameraUpdateFactory
+                            .zoomTo(MARKER_ZOOM));
 
                     }
                 });
