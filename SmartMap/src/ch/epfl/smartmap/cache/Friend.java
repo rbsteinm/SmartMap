@@ -60,7 +60,6 @@ public class Friend implements User {
 		mLocation = new Location(PROVIDER_NAME);
 		mVisible = true;
 		mOnline = false;
-		
 	}
 
 	public Friend(long userID, String userName, double latitude, double longitude) {

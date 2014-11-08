@@ -124,7 +124,9 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Test
     public void testAddEvent() {
         dbh.addEvent(event);
-        assertTrue(dbh.getEvent(event.getID()).getCreatorName().equals(event.getCreatorName()));
+        assertTrue(dbh.getEvent(event.getID()).getCreatorName().equals(event.getCreatorName())
+                && dbh.getEvent(event.getID()).getStartDate().get(GregorianCalendar.MINUTE) 
+                == event.getStartDate().get(GregorianCalendar.MINUTE));
     }
     
     @Test

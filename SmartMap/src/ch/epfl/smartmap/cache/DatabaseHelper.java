@@ -34,28 +34,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_POSX = "posX";
     private static final String KEY_POSY = "posY";
     private static final String KEY_POSNAME = "posName";
-
+    private static final String KEY_ONLINE = "isOnline";
+    private static final String KEY_LASTSEEN = "lastSeen";
+    private static final String KEY_VISIBLE = "isVisible";
+    
     private static final String KEY_ID = "id";
     private static final String KEY_FILTER_ID = "filterID";
     
-    private static final String KEY_YEAR = "year";
-    private static final String KEY_MONTH = "month";
-    private static final String KEY_DATE = "day";
-    private static final String KEY_HOUR = "hour";
-    private static final String KEY_MINUTE = "minute";
-    
-    private static final String KEY_ENDYEAR = "endYear";
-    private static final String KEY_ENDMONTH = "endMonth";
-    private static final String KEY_ENDDATE = "endDay";
-    private static final String KEY_ENDHOUR = "endHour";
-    private static final String KEY_ENDMINUTE = "endMinute";
+    private static final String KEY_DATE = "date";
+    private static final String KEY_ENDDATE = "endDate";
     
     private static final String KEY_CREATOR_NAME = "creatorName";
     private static final String KEY_EVTDESC = "eventDescription";
     
     //Columns for the User table
     private static final String[] USER_COLUMNS = {
-        KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL, KEY_POSX, KEY_POSY, KEY_POSNAME
+        KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL,
+        KEY_POSX, KEY_POSY, KEY_POSNAME, KEY_ONLINE, KEY_LASTSEEN, KEY_VISIBLE
     };
     
     //Columns for the Filter table
@@ -70,9 +65,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     
     //Columns for the Event table
     private static final String[] EVENT_COLUMNS = {
-        KEY_ID, KEY_NAME, KEY_EVTDESC, KEY_USER_ID, KEY_CREATOR_NAME, KEY_POSX, KEY_POSY, KEY_POSNAME,
-        KEY_YEAR, KEY_MONTH, KEY_DATE, KEY_HOUR, KEY_MINUTE,
-        KEY_ENDYEAR, KEY_ENDMONTH, KEY_ENDDATE, KEY_ENDHOUR, KEY_ENDMINUTE
+        KEY_ID, KEY_NAME, KEY_EVTDESC, KEY_USER_ID, KEY_CREATOR_NAME, 
+        KEY_POSX, KEY_POSY, KEY_POSNAME, KEY_DATE, KEY_ENDDATE
     };
     
     //Table of users
@@ -84,7 +78,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_EMAIL + " TEXT,"
             + KEY_POSX + " DOUBLE,"
             + KEY_POSY + " DOUBLE,"
-            + KEY_POSNAME + " TEXT"
+            + KEY_POSNAME + " TEXT,"
+            + KEY_ONLINE + " INTEGER,"
+            + KEY_LASTSEEN + " INTEGER,"
+            + KEY_VISIBLE + " INTEGER"
             + ")";
     
     //Table of filters
@@ -113,16 +110,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_POSX + " DOUBLE,"
             + KEY_POSY + " DOUBLE,"
             + KEY_POSNAME + " TEXT,"
-            + KEY_YEAR + " INTEGER,"
-            + KEY_MONTH + " INTEGER,"
             + KEY_DATE + " INTEGER,"
-            + KEY_HOUR + " INTEGER,"
-            + KEY_MINUTE + " INTEGER,"
-            + KEY_ENDYEAR + " INTEGER,"
-            + KEY_ENDMONTH + " INTEGER,"
-            + KEY_ENDDATE + " INTEGER,"
-            + KEY_ENDHOUR + " INTEGER,"
-            + KEY_ENDMINUTE + " INTEGER"
+            + KEY_ENDDATE + " INTEGER"
             + ")";
       
     public DatabaseHelper(Context context) {
@@ -171,6 +160,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_POSX, user.getLocation().getLongitude());
         values.put(KEY_POSY, user.getLocation().getLatitude());
         values.put(KEY_POSNAME, user.getPositionName());
+        values.put(KEY_ONLINE, user.isOnline() ? 1 : 0); //boolean to int
+        values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
+        values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); //boolean to int
      
         db.insert(TABLE_USER, null, values);
      
@@ -199,7 +191,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             cursor.moveToFirst();
         }
-     
+        
+        
         Friend friend = new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
                 cursor.getString(cursor.getColumnIndex(KEY_NAME)));
         friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
@@ -207,6 +200,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
         friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
         friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
+        friend.setOnline(cursor.getInt(cursor.getColumnIndex(KEY_ONLINE)) == 1); //int to boolean
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
+        friend.setLastSeen(cal);
+        friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); //int to boolean
         
         return friend;
     }
@@ -233,7 +231,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
                 friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
                 friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
-  
+                friend.setOnline(cursor.getInt(cursor.getColumnIndex(KEY_ONLINE)) == 1); //int to boolean
+                GregorianCalendar cal = new GregorianCalendar();
+                cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
+                friend.setLastSeen(cal);
+                friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); //int to boolean
+                
                 friends.put(friend.getID(), friend);
             } while (cursor.moveToNext());
         }
@@ -258,6 +261,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_POSX, user.getLocation().getLongitude());
         values.put(KEY_POSY, user.getLocation().getLatitude());
         values.put(KEY_POSNAME, user.getPositionName());
+        values.put(KEY_ONLINE, user.isOnline() ? 1 : 0); //boolean to int
+        values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
+        values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); //boolean to int
         
         int rows = db.update(TABLE_USER,
                 values,
@@ -432,16 +438,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_POSX, event.getLocation().getLongitude());
         values.put(KEY_POSY, event.getLocation().getLatitude());
         values.put(KEY_POSNAME, event.getPositionName());
-        values.put(KEY_YEAR, event.getStartDate().get(Calendar.YEAR));
-        values.put(KEY_MONTH, event.getStartDate().get(Calendar.MONTH));
-        values.put(KEY_DATE, event.getStartDate().get(Calendar.DATE));
-        values.put(KEY_HOUR, event.getStartDate().get(Calendar.HOUR));
-        values.put(KEY_MINUTE, event.getStartDate().get(Calendar.MINUTE));
-        values.put(KEY_ENDYEAR, event.getEndDate().get(Calendar.YEAR));
-        values.put(KEY_ENDMONTH, event.getEndDate().get(Calendar.MONTH));
-        values.put(KEY_ENDDATE, event.getEndDate().get(Calendar.DATE));
-        values.put(KEY_ENDHOUR, event.getEndDate().get(Calendar.HOUR));
-        values.put(KEY_ENDMINUTE, event.getEndDate().get(Calendar.MINUTE));
+        values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
+        values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
      
         db.insert(TABLE_EVENT, null, values);
         
@@ -470,17 +468,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
         }
      
-        GregorianCalendar startDate = new GregorianCalendar(cursor.getInt(cursor.getColumnIndex(KEY_YEAR)),
-                cursor.getInt(cursor.getColumnIndex(KEY_MONTH)),
-                cursor.getInt(cursor.getColumnIndex(KEY_DATE)),
-                cursor.getInt(cursor.getColumnIndex(KEY_HOUR)),
-                cursor.getInt(cursor.getColumnIndex(KEY_MINUTE)));
+        GregorianCalendar startDate = new GregorianCalendar();
+        GregorianCalendar endDate = new GregorianCalendar();
         
-        GregorianCalendar endDate = new GregorianCalendar(cursor.getInt(cursor.getColumnIndex(KEY_ENDYEAR)),
-                cursor.getInt(cursor.getColumnIndex(KEY_ENDMONTH)),
-                cursor.getInt(cursor.getColumnIndex(KEY_ENDDATE)),
-                cursor.getInt(cursor.getColumnIndex(KEY_ENDHOUR)),
-                cursor.getInt(cursor.getColumnIndex(KEY_ENDMINUTE)));
+        startDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_DATE)));
+        endDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_ENDDATE)));
         
         Location loc = new Location("");
         loc.setLongitude(cursor.getColumnIndex(KEY_POSX));
@@ -552,16 +544,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_POSX, event.getLocation().getLongitude());
         values.put(KEY_POSY, event.getLocation().getLatitude());
         values.put(KEY_POSNAME, event.getPositionName());
-        values.put(KEY_YEAR, event.getStartDate().get(Calendar.YEAR));
-        values.put(KEY_MONTH, event.getStartDate().get(Calendar.MONTH));
-        values.put(KEY_DATE, event.getStartDate().get(Calendar.DATE));
-        values.put(KEY_HOUR, event.getStartDate().get(Calendar.HOUR));
-        values.put(KEY_MINUTE, event.getStartDate().get(Calendar.MINUTE));
-        values.put(KEY_ENDYEAR, event.getEndDate().get(Calendar.YEAR));
-        values.put(KEY_ENDMONTH, event.getEndDate().get(Calendar.MONTH));
-        values.put(KEY_ENDDATE, event.getEndDate().get(Calendar.DATE));
-        values.put(KEY_ENDHOUR, event.getEndDate().get(Calendar.HOUR));
-        values.put(KEY_ENDMINUTE, event.getEndDate().get(Calendar.MINUTE));
+        values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
+        values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
         
         int rows = db.update(TABLE_EVENT,
                 values,
