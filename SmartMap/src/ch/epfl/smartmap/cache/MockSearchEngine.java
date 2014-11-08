@@ -1,6 +1,3 @@
-/**
- * 
- */
 package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
@@ -8,8 +5,9 @@ import java.util.List;
 import java.util.Locale;
 
 /**
+ * Mock class that returns filtered Lists from {@code MockDB}.
+ * 
  * @author jfperren
- *
  */
 public class MockSearchEngine implements SearchEngine {
 
@@ -18,20 +16,18 @@ public class MockSearchEngine implements SearchEngine {
      */
     @Override
     public List<Friend> sendQuery(String query) {
-        if(query == ""){
+        if (query.equals("")) {
             return new ArrayList<Friend>();
         }
         query = query.toLowerCase(Locale.US);
         ArrayList<Friend> result = new ArrayList<Friend>();
-        MockDB mMockDB = new MockDB();
         
-        for (Friend f : mMockDB.FRIENDS_LIST){
-            if(f.getName().toLowerCase(Locale.US).contains(query)){
+        for (Friend f : MockDB.FRIENDS_LIST) {
+            if (f.getName().toLowerCase(Locale.US).contains(query)) {
                 result.add(f);
             }
         }
         
         return result;
     }
-
 }

@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.test.login;
+package ch.epfl.smartmap.test.gui;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
@@ -28,6 +28,4 @@ public class StartActivityTest extends
 		onView(withId(R.id.logo)).check(matches(isDisplayed()));
 	}
 
-	// public void testWelcomeClick() throws Exception {
-	// }
 }

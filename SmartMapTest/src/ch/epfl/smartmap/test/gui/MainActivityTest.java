@@ -1,18 +1,16 @@
 package ch.epfl.smartmap.test.gui;
 
-import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.gui.MainActivity;
-import android.test.ActivityInstrumentationTestCase2;
-
-import static com.google.android.apps.common.testing.ui.espresso.Espresso.pressBack;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
-import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.typeText;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static com.google.android.apps.common.testing.ui.espresso.Espresso.pressBack;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.hasFocus;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.not;
+import android.test.ActivityInstrumentationTestCase2;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.gui.MainActivity;
 
 public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity>
 {

@@ -1,11 +1,11 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,32 +13,26 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.MockDB;
-import ch.epfl.smartmap.cache.Friend;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-
 import com.google.android.gms.maps.model.LatLng;
-
 import com.google.android.gms.maps.model.LatLngBounds;
 
 /**
@@ -46,11 +40,14 @@ import com.google.android.gms.maps.model.LatLngBounds;
  * 
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
-
 	private static final String TAG = "GoogleMap";
 	private static final int LOCATION_UPDATE_TIMEOUT = 20000;
 	private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
 	private static final int GMAP_ZOOM_LEVEL = 15;
+	private static final double CENTER_LATTITUDE = 47.20380010;
+	private static final double CENTER_LONGITUDE = 2.00168440;
+	private static final int LATLNG_BOUNDS = 50;
+	private static final int MARKER_ZOOM = 5;
 
 	@SuppressWarnings("unused")
 	private DrawerLayout mSideDrawerLayout;
@@ -59,32 +56,31 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
 	private GoogleMap mGoogleMap;
 	private ProfilePictureFriendMarkerDisplayer mFriendMarkerDisplayer;
-	
-	private MockDB mMockDB;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		// Get needed Views
+		final Button mSearchButton = (Button) findViewById(R.id.searchButton);
+		final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+
+		// FIXME : Should be done in DrawerLayout class
 		initializeDrawerLayout();
+		mSearchLayout.initSearchLayout();
+
 		if (savedInstanceState == null) {
 			displayMap();
 		}
+
 		if (mGoogleMap != null) {
-		    mMockDB = new MockDB();
-		    mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-			mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, mMockDB.FRIENDS_LIST);
+			mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
+			mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
+					MockDB.FRIENDS_LIST);
 			zoomAccordingToMarkers();
 		}
 
-		/*
-		 * BELOW GOES SEARCHBAR & SLIDINGUPPANEL INIT
-		 */
-
-		final Button mSearchButton = (Button) findViewById(R.id.searchButton);
-		final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
-		mSearchLayout.initSearchLayout();
 		mSearchButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -124,24 +120,24 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	@Override
 	public void onBackPressed() {
 		final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+
 		if (mSearchLayout.isShown()) {
 			mSearchLayout.close();
 		} else {
 			super.onBackPressed();
 		}
-
 	}
 
 	/**
 	 * Called to set up the left side menu. Supposedly called only once.
 	 */
 	private void initializeDrawerLayout() {
-		// Get ressources
+		// Get needed Ressources & Views
 		mSideLayoutElements = getResources().getStringArray(
 				R.array.sideMenuElements);
-
 		mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerListView = (ListView) findViewById(R.id.left_drawer);
+
 		// Set the adapter for the listView
 		mDrawerListView.setAdapter(new ArrayAdapter<String>(this,
 				R.layout.drawer_list_item, mSideLayoutElements));
@@ -181,8 +177,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			dialog.show();
 
 		} else {
-			// Google Play Services are available
-
+			// Google Play Services are available.
 			// Getting reference to the SupportMapFragment of activity_main.xml
 			SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.map);
@@ -226,11 +221,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		if (mapView.getViewTreeObserver().isAlive()) {
 			mapView.getViewTreeObserver().addOnGlobalLayoutListener(
 					new OnGlobalLayoutListener() {
+						@SuppressWarnings("deprecation")
 						@SuppressLint("NewApi")
 						// We check which build version we are using.
 						@Override
 						public void onGlobalLayout() {
-							LatLng centre = new LatLng(47.20380010, 2.00168440);
+							LatLng centre = new LatLng(CENTER_LATTITUDE,
+									CENTER_LONGITUDE);
 							LatLngBounds bounds = new LatLngBounds.Builder()
 									.include(centre).build();
 							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
@@ -241,9 +238,9 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 										.removeOnGlobalLayoutListener(this);
 							}
 							mGoogleMap.moveCamera(CameraUpdateFactory
-									.newLatLngBounds(bounds, 50));
+									.newLatLngBounds(bounds, LATLNG_BOUNDS));
 							mGoogleMap.animateCamera(CameraUpdateFactory
-									.zoomTo(5));
+									.zoomTo(MARKER_ZOOM));
 
 						}
 					});
@@ -259,8 +256,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 */
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-
+		// nothing
 	}
 
 	/*
@@ -271,8 +267,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 */
 	@Override
 	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-
+		// nothing
 	}
 
 	/*
@@ -283,7 +278,30 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 */
 	@Override
 	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
+		// nothing
+	}
+
+	/**
+	 * TODO JAVADOC
+	 */
+	public void createNotification(View view) {
+		// Prepare intent which is triggered if the
+		// notification is selected
+		Intent intent = new Intent(this, MainActivity.class);
+		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+		// Build notification
+		// Actions are just fake
+		NotificationCompat.Builder noti = new NotificationCompat.Builder(this);
+		noti.setContentTitle("TITLE OF NOTIFICATION");
+		noti.setContentText("SUBJECT OF NOTIFICATION").setSmallIcon(R.drawable.icon);
+		noti.setContentIntent(pIntent);
+		noti.addAction(0, "Call", pIntent);
+		noti.addAction(0, "More", pIntent);
+		noti.addAction(0, "And more", pIntent).build();
+		NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		notificationManager.notify(0, noti.build());
 
 	}
+
 }
