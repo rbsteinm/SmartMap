@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item name="test_ids_xml_id" type="id"/>    
+<resources name="side_menu_ids">
+    <item name="side_menu_profile" type="id"/>
+    <item name="side_menu_friends" type="id"/>
+    <item name="side_menu_events" type="id"/>
+    <item name="side_menu_filters" type="id"/>
+    <item name="side_menu_settings" type="id"/>
 </resources>

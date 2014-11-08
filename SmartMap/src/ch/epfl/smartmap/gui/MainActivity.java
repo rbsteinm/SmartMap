@@ -10,16 +10,13 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.MockDB;
 
@@ -47,11 +44,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private static final int LATLNG_BOUNDS = 50;
     private static final int MARKER_ZOOM = 5;
     
-    @SuppressWarnings("unused")
-    private DrawerLayout mSideDrawerLayout;
-    private String[] mSideLayoutElements;
-    private ListView mDrawerListView;
-
+    private SideMenu sideMenu;
     private GoogleMap mGoogleMap;
     private ProfilePictureFriendMarkerDisplayer mFriendMarkerDisplayer;
 
@@ -64,8 +57,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         final Button mSearchButton = (Button) findViewById(R.id.searchButton);
         final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
 
-        // FIXME : Should be done in DrawerLayout class
-        initializeDrawerLayout();
+        sideMenu = new SideMenu(this);
+        sideMenu.initializeDrawerLayout();
         mSearchLayout.initSearchLayout();
 
         if (savedInstanceState == null) {
@@ -124,22 +117,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         } else {
             super.onBackPressed();
         }
-    }
-
-    /**
-     * Called to set up the left side menu. Supposedly called only once.
-     */
-    private void initializeDrawerLayout() {
-        // Get needed Ressources & Views
-        mSideLayoutElements = getResources().getStringArray(
-            R.array.sideMenuElements);
-        mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerListView = (ListView) findViewById(R.id.left_drawer);
-
-        // Set the adapter for the listView
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(this,
-            R.layout.drawer_list_item, mSideLayoutElements));
-        mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
     }
 
     public Context getContext() {
