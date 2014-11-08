@@ -31,6 +31,7 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
     /**
      * An adapter for event's list
+     *
      * @param context
      * @param itemsArrayList
      */
@@ -71,16 +72,21 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
         String endDateTextContent = "end: ";
 
-        if (hoursTillEvent <= FORTY_EIGHT_HOURS) {
-            startDateTextContent = "starts in "
-                    + Long.toString(hoursTillEvent)
-                    + " hours and "
-                    + Long.toString((getDateDiff(now.getTime(), start.getTime(), TimeUnit.MINUTES))
-                            - (hoursTillEvent * MINUTES_IN_A_HOUR)) + " minutes";
+        if (start.before(now)) {
+            // Ongoing event
+            startDateTextContent = "Event is live!";
         } else {
-            // Add 1 to the month because jan = 0
-            startDateTextContent = "starts: " + start.get(GregorianCalendar.DAY_OF_MONTH) + "/"
-                    + (start.get(GregorianCalendar.MONTH) + 1) + "/" + start.get(GregorianCalendar.YEAR);
+            if (hoursTillEvent <= FORTY_EIGHT_HOURS) {
+                startDateTextContent = "starts in "
+                        + Long.toString(hoursTillEvent)
+                        + " hours and "
+                        + Long.toString((getDateDiff(now.getTime(), start.getTime(), TimeUnit.MINUTES))
+                                - (hoursTillEvent * MINUTES_IN_A_HOUR)) + " minutes";
+            } else {
+                // Add 1 to the month because jan = 0
+                startDateTextContent = "starts: " + start.get(GregorianCalendar.DAY_OF_MONTH) + "/"
+                        + (start.get(GregorianCalendar.MONTH) + 1) + "/" + start.get(GregorianCalendar.YEAR);
+            }
         }
 
         if (hoursTillEnd <= FORTY_EIGHT_HOURS) {
