@@ -27,5 +27,10 @@ public class StartActivityTest extends
 		onView(withId(R.id.logo)).perform(click());
 		onView(withId(R.id.logo)).check(matches(isDisplayed()));
 	}
+	
+	public void testWelcomeClick() throws Exception {
+		onView(withId(R.id.welcome)).perform(click());
+		onView(withId(R.id.welcome)).check(matches(isDisplayed()));
+	}
 
 }
