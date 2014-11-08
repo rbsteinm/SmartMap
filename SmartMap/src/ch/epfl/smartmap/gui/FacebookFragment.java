@@ -31,9 +31,8 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 
 /**
- * <<<<<<< HEAD The fragment for the "Login with Facebook" button, that is used
- * in scrim (1) - Welcome ======= The fragment for the "Login with Facebook"
- * button, that is used in scrim (1) - Welcome >>>>>>> dev
+ * The fragment for the "Login with Facebook"
+ * button, that is used in scrim (1) - Welcome
  * 
  * @author SpicyCH
  * 
