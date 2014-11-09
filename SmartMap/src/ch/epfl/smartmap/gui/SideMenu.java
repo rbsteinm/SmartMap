@@ -3,7 +3,6 @@ package ch.epfl.smartmap.gui;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
 
@@ -34,8 +33,7 @@ public class SideMenu extends DrawerLayout {
      */
     public void initializeDrawerLayout() {
         // Set the adapter for the listView
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(mContext, R.layout.drawer_list_item,
-                mSideLayoutElements));
+        mDrawerListView.setAdapter(new SideMenuAdapter(mContext, mSideLayoutElements));
         mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
     }
 }

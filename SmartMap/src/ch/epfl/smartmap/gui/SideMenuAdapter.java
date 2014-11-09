@@ -22,26 +22,31 @@ public class SideMenuAdapter extends ArrayAdapter<String> {
      * @param context Context of the Activity where we want to display the user list
      * @param listItems list of String to display in the side menu
      */
-    public SideMenuAdapter(Context context, int resource) {
-        super(context, R.layout.drawer_list_item, resource);
+    public SideMenuAdapter(Context context, String[] listItems) {
+        super(context, R.layout.drawer_list_item, listItems);
         mContext = context;
-        mListItems = context.getResources().getStringArray(
-                R.array.sideMenuElements);
+        mListItems = listItems;
     }
     
+    /* (non-Javadoc)
+     * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+         //Log.d("sideMenuView is null", "NULLVIEW");
         
         // Create inflater,get item to construct
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
+        convertView = inflater.inflate(R.layout.drawer_list_item, parent, false);
         
         //Get item field
         TextView sideMenuView = (TextView) convertView.findViewById(R.id.side_menu_view_item);
-        
+        /*if(sideMenuView == null){
+            Log.d("sideMenuView is null", "NULLVIEW");
+        }*/
         //Set item field + id
         sideMenuView.setText(mListItems[position]);
-        //TODO set tag to each View
+        //set tag to each View
         sideMenuView.setTag("side_menu_tag_" + position);
         
         return convertView;

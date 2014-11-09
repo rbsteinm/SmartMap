@@ -1,6 +1,8 @@
 package ch.epfl.smartmap.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.app.ListActivity;
@@ -8,7 +10,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -18,27 +20,27 @@ import ch.epfl.smartmap.cache.User;
 public class FriendsActivity extends ListActivity {
     // Mock stuff
     private List<User> mockUsersList;
-    private Friend julien;
-    private Friend robin;
-    private Friend alain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
-
-        // Filling up mock stuff
         mockUsersList = new ArrayList<User>();
-        julien = new Friend(1, "Julien Perrenoud");
-        julien.setOnline(true);
-        mockUsersList.add(julien);
-        robin = new Friend(2, "Robin Genolet");
-        robin.setOnline(false);
-        mockUsersList.add(robin);
-        alain = new Friend(2, "Alain Milliet");
-        alain.setOnline(false);
-        mockUsersList.add(alain);
+        //mockUsersList = MockDB.FRIENDS_LIST;
+        for (User user: MockDB.FRIENDS_LIST) {
+            mockUsersList.add(user);
+        }
+        mockUsersList.get(1).setOnline(true);
+        mockUsersList.get(3).setOnline(true);
+        //We sort the users to first display the online ones
+        Collections.sort(mockUsersList, new Comparator<User>(){
 
+            @Override
+            public int compare(User user1, User user2) {
+                return Boolean.compare(user2.isOnline(), user1.isOnline());
+            }
+        });
+        
         // Create custom Adapter and pass it to the Activity
         FriendListItemAdapter adapter = new FriendListItemAdapter(this, mockUsersList);
         setListAdapter(adapter);

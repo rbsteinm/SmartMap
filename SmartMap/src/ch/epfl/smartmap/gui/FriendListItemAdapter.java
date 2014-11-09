@@ -3,10 +3,12 @@ package ch.epfl.smartmap.gui;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.User;
@@ -46,16 +48,19 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
 
         // Get FriendItem fields
-        TextView name = (TextView) convertView.findViewById(R.id.name);
-        TextView isOnline = (TextView) convertView.findViewById(R.id.isOnline);
+        TextView name = (TextView) convertView.findViewById(R.id.activity_friends_name);
+        TextView isOnline = (TextView) convertView.findViewById(R.id.activity_friends_isOnline);
+        ImageView picture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
 
         // Set fields with friend attributes
         name.setText(mItemsArrayList.get(position).getName());
-        String status = "Status: ";
+        picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
+        String status;
         if (mItemsArrayList.get(position).isOnline()) {
-            status += "online";
+            status = "online";
+            isOnline.setTextColor(Color.GREEN);
         } else {
-            status += "offline";
+            status = "offline";
         }
         isOnline.setText(status);
 
