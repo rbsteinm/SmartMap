@@ -20,6 +20,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.UserEvent;
 
@@ -34,11 +35,13 @@ public class ShowEventsActivity extends ListActivity {
     private final static String TAG = ShowEventsActivity.class.getSimpleName();
 
     private final static double EARTH_RADIUS = 6378.1;
-
     private final static int SEEK_BAR_MIN_VALUE = 2;
+    private final static int ONE_HUNDRED = 100;
 
     private SeekBar mSeekBar;
     private TextView mShowKilometers;
+
+    private DatabaseHelper mDbHelper;
 
     private boolean mMyEventsChecked;
     private boolean mOngoingChecked;
@@ -89,8 +92,6 @@ public class ShowEventsActivity extends ListActivity {
 
         });
 
-        mMockEventsList = new ArrayList<Event>();
-
         GregorianCalendar timeE0 = new GregorianCalendar();
         timeE0.add(GregorianCalendar.MINUTE, -5);
         GregorianCalendar timeEndE0 = new GregorianCalendar();
@@ -100,6 +101,7 @@ public class ShowEventsActivity extends ListActivity {
         lutry.setLongitude(6.685314);
 
         UserEvent e0 = new UserEvent("Now Event", 2, "Robich", timeE0, timeEndE0, lutry);
+        e0.setID(0);
         e0.setPositionName("Lutry");
 
         GregorianCalendar timeE1 = new GregorianCalendar();
@@ -111,6 +113,7 @@ public class ShowEventsActivity extends ListActivity {
         lausanne.setLongitude(6.633597);
 
         UserEvent e1 = new UserEvent("Swag party", 2, "Robich", timeE1, timeEndE1, lausanne);
+        e1.setID(1);
         e1.setPositionName("Lausanne");
 
         GregorianCalendar timeE2 = new GregorianCalendar();
@@ -122,6 +125,7 @@ public class ShowEventsActivity extends ListActivity {
         epfl.setLongitude(6.563778);
 
         UserEvent e2 = new UserEvent("LOL Tournament", 1, "Alain", timeE2, timeEndE2, epfl);
+        e2.setID(2);
         e2.setPositionName("EPFL");
 
         GregorianCalendar timeE3 = new GregorianCalendar();
@@ -133,11 +137,21 @@ public class ShowEventsActivity extends ListActivity {
         verbier.setLongitude(7.228875);
 
         UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Alain", timeE3, timeEndE3, verbier);
+        e3.setID(3);
         e3.setPositionName("Verbier");
         String descrE3 = "It’s a vertical free-verse poem on the mountain. It’s the ultimate expression of all that"
                 + "is fun and liberating about sliding on snow in wintertime.";
         e3.setDescription(descrE3);
 
+        /*mDbHelper = new DatabaseHelper(this);
+        mDbHelper.clearAll();
+        mDbHelper.addEvent(e0);
+        mDbHelper.addEvent(e1);
+        mDbHelper.addEvent(e2);
+        mDbHelper.addEvent(e3);
+
+        mMockEventsList = mDbHelper.getAllEvents();*/
+        mMockEventsList = new ArrayList<Event>();
         mMockEventsList.add(e0);
         mMockEventsList.add(e1);
         mMockEventsList.add(e2);
@@ -244,6 +258,8 @@ public class ShowEventsActivity extends ListActivity {
      * This runs in O(n), can we do better?
      */
     private void updateCurrentList() {
+
+        //mMockEventsList = mDbHelper.getAllEvents();
         mCurrentList = new ArrayList<Event>();
 
         // Copy complete list into current list
@@ -297,6 +313,6 @@ public class ShowEventsActivity extends ListActivity {
         // Radius of Earth: 6378.1 kilometers
         double distance = centralAngle * EARTH_RADIUS;
 
-        return Math.floor(distance * 100) / 100;
+        return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;
     }
 }

@@ -48,6 +48,8 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
         mContext = context;
         mItemsArrayList = itemsArrayList;
+        //DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        //mItemsArrayList = dbHelper.getAllEvents();
 
         mMyLocation = myLocation;
     }
@@ -129,10 +131,21 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
         String dateTextContent = "";
 
-        if (date1.before(now)) {
-            // Ongoing event
+        if (date1.before(midnight) && date2.before(midnight)) {
+            // ends and starts the same day
             if (s.equals("start")) {
-                dateTextContent = "Event is live!";
+                dateTextContent = "Today";
+            } else {
+                dateTextContent = "from " + startHourOfDayString + ":" + startMinuteString + " to "
+                        + endHourOfDayString + ":" + endMinuteString;
+            }
+        } else if (date1.before(tomorrowMidnight) && date2.before(tomorrowMidnight)) {
+            // ends and starts the same day
+            if (s.equals("start")) {
+                dateTextContent = "Tomorrow";
+            } else {
+                dateTextContent = "from " + startHourOfDayString + ":" + startMinuteString + " to "
+                        + endHourOfDayString + ":" + endMinuteString;
             }
         } else {
             // Upcoming event
@@ -158,13 +171,10 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
             }
         }
 
-        if (date1.before(midnight) && date2.before(midnight)) {
-            // ends and starts the same day
+        if (date1.before(now)) {
+            // Ongoing event
             if (s.equals("start")) {
-                dateTextContent = "Today";
-            } else {
-                dateTextContent = "From " + startHourOfDayString + ":" + startMinuteString + " to "
-                        + endHourOfDayString + ":" + endMinuteString;
+                dateTextContent = "Event is live!";
             }
         }
 
