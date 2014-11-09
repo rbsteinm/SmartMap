@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -39,18 +40,17 @@ public class ProfilePictureFriendMarkerDisplayer implements
 	 */
 	private Map<Marker, User> displayedMarkers = new HashMap<Marker, User>();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ch.epfl.smartmap.gui.FriendMarker#setMarkersToMaps(android.content.Context
-	 * , com.google.android.gms.maps.GoogleMap, java.util.List)
-	 */
+	public ProfilePictureFriendMarkerDisplayer() {
+
+	}
+
+
+	@Override
 	public void setMarkersToMaps(Context context, GoogleMap googleMap,
 			List<Friend> listOfFriends) {
-
+		
 		// Add marker with profile picture for each friend
-		for (Friend friend : listOfFriends) {
+		for (User friend : listOfFriends) {
 			Bitmap friendProfilePicture = Bitmap.createScaledBitmap(
 					friend.getPicture(context), WIDTH, HEIGHT, false);
 			Marker marker = googleMap.addMarker(new MarkerOptions()
@@ -64,19 +64,111 @@ public class ProfilePictureFriendMarkerDisplayer implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#isDisplayedFriend(ch.epfl.
+	 * smartmap.cache.User)
+	 */
 	public boolean isDisplayedFriend(User friend) {
 		return displayedMarkers.containsValue(friend);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#isDisplayedMarker(com.google
+	 * .android.gms.maps.model.Marker)
+	 */
 	public boolean isDisplayedMarker(Marker marker) {
 		return displayedMarkers.containsKey(marker);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ch.epfl.smartmap.gui.FriendMarkerDisplayer#getDisplayedMarkers()
+	 */
 	public List<Marker> getDisplayedMarkers() {
 		return new ArrayList<Marker>(displayedMarkers.keySet());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#getFriendForMarker(com.google
+	 * .android.gms.maps.model.Marker)
+	 */
 	public User getFriendForMarker(Marker marker) {
 		return displayedMarkers.get(marker);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#addMarker(ch.epfl.smartmap
+	 * .cache.User, android.content.Context,
+	 * com.google.android.gms.maps.GoogleMap)
+	 */
+	@Override
+	public void addMarker(User friend, Context context, GoogleMap mGoogleMap) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#getMarkerForFriend(ch.epfl
+	 * .smartmap.cache.User)
+	 */
+	@Override
+	public Marker getMarkerForFriend(User friend) {
+		for (Entry<Marker, User> entry : displayedMarkers.entrySet())
+			if (entry.getValue().getID()==(friend.getID())) {
+				return entry.getKey();
+			}
+		return null;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ch.epfl.smartmap.gui.FriendMarkerDisplayer#getDisplayedFriends()
+	 */
+	@Override
+	public List<User> getDisplayedFriends() {
+		return new ArrayList<User>(displayedMarkers.values());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#removeMarker(ch.epfl.smartmap
+	 * .cache.User, android.content.Context,
+	 * com.google.android.gms.maps.GoogleMap)
+	 */
+	@Override
+	public void removeMarker(User friend, Context context, GoogleMap mGoogleMap) {
+		// TODO Auto-generated method stub
+
+	}
+
+
+	/* (non-Javadoc)
+	 * @see ch.epfl.smartmap.gui.FriendMarkerDisplayer#updateMarkers(android.content.Context, com.google.android.gms.maps.GoogleMap, java.util.List)
+	 */
+	@Override
+	public void updateMarkers(Context context, GoogleMap mGoogleMap,
+			List<Friend> listOfFriends) {
+		// TODO Auto-generated method stub
+		
 	}
 }

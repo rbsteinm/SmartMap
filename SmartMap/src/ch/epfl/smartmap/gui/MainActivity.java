@@ -1,5 +1,8 @@
 package ch.epfl.smartmap.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.location.Criteria;
@@ -27,6 +30,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Marker;
 
 /**
  * This Activity displays the core features of the App. It displays the map and
@@ -47,7 +51,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	private ListView mDrawerListView;
 
 	private GoogleMap mGoogleMap;
-	private ProfilePictureFriendMarkerDisplayer mFriendMarkerDisplayer;
+	private FriendMarkerDisplayer mFriendMarkerDisplayer;
+	private EventMarkerDisplayer mEventMarkerDisplayer;
 	private DefaultZoomManager mMapZoomer;
 	private SupportMapFragment mFragmentMap;
 
@@ -69,14 +74,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		}
 
 		if (mGoogleMap != null) {
-			mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-			mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-					MockDB.FRIENDS_LIST);
-
-			mMapZoomer = new DefaultZoomManager(mFragmentMap);
-			Log.i(TAG, "before enter to zoom according");
-			mMapZoomer.zoomAccordingToMarkers(mGoogleMap,
-					mFriendMarkerDisplayer.getDisplayedMarkers());
+			initializeMarkers();
 		}
 
 		mSearchButton.setOnClickListener(new OnClickListener() {
@@ -195,6 +193,25 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 								LOCATION_UPDATE_DISTANCE, this);
 			}
 		}
+	}
+
+	public void initializeMarkers() {
+
+		mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
+		mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
+				MockDB.getEventsList());
+
+		mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
+		mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
+				MockDB.FRIENDS_LIST);
+
+		mMapZoomer = new DefaultZoomManager(mFragmentMap);
+		Log.i(TAG, "before enter to zoom according");
+
+		List<Marker> allMarkers = new ArrayList<Marker>(
+				mFriendMarkerDisplayer.getDisplayedMarkers());
+		allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
+		mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
 	}
 
 	/*
