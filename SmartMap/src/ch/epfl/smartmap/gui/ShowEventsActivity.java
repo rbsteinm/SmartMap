@@ -256,7 +256,7 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
-        // mMockEventsList = mDbHelper.getAllEvents();
+        mMockEventsList = mDbHelper.getAllEvents();
         mCurrentList = new ArrayList<Event>();
 
         // Copy complete list into current list
@@ -278,17 +278,8 @@ public class ShowEventsActivity extends ListActivity {
             }
 
             if (mNearMeChecked) {
-                // DEBUG
-                Toast.makeText(
-                        this,
-                        "Event at pos " + e.getPositionName() + " has lattitude " + e.getLocation().getLatitude()
-                                + " and longitude " + e.getLocation().getLongitude(), Toast.LENGTH_SHORT).show();
                 double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
                         mMyLocation.getLatitude(), mMyLocation.getLongitude());
-                /*
-                 * Toast.makeText( this, "The distance between me and event " + e.getName() + " @ " +
-                 * e.getPositionName() + " is " + distanceMeEvent + " km", Toast.LENGTH_LONG).show();
-                 */
                 String[] showKMContent = mShowKilometers.getText().toString().split(" ");
                 double distanceMax = Double.parseDouble(showKMContent[0]);
                 if (!(distanceMeEvent < distanceMax)) {
