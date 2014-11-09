@@ -14,6 +14,7 @@ import ch.epfl.smartmap.cache.User;
  * 
  * @author marion-S
  * 
+ * @author Pamoi (code reviewed : 9.11.2014)
  */
 
 public interface SmartMapClient {

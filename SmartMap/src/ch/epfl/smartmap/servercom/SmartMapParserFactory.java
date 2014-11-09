@@ -4,6 +4,8 @@ package ch.epfl.smartmap.servercom;
  * This factory class knows about supported formats.
  * 
  * @author marion-S
+ * 
+ * @author Pamoi (code reviewed : 9.11.2014)
  */
 public class SmartMapParserFactory {
 

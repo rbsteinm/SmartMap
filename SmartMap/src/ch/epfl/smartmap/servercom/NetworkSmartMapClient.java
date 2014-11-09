@@ -28,6 +28,32 @@ import ch.epfl.smartmap.cache.User;
  * 
  * @author marion-S
  * 
+ * @author Pamoi (code reviewed : 9.11.2014) : 
+ * - I don't think user-agent and accept-language request headers are necessary, and they 
+ * provide wrong information to the server (we are not firefox !).
+ * 
+ * - Should COOKIES_HEADER not be private ?
+ * 
+ * - At line 120 the HashMap could be initialize to null as it is reassigned later
+ * and not used if an exception is thrown.
+ * 
+ * - There is a typo: it is listFriendsPos instead of listFriendPos.
+ * 
+ * - We should check for the server response code in sendViaPost (for example if it returns
+ * 404 not found, there will be a json error that is not the real error source).
+ * 
+ * - It would be better to give sendViaPost an empty map when there are no post arguments instead
+ * of null, and throw an exception if params is null.
+ * 
+ * - Sould not getHttpUrlConnection and sendViaPost methods be private ? Server should not be accessed
+ * outside of this class ?
+ * 
+ * - More general remark (you can discuss it with Nicolas and me): how should we handle partially
+ * initialized users (for example from getUserInfo) ? Is there a way to update the only partially
+ * in the database ?
+ * 
+ * - I think you should replace the @author SpicyCH by your name in this package files as it is
+ * you who implemented it.
  */
 
 final public class NetworkSmartMapClient implements SmartMapClient {

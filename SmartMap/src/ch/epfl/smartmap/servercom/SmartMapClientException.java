@@ -9,6 +9,8 @@ package ch.epfl.smartmap.servercom;
 /**
  * @author marion-S
  * 
+ * @author Pamoi (code reviewed : 9.11.2014)
+ * 
  */
 public class SmartMapClientException extends Exception {
 
