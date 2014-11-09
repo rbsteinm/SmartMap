@@ -7,7 +7,9 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
@@ -23,6 +25,8 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.UserEvent;
+
+import com.google.android.gms.maps.SupportMapFragment;
 
 /**
  * This activity shows the events and offers to filter them.
@@ -41,6 +45,8 @@ public class ShowEventsActivity extends ListActivity {
 
     private SeekBar mSeekBar;
     private TextView mShowKilometers;
+
+    private Context mContext;
 
     private DatabaseHelper mDbHelper;
 
@@ -62,6 +68,8 @@ public class ShowEventsActivity extends ListActivity {
         mMyLocation = new Location("Mock location Pully");
         mMyLocation.setLatitude(46.509300);
         mMyLocation.setLongitude(6.661600);
+
+        mContext = getApplicationContext();
 
         mMyEventsChecked = false;
         mOngoingChecked = false;
@@ -137,7 +145,7 @@ public class ShowEventsActivity extends ListActivity {
         verbier.setLatitude(46.096076);
         verbier.setLongitude(7.228875);
 
-        UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Alain", timeE3, timeEndE3, verbier);
+        UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Julien", timeE3, timeEndE3, verbier);
         e3.setID(3);
         e3.setPositionName("Verbier");
         String descrE3 = "It’s a vertical free-verse poem on the mountain. It’s the ultimate expression of all that"
@@ -178,7 +186,7 @@ public class ShowEventsActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        Event event = (UserEvent) findViewById(position).getTag();
+        final Event event = (UserEvent) findViewById(position).getTag();
 
         String message = EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "start")
                 + " - " + EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "end")
@@ -200,6 +208,12 @@ public class ShowEventsActivity extends ListActivity {
 
                 // TODO open event in map
                 Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
+                DefaultZoomManager zoomManager = new DefaultZoomManager(new SupportMapFragment());
+
+                Intent displayActivityIntent = new Intent(mContext, MainActivity.class);
+                displayActivityIntent.putExtra("location", event.getLocation());
+                startActivity(displayActivityIntent);
+
             }
         });
 
@@ -288,6 +302,7 @@ public class ShowEventsActivity extends ListActivity {
 
     /**
      * Computes the distance between two GPS locations (takes into consideration the earth radius)
+     *
      * @param lat1
      * @param lon1
      * @param lat2
