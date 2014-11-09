@@ -74,8 +74,8 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         String startDateTextContent = "";
         String endDateTextContent = "";
 
-        startDateTextContent = setTextFromDate(start, "start");
-        endDateTextContent = setTextFromDate(end, "end");
+        startDateTextContent = setTextFromDate(start, end, "start");
+        endDateTextContent = setTextFromDate(start, end, "end");
 
         startDateText.setText(startDateTextContent);
         endDateText.setText(endDateTextContent);
@@ -97,12 +97,19 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
     /**
      *
-     * @param date the date (start or end of the event)
-     * @param s "start" or "end"
+     * @param date1
+     *            the date (start or end of the event)
+     * @param s
+     *            "start" or "end"
      * @return the time of the event, in a cool format
      * @author SpicyCH
      */
-    protected static String setTextFromDate(GregorianCalendar date, String s) {
+    protected static String setTextFromDate(GregorianCalendar date1, GregorianCalendar date2, String s) {
+        if (date1.after(date2)) {
+            // TODO assert
+            throw new IllegalArgumentException("date1 must be before date2");
+        }
+
         GregorianCalendar now = new GregorianCalendar();
 
         GregorianCalendar midnight = new GregorianCalendar(now.get(GregorianCalendar.YEAR),
@@ -114,43 +121,50 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
                 MIDNIGHT_MINUTES);
         tomorrowMidnight.add(GregorianCalendar.DAY_OF_YEAR, 1);
 
-        String startHourOfDayString = formatForClock(date.get(GregorianCalendar.HOUR_OF_DAY));
-        String startMinuteString = formatForClock(date.get(GregorianCalendar.MINUTE));
+        String startHourOfDayString = formatForClock(date1.get(GregorianCalendar.HOUR_OF_DAY));
+        String startMinuteString = formatForClock(date1.get(GregorianCalendar.MINUTE));
+
+        String endHourOfDayString = formatForClock(date2.get(GregorianCalendar.HOUR_OF_DAY));
+        String endMinuteString = formatForClock(date2.get(GregorianCalendar.MINUTE));
 
         String dateTextContent = "";
 
-        if (date.before(now)) {
+        if (date1.before(now)) {
             // Ongoing event
             if (s.equals("start")) {
                 dateTextContent = "Event is live!";
-            } else {
-                throw new IllegalArgumentException(
-                        "The given date is before now, but the given string s wasn't 'start'");
             }
         } else {
             // Upcoming event
-            if (date.before(midnight)) {
-                if (s.equals("start")) {
-                    dateTextContent = "Today at " + startHourOfDayString + ":" + startMinuteString;
-                } else {
-                    dateTextContent ="Ends today at " + startHourOfDayString + ":" + startMinuteString;
-                }
-            } else if (date.before(tomorrowMidnight)) {
-                if (s.equals("start")) {
-                    dateTextContent = "Tomorrow at " + startHourOfDayString + ":" + startMinuteString;
-                } else {
-                    dateTextContent = "Ends Tomorrow at " + startHourOfDayString + ":" + startMinuteString;
-                }
+            if (date1.before(midnight) && s.equals("start")) {
+                dateTextContent = "Today at " + startHourOfDayString + ":" + startMinuteString;
+            } else if (date2.before(midnight) && s.equals("end")) {
+                dateTextContent = "Ends today at " + endHourOfDayString + ":" + endMinuteString;
+            } else if (date1.before(tomorrowMidnight) && s.equals("start")) {
+                dateTextContent = "Tomorrow at " + startHourOfDayString + ":" + startMinuteString;
+            } else if (date2.before(tomorrowMidnight) && s.equals("end")) {
+                dateTextContent = "Ends tomorrow at " + startHourOfDayString + ":" + startMinuteString;
             } else {
-                // Add 1 to the month because jan = 0
                 if (s.equals("start")) {
-                    dateTextContent = "Starts: ";
+                    dateTextContent = "Starts: " + date1.get(GregorianCalendar.DAY_OF_MONTH) + "/"
+                            + (date1.get(GregorianCalendar.MONTH) + 1) + "/" + date1.get(GregorianCalendar.YEAR)
+                            + " at " + startHourOfDayString + ":" + startMinuteString;
                 } else {
-                    dateTextContent = "Ends: ";
+                    dateTextContent = "Ends: " + date2.get(GregorianCalendar.DAY_OF_MONTH) + "/"
+                            + (date2.get(GregorianCalendar.MONTH) + 1) + "/" + date2.get(GregorianCalendar.YEAR)
+                            + " at " + endHourOfDayString + ":" + endMinuteString;
                 }
-                dateTextContent += date.get(GregorianCalendar.DAY_OF_MONTH) + "/"
-                        + (date.get(GregorianCalendar.MONTH) + 1) + "/" + date.get(GregorianCalendar.YEAR) + " at "
-                        + startHourOfDayString + ":" + startMinuteString;
+
+            }
+        }
+
+        if (date1.before(midnight) && date2.before(midnight)) {
+            // ends and starts the same day
+            if (s.equals("start")) {
+                dateTextContent = "Today";
+            } else {
+                dateTextContent = "From " + startHourOfDayString + ":" + startMinuteString + " to "
+                        + endHourOfDayString + ":" + endMinuteString;
             }
         }
 

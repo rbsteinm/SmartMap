@@ -134,7 +134,8 @@ public class ShowEventsActivity extends ListActivity {
 
         UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Alain", timeE3, timeEndE3, verbier);
         e3.setPositionName("Verbier");
-        String descrE3 = "It’s a vertical free-verse poem on the mountain. It’s the ultimate expression of all that is fun and liberating about sliding on snow in wintertime.";
+        String descrE3 = "It’s a vertical free-verse poem on the mountain. It’s the ultimate expression of all that"
+                + "is fun and liberating about sliding on snow in wintertime.";
         e3.setDescription(descrE3);
 
         mMockEventsList.add(e0);
@@ -170,9 +171,9 @@ public class ShowEventsActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Event event = (UserEvent) findViewById(position).getTag();
 
-        String message = EventsListItemAdapter.setTextFromDate(event.getStartDate(), "start") + " - "
-                + EventsListItemAdapter.setTextFromDate(event.getEndDate(), "end") + "\nCreated by "
-                + event.getCreatorName() + "\n\n" + event.getDescription();
+        String message = EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "start")
+                + " - " + EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "end")
+                + "\nCreated by " + event.getCreatorName() + "\n\n" + event.getDescription();
 
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(event.getName()
