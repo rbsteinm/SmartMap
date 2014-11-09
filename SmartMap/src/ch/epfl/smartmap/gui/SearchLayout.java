@@ -1,26 +1,17 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
-import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
-import ch.epfl.smartmap.cache.User;
 
 /**
  * Represents a Panel that can can be opened or closed from the bottom of the activity. It contains A search bar
@@ -41,7 +32,7 @@ public class SearchLayout extends RelativeLayout {
     public enum InitState {
         NOT_INITIALIZED, INITIALIZED
     };
-    
+
     /**
      * All possible search result lists
      * 
@@ -54,8 +45,6 @@ public class SearchLayout extends RelativeLayout {
     private final Context mContext;
     private InitState mInitState;
     private final SearchEngine mSearchEngine;
-    private final SearchResultViewGroup mSearchResultViewGroup;
-    private final TextView mSearchResultTitle;
 
     /**
      * Constructor
@@ -70,9 +59,6 @@ public class SearchLayout extends RelativeLayout {
         mInitState = InitState.NOT_INITIALIZED;
         mSearchEngine = searchEngine;
         this.setVisibility(View.GONE);
-        mSearchResultViewGroup = new SearchResultViewGroup(mContext, MockDB.FRIENDS_LIST);
-        mSearchResultTitle = new TextView(mContext);
-        mSearchResultTitle.setText("Quick Search");
     }
 
     /**
@@ -98,9 +84,6 @@ public class SearchLayout extends RelativeLayout {
 
         // Get Views
         final SearchView mSearchView = (SearchView) findViewById(R.id.searchBar);
-        final ScrollView mSearchResultListView = (ScrollView) findViewById(R.id.search_result_list);
-        
-        mSearchResultListView.addView(mSearchResultViewGroup);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 
             public boolean onQueryTextSubmit(String query) {
@@ -115,14 +98,13 @@ public class SearchLayout extends RelativeLayout {
                 return false;
             }
         });
-        
 
-//        mSearchResultList.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mSearchView.clearFocus();
-//            }
-//        });
+        // mSearchResultList.setOnClickListener(new OnClickListener() {
+        // @Override
+        // public void onClick(View v) {
+        // mSearchView.clearFocus();
+        // }
+        // });
 
         mInitState = InitState.INITIALIZED;
     }
@@ -134,10 +116,13 @@ public class SearchLayout extends RelativeLayout {
         // Get needed Views
         final SearchView mSearchBarEditText = (SearchView) this
             .findViewById(R.id.searchBar);
+        final SearchResultSwipeableContainer mSearchResultSwipeableContainer = 
+            (SearchResultSwipeableContainer) findViewById(R.id.swipeable_search_result_container);
 
         // Get search query
         String query = mSearchBarEditText.getQuery().toString();
-        mSearchResultViewGroup.setResultList(mSearchEngine.sendQuery(query));
+        mSearchResultSwipeableContainer.setResultList(mSearchEngine
+            .sendQuery(query));
     }
 
     /**

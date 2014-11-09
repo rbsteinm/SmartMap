@@ -13,7 +13,6 @@ public abstract class SearchResultViewFactory {
     private static final String TAG = "SEARCH_RESULT_VIEW_FACTORY";
     public static SearchResultView getSearchResultView(Context context, Object item) {
         if (item instanceof Friend) {
-            Log.d(TAG, "return FriendSearchResultView");
             return new FriendSearchResultView(context, (Friend) item);
         } else {
             throw new IllegalArgumentException("Bad type item");

@@ -53,6 +53,10 @@ public class SearchResultViewGroup extends LinearLayout {
         displayMinimized();
     }
     
+    public SearchResultViewGroup(Context context) {
+        this(context, new ArrayList<Friend>());
+    }
+    
     public void displayMinimized() {
         this.removeAllViews();
         mCurrentItemNb = Math.min(ITEMS_PER_PAGE, mList.size());
@@ -78,7 +82,6 @@ public class SearchResultViewGroup extends LinearLayout {
     }
     
     public void setResultList(List<Friend> newResultList) {
-        Log.d(TAG, "set result list called");
         mList.clear();
         mList.addAll(newResultList);
         displayMinimized();
