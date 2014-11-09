@@ -143,19 +143,20 @@ public class ShowEventsActivity extends ListActivity {
                 + "is fun and liberating about sliding on snow in wintertime.";
         e3.setDescription(descrE3);
 
-        /*mDbHelper = new DatabaseHelper(this);
+        mDbHelper = new DatabaseHelper(this);
         mDbHelper.clearAll();
         mDbHelper.addEvent(e0);
         mDbHelper.addEvent(e1);
         mDbHelper.addEvent(e2);
         mDbHelper.addEvent(e3);
 
-        mMockEventsList = mDbHelper.getAllEvents();*/
-        mMockEventsList = new ArrayList<Event>();
+        mMockEventsList = mDbHelper.getAllEvents();
+
+        /*mMockEventsList = new ArrayList<Event>();
         mMockEventsList.add(e0);
         mMockEventsList.add(e1);
         mMockEventsList.add(e2);
-        mMockEventsList.add(e3);
+        mMockEventsList.add(e3);*/
 
         // Create custom Adapter and pass it to the Activity
         EventsListItemAdapter adapter = new EventsListItemAdapter(this, mMockEventsList, mMyLocation);
@@ -221,12 +222,10 @@ public class ShowEventsActivity extends ListActivity {
                 SeekBar seekBar = (SeekBar) findViewById(R.id.showEventSeekBar);
                 if (checkBox.isChecked()) {
                     mNearMeChecked = true;
-                    updateCurrentList();
                     // Show the seek bar
                     seekBar.setEnabled(true);
                 } else {
                     mNearMeChecked = false;
-                    updateCurrentList();
                     // Hide the seek bar
                     seekBar.setEnabled(false);
                 }
@@ -234,24 +233,22 @@ public class ShowEventsActivity extends ListActivity {
             case R.id.ShowEventsCheckBoxMyEv:
                 if (checkBox.isChecked()) {
                     mMyEventsChecked = true;
-                    updateCurrentList();
                 } else {
                     mMyEventsChecked = false;
-                    updateCurrentList();
                 }
                 break;
             case R.id.ShowEventscheckBoxStatus:
                 if (checkBox.isChecked()) {
                     mOngoingChecked = true;
-                    updateCurrentList();
                 } else {
                     mOngoingChecked = false;
-                    updateCurrentList();
                 }
                 break;
             default:
                 break;
         }
+
+        updateCurrentList();
     }
 
     /**
@@ -259,7 +256,7 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
-        //mMockEventsList = mDbHelper.getAllEvents();
+        // mMockEventsList = mDbHelper.getAllEvents();
         mCurrentList = new ArrayList<Event>();
 
         // Copy complete list into current list
@@ -281,6 +278,11 @@ public class ShowEventsActivity extends ListActivity {
             }
 
             if (mNearMeChecked) {
+                // DEBUG
+                Toast.makeText(
+                        this,
+                        "Event at pos " + e.getPositionName() + " has lattitude " + e.getLocation().getLatitude()
+                                + " and longitude " + e.getLocation().getLongitude(), Toast.LENGTH_SHORT).show();
                 double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
                         mMyLocation.getLatitude(), mMyLocation.getLongitude());
                 /*
