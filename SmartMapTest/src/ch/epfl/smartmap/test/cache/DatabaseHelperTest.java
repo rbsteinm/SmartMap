@@ -31,6 +31,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
     private DatabaseHelper dbh;
     private FriendList filter;
     private FriendList filter2;
+    private Location loc = new Location("");
     
     @Override
     protected void setUp() throws Exception {
@@ -50,6 +51,10 @@ public class DatabaseHelperTest extends AndroidTestCase {
         event.setID(123123);
     	event2.setID(456789);
         
+    	loc.setLatitude(12.34);
+    	loc.setLatitude(3.45);
+    	event.setLocation(loc);
+    	
         dbh.clearAll();
     }
 
@@ -63,13 +68,17 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Test
     public void testAddUser() {
         dbh.addUser(a);
+        a.setName(name);
+        //testing that adding a user with the same id erases the first one
+        dbh.addUser(a);
         assertTrue(dbh.getUser(a.getID()).getID() == a.getID() 
                 && dbh.getUser(a.getID()).getName().equals(a.getName())
                 && dbh.getUser(a.getID()).getNumber().equals(a.getNumber())
                 && dbh.getUser(a.getID()).getEmail().equals(a.getEmail())
                 && dbh.getUser(a.getID()).getPositionName().equals(a.getPositionName())
                 && dbh.getUser(a.getID()).getLocation().getLongitude() == a.getLocation().getLongitude()
-                && dbh.getUser(a.getID()).getLocation().getLatitude() == a.getLocation().getLatitude());
+                && dbh.getUser(a.getID()).getLocation().getLatitude() == a.getLocation().getLatitude()
+                && dbh.getAllUsers().size() == 1);
     }
     
     @Test
@@ -125,8 +134,9 @@ public class DatabaseHelperTest extends AndroidTestCase {
     public void testAddEvent() {
         dbh.addEvent(event);
         assertTrue(dbh.getEvent(event.getID()).getCreatorName().equals(event.getCreatorName())
-                && dbh.getEvent(event.getID()).getStartDate().get(GregorianCalendar.MINUTE) 
-                == event.getStartDate().get(GregorianCalendar.MINUTE));
+                && dbh.getEvent(event.getID()).getStartDate().get(GregorianCalendar.MINUTE)
+                == event.getStartDate().get(GregorianCalendar.MINUTE)
+                && dbh.getEvent(event.getID()).getLocation().getLatitude() == event.getLocation().getLatitude());
     }
     
     @Test

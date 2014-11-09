@@ -30,8 +30,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_NAME = "name";
     private static final String KEY_NUMBER = "number";
     private static final String KEY_EMAIL = "email";
-    private static final String KEY_LONGITUDE = "posX";
-    private static final String KEY_LATITUDE = "posY";
+    private static final String KEY_LONGITUDE = "longitude";
+    private static final String KEY_LATITUDE = "latitude";
     private static final String KEY_POSNAME = "posName";
     private static final String KEY_ONLINE = "isOnline";
     private static final String KEY_LASTSEEN = "lastSeen";
@@ -505,8 +505,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         endDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_ENDDATE)));
         
         Location loc = new Location("");
-        loc.setLongitude(cursor.getLong(cursor.getColumnIndex(KEY_LONGITUDE)));
-        loc.setLatitude(cursor.getLong(cursor.getColumnIndex(KEY_LATITUDE)));
+        loc.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
+        loc.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
         
         UserEvent event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                 cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
