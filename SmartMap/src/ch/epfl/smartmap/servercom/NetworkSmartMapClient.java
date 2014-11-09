@@ -20,9 +20,9 @@ import ch.epfl.smartmap.cache.User;
 /**
  * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider}
  * to communicate with a SmartMap server.
- * 
+ *
  * @author marion-S
- * 
+ *
  */
 
 final public class NetworkSmartMapClient implements SmartMapClient {
@@ -52,9 +52,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.servercom.SmartMapClient#authServer(java.lang.String, long, java.lang.String)
      */
+    @Override
     public void authServer(String name, long facebookId, String fbAccessToken)
         throws SmartMapClientException {
         Log.d("authServer", "begin");
@@ -84,7 +85,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#listFriendPos()
      */
     @Override
@@ -119,7 +120,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#followFriend(int)
      */
     @Override
@@ -148,7 +149,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#unfollowFriend(int)
      */
     @Override
@@ -176,7 +177,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#allowFriend(int)
      */
     @Override
@@ -203,7 +204,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#disallowFriend(int)
      */
     @Override
@@ -231,7 +232,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#allowFriendList(java. util.List)
      */
     @Override
@@ -260,7 +261,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#disallowFriendList(java .util.List)
      */
     @Override
@@ -289,9 +290,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.servercom.SmartMapClient#inviteFriend(int)
      */
+    @Override
     public void inviteFriend(int id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Integer.toString(id));
@@ -316,7 +318,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getInvitations()
      */
     @Override
@@ -351,7 +353,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#acceptInvitation(int)
      */
     @Override
@@ -388,7 +390,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getUserInfo(int)
      */
     @Override
@@ -425,9 +427,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ch.epfl.smartmap.servercom.SmartMapClient#updatePos(ch.epfl.smartmap. cache.Point)
      */
+    @Override
     public void updatePos(Point position) throws SmartMapClientException {
         Log.d("updatePos", "start");
         Map<String, String> params = new HashMap<String, String>();
@@ -465,7 +468,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /**
      * Sends a POST request to the server and returns the server's response
-     * 
+     *
      * @param params
      *            the parameters to send to the server
      * @param uri

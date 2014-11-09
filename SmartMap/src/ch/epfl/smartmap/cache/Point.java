@@ -4,6 +4,7 @@ package ch.epfl.smartmap.cache;
  * A point defined by two coordinates
  * @author ritterni
  */
+@Deprecated
 public class Point {
     
     private double x;
