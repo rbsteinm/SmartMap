@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -31,8 +30,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_NAME = "name";
     private static final String KEY_NUMBER = "number";
     private static final String KEY_EMAIL = "email";
-    private static final String KEY_POSX = "posX";
-    private static final String KEY_POSY = "posY";
+    private static final String KEY_LONGITUDE = "posX";
+    private static final String KEY_LATITUDE = "posY";
     private static final String KEY_POSNAME = "posName";
     private static final String KEY_ONLINE = "isOnline";
     private static final String KEY_LASTSEEN = "lastSeen";
@@ -50,7 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //Columns for the User table
     private static final String[] USER_COLUMNS = {
         KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL,
-        KEY_POSX, KEY_POSY, KEY_POSNAME, KEY_ONLINE, KEY_LASTSEEN, KEY_VISIBLE
+        KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_ONLINE, KEY_LASTSEEN, KEY_VISIBLE
     };
     
     //Columns for the Filter table
@@ -66,7 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //Columns for the Event table
     private static final String[] EVENT_COLUMNS = {
         KEY_ID, KEY_NAME, KEY_EVTDESC, KEY_USER_ID, KEY_CREATOR_NAME, 
-        KEY_POSX, KEY_POSY, KEY_POSNAME, KEY_DATE, KEY_ENDDATE
+        KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_DATE, KEY_ENDDATE
     };
     
     //Table of users
@@ -76,8 +75,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_NAME + " TEXT,"
             + KEY_NUMBER + " TEXT,"
             + KEY_EMAIL + " TEXT,"
-            + KEY_POSX + " DOUBLE,"
-            + KEY_POSY + " DOUBLE,"
+            + KEY_LONGITUDE + " DOUBLE,"
+            + KEY_LATITUDE + " DOUBLE,"
             + KEY_POSNAME + " TEXT,"
             + KEY_ONLINE + " INTEGER,"
             + KEY_LASTSEEN + " INTEGER,"
@@ -107,8 +106,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_EVTDESC + " TEXT,"
             + KEY_USER_ID + " INTEGER,"
             + KEY_CREATOR_NAME + " TEXT,"
-            + KEY_POSX + " DOUBLE,"
-            + KEY_POSY + " DOUBLE,"
+            + KEY_LONGITUDE + " DOUBLE,"
+            + KEY_LATITUDE + " DOUBLE,"
             + KEY_POSNAME + " TEXT,"
             + KEY_DATE + " INTEGER,"
             + KEY_ENDDATE + " INTEGER"
@@ -145,28 +144,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     /**
-     * Adds a user to the internal database
+     * Adds a user to the internal database. If an user with the same ID already exists, updates that user instead.
      * @param user The user to add to the database
      */
     public void addUser(User user) {
         
         SQLiteDatabase db = this.getWritableDatabase();
-     
-        ContentValues values = new ContentValues();
-        values.put(KEY_USER_ID, user.getID());
-        values.put(KEY_NAME, user.getName());
-        values.put(KEY_NUMBER, user.getNumber());
-        values.put(KEY_EMAIL, user.getEmail());
-        values.put(KEY_POSX, user.getLocation().getLongitude());
-        values.put(KEY_POSY, user.getLocation().getLatitude());
-        values.put(KEY_POSNAME, user.getPositionName());
-        values.put(KEY_ONLINE, user.isOnline() ? 1 : 0); //boolean to int
-        values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
-        values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); //boolean to int
-     
-        db.insert(TABLE_USER, null, values);
-     
-        db.close();
+        
+        Cursor cursor = db.query(
+                TABLE_USER,
+                USER_COLUMNS,
+                KEY_USER_ID + " = ?",
+                new String[] {String.valueOf(user.getID())},
+                null,
+                null,
+                null,
+                null);
+        
+        if (!cursor.moveToFirst()) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_ID, user.getID());
+            values.put(KEY_NAME, user.getName());
+            values.put(KEY_NUMBER, user.getNumber());
+            values.put(KEY_EMAIL, user.getEmail());
+            values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
+            values.put(KEY_LATITUDE, user.getLocation().getLatitude());
+            values.put(KEY_POSNAME, user.getPositionName());
+            values.put(KEY_ONLINE, user.isOnline() ? 1 : 0); //boolean to int
+            values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
+            values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); //boolean to int
+         
+            db.insert(TABLE_USER, null, values);
+            
+            db.close();
+        } else {
+            db.close();
+            updateUser(user);
+        }
     }
     
     /**
@@ -197,8 +211,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.getString(cursor.getColumnIndex(KEY_NAME)));
         friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
         friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
-        friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
-        friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
+        friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
+        friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
         friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
         friend.setOnline(cursor.getInt(cursor.getColumnIndex(KEY_ONLINE)) == 1); //int to boolean
         GregorianCalendar cal = new GregorianCalendar();
@@ -228,8 +242,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex(KEY_NAME)));
                 friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
                 friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
-                friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSX)));
-                friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_POSY)));
+                friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
+                friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
                 friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
                 friend.setOnline(cursor.getInt(cursor.getColumnIndex(KEY_ONLINE)) == 1); //int to boolean
                 GregorianCalendar cal = new GregorianCalendar();
@@ -258,8 +272,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_NAME, user.getName());
         values.put(KEY_NUMBER, user.getNumber());
         values.put(KEY_EMAIL, user.getEmail());
-        values.put(KEY_POSX, user.getLocation().getLongitude());
-        values.put(KEY_POSY, user.getLocation().getLatitude());
+        values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
+        values.put(KEY_LATITUDE, user.getLocation().getLatitude());
         values.put(KEY_POSNAME, user.getPositionName());
         values.put(KEY_ONLINE, user.isOnline() ? 1 : 0); //boolean to int
         values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
@@ -418,7 +432,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     /**
-     * Stores an event in the database.
+     * Stores an event in the database. If there's already an event with the same ID, updates that event instead
      * The event must have an ID (given by the server)!
      * @param event The event to store
      */
@@ -429,21 +443,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     	
         SQLiteDatabase db = this.getWritableDatabase();
         
-        ContentValues values = new ContentValues();
-        values.put(KEY_ID, event.getID());
-        values.put(KEY_NAME, event.getName());
-        values.put(KEY_EVTDESC, event.getDescription());
-        values.put(KEY_USER_ID, event.getCreator());
-        values.put(KEY_CREATOR_NAME, event.getCreatorName());
-        values.put(KEY_POSX, event.getLocation().getLongitude());
-        values.put(KEY_POSY, event.getLocation().getLatitude());
-        values.put(KEY_POSNAME, event.getPositionName());
-        values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
-        values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
+        Cursor cursor = db.query(
+                TABLE_EVENT,
+                EVENT_COLUMNS,
+                KEY_ID + " = ?",
+                new String[] {String.valueOf(event.getID())},
+                null,
+                null,
+                null,
+                null);
      
-        db.insert(TABLE_EVENT, null, values);
-        
-        db.close();
+        //We check if the even is already there
+        if (!cursor.moveToFirst()) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_ID, event.getID());
+            values.put(KEY_NAME, event.getName());
+            values.put(KEY_EVTDESC, event.getDescription());
+            values.put(KEY_USER_ID, event.getCreator());
+            values.put(KEY_CREATOR_NAME, event.getCreatorName());
+            values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
+            values.put(KEY_LATITUDE, event.getLocation().getLatitude());
+            values.put(KEY_POSNAME, event.getPositionName());
+            values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
+            values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
+         
+            db.insert(TABLE_EVENT, null, values);
+            
+            db.close();
+        } else {
+            db.close();
+            updateEvent(event);
+        }
     }
     
     /**
@@ -475,8 +505,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         endDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_ENDDATE)));
         
         Location loc = new Location("");
-        loc.setLongitude(cursor.getColumnIndex(KEY_POSX));
-        loc.setLatitude(cursor.getColumnIndex(KEY_POSY));
+        loc.setLongitude(cursor.getLong(cursor.getColumnIndex(KEY_LONGITUDE)));
+        loc.setLatitude(cursor.getLong(cursor.getColumnIndex(KEY_LATITUDE)));
         
         UserEvent event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                 cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
@@ -541,8 +571,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_EVTDESC, event.getDescription());
         values.put(KEY_USER_ID, event.getCreator());
         values.put(KEY_CREATOR_NAME, event.getCreatorName());
-        values.put(KEY_POSX, event.getLocation().getLongitude());
-        values.put(KEY_POSY, event.getLocation().getLatitude());
+        values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
+        values.put(KEY_LATITUDE, event.getLocation().getLatitude());
         values.put(KEY_POSNAME, event.getPositionName());
         values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
         values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
