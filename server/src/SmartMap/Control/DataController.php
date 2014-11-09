@@ -41,8 +41,15 @@ class DataController
         
         $user = $this->mRepo->getUser($userId);
         
-        $user->setLongitude($longitude);
-        $user->setLatitude($latitude);
+        try
+        {
+            $user->setLongitude($longitude);
+            $user->setLatitude($latitude);
+        }
+        catch (\InvalidArgumentException $e)
+        {
+            throw new ControlException('Invalid coordinates.');
+        }
         
         $this->mRepo->updateUser($user);
         

@@ -61,7 +61,47 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
     
-    public function testValidListFreindPos()
+    /**
+     * @expectedException SmartMap\Control\ControlException
+     * @expectedExceptionMessage Invalid coordinates.
+     */
+    public function testInvalidCoordinatesUpdatePos()
+    {
+        $returnUser = new User(14, 12345, 'Toto', 'VISIBLE', 1.0, 2.0);
+        
+        $this->mockRepo
+             ->method('getUser')
+             ->willReturn($returnUser);
+        
+        $request = new Request($query = array(), $request = array('longitude' => 200.0, 'latitude' => -35.0));
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new DataController($this->mockRepo);
+        
+        $controller->updatePos($request);
+    }
+    
+    /**
+     * @expectedException SmartMap\Control\ControlException
+     * @expectedExceptionMessage Post parameter longitude is not set !
+     */
+    public function testMissingPostParam()
+    {
+        $request = new Request();
+    
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+    
+        $controller = new DataController($this->mockRepo);
+    
+        $response = $controller->updatePos($request);
+    }
+    
+    public function testValidListFriendPos()
     {
         $friendsIds = array(1, 2);
         
@@ -169,12 +209,60 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
     
-    public function testInvalidInviteFriend()
+    /**
+     * @expectedException SmartMap\Control\ControlException
+     * @expectedExceptionMessage You cannot invite yourself !
+     */
+    public function testInvalidSelfInviteFriend()
     {
-        // TODO
+        $request = new Request($query = array(), $request = array('friend_id' => 14));
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new DataController($this->mockRepo);
+        
+        $response = $controller->inviteFriend($request);
     }
     
-    public function gestValidGetInvitations()
+    public function testInvalidInviteFriend()
+    {
+        $this->mockRepo
+             ->method('getFriendsIds')
+             ->willReturn(array(1,2));
+        
+        $this->mockRepo->expects($this->once())
+             ->method('getFriendsIds')
+             ->with($this->equalTo(14));
+        
+        $this->mockRepo
+             ->method('getInvitationIds')
+             ->willReturn(array());
+        
+        $this->mockRepo->expects($this->exactly(2))
+             ->method('getInvitationIds')
+             ->withConsecutive(
+                $this->equalTo(14),
+                $this->equalTo(15)
+             );
+        
+        $request = new Request($query = array(), $request = array('friend_id' => 1));
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new DataController($this->mockRepo);
+        
+        $response = $controller->inviteFriend($request);
+        
+        $validResponse = array('status' => 'error', 'message' => 'You are already friends or invited.');
+        
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+    
+    public function testValidGetInvitations()
     {
         $invitIds = array(1, 2);
         
@@ -207,7 +295,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         
         $controller = new DataController($this->mockRepo);
         
-        $response = $controller->inviteFriend($request);
+        $response = $controller->getInvitations($request);
         
         $list = array(
             array('id' => 1, 'name' => 'Toto'),
@@ -272,6 +360,68 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         );
         
         $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+    
+    /**
+     * @expectedException SmartMap\Control\ControlException
+     * @expectedExceptionMessage Not invited by user with id 3 !
+     */
+    public function testNonInvitedAcceptInvitation()
+    {
+        $invitIds = array(1, 2);
+        
+        $this->mockRepo
+             ->method('getInvitationIds')
+             ->willReturn($invitIds);
+        
+        $this->mockRepo->expects($this->once())
+             ->method('getInvitationIds')
+             ->with($this->equalTo(14));
+        
+        $request = new Request($query = array(), $request = array('friend_id' => 3));
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new DataController($this->mockRepo);
+        
+        $controller->acceptInvitation($request);
+    }
+    
+    /**
+     * @expectedException SmartMap\Control\ControlException
+     * @expectedExceptionMessage You are already friends !
+     */
+    public function testAlreadyFriendAcceptInvitation()
+    {
+        $invitIds = array(1, 2);
+        
+        $this->mockRepo
+             ->method('getInvitationIds')
+             ->willReturn($invitIds);
+        
+        $this->mockRepo->expects($this->once())
+             ->method('getInvitationIds')
+             ->with($this->equalTo(14));
+        
+        $this->mockRepo->expects($this->once())
+             ->method('removeInvitation')
+             ->with($this->equalTo(1), $this->equalTo(14));
+        
+        $this->mockRepo
+             ->method('addFriendshipLink')
+             ->will($this->throwException(new \Exception('This friendship link already exists !')));
+        
+        $request = new Request($query = array(), $request = array('friend_id' => 1));
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new DataController($this->mockRepo);
+        
+        $controller->acceptInvitation($request);
     }
     
     public function testValidFindUsers()
