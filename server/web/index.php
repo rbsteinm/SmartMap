@@ -92,8 +92,10 @@ $app->post('/updatePos', 'data.controller:updatePos');
 
 $app->post('/findUsers', 'data.controller:findUsers');
 
-// Testing
-$app->post('/fakeAuth', 'authentication.controller:fakeAuth');
+if ($app['debug'])
+{
+    $app->post('/fakeAuth', 'authentication.controller:fakeAuth');
+}
 
 
 $app->run();

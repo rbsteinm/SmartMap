@@ -2,8 +2,6 @@
 
 namespace SmartMap\Control;
 
-use Silex\Application;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -26,15 +24,17 @@ class AuthorizationController
         $this->mRepo = $repo;
     }
     
+    /** 
+     * Allow a friend to see the user's location.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function allowFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         $this->mRepo->setFriendshipStatus($userId, $friendId, 'ALLOWED');
         
@@ -43,15 +43,17 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** 
+     * Disallow a friend to see the user's location.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function disallowFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         $this->mRepo->setFriendshipStatus($userId, $friendId, 'DISALLOWED');
         
@@ -60,17 +62,20 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** 
+     * Allow friends in a list of ids separated by commas to see
+     * the user's location.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function allowFriendList(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendsIds = $request->request->get('friend_ids');
-        if ($friendsIds === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendsIds = $this->getPostParam($request, 'friend_ids');
         
-        $friendsIds = explode(',', $friendsIds);
+        $friendsIds = $this->getIntArrayFromString($friendsIds);
         
         $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'ALLOWED');
         
@@ -79,17 +84,20 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** 
+     * Disallow friends in a list of ids separaed by commas to see
+     * the user's location.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function disallowFriendList(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendsIds = $request->request->get('friend_ids');
-        if ($friendsIds === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendsIds = $this->getPostParam($request, 'friend_ids');
         
-        $friendsIds = explode(',', $friendsIds);
+        $friendsIds = $this->getIntArrayFromString($friendsIds);
         
         $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'DISALLOWED');
         
@@ -98,15 +106,17 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** 
+     * Follow a friend to be notified of his position.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function followFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         $this->mRepo->setFriendshipFollow($userId, $friendId, 'FOLLOWED');
         
@@ -115,20 +125,62 @@ class AuthorizationController
         return new JsonResponse($response);
     }
     
+    /** 
+     * Unfollow a friend to be no longer notified of his position.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function unfollowFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         $this->mRepo->setFriendshipFollow($userId, $friendId, 'UNFOLLOWED');
         
         $response = array('status' => 'Ok', 'message' => 'Unfollowed friend !');
         
         return new JsonResponse($response);
+    }
+    
+    /** 
+     * Utility function transforming a list of numbers separated by commas
+     * in an array of integers.
+     * 
+     * @param string $string
+     * @return array
+     */
+    private function getIntArrayFromString($string)
+    {
+        $array = explode(',', $string);
+        
+        for ($i = 0; $i < count($array); $i++)
+        {
+            $array[$i] = (int) $array[$i];
+        }
+        
+        return $array;
+    }
+    
+    /** 
+     * Utility function getting a post parameter and throwing a ControlException
+     * if the parameter is not set in the request.
+     * 
+     * @param Request $request
+     * @param string $param
+     * @throws ControlException
+     * @return string
+     */
+    private function getPostParam(Request $request, $param)
+    {
+        $value = $request->request->get($param);
+        
+        if ($value === null)
+        {
+            throw new ControlException('Post parameter ' . $param . ' is not set !');
+        }
+        
+        return $value;
     }
 }
