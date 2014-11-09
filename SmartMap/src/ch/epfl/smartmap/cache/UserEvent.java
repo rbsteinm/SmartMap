@@ -42,7 +42,6 @@ public class UserEvent implements Event {
                 startDate.get(Calendar.MINUTE));
 
         mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
-
         mEndDate = new GregorianCalendar(endDate.get(Calendar.YEAR),
                 endDate.get(Calendar.MONTH),
                 endDate.get(Calendar.DATE),
