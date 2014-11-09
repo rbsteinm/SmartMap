@@ -48,8 +48,6 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
         mContext = context;
         mItemsArrayList = itemsArrayList;
-        //DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        //mItemsArrayList = dbHelper.getAllEvents();
 
         mMyLocation = myLocation;
     }

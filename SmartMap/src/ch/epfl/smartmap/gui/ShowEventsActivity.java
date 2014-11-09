@@ -32,6 +32,7 @@ import ch.epfl.smartmap.cache.UserEvent;
  */
 public class ShowEventsActivity extends ListActivity {
 
+    @SuppressWarnings("unused")
     private final static String TAG = ShowEventsActivity.class.getSimpleName();
 
     private final static double EARTH_RADIUS = 6378.1;
@@ -144,19 +145,12 @@ public class ShowEventsActivity extends ListActivity {
         e3.setDescription(descrE3);
 
         mDbHelper = new DatabaseHelper(this);
-        mDbHelper.clearAll();
         mDbHelper.addEvent(e0);
         mDbHelper.addEvent(e1);
         mDbHelper.addEvent(e2);
         mDbHelper.addEvent(e3);
 
         mMockEventsList = mDbHelper.getAllEvents();
-
-        /*mMockEventsList = new ArrayList<Event>();
-        mMockEventsList.add(e0);
-        mMockEventsList.add(e1);
-        mMockEventsList.add(e2);
-        mMockEventsList.add(e3);*/
 
         // Create custom Adapter and pass it to the Activity
         EventsListItemAdapter adapter = new EventsListItemAdapter(this, mMockEventsList, mMyLocation);
@@ -292,6 +286,15 @@ public class ShowEventsActivity extends ListActivity {
         setListAdapter(adapter);
     }
 
+    /**
+     * Computes the distance between two GPS locations (takes into consideration the earth radius)
+     * @param lat1
+     * @param lon1
+     * @param lat2
+     * @param lon2
+     * @return the distance in km, with 2 digits
+     * @author SpicyCH
+     */
     protected static double distance(double lat1, double lon1, double lat2, double lon2) {
         double x1 = Math.toRadians(lat1);
         double y1 = Math.toRadians(lon1);
@@ -301,9 +304,8 @@ public class ShowEventsActivity extends ListActivity {
         double sec1 = Math.sin(x1) * Math.sin(x2);
         double dl = Math.abs(y1 - y2);
         double sec2 = Math.cos(x1) * Math.cos(x2);
-        // sec1,sec2,dl are in degree, need to convert to radians
+        // sec1, sec2, dl are in degree, need to convert to radians
         double centralAngle = Math.acos(sec1 + sec2 * Math.cos(dl));
-        // Radius of Earth: 6378.1 kilometers
         double distance = centralAngle * EARTH_RADIUS;
 
         return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;

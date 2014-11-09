@@ -17,15 +17,15 @@ import android.util.LongSparseArray;
  * @author ritterni
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
-    
+
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "SmartMapDB";
-    
+
     public static final String TABLE_USER = "users";
     public static final String TABLE_FILTER = "filters";
     public static final String TABLE_FILTER_USER = "filter_users";
     public static final String TABLE_EVENT = "events";
-    
+
     private static final String KEY_USER_ID = "userID";
     private static final String KEY_NAME = "name";
     private static final String KEY_NUMBER = "number";
@@ -36,38 +36,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ONLINE = "isOnline";
     private static final String KEY_LASTSEEN = "lastSeen";
     private static final String KEY_VISIBLE = "isVisible";
-    
+
     private static final String KEY_ID = "id";
     private static final String KEY_FILTER_ID = "filterID";
-    
+
     private static final String KEY_DATE = "date";
     private static final String KEY_ENDDATE = "endDate";
-    
+
     private static final String KEY_CREATOR_NAME = "creatorName";
     private static final String KEY_EVTDESC = "eventDescription";
-    
+
     //Columns for the User table
     private static final String[] USER_COLUMNS = {
         KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL,
         KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_ONLINE, KEY_LASTSEEN, KEY_VISIBLE
     };
-    
+
     //Columns for the Filter table
     private static final String[] FILTER_COLUMNS = {
         KEY_ID, KEY_NAME
     };
-    
+
     //Columns for the Filter/User table
     private static final String[] FILTER_USER_COLUMNS = {
         KEY_ID, KEY_FILTER_ID, KEY_USER_ID
     };
-    
+
     //Columns for the Event table
     private static final String[] EVENT_COLUMNS = {
-        KEY_ID, KEY_NAME, KEY_EVTDESC, KEY_USER_ID, KEY_CREATOR_NAME, 
+        KEY_ID, KEY_NAME, KEY_EVTDESC, KEY_USER_ID, KEY_CREATOR_NAME,
         KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_DATE, KEY_ENDDATE
     };
-    
+
     //Table of users
     private static final String CREATE_TABLE_USER = "CREATE TABLE IF NOT EXISTS "
             + TABLE_USER + "("
@@ -82,14 +82,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_LASTSEEN + " INTEGER,"
             + KEY_VISIBLE + " INTEGER"
             + ")";
-    
+
     //Table of filters
     private static final String CREATE_TABLE_FILTER = "CREATE TABLE IF NOT EXISTS "
             + TABLE_FILTER + "("
             + KEY_ID + " INTEGER PRIMARY KEY,"
             + KEY_NAME + " TEXT"
             + ")";
-    
+
     //Table that maps filters to users
     private static final String CREATE_TABLE_FILTER_USER = "CREATE TABLE IF NOT EXISTS "
             + TABLE_FILTER_USER + "("
@@ -97,7 +97,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_FILTER_ID + " INTEGER,"
             + KEY_USER_ID + " INTEGER"
             + ")";
-    
+
     //Table of events
     private static final String CREATE_TABLE_EVENT = "CREATE TABLE IF NOT EXISTS "
             + TABLE_EVENT + "("
@@ -112,7 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_DATE + " INTEGER,"
             + KEY_ENDDATE + " INTEGER"
             + ")";
-      
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -131,7 +131,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
-        
+
         onCreate(db);
     }
 
@@ -142,15 +142,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         onUpgrade(db, 1, 2);
     }
-    
+
     /**
      * Adds a user to the internal database. If an user with the same ID already exists, updates that user instead.
      * @param user The user to add to the database
      */
     public void addUser(User user) {
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
-        
+
         Cursor cursor = db.query(
                 TABLE_USER,
                 USER_COLUMNS,
@@ -160,7 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null);
-        
+
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
             values.put(KEY_USER_ID, user.getID());
@@ -173,25 +173,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_ONLINE, user.isOnline() ? 1 : 0); //boolean to int
             values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
             values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); //boolean to int
-         
+
             db.insert(TABLE_USER, null, values);
-            
+
             db.close();
         } else {
             db.close();
             updateUser(user);
         }
+
+        cursor.close();
     }
-    
+
     /**
      * Gets a user from the database
      * @param id The user's unique ID
      * @return The user as a Friend object
      */
     public User getUser(long id) {
-        
+
         SQLiteDatabase db = this.getReadableDatabase();
-        
+
         Cursor cursor = db.query(
                 TABLE_USER,
                 USER_COLUMNS,
@@ -201,12 +203,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null);
-     
+
         if (cursor != null) {
             cursor.moveToFirst();
         }
-        
-        
+
+
         Friend friend = new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
                 cursor.getString(cursor.getColumnIndex(KEY_NAME)));
         friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
@@ -219,22 +221,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
         friend.setLastSeen(cal);
         friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); //int to boolean
-        
+
+        cursor.close();
+
         return friend;
     }
-    
+
     /**
      * Creates a LongSparseArray containing all users in the database, mapped to their ID
      * @return A LongSparseArray of all users
      */
     public LongSparseArray<User> getAllUsers() {
         LongSparseArray<User> friends = new LongSparseArray<User>();
-  
+
         String query = "SELECT  * FROM " + TABLE_USER;
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
-        
+
         Friend friend = null;
         if (cursor.moveToFirst()) {
             do {
@@ -250,23 +254,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
                 friend.setLastSeen(cal);
                 friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); //int to boolean
-                
+
                 friends.put(friend.getID(), friend);
             } while (cursor.moveToNext());
         }
-        
+
+        cursor.close();
         return friends;
     }
-    
+
     /**
      * Updates a user's values
      * @param user The user to update
      * @return The number of rows that were updated
      */
     public int updateUser(User user) {
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
-     
+
         ContentValues values = new ContentValues();
         values.put(KEY_USER_ID, user.getID());
         values.put(KEY_NAME, user.getName());
@@ -278,46 +283,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_ONLINE, user.isOnline() ? 1 : 0); //boolean to int
         values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
         values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); //boolean to int
-        
+
         int rows = db.update(TABLE_USER,
                 values,
                 KEY_USER_ID + " = ?",
                 new String[] {String.valueOf(user.getID())});
-     
+
         db.close();
-     
+
         return rows;
     }
-    
+
     /**
      * Deletes a user from the database
      * @param id The user's id
      */
     public void deleteUser(long id) {
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
- 
+
         db.delete(TABLE_USER,
                 KEY_USER_ID + " = ?",
                 new String[] {String.valueOf(id)});
-                
-        db.close(); 
+
+        db.close();
     }
-    
+
     /**
      * Adds a filter/userlist/friendlist to the database, and gives an ID to the filter
      * @param filter The filter/list to add
      * @return The ID of the newly added filter in the filter database
      */
     public long addFilter(UserList filter) {
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
-     
+
         //First we insert the filter in the table of lists
         ContentValues filterValues = new ContentValues();
         filterValues.put(KEY_NAME, filter.getListName());
         long filterID = db.insert(TABLE_FILTER, null, filterValues);
-        
+
         //Then we add the filter-user pairs to another table
         ContentValues pairValues = null;
         for (long id : filter.getList()) {
@@ -330,16 +335,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         filter.setID(filterID); //sets an ID so the filter can be easily accessed
         return filterID;
     }
-    
+
     /**
      * Gets a specific filter by its id
      * @param name The filter's id
      * @return The filter as a FriendList object
      */
     public UserList getFilter(long id) {
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
-        
+
         //First query to get the filter's name
         Cursor cursor = db.query(
                 TABLE_FILTER,
@@ -350,14 +355,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null);
-     
+
         if (cursor != null) {
             cursor.moveToFirst();
         }
-        
+
         FriendList filter = new FriendList(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
         filter.setID(id);
-        
+
         //Second query to get the associated list of IDs
         cursor = db.query(
                 TABLE_FILTER_USER,
@@ -368,69 +373,73 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null);
-            
+
         if (cursor.moveToFirst()) {
             do {
                 filter.addUser(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
             } while (cursor.moveToNext());
         }
+
+        cursor.close();
         return filter;
     }
-    
+
     /**
      * Gets all the filters from the database
      * @return A list of FriendLists
      */
     public List<UserList> getAllFilters() {
-        
+
         ArrayList<UserList> filters = new ArrayList<UserList>();
-        
+
         String query = "SELECT  * FROM " + TABLE_FILTER;
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
-        
+
         if (cursor.moveToFirst()) {
             do {
                 //using getFilter to add this row's filter to the list
                 filters.add(getFilter(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
             } while (cursor.moveToNext());
         }
+
+        cursor.close();
         return filters;
     }
-    
+
     /**
      * Deletes a filter from the database
      * @param filter The filter to delete
      */
     public void deleteFilter(long id) {
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
- 
+
         //delete the filter from the table of filters
         db.delete(TABLE_FILTER,
                 KEY_ID + " = ?",
                 new String[] {String.valueOf(id)});
-        
+
         //then delete all the rows that reference this filter in the filter-user table
         db.delete(TABLE_FILTER_USER,
                 KEY_FILTER_ID + " = ?",
                 new String[] {String.valueOf(id)});
-                
-        db.close(); 
+
+        db.close();
     }
-    
+
     /**
      * Updates a filter
      * @param filter The updated filter
      */
     public void updateFilter(UserList filter) {
- 
+
         deleteFilter(filter.getID());
         addFilter(filter);
         //not sure if there's a more efficient way
     }
-    
+
     /**
      * Stores an event in the database. If there's already an event with the same ID, updates that event instead
      * The event must have an ID (given by the server)!
@@ -440,9 +449,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     	if (event.getID() < 0) {
     		throw new IllegalArgumentException("Invalid event ID");
     	}
-    	
+
         SQLiteDatabase db = this.getWritableDatabase();
-        
+
         Cursor cursor = db.query(
                 TABLE_EVENT,
                 EVENT_COLUMNS,
@@ -452,7 +461,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null);
-     
+
         //We check if the even is already there
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
@@ -466,24 +475,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_POSNAME, event.getPositionName());
             values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
             values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
-         
+
             db.insert(TABLE_EVENT, null, values);
-            
+
             db.close();
         } else {
             db.close();
             updateEvent(event);
         }
+
+        cursor.close();
     }
-    
+
     /**
      * @param id The event's ID
      * @return The event associated to this ID
      */
     public Event getEvent(long id) {
-        
+
         SQLiteDatabase db = this.getReadableDatabase();
-        
+
         Cursor cursor = db.query(
                 TABLE_EVENT,
                 EVENT_COLUMNS,
@@ -493,21 +504,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null);
-     
+
         if (cursor != null) {
             cursor.moveToFirst();
         }
-     
+
         GregorianCalendar startDate = new GregorianCalendar();
         GregorianCalendar endDate = new GregorianCalendar();
-        
+
         startDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_DATE)));
         endDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_ENDDATE)));
-        
+
         Location loc = new Location("");
         loc.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
         loc.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
-        
+
         UserEvent event = new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)),
                 cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
                 cursor.getString(cursor.getColumnIndex(KEY_CREATOR_NAME)),
@@ -518,53 +529,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         event.setID(id);
         event.setDescription(cursor.getString(cursor.getColumnIndex(KEY_EVTDESC)));
         event.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
-        
+
+        cursor.close();
+
         return event;
     }
-    
+
     /**
      * @return The list of all events
      */
     public List<Event> getAllEvents() {
         ArrayList<Event> events = new ArrayList<Event>();
-  
+
         String query = "SELECT  * FROM " + TABLE_EVENT;
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
-        
+
         if (cursor.moveToFirst()) {
             do {
             	events.add(getEvent(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return events;
     }
-    
+
     /**
      * Deletes an event from the database
      * @param event The event to delete
      */
     public void deleteEvent(long id) {
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
- 
+
         db.delete(TABLE_EVENT,
                 KEY_ID + " = ?",
                 new String[] {String.valueOf(id)});
-                
-        db.close(); 
+
+        db.close();
     }
-    
+
     /**
      * Updates an event
      * @param event The event to update
      * @return The number of rows that were affected
      */
     public int updateEvent(Event event) {
-        
+
         SQLiteDatabase db = this.getWritableDatabase();
-     
+
         ContentValues values = new ContentValues();
         values.put(KEY_ID, event.getID());
         values.put(KEY_NAME, event.getName());
@@ -576,14 +590,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_POSNAME, event.getPositionName());
         values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
         values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
-        
+
         int rows = db.update(TABLE_EVENT,
                 values,
                 KEY_ID + " = ?",
                 new String[] {String.valueOf(event.getID())});
-     
+
         db.close();
-     
+
         return rows;
     }
 }
