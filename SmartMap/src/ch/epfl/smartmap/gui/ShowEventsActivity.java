@@ -4,16 +4,21 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.UserEvent;
@@ -27,6 +32,8 @@ import ch.epfl.smartmap.cache.UserEvent;
 public class ShowEventsActivity extends ListActivity {
 
     private final static String TAG = ShowEventsActivity.class.getSimpleName();
+
+    private final static double EARTH_RADIUS = 6378.1;
 
     private final static int SEEK_BAR_MIN_VALUE = 2;
 
@@ -127,6 +134,8 @@ public class ShowEventsActivity extends ListActivity {
 
         UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Alain", timeE3, timeEndE3, verbier);
         e3.setPositionName("Verbier");
+        String descrE3 = "It’s a vertical free-verse poem on the mountain. It’s the ultimate expression of all that is fun and liberating about sliding on snow in wintertime.";
+        e3.setDescription(descrE3);
 
         mMockEventsList.add(e0);
         mMockEventsList.add(e1);
@@ -155,6 +164,38 @@ public class ShowEventsActivity extends ListActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Event event = (UserEvent) findViewById(position).getTag();
+
+        String message = EventsListItemAdapter.setTextFromDate(event.getStartDate(), "start") + " - "
+                + EventsListItemAdapter.setTextFromDate(event.getEndDate(), "end") + "\nCreated by "
+                + event.getCreatorName() + "\n\n" + event.getDescription();
+
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(event.getName()
+                + " @ "
+                + event.getPositionName()
+                + "\n"
+                + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation().getLatitude(),
+                        event.getLocation().getLongitude()) + " km away");
+        alertDialog.setMessage(message);
+        final Activity activity = this;
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show on the map", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+
+                // TODO open event in map
+                Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        alertDialog.show();
+
+        super.onListItemClick(l, v, position, id);
     }
 
     public void onCheckboxClicked(View v) {
@@ -224,7 +265,7 @@ public class ShowEventsActivity extends ListActivity {
 
             if (mNearMeChecked) {
                 double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
-                        mMyLocation.getLatitude(), mMyLocation.getLongitude(), 'K');
+                        mMyLocation.getLatitude(), mMyLocation.getLongitude());
                 /*
                  * Toast.makeText( this, "The distance between me and event " + e.getName() + " @ " +
                  * e.getPositionName() + " is " + distanceMeEvent + " km", Toast.LENGTH_LONG).show();
@@ -241,32 +282,20 @@ public class ShowEventsActivity extends ListActivity {
         setListAdapter(adapter);
     }
 
-    protected static double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
-        double theta = lon1 - lon2;
-        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1))
-                * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
-        dist = Math.acos(dist);
-        dist = rad2deg(dist);
-        dist = dist * 60 * 1.1515;
-        if (unit == 'K') {
-            dist = dist * 1.609344;
-        } else if (unit == 'N') {
-            dist = dist * 0.8684;
-        }
-        return (dist);
-    }
+    protected static double distance(double lat1, double lon1, double lat2, double lon2) {
+        double x1 = Math.toRadians(lat1);
+        double y1 = Math.toRadians(lon1);
+        double x2 = Math.toRadians(lat2);
+        double y2 = Math.toRadians(lon2);
 
-    private static double deg2rad(double deg) {
-        return (deg * Math.PI / 180.0);
-    }
+        double sec1 = Math.sin(x1) * Math.sin(x2);
+        double dl = Math.abs(y1 - y2);
+        double sec2 = Math.cos(x1) * Math.cos(x2);
+        // sec1,sec2,dl are in degree, need to convert to radians
+        double centralAngle = Math.acos(sec1 + sec2 * Math.cos(dl));
+        // Radius of Earth: 6378.1 kilometers
+        double distance = centralAngle * EARTH_RADIUS;
 
-    private static double rad2deg(double rad) {
-        return (rad * 180.0 / Math.PI);
+        return Math.floor(distance * 100) / 100;
     }
-
-    /*
-     * System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, 'M') + " Miles\n");
-     * System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, 'K') + " Kilometers\n");
-     * System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, 'N') + " Nautical Miles\n");
-     */
 }
