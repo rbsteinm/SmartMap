@@ -79,7 +79,7 @@
                 android:id="@+id/searchBarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="0dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
                 android:layout_marginTop="0dp"
@@ -105,15 +105,17 @@
                     android:singleLine="true"
                     android:textSize="25sp" />
             </LinearLayout>
-
-            <ListView
+            
+            <ScrollView
                 android:id="@+id/search_result_list"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:orientation="vertical"
-                android:overScrollMode="never" />
+                android:overScrollMode="never"
+                android:scrollbars="none" >
+            </ScrollView>
         </LinearLayout>
     </ch.epfl.smartmap.gui.SearchLayout>
 

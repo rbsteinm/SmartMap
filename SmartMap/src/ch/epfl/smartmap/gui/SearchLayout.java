@@ -11,8 +11,10 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
+import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
@@ -39,12 +41,21 @@ public class SearchLayout extends RelativeLayout {
     public enum InitState {
         NOT_INITIALIZED, INITIALIZED
     };
+    
+    /**
+     * All possible search result lists
+     * 
+     * @author jfperren
+     */
+    public enum SearchTypes {
+        QUICK, USERS, EVENTS, TAGS, GROUPS
+    }
 
     private final Context mContext;
     private InitState mInitState;
     private final SearchEngine mSearchEngine;
-    private final SearchResultItemAdapter mSearchResultItemAdapter;
-    private final ArrayList<Friend> mSearchResultList;
+    private final SearchResultViewGroup mSearchResultViewGroup;
+    private final TextView mSearchResultTitle;
 
     /**
      * Constructor
@@ -58,9 +69,10 @@ public class SearchLayout extends RelativeLayout {
         mContext = context;
         mInitState = InitState.NOT_INITIALIZED;
         mSearchEngine = searchEngine;
-        mSearchResultList = new ArrayList<Friend>();
-        mSearchResultItemAdapter = new SearchResultItemAdapter(context, MockDB.FRIENDS_LIST);
         this.setVisibility(View.GONE);
+        mSearchResultViewGroup = new SearchResultViewGroup(mContext, MockDB.FRIENDS_LIST);
+        mSearchResultTitle = new TextView(mContext);
+        mSearchResultTitle.setText("Quick Search");
     }
 
     /**
@@ -86,9 +98,9 @@ public class SearchLayout extends RelativeLayout {
 
         // Get Views
         final SearchView mSearchView = (SearchView) findViewById(R.id.searchBar);
-        final ListView mSearchResultListView = (ListView) findViewById(R.id.search_result_list);
-
-        mSearchResultListView.setAdapter(mSearchResultItemAdapter);
+        final ScrollView mSearchResultListView = (ScrollView) findViewById(R.id.search_result_list);
+        
+        mSearchResultListView.addView(mSearchResultViewGroup);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 
             public boolean onQueryTextSubmit(String query) {
@@ -103,6 +115,7 @@ public class SearchLayout extends RelativeLayout {
                 return false;
             }
         });
+        
 
 //        mSearchResultList.setOnClickListener(new OnClickListener() {
 //            @Override
@@ -119,18 +132,12 @@ public class SearchLayout extends RelativeLayout {
      */
     private void updateSearchResults() {
         // Get needed Views
-        final ListView mSearchResultList = (ListView) this
-            .findViewById(R.id.search_result_list);
         final SearchView mSearchBarEditText = (SearchView) this
             .findViewById(R.id.searchBar);
 
         // Get search query
         String query = mSearchBarEditText.getQuery().toString();
-        List<Friend> result = mSearchEngine.sendQuery(query);
-
-        mSearchResultItemAdapter.clear();
-        mSearchResultItemAdapter.addAll(result);
-        mSearchResultItemAdapter.notifyDataSetChanged();
+        mSearchResultViewGroup.setResultList(mSearchEngine.sendQuery(query));
     }
 
     /**
@@ -148,11 +155,13 @@ public class SearchLayout extends RelativeLayout {
      * @param query Initial search query of search bar.
      */
     public void open(String query) {
+        Log.d(TAG, "Etape open START");
         this.setVisibility(View.VISIBLE);
         Animation bottomUp = AnimationUtils.loadAnimation(getContext(),
             R.anim.bottom_up);
         this.startAnimation(bottomUp);
         updateSearchResults();
+        Log.d(TAG, "Etape open END");
     }
 
     /**

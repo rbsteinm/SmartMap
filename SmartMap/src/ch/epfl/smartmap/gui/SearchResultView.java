@@ -1,8 +1,11 @@
 package ch.epfl.smartmap.gui;
 
 import android.content.Context;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
-import ch.epfl.smartmap.R;
 
 /**
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}.
@@ -11,19 +14,24 @@ import ch.epfl.smartmap.R;
  */
 public abstract class SearchResultView extends LinearLayout {
 
+    // FIXME : Should define
     private static final int PADDING_BOTTOM = 20;
     private static final int PADDING_RIGHT = 20;
     private static final int PADDING_LEFT = 20;
     private static final int PADDING_TOP = 20;
-
-    private static final int SHADOW_WIDTH = 10;
-    private static final int BORDER_WIDTH = 1;
-    private static final int BOTTOM_BORDER_WIDTH = 4;
     private static final float MAIN_LAYOUT_WEIGHTSUM = 10f;
+    private final static int PHOTO_RIGHT_MARGIN = 40;
+    private final static int PHOTO_SIZE = 150;
+    
+    private final ImageView mImageView;
+    /**
+     * 
+     */
+    public enum ChildrenState {
+        EMPTY, ADDED
+    }
 
-    private final LinearLayout mMainLayout;
-    private final LinearLayout mBorderLayout;
-
+    private ChildrenState mChildrenState;
     /** 
      * Constructor 
      * 
@@ -31,47 +39,44 @@ public abstract class SearchResultView extends LinearLayout {
      */
     public SearchResultView(Context context) {
         super(context);
-        // TODO : Decide what to put here and what needs to be done in subclasses.
-
-        // Creates shadow layout
-        this.setBackgroundResource(R.color.searchResultShadow);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-            LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(0, 0, 0, SHADOW_WIDTH);
-        this.setLayoutParams(layoutParams);
-
-        // Creates border layout
-        mBorderLayout = new LinearLayout(context);
-        mBorderLayout.setBackgroundResource(R.color.searchResultBorder);
-        mBorderLayout.setLayoutParams(new LayoutParams(
+        mChildrenState = ChildrenState.EMPTY;
+        
+        // Layout Parameters
+        this.setLayoutParams(new AbsListView.LayoutParams(
             LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        mBorderLayout.setPadding(BORDER_WIDTH, BORDER_WIDTH, BORDER_WIDTH,
-            BOTTOM_BORDER_WIDTH);
-
-        // this.setBackgroundResource(R.drawable.shape);
-
-        this.addView(mBorderLayout);
-        // Creates mMainLayout
-        mMainLayout = new LinearLayout(context);
-        mMainLayout.setOrientation(HORIZONTAL);
-        mMainLayout.setWeightSum(MAIN_LAYOUT_WEIGHTSUM);
-
-        // Parameters
-        mMainLayout.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT,
+        this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT,
             PADDING_BOTTOM);
-        mMainLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-            LayoutParams.WRAP_CONTENT));
-        mMainLayout.setBackgroundResource(R.color.searchResultBackground);
+        this.setOrientation(LinearLayout.HORIZONTAL);
+        this.setWeightSum(MAIN_LAYOUT_WEIGHTSUM);
 
-        mBorderLayout.addView(mMainLayout);
+        // ImageView Parameters
+        mImageView = new ImageView(context);
+        mImageView.setAdjustViewBounds(true);
+        mImageView.setImageResource(getImageResource());
+        LayoutParams mPhotoViewLayoutParams = new LayoutParams(PHOTO_SIZE,
+            PHOTO_SIZE);
+        mPhotoViewLayoutParams.setMargins(0, 0, PHOTO_RIGHT_MARGIN, 0);
+        mImageView.setLayoutParams(mPhotoViewLayoutParams);
+        mImageView.setScaleType(ScaleType.FIT_XY);
+
+        this.setOnClickListener(getOnClickListener());
+    }
+    
+    public void initViews() {
+        mImageView.setImageResource(getImageResource());
+        this.addView(mImageView);
+        this.addView(getInfosLayout());
+        mChildrenState = ChildrenState.ADDED;
     }
 
-    protected LinearLayout getMainLayout() {
-        return mMainLayout;
-    }
-
-    /** 
-     * Called when a change is performed on the item this object displays.
+    /**
+     * Define the OnClickListener that will be called when touching this View. Needs to be overriden
+     * 
+     * @return
      */
-    public abstract void update();
+    public abstract OnClickListener getOnClickListener();
+
+    public abstract int getImageResource();
+
+    public abstract ViewGroup getInfosLayout();
 }

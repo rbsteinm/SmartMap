@@ -81,10 +81,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             zoomAccordingToMarkers();
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-            android.R.layout.simple_dropdown_item_1line, Arrays.asList("Lol",
-                "MDR", "fag"));
-//        mSearchButton.setAdapter(adapter);
         mSearchButton.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View v) {

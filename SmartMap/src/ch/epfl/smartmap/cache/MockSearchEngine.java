@@ -17,7 +17,7 @@ public class MockSearchEngine implements SearchEngine {
     @Override
     public List<Friend> sendQuery(String query) {
         if (query.equals("")) {
-            return new ArrayList<Friend>();
+            return MockDB.FRIENDS_LIST;
         }
         query = query.toLowerCase(Locale.US);
         ArrayList<Friend> result = new ArrayList<Friend>();

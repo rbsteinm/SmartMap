@@ -3,8 +3,8 @@ package ch.epfl.smartmap.gui;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
@@ -18,19 +18,15 @@ import ch.epfl.smartmap.cache.Friend;
 public class FriendSearchResultView extends SearchResultView {
 
     private final static String TAG = "FriendSearchResultView";
+    @SuppressWarnings("unused")
     private final static String AUDIT_TAG = "AuditError : " + TAG;
 
-    private final static int PHOTO_RIGHT_MARGIN = 40;
     private final static int NAME_VIEW_BOTTOM_PADDING = 5;
-    private final static int PHOTO_SIZE = 150;
     private final static float NAME_VIEW_TEXT_SIZE = 17f;
 
     private final Friend mFriend;
-    private final ImageView mPhotoView;
-    private final TextView mNameView;
-    private final TextView mLastConnectionView;
-
     private final LinearLayout mInfoLayout;
+    private int mImageResource;
 
     /**
      * @param context
@@ -40,51 +36,58 @@ public class FriendSearchResultView extends SearchResultView {
         super(context);
 
         mFriend = friend;
-
-        // Creates mPhotoView
-        mPhotoView = new ImageView(context);
-        mPhotoView.setAdjustViewBounds(true);
-        mPhotoView.setImageResource(R.drawable.default_user_icon);
-        LayoutParams mPhotoViewLayoutParams = new LayoutParams(PHOTO_SIZE,
-            PHOTO_SIZE);
-        mPhotoViewLayoutParams.setMargins(0, 0, PHOTO_RIGHT_MARGIN, 0);
-        mPhotoView.setLayoutParams(mPhotoViewLayoutParams);
-        mPhotoView.setScaleType(ScaleType.FIT_XY);
+        // FIXME : Should be mFriend.getImageResource();
+        mImageResource = R.drawable.default_user_icon;
 
         // Creates mNameView
-        mNameView = new TextView(context);
-        mNameView.setText(mFriend.getName());
-        mNameView.setTextSize(NAME_VIEW_TEXT_SIZE);
-        mNameView.setTypeface(null, Typeface.BOLD);
-        mNameView.setPadding(0, 0, 0, NAME_VIEW_BOTTOM_PADDING);
+        TextView nameView = new TextView(context);
+        nameView.setText(mFriend.getName());
+        nameView.setTextSize(NAME_VIEW_TEXT_SIZE);
+        nameView.setTypeface(null, Typeface.BOLD);
+        nameView.setPadding(0, 0, 0, NAME_VIEW_BOTTOM_PADDING);
 
         // Creates mLastConnectionView
-        mLastConnectionView = new TextView(context);
-        mLastConnectionView.setText("last seen "
+        TextView lastConnectionView = new TextView(context);
+        lastConnectionView.setText("last seen "
             + friend.getLastSeen().getTime().toString() + ".");
-        mLastConnectionView.setTextColor(getResources().getColor(
+        lastConnectionView.setTextColor(getResources().getColor(
             R.color.lastSeenConnectionTextColor));
 
-        // Create mInfoLayout
+        // Create mInfoLayout and add everything
         mInfoLayout = new LinearLayout(context);
         mInfoLayout.setOrientation(VERTICAL);
-
-        // Adds all view into the ResultView
-        getMainLayout().addView(mPhotoView);
-        mInfoLayout.addView(mNameView);
-        mInfoLayout.addView(mLastConnectionView);
         mInfoLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
             LayoutParams.WRAP_CONTENT));
-        getMainLayout().addView(mInfoLayout);
+        mInfoLayout.addView(nameView);
+        mInfoLayout.addView(lastConnectionView);
+        
+        // Add view on the parent class
+        this.initViews();
     }
 
-    /**
-     * This method should be called when the infos on the user changes. Typically called by a FriendObserver.
+    @Override
+    public ViewGroup getInfosLayout() {
+        return mInfoLayout;
+    }
+
+    @Override
+    public int getImageResource() {
+        return mImageResource;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ch.epfl.smartmap.gui.SearchResultView#getOnClickListener()
      */
     @Override
-    public void update() {
-        // TODO
-        // 1) Update last connection info
+    public OnClickListener getOnClickListener() {
+        return new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "View clicked !");
+            }
+        };
     }
 
     /**
@@ -100,19 +103,6 @@ public class FriendSearchResultView extends SearchResultView {
 
         int auditErrors = 0;
         // auditErrors += mFriend.auditErrors(depth - 1);
-
-        if (mNameView.getText().equals("")) {
-            auditErrors++;
-            Log.e(AUDIT_TAG, "mNameView contains empty string");
-        }
-        if (this.isShown()
-            && !(getMainLayout().isShown() && mNameView.isShown()
-                && mInfoLayout.isShown() && mLastConnectionView.isShown() && mPhotoView
-                    .isShown())) {
-            auditErrors++;
-            Log.e(AUDIT_TAG,
-                "all components are not visible when they should be");
-        }
 
         return auditErrors;
     }

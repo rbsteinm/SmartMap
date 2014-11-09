@@ -29,6 +29,6 @@ public class MockDB {
         39.5547877, 7.4255457);
     public static final Friend HUGO = new Friend(7, "Hugo Sbai", 47.5547877,
         4.4255457);
-    public static final List<Friend> FRIENDS_LIST = Arrays.asList(JULIEN,
-        ALAIN, ROBIN, MATTHIEU, NICOLAS, MARION, RAPHAEL, HUGO);
+    public static final ArrayList<Friend> FRIENDS_LIST = new ArrayList<Friend>(Arrays.asList(JULIEN,
+        ALAIN, ROBIN, MATTHIEU, NICOLAS, MARION, RAPHAEL, HUGO));
 }
