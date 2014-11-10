@@ -82,7 +82,6 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 					new OnGlobalLayoutListener() {
 						@SuppressWarnings("deprecation")
 						@SuppressLint("NewApi")
-						// We check which build version we are using.
 						@Override
 						public void onGlobalLayout() {
 							Log.d(TAG, "enter to zoom according on glpbal");
@@ -111,5 +110,5 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 		}
 
 	}
-
 }
+
