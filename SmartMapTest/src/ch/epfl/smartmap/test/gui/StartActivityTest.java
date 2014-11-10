@@ -5,14 +5,19 @@ import static com.google.android.apps.common.testing.ui.espresso.action.ViewActi
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withEffectiveVisibility;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.Visibility;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+
+import com.facebook.Session;
+
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.StartActivity;
-
-import com.facebook.Session;
-import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.Visibility;
-
+/**
+ * 
+ * @author Alain
+ * 
+ */
 public class StartActivityTest extends
 		ActivityInstrumentationTestCase2<StartActivity> {
 	public StartActivityTest() {
@@ -28,15 +33,16 @@ public class StartActivityTest extends
 	}
 
 	public void testLogoClick() throws Exception {
-		onView(withId(R.id.logo)).perform(click())
-				.check(matches(isDisplayed()));
+		onView(withId(R.id.logo)).perform(click());
+		onView(withId(R.id.logo)).check(matches(isDisplayed()));
 	}
-
 	public void testWelcomeClick() throws Exception {
 		onView(withId(R.id.welcome)).perform(click()).check(
 				matches(isDisplayed()));
 	}
-
+	/*
+	 * How to test this?
+	 */
 	public void testFacebookButtonVisibility() throws Exception {
 		if (Session.getActiveSession() == null
 				|| Session.getActiveSession().getPermissions().isEmpty()) {
