@@ -11,6 +11,8 @@
     <string name="logo_description">Logo</string>
     <string name="welcome">W E L C O M E</string>
     <string name="loading_text">Loading Map...</string>
+    <string name="create_notif">Create Notification</string>
+    <string name="search_text">Search</string>
 
     <string-array name="sideMenuElements">
         <item>Profile</item>

@@ -37,7 +37,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
  * @author jfperren
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
-
     private static final String TAG = "GoogleMap";
     private static final int LOCATION_UPDATE_TIMEOUT = 20000;
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
@@ -274,4 +273,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     public void onProviderDisabled(String provider) {
         // nothing
     }
+
+	/**
+	 * Create a notification that appear in the notifications tab
+	 */
+	public void createNotification(View view) {
+		Notifications.createAddNotification(view, this);
+	}
 }

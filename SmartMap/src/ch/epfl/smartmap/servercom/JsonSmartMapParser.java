@@ -162,5 +162,4 @@ public class JsonSmartMapParser implements SmartMapParser {
 
         return friend;
     }
-
 }
