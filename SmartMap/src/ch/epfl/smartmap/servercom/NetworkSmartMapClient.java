@@ -34,14 +34,12 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
 	private static final String SERVER_URL = "http://smartmap.ddns.net";
 	private static final NetworkProvider NETWORK_PROVIDER = new DefaultNetworkProvider();
-	static final String COOKIES_HEADER = "Set-Cookie";
-	public static final String USER_AGENT = "Mozilla/5.0"; // latest firefox's
-	private static CookieManager mCookieManager; // user agent
+	private static CookieManager mCookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);; 
 
 	private static final NetworkSmartMapClient ONE_INSTANCE = new NetworkSmartMapClient();
 
 	private NetworkSmartMapClient() {
-		mCookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
+		
 		CookieHandler.setDefault(mCookieManager);
 		if (ONE_INSTANCE != null) {
 			throw new IllegalStateException("Already instantiated");
@@ -94,9 +92,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 */
 	@SuppressLint("UseSparseArrays")
 	@Override
-	public Map<Long, Location> listFriendPos() throws SmartMapClientException {
+	public Map<Long, Location> listFriendsPos() throws SmartMapClientException {
 
-		HttpURLConnection conn = getHttpURLConnection("/listFriendPos");
+		HttpURLConnection conn = getHttpURLConnection("/listFriendsPos");
 		String response = sendViaPost(null, conn);
 
 		SmartMapParser parser = null;
@@ -129,10 +127,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#followFriend(int)
 	 */
 	@Override
-	public void followFriend(int id) throws SmartMapClientException {
+	public void followFriend(long id) throws SmartMapClientException {
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("friend_id", Integer.toString(id));
+		params.put("friend_id", Long.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/followFriend");
 		String response = sendViaPost(params, conn);
 
@@ -158,9 +156,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#unfollowFriend(int)
 	 */
 	@Override
-	public void unfollowFriend(int id) throws SmartMapClientException {
+	public void unfollowFriend(long id) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("friend_id", Integer.toString(id));
+		params.put("friend_id", Long.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/unfollowFriend");
 		String response = sendViaPost(params, conn);
 
@@ -186,9 +184,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#allowFriend(int)
 	 */
 	@Override
-	public void allowFriend(int id) throws SmartMapClientException {
+	public void allowFriend(long id) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("friend_id", Integer.toString(id));
+		params.put("friend_id", Long.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/allowFriend");
 		String response = sendViaPost(params, conn);
 
@@ -213,9 +211,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#disallowFriend(int)
 	 */
 	@Override
-	public void disallowFriend(int id) throws SmartMapClientException {
+	public void disallowFriend(long id) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("friend_id", Integer.toString(id));
+		params.put("friend_id", Long.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/disallowFriend");
 		String response = sendViaPost(params, conn);
 
@@ -243,10 +241,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 * util.List)
 	 */
 	@Override
-	public void allowFriendList(List<Integer> ids)
+	public void allowFriendList(List<Long> ids)
 			throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("friend_ids", intListToString(ids));
+		params.put("friend_ids", longListToString(ids));
 		HttpURLConnection conn = getHttpURLConnection("/allowFriendList");
 		String response = sendViaPost(params, conn);
 
@@ -274,10 +272,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 * .util.List)
 	 */
 	@Override
-	public void disallowFriendList(List<Integer> ids)
+	public void disallowFriendList(List<Long> ids)
 			throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("friend_ids", intListToString(ids));
+		params.put("friend_ids", longListToString(ids));
 		HttpURLConnection conn = getHttpURLConnection("/disallowFriendList");
 		String response = sendViaPost(params, conn);
 
@@ -302,9 +300,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 * 
 	 * @see ch.epfl.smartmap.servercom.SmartMapClient#inviteFriend(int)
 	 */
-	public void inviteFriend(int id) throws SmartMapClientException {
+	public void inviteFriend(long id) throws SmartMapClientException {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("friend_id", Integer.toString(id));
+		params.put("friend_id", Long.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/inviteFriend");
 		String response = sendViaPost(params, conn);
 
@@ -366,10 +364,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 * ch.epfl.smartmap.severcom.SmartMapInvitationsClient#acceptInvitation(int)
 	 */
 	@Override
-	public User acceptInvitation(int id) throws SmartMapClientException {
+	public User acceptInvitation(long id) throws SmartMapClientException {
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("friend_id", Integer.toString(id));
+		params.put("friend_id", Long.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/acceptInvitation");
 		String response = sendViaPost(params, conn);
 
@@ -403,10 +401,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getUserInfo(int)
 	 */
 	@Override
-	public User getUserInfo(int id) throws SmartMapClientException {
+	public User getUserInfo(long id) throws SmartMapClientException {
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("user_id", Integer.toString(id));
+		params.put("user_id", Long.toString(id));
 		HttpURLConnection conn = getHttpURLConnection("/getUserInfo");
 		String response = sendViaPost(params, conn);
 
@@ -466,10 +464,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
 	}
 
-	private String intListToString(List<Integer> list) {
+	private String longListToString(List<Long> list) {
 		String listString = "";
 
-		for (int n : list) {
+		for (long n : list) {
 			listString += n + ",";
 		}
 
@@ -496,10 +494,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 		try {
 
 			// Add request header
-
 			connection.setRequestMethod("POST");
-			connection.setRequestProperty("User-Agent", USER_AGENT);
-			connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
 
 			if (params != null) {
 

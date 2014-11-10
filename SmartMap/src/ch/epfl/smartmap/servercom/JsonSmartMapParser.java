@@ -32,6 +32,8 @@ public class JsonSmartMapParser implements SmartMapParser {
 	private static final int MAX_LATITUDE = 90;
 	private static final int MIN_LONGITUDE = -180;
 	private static final int MAX_LONGITUDE = 180;
+	
+	private static final String TAG="JSON_PARSER";
 
 	/*
 	 * (non-Javadoc)
@@ -124,11 +126,16 @@ public class JsonSmartMapParser implements SmartMapParser {
 				checkLatitude(latitude);
 				checkLongitude(longitude);
 				
+				Log.d(TAG, Long.toString(userId));
+				Log.d(TAG, Double.toString(latitude));
+				Log.d(TAG, Double.toString(longitude));
+				
 				Location location = new Location("SmartMapServers");
 				location.setLatitude(latitude);
 				location.setLongitude(longitude);
 				positions.put((long)userId, location);
 			}
+			Log.d(TAG + "number of positions in the list",Integer.toString(positions.size()));
 		} catch (JSONException e) {
 			throw new SmartMapParseException(e);
 		}
@@ -170,23 +177,29 @@ public class JsonSmartMapParser implements SmartMapParser {
 		
 		checkId(id);
 		checkName(name);
+		Log.d(TAG, Long.toString(id));
+		Log.d(TAG, name);
 		Friend friend = new Friend(id, name);
 
 		if (latitude != UINITIALIZED_LATITUDE) {
 			checkLatitude(latitude);
+			Log.d(TAG, Double.toString(latitude));
 			friend.setLatitude(latitude);
 		}
 		if (longitude != UNITIALIZED_LONGITUDE) {
 			checkLongitude(longitude);
+			Log.d(TAG, Double.toString(longitude));
 			friend.setLongitude(longitude);
 		}
 
 		if (phoneNumber != null) {
 			checkPhoneNumber(phoneNumber);
+			Log.d(TAG, phoneNumber);
 			friend.setNumber(phoneNumber);
 		}
 		if (email != null) {
 			checkEmail(email);
+			Log.d(TAG, email);
 			friend.setEmail(email);
 		}
 		if (online != null) {

@@ -13,7 +13,7 @@ import ch.epfl.smartmap.servercom.SmartMapParseException;
 import ch.epfl.smartmap.servercom.SmartMapParser;
 import junit.framework.TestCase;
 
-public class checkServerErrorMalformedJSONParsingTest extends TestCase {
+public class CheckServerErrorMalformedJSONParsingTest extends TestCase {
 
 	private static final String SERVER_STATUS_JSON = "{\n"
 			+ " \"status\" : \"Ok\", \n" + " \"message\" : \"Success!\" \n"

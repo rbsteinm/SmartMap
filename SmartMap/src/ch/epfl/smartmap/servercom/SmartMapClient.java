@@ -37,7 +37,7 @@ public interface SmartMapClient {
 	 * @return a map that maps each friend id to a position
 	 * @throws SmartMapClientException
 	 */
-	Map<Long, Location> listFriendPos() throws SmartMapClientException;
+	Map<Long, Location> listFriendsPos() throws SmartMapClientException;
 
 	/**
 	 * Asks the server to follow the friend with id id
@@ -46,7 +46,7 @@ public interface SmartMapClient {
 	 *            : the id of the friend to follow
 	 * @throws SmartMapClientException
 	 */
-	void followFriend(int id) throws SmartMapClientException;
+	void followFriend(long id) throws SmartMapClientException;
 
 	/**
 	 * Asks the server to unfollow the friend with id id
@@ -55,7 +55,7 @@ public interface SmartMapClient {
 	 *            : the id of the friend to unfollow
 	 * @throws SmartMapClientException
 	 */
-	void unfollowFriend(int id) throws SmartMapClientException;
+	void unfollowFriend(long id) throws SmartMapClientException;
 
 	/**
 	 * Asks the server to allow the friend with id id to see the position
@@ -64,7 +64,7 @@ public interface SmartMapClient {
 	 *            : the id of the friend to allow
 	 * @throws SmartMapClientException
 	 */
-	void allowFriend(int id) throws SmartMapClientException;
+	void allowFriend(long id) throws SmartMapClientException;
 
 	/**
 	 * Asks the server to disallow the friend with id id to see the position
@@ -73,7 +73,7 @@ public interface SmartMapClient {
 	 *            : the id of the friend to disallow
 	 * @throws SmartMapClientException
 	 */
-	void disallowFriend(int id) throws SmartMapClientException;
+	void disallowFriend(long id) throws SmartMapClientException;
 
 	/**
 	 * Asks the server to allow the friends with ids in the list ids to see the
@@ -83,7 +83,7 @@ public interface SmartMapClient {
 	 *            : the ids of the friends to allow
 	 * @throws SmartMapClientException
 	 */
-	void allowFriendList(List<Integer> ids) throws SmartMapClientException;
+	void allowFriendList(List<Long> ids) throws SmartMapClientException;
 
 	/**
 	 * Asks the server to disallow the friends with ids in the list ids to see
@@ -93,7 +93,7 @@ public interface SmartMapClient {
 	 *            : the ids of the friends to disallow
 	 * @throws SmartMapClientException
 	 */
-	void disallowFriendList(List<Integer> ids) throws SmartMapClientException;
+	void disallowFriendList(List<Long> ids) throws SmartMapClientException;
 
 	/**
 	 * Sends an invitation to the server for the friend with id "id"
@@ -102,7 +102,7 @@ public interface SmartMapClient {
 	 *            the id of the frien to invite
 	 * @throws SmartMapClientException
 	 */
-	void inviteFriend(int id) throws SmartMapClientException;
+	void inviteFriend(long id) throws SmartMapClientException;
 
 	/**
 	 * Retrieve the invitations from the server
@@ -120,7 +120,7 @@ public interface SmartMapClient {
 	 * @return the new Friend
 	 * @throws SmartMapClientException
 	 */
-	User acceptInvitation(int id) throws SmartMapClientException;
+	User acceptInvitation(long id) throws SmartMapClientException;
 
 	/**
 	 * Asks to the server informations about the user with id id
@@ -130,7 +130,7 @@ public interface SmartMapClient {
 	 * @return the User for which we wanted for infos
 	 * @throws SmartMapClientException
 	 */
-	User getUserInfo(int id) throws SmartMapClientException;
+	User getUserInfo(long id) throws SmartMapClientException;
 
 	/**
 	 * Sends the latitude and longitude to the server
