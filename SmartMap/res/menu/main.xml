@@ -1,11 +1,17 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ch.epfl.smartmap.MainActivity" >
-
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
-
+<menu 
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+       <item 
+          android:id="@+id/action_search"
+          android:title="Search"
+          android:icon="@drawable/ic_drawer"
+          android:showAsAction="collapseActionView|ifRoom"
+          android:actionViewClass="android.widget.SearchView" 
+          android:queryHint="@string/search_bar_hint"
+          android:singleLine="true"
+          android:textSize="25sp" />
+    
+    <item android:id="@+id/action_compose"
+          android:icon="@drawable/ic_launcher"
+          android:title="test2" />
 </menu>

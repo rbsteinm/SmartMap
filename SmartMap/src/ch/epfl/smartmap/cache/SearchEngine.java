@@ -9,4 +9,6 @@ import java.util.List;
  */
 public interface SearchEngine {
     List<Friend> sendQuery(String query);
+
+    History getHistory();
 }

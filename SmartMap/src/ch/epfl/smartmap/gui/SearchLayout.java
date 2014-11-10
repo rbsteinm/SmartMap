@@ -3,6 +3,7 @@ package ch.epfl.smartmap.gui;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -10,7 +11,6 @@ import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
 
 /**
@@ -44,29 +44,19 @@ public class SearchLayout extends RelativeLayout {
 
     private final Context mContext;
     private InitState mInitState;
-    private final SearchEngine mSearchEngine;
+    private SearchEngine mSearchEngine;
 
     /**
      * Constructor
+     * 
      * @param context The current context
-     * @param searchEngine The searchEngine providing results for queries
      */
-    public SearchLayout(Context context, AttributeSet attrs,
-        SearchEngine searchEngine) {
+    public SearchLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         mContext = context;
         mInitState = InitState.NOT_INITIALIZED;
-        mSearchEngine = searchEngine;
         this.setVisibility(View.GONE);
-    }
-
-    /**
-     * Constructor with default mockSearchEngine
-     * @param context The current context
-     */
-    public SearchLayout(Context context, AttributeSet attrs) {
-        this(context, attrs, new MockSearchEngine());
     }
 
     /**
@@ -80,47 +70,28 @@ public class SearchLayout extends RelativeLayout {
     /**
      * Initializes the searchLayout, setting all listeners needed
      */
-    public void initSearchLayout() {
+    public void initSearchLayout(SearchEngine searchEngine) {
 
         // Get Views
-        final SearchView mSearchView = (SearchView) findViewById(R.id.searchBar);
-        mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
+//        final SearchView mSearchView = (SearchView) findViewById(R.id.action_search);
+        final SearchResultSwipeableContainer mSwipeableContainer = (SearchResultSwipeableContainer) findViewById(R.id.swipeable_search_result_container);
 
-            public boolean onQueryTextSubmit(String query) {
-                // Do something when user his enter on keyboard
-                mSearchView.clearFocus();
-                return false;
-            }
+        mSwipeableContainer.setSearchEngine(searchEngine);
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                updateSearchResults();
-                return false;
-            }
-        });
 
-        // mSearchResultList.setOnClickListener(new OnClickListener() {
-        // @Override
-        // public void onClick(View v) {
-        // mSearchView.clearFocus();
-        // }
-        // });
 
+        mSearchEngine = searchEngine;
         mInitState = InitState.INITIALIZED;
     }
 
     /**
      * Takes the value in the search bar and display the results of the searchEngine query in the result list.
      */
-    private void updateSearchResults() {
+    public void updateSearchResults(String query) {
         // Get needed Views
-        final SearchView mSearchBarEditText = (SearchView) this
-            .findViewById(R.id.searchBar);
-        final SearchResultSwipeableContainer mSearchResultSwipeableContainer = 
-            (SearchResultSwipeableContainer) findViewById(R.id.swipeable_search_result_container);
+        final SearchResultSwipeableContainer mSearchResultSwipeableContainer = (SearchResultSwipeableContainer) findViewById(R.id.swipeable_search_result_container);
 
         // Get search query
-        String query = mSearchBarEditText.getQuery().toString();
         mSearchResultSwipeableContainer.setResultList(mSearchEngine
             .sendQuery(query));
     }
@@ -145,7 +116,7 @@ public class SearchLayout extends RelativeLayout {
         Animation bottomUp = AnimationUtils.loadAnimation(getContext(),
             R.anim.bottom_up);
         this.startAnimation(bottomUp);
-        updateSearchResults();
+        updateSearchResults(query);
         Log.d(TAG, "Etape open END");
     }
 

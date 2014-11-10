@@ -59,7 +59,7 @@ public abstract class SearchResultView extends LinearLayout {
         mImageView.setLayoutParams(mPhotoViewLayoutParams);
         mImageView.setScaleType(ScaleType.FIT_XY);
 
-        this.setOnClickListener(getOnClickListener());
+        this.setOnTouchListener(getOnTouchListener(this));
     }
     
     public void initViews() {
@@ -74,7 +74,7 @@ public abstract class SearchResultView extends LinearLayout {
      * 
      * @return
      */
-    public abstract OnClickListener getOnClickListener();
+    public abstract OnTouchListener getOnTouchListener(final SearchResultView v);
 
     public abstract int getImageResource();
 

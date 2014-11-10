@@ -1,6 +1,6 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.Arrays;
+import java.util.Date;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -16,15 +16,20 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
+import ch.epfl.smartmap.cache.MockSearchEngine;
+import ch.epfl.smartmap.cache.SearchEngine;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -54,9 +59,9 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private DrawerLayout mSideDrawerLayout;
     private String[] mSideLayoutElements;
     private ListView mDrawerListView;
-
     private GoogleMap mGoogleMap;
     private ProfilePictureFriendMarkerDisplayer mFriendMarkerDisplayer;
+    private SearchEngine mSearchEngine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +69,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         setContentView(R.layout.activity_main);
 
         // Get needed Views
-        final Button mSearchButton = (Button) findViewById(R.id.searchButton);
         final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
 
         // FIXME : Should be done in DrawerLayout class
         initializeDrawerLayout();
-        mSearchLayout.initSearchLayout();
+        // Create SearchEngine and give it to SearchPanel
+        mSearchEngine = new MockSearchEngine();
+        mSearchLayout.initSearchLayout(mSearchEngine);
 
         if (savedInstanceState == null) {
             displayMap();
@@ -81,20 +87,42 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 MockDB.FRIENDS_LIST);
             zoomAccordingToMarkers();
         }
-
-        mSearchButton.setOnClickListener(new OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                mSearchLayout.open();
-            }
-        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        final SearchLayout searchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+        
+        searchView.setOnQueryTextListener(new OnQueryTextListener() {
+
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "querysubmit");
+                // Do something when user his enter on keyboard
+                searchView.clearFocus();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.d(TAG, "querychange");
+                
+                searchLayout.updateSearchResults(searchView.getQuery().toString());
+                return false;
+            }
+        });
+        
+        searchView.setOnSearchClickListener(new OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                searchLayout.open();
+            }
+        });
+        // Configure the search info and add any event listeners
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -149,6 +177,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         return this;
     }
 
+    public void performQuery(Friend friend) {
+        closeSearchPanel();
+        zoomMap(friend.getLocation());
+        // Add query to the searchEngine
+        mSearchEngine.getHistory().addEntry(friend, new Date());
+    }
+
     /**
      * Zoom on the location "location"
      * 
@@ -162,6 +197,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         // Zoom in the Google Map
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
         mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(GMAP_ZOOM_LEVEL));
+    }
+
+    public void closeSearchPanel() {
+        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+        mSearchLayout.close();
     }
 
     /**

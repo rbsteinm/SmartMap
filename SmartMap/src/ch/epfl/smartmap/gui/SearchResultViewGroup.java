@@ -24,11 +24,17 @@ import ch.epfl.smartmap.cache.Friend;
  */
 public class SearchResultViewGroup extends LinearLayout {
 
+    /**
+     * Visual state of a ViewGroup
+     * 
+     * @author jfperren
+     */
     private enum State {
         MINIMIZED, EXPANDED, MAX
     }
     
-    private static final String TAG = "SEARCH_RESULT_ITEM_ADAPTER";
+    @SuppressWarnings("unused")
+    private static final String TAG = "SEARCH_RESULT_VIEW_GROUP";
     
     private static final int ITEMS_PER_PAGE = 10;
     private int mCurrentItemNb;
@@ -44,7 +50,7 @@ public class SearchResultViewGroup extends LinearLayout {
         
         this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         this.setOrientation(VERTICAL);
-        this.setBackgroundResource(R.drawable.shape);
+        this.setBackgroundResource(R.drawable.view_group_background);
         mContext = context;
         mList = new ArrayList<Friend>(friendsList);
         
@@ -66,17 +72,30 @@ public class SearchResultViewGroup extends LinearLayout {
             this.addView(new Divider(mContext));
         }
         
-        //this.addView(mMoreResultsButton);
-        
-        mState = State.MINIMIZED;
+        if (mCurrentItemNb == mList.size()) {
+            mState = State.MAX;
+        } else {
+            this.addView(mMoreResultsButton);
+            mState = State.MINIMIZED;
+        }
     }
     
     public void showMoreResults() {
         if (mState != State.MAX) {
             mState = State.EXPANDED;
-            mCurrentItemNb += Math.min(ITEMS_PER_PAGE, mList.size() - mCurrentItemNb);
+            int newItemsNb = Math.min(ITEMS_PER_PAGE, mList.size() - mCurrentItemNb);
+            this.removeViewAt(this.getChildCount()-1);
+            for (int i= mCurrentItemNb; i< mCurrentItemNb + newItemsNb; i++) {
+                this.addView(SearchResultViewFactory.getSearchResultView(mContext, mList.get(i)));
+                this.addView(new Divider(mContext));
+            }
+            mCurrentItemNb += newItemsNb;
+            
             if (mCurrentItemNb == mList.size()) {
                 mState = State.MAX;
+            } else {
+                this.addView(mMoreResultsButton);
+                mState = State.EXPANDED;
             }
         }
     }
@@ -87,23 +106,30 @@ public class SearchResultViewGroup extends LinearLayout {
         displayMinimized();
     }
     
-    public int getSize() {
-        return mCurrentItemNb + 1;
-    }
-    
+    /**
+     * Button showing more Search results when clicked
+     * 
+     * @author jfperren
+     */
     private static class MoreResultsButton extends Button {
-        public MoreResultsButton(Context context, final SearchResultViewGroup adapter) {
+        public MoreResultsButton(Context context, final SearchResultViewGroup searchResultViewGroup) {
             super(context);
             this.setText("See more");
+            this.setBackgroundResource(0);
             this.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    adapter.showMoreResults();
+                    searchResultViewGroup.showMoreResults();
                 }
             });
         }
     }
     
+    /**
+     * Horizontal bar separating two different search results.
+     * 
+     * @author jfperren
+     */
     private static class Divider extends LinearLayout {
         private static final int LEFT_PADDING = 10;
         private static final int RIGHT_PADDING = 10; 

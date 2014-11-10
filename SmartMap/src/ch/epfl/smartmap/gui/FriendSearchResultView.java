@@ -1,14 +1,19 @@
 package ch.epfl.smartmap.gui;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.SearchEngine;
 
 /**
  * Represents a {@code SearchResultView} that displays a {@code Friend}
@@ -60,7 +65,7 @@ public class FriendSearchResultView extends SearchResultView {
             LayoutParams.WRAP_CONTENT));
         mInfoLayout.addView(nameView);
         mInfoLayout.addView(lastConnectionView);
-        
+
         // Add view on the parent class
         this.initViews();
     }
@@ -81,11 +86,38 @@ public class FriendSearchResultView extends SearchResultView {
      * @see ch.epfl.smartmap.gui.SearchResultView#getOnClickListener()
      */
     @Override
-    public OnClickListener getOnClickListener() {
-        return new OnClickListener() {
+    public OnTouchListener getOnTouchListener(final SearchResultView v) {
+        return new OnTouchListener() {
+            private static final int CLICK_DISTANCE_THRESHHOLD = 50;
+            private float startX;
+            private float startY;
+
             @Override
-            public void onClick(View v) {
-                Log.d(TAG, "View clicked !");
+            public boolean onTouch(View v, MotionEvent ev) {
+                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Action DOWN");
+                    startX = ev.getAxisValue(MotionEvent.AXIS_X);
+                    startY = ev.getAxisValue(MotionEvent.AXIS_Y);
+                    v.setBackgroundColor(getResources().getColor(
+                        R.color.searchResultOnSelect));
+
+                } else if (ev.getAction() == MotionEvent.ACTION_UP) {
+                    Log.d(TAG, "Action UP");
+                    float endX = ev.getAxisValue(MotionEvent.AXIS_X);
+                    float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
+
+                    if (Math.sqrt(Math.pow(endX - startX, 2)
+                        + Math.pow(endY - startY, 2)) < CLICK_DISTANCE_THRESHHOLD) {
+                        ((MainActivity) getContext()).performQuery(mFriend);
+                    }
+                    v.setBackgroundColor(getResources().getColor(
+                        R.color.searchResultBackground));
+                } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
+                    Log.d(TAG, "Action CANCEL");
+                    v.setBackgroundColor(getResources().getColor(
+                        R.color.searchResultBackground));
+                }
+                return true;
             }
         };
     }
