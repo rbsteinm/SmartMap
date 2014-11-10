@@ -4,10 +4,14 @@ import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.StartActivity;
+
+import com.facebook.Session;
+import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.Visibility;
 
 public class StartActivityTest extends
 		ActivityInstrumentationTestCase2<StartActivity> {
@@ -24,11 +28,25 @@ public class StartActivityTest extends
 	}
 
 	public void testLogoClick() throws Exception {
-		onView(withId(R.id.logo)).perform(click()).check(matches(isDisplayed()));
+		onView(withId(R.id.logo)).perform(click())
+				.check(matches(isDisplayed()));
 	}
-	
+
 	public void testWelcomeClick() throws Exception {
-		onView(withId(R.id.welcome)).perform(click()).check(matches(isDisplayed()));
+		onView(withId(R.id.welcome)).perform(click()).check(
+				matches(isDisplayed()));
+	}
+
+	public void testFacebookButtonVisibility() throws Exception {
+		if (Session.getActiveSession() == null
+				|| Session.getActiveSession().getPermissions().isEmpty()) {
+			onView(withId(R.id.loginButton)).check(matches(isDisplayed()));
+		} else {
+			onView(withId(R.id.loadingTextView)).check(
+					matches(withEffectiveVisibility(Visibility.INVISIBLE)));
+			onView(withId(R.id.loadingBar)).check(
+					matches(withEffectiveVisibility(Visibility.INVISIBLE)));
+		}
 	}
 
 }

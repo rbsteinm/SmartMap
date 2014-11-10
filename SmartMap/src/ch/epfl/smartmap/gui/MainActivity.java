@@ -2,10 +2,7 @@ package ch.epfl.smartmap.gui;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,7 +10,6 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -282,26 +278,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	}
 
 	/**
-	 * TODO JAVADOC
+	 * Create a notification that appear in the notifications tab
 	 */
 	public void createNotification(View view) {
-		// Prepare intent which is triggered if the
-		// notification is selected
-		Intent intent = new Intent(this, MainActivity.class);
-		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-		// Build notification
-		// Actions are just fake
-		NotificationCompat.Builder noti = new NotificationCompat.Builder(this);
-		noti.setContentTitle("TITLE OF NOTIFICATION");
-		noti.setContentText("SUBJECT OF NOTIFICATION").setSmallIcon(R.drawable.icon);
-		noti.setContentIntent(pIntent);
-		noti.addAction(0, "Call", pIntent);
-		noti.addAction(0, "More", pIntent);
-		noti.addAction(0, "And more", pIntent).build();
-		NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		notificationManager.notify(0, noti.build());
-
+		Notifications.createAddNotification(view, this);
 	}
 
 }
