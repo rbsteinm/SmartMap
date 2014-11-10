@@ -226,7 +226,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      * Create a notification that appear in the notifications tab
      */
     public void createNotification(View view) {
-        // FIXME doesn't compile when uncommented (comment by Robin)
-        // Notifications.createAddNotification(view, this);
+        Notifications.createAddNotification(view, this);
     }
 }
