@@ -20,7 +20,7 @@ which is needed when building test cases.
     <!--
 This declares that this application uses the instrumentation test runner targeting
 the package of ch.epfl.smartmap. To run the tests use the command:
-"adb shell am instrument -w ch.epfl.smartmap.tests/android.test.InstrumentationTestRunner"
+"adb shell am instrument -w ch.epfl.smartmap.tests/android.test.InstrumentationTestRunner"
     -->
     <instrumentation
         android:name="com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
