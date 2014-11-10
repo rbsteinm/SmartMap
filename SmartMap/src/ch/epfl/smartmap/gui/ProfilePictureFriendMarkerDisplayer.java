@@ -25,8 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * @author hugo-S
  * 
  */
-public class ProfilePictureFriendMarkerDisplayer implements
-		FriendMarkerDisplayer {
+public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplayer {
 
 	public static final float MARKER_ANCHOR_X = (float) 0.5;
 	public static final float MARKER_ANCHOR_Y = 1;
@@ -44,15 +43,12 @@ public class ProfilePictureFriendMarkerDisplayer implements
 
 	}
 
-
 	@Override
-	public void setMarkersToMaps(Context context, GoogleMap googleMap,
-			List<Friend> listOfFriends) {
-		
+	public void setMarkersToMaps(Context context, GoogleMap googleMap, List<Friend> listOfFriends) {
+
 		// Add marker with profile picture for each friend
 		for (User friend : listOfFriends) {
-			Bitmap friendProfilePicture = Bitmap.createScaledBitmap(
-					friend.getPicture(context), WIDTH, HEIGHT, false);
+			Bitmap friendProfilePicture = Bitmap.createScaledBitmap(friend.getPicture(context), WIDTH, HEIGHT, false);
 			Marker marker = googleMap.addMarker(new MarkerOptions()
 					.position(friend.getLatLng())
 					.title(friend.getName())
@@ -115,8 +111,14 @@ public class ProfilePictureFriendMarkerDisplayer implements
 	 * com.google.android.gms.maps.GoogleMap)
 	 */
 	@Override
-	public void addMarker(User friend, Context context, GoogleMap mGoogleMap) {
-		// TODO Auto-generated method stub
+	public void addMarker(User friend, Context context, GoogleMap googleMap) {
+		Bitmap friendProfilePicture = Bitmap.createScaledBitmap(friend.getPicture(context), WIDTH, HEIGHT, false);
+		Marker marker = googleMap.addMarker(new MarkerOptions()
+				.position(friend.getLatLng()).title(friend.getName())
+				.icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
+				.anchor((float) MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
+
+		displayedMarkers.put(marker, friend);
 
 	}
 
@@ -130,7 +132,7 @@ public class ProfilePictureFriendMarkerDisplayer implements
 	@Override
 	public Marker getMarkerForFriend(User friend) {
 		for (Entry<Marker, User> entry : displayedMarkers.entrySet())
-			if (entry.getValue().getID()==(friend.getID())) {
+			if (entry.getValue().getID() == (friend.getID())) {
 				return entry.getKey();
 			}
 		return null;
@@ -156,19 +158,23 @@ public class ProfilePictureFriendMarkerDisplayer implements
 	 * com.google.android.gms.maps.GoogleMap)
 	 */
 	@Override
-	public void removeMarker(User friend, Context context, GoogleMap mGoogleMap) {
-		// TODO Auto-generated method stub
+	public void removeMarker(User friend) {
+		Marker marker = getMarkerForFriend(friend);
+		displayedMarkers.remove(marker);
+		marker.remove();
 
 	}
 
-
-	/* (non-Javadoc)
-	 * @see ch.epfl.smartmap.gui.FriendMarkerDisplayer#updateMarkers(android.content.Context, com.google.android.gms.maps.GoogleMap, java.util.List)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#updateMarkers(android.content
+	 * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
 	 */
 	@Override
-	public void updateMarkers(Context context, GoogleMap mGoogleMap,
-			List<Friend> listOfFriends) {
+	public void updateMarkers(Context context, GoogleMap mGoogleMap, List<Friend> listOfFriends) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

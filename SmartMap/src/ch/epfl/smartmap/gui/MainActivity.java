@@ -146,13 +146,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 * Display the map with the current location
 	 */
 	public void displayMap() {
-		int status = GooglePlayServicesUtil
-				.isGooglePlayServicesAvailable(getBaseContext());
+		int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
 		// Showing status
 		if (status != ConnectionResult.SUCCESS) { // Google Play Services are
 													// not available
-			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
-					GOOGLE_PLAY_REQUEST_CODE);
+			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
 			dialog.show();
 
 		} else {
@@ -175,8 +173,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			// Getting Current Location
 			// Location location =
 			// locationManager.getLastKnownLocation(provider);
-			boolean isGPSEnabled = locationManager
-					.isProviderEnabled(LocationManager.GPS_PROVIDER);
+			boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 			if (isGPSEnabled) {
 				Log.d(TAG, "gps enabled");
 
@@ -198,18 +195,15 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public void initializeMarkers() {
 
 		mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
-		mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-				MockDB.getEventsList());
+		mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, MockDB.getEventsList());
 
 		mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-		mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-				MockDB.FRIENDS_LIST);
+		mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, MockDB.FRIENDS_LIST);
 
 		mMapZoomer = new DefaultZoomManager(mFragmentMap);
 		Log.i(TAG, "before enter to zoom according");
 
-		List<Marker> allMarkers = new ArrayList<Marker>(
-				mFriendMarkerDisplayer.getDisplayedMarkers());
+		List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
 		allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
 		mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
 	}

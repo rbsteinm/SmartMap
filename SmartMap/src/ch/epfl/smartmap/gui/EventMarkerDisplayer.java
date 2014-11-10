@@ -4,7 +4,7 @@ import java.util.List;
 
 import android.content.Context;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.Friend;
+
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
@@ -26,8 +26,7 @@ public interface EventMarkerDisplayer {
 	 * @param listOfEvent
 	 *            the events we want to display
 	 */
-	void setMarkersToMaps(Context context, GoogleMap mGoogleMap,
-			List<Event> listOfEvent);
+	void setMarkersToMaps(Context context, GoogleMap googleMap, List<Event> listOfEvent);
 	
 	/**
 	 * This method updates the markers on the map with the given list of events
@@ -38,8 +37,7 @@ public interface EventMarkerDisplayer {
 	 * @param listOfEvents
 	 *            the updated events
 	 */
-	void updateMarkers(Context context, GoogleMap mGoogleMap,
-			List<Event> listOfEvents);
+	void updateMarkers(Context context, GoogleMap googleMap, List<Event> listOfEvents);
 
 	/**
 	 * @param event
@@ -69,7 +67,7 @@ public interface EventMarkerDisplayer {
 	 * @param event
 	 *            the event for which we want to add a marker
 	 */
-	void addMarker(Event event, Context context, GoogleMap mGoogleMap);
+	void addMarker(Event event, Context context, GoogleMap googleMap);
 	
 	/**
 	 * Remove a marker  from the map
@@ -77,7 +75,7 @@ public interface EventMarkerDisplayer {
 	 * @param event
 	 *            the event for which we want to remove the marker
 	 */
-	void removeMarker(Event event, Context context, GoogleMap mGoogleMap);
+	void removeMarker(Event event);
 
 	/**
 	 * @param event 
