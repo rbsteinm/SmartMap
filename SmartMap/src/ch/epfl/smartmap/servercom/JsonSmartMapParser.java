@@ -32,8 +32,9 @@ public class JsonSmartMapParser implements SmartMapParser {
 	private static final int MAX_LATITUDE = 90;
 	private static final int MIN_LONGITUDE = -180;
 	private static final int MAX_LONGITUDE = 180;
-	
-	private static final String TAG="JSON_PARSER";
+	private static final int MAX_NAME_LENGTH=60;
+
+	private static final String TAG = "JSON_PARSER";
 
 	/*
 	 * (non-Javadoc)
@@ -121,29 +122,27 @@ public class JsonSmartMapParser implements SmartMapParser {
 				long userId = position.getLong("id");
 				double latitude = position.getDouble("latitude");
 				double longitude = position.getDouble("longitude");
-				
+
 				checkId(userId);
 				checkLatitude(latitude);
 				checkLongitude(longitude);
-				
+
 				Log.d(TAG, Long.toString(userId));
 				Log.d(TAG, Double.toString(latitude));
 				Log.d(TAG, Double.toString(longitude));
-				
+
 				Location location = new Location("SmartMapServers");
 				location.setLatitude(latitude);
 				location.setLongitude(longitude);
-				positions.put((long)userId, location);
+				positions.put((long) userId, location);
 			}
-			Log.d(TAG + "number of positions in the list",Integer.toString(positions.size()));
+			Log.d(TAG + "number of positions in the list", Integer.toString(positions.size()));
 		} catch (JSONException e) {
 			throw new SmartMapParseException(e);
 		}
 
 		return positions;
 	}
-
-	
 
 	/**
 	 * Return the friend parsed from a jsonObject
@@ -166,7 +165,8 @@ public class JsonSmartMapParser implements SmartMapParser {
 			id = jsonObject.getLong("id");
 			name = jsonObject.getString("name");
 			latitude = jsonObject.optDouble("latitude", UINITIALIZED_LATITUDE);
-			longitude = jsonObject.optDouble("longitude", UNITIALIZED_LONGITUDE);
+			longitude = jsonObject
+					.optDouble("longitude", UNITIALIZED_LONGITUDE);
 			phoneNumber = jsonObject.optString("phoneNumber", null);
 			email = jsonObject.optString("email", null);
 			online = jsonObject.optString("online", null);
@@ -174,7 +174,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 		} catch (JSONException e) {
 			throw new SmartMapParseException(e);
 		}
-		
+
 		checkId(id);
 		checkName(name);
 		Log.d(TAG, Long.toString(id));
@@ -204,81 +204,96 @@ public class JsonSmartMapParser implements SmartMapParser {
 		}
 		if (online != null) {
 			checkOnLine(online);
-			//TODO see with Mathieu
+			// TODO see with Mathieu
 		}
 
 		return friend;
 	}
-	
+
 	/**
-	 * Checks if the latitude is valid 
+	 * Checks if the latitude is valid
+	 * 
 	 * @param latitude
-	 * @throws SmartMapParseException if invalid latitude
+	 * @throws SmartMapParseException
+	 *             if invalid latitude
 	 */
 	private void checkLatitude(double latitude) throws SmartMapParseException {
 		if (!(MIN_LATITUDE <= latitude && latitude <= MAX_LATITUDE)) {
 			throw new SmartMapParseException("invalid latitude");
 		}
 	}
-	
+
 	/**
-	 *  Checks if the longitude is valid 
+	 * Checks if the longitude is valid
+	 * 
 	 * @param longitude
-	 * @throws SmartMapParseException if invalid longitude
+	 * @throws SmartMapParseException
+	 *             if invalid longitude
 	 */
-	private void checkLongitude(double longitude) throws SmartMapParseException{
+	private void checkLongitude(double longitude) throws SmartMapParseException {
 		if (!(MIN_LONGITUDE <= longitude && longitude <= MAX_LONGITUDE)) {
 			throw new SmartMapParseException("invalid longitude");
 		}
 	}
-	
+
 	/**
 	 * Checks if the id is valid
+	 * 
 	 * @param id
-	 * @throws SmartMapParseException if invalid id
+	 * @throws SmartMapParseException
+	 *             if invalid id
 	 */
-	private void checkId(long id) throws SmartMapParseException{
-		if(id<=0){
+	private void checkId(long id) throws SmartMapParseException {
+		if (id <= 0) {
 			throw new SmartMapParseException("invalid id");
 		}
 	}
-	
+
 	/**
 	 * Checks if the name is valid
+	 * 
 	 * @param name
-	 * @throws SmartMapParseException if invalid name
+	 * @throws SmartMapParseException
+	 *             if invalid name
 	 */
-	private void checkName(String name) throws SmartMapParseException{
-		if(name.length()>=60 || name.length()==0){
+	private void checkName(String name) throws SmartMapParseException {
+		if (name.length() >= MAX_NAME_LENGTH || name.length() == 0) {
 			throw new SmartMapParseException("invalid name");
 		}
 	}
-	
+
 	/**
 	 * Checks if the email address is valid
+	 * 
 	 * @param email
-	 * @throws SmartMapParseException if invalid email address
+	 * @throws SmartMapParseException
+	 *             if invalid email address
 	 */
-	private void checkEmail(String email) throws SmartMapParseException{
-		//TODO
+	private void checkEmail(String email) throws SmartMapParseException {
+		// TODO
 	}
-	
+
 	/**
 	 * Checks if the phone number is valid
+	 * 
 	 * @param phoneNumber
-	 * @throws SmartMapParseException if invalid phone number
+	 * @throws SmartMapParseException
+	 *             if invalid phone number
 	 */
-	private void checkPhoneNumber(String phoneNumber) throws SmartMapParseException{
-		//TODO
+	private void checkPhoneNumber(String phoneNumber)
+			throws SmartMapParseException {
+		// TODO
 	}
-	
+
 	/**
 	 * Checks if the parameter "online" is valid
+	 * 
 	 * @param online
-	 * @throws SmartMapParseException if invalid parameter
+	 * @throws SmartMapParseException
+	 *             if invalid parameter
 	 */
-	private void checkOnLine(String online) throws SmartMapParseException{
-		//TODO
+	private void checkOnLine(String online) throws SmartMapParseException {
+		// TODO
 	}
 
 }

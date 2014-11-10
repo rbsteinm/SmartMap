@@ -60,6 +60,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
 	private static final String SERVER_URL = "http://smartmap.ddns.net";
 	private static final NetworkProvider NETWORK_PROVIDER = new DefaultNetworkProvider();
+	private static final int SERVER_RESPONSE_OK=200;
 	private static CookieManager mCookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);; 
 
 	private static final NetworkSmartMapClient ONE_INSTANCE = new NetworkSmartMapClient();
@@ -121,8 +122,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	public Map<Long, Location> listFriendsPos() throws SmartMapClientException {
 
 		HttpURLConnection conn = getHttpURLConnection("/listFriendsPos");
-		String response = sendViaPost(null, conn);
-
+		String response = sendViaPost(new HashMap<String, String>(), conn);
+		Map<Long, Location> positions=null;
+		
 		SmartMapParser parser = null;
 		try {
 			parser = SmartMapParserFactory.parserForContentType(conn
@@ -137,7 +139,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 			throw new SmartMapClientException(e);
 		}
 
-		Map<Long, Location> positions = new HashMap<Long, Location>();
+		positions = new HashMap<Long, Location>();
 		try {
 			positions = parser.parsePositions(response);
 		} catch (SmartMapParseException e) {
@@ -357,7 +359,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	public List<User> getInvitations() throws SmartMapClientException {
 
 		HttpURLConnection conn = getHttpURLConnection("/getInvitations");
-		String response = sendViaPost(null, conn);
+		String response = sendViaPost(new HashMap<String, String>(), conn);
 
 		SmartMapParser parser = null;
 		try {
@@ -512,8 +514,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 *             in case the response could not be retrieved for any reason
 	 *             external to the application (network failure etc.)
 	 */
-	public String sendViaPost(Map<String, String> params,
-			HttpURLConnection connection) throws SmartMapClientException {
+	private String sendViaPost(Map<String, String> params, HttpURLConnection connection) 
+				throws SmartMapClientException {
 		StringBuffer response = null;
 		Log.d("sendViaPost", "start");
 
@@ -523,7 +525,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 			connection.setRequestMethod("POST");
 
 
-			if (params != null) {
+			if (params.size() != 0) {
 
 				// Build the request
 				StringBuilder postData = new StringBuilder();
@@ -534,8 +536,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
 					postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
 					postData.append('=');
-					postData.append(URLEncoder.encode(
-							String.valueOf(param.getValue()), "UTF-8"));
+					postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
 
 				}
 
@@ -550,6 +551,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 				wr.flush();
 				wr.close();
 
+			}
+			
+			if (connection.getResponseCode()!=SERVER_RESPONSE_OK) {
+				throw new SmartMapClientException("error from server");
 			}
 
 			// Get response
@@ -576,7 +581,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 		return response.toString();
 	}
 
-	public HttpURLConnection getHttpURLConnection(String uri)
+	private HttpURLConnection getHttpURLConnection(String uri)
 			throws SmartMapClientException {
 		URL serverURL = null;
 		HttpURLConnection connection = null;

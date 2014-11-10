@@ -5,7 +5,7 @@ import java.util.Map;
 
 import android.location.Location;
 
-import ch.epfl.smartmap.cache.Point;
+
 import ch.epfl.smartmap.cache.User;
 
 /**
