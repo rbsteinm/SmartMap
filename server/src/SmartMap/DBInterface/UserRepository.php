@@ -24,6 +24,7 @@ class UserRepository
     
     /**
      * Constructs a UserRepository with a Doctrine\DBAL\Connection object.
+     * 
      * @param Connection $db
      */
     function __construct(Connection $db)
@@ -36,6 +37,7 @@ class UserRepository
     /**
      * Gets a user id given it's facebook id, or returns false if such user
      * does not exist.
+     * 
      * @param Long $fbId
      * @return false if we couldn't fetch the user's data and the user id otherwise.
      */
@@ -58,6 +60,7 @@ class UserRepository
     
     /**
      * Gets a user from the database, given it's id.
+     * 
      * @param Long $id
      * @throws \Exception when the user is not found
      * @return \SmartMap\DBInterface\User
@@ -69,7 +72,7 @@ class UserRepository
         
         if (!$userData)
         {
-            throw new \Exception('No user found with id ' . $id);
+            throw new \Exception('No user found with id ' . $id . '.');
         }
         
         $user = new User(
@@ -86,6 +89,7 @@ class UserRepository
     
     /**
      * Gets a list of users, given a list of ids.
+     * 
      * @param array $ids
      * @param array $visibility
      * @throws \InvalidArgumentException if $ids or $visibility is not of the right type
@@ -95,7 +99,7 @@ class UserRepository
     {
         if (!is_array($ids) OR !is_array($visibility))
         {
-            throw new \InvalidArgumentException('$ids and $visibility must be arrays');
+            throw new \InvalidArgumentException('Arguments $ids and $visibility must be arrays.');
         }
         
         // If $ids is empty, we will find no user
@@ -114,6 +118,7 @@ class UserRepository
     
     /**
      * Gets a list of users whose name is starting by $partialName
+     * 
      * @param String $partialName
      * @return multitype:\SmartMap\DBInterface\User
      */
@@ -132,6 +137,7 @@ class UserRepository
     /**
      * Adds a new user in the database. The id value from the parameter
      * is not used. Returns the created user with it's id properly set.
+     * 
      * @param User $user
      * @return User
      */
@@ -154,6 +160,7 @@ class UserRepository
     /**
      * Updates an existing user in the database. Modifiable entries are
      * name, visibility, longitude and latitude.
+     * 
      * @param User $user
      */
     public function updateUser(User $user)
@@ -175,7 +182,8 @@ class UserRepository
      * (can be 'ALLOWED', 'DISALLOWED' or 'BLOCKED'),
      * and the following stauts in the array $follow (can be
      * 'FOLLOWED' or 'UNFOLLOWED').
-     * @param Long $userId
+     * 
+     * @param long $userId
      * @param array $status
      * @param array $follow
      * @throws \InvalidArgumentException
@@ -187,7 +195,7 @@ class UserRepository
     {
         if (!is_array($status) OR !is_array($follow))
         {
-            throw new \InvalidArgumentException('Parameters $status and $follow must be arrays.');
+            throw new \InvalidArgumentException('Arguments $status and $follow must be arrays.');
         }
         
         $req = "SELECT id2 FROM " . self::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND ".
@@ -213,11 +221,22 @@ class UserRepository
     /**
      * Add a friendship link between two users, with status set to ALLOWED
      * and follow to FOLLOWED.
-     * @param Long $idUser
-     * @param Long $idFriend
+     * 
+     * @param long $idUser
+     * @param long $idFriend
+     * @throws \Exception if the friendship link already exists.
      */
     public function addFriendshipLink($idUser, $idFriend)
     {
+        // We first check that there is not already a friendship link.
+        $req = "SELECT * FROM " . self::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND id2 = ?";
+        $data = $this->mDb->fetchAssoc($req, array((int) $idUser, (int) $idFriend));
+        
+        if ($data)
+        {
+            throw new \Exception('This friendship link already exists !');
+        }
+        
         $this->mDb->insert(self::$TABLE_FRIENDSHIP,
                            array(
                             'id1' => (int) $idUser,
@@ -229,16 +248,17 @@ class UserRepository
     
     /**
      * Sets the status of a friendship link.
-     * @param unknown $idUser
-     * @param unknown $idFriend
-     * @param unknown $status
+     * 
+     * @param long $idUser
+     * @param long $idFriend
+     * @param string $status
      * @throws \Exception when the status is invalid, i.e. not ALLOWED, DISALLOWED or BLOCKED
      */
     public function setFriendshipStatus($idUser, $idFriend, $status)
     {
         if (!in_array($status, array('ALLOWED', 'DISALLOWED', 'BLOCKED')))
         {
-            throw new \Exception('Invalid value for status');
+            throw new \Exception('Invalid value for status !');
         }
         
         $this->mDb->update(self::$TABLE_FRIENDSHIP,
@@ -249,7 +269,7 @@ class UserRepository
     
     /**
      * Sets the status of a list of friendship links.
-     * @param Long $idUser
+     * @param long $idUser
      * @param array $idsFriends
      * @param array $status
      * @throws \Exception when either $status or $idsFreinds is invalid.
@@ -258,12 +278,12 @@ class UserRepository
     {
         if (!in_array($status, array('ALLOWED', 'DISALLOWED', 'BLOCKED')))
         {
-            throw new \Exception('Invalid value for status');
+            throw new \Exception('Invalid value for status !');
         }
         
         if (!is_array($idsFriends))
         {
-            throw new \Exception('Parameter $idsFriends must be an array !');
+            throw new \Exception('Argument $idsFriends must be an array !');
         }
         
         $req = "UPDATE " . self::$TABLE_FRIENDSHIP .
@@ -277,16 +297,16 @@ class UserRepository
     
     /**
      * Sets the follow status of a friendship link.
-     * @param unknown $idUser
-     * @param unknown $friendId
-     * @param unknown $follow
+     * @param long $idUser
+     * @param long $friendId
+     * @param string $follow
      * @throws \Exception when $follow is invalid.
      */
     public function setFriendshipFollow($idUser, $friendId, $follow)
     {
         if (!in_array($follow, array('FOLLOWED', 'UNFOLLOWED')))
         {
-            throw new \Exception('Invalid value for follow status');
+            throw new \Exception('Invalid value for follow status !');
         }
         
         $this->mDb->update(self::$TABLE_FRIENDSHIP,
@@ -300,7 +320,8 @@ class UserRepository
     /**
      * Gets a list of the ids of users who sent a friend invitation to 
      * the user with id $userId.
-     * @param Long $userId
+     * 
+     * @param long $userId
      * @return an array of user ids who sent an invitation to the user $userId
      */
     public function getInvitationIds($userId)
@@ -321,8 +342,9 @@ class UserRepository
     /**
      * Adds an nvitation from the user with id $idUser to the user with
      * id $idFriend.
-     * @param Long $idUser
-     * @param Long $idFriend
+     * 
+     * @param long $idUser
+     * @param long $idFriend
      */
     public function addInvitation($idUser, $idFriend)
     {
@@ -336,8 +358,9 @@ class UserRepository
     /**
      * Removes the invitation from the user with id $idUser to the user
      * with id $friendId.
-     * @param Long $idUser
-     * @param Long $idFriend
+     * 
+     * @param long $idUser
+     * @param long $idFriend
      */
     public function removeInvitation($idUser, $idFriend)
     {
@@ -348,6 +371,13 @@ class UserRepository
     }
     
     // Utility functions
+    
+    /**
+     * Gets an array of users given a database query statement.
+     * 
+     * @param unknown $stmt
+     * @return array
+     */
     private function userArrayFromStmt($stmt)
     {
         $users = array();

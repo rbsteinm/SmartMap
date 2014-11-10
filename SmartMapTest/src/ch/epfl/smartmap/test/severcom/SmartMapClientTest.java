@@ -64,5 +64,4 @@ public class SmartMapClientTest extends AndroidTestCase {
 
         assertEquals(previousCountInt + 1, finalCountInt);
     }
-
 }

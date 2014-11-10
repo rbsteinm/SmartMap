@@ -24,28 +24,32 @@ class DataController
         $this->mRepo = $repo;
     }
     
-    /** Updates the user's position.
+    /**
+     * Updates the user's position.
+     * 
+     * @param Request $request
+     * @throws ControlException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function updatePos(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
-        $longitude = $request->request->get('longitude');
-        if ($longitude === null)
-        {
-            throw new ControlException('Post parameter longitude is not set !');
-        }
+        $longitude = $this->getPostParam($request, 'longitude');
         
-        $latitude = $request->request->get('latitude');
-        if ($latitude === null)
-        {
-            throw new ControlException('Post parameter latitude is not set !');
-        }
+        $latitude = $this->getPostParam($request, 'latitude');
         
         $user = $this->mRepo->getUser($userId);
         
-        $user->setLongitude($longitude);
-        $user->setLatitude($latitude);
+        try
+        {
+            $user->setLongitude($longitude);
+            $user->setLatitude($latitude);
+        }
+        catch (\InvalidArgumentException $e)
+        {
+            throw new ControlException('Invalid coordinates.');
+        }
         
         $this->mRepo->updateUser($user);
         
@@ -54,7 +58,11 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /* Gets the position of followed friends allowing it.
+    /**
+     * Gets the position of followed friends allowing it.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function listFriendsPos(Request $request)
     {
@@ -77,23 +85,23 @@ class DataController
         
         $response = array(
                             'status' => 'Ok',
-                            'message' => 'Fetched friends positions',
+                            'message' => 'Fetched friends positions !',
                             'positions' => $list
                          );
         
         return new JsonResponse($response);
     }
     
-    /** Gets the information for the user whose id is passed in user_id
-     * POST parameter.
+    /**
+     * Gets the information for the user whose id is passed in user_id POST parameter.
+     * 
+     * @param Request $request
+     * @throws ControlException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getUserInfo(Request $request)
     {
-        $id = $request->request->get('user_id');
-        if ($id === null)
-        {
-            throw new ControlException('Post parameter user_id is not set !');
-        }
+        $id = $this->getPostParam($request, 'user_id');
         
         $user = $this->mRepo->getUser($id);
         
@@ -108,17 +116,18 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /** Sets an invitation for user with friend_id POST parameter.
+    /**
+     * Sets an invitation for user with friend_id POST parameter.
+     * 
+     * @param Request $request
+     * @throws ControlException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function inviteFriend(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         if ($userId == $friendId)
         {
@@ -146,8 +155,12 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /** Gets a list of user ids and names which are wanting to be friend
+    /**
+     * Gets a list of user ids and names which are wanting to be friend
      * with the current user.
+     * 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getInvitations(Request $request)
     {
@@ -166,25 +179,25 @@ class DataController
         
         $response = array(
                             'status' => 'Ok',
-                            'message' => 'Fetched invitations',
+                            'message' => 'Fetched invitations !',
                             'list' => $invitersList
                          );
         
         return new JsonResponse($response);
     }
     
-    /** Accpets the invitation from the user with in POST parameter 
-     * friend_id.
+    /**
+     * Accpets the invitation from the user with in POST parameter friend_id.
+     * 
+     * @param Request $request
+     * @throws ControlException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function acceptInvitation(Request $request)
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendId = $request->request->get('friend_id');
-        if ($friendId === null)
-        {
-            throw new ControlException('Post parameter friend_id is not set !');
-        }
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         // We check that the friend invited the user
         $invitersIds = $this->mRepo->getInvitationIds($userId);
@@ -196,8 +209,15 @@ class DataController
         
         $this->mRepo->removeInvitation($friendId, $userId);
         
-        $this->mRepo->addFriendshipLink($userId, $friendId);
-        $this->mRepo->addFriendshipLink($friendId, $userId);
+        try
+        {
+            $this->mRepo->addFriendshipLink($userId, $friendId);
+            $this->mRepo->addFriendshipLink($friendId, $userId);
+        }
+        catch (\Exception $e)
+        {
+            throw new ControlException('You are already friends !');
+        }
         
         $user = $this->mRepo->getUser($friendId);
         
@@ -213,16 +233,20 @@ class DataController
         return new JsonResponse($response);
     }
     
-    /** Gets a list of user names and ids where name begins with post parameter
+    /**
+     * Gets a list of user names and ids where name begins with post parameter
      * search_text (ignores case). 
+     * 
+     * @param Request $request
+     * @throws ControlException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function findUsers(Request $request)
     {
-        $partialName = $request->request->get('search_text');
-        if ($partialName === null)
-        {
-            throw new ControlException('Post parameter search_text is not set !');
-        }
+        // We check that we are authenticated.
+        User::getIdFromRequest($request);
+        
+        $partialName = $this->getPostParam($request, 'search_text');
         
         $users = $this->mRepo->findUsersByPartialName($partialName);
         
@@ -235,5 +259,26 @@ class DataController
         $response = array('status' => 'Ok', 'message' => 'Fetched users !', 'list' => $data);
         
         return new JsonResponse($response);
+    }
+    
+    /**
+     * Utility function getting a post parameter and throwing a ControlException
+     * if the parameter is not set in the request.
+     *
+     * @param Request $request
+     * @param string $param
+     * @throws ControlException
+     * @return string
+     */
+    private function getPostParam(Request $request, $param)
+    {
+        $value = $request->request->get($param);
+        
+        if ($value === null)
+        {
+            throw new ControlException('Post parameter ' . $param . ' is not set !');
+        }
+        
+        return $value;
     }
 }

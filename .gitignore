@@ -21,8 +21,9 @@ server/.checksytle
 server/.settings
 server/config.json
 server/tests/phpunit.phar
+server/tests/phpunit.xml
 server/.checkstyle
-Libraries/google-play-services_lib/local.propetries
+Libraries/google-play-services_lib/local.properties
 Libraries/facebook/local.properties
 Libraries/facebook/bin/
 Libraries/facebook/gen/
@@ -34,3 +35,5 @@ Libraries/google-play-services_lib/.classpath
 *~
 *.checkstyle
 *.classpath
+*.settings/
+*/bin/

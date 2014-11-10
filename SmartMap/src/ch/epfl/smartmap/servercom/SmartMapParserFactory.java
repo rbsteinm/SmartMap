@@ -18,7 +18,7 @@ public class SmartMapParserFactory {
 	 *             If no known parser supports this content type
 	 */
 	public static SmartMapParser parserForContentType(String contentType)
-			throws NoSuchFormatException {
+		throws NoSuchFormatException {
 
 		if (contentType.equals("application/json")) {
 			return new JsonSmartMapParser();

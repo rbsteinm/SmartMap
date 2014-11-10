@@ -1,0 +1,54 @@
+users:
+  -
+    idusers: 1
+    fbid: 274
+    name: "Toto"
+    visibility: "VISIBLE"
+    longitude: 42.05
+    latitude: 23.77
+  -
+    idusers: 2
+    fbid: 347876
+    name: "Titi"
+    visibility: "INVISIBLE"
+    longitude: 12.75645
+    latitude: 54.34556
+  -
+    idusers: 3
+    fbid: 987645
+    name: "Tata"
+    visibility: "INVISIBLE"
+    longitude: -12.4546
+    latitude: -73.76
+  -
+    idusers: 4
+    fbid: 12345
+    name: "Tutu"
+    visibility: "VISIBLE"
+    longitude: 156.85
+    latitude: -89.765
+friendships:
+  -
+    id1: 1
+    id2: 2
+    status: "DISALLOWED"
+    follow: "FOLLOWED"
+  -
+    id1: 2
+    id2: 1
+    status: "ALLOWED"
+    follow: "FOLLOWED"
+  -
+    id1: 1
+    id2: 3
+    status: "ALLOWED"
+    follow: "UNFOLLOWED"
+  -
+    id1: 3
+    id2: 1
+    status: "DISALLOWED"
+    follow: "UNFOLLOWED"
+invitations:
+  -
+    id1: 1
+    id2: 4

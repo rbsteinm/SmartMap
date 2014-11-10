@@ -51,5 +51,4 @@ public interface SmartMapParser {
         SmartMapClientException;
 
     // TODO if necessary add a method to parse an event
-
 }

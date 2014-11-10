@@ -45,16 +45,28 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" />
 
+        <!-- 
+        The button that create notifications
+        <Button
+            android:id="@+id/create_notif_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:onClick="createNotification"
+            android:text="@string/create_notif" >
+        </Button>
+		-->
+		
         <Button
             android:id="@+id/searchButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Search"
-            android:alpha="0.7"
-            android:textColor="#222222" 
-            android:background="#ffffff" 
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp" />
+            android:alpha="0.7"
+            android:background="#ffffff"
+            android:text="@string/search_text"
+            android:textColor="#222222" />
     </RelativeLayout>
 
     <ch.epfl.smartmap.gui.SearchLayout
@@ -122,4 +134,5 @@
             </ScrollView>
         </LinearLayout>
     </ch.epfl.smartmap.gui.SearchLayout>
+
 </FrameLayout>

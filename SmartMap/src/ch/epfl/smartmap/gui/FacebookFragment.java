@@ -31,13 +31,13 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 
 /**
- * The fragment for the "Login with Facebook" button, that is used in scrim (1) - Welcome
- *
+ * The fragment for the "Login with Facebook" button, that is used in scrim (1)
+ * - Welcome
+ * 
  * @author SpicyCH
- *
+ * 
  */
 public class FacebookFragment extends Fragment {
-
     private static final String TAG = FacebookFragment.class.getSimpleName();
 
     private static final String FACEBOOK_ID_POST_NAME = "facebookId";
