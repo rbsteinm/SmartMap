@@ -26,8 +26,6 @@ import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.UserEvent;
 
-import com.google.android.gms.maps.SupportMapFragment;
-
 /**
  * This activity shows the events and offers to filter them.
  *
@@ -208,7 +206,6 @@ public class ShowEventsActivity extends ListActivity {
 
                 // TODO open event in map
                 Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
-                DefaultZoomManager zoomManager = new DefaultZoomManager(new SupportMapFragment());
 
                 Intent displayActivityIntent = new Intent(mContext, MainActivity.class);
                 displayActivityIntent.putExtra("location", event.getLocation());

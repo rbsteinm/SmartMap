@@ -83,18 +83,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 mSearchLayout.open();
             }
         });
-
-        // get Intent that started this Activity
-        Intent startingIntent = getIntent();
-
-        // get the value of the user string
-        Location eventLocation = startingIntent.getParcelableExtra("location");
-        if (eventLocation != null) {
-            // doesn't work when initializeMarkers() is called :(
-            LatLng coordinate = new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude());
-            CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(coordinate, 9);
-            mGoogleMap.animateCamera(yourLocation);
-        }
     }
 
     @Override
@@ -220,6 +208,23 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // nothing
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // get Intent that started this Activity
+        Intent startingIntent = getIntent();
+
+        // get the value of the user string
+        Location eventLocation = startingIntent.getParcelableExtra("location");
+        if (eventLocation != null) {
+            // doesn't work when initializeMarkers() is called :(
+            LatLng coordinate = new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude());
+            CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(coordinate, 9);
+            mGoogleMap.animateCamera(yourLocation);
+        }
     }
 
     /*
