@@ -13,6 +13,8 @@ import java.net.URL;
  * {@link HttpURLConnection} objects.
  * 
  * @author SpicyCH
+ * 
+ * @author Pamoi (code reviewed : 9.11.2014)
  */
 public class DefaultNetworkProvider implements NetworkProvider {
 

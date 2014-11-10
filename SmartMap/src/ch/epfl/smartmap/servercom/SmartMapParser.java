@@ -13,6 +13,8 @@ import ch.epfl.smartmap.cache.User;
  * all share this common interface.
  * 
  * @author marion-S
+ * 
+ * @author Pamoi (code reviewed : 9.11.2014)
  */
 
 public interface SmartMapParser {
