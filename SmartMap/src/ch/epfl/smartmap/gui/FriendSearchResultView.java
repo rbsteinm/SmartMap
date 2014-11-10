@@ -1,3 +1,4 @@
+
 package ch.epfl.smartmap.gui;
 
 import android.content.Context;
@@ -16,6 +17,7 @@ import ch.epfl.smartmap.cache.Friend;
  * @author jfperren
  */
 public class FriendSearchResultView extends SearchResultView {
+
 
     private final static String TAG = "FriendSearchResultView";
     private final static String AUDIT_TAG = "AuditError : " + TAG;
@@ -45,6 +47,7 @@ public class FriendSearchResultView extends SearchResultView {
         mPhotoView = new ImageView(context);
         mPhotoView.setAdjustViewBounds(true);
         mPhotoView.setImageResource(R.drawable.default_user_icon);
+
         LayoutParams mPhotoViewLayoutParams = new LayoutParams(PHOTO_SIZE,
             PHOTO_SIZE);
         mPhotoViewLayoutParams.setMargins(0, 0, PHOTO_RIGHT_MARGIN, 0);

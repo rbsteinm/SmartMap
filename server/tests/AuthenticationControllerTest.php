@@ -27,7 +27,6 @@ use Doctrine\DBAL\Configuration;
 
 
 /**
- *
  * To run these tests, you need to
  *  -Have a db named smartmap live on localhost, that has the user root with no pwd
  *  -Set these settings in web/index.php
@@ -84,7 +83,6 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
         );
     }
     
-
     public function testCanLoginWithGoodRequestParams()
     {
         $request = new Request($getRequest = array(), $this->validPostRequest);
@@ -223,7 +221,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
         $session = new Session(new MockFileSessionStorage());
         $request->setSession($session);
         
-        $this->assertTrue($session->get('userId') == null);
+        $this->assertTrue ( $session->get ( 'userId' ) == null );
         
         $serverResponse = $this->authController->authenticate($request);
         

@@ -84,6 +84,7 @@ public class SearchLayout extends RelativeLayout {
 
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
 
+            @Override
             public boolean onQueryTextSubmit(String query) {
                 // Do something when user his enter on keyboard
                 mSearchView.clearFocus();
