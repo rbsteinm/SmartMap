@@ -2,6 +2,7 @@ package ch.epfl.smartmap.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -11,17 +12,15 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.MockDB;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,10 +37,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private static final int LOCATION_UPDATE_TIMEOUT = 10000;
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
     private static final int LOCATION_UPDATE_DISTANCE = 10;
-    @SuppressWarnings("unused")
-    private DrawerLayout mSideDrawerLayout;
-    private String[] mSideLayoutElements;
-    private ListView mDrawerListView;
+    
+    private SideMenu sideMenu;
     private GoogleMap mGoogleMap;
     private FriendMarkerDisplayer mFriendMarkerDisplayer;
     private EventMarkerDisplayer mEventMarkerDisplayer;
@@ -55,8 +52,9 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         // Get needed Views
         final Button mSearchButton = (Button) findViewById(R.id.searchButton);
         final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
-        // FIXME : Should be done in DrawerLayout class
-        initializeDrawerLayout();
+
+        sideMenu = new SideMenu(this);
+        sideMenu.initializeDrawerLayout();
         mSearchLayout.initSearchLayout();
         if (savedInstanceState == null) {
             displayMap();
@@ -105,19 +103,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         } else {
             super.onBackPressed();
         }
-    }
-
-    /**
-     * Called to set up the left side menu. Supposedly called only once.
-     */
-    private void initializeDrawerLayout() {
-        // Get needed Ressources & Views
-        mSideLayoutElements = getResources().getStringArray(R.array.sideMenuElements);
-        mSideDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerListView = (ListView) findViewById(R.id.left_drawer);
-        // Set the adapter for the listView
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mSideLayoutElements));
-        mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
     }
 
     public Context getContext() {
