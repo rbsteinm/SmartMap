@@ -6,7 +6,7 @@ package ch.epfl.smartmap.gui;
 import java.util.List;
 
 import android.content.Context;
-import ch.epfl.smartmap.cache.Event;
+
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 
@@ -30,8 +30,7 @@ public interface FriendMarkerDisplayer {
 	 * @param listOfFriends
 	 *            the friends we want to display
 	 */
-	void setMarkersToMaps(Context context, GoogleMap mGoogleMap,
-			List<Friend> listOfFriends);
+	void setMarkersToMaps(Context context, GoogleMap googleMap, List<Friend> listOfFriends);
 
 	/**
 	 * This method updates the markers on the map with the given list of friends
@@ -42,8 +41,7 @@ public interface FriendMarkerDisplayer {
 	 * @param listOfFriends
 	 *            the updated friends
 	 */
-	void updateMarkers(Context context, GoogleMap mGoogleMap,
-			List<Friend> listOfFriends);
+	void updateMarkers(Context context, GoogleMap googleMap, List<Friend> listOfFriends);
 
 	/**
 	 * 
@@ -74,7 +72,7 @@ public interface FriendMarkerDisplayer {
 	 * @param event
 	 *            the friend for which we want to add a marker
 	 */
-	void addMarker(User friend, Context context, GoogleMap mGoogleMap);
+	void addMarker(User friend, Context context, GoogleMap googleMap);
 
 	/**
 	 * Remove a marker from the map
@@ -82,7 +80,7 @@ public interface FriendMarkerDisplayer {
 	 * @param event
 	 *            the friend for which we want to remove a marker
 	 */
-	void removeMarker(User friend, Context context, GoogleMap mGoogleMap);
+	void removeMarker(User friend);
 
 	/**
 	 * @param marker
