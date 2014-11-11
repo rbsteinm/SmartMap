@@ -493,6 +493,38 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 		}
 
 	}
+	
+	
+	@Override
+	public List<User> findUsers(String text) throws SmartMapClientException {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("search_text", text);
+		HttpURLConnection conn = getHttpURLConnection("/findUsers");
+		String response = sendViaPost(params, conn);
+		
+		SmartMapParser parser = null;
+		try {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+		
+		List<User> friends = null;
+		try {
+			friends = parser.parseFriends(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+		
+		return friends;
+	}
 
 	private String longListToString(List<Long> list) {
 		String listString = "";
