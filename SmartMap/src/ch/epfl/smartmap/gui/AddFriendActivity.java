@@ -18,7 +18,8 @@ public class AddFriendActivity extends Activity {
     
     private List<User> mUserList;
     
-    protected void updateUserList(){
+    protected void updateUserList() {
+        //TODO call this method in the Activity's xml
         new RefreshUserList().execute();
     }
 
@@ -47,7 +48,13 @@ public class AddFriendActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
     
-    private class RefreshUserList extends AsyncTask<String, Void, List<User>>{
+    /**
+     * Asynchronous task that refreshes the list of users displayed every time a new 
+     * character is typed in the searchbar
+     * @author rbsteinm
+     *
+     */
+    private class RefreshUserList extends AsyncTask<String, Void, List<User>> {
 
         @Override
         protected List<User> doInBackground(String... params) {
