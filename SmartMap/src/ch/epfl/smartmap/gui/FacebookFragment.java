@@ -84,7 +84,7 @@ public class FacebookFragment extends Fragment {
 				.getActivity().getBaseContext(), R.anim.face_anim));
 		authButton.setFragment(this);
 
-		if (!Session.getActiveSession().isOpened()
+		if (Session.getActiveSession() == null
 				|| Session.getActiveSession().getPermissions().isEmpty()) {
 			authButton.setReadPermissions(mPermissions);
 		} else {
