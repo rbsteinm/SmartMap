@@ -12,7 +12,7 @@ import ch.epfl.smartmap.R;
  */
 public class SideMenu extends DrawerLayout {
 
-    private final String[] mSideLayoutElements;
+    private final String[] mListItemsNames;
     private ListView mDrawerListView;
     private final Context mContext;
     
@@ -23,7 +23,7 @@ public class SideMenu extends DrawerLayout {
      */
     public SideMenu(Context context) {
         super(context);
-        mSideLayoutElements = getResources().getStringArray(R.array.sideMenuElements);
+        mListItemsNames = getResources().getStringArray(R.array.sideMenuElements);
         mDrawerListView = (ListView) ((Activity) context).findViewById(R.id.left_drawer);
         mContext = context;
     }
@@ -33,7 +33,7 @@ public class SideMenu extends DrawerLayout {
      */
     public void initializeDrawerLayout() {
         // Set the adapter for the listView
-        mDrawerListView.setAdapter(new SideMenuAdapter(mContext, mSideLayoutElements));
+        mDrawerListView.setAdapter(new SideMenuAdapter(mContext, mListItemsNames));
         mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
     }
 }

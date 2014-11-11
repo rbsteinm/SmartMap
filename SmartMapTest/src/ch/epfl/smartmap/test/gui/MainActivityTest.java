@@ -8,6 +8,8 @@ import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMat
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withTagValue;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 import org.hamcrest.Matcher;
@@ -96,7 +98,7 @@ public class MainActivityTest extends
         onView(withId(R.id.searchBar)).check(matches(not(hasFocus())));
     }
     
-    /*public void testOpenSideMenu() throws Exception{
+    public void testOpenSideMenu() throws Exception{
         onView(withId(R.id.left_drawer)).perform(actionOpenDrawer());
         onView(withId(R.id.left_drawer)).check(matches(isDisplayed()));
     }
@@ -114,5 +116,5 @@ public class MainActivityTest extends
     
     public void testSideMenuViewExist() throws Exception{
         //TODO check that all the views in the side menu exist
-    }*/
+    }
 }

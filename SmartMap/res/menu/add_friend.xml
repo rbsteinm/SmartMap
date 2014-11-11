@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ch.epfl.smartmap.AddFriendActivity" >
+
+    <item
+        android:id="@+id/add_friend_activity_searchBar"
+        android:orderInCategory="100"
+        android:title="@string/search_text"
+        android:icon="@drawable/searchicon"
+        android:showAsAction="collapseActionView|ifRoom"
+        android:actionViewClass="android.widget.SearchView"/>
+
+</menu>
