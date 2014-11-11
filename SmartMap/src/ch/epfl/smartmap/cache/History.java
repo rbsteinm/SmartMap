@@ -17,6 +17,8 @@ public interface History {
 
     int nbOfDates();
 
+    boolean isEmpty();
+
     /**
      * Represents an entry in the history of searches : Tuple of a searchResult and a Date
      * 

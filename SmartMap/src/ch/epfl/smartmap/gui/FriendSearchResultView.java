@@ -1,8 +1,5 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.Calendar;
-import java.util.Date;
-
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Log;
@@ -13,7 +10,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.SearchEngine;
 
 /**
  * Represents a {@code SearchResultView} that displays a {@code Friend}

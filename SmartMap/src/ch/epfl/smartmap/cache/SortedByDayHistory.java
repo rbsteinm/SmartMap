@@ -14,6 +14,7 @@ import java.util.Queue;
  */
 public class SortedByDayHistory implements History {
 
+    @SuppressWarnings("unused")
     private static final int MAX_HISTORY_ENTRY = 50;
 
     private List<Queue<Friend>> mHistoryEntries;
@@ -26,6 +27,7 @@ public class SortedByDayHistory implements History {
         mSize = 0;
     }
 
+    @SuppressWarnings("deprecation")
     public void addEntry(Friend friend, Date date) {
         if (!mHistoryEntries.isEmpty()
             && date.getDate() == mDates.get(0).getDate()) {
@@ -46,6 +48,10 @@ public class SortedByDayHistory implements History {
 
     public Date getDateForIndex(int index) {
         return mDates.get(index);
+    }
+
+    public boolean isEmpty() {
+        return mSize == 0;
     }
 
     /*

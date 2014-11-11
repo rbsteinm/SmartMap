@@ -1,10 +1,8 @@
 package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Queue;
 
 /**
  * Mock class that returns filtered Lists from {@code MockDB}.
@@ -16,8 +14,6 @@ public class MockSearchEngine implements SearchEngine {
     private static final String TAG = "MOCK_SEARCH_ENGINE";
     @SuppressWarnings("unused")
     private static final String AUDIT_TAG = "Audit : " + TAG;
-
-
 
     private History mHistory;
 

@@ -1,14 +1,12 @@
-/**
- * 
- */
 package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * @author hugo-S
+ * Static Friends
  * 
+ * @author jfperren
  */
 public class MockDB {
 
@@ -35,7 +33,7 @@ public class MockDB {
     public static final Friend PIETRO = new Friend(10, "Pietro Ortelli",
         42.2547877, 5.214577);
     public static final Friend CHRISTIE = new Friend(11, "Christie Palmer",
-        1.2547877, 79.214577);
+        18.4641834, -69.9585861);
     public static final Friend MARIE = new Friend(12, "Marie Wermeille",
         45.2547877, 45.004577);
     public static final Friend HUGO = new Friend(13, "Hugo Sbai", 47.5547877,

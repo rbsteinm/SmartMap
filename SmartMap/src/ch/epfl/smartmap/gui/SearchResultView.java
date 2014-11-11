@@ -22,8 +22,9 @@ public abstract class SearchResultView extends LinearLayout {
     private static final float MAIN_LAYOUT_WEIGHTSUM = 10f;
     private final static int PHOTO_RIGHT_MARGIN = 40;
     private final static int PHOTO_SIZE = 150;
-    
+
     private final ImageView mImageView;
+
     /**
      * 
      */
@@ -31,7 +32,9 @@ public abstract class SearchResultView extends LinearLayout {
         EMPTY, ADDED
     }
 
+    @SuppressWarnings("unused")
     private ChildrenState mChildrenState;
+
     /** 
      * Constructor 
      * 
@@ -40,7 +43,7 @@ public abstract class SearchResultView extends LinearLayout {
     public SearchResultView(Context context) {
         super(context);
         mChildrenState = ChildrenState.EMPTY;
-        
+
         // Layout Parameters
         this.setLayoutParams(new AbsListView.LayoutParams(
             LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
@@ -61,7 +64,7 @@ public abstract class SearchResultView extends LinearLayout {
 
         this.setOnTouchListener(getOnTouchListener(this));
     }
-    
+
     public void initViews() {
         mImageView.setImageResource(getImageResource());
         this.addView(mImageView);
@@ -74,7 +77,8 @@ public abstract class SearchResultView extends LinearLayout {
      * 
      * @return
      */
-    public abstract OnTouchListener getOnTouchListener(final SearchResultView v);
+    public abstract OnTouchListener
+        getOnTouchListener(final SearchResultView v);
 
     public abstract int getImageResource();
 

@@ -18,10 +18,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
@@ -62,20 +60,20 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private GoogleMap mGoogleMap;
     private ProfilePictureFriendMarkerDisplayer mFriendMarkerDisplayer;
     private SearchEngine mSearchEngine;
+    
+    private Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Get needed Views
-        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
-
         // FIXME : Should be done in DrawerLayout class
         initializeDrawerLayout();
         // Create SearchEngine and give it to SearchPanel
         mSearchEngine = new MockSearchEngine();
-        mSearchLayout.initSearchLayout(mSearchEngine);
+        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.swipeable_search_result_container);
+        mSearchLayout.setSearchEngine(mSearchEngine);
 
         if (savedInstanceState == null) {
             displayMap();
@@ -93,32 +91,35 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) searchItem.getActionView();
-        final SearchLayout searchLayout = (SearchLayout) findViewById(R.id.searchLayout);
-        
-        searchView.setOnQueryTextListener(new OnQueryTextListener() {
+        mMenu = menu;
 
+        // Get Views
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView mSearchView = (SearchView) searchItem.getActionView();
+        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.swipeable_search_result_container);
+        final SlidingUpPanel mSearchPanel = (SlidingUpPanel) findViewById(R.id.searchLayout);
+        mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
             public boolean onQueryTextSubmit(String query) {
-                Log.d(TAG, "querysubmit");
-                // Do something when user his enter on keyboard
-                searchView.clearFocus();
+                mSearchView.clearFocus();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Log.d(TAG, "querychange");
-                
-                searchLayout.updateSearchResults(searchView.getQuery().toString());
+                // Give the query results to searchLayout
+                mSearchLayout.updateSearchResults(mSearchView.getQuery()
+                    .toString());
                 return false;
             }
         });
-        
-        searchView.setOnSearchClickListener(new OnClickListener(){
+
+        mSearchView.setOnSearchClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                searchLayout.open();
+                // Open Sliding Panel and Displays the main search view
+                String query = mSearchView.getQuery().toString();
+                mSearchPanel.open();
+                mSearchLayout.showMainPanel(query);
             }
         });
         // Configure the search info and add any event listeners
@@ -140,18 +141,14 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         zoomMap(location);
-        // updatePos
-        // mListOfFriends = = listFriendPos();
-        // mFriendMarker.setMarkersToMaps(this, mGoogleMap, mListOfFriends);
-        // zoomAccordingToMarkers();
     }
 
     @Override
     public void onBackPressed() {
-        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+        final SlidingUpPanel mSearchPanel = (SlidingUpPanel) findViewById(R.id.searchLayout);
 
-        if (mSearchLayout.isShown()) {
-            mSearchLayout.close();
+        if (mSearchPanel.isShown()) {
+            mSearchPanel.close();
         } else {
             super.onBackPressed();
         }
@@ -178,7 +175,12 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     }
 
     public void performQuery(Friend friend) {
+        // Get Views
+        final MenuItem mSearchView = (MenuItem) mMenu.findItem(R.id.action_search);
+        
         closeSearchPanel();
+        mSearchView.collapseActionView();
+        
         zoomMap(friend.getLocation());
         // Add query to the searchEngine
         mSearchEngine.getHistory().addEntry(friend, new Date());
@@ -200,7 +202,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     }
 
     public void closeSearchPanel() {
-        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.searchLayout);
+        final SlidingUpPanel mSearchLayout = (SlidingUpPanel) findViewById(R.id.searchLayout);
         mSearchLayout.close();
     }
 

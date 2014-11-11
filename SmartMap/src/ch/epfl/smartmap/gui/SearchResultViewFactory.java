@@ -1,8 +1,7 @@
 package ch.epfl.smartmap.gui;
 
-import ch.epfl.smartmap.cache.Friend;
 import android.content.Context;
-import android.util.Log;
+import ch.epfl.smartmap.cache.Friend;
 
 /**
  * Factory class that provides a function {@code getSearchResultView} returning the right type of SearchResultView
@@ -10,8 +9,11 @@ import android.util.Log;
  * @author jfperren
  */
 public abstract class SearchResultViewFactory {
+    @SuppressWarnings("unused")
     private static final String TAG = "SEARCH_RESULT_VIEW_FACTORY";
-    public static SearchResultView getSearchResultView(Context context, Object item) {
+
+    public static SearchResultView getSearchResultView(Context context,
+        Object item) {
         if (item instanceof Friend) {
             return new FriendSearchResultView(context, (Friend) item);
         } else {
