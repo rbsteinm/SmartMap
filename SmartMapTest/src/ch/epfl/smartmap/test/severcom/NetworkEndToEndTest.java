@@ -170,6 +170,18 @@ public class NetworkEndToEndTest extends TestCase {
 		}
 	}
 
+	@Test
+	public void testM_FindUsers() throws SmartMapClientException{
+		NetworkSmartMapClient networkClient = NetworkSmartMapClient
+				.getInstance();
+		List<User> friends=networkClient.findUsers("s");
+		
+		assertTrue("Null list", friends != null);
+		for (User user : friends) {
+			assertValidIdAndName(user);
+		}
+	}
+	
 	private void assertValidIdAndName(User user) {
 		assertTrue("Unexpected id", user.getID() >= 0);
 		assertTrue("Unexpected name", 0 < user.getName().length()

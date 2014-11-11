@@ -141,6 +141,14 @@ public interface SmartMapClient {
 	 * @throws SmartMapClientException
 	 */
 	void updatePos(Location location) throws SmartMapClientException;
+	
+	/**
+	 * Asks the server for the friends whose name begin with the given text
+	 * @param text
+	 * @return the list of friends
+	 * @throws SmartMapClientException
+	 */
+	public List<User> findUsers(String text) throws SmartMapClientException;
 
 
 }

@@ -77,6 +77,8 @@ public class JsonSmartMapParser implements SmartMapParser {
 		} catch (JSONException e) {
 			throw new SmartMapParseException(e);
 		}
+		
+		Log.d(TAG, Integer.toString(friends.size()));
 		return friends;
 	}
 
