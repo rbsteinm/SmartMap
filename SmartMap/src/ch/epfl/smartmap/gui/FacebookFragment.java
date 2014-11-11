@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 

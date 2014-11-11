@@ -79,16 +79,16 @@ public class FriendTest extends AndroidTestCase {
     @Test
     public void testSetPic() {
         friend.setPicture(BitmapFactory.decodeResource(getContext()
-            .getResources(), R.drawable.searchicon), getContext());
+            .getResources(), R.drawable.ic_search), getContext());
         assertTrue(friend.getPicture(getContext()).sameAs(
             BitmapFactory.decodeResource(getContext().getResources(),
-            R.drawable.searchicon)));
+            R.drawable.ic_search)));
     }
 
     @Test
     public void testDeletePic() {
         friend.setPicture(BitmapFactory.decodeResource(getContext()
-            .getResources(), R.drawable.searchicon), getContext());
+            .getResources(), R.drawable.ic_search), getContext());
         friend.deletePicture(getContext());
         assertTrue(friend.getPicture(getContext()).sameAs(
             BitmapFactory.decodeResource(getContext().getResources(),
