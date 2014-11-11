@@ -4,7 +4,7 @@ namespace SmartMap\DBInterface;
 
 use Symfony\Component\HttpFoundation\Request;
 
-use SmartMap\Control\ControlException;
+use SmartMap\Control\InvalidRequestException;
 
 /**
  * Models a user.
@@ -54,14 +54,14 @@ class User
      * if the session parameter userId is not set.
      * 
      * @param Request $request
-     * @throws ControlException 
+     * @throws InvalidRequestException 
      * @return a Long representing the user id
      */
     public static function getIdFromRequest(Request $request)
     {
         if (!$request->hasSession())
         {
-            throw new ControlException('Trying to access session but the session is not started.');
+            throw new InvalidRequestException('Trying to access session but the session is not started.');
         }
         
         $session = $request->getSession();
@@ -71,7 +71,7 @@ class User
         
         if ($id == null)
         {
-            throw new ControlException('The user is not authenticated.');
+            throw new InvalidRequestException('The user is not authenticated.');
         }
         
         return $id;

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use SmartMap\DBInterface\UserRepository;
 use SmartMap\DBInterface\User;
+use SmartMap\DBInterface\DatabaseException;
 
 /**
  * This class handles all the authorizations (allow, disallow friends, ...) between the users. 
@@ -36,7 +37,14 @@ class AuthorizationController
         
         $friendId = $this->getPostParam($request, 'friend_id');
         
-        $this->mRepo->setFriendshipStatus($userId, $friendId, 'ALLOWED');
+        try
+        {
+            $this->mRepo->setFriendshipStatus($userId, $friendId, 'ALLOWED');
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in allowFriend method.', 2, $e);
+        }
         
         $response = array('status' => 'Ok', 'message' => 'Allowed friend !');
         
@@ -55,7 +63,14 @@ class AuthorizationController
         
         $friendId = $this->getPostParam($request, 'friend_id');
         
-        $this->mRepo->setFriendshipStatus($userId, $friendId, 'DISALLOWED');
+        try
+        {
+            $this->mRepo->setFriendshipStatus($userId, $friendId, 'DISALLOWED');
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in disallowFriend method.', 2, $e);
+        }
         
         $response = array('status' => 'Ok', 'message' => 'Disallowed friend !');
         
@@ -77,7 +92,14 @@ class AuthorizationController
         
         $friendsIds = $this->getIntArrayFromString($friendsIds);
         
-        $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'ALLOWED');
+        try
+        {
+            $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'ALLOWED');
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in allowFriendList method.', 2, $e);
+        }
         
         $response = array('status' => 'Ok', 'message' => 'Allowed friend list !');
         
@@ -99,7 +121,14 @@ class AuthorizationController
         
         $friendsIds = $this->getIntArrayFromString($friendsIds);
         
-        $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'DISALLOWED');
+        try
+        {
+            $this->mRepo->setFriendshipsStatus($userId, $friendsIds, 'DISALLOWED');
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in disallowFriendList method.', 2, $e);
+        }
         
         $response = array('status' => 'Ok', 'message' => 'Disallowed friend list !');
         
@@ -118,7 +147,14 @@ class AuthorizationController
         
         $friendId = $this->getPostParam($request, 'friend_id');
         
-        $this->mRepo->setFriendshipFollow($userId, $friendId, 'FOLLOWED');
+        try
+        {
+            $this->mRepo->setFriendshipFollow($userId, $friendId, 'FOLLOWED');
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in followFriend method.', 2, $e);
+        }
         
         $response = array('status' => 'Ok', 'message' => 'Followed friend !');
         
@@ -137,7 +173,14 @@ class AuthorizationController
         
         $friendId = $this->getPostParam($request, 'friend_id');
         
-        $this->mRepo->setFriendshipFollow($userId, $friendId, 'UNFOLLOWED');
+        try
+        {
+            $this->mRepo->setFriendshipFollow($userId, $friendId, 'UNFOLLOWED');
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in unfollowFriend method.', 2, $e);
+        }
         
         $response = array('status' => 'Ok', 'message' => 'Unfollowed friend !');
         
@@ -178,7 +221,7 @@ class AuthorizationController
         
         if ($value === null)
         {
-            throw new ControlException('Post parameter ' . $param . ' is not set !');
+            throw new InvalidRequestException('Post parameter ' . $param . ' is not set !');
         }
         
         return $value;

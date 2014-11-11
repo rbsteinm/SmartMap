@@ -50,6 +50,12 @@ $app['data.controller'] = $app->share(function() use($app) {
 
 // Error management
 $app->error(function (SmartMap\Control\ControlException $e, $code) use ($app) {
+    // To be deleted
+    return new JsonResponse(array('status' => 'error', 'message' => $e->getMessage()));
+});
+
+$app->error(function (SmartMap\Control\InvalidRequestException $e, $code) use ($app) {
+    // need to set response status to 200 OK !
     return new JsonResponse(array('status' => 'error', 'message' => $e->getMessage()));
 });
 

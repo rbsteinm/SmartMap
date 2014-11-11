@@ -133,7 +133,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Trying to access session but the session is not started.
      */
     public function testSessionNotStartedException()
@@ -144,7 +144,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage The user is not authenticated.
      */
     public function testUserNotAuthenticatedException()

@@ -79,8 +79,8 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	}
 	
 	/**
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage No user found with id 56.
+	 * @expectedException SmartMap\DBInterface\DatabaseException
+	 * @expectedExceptionMessage No user found with id 56 in method getUser.
 	 */
 	public function testGetNonexistingUser()
 	{
@@ -129,7 +129,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	}
 	
 	/**
-	 * @expectedException \Exception
+	 * @expectedException SmartMap\DBInterface\DatabaseException
 	 * @expectedExceptionMessage Arguments $ids and $visibility must be arrays.
 	 */
 	public function testGetUsersWithInvalidArguments()
@@ -252,7 +252,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	}
 	
 	/**
-	 * @expectedException \Exception
+	 * @expectedException SmartMap\DBInterface\DatabaseException
 	 * @expectedExceptionMessage Arguments $status and $follow must be arrays.
 	 */
 	public function testGetFriendsIdsWithInvalidArguments()
@@ -285,7 +285,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	}
 	
 	/**
-	 * @expectedException \Exception
+	 * @expectedException SmartMap\DBInterface\DatabaseException
 	 * @expectedExceptionMessage This friendship link already exists !
 	 */
 	public function testAddAlreadyExistingFriendshipLink()
@@ -312,7 +312,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	}
 	
 	/**
-	 * @expectedException \Exception
+	 * @expectedException SmartMap\DBInterface\DatabaseException
 	 * @expectedExceptionMessage Invalid value for status !
 	 */
 	public function testSetFriendshipStatusWithInvalidStatus()
@@ -340,7 +340,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	}
 	
 	/**
-	 * @expectedException \Exception
+	 * @expectedException SmartMap\DBInterface\DatabaseException
 	 * @expectedExceptionMessage Invalid value for status !
 	 */
 	public function testSetFriendshipsStatusWithInvalidStatus()
@@ -353,7 +353,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	}
 	
 	/**
-	 * @expectedException \Exception
+	 * @expectedException SmartMap\DBInterface\DatabaseException
 	 * @expectedExceptionMessage Argument $idsFriends must be an array !
 	 */
 	public function testSetFriendshipsStatusWithNonArrayArgument()
@@ -380,7 +380,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	}
 	
 	/**
-	 * @expectedException \Exception
+	 * @expectedException SmartMap\DBInterface\DatabaseException
 	 * @expectedExceptionMessage Invalid value for follow status !
 	 */
 	public function testSetFriendshipFollowkWithInvalidStatus()
