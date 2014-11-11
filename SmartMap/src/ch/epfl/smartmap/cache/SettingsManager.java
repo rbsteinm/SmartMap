@@ -2,6 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 
 /**
  * Used to get and set settings and local info using SharedPreferences
@@ -17,6 +18,8 @@ public class SettingsManager {
     public final static String FB_ID = "FacebookID";
     public static final String COOKIE = "Cookie";
     public static final String HIDDEN = "Hidden";
+    public static final String LONGITUDE = "Longitude";
+    public static final String LATITUDE = "Latitude";
     
     public static final long DEFAULT_ID = -1;
     public static final String DEFAULT_NAME = "No name";
@@ -88,6 +91,17 @@ public class SettingsManager {
 	public String getCookie() {
         return mSharedPref.getString(COOKIE, DEFAULT_COOKIE);
     }
+	
+	/**
+	 * @return The local user's current position as a Location object
+	 */
+	public Location getLocation() {
+	    Location loc = new Location("");
+	    //Shared prefs can't store doubles
+	    loc.setLongitude(Double.longBitsToDouble(mSharedPref.getLong(LONGITUDE, 0)));
+	    loc.setLatitude(Double.longBitsToDouble(mSharedPref.getLong(LATITUDE, 0)));
+	    return loc;
+	}
 	
 	/**
 	 * @return True if hidden mode is enabled
@@ -174,6 +188,17 @@ public class SettingsManager {
     public boolean setHidden(boolean isHidden) {
     	mEditor.putBoolean(HIDDEN, isHidden);
     	return mEditor.commit();
+    }
+    
+    /**
+     * Stores the local users location
+     * @param loc The location to be stored
+     * @return True if the location was stores successfully
+     */
+    public boolean setLocation(Location loc) {
+        mEditor.putLong(LONGITUDE, Double.doubleToRawLongBits(loc.getLongitude()));
+        mEditor.putLong(LATITUDE, Double.doubleToRawLongBits(loc.getLatitude()));
+        return mEditor.commit();
     }
     
     /**
