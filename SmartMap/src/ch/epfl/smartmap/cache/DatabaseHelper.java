@@ -3,6 +3,11 @@ package ch.epfl.smartmap.cache;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -599,5 +604,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
 
         return rows;
+    }
+    
+    /**
+     * Uses listFriendsPos() to update the entire friends database with updated positions
+     */
+    public void refreshFriendsPos() {
+        try {
+            Map<Long, Location> locations = NetworkSmartMapClient.getInstance().listFriendsPos();
+            Set<Long> keySet = locations.keySet(); //the keys are friend IDs
+            User friend;
+            for (long i : keySet) {
+                friend = getUser(i);
+                friend.setLocation(locations.get(i));
+                updateUser(friend);
+            }
+        } catch (SmartMapClientException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Fully updates the friends database (not only positions)
+     */
+    public void refreshFriendsInfo() {
+        LongSparseArray<User> friends = getAllUsers();
+        NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+        for (int i = 0; i < friends.size(); i++) {
+            try {
+                //The keys are IDs, so we call getUserInfo for each key and update the db with the result
+                updateUser(client.getUserInfo(friends.keyAt(i)));
+            } catch (SmartMapClientException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

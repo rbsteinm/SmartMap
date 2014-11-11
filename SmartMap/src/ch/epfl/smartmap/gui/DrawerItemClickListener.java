@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.gui;
 
+import ch.epfl.smartmap.activities.FriendsActivity;
 import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;

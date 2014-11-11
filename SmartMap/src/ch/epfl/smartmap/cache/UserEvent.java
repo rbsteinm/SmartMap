@@ -32,7 +32,7 @@ public class UserEvent implements Event {
      * @param p The event's location on the map
      */
     public UserEvent(String name, long creator, String creatorName,
-    		GregorianCalendar startDate, GregorianCalendar endDate, Location p) {
+        GregorianCalendar startDate, GregorianCalendar endDate, Location p) {
         mEvtName = name;
         mEvtCreator = creator;
         mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR),

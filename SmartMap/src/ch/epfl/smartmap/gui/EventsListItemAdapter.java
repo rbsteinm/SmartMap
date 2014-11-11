@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.cache.Event;
 
 /**
@@ -24,6 +25,7 @@ import ch.epfl.smartmap.cache.Event;
  */
 public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
+    @SuppressWarnings("unused")
     private final static String TAG = EventsListItemAdapter.class.getSimpleName();
 
     private final static int HUNDRED_PERCENT = 100;
@@ -104,7 +106,7 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
      * @return the time of the event, in a cool format
      * @author SpicyCH
      */
-    protected static String setTextFromDate(GregorianCalendar date1, GregorianCalendar date2, String s) {
+    public static String setTextFromDate(GregorianCalendar date1, GregorianCalendar date2, String s) {
         if (date1.after(date2)) {
             // TODO assert
             throw new IllegalArgumentException("date1 must be before date2");

@@ -35,7 +35,7 @@ public class Friend implements User {
 	public static final String NO_NUMBER = "No phone number specified";
 	public static final String NO_EMAIL = "No email address specified";
 	public static final String POSITION_UNKNOWN = "Unknown position";
-	public static final int DEFAULT_PICTURE = R.drawable.default_user_icon; // placeholder
+	public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
 	public static final int IMAGE_QUALITY = 100;
 	public static final String PROVIDER_NAME = "SmartMapServers";
 
