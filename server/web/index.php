@@ -59,10 +59,19 @@ $app->error(function (SmartMap\Control\InvalidRequestException $e, $code) use ($
     return new JsonResponse(array('status' => 'error', 'message' => $e->getMessage()));
 });
 
+$app->error(function (SmartMap\Control\ControlLogicException $e, $code) use ($app) {
+    if ($app['debug'] == true) {
+        return;
+    }
+    // log error
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occured.'));
+});
+
 $app->error(function (\Exception $e, $code) use ($app) {
     if ($app['debug'] == true) {
         return;
     }
+    // log
     return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occured'));
 });
 
@@ -98,7 +107,7 @@ $app->post('/updatePos', 'data.controller:updatePos');
 
 $app->post('/findUsers', 'data.controller:findUsers');
 
-if ($app['debug'])
+if ($app['debug'] == true)
 {
     $app->post('/fakeAuth', 'authentication.controller:fakeAuth');
 }

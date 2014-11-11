@@ -62,7 +62,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Invalid coordinates.
      */
     public function testInvalidCoordinatesUpdatePos()
@@ -85,7 +85,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Post parameter longitude is not set !
      */
     public function testMissingPostParam()
@@ -210,7 +210,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage You cannot invite yourself !
      */
     public function testInvalidSelfInviteFriend()
@@ -226,6 +226,10 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $response = $controller->inviteFriend($request);
     }
     
+    /**
+     * @expectedException SmartMap\Control\InvalidRequestException
+     * @expectedExceptionMessage You are already friends or invited.
+     */
     public function testInvalidInviteFriend()
     {
         $this->mockRepo
@@ -255,11 +259,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         
         $controller = new DataController($this->mockRepo);
         
-        $response = $controller->inviteFriend($request);
-        
-        $validResponse = array('status' => 'error', 'message' => 'You are already friends or invited.');
-        
-        $this->assertEquals($response->getContent(), json_encode($validResponse));
+        $controller->inviteFriend($request);
     }
     
     public function testValidGetInvitations()
@@ -363,7 +363,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Not invited by user with id 3 !
      */
     public function testNonInvitedAcceptInvitation()
@@ -390,8 +390,8 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
-     * @expectedExceptionMessage You are already friends !
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in acceptInvitation.
      */
     public function testAlreadyFriendAcceptInvitation()
     {
@@ -411,7 +411,8 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         
         $this->mockRepo
              ->method('addFriendshipLink')
-             ->will($this->throwException(new \Exception('This friendship link already exists !')));
+             ->will($this->throwException(new SmartMap\DBInterface\DatabaseException(
+                 'This friendship link already exists !')));
         
         $request = new Request($query = array(), $request = array('friend_id' => 1));
         
