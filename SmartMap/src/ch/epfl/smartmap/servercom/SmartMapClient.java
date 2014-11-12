@@ -1,25 +1,33 @@
 package ch.epfl.smartmap.servercom;
 
 import java.util.List;
+import java.util.Map;
 
-import ch.epfl.smartmap.cache.Point;
+import android.location.Location;
+
+
 import ch.epfl.smartmap.cache.User;
 
 /**
  * A client object to a SmartMap server that abstracts the underlying
  * communication protocol and data formats.
- * 
+ *
  * @author marion-S
+ *
  * 
+ * @author Pamoi (code reviewed : 9.11.2014)
  */
 
 public interface SmartMapClient {
 
+
 	/**
 	 * Send to the server the user's name, id and token
 	 * 
-	 * @param user
-	 *            the user who authenticates
+	 * @param name
+	 *            the name of the user who authenticates
+	 * @param facebookId
+	 *            the facebook id of the user
 	 * @param fbAccessToken
 	 * @throws SmartMapClientException
 	 */
@@ -29,10 +37,10 @@ public interface SmartMapClient {
 	/**
 	 * Asks to the server the friends positions
 	 * 
-	 * @return the list of friends (including their position)
+	 * @return a map that maps each friend id to a position
 	 * @throws SmartMapClientException
 	 */
-	List<User> listFriendPos() throws SmartMapClientException;
+	Map<Long, Location> listFriendsPos() throws SmartMapClientException;
 
 	/**
 	 * Asks the server to follow the friend with id id
@@ -41,7 +49,7 @@ public interface SmartMapClient {
 	 *            : the id of the friend to follow
 	 * @throws SmartMapClientException
 	 */
-	void followFriend(int id) throws SmartMapClientException;
+	void followFriend(long id) throws SmartMapClientException;
 
 	/**
 	 * Asks the server to unfollow the friend with id id
@@ -50,7 +58,7 @@ public interface SmartMapClient {
 	 *            : the id of the friend to unfollow
 	 * @throws SmartMapClientException
 	 */
-	void unfollowFriend(int id) throws SmartMapClientException;
+	void unfollowFriend(long id) throws SmartMapClientException;
 
 	/**
 	 * Asks the server to allow the friend with id id to see the position
@@ -59,7 +67,7 @@ public interface SmartMapClient {
 	 *            : the id of the friend to allow
 	 * @throws SmartMapClientException
 	 */
-	void allowFriend(int id) throws SmartMapClientException;
+	void allowFriend(long id) throws SmartMapClientException;
 
 	/**
 	 * Asks the server to disallow the friend with id id to see the position
@@ -68,7 +76,7 @@ public interface SmartMapClient {
 	 *            : the id of the friend to disallow
 	 * @throws SmartMapClientException
 	 */
-	void disallowFriend(int id) throws SmartMapClientException;
+	void disallowFriend(long id) throws SmartMapClientException;
 
 	/**
 	 * Asks the server to allow the friends with ids in the list ids to see the
@@ -78,7 +86,7 @@ public interface SmartMapClient {
 	 *            : the ids of the friends to allow
 	 * @throws SmartMapClientException
 	 */
-	void allowFriendList(List<Integer> ids) throws SmartMapClientException;
+	void allowFriendList(List<Long> ids) throws SmartMapClientException;
 
 	/**
 	 * Asks the server to disallow the friends with ids in the list ids to see
@@ -88,7 +96,7 @@ public interface SmartMapClient {
 	 *            : the ids of the friends to disallow
 	 * @throws SmartMapClientException
 	 */
-	void disallowFriendList(List<Integer> ids) throws SmartMapClientException;
+	void disallowFriendList(List<Long> ids) throws SmartMapClientException;
 
 	/**
 	 * Sends an invitation to the server for the friend with id "id"
@@ -97,7 +105,7 @@ public interface SmartMapClient {
 	 *            the id of the frien to invite
 	 * @throws SmartMapClientException
 	 */
-	void inviteFriend(int id) throws SmartMapClientException;
+	void inviteFriend(long id) throws SmartMapClientException;
 
 	/**
 	 * Retrieve the invitations from the server
@@ -115,7 +123,7 @@ public interface SmartMapClient {
 	 * @return the new Friend
 	 * @throws SmartMapClientException
 	 */
-	User acceptInvitation(int id) throws SmartMapClientException;
+	User acceptInvitation(long id) throws SmartMapClientException;
 
 	/**
 	 * Asks to the server informations about the user with id id
@@ -125,13 +133,14 @@ public interface SmartMapClient {
 	 * @return the User for which we wanted for infos
 	 * @throws SmartMapClientException
 	 */
-	User getUserInfo(int id) throws SmartMapClientException;
+	User getUserInfo(long id) throws SmartMapClientException;
 
 	/**
 	 * Sends the latitude and longitude to the server
 	 * 
 	 * @throws SmartMapClientException
 	 */
-	void updatePos(Point position) throws SmartMapClientException;
+	void updatePos(Location location) throws SmartMapClientException;
+
 
 }

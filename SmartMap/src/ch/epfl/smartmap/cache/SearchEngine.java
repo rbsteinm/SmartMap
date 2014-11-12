@@ -8,5 +8,17 @@ import java.util.List;
  * @author jfperren
  */
 public interface SearchEngine {
+    
+    /**
+     * Sends a Query, computes it and return matched results
+     * 
+     * @param query 
+     * @return a List containing the result
+     */
     List<Friend> sendQuery(String query);
+
+    /**
+     * @return History of searches of this SearchEngine
+     */
+    History getHistory();
 }

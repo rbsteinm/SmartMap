@@ -1,13 +1,14 @@
 package ch.epfl.smartmap.gui;
 
+import ch.epfl.smartmap.activities.FriendsActivity;
 import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 /**
+ * Listener handling the clics on each element in the left drawer menu
  * @author rbsteinm
- * 
  */
 public class DrawerItemClickListener implements ListView.OnItemClickListener {
 

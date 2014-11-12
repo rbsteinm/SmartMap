@@ -47,7 +47,8 @@ use Doctrine\DBAL\Configuration;
  * @author Pamoi (code reviewed - 01.11.2014)
  *        
  */
-class AuthenticationControllerTest extends PHPUnit_Framework_TestCase {
+class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
+{
     
     private $authController;
     private $validPostRequest;

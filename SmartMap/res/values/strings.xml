@@ -11,6 +11,8 @@
     <string name="logo_description">Logo</string>
     <string name="welcome">W E L C O M E</string>
     <string name="loading_text">Loading Map...</string>
+    <string name="create_notif">Create Notification</string>
+    <string name="search_text">Search</string>
 
     <string-array name="sideMenuElements">
         <item>Profile</item>
@@ -82,5 +84,11 @@
     <string name="unknown_activity_request_code">
         Received an unknown activity request code %1$d in onActivityResult.
     </string>
+    
+    <!-- ShowEventsActivity -->
+    <string name="title_activity_show_events">Events</string>
+    <string name="ShowEventsCheckBoxMyEv">My events</string>
+    <string name="ShowEventsCheckBoxNearMe">Near me</string>
+    <string name="ShowEventsCheckBoxStatus">Ongoing</string>
 
 </resources>

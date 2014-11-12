@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -31,8 +33,7 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 
 /**
- * The fragment for the "Login with Facebook"
- * button, that is used in scrim (1) - Welcome
+ * The fragment for the "Login with Facebook" button, that is used in scrim (1)
  * 
  * @author SpicyCH
  * 
@@ -82,7 +83,7 @@ public class FacebookFragment extends Fragment {
 				.getActivity().getBaseContext(), R.anim.face_anim));
 		authButton.setFragment(this);
 
-		if (!Session.getActiveSession().isOpened()
+		if (Session.getActiveSession() == null
 				|| Session.getActiveSession().getPermissions().isEmpty()) {
 			authButton.setReadPermissions(mPermissions);
 		} else {
@@ -165,60 +166,70 @@ public class FacebookFragment extends Fragment {
 
 	protected void makeMeRequest() {
 		Request request = Request.newMeRequest(Session.getActiveSession(),
-				new Request.GraphUserCallback() {
-					@Override
-					public void onCompleted(GraphUser user, Response response) {
 
-						if (user != null) {
+		new Request.GraphUserCallback() {
+		    
+			@Override
+			public void onCompleted(GraphUser user, Response response) {
 
-							// This portable token is used by the server
-							String facebookToken = Session.getActiveSession()
-									.getAccessToken();
+				if (user != null) {
 
-							// Send user's infos to SmartMap server
-							Map<String, String> params = new LinkedHashMap<String, String>();
-							params.put(FACEBOOK_ID_POST_NAME, user.getId());
-							params.put(FACEBOOK_NAME_POST_NAME, user.getName());
-							params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
-							// TODO put user's friends?
+					// This portable token is used by the server
+					String facebookToken = Session.getActiveSession()
+							.getAccessToken();
 
-							// Debug
-							Log.i(TAG, "user name: " + params.get("name"));
-							Log.i(TAG,
-									"user facebookId: "
-											+ params.get(FACEBOOK_ID_POST_NAME));
+					// Send user's infos to SmartMap server
+					Map<String, String> params = new LinkedHashMap<String, String>();
+					params.put(FACEBOOK_ID_POST_NAME, user.getId());
+					params.put(FACEBOOK_NAME_POST_NAME, user.getName());
+					params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
+					// TODO put user's friends?
 
-							if (!sendDataToServer(params)) {
-								Toast.makeText(
-										getActivity(),
-										"Failed to log in to the SmartMap server.",
-										Toast.LENGTH_LONG).show();
-							} else {
-								// Create and start the next activity
-								Toast.makeText(
-										getActivity(),
-										"You logged in successfully, "
-												+ user.getName(),
-										Toast.LENGTH_LONG).show();
-								Intent intent = new Intent(getActivity(),
-										MainActivity.class);
-								startActivity(intent);
-							}
+					// Debug
+					Log.i(TAG, "user name: " + params.get("name"));
+					Log.i(TAG,
+							"user facebookId: "
+									+ params.get(FACEBOOK_ID_POST_NAME));
 
-						} else if (response.getError() != null) {
-							Log.e(TAG,
-									"The user is null (authentication aborted?)");
-						}
+					if (!sendDataToServer(params)) {
+						Toast.makeText(
+								getActivity(),
+								"Failed to log in to the SmartMap server.",
+								Toast.LENGTH_LONG).show();
+					} else {
+						// Create and start the next activity
+						Toast.makeText(
+								getActivity(),
+								"You logged in successfully, "
+										+ user.getName(),
+								Toast.LENGTH_LONG).show();
+						startMainActivity();
+						
 					}
-				});
+
+				} else if (response.getError() != null) {
+					Log.e(TAG,
+							"The user is null (authentication aborted?)");
+				}
+			}
+		});
 
 		request.executeAsync();
+	}
+	
+	private void startMainActivity() {
+	    Activity currentActivity = getActivity();
+	    Intent intent = new Intent(getActivity(),
+            MainActivity.class);
+	    startActivity(intent);
+	    currentActivity.finish();
 	}
 
 	private boolean sendDataToServer(Map<String, String> params) {
 
 		ConnectivityManager connMgr = (ConnectivityManager) getActivity()
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+			.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 		if (networkInfo != null && networkInfo.isConnected()) {
 			// Send data
@@ -229,8 +240,8 @@ public class FacebookFragment extends Fragment {
 			// An error occured
 			Log.e(TAG, "Could not send user's data to server. Net down?");
 			Toast.makeText(getActivity(),
-					"Your internet connection seems down. Please try again!",
-					Toast.LENGTH_LONG).show();
+				"Your internet connection seems down. Please try again!",
+				Toast.LENGTH_LONG).show();
 			return false;
 		}
 
