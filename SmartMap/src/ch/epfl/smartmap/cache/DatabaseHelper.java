@@ -608,8 +608,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     
     /**
      * Uses listFriendsPos() to update the entire friends database with updated positions
+     * @return The number of rows (i.e. friends) that were updated
      */
-    public void refreshFriendsPos() {
+    public int refreshFriendsPos() {
+        int updatedFriends = 0;
         try {
             Map<Long, Location> locations = NetworkSmartMapClient.getInstance().listFriendsPos();
             Set<Long> keySet = locations.keySet(); //the keys are friend IDs
@@ -617,11 +619,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             for (long i : keySet) {
                 friend = getUser(i);
                 friend.setLocation(locations.get(i));
-                updateUser(friend);
+                updatedFriends += updateUser(friend);
             }
         } catch (SmartMapClientException e) {
             e.printStackTrace();
         }
+        return updatedFriends;
     }
     
     /**
