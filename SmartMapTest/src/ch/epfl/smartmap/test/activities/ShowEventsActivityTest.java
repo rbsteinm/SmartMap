@@ -4,6 +4,7 @@ import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isEnabled;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static org.hamcrest.Matchers.not;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
@@ -42,6 +43,11 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
     public void testSeekBarCannotGoToZero() {
         onView(withId(R.id.showEventSeekBar)).perform(setProgress(0));
         onView(withId(R.id.showEventKilometers)).check(matches(not(ViewMatchers.withText("0 km"))));
+    }
+
+    public void testCheckingNearMeChangesListSize() {
+        onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(click());
+        //onView(withId(R.id.list));
     }
 
     // from stackoverflow

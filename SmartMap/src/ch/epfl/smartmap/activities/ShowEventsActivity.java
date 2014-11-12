@@ -75,7 +75,8 @@ public class ShowEventsActivity extends ListActivity {
         mNearMeChecked = false;
 
         mShowKilometers = (TextView) findViewById(R.id.showEventKilometers);
-        // By default, the seek bar is disabled. This is done programmatically as android:enabled="false" doesn't work
+        // By default, the seek bar is disabled. This is done programmatically
+        // as android:enabled="false" doesn't work
         // out in xml
         mSeekBar = (SeekBar) findViewById(R.id.showEventSeekBar);
         mSeekBar.setEnabled(false);
@@ -180,6 +181,16 @@ public class ShowEventsActivity extends ListActivity {
         if (id == R.id.action_settings) {
             return true;
         }
+
+        switch (item.getItemId()) {
+            case R.id.showEventsMenuNewEvent:
+                Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
+                startActivity(showEventIntent);
+            default:
+                // No other menu items!
+                break;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -208,9 +219,9 @@ public class ShowEventsActivity extends ListActivity {
                 // TODO open event in map
                 Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
 
-                Intent displayActivityIntent = new Intent(mContext, MainActivity.class);
-                displayActivityIntent.putExtra("location", event.getLocation());
-                startActivity(displayActivityIntent);
+                Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                showEventIntent.putExtra("location", event.getLocation());
+                startActivity(showEventIntent);
 
             }
         });

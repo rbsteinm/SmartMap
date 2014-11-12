@@ -30,22 +30,17 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="ch.epfl.smartmap.activities.MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.StartActivity"
+            android:name=".activities.StartActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.FriendsActivity"
+            android:name=".activities.FriendsActivity"
             android:label="@string/title_activity_friends"
             android:screenOrientation="portrait" >
         </activity>
@@ -55,7 +50,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.LoggedInActivity"
+            android:name=".activities.LoggedInActivity"
             android:label="@string/title_activity_logged_in"
             android:screenOrientation="portrait" >
         </activity>
@@ -69,10 +64,20 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
         <activity
-            android:name="ch.epfl.smartmap.activities.ShowEventsActivity"
+            android:name=".activities.ShowEventsActivity"
             android:label="@string/title_activity_show_events"
             android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ch.epfl.smartmap.activities.AddEventActivity"
+            android:label="@string/title_activity_add_event" >
         </activity>
     </application>
 
