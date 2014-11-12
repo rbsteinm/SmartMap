@@ -227,7 +227,7 @@ public class FacebookFragment extends Fragment {
 	private boolean sendDataToServer(Map<String, String> params) {
 
 		ConnectivityManager connMgr = (ConnectivityManager) getActivity()
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
+			.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 		if (networkInfo != null && networkInfo.isConnected()) {
 			// Send data
@@ -238,8 +238,8 @@ public class FacebookFragment extends Fragment {
 			// An error occured
 			Log.e(TAG, "Could not send user's data to server. Net down?");
 			Toast.makeText(getActivity(),
-					"Your internet connection seems down. Please try again!",
-					Toast.LENGTH_LONG).show();
+				"Your internet connection seems down. Please try again!",
+				Toast.LENGTH_LONG).show();
 			return false;
 		}
 
