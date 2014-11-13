@@ -420,4 +420,28 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	     
 	    $this->assertEquals(0, $this->getConnection()->getRowCount('invitations'), "Post-Condition");
 	}
+	
+	public function testAddAcceptedInvitation()
+	{
+	    $this->assertEquals(1, $this->getConnection()->getRowCount('accepted_invitations'), "Pre-Condition");
+	    
+	    $repo = new UserRepository(self::$doctrine);
+	     
+	    $repo->addAcceptedInvitation(2, 4);
+	    
+	    $this->assertEquals(2, $this->getConnection()->getRowCount('accepted_invitations'), "Post-Condition");
+	}
+	
+	public function testGetAcceptedInvitations()
+	{
+	    $this->assertEquals(1, $this->getConnection()->getRowCount('accepted_invitations'), "Pre-Condition");
+	     
+	    $repo = new UserRepository(self::$doctrine);
+	    
+	    $ids = $repo->getAcceptedInvitations(3);
+	     
+	    $this->assertEquals(0, $this->getConnection()->getRowCount('accepted_invitations'), "Post-Condition");
+	    
+	    $this->assertEquals(array(2), $ids);
+	}
 }

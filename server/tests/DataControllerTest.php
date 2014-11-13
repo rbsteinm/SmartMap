@@ -292,6 +292,10 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
             new User(2, 3, 'Titi', 'VISIBLE', 3.0, 4.0)
         );
         
+        $acceptedInvitationIds = array(3);
+        
+        $acceptingUsers = array(new User(3, 4, 'Tutu', 'VISIBLE', 5.0, 6.0));
+        
         $this->mockRepo
              ->method('getInvitationIds')
              ->willReturn($invitIds);
@@ -301,12 +305,23 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
              ->with($this->equalTo(14));
         
         $this->mockRepo
-             ->method('getUsers')
-             ->willReturn($returnUsers);
+             ->method('getAcceptedInvitations')
+             ->willReturn($acceptedInvitationIds);
         
         $this->mockRepo->expects($this->once())
+             ->method('getAcceptedInvitations')
+             ->with($this->equalTo(14));
+        
+        $this->mockRepo
              ->method('getUsers')
-             ->with($this->equalTo($invitIds));
+             ->will($this->onConsecutiveCalls($returnUsers, $acceptingUsers));
+        
+        $this->mockRepo->expects($this->exactly(2))
+             ->method('getUsers')
+             ->withConsecutive(
+                 array($this->equalTo($invitIds)),
+                 array($this->equalTo($acceptedInvitationIds))
+             );
         
         $request = new Request();
         
@@ -318,12 +333,20 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         
         $response = $controller->getInvitations($request);
         
-        $list = array(
+        $invitations = array(
             array('id' => 1, 'name' => 'Toto'),
             array('id' => 2, 'name' => 'Titi')
         );
         
-        $validResponse = array('status' => 'Ok', 'message' => 'Fetched invitations !', 'list' => $list);
+        $newFriends = array(
+            array('id' => 3, 'name' => 'Tutu', 'longitude' => 5.0, 'latitude' => 6.0));
+        
+        $validResponse = array(
+            'status' => 'Ok',
+            'message' => 'Fetched invitations !',
+            'invitations' => $invitations,
+            'newFriends' => $newFriends
+        );
         
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
@@ -360,6 +383,10 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $this->mockRepo->expects($this->once())
              ->method('getUser')
              ->with($this->equalTo(1));
+        
+        $this->mockRepo->expects($this->once())
+             ->method('addAcceptedInvitation')
+             ->with($this->equalTo(14), $this->equalTo(1));
         
         $request = new Request($query = array(), $request = array('friend_id' => 1));
         

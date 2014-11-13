@@ -207,6 +207,10 @@ class DataController
             $inviterIds = $this->mRepo->getInvitationIds($userId);
             
             $inviters = $this->mRepo->getUsers($inviterIds);
+            
+            $acceptedInvitationIds = $this->mRepo->getAcceptedInvitations($userId);
+            
+            $newFriends = $this->mRepo->getUsers($acceptedInvitationIds);
         }
         catch (DatabaseException $e)
         {
@@ -220,10 +224,23 @@ class DataController
             $invitersList[] = array('id' => $inviter->getId(), 'name' => $inviter->getName());
         }
         
+        $friendsList = array();
+        
+        foreach ($newFriends as $friend)
+        {
+            $friendsList[] = array(
+                'id' => $friend->getId(),
+                'name' => $friend->getName(),
+                'longitude' => $friend->getLongitude(),
+                'latitude' => $friend->getLatitude()
+            );
+        }
+        
         $response = array(
                             'status' => 'Ok',
                             'message' => 'Fetched invitations !',
-                            'list' => $invitersList
+                            'invitations' => $invitersList,
+                            'newFriends' => $friendsList
                          );
         
         return new JsonResponse($response);
@@ -256,6 +273,8 @@ class DataController
         
             $this->mRepo->addFriendshipLink($userId, $friendId);
             $this->mRepo->addFriendshipLink($friendId, $userId);
+            
+            $this->mRepo->addAcceptedInvitation($userId, $friendId);
         
             $user = $this->mRepo->getUser($friendId);
         }

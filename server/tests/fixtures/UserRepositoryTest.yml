@@ -52,3 +52,7 @@ invitations:
   -
     id1: 1
     id2: 4
+accepted_invitations:
+  -
+    id1: 2
+    id2: 3

@@ -19,6 +19,7 @@ class UserRepository
     private static $TABLE_USER = 'users';
     private static $TABLE_FRIENDSHIP = 'friendships';
     private static $TABLE_INVITATIONS = 'invitations';
+    private static $TABLE_ACCEPTED_INVITATIONS = 'accepted_invitations';
     
     private $mApp;
     
@@ -368,10 +369,11 @@ class UserRepository
         try
         {
             $stmt = $this->mDb->executeQuery($req,
-                                        array($status, $idsFriends, $idUser),
-                                        array(\PDO::PARAM_STR,
-                                              \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
-                                              \PDO::PARAM_INT,));
+                array($status, $idsFriends, $idUser),
+                array(\PDO::PARAM_STR,
+                    \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
+                    \PDO::PARAM_INT
+                ));
         }
         catch (\Exception $e)
         {
@@ -396,9 +398,9 @@ class UserRepository
         try
         {
             $this->mDb->update(self::$TABLE_FRIENDSHIP,
-                               array('follow' => $follow),
-                               array('id1' => (int) $idUser, 'id2' => (int) $friendId)
-                              );
+                array('follow' => $follow),
+                array('id1' => (int) $idUser, 'id2' => (int) $friendId)
+            );
         }
         catch (\Exception $e)
         {
@@ -449,11 +451,10 @@ class UserRepository
     {
         try
         {
-            $this->mDb->insert(self::$TABLE_INVITATIONS,
-                              array(
-                                'id1' => (int) $idUser,
-                                'id2' => (int) $idFriend
-                             ));
+            $this->mDb->insert(self::$TABLE_INVITATIONS, array(
+                'id1' => (int) $idUser,
+                'id2' => (int) $idFriend
+            ));
         }
         catch (\Exception $e)
         {
@@ -473,14 +474,69 @@ class UserRepository
         try
         {
             $this->mDb->delete(self::$TABLE_INVITATIONS, array(
-                                    'id1' => (int) $idUser,
-                                    'id2' => (int) $idFriend
-                               ));
+                'id1' => (int) $idUser,
+                'id2' => (int) $idFriend
+            ));
         }
         catch (\Exception $e)
         {
             throw new DatabaseException('Error removing invitation in removeInvitations.', 1, $e);
         }
+    }
+    
+    /**
+     * Adds an accepted invitation.
+     * 
+     * @param long $idUser
+     * @param long $idFriend
+     * @throws DatabaseExeption
+     */
+    public function addAcceptedInvitation($idUser, $idFriend)
+    {
+        try
+        {
+            $this->mDb->insert(self::$TABLE_ACCEPTED_INVITATIONS, array(
+                'id1' => (int) $idUser,
+                'id2' => (int) $idFriend
+            ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseExeption('Error in addAcceptedInvitation.', 1, $e);
+        }
+    }
+    
+    /**
+     * Gets the accepted invitations and deletes them from the database as the info is only needed once.
+     * 
+     * @param long $idUser
+     * @throws DatabaseExeption
+     * @return array
+     */
+    public function getAcceptedInvitations($idUser)
+    {
+        $req = "SELECT id1 FROM " . self::$TABLE_ACCEPTED_INVITATIONS .  " WHERE id2 = ?";
+        
+        try
+        {
+            $stmt = $this->mDb->executeQuery($req, array((int) $idUser));
+            
+            // We delete the accepted invitation as it is no longer needed
+            $this->mDb->delete(self::$TABLE_ACCEPTED_INVITATIONS, array('id2' => (int) $idUser));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseExeption('Error in addAcceptedInvitation.', 1, $e);
+        }
+        
+        $ids = array();
+        
+        while ($id = $stmt->fetch())
+        {
+            $ids[] = $id['id1'];
+        }
+        
+        return $ids;
     }
     
     // Utility functions
@@ -500,13 +556,13 @@ class UserRepository
             try
             {
                 $users[] = new User(
-                                        $userData['idusers'], 
-                                        $userData['fbid'],
-                                        $userData['name'],
-                                        $userData['visibility'],
-                                        $userData['longitude'],
-                                        $userData['latitude']
-                                    );
+                    $userData['idusers'], 
+                    $userData['fbid'],
+                    $userData['name'],
+                    $userData['visibility'],
+                    $userData['longitude'],
+                    $userData['latitude']
+                );
             }
             catch (\Exception $e)
             {
