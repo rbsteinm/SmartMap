@@ -40,7 +40,14 @@ class DataController
         
         $latitude = $this->getPostParam($request, 'latitude');
         
-        $user = $this->mRepo->getUser($userId);
+        try
+        {
+            $user = $this->mRepo->getUser($userId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in updatePos.', 2, $e);
+        }
         
         try
         {
@@ -249,13 +256,13 @@ class DataController
         
             $this->mRepo->addFriendshipLink($userId, $friendId);
             $this->mRepo->addFriendshipLink($friendId, $userId);
+        
+            $user = $this->mRepo->getUser($friendId);
         }
         catch (DatabaseException $e)
         {
             throw new ControlLogicException('Error in acceptInvitation.', 2, $e);
         }
-        
-        $user = $this->mRepo->getUser($friendId);
         
         $response = array(
                             'status' => 'Ok',

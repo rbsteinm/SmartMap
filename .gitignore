@@ -22,6 +22,7 @@ server/.settings
 server/config.json
 server/tests/phpunit.phar
 server/tests/phpunit.xml
+server/logs/
 server/.checkstyle
 Libraries/google-play-services_lib/local.properties
 Libraries/facebook/local.properties

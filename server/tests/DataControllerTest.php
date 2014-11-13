@@ -101,6 +101,27 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $response = $controller->updatePos($request);
     }
     
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in updatePos.
+     */
+    public function testDatabaseErrorUpdatePos()
+    {
+        $this->mockRepo
+             ->method('getUser')
+             ->will($this->throwException(new SmartMap\DBInterface\DatabaseException('Nasty error')));
+        
+        $request = new Request($query = array(), $request = array('longitude' => 100.0, 'latitude' => -35.0));
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new DataController($this->mockRepo);
+        
+        $controller->updatePos($request);
+    }
+    
     public function testValidListFriendPos()
     {
         $friendsIds = array(1, 2);

@@ -91,14 +91,21 @@ class UserRepository
             throw new DatabaseException('No user found with id ' . $id . ' in method getUser.');
         }
         
-        $user = new User(
-                            $userData['idusers'], 
-                            $userData['fbid'],
-                            $userData['name'],
-                            $userData['visibility'],
-                            $userData['longitude'],
-                            $userData['latitude']
-                        );
+        try
+        {
+            $user = new User(
+                                $userData['idusers'], 
+                                $userData['fbid'],
+                                $userData['name'],
+                                $userData['visibility'],
+                                $userData['longitude'],
+                                $userData['latitude']
+                            );
+        }
+        catch (\InvalidArgumentException $e)
+        {
+            throw new DatabaseException('User with invalid state in database with id ' . $id . '.');
+        }
                         
         return $user;
     }
@@ -490,14 +497,21 @@ class UserRepository
         
         while ($userData = $stmt->fetch())
         {
-            $users[] = new User(
-                                    $userData['idusers'], 
-                                    $userData['fbid'],
-                                    $userData['name'],
-                                    $userData['visibility'],
-                                    $userData['longitude'],
-                                    $userData['latitude']
-                                );
+            try
+            {
+                $users[] = new User(
+                                        $userData['idusers'], 
+                                        $userData['fbid'],
+                                        $userData['name'],
+                                        $userData['visibility'],
+                                        $userData['longitude'],
+                                        $userData['latitude']
+                                    );
+            }
+            catch (\Exception $e)
+            {
+                throw DatabaseException('User with invalid state in database with id ' . $userData['idusers'] . '.');
+            }
         }
         
         return $users;
