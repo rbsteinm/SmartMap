@@ -303,16 +303,31 @@ class UserRepository
         try
         {
             $this->mDb->insert(self::$TABLE_FRIENDSHIP,
-                               array(
-                                'id1' => (int) $idUser,
-                                'id2' => (int) $idFriend,
-                                'status' => 'ALLOWED',
-                                'follow' => 'FOLLOWED'
-                              ));
+                array(
+                    'id1' => (int) $idUser,
+                    'id2' => (int) $idFriend,
+                    'status' => 'ALLOWED',
+                    'follow' => 'FOLLOWED'
+                ));
         }
         catch (\Exception $e)
         {
             throw new DatabaseException('Error adding a firendship link in addFriendshipLink.', 1, $e);
+        }
+    }
+    
+    public function removeFriendshipLink($idUser, $idFriend)
+    {
+        try
+        {
+            $this->mDb->delete(self::$TABLE_FRIENDSHIP, array(
+                'id1' => (int) $idUser,
+                'id2' => (int) $idFriend
+            ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error removing a firendship link in removeFriendshipLink.', 1, $e);
         }
     }
     

@@ -296,6 +296,63 @@ class DataController
     }
     
     /**
+     * Declines an invitation.
+     * 
+     * @param Request $request
+     * @throws ControlLogicException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function declineInvitation(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+        
+        $friendId = $this->getPostParam($request, 'friend_id');
+        
+        try
+        {
+            $this->mRepo->removeInvitation($friendId, $userId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in declineInvitation.', 2, $e);
+        }
+        
+        $response = array(
+            'status' => 'Ok', 'message' => 'Declined invitation !',
+        );
+        
+        return new JsonResponse($response);
+    }
+    
+    /**
+     * Removes a friend.
+     * 
+     * @param Request $request
+     * @throws ControlLogicException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function removeFriend(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+        
+        $friendId = $this->getPostParam($request, 'friend_id');
+        
+        try
+        {
+            $this->mRepo->removeFriendshipLink($userId, $friendId);
+            $this->mRepo->removeFriendshipLink($friendId, $userId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in removeFriend.', 2, $e);
+        }
+        
+        $response = array('status' => 'Ok', 'message' => 'Removed friend !');
+        
+        return new JsonResponse($response);
+    }
+    
+    /**
      * Gets a list of user names and ids where name begins with post parameter
      * search_text (ignores case). 
      * 

@@ -295,6 +295,28 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    $repo->addFriendshipLink(1, 3);
 	}
 	
+	public function testRemoveFriendshipLink()
+	{
+	    $this->assertEquals(4, $this->getConnection()->getRowCount('friendships'), "Pre-Condition");
+	     
+	    $repo = new UserRepository(self::$doctrine);
+	     
+	    $repo->removeFriendshipLink(1, 3);
+	     
+	    $this->assertEquals(3, $this->getConnection()->getRowCount('friendships'), "Post-Condition");
+	}
+	
+	public function testRemoveUnexistingFriendshipLink()
+	{
+	    $this->assertEquals(4, $this->getConnection()->getRowCount('friendships'), "Pre-Condition");
+	    
+	    $repo = new UserRepository(self::$doctrine);
+	    
+	    $repo->removeFriendshipLink(1, 4);
+	    
+	    $this->assertEquals(4, $this->getConnection()->getRowCount('friendships'), "Post-Condition");
+	}
+	
 	public function testSetFriendshipStatus()
 	{
 	    $repo = new UserRepository(self::$doctrine);

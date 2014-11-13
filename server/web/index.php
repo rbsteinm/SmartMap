@@ -110,6 +110,10 @@ $app->post('/getInvitations', 'data.controller:getInvitations');
 
 $app->post('/acceptInvitation', 'data.controller:acceptInvitation');
 
+$app->post('/declineInvitation', 'data.controller:declineInvitation');
+
+$app->post('/removeFriend', 'data.controller:removeFriend');
+
 $app->post('/listFriendsPos', 'data.controller:listFriendsPos');
 
 $app->post('/updatePos', 'data.controller:updatePos');

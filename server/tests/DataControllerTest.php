@@ -473,6 +473,51 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $controller->acceptInvitation($request);
     }
     
+    public function testValidDeclineInvitation()
+    {
+        $this->mockRepo->expects($this->once())
+             ->method('removeInvitation')
+             ->with($this->equalTo(1), $this->equalTo(14));
+        
+        $request = new Request($query = array(), $request = array('friend_id' => 1));
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new DataController($this->mockRepo);
+        
+        $response = $controller->declineInvitation($request);
+        
+        $validResponse = array('status' => 'Ok', 'message' => 'Declined invitation !');
+        
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+    
+    public function testValidRemoveFriend()
+    {
+        $this->mockRepo->expects($this->exactly(2))
+             ->method('removeFriendshipLink')
+             ->withConsecutive(
+                 array($this->equalTo(14), $this->equalTo(1)),
+                 array($this->equalTo(1), $this->equalTo(14))
+                 );
+        
+        $request = new Request($query = array(), $request = array('friend_id' => 1));
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new DataController($this->mockRepo);
+        
+        $response = $controller->removeFriend($request);
+        
+        $validResponse = array('status' => 'Ok', 'message' => 'Removed friend !');
+        
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+    
     public function testValidFindUsers()
     {
         $returnUsers = array(
@@ -504,5 +549,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         );
         
         $validResponse = array('status' => 'Ok', 'message' => 'Fetched users !', 'list' => $list);
+        
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
 }
