@@ -21,7 +21,7 @@
          android:layout_height="wrap_content"
          android:layout_below="@+id/addEventEventName"
          android:focusable="false"
-         android:hint="1234567"
+         android:hint="@string/addEventEventDate"
          android:inputType="date" >
 
     </EditText>
@@ -34,7 +34,7 @@
         android:layout_alignBottom="@+id/addEventEventDate"
         android:layout_toRightOf="@+id/addEventEventDate"
         android:focusable="false"
-        android:hint="time time time" />
+        android:hint="@string/addEventEventTime" />
 
     <EditText
         android:id="@+id/addEventEndDate"
@@ -60,5 +60,48 @@
         android:ems="10"
         android:focusable="false"
         android:hint="@string/addEventEndTime" />
+
+    <EditText
+        android:id="@+id/addEventLatitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/addEventEndDate"
+        android:layout_alignRight="@+id/addEventEndDate"
+        android:layout_below="@+id/addEventEndDate"
+        android:layout_marginTop="58dp"
+        android:ems="10"
+        android:inputType="numberDecimal|numberSigned"
+        android:hint="@string/addEventLatitude" />
+
+    <EditText
+        android:id="@+id/addEventLongitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/addEventLatitude"
+        android:layout_alignBottom="@+id/addEventLatitude"
+        android:layout_toRightOf="@+id/addEventLatitude"
+        android:ems="10"
+        android:hint="@string/addEventLongitude"
+        android:inputType="numberDecimal|numberSigned" />
+    
+    <EditText
+        android:id="@+id/addEventPlaceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/addEventDescription"
+        android:layout_below="@+id/addEventLatitude"
+        android:layout_marginTop="30dp"
+        android:ems="10"
+        android:hint="@string/addEventPlaceName" />
+
+    <EditText
+        android:id="@+id/addEventDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/addEventLatitude"
+        android:layout_below="@+id/addEventPlaceName"
+        android:layout_marginTop="24dp"
+        android:ems="10"
+        android:hint="@string/addEventDescription" />
 
 </RelativeLayout>

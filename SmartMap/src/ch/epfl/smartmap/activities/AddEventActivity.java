@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -16,7 +17,9 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.cache.UserEvent;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
 
@@ -29,11 +32,15 @@ import ch.epfl.smartmap.gui.TimePickerFragment;
 public class AddEventActivity extends FragmentActivity {
 
     private EditText mEventName;
-    private static EditText mPickStartTime;
-    private static EditText mPickStartDate;
-    private static EditText mPickEndTime;
-    private static EditText mPickEndDate;
-    private static Context mContext;
+    private EditText mPickStartTime;
+    private EditText mPickStartDate;
+    private EditText mPickEndTime;
+    private EditText mPickEndDate;
+    private EditText mLatitude;
+    private EditText mLongitude;
+    private EditText mDescription;
+    private EditText mPlaceName;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +53,10 @@ public class AddEventActivity extends FragmentActivity {
         mPickStartTime = (EditText) findViewById(R.id.addEventEventTime);
         mPickEndTime = (EditText) findViewById(R.id.addEventEndTime);
         mPickEndDate = (EditText) findViewById(R.id.addEventEndDate);
+        mLatitude = (EditText) findViewById(R.id.addEventLatitude);
+        mLongitude = (EditText) findViewById(R.id.addEventLongitude);
+        mDescription = (EditText) findViewById(R.id.addEventDescription);
+        mPlaceName = (EditText) findViewById(R.id.addEventPlaceName);
 
         TextWatcher textChangedListener = new TextWatcher() {
 
@@ -132,7 +143,7 @@ public class AddEventActivity extends FragmentActivity {
      * @param endTime
      * @author SpicyCH
      */
-    private static void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
+    private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
         int[] startDateTag = (int[]) startDate.getTag();
         int[] startTimeTag = (int[]) startTime.getTag();
 
@@ -148,13 +159,23 @@ public class AddEventActivity extends FragmentActivity {
                     endTimeTag[1], 0);
 
             if (end.before(start)) {
-                // The user tried to create the end of the event before its start!
+                // The user is trying to create the end of the event before its start!
                 endDate.setTag(null);
                 endTime.setTag(null);
                 endDate.setText("End Date");
                 endTime.setText("End Time");
 
-                Toast.makeText(mContext, "The event cannot end before it begins.", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "The event cannot end before it begins!", Toast.LENGTH_LONG).show();
+            }
+
+            if (end.before(Calendar.getInstance())) {
+                // The user is trying to create an event in the past
+                endDate.setTag(null);
+                endTime.setTag(null);
+                endDate.setText("End Date");
+                endTime.setText("End Time");
+
+                Toast.makeText(mContext, "The event's end must cannot be in the past!", Toast.LENGTH_LONG).show();
             }
         }
 
@@ -174,17 +195,47 @@ public class AddEventActivity extends FragmentActivity {
             return true;
         }
 
-        EditText eventName = (EditText) findViewById(R.id.addEventEventName);
-
         switch (item.getItemId()) {
             case R.id.addEventButtonCreateEvent:
                 // Create event TODO
-                SettingsManager setMng = new SettingsManager(getApplicationContext());
-                /*
-                 * UserEvent event = new UserEvent(eventName.getText(), setMng.getUserID(), setMng.getUserName(),
-                 * startDate, endDate, p); DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-                 * dbHelper.addEvent(event);
-                 */
+                int[] startDateTag = (int[]) mPickStartDate.getTag();
+                int[] startTimeTag = (int[]) mPickStartTime.getTag();
+
+                int[] endDateTag = (int[]) mPickEndDate.getTag();
+                int[] endTimeTag = (int[]) mPickEndTime.getTag();
+
+                if (endDateTag == null || endTimeTag == null || mLatitude.getText().toString() == null
+                        || mLongitude.getText().toString() == null || mPlaceName == null) {
+                    Toast.makeText(mContext, "Cannot create event: please specify all fields!", Toast.LENGTH_SHORT)
+                            .show();
+                } else {
+                    GregorianCalendar startDate = new GregorianCalendar(startDateTag[0], startDateTag[1],
+                            startDateTag[2], startTimeTag[0], startTimeTag[1], 0);
+                    GregorianCalendar endDate = new GregorianCalendar(endDateTag[0], endDateTag[1], endDateTag[2],
+                            endTimeTag[0], endTimeTag[1], 0);
+
+                    double latitude = Double.parseDouble(mLatitude.getText().toString());
+                    double longitude = Double.parseDouble(mLongitude.getText().toString());
+                    Location location = new Location("Location set by user");
+                    location.setLatitude(latitude);
+                    location.setLongitude(longitude);
+
+                    SettingsManager setMng = new SettingsManager(getApplicationContext());
+                    UserEvent event = new UserEvent(mEventName.getText().toString(), setMng.getUserID(),
+                            setMng.getUserName(), startDate, endDate, location);
+
+                    // TODO send event to server (server-side code not written yet :( ), and use the returned event id
+                    // in setID
+                    event.setID(5);
+                    event.setDescription(mDescription.getText().toString());
+                    event.setPositionName(mPlaceName.getText().toString());
+
+                    DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+                    dbHelper.addEvent(event);
+
+                    Toast.makeText(mContext, "Event created!", Toast.LENGTH_SHORT).show();
+                }
+
             default:
                 // No other menu items!
                 break;

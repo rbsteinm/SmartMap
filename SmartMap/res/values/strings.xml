@@ -84,5 +84,11 @@
     <string name="addEventButtonCreateEvent">Done</string>
     <string name="addEventEndDate">End Date</string>
     <string name="addEventEndTime">End Time</string>
+    <string name="addEventEventDate">Event is today!</string>
+    <string name="addEventEventTime">Event is now!</string>
+    <string name="addEventLatitude">Latitude</string>
+    <string name="addEventLongitude">Longitude</string>
+    <string name="addEventPlaceName">Place (town, canton, etc...)</string>
+    <string name="addEventDescription">Description (optional)</string>
     
 </resources>
