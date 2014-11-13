@@ -76,9 +76,8 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.gui.AddFriendActivity"
+            android:name="ch.epfl.smartmap.activities.AddFriendActivity"
             android:label="@string/title_activity_add_friend" >
-            
         </activity>
     </application>
 

@@ -13,6 +13,7 @@
     <string name="loading_text">Loading Map...</string>
     <string name="create_notif">Create Notification</string>
     <string name="search_text">Search</string>
+    <string name="add_friend">Add a friend</string>
 
     <string-array name="sideMenuElements">
         <item>Profile</item>
@@ -22,7 +23,7 @@
         <item>Settings</item>
     </string-array>
 
-    <string name="title_activity_friends">FriendsActivity</string>
+    <string name="title_activity_friends">Friends</string>
     <string name="search_bar_hint">Search...</string>
     <string name="title_activity_map_fragment">MapFragment</string>
 

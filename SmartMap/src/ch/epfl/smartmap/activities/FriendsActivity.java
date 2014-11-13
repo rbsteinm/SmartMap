@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,7 +32,7 @@ public class FriendsActivity extends ListActivity {
             mMockUsersList.add(user);
         }
         mMockUsersList.get(1).setOnline(true);
-        mMockUsersList.get(3).setOnline(true);
+        mMockUsersList.get(2).setOnline(true);
         sortByOnline(mMockUsersList);
         
         // Create custom Adapter and pass it to the Activity
@@ -39,16 +40,6 @@ public class FriendsActivity extends ListActivity {
         setListAdapter(adapter);
     }
     
-    private void sortByOnline(List<User> userList) {
-        Collections.sort(userList, new Comparator<User>(){
-
-            @Override
-            public int compare(User user1, User user2) {
-                return Boolean.compare(user2.isOnline(), user1.isOnline());
-            }
-        });
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -66,5 +57,20 @@ public class FriendsActivity extends ListActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    public void startAddFriendActivity(MenuItem menu) {
+        Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
+        startActivity(displayActivityIntent);
+    }
+    
+    private void sortByOnline(List<User> userList) {
+        Collections.sort(userList, new Comparator<User>(){
+
+            @Override
+            public int compare(User user1, User user2) {
+                return Boolean.compare(user2.isOnline(), user1.isOnline());
+            }
+        });
     }
 }
