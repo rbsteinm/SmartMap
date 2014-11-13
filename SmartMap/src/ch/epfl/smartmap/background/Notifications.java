@@ -7,7 +7,10 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.activities.MainActivity;
+import ch.epfl.smartmap.activities.FriendsActivity;
+import ch.epfl.smartmap.activities.ShowEventsActivity;
+import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.Friend;
 
 /**
  * Class that creates different sort of notifications
@@ -17,26 +20,71 @@ import ch.epfl.smartmap.activities.MainActivity;
  */
 public class Notifications {
 
-    public static void createAddNotification(View view, Activity activity) {
-        // Prepare intent which is triggered if the
-        // notification is selected
-        Intent intent = new Intent(activity, MainActivity.class);
-        PendingIntent pIntent = PendingIntent.getActivity(
-            activity.getBaseContext(), 0, intent, 0);
+	public static void newFriendNotification(View view, Activity activity,
+			Friend friend) {
+		// Prepare intent which is triggered if the
+		// notification is selected
+		PendingIntent pFriendIntent = PendingIntent.getActivity(activity
+				.getBaseContext(), 0, new Intent(activity,
+						FriendsActivity.class), 0);
 
-        // Build notification
-        // Actions are just fake
-        NotificationCompat.Builder noti = new NotificationCompat.Builder(
-            activity);
-        noti.setContentTitle("TITLE OF ADD NOTIFICATION");
-        noti.setContentText("SUBJECT OF ADD NOTIFICATION").setSmallIcon(
-            R.drawable.ic_launcher);
-        noti.setContentIntent(pIntent);
-        noti.addAction(0, "accept", pIntent);
-        noti.addAction(0, "decline", pIntent).build();
-        @SuppressWarnings("static-access")
-        NotificationManager notificationManager = (NotificationManager) activity
-            .getSystemService(activity.getBaseContext().NOTIFICATION_SERVICE);
-        notificationManager.notify(0, noti.build());
-    }
+		// Build notification
+		NotificationCompat.Builder noti = new NotificationCompat.Builder(
+				activity);
+		noti.setContentTitle(friend.getName() + " wants to be your friend");
+		noti.setContentText("Click here to open your list of friends")
+				.setSmallIcon(R.drawable.ic_launcher);
+		noti.setContentIntent(pFriendIntent);
+		// TODO : determine if we need those buttons
+		// noti.addAction(0, "Decline", pIntent);
+		// noti.addAction(0, "Accept", pIntent).build();
+		@SuppressWarnings("static-access")
+		NotificationManager notificationManager = (NotificationManager) activity
+				.getSystemService(activity.getBaseContext().NOTIFICATION_SERVICE);
+		notificationManager.notify(0, noti.build());
+	}
+	
+	public static void acceptedNotification(View view, Activity activity,
+			Friend friend) {
+		// Prepare intent which is triggered if the
+		// notification is selected
+		PendingIntent pFriendIntent = PendingIntent.getActivity(activity
+				.getBaseContext(), 0, new Intent(activity,
+						FriendsActivity.class), 0);
+
+		// Build notification
+		NotificationCompat.Builder noti = new NotificationCompat.Builder(
+				activity);
+		noti.setContentTitle(friend.getName() + " accepted your invitation");
+		noti.setContentText("Click here to open your list of friends")
+				.setSmallIcon(R.drawable.ic_launcher);
+		noti.setContentIntent(pFriendIntent);
+		@SuppressWarnings("static-access")
+		NotificationManager notificationManager = (NotificationManager) activity
+				.getSystemService(activity.getBaseContext().NOTIFICATION_SERVICE);
+		notificationManager.notify(0, noti.build());
+	}
+
+	public static void newEventNotification(View view, Activity activity,
+			Event event) {
+		// Prepare intent which is triggered if the
+		// notification is selected
+		PendingIntent pEventIntent = PendingIntent.getActivity(activity
+				.getBaseContext(), 0, new Intent(activity,
+						ShowEventsActivity.class), 0);
+
+		// Build notification
+		NotificationCompat.Builder noti = new NotificationCompat.Builder(
+				activity);
+		noti.setContentTitle(event.getCreatorName() + " invite you to "
+				+ event.getName());
+		noti.setContentText(event.getDescription()).setSmallIcon(
+				R.drawable.ic_launcher);
+		noti.setContentIntent(pEventIntent);
+		noti.addAction(0, "Open SmartMap", pEventIntent).build();
+		@SuppressWarnings("static-access")
+		NotificationManager notificationManager = (NotificationManager) activity
+				.getSystemService(activity.getBaseContext().NOTIFICATION_SERVICE);
+		notificationManager.notify(0, noti.build());
+	}
 }

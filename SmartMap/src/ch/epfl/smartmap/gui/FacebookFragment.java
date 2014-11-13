@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -202,9 +203,7 @@ public class FacebookFragment extends Fragment {
 										"You logged in successfully, "
 												+ user.getName(),
 										Toast.LENGTH_LONG).show();
-								Intent intent = new Intent(getActivity(),
-										MainActivity.class);
-								startActivity(intent);
+								startMainActivity();
 							}
 
 						} else if (response.getError() != null) {
@@ -215,6 +214,14 @@ public class FacebookFragment extends Fragment {
 				});
 
 		request.executeAsync();
+	}
+	
+	private void startMainActivity() {
+	    Activity currentActivity = getActivity();
+	    Intent intent = new Intent(getActivity(),
+            MainActivity.class);
+	    startActivity(intent);
+	    currentActivity.finish();
 	}
 
 	private boolean sendDataToServer(Map<String, String> params) {
