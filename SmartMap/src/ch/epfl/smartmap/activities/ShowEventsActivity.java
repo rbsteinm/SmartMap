@@ -64,6 +64,7 @@ public class ShowEventsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_events);
 
+        // Makes the logo clickable (clicking it returns to previous activity)
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         mMyLocation = new Location("Mock location Pully");
@@ -184,6 +185,7 @@ public class ShowEventsActivity extends ListActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                break;
             case R.id.showEventsMenuNewEvent:
                 Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
                 startActivity(showEventIntent);

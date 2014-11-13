@@ -24,7 +24,7 @@ import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
 
 /**
- * This activity lets the user create a new event
+ * This activity lets the user create a new event.
  *
  * @author SpicyCH
  *
@@ -46,6 +46,9 @@ public class AddEventActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
+
+        // Makes the logo clickable (clicking it returns to previous activity)
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         mContext = getApplicationContext();
         mEventName = (EditText) findViewById(R.id.addEventEventName);
@@ -194,51 +197,61 @@ public class AddEventActivity extends FragmentActivity {
         }
 
         switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
             case R.id.addEventButtonCreateEvent:
-                // Create event TODO
-                int[] startDateTag = (int[]) mPickStartDate.getTag();
-                int[] startTimeTag = (int[]) mPickStartTime.getTag();
-
-                int[] endDateTag = (int[]) mPickEndDate.getTag();
-                int[] endTimeTag = (int[]) mPickEndTime.getTag();
-
-                if (endDateTag == null || endTimeTag == null || mLatitude.getText().toString() == null
-                        || mLongitude.getText().toString() == null || mPlaceName == null) {
-                    Toast.makeText(mContext, "Cannot create event: please specify all fields!", Toast.LENGTH_SHORT)
-                            .show();
-                } else {
-                    GregorianCalendar startDate = new GregorianCalendar(startDateTag[0], startDateTag[1],
-                            startDateTag[2], startTimeTag[0], startTimeTag[1], 0);
-                    GregorianCalendar endDate = new GregorianCalendar(endDateTag[0], endDateTag[1], endDateTag[2],
-                            endTimeTag[0], endTimeTag[1], 0);
-
-                    double latitude = Double.parseDouble(mLatitude.getText().toString());
-                    double longitude = Double.parseDouble(mLongitude.getText().toString());
-                    Location location = new Location("Location set by user");
-                    location.setLatitude(latitude);
-                    location.setLongitude(longitude);
-
-                    SettingsManager setMng = new SettingsManager(getApplicationContext());
-                    UserEvent event = new UserEvent(mEventName.getText().toString(), setMng.getUserID(),
-                            setMng.getUserName(), startDate, endDate, location);
-
-                    // TODO send event to server (server-side code not written yet :( ), and use the returned event id
-                    // in setID
-                    event.setID(5);
-                    event.setDescription(mDescription.getText().toString());
-                    event.setPositionName(mPlaceName.getText().toString());
-
-                    DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-                    dbHelper.addEvent(event);
-
-                    Toast.makeText(mContext, "Event created!", Toast.LENGTH_SHORT).show();
-                }
-
+                createEvent();
+                break;
             default:
                 // No other menu items!
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     *
+     * @author SpicyCH
+     */
+    private void createEvent() {
+        int[] startDateTag = (int[]) mPickStartDate.getTag();
+        int[] startTimeTag = (int[]) mPickStartTime.getTag();
+
+        int[] endDateTag = (int[]) mPickEndDate.getTag();
+        int[] endTimeTag = (int[]) mPickEndTime.getTag();
+
+        if (endDateTag == null || endTimeTag == null || mLatitude.getText().toString() == null
+                || mLongitude.getText().toString() == null || mPlaceName == null) {
+            Toast.makeText(mContext, "Cannot create event: please specify all fields!", Toast.LENGTH_SHORT).show();
+        } else {
+            GregorianCalendar startDate = new GregorianCalendar(startDateTag[0], startDateTag[1], startDateTag[2],
+                    startTimeTag[0], startTimeTag[1], 0);
+            GregorianCalendar endDate = new GregorianCalendar(endDateTag[0], endDateTag[1], endDateTag[2],
+                    endTimeTag[0], endTimeTag[1], 0);
+
+            double latitude = Double.parseDouble(mLatitude.getText().toString());
+            double longitude = Double.parseDouble(mLongitude.getText().toString());
+            Location location = new Location("Location set by user");
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+
+            SettingsManager setMng = new SettingsManager(getApplicationContext());
+            UserEvent event = new UserEvent(mEventName.getText().toString(), setMng.getUserID(), setMng.getUserName(),
+                    startDate, endDate, location);
+
+            // TODO send event to server (server-side code not written yet :( ), and use the returned event id
+            // in setID
+            event.setID(5);
+            event.setDescription(mDescription.getText().toString());
+            event.setPositionName(mPlaceName.getText().toString());
+
+            DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+            dbHelper.addEvent(event);
+
+            Toast.makeText(mContext, "Event created!", Toast.LENGTH_SHORT).show();
+
+        }
     }
 }
