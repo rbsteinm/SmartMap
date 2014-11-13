@@ -13,16 +13,52 @@
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:background="@drawable/event_name_border"
-        android:hint="@string/addEventHintEventName" />
+        android:hint="@string/addEventEventName" />
+     
+     <EditText
+         android:id="@+id/addEventEventDate"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_below="@+id/addEventEventName"
+         android:focusable="false"
+         android:hint="1234567"
+         android:inputType="date" >
+
+    </EditText>
 
     <EditText
         android:id="@+id/addEventEventTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/addEventEventName"
-        android:layout_below="@+id/addEventEventName"
-        android:layout_marginTop="15dp"
+        android:layout_alignBaseline="@+id/addEventEventDate"
+        android:layout_alignBottom="@+id/addEventEventDate"
+        android:layout_toRightOf="@+id/addEventEventDate"
         android:focusable="false"
-        android:hint=""/>
+        android:hint="time time time" />
+
+    <EditText
+        android:id="@+id/addEventEndDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/addEventEventTime"
+        android:layout_toLeftOf="@+id/addEventEventTime"
+        android:ems="10"
+        android:focusable="false"
+        android:hint="@string/addEventEndDate"
+        android:inputType="date" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/addEventEndTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/addEventEventTime"
+        android:layout_below="@+id/addEventEventDate"
+        android:layout_toRightOf="@+id/addEventEventDate"
+        android:ems="10"
+        android:focusable="false"
+        android:hint="@string/addEventEndTime" />
 
 </RelativeLayout>

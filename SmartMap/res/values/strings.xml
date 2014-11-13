@@ -80,6 +80,9 @@
     
     <!-- AddEventActivity -->
     <string name="title_activity_add_event">Create a new event</string>
-    <string name="addEventHintEventName">Event name</string>
-
+    <string name="addEventEventName">Event name</string>
+    <string name="addEventButtonCreateEvent">Done</string>
+    <string name="addEventEndDate">End Date</string>
+    <string name="addEventEndTime">End Time</string>
+    
 </resources>

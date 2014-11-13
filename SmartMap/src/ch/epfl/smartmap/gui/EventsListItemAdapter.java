@@ -31,7 +31,6 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
     private final static int HUNDRED_PERCENT = 100;
     private final static int MIDNIGHT_HOUR = 23;
     private final static int MIDNIGHT_MINUTES = 59;
-    private final static int TEN = 10;
 
     private final Context mContext;
     private final List<Event> mItemsArrayList;
@@ -123,11 +122,11 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
                 MIDNIGHT_MINUTES);
         tomorrowMidnight.add(GregorianCalendar.DAY_OF_YEAR, 1);
 
-        String startHourOfDayString = formatForClock(date1.get(GregorianCalendar.HOUR_OF_DAY));
-        String startMinuteString = formatForClock(date1.get(GregorianCalendar.MINUTE));
+        String startHourOfDayString = TimePickerFragment.formatForClock(date1.get(GregorianCalendar.HOUR_OF_DAY));
+        String startMinuteString = TimePickerFragment.formatForClock(date1.get(GregorianCalendar.MINUTE));
 
-        String endHourOfDayString = formatForClock(date2.get(GregorianCalendar.HOUR_OF_DAY));
-        String endMinuteString = formatForClock(date2.get(GregorianCalendar.MINUTE));
+        String endHourOfDayString = TimePickerFragment.formatForClock(date2.get(GregorianCalendar.HOUR_OF_DAY));
+        String endMinuteString = TimePickerFragment.formatForClock(date2.get(GregorianCalendar.MINUTE));
 
         String dateTextContent = "";
 
@@ -179,23 +178,6 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         }
 
         return dateTextContent;
-    }
-
-    /**
-     * @param time
-     *            a second, minute or hour of the format 0, 24
-     * @return a String prefixed with 0 and the time if time < 10
-     * @author SpicyCH
-     */
-    private static String formatForClock(int time) {
-        String hourOfDayString = "";
-        if (time < TEN) {
-            hourOfDayString += "0" + time;
-        } else {
-            hourOfDayString += time;
-        }
-
-        return hourOfDayString;
     }
 
     /**

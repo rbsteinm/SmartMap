@@ -11,12 +11,17 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 
 /**
- * A simple time picker. Used in {@link AddEventActivity}.
+ * A simple time picker. Used in {@link ch.epfl.smartmap.activities.AddEventActivity}.
+ * When the time is set, the
+ * associated EditText is modified accordingly and a tag containing an int array of hour, minute is linked to this
+ * EditText.
  *
  * @author SpicyCH
  *
  */
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+
+    private final static int TEN = 10;
 
     private final EditText mPickTimeEditText;
 
@@ -37,6 +42,24 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        mPickTimeEditText.setText(hourOfDay + ":" + minute);
+        mPickTimeEditText.setText(formatForClock(hourOfDay) + ":" + formatForClock(minute));
+        mPickTimeEditText.setTag(new int[] {hourOfDay, minute});
+    }
+
+    public static String formatForClock(int time) {
+        /**
+         * @param time
+         *            a second, minute or hour of the format 0, 24
+         * @return a String prefixed with 0 and the time if time < 10
+         * @author SpicyCH
+         */
+        String hourOfDayString = "";
+        if (time < TEN) {
+            hourOfDayString += "0" + time;
+        } else {
+            hourOfDayString += time;
+        }
+
+        return hourOfDayString;
     }
 }
