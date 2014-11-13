@@ -205,7 +205,6 @@ public class FacebookFragment extends Fragment {
 										+ user.getName(),
 								Toast.LENGTH_LONG).show();
 						startMainActivity();
-						
 					}
 
 				} else if (response.getError() != null) {

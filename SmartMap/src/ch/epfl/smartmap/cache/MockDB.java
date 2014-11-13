@@ -36,7 +36,7 @@ public class MockDB {
     public static final Friend PIETRO = new Friend(10, "Pietro Ortelli",
         42.2547877, -5.214577);
     public static final Friend CHRISTIE = new Friend(11, "Christie Palmer",
-        18.4641834, -69.9585861);
+    		46.5162802, 6.6698749);
     public static final Friend MARIE = new Friend(12, "Marie Wermeille",
         45.2547877, 45.004577);
     public static final Friend HUGO = new Friend(13, "Hugo Sbai", 47.5547877,
