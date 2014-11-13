@@ -35,10 +35,11 @@ public class SettingsManager {
     private static SettingsManager mInstance;
     
 	/**
-	 * SettingsManager constructor
+	 * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
 	 * @param context The app's context, needed to access the shared preferences
 	 */
-	private SettingsManager(Context context) {
+    @Deprecated
+	public SettingsManager(Context context) {
 	    mContext = context;
 	    mSharedPref = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 	    mEditor = mSharedPref.edit();
