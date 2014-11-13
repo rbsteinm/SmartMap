@@ -32,15 +32,33 @@ public class SettingsManager {
     private Context mContext;
     private SharedPreferences mSharedPref;
     private SharedPreferences.Editor mEditor;
+    private static SettingsManager mInstance;
     
 	/**
 	 * SettingsManager constructor
 	 * @param context The app's context, needed to access the shared preferences
 	 */
-	public SettingsManager(Context context) {
+	private SettingsManager(Context context) {
 	    mContext = context;
 	    mSharedPref = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 	    mEditor = mSharedPref.edit();
+	}
+	
+	/**
+	 * Initializes the settings manager (should be called once when starting the app)
+	 * @param context The app's context, needed to access the shared preferences
+	 * @return The SettingsManager instance
+	 */
+	public static SettingsManager initialize(Context context) {
+		mInstance = new SettingsManager(context);
+		return mInstance;
+	}
+	
+	/**
+	 * @return The SettingsManager instance
+	 */
+	public static SettingsManager getInstance() {
+		return mInstance;
 	}
 	
 	/**

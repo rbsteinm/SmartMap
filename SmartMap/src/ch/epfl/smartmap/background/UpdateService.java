@@ -11,7 +11,6 @@ import android.os.IBinder;
  * @author ritterni
  */
 public class UpdateService extends Service {
-    private static final String TAG = "BroadcastService";
     public static final String BROADCAST_POS = "ch.epfl.smartmap.background.broadcastPos";
     public static final String UPDATED_ROWS = "UpdatedRows";
     
@@ -49,7 +48,4 @@ public class UpdateService extends Service {
         // TODO Auto-generated method stub
         return null;
     }
-    
-    
-
 }
