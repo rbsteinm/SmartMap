@@ -64,6 +64,8 @@ public class ShowEventsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_events);
 
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
         mMyLocation = new Location("Mock location Pully");
         mMyLocation.setLatitude(46.509300);
         mMyLocation.setLongitude(6.661600);
@@ -180,6 +182,8 @@ public class ShowEventsActivity extends ListActivity {
         }
 
         switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
             case R.id.showEventsMenuNewEvent:
                 Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
                 startActivity(showEventIntent);
