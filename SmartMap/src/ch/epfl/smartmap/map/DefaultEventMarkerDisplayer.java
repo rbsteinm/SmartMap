@@ -182,7 +182,7 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 	@Override
 	public void updateMarkers(Context context, GoogleMap googleMap,
 			List<Event> eventsToDisplay) {
-		
+
 		for (Event event : eventsToDisplay) {
 			if (isDisplayedEvent(event)) {
 				getMarkerForEvent(event).setPosition(event.getLatLng());
@@ -199,6 +199,4 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 		}
 
 	}
-	}
-
 }

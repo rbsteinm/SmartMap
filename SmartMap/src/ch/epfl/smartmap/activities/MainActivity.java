@@ -5,8 +5,10 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -23,6 +25,7 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.Notifications;
+import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
@@ -58,14 +61,17 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	private static final int LOCATION_UPDATE_DISTANCE = 10;
 
 	private SideMenu mSideMenu;
+	private SearchEngine mSearchEngine;
+	private Menu mMenu;
+
+	private DatabaseHelper mDbHelper;
+	private Intent updateServiceIntent;
+
 	private GoogleMap mGoogleMap;
 	private FriendMarkerDisplayer mFriendMarkerDisplayer;
 	private EventMarkerDisplayer mEventMarkerDisplayer;
 	private DefaultZoomManager mMapZoomer;
 	private SupportMapFragment mFragmentMap;
-	private SearchEngine mSearchEngine;
-	private Menu mMenu;
-	private DatabaseHelper mDbHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +99,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		if (mGoogleMap != null) {
 			initializeMarkers();
 		}
+
+		updateServiceIntent = new Intent(this, UpdateService.class);
 	}
 
 	@Override
@@ -163,6 +171,32 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		}
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		startService(updateServiceIntent);
+		registerReceiver(broadcastReceiver, new IntentFilter(
+				UpdateService.BROADCAST_POS));
+
+		// get Intent that started this Activity
+		Intent startingIntent = getIntent();
+		// get the value of the user string
+		Location eventLocation = startingIntent.getParcelableExtra("location");
+		if (eventLocation != null) {
+			mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
+		}
+	}
+
+	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			mFriendMarkerDisplayer.updateMarkers(getContext(), mGoogleMap,
+					getVisibleUsers(mDbHelper.getAllUsers()));
+		}
+
+	};
+
 	public Context getContext() {
 		return this;
 	}
@@ -227,13 +261,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 				getVisibleUsers(mDbHelper.getAllUsers()));
 
 		mMapZoomer = new DefaultZoomManager(mFragmentMap);
-		
+
 		Log.i(TAG, "before enter to zoom according");
 		List<Marker> allMarkers = new ArrayList<Marker>(
 				mFriendMarkerDisplayer.getDisplayedMarkers());
 		allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
 		Intent startingIntent = getIntent();
-		
+
 		if (startingIntent.getParcelableExtra("location") == null) {
 			mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
 		}
@@ -259,18 +293,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		// nothing
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		// get Intent that started this Activity
-		Intent startingIntent = getIntent();
-		// get the value of the user string
-		Location eventLocation = startingIntent.getParcelableExtra("location");
-		if (eventLocation != null) {
-			mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
-		}
 	}
 
 	/*
