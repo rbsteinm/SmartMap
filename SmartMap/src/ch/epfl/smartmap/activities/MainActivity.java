@@ -65,7 +65,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	private Menu mMenu;
 
 	private DatabaseHelper mDbHelper;
-	private Intent updateServiceIntent;
+	private Intent mUpdateServiceIntent;
 
 	private GoogleMap mGoogleMap;
 	private FriendMarkerDisplayer mFriendMarkerDisplayer;
@@ -100,7 +100,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			initializeMarkers();
 		}
 
-		updateServiceIntent = new Intent(this, UpdateService.class);
+		mUpdateServiceIntent = new Intent(this, UpdateService.class);
 	}
 
 	@Override
@@ -175,8 +175,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public void onResume() {
 		super.onResume();
 
-		startService(updateServiceIntent);
-		registerReceiver(broadcastReceiver, new IntentFilter(
+		startService(mUpdateServiceIntent);
+		registerReceiver(mBroadcastReceiver, new IntentFilter(
 				UpdateService.BROADCAST_POS));
 
 		// get Intent that started this Activity
@@ -188,7 +188,14 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		}
 	}
 
-	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+	@Override
+	public void onPause() {
+		super.onPause();
+		unregisterReceiver(mBroadcastReceiver);
+		stopService(mUpdateServiceIntent);
+	}
+
+	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			mFriendMarkerDisplayer.updateMarkers(getContext(), mGoogleMap,
