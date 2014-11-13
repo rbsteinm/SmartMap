@@ -166,16 +166,14 @@ public class AddEventActivity extends FragmentActivity {
                 endTime.setText("End Time");
 
                 Toast.makeText(mContext, "The event cannot end before it begins!", Toast.LENGTH_LONG).show();
-            }
-
-            if (end.before(Calendar.getInstance())) {
+            } else if (end.before(Calendar.getInstance())) {
                 // The user is trying to create an event in the past
                 endDate.setTag(null);
                 endTime.setTag(null);
                 endDate.setText("End Date");
                 endTime.setText("End Time");
 
-                Toast.makeText(mContext, "The event's end must cannot be in the past!", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "The event's end cannot be in the past!", Toast.LENGTH_LONG).show();
             }
         }
 
