@@ -11,7 +11,7 @@ import android.location.Location;
  * An event that can be seen on the map
  * @author ritterni
  */
-public class UserEvent implements Event {
+public class UserEvent implements Event, Searchable {
     private String mEvtName;
     private final long mEvtCreator; //the user who created the event
     private final GregorianCalendar mStartDate;

@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public class Friend implements User {
+public class Friend implements User, Searchable {
 
 	private long mId; // the user's unique ID
 	private String mName; // the user's name as it will be displayed

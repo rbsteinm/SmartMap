@@ -38,7 +38,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_LONGITUDE = "longitude";
     private static final String KEY_LATITUDE = "latitude";
     private static final String KEY_POSNAME = "posName";
-    private static final String KEY_ONLINE = "isOnline";
     private static final String KEY_LASTSEEN = "lastSeen";
     private static final String KEY_VISIBLE = "isVisible";
 
@@ -54,7 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //Columns for the User table
     private static final String[] USER_COLUMNS = {
         KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL,
-        KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_ONLINE, KEY_LASTSEEN, KEY_VISIBLE
+        KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_LASTSEEN, KEY_VISIBLE
     };
 
     //Columns for the Filter table
@@ -83,7 +82,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_LONGITUDE + " DOUBLE,"
             + KEY_LATITUDE + " DOUBLE,"
             + KEY_POSNAME + " TEXT,"
-            + KEY_ONLINE + " INTEGER,"
             + KEY_LASTSEEN + " INTEGER,"
             + KEY_VISIBLE + " INTEGER"
             + ")";
@@ -175,7 +173,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
             values.put(KEY_LATITUDE, user.getLocation().getLatitude());
             values.put(KEY_POSNAME, user.getPositionName());
-            values.put(KEY_ONLINE, user.isOnline() ? 1 : 0); //boolean to int
             values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
             values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); //boolean to int
 
@@ -221,7 +218,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
         friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
         friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
-        friend.setOnline(cursor.getInt(cursor.getColumnIndex(KEY_ONLINE)) == 1); //int to boolean
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
         friend.setLastSeen(cal);
@@ -254,7 +250,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
                 friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
                 friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
-                friend.setOnline(cursor.getInt(cursor.getColumnIndex(KEY_ONLINE)) == 1); //int to boolean
                 GregorianCalendar cal = new GregorianCalendar();
                 cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
                 friend.setLastSeen(cal);
@@ -285,7 +280,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
         values.put(KEY_LATITUDE, user.getLocation().getLatitude());
         values.put(KEY_POSNAME, user.getPositionName());
-        values.put(KEY_ONLINE, user.isOnline() ? 1 : 0); //boolean to int
         values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
         values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); //boolean to int
 
@@ -608,8 +602,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     
     /**
      * Uses listFriendsPos() to update the entire friends database with updated positions
+     * @return The number of rows (i.e. friends) that were updated
      */
-    public void refreshFriendsPos() {
+    public int refreshFriendsPos() {
+        int updatedFriends = 0;
         try {
             Map<Long, Location> locations = NetworkSmartMapClient.getInstance().listFriendsPos();
             Set<Long> keySet = locations.keySet(); //the keys are friend IDs
@@ -617,11 +613,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             for (long i : keySet) {
                 friend = getUser(i);
                 friend.setLocation(locations.get(i));
-                updateUser(friend);
+                updatedFriends += updateUser(friend);
             }
         } catch (SmartMapClientException e) {
             e.printStackTrace();
         }
+        return updatedFriends;
     }
     
     /**
