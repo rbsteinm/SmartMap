@@ -21,7 +21,7 @@ import android.widget.TimePicker;
  */
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 
-    private final static int TEN = 10;
+    private final static int FIRST_2DIGITS_NUMBER = 10;
 
     private final EditText mPickTimeEditText;
 
@@ -46,15 +46,14 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         mPickTimeEditText.setTag(new int[] {hourOfDay, minute});
     }
 
+    /**
+     * @param time a second, minute, hour, day or month
+     * @return the time prefixed with 0 if it was < 10
+     * @author SpicyCH
+     */
     public static String formatForClock(int time) {
-        /**
-         * @param time
-         *            a second, minute or hour of the format 0, 24
-         * @return a String prefixed with 0 and the time if time < 10
-         * @author SpicyCH
-         */
         String hourOfDayString = "";
-        if (time < TEN) {
+        if (time < FIRST_2DIGITS_NUMBER) {
             hourOfDayString += "0" + time;
         } else {
             hourOfDayString += time;

@@ -3,9 +3,12 @@ package ch.epfl.smartmap.activities;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,22 +29,49 @@ import ch.epfl.smartmap.gui.TimePickerFragment;
 public class AddEventActivity extends FragmentActivity {
 
     private EditText mEventName;
-    private EditText mPickStartTime;
-    private EditText mPickStartDate;
-    private EditText mPickEndTime;
-    private EditText mPickEndDate;
+    private static EditText mPickStartTime;
+    private static EditText mPickStartDate;
+    private static EditText mPickEndTime;
+    private static EditText mPickEndDate;
+    private static Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
 
-        // TODO make keyboard appear when activity is started (facebook like)
+        mContext = getApplicationContext();
         mEventName = (EditText) findViewById(R.id.addEventEventName);
         mPickStartDate = (EditText) findViewById(R.id.addEventEventDate);
         mPickStartTime = (EditText) findViewById(R.id.addEventEventTime);
         mPickEndTime = (EditText) findViewById(R.id.addEventEndTime);
         mPickEndDate = (EditText) findViewById(R.id.addEventEndDate);
+
+        TextWatcher textChangedListener = new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Good
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Good
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
+
+            }
+        };
+
+        mPickStartDate.addTextChangedListener(textChangedListener);
+        mPickStartTime.addTextChangedListener(textChangedListener);
+        mPickEndDate.addTextChangedListener(textChangedListener);
+        mPickEndTime.addTextChangedListener(textChangedListener);
 
         Calendar now = Calendar.getInstance();
 
@@ -55,7 +85,6 @@ public class AddEventActivity extends FragmentActivity {
             public void onClick(View v) {
                 DialogFragment newFragment = new TimePickerFragment(mPickStartTime);
                 newFragment.show(getSupportFragmentManager(), "timePicker");
-                checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
             }
 
         });
@@ -71,7 +100,6 @@ public class AddEventActivity extends FragmentActivity {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment(mPickStartDate);
                 newFragment.show(getSupportFragmentManager(), "datePicker");
-                checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
             }
         });
 
@@ -81,7 +109,6 @@ public class AddEventActivity extends FragmentActivity {
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment(mPickEndDate);
                 newFragment.show(getSupportFragmentManager(), "datePicker");
-                checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
             }
         });
 
@@ -91,7 +118,6 @@ public class AddEventActivity extends FragmentActivity {
             public void onClick(View v) {
                 DialogFragment newFragment = new TimePickerFragment(mPickEndTime);
                 newFragment.show(getSupportFragmentManager(), "timePicker");
-                checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
             }
         });
 
@@ -106,7 +132,7 @@ public class AddEventActivity extends FragmentActivity {
      * @param endTime
      * @author SpicyCH
      */
-    protected void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
+    private static void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
         int[] startDateTag = (int[]) startDate.getTag();
         int[] startTimeTag = (int[]) startTime.getTag();
 
@@ -128,8 +154,7 @@ public class AddEventActivity extends FragmentActivity {
                 endDate.setText("End Date");
                 endTime.setText("End Time");
 
-                Toast.makeText(getApplicationContext(), "The event cannot end before it begins.", Toast.LENGTH_LONG)
-                        .show();
+                Toast.makeText(mContext, "The event cannot end before it begins.", Toast.LENGTH_LONG).show();
             }
         }
 
