@@ -269,7 +269,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      * Create a notification that appear in the notifications tab
      */
     public void createNotification(View view) {
-        Notifications.createAddNotification(view, this);
+        Notifications.newFriendNotification(view, this, MockDB.ALAIN);
     }
 
     public void performQuery(Friend friend) {

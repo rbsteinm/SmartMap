@@ -19,6 +19,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
+            <fragment
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true" />
+
             <ListView
                 android:id="@+id/left_drawer"
                 android:layout_width="240dp"
@@ -37,15 +45,8 @@
 
         <!-- <fragment xmlns:android="http://schemas.android.com/apk/res/android" -->
 
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" />
 
-        <!-- 
+        <!--
         The button that create notifications
         <Button
             android:id="@+id/create_notif_button"
@@ -54,9 +55,8 @@
             android:layout_centerHorizontal="true"
             android:onClick="createNotification"
             android:text="@string/create_notif" >
-        </Button>
-		-->
-		
+        </Button> -->
+
     </RelativeLayout>
 
     <ch.epfl.smartmap.gui.SlidingUpPanel
@@ -73,6 +73,6 @@
             android:layout_marginLeft="0dp"
             android:layout_marginRight="0dp"
             android:orientation="horizontal" />
-
     </ch.epfl.smartmap.gui.SlidingUpPanel>
+
 </FrameLayout>
