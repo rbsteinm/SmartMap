@@ -8,12 +8,8 @@ import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMat
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withTagValue;
-<<<<<<< HEAD
 import static org.hamcrest.Matchers.is;
-=======
->>>>>>> dev
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.is;
 
 import org.hamcrest.Matcher;
 

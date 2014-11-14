@@ -3,13 +3,19 @@ package ch.epfl.smartmap.activities;
 import java.util.Collections;
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
+import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
@@ -17,6 +23,7 @@ import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
+ * This Activity displays a list of users from the DB and lets you send them friend requests
  * @author rbsteinm
  *
  */
@@ -51,6 +58,16 @@ public class AddFriendActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
     
+    @Override
+    protected void onListItemClick(ListView listView, View view, int position, long id) {
+        long userId = (Long) view.getTag();
+        RelativeLayout rl = (RelativeLayout) view;
+        TextView tv = (TextView) rl.getChildAt(1);
+        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
+        String name = tv.getText().toString();
+        displayConfirmationDialog(name, userId);
+    }
+    
     private void setSearchBarListener() {
         mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
             
@@ -66,6 +83,33 @@ public class AddFriendActivity extends ListActivity {
                 return true;
             }
         });
+    }
+    
+    private void displayConfirmationDialog(String name, long id) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(AddFriendActivity.this);
+        builder.setMessage("Add " + name + " as a friend?");
+        
+        // Add positive button
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                /*try {
+                    //TODO move this request in an asynch task, => interface? ask Marion
+                    NetworkSmartMapClient.getInstance().inviteFriend(id);
+                } catch (SmartMapClientException e) {
+                    e.printStackTrace();
+                }*/
+            }
+        });
+        
+        //Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        
+        // display the AlertDialog
+        builder.create().show();
     }
     
     /**
