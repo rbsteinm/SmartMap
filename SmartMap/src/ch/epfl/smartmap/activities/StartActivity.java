@@ -31,18 +31,14 @@ import ch.epfl.smartmap.gui.FacebookFragment;
  */
 public class StartActivity extends FragmentActivity {
 
+	private static final String TAG = StartActivity.class.getSimpleName();
+
 	private FacebookFragment mFacebookFragment;
 	private ImageView mLogoImage;
 	private TextView mWelcomeText;
 	private ProgressBar mProgressBar;
 	private TextView mProgressText;
-	/*
-	 * // TEST private ProgressDialog mProgressDialog; private int mProgress =
-	 * 0; private Handler mProgressHandler;
-	 */
-
 	private com.facebook.widget.LoginButton mLoginButton;
-	private static final String TAG = StartActivity.class.getSimpleName();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +66,15 @@ public class StartActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
 
+		// Get all views
 		mLogoImage = (ImageView) findViewById(R.id.logo);
 		mWelcomeText = (TextView) findViewById(R.id.welcome);
 		mLoginButton = (com.facebook.widget.LoginButton) findViewById(R.id.loginButton);
 		mProgressBar = (ProgressBar) findViewById(R.id.loadingBar);
 		mProgressText = (TextView) findViewById(R.id.loadingTextView);
 
+		// Not logged in Facebook or permission to use Facebook in SmartMap not
+		// given
 		if (Session.getActiveSession() == null
 				|| Session.getActiveSession().getPermissions().isEmpty()) {
 
@@ -95,12 +94,11 @@ public class StartActivity extends FragmentActivity {
 			int timeOut = this.getResources().getInteger(
 					R.integer.offset_runnable);
 
-			// Wait for the end of facebook animation before testing if already
-			// logged in or not
+			// Wait for the end of welcome animation before instantiate the
+			// facebook fragment and use it
 			mWelcomeText.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					// Login button
 					mFacebookFragment = new FacebookFragment();
 					getSupportFragmentManager().beginTransaction()
 							.add(android.R.id.content, mFacebookFragment)
@@ -109,12 +107,11 @@ public class StartActivity extends FragmentActivity {
 				}
 			}, timeOut);
 		} else {
+			// Hide all views except progress bar and text
 			mLoginButton.setVisibility(View.INVISIBLE);
-			mProgressBar.setVisibility(View.INVISIBLE);
-			mProgressText.setVisibility(View.INVISIBLE);
 			mWelcomeText.setVisibility(View.INVISIBLE);
 			mLogoImage.setVisibility(View.INVISIBLE);
-			
+
 			mFacebookFragment = new FacebookFragment();
 			getSupportFragmentManager().beginTransaction()
 					.add(android.R.id.content, mFacebookFragment).commit();

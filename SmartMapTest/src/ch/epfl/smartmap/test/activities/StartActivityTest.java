@@ -4,12 +4,8 @@ import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.Visibility;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
-import static org.hamcrest.Matchers.not;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.View;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.StartActivity;
 
@@ -45,6 +41,10 @@ public class StartActivityTest extends
 	}
 
 	public void testFacebookButtonVisibility() throws Exception{
-		// TODO
+		if (Session.getActiveSession() == null
+				|| Session.getActiveSession().getPermissions().isEmpty()) {
+			onView(withId(R.id.loginButton)).check(matches(isDisplayed()));
+		}
+		
 	}
 }

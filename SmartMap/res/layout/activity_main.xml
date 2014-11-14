@@ -46,16 +46,34 @@
         <!-- <fragment xmlns:android="http://schemas.android.com/apk/res/android" -->
 
 
-        <!--
-        The button that create notifications
+        <!-- 
+        The button that create notifications -->
         <Button
-            android:id="@+id/create_notif_button"
+            android:id="@+id/create_add_notif_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:onClick="createNotification"
-            android:text="@string/create_notif" >
-        </Button> -->
+            android:onClick="createAddNotification"
+            android:text="@string/create_add_notif" >
+        </Button>
+        <Button
+            android:id="@+id/create_accepted_notif_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true"
+            android:onClick="createAcceptedNotification"
+            android:text="@string/create_accepted_notif" >
+        </Button>
+        <Button
+            android:id="@+id/create_event_notif_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:layout_centerHorizontal="true"
+            android:onClick="createEventNotification"
+            android:text="@string/create_event_notif" >
+        </Button> <!--  -->
 
     </RelativeLayout>
 

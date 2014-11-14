@@ -11,7 +11,9 @@
     <string name="logo_description">Logo</string>
     <string name="welcome">W E L C O M E</string>
     <string name="loading_text">Logging In...</string>
-    <string name="create_notif">Create Notification</string>
+    <string name="create_add_notif">Create Add Notification</string>
+    <string name="create_accepted_notif">Create Accepted Notification</string>
+    <string name="create_event_notif">Create Event Notification</string>
     <string name="search_text">Search</string>
 
     <string-array name="sideMenuElements">
