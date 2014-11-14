@@ -152,7 +152,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage do not match the fb access token
      */
     public function testCannotLoginWithGoodSessionButBadId()
@@ -174,9 +174,9 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException \PDOException
+     * @expectedException SmartMap\DBInterface\DatabaseException
      */
-    public function testDatabaseErrorYieldsPDOException()
+    public function testDatabaseErrorYieldsDBException()
     {
         $config = new Configuration ();
         $connectionParams = array (

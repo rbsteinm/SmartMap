@@ -5,7 +5,7 @@
     <item
         android:id="@+id/addEventButtonCreateEvent"
         android:orderInCategory="100"
-        android:showAsAction="never"
+        android:showAsAction="always"
         android:title="@string/addEventButtonCreateEvent"/>
 
 </menu>
