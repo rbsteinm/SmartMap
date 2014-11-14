@@ -18,7 +18,8 @@ class UserTest extends PHPUnit_Framework_TestCase
 {
     public function testGetters()
     {
-        $user = new User(23, 34, 'Toto', 'VISIBLE', 75.43, 22.88);
+        $date = date('Y-m-d H:i:s');
+        $user = new User(23, 34, 'Toto', 'VISIBLE', 75.43, 22.88, $date);
         
         $this->assertEquals(23, $user->getId());
         $this->assertEquals(34, $user->getFbId());
@@ -26,6 +27,7 @@ class UserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('VISIBLE', $user->getVisibility());
         $this->assertEquals(75.43, $user->getLongitude());
         $this->assertEquals(22.88, $user->getLatitude());
+        $this->assertEquals($date, $user->getLastUpdate());
     }
     
     public function testSetters()
@@ -38,6 +40,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     	$user->setVisibility('INVISIBLE');
     	$user->setLongitude(1.2);
     	$user->setLatitude(2.1);
+    	// No setter for lastUpdate: it is only set by the database
     	
     	$this->assertEquals(33, $user->getId());
     	$this->assertEquals(35, $user->getFbId());
@@ -120,6 +123,16 @@ class UserTest extends PHPUnit_Framework_TestCase
         $user = new User(1, 1, 'Toto', 'VISIBLE', 75.43, -90.88);
     }
     
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Last update time cannot be in the future !
+     */
+    public function testInvalidDate()
+    {
+        $date = '2456-12-25 00:00:01';
+        $user = new User(1, 1, 'Toto', 'VISIBLE', 75.43, 45.88, $date);
+    }
+    
     public function testGetIdFromRequest()
     {
     	$request = new Request();
@@ -133,7 +146,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Trying to access session but the session is not started.
      */
     public function testSessionNotStartedException()
@@ -144,7 +157,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage The user is not authenticated.
      */
     public function testUserNotAuthenticatedException()

@@ -60,7 +60,7 @@ class AuthenticationController
         // Check if function called with proper parameters
         if ($name == null OR $facebookToken == null OR $facebookId == null)
         {
-            throw new ControlException('Missing POST parameter.');
+            throw new InvalidRequestException('Missing POST parameter.');
         }
         
         // Check if token is valid and matches name + ID
@@ -74,12 +74,12 @@ class AuthenticationController
         catch (FacebookRequestException $ex)
         {
             // Session not valid, Graph API returned an exception with the reason.
-            throw new ControlException('Invalid Facebook session.');
+            throw new InvalidRequestException('Invalid Facebook session.');
         }
         catch (\Exception $ex)
         {
             // Graph API returned info, but it may mismatch the current app or have expired.
-            throw new ControlException('Mismatch or expired facebook data.');
+            throw new InvalidRequestException('Mismatch or expired facebook data.');
         }
         
         // At this point the session is valid. We check the session is associated with the user name and id.
@@ -89,12 +89,12 @@ class AuthenticationController
                              GraphUser::className());
             if ($name != $user_profile->getName() OR $facebookId != $user_profile->getId())
             {
-                throw new ControlException('Id and name do not match the fb access token.');
+                throw new InvalidRequestException('Id and name do not match the fb access token.');
             }
         }
         catch (FacebookRequestException $e)
         {
-            throw new ControlException($e->getMessage());
+            throw new ControlLogicException($e->getMessage());
         }
         
         // OK, at this point user is successfully authenticated!
@@ -103,7 +103,7 @@ class AuthenticationController
         $session = $request->getSession();
         if ($session == null)
         {
-            throw new ControlException('Session is null. Did you send session cookie ?');
+            throw new InvalidRequestException('Session is null. Did you send session cookie ?');
         }
         
         // Set session parameter or create new user
@@ -134,12 +134,12 @@ class AuthenticationController
         $id = $request->request->get('user_id');
         if ($id === null)
         {
-            throw new \Exception('Field user_id is not set !');
+            throw new \InvalidRequestException('Field user_id is not set !');
         }
         $session = $request->getSession();
         if ($session == null)
         {
-            throw new \Exception('Session is null.');
+            throw new \InvalidRequestException('Session is null.');
         }
         $session->set('userId', $id);
         return new JsonResponse (array(

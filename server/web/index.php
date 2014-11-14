@@ -34,6 +34,11 @@ $app['user.repository'] = $app->share(function() use($app) {
 // Injecting controllers
 $app->register(new Silex\Provider\ServiceControllerServiceProvider());
 
+$app->register(new Silex\Provider\MonologServiceProvider(), array(
+    'monolog.logfile' => __DIR__.'/../'.$options['monolog']['logfile'],
+    'monolog.name' => $options['monolog']['name']
+));
+
 $app['authentication.controller'] = $app->share(function() use($app, $options) {
     return new SmartMap\Control\AuthenticationController($app['user.repository'],
                                                          $options['facebook']['appId'],
@@ -50,14 +55,33 @@ $app['data.controller'] = $app->share(function() use($app) {
 
 // Error management
 $app->error(function (SmartMap\Control\ControlException $e, $code) use ($app) {
-    return new JsonResponse(array('status' => 'error', 'message' => $e->getMessage()));
+    $app['monolog']->addDebug('Deprecated ControlException thrown: ' . $e->__toString());
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occured.', 500,
+        array('X-Status-Code' => 200)));
 });
 
-$app->error(function (\Exception $e, $code) use ($app) {
+$app->error(function (SmartMap\Control\InvalidRequestException $e, $code) use ($app) {
+    $app['monolog']->addWarning('Invalid request: ' . $e->__toString());
+    return new JsonResponse(array('status' => 'error', 'message' => $e->getMessage()), 200,
+        array('X-Status-Code' => 200));
+});
+
+$app->error(function (SmartMap\Control\ControlLogicException $e, $code) use ($app) {
+    $app['monolog']->addError($e->__toString());
     if ($app['debug'] == true) {
         return;
     }
-    return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occured'));
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occured.'), 500,
+        array('X-Status-Code' => 200));
+});
+
+$app->error(function (\Exception $e, $code) use ($app) {
+    $app['monolog']->addError('Unexpected exception: ' . $e->__toString());
+    if ($app['debug'] == true) {
+        return;
+    }
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occured'), 500,
+        array('X-Status-Code' => 200));
 });
 
 
@@ -86,13 +110,19 @@ $app->post('/getInvitations', 'data.controller:getInvitations');
 
 $app->post('/acceptInvitation', 'data.controller:acceptInvitation');
 
+$app->post('/declineInvitation', 'data.controller:declineInvitation');
+
+$app->post('/ackAcceptedInvitation', 'data.controller:ackAcceptedInvitation');
+
+$app->post('/removeFriend', 'data.controller:removeFriend');
+
 $app->post('/listFriendsPos', 'data.controller:listFriendsPos');
 
 $app->post('/updatePos', 'data.controller:updatePos');
 
 $app->post('/findUsers', 'data.controller:findUsers');
 
-if ($app['debug'])
+if ($app['debug'] == true)
 {
     $app->post('/fakeAuth', 'authentication.controller:fakeAuth');
 }
