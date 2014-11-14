@@ -67,11 +67,11 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    $this->assertEquals(false, $id);
 	}
 	
-	public function testGetExistingUsers()
+	public function testGetExistingUser()
 	{
 	    $repo = new UserRepository(self::$doctrine);
 	    
-	    $correct = new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77);
+	    $correct = new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77, '2014-11-12 13:33:45');
 	    
 	    $user = $repo->getUser(1);
 	    
@@ -94,8 +94,8 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    $repo = new UserRepository(self::$doctrine);
 	    
 	    $correct = array(
-	        new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77),
-	        new User(2, 347876, 'Titi', 'INVISIBLE', 12.75645, 54.34556)
+	        new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77, '2014-11-12 13:33:45'),
+	        new User(2, 347876, 'Titi', 'INVISIBLE', 12.75645, 54.34556, '2014-04-12 01:34:22')
 	    );
 	    
 	    $users = $repo->getUsers(array(1, 2));
@@ -119,8 +119,8 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    $repo = new UserRepository(self::$doctrine);
 	    
 	    $correct = array(
-	        new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77),
-	        new User(4, 12345, 'Tutu', 'VISIBLE', 156.85, -89.765)
+	        new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77, '2014-11-12 13:33:45'),
+	        new User(4, 12345, 'Tutu', 'VISIBLE', 156.85, -89.765, '2013-12-01 23:15:37')
 	    );
 	    
 	    $users = $repo->getUsers(array(1, 2, 3, 4), array('VISIBLE'));
@@ -144,10 +144,10 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    $repo = new UserRepository(self::$doctrine);
 	    
 	    $correct = array(
-	        new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77),
-	        new User(2, 347876, 'Titi', 'INVISIBLE', 12.75645, 54.34556),
-	        new User(3, 987645, 'Tata', 'INVISIBLE', -12.4546, -73.76),
-	        new User(4, 12345, 'Tutu', 'VISIBLE', 156.85, -89.765)
+	        new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77, '2014-11-12 13:33:45'),
+	        new User(2, 347876, 'Titi', 'INVISIBLE', 12.75645, 54.34556, '2014-04-12 01:34:22'),
+	        new User(3, 987645, 'Tata', 'INVISIBLE', -12.4546, -73.76, '2014-07-23 18:02:12'),
+	        new User(4, 12345, 'Tutu', 'VISIBLE', 156.85, -89.765, '2013-12-01 23:15:37')
 	    );
 	    
 	    $users = $repo->findUsersByPartialName('t');
@@ -160,7 +160,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    $repo = new UserRepository(self::$doctrine);
 	     
 	    $correct = array(
-	        new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77)
+	        new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77, '2014-11-12 13:33:45')
 	    );
 	     
 	    $users = $repo->findUsersByPartialName('tO');
@@ -176,6 +176,17 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	     
 	    $users = $repo->findUsersByPartialName('toa');
 	     
+	    $this->assertEquals($correct, $users);
+	}
+	
+	public function testEmptyFindUsersByPartialName()
+	{
+	    $repo = new UserRepository(self::$doctrine);
+	    
+	    $correct = array();
+	    
+	    $users = $repo->findUsersByPartialName('');
+	    
 	    $this->assertEquals($correct, $users);
 	}
 	
@@ -208,7 +219,8 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	        'name' => 'Tete',
 	        'visibility' => 'INVISIBLE',
 	        'longitude' => 1.0,
-	        'latitude' => 2.0
+	        'latitude' => 2.0,
+	        'last_update' => date('Y-m-d H:i:s')
 	    );
 	    
 	    $queryTable = $this->getConnection()->createQueryTable('users', 'SELECT * FROM users WHERE idusers = 1');
@@ -456,14 +468,21 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	
 	public function testGetAcceptedInvitations()
 	{
+	    $repo = new UserRepository(self::$doctrine);
+	    
+	    $ids = $repo->getAcceptedInvitations(3);
+	    
+	    $this->assertEquals(array(2), $ids);
+	}
+	
+	public function testRemoveAcceptedInvitation()
+	{
 	    $this->assertEquals(1, $this->getConnection()->getRowCount('accepted_invitations'), "Pre-Condition");
 	     
 	    $repo = new UserRepository(self::$doctrine);
 	    
-	    $ids = $repo->getAcceptedInvitations(3);
+	    $repo->removeAcceptedInvitation(3, 2);
 	     
 	    $this->assertEquals(0, $this->getConnection()->getRowCount('accepted_invitations'), "Post-Condition");
-	    
-	    $this->assertEquals(array(2), $ids);
 	}
 }

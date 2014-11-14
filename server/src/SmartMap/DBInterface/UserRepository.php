@@ -95,13 +95,14 @@ class UserRepository
         try
         {
             $user = new User(
-                                $userData['idusers'], 
-                                $userData['fbid'],
-                                $userData['name'],
-                                $userData['visibility'],
-                                $userData['longitude'],
-                                $userData['latitude']
-                            );
+                $userData['idusers'],
+                $userData['fbid'],
+                $userData['name'],
+                $userData['visibility'],
+                $userData['longitude'],
+                $userData['latitude'],
+                $userData['last_update']
+            );
         }
         catch (\InvalidArgumentException $e)
         {
@@ -158,6 +159,11 @@ class UserRepository
     {
         $length = strlen($partialName);
         
+        if ($length == 0)
+        {
+            return array();
+        }
+        
         $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE SUBSTR(LOWER(name), 1, ?) = ? LIMIT 10";
         
         try
@@ -192,7 +198,8 @@ class UserRepository
                     'name' => $user->getName(),
                     'visibility' => $user->getVisibility(),
                     'longitude' => $user->getLongitude(),
-                    'latitude' => $user->getLatitude()
+                    'latitude' => $user->getLatitude(),
+                    'last_update' => date(User::$DATE_FORMAT)
                 ));
         }
         catch (\Exception $e)
@@ -215,12 +222,14 @@ class UserRepository
     {
         try
         {
+            // We do not need to check the validity of parameters as it is done in the User class.
             $this->mDb->update(self::$TABLE_USER, 
                 array(
                     'name' => $user->getName(),
                     'visibility' => $user->getVisibility(),
                     'longitude' => $user->getLongitude(),
-                    'latitude' => $user->getLatitude()
+                    'latitude' => $user->getLatitude(),
+                    'last_update' => date(User::$DATE_FORMAT)
                 ), array('idusers' => $user->getId()));
         }
         catch (\Exception $e)
@@ -535,9 +544,6 @@ class UserRepository
         try
         {
             $stmt = $this->mDb->executeQuery($req, array((int) $idUser));
-            
-            // We delete the accepted invitation as it is no longer needed
-            $this->mDb->delete(self::$TABLE_ACCEPTED_INVITATIONS, array('id2' => (int) $idUser));
         }
         catch (\Exception $e)
         {
@@ -552,6 +558,21 @@ class UserRepository
         }
         
         return $ids;
+    }
+    
+    public function removeAcceptedInvitation($idUser, $friendId)
+    {
+        try
+        {
+            $this->mDb->delete(self::$TABLE_ACCEPTED_INVITATIONS, array(
+                'id1' => (int) $friendId,
+                'id2' => (int) $idUser
+            ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseExeption('Error in removeAcceptedInvitation.', 1, $e);
+        }
     }
     
     // Utility functions
@@ -576,7 +597,8 @@ class UserRepository
                     $userData['name'],
                     $userData['visibility'],
                     $userData['longitude'],
-                    $userData['latitude']
+                    $userData['latitude'],
+                    $userData['last_update']
                 );
             }
             catch (\Exception $e)

@@ -112,6 +112,8 @@ $app->post('/acceptInvitation', 'data.controller:acceptInvitation');
 
 $app->post('/declineInvitation', 'data.controller:declineInvitation');
 
+$app->post('/ackAcceptedInvitation', 'data.controller:ackAcceptedInvitation');
+
 $app->post('/removeFriend', 'data.controller:removeFriend');
 
 $app->post('/listFriendsPos', 'data.controller:listFriendsPos');

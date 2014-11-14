@@ -6,6 +6,7 @@ users:
     visibility: "VISIBLE"
     longitude: 42.05
     latitude: 23.77
+    last_update: "2014-11-12 13:33:45"
   -
     idusers: 2
     fbid: 347876
@@ -13,6 +14,7 @@ users:
     visibility: "INVISIBLE"
     longitude: 12.75645
     latitude: 54.34556
+    last_update: "2014-04-12 01:34:22"
   -
     idusers: 3
     fbid: 987645
@@ -20,6 +22,7 @@ users:
     visibility: "INVISIBLE"
     longitude: -12.4546
     latitude: -73.76
+    last_update: "2014-07-23 18:02:12"
   -
     idusers: 4
     fbid: 12345
@@ -27,6 +30,7 @@ users:
     visibility: "VISIBLE"
     longitude: 156.85
     latitude: -89.765
+    last_update: "2013-12-01 23:15:37"
 friendships:
   -
     id1: 1

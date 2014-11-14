@@ -15,12 +15,15 @@ use SmartMap\Control\InvalidRequestException;
  */
 class User
 {
+    public static $DATE_FORMAT = 'Y-m-d H:i:s';
+    
     private $mId;
     private $mFbId;
     private $mName;
     private $mVisibility;
     private $mLongitude;
     private $mLatitude;
+    private $mLastUpdate;
     
     /**
      * Constructor
@@ -30,8 +33,16 @@ class User
      * @param enum $visibility
      * @param double $longitude
      * @param double $latitude
+     * @param string $date A string representation of a date in format $DATE_FORMAT
      */
-    function __construct($id, $fbId, $name, $visibility, $longitude, $latitude)
+    function __construct(
+        $id,
+        $fbId,
+        $name,
+        $visibility = "VISIBLE",
+        $longitude = 0.0,
+        $latitude = 0.0,
+        $lastUpdate = null)
     {
         // Checking for validity of attributes
         $this->checkId($id);
@@ -40,6 +51,11 @@ class User
         $this->checkVisibility($visibility);
         $this->checkLongitude($longitude);
         $this->checkLatitude($latitude);
+        if ($lastUpdate == null)
+        {
+            $lastUpdate = date(self::$DATE_FORMAT);
+        }
+        $this->checkLastUpdate($lastUpdate);
         
         $this->mId = $id;
         $this->mFbId = $fbId;
@@ -47,6 +63,7 @@ class User
         $this->mVisibility = $visibility;
         $this->mLongitude = $longitude;
         $this->mLatitude = $latitude;
+        $this->mLastUpdate = $lastUpdate;
     }
     
     /**
@@ -66,7 +83,7 @@ class User
         
         $session = $request->getSession();
         
-        // The userId is set in the $_SESSION when successfully authenticated
+        // The userId is set in the session when successfully authenticated
         $id = $session->get('userId');
         
         if ($id == null)
@@ -215,6 +232,11 @@ class User
         return $this;
     }
     
+    public function getLastUpdate()
+    {
+        return $this->mLastUpdate;
+    }
+    
     /** Checks the validity of an id parameter.
      * @param Long $id
      * @throws \InvalidArgumentException if the id is below 1
@@ -273,6 +295,14 @@ class User
         if ($latitude < -90.0 OR $latitude > 90.0)
         {
             throw new \InvalidArgumentException('Latitude must be between -90 and 90.');
+        }
+    }
+    
+    private function checkLastUpdate($date)
+    {
+        if (strtotime($date) > time())
+        {
+            throw new \InvalidArgumentException('Last update time cannot be in the future !');
         }
     }
 }

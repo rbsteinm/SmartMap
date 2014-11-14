@@ -351,6 +351,27 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
     
+    public function testValidAckAcceptedInvitation()
+    {
+        $this->mockRepo->expects($this->once())
+             ->method('removeAcceptedInvitation')
+             ->with($this->equalTo(14), $this->equalTo(1));
+        
+        $request = new Request($query = array(), $request = array('friend_id' => 1));
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new DataController($this->mockRepo);
+        
+        $response = $controller->ackAcceptedInvitation($request);
+        
+        $validResponse = array('status' => 'Ok', 'message' => 'Acknowledged accepted invitation !');
+        
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+    
     public function testValidAcceptInvitation()
     {
         $invitIds = array(1, 2);

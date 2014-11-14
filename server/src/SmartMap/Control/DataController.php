@@ -98,17 +98,18 @@ class DataController
         foreach ($friends as $friend)
         {
             $list[] = array(
-                                'id' => $friend->getId(),
-                                'longitude' => $friend->getLongitude(),
-                                'latitude' => $friend->getLatitude()
-                            );
+                'id' => $friend->getId(),
+                'longitude' => $friend->getLongitude(),
+                'latitude' => $friend->getLatitude(),
+                'lastUpdate' => $friend->getLastUpdate()
+            );
         }
         
         $response = array(
-                            'status' => 'Ok',
-                            'message' => 'Fetched friends positions !',
-                            'positions' => $list
-                         );
+            'status' => 'Ok',
+            'message' => 'Fetched friends positions !',
+            'positions' => $list
+        );
         
         return new JsonResponse($response);
     }
@@ -232,16 +233,17 @@ class DataController
                 'id' => $friend->getId(),
                 'name' => $friend->getName(),
                 'longitude' => $friend->getLongitude(),
-                'latitude' => $friend->getLatitude()
+                'latitude' => $friend->getLatitude(),
+                'lastUpdate' => $friend->getLastUpdate()
             );
         }
         
         $response = array(
-                            'status' => 'Ok',
-                            'message' => 'Fetched invitations !',
-                            'invitations' => $invitersList,
-                            'newFriends' => $friendsList
-                         );
+            'status' => 'Ok',
+            'message' => 'Fetched invitations !',
+            'invitations' => $invitersList,
+            'newFriends' => $friendsList
+        );
         
         return new JsonResponse($response);
     }
@@ -284,13 +286,14 @@ class DataController
         }
         
         $response = array(
-                            'status' => 'Ok',
-                            'message' => 'Accepted invitation !',
-                            'id' => $user->getId(),
-                            'name' => $user->getName(),
-                            'longitude' => $user->getLongitude(),
-                            'latitude' => $user->getLatitude()
-                         );
+            'status' => 'Ok',
+            'message' => 'Accepted invitation !',
+            'id' => $user->getId(),
+            'name' => $user->getName(),
+            'longitude' => $user->getLongitude(),
+            'latitude' => $user->getLatitude(),
+            'lastUpdate' => $user->getLastUpdate()
+        );
         
         return new JsonResponse($response);
     }
@@ -317,9 +320,27 @@ class DataController
             throw new ControlLogicException('Error in declineInvitation.', 2, $e);
         }
         
-        $response = array(
-            'status' => 'Ok', 'message' => 'Declined invitation !',
-        );
+        $response = array('status' => 'Ok', 'message' => 'Declined invitation !');
+        
+        return new JsonResponse($response);
+    }
+    
+    public function ackAcceptedInvitation(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+        
+        $friendId = $this->getPostParam($request, 'friend_id');
+        
+        try
+        {
+            $this->mRepo->removeAcceptedInvitation($userId, $friendId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in ackAcceptedInvitation.', 2, $e);
+        }
+        
+        $response = array('status' => 'Ok', 'message' => 'Acknowledged accepted invitation !');
         
         return new JsonResponse($response);
     }
