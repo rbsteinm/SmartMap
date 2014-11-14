@@ -22,6 +22,7 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.Notifications;
+import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;

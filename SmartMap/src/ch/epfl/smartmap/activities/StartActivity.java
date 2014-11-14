@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 
 import com.facebook.Session;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.gui.FacebookFragment;
@@ -124,6 +126,7 @@ public class StartActivity extends FragmentActivity {
 		
 		SettingsManager.initialize(getApplicationContext());
 		DatabaseHelper.initialize(getApplicationContext());
+		startService(new Intent(this, UpdateService.class)); //test
 	}
 
 	@Override

@@ -137,6 +137,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return mInstance;
     }
     
+    /**
+     * @return The instance of DatabaseHelper
+     */
+    public static DatabaseHelper getInstance() {
+    	return mInstance;
+    }
+    
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_USER);
@@ -648,6 +655,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 //The keys are IDs, so we call getUserInfo for each key and update the db with the result
                 updateUser(client.getUserInfo(friends.keyAt(i)));
+            } catch (SmartMapClientException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    /**
+     * Fills the friend database
+     */
+    public void initializeAllFriends() {
+        LongSparseArray<User> friends = getAllUsers();
+        NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+        for (int i = 0; i < friends.size(); i++) {
+            try {
+                //The keys are IDs, so we call getUserInfo for each key and update the db with the result
+                addUser(client.getUserInfo(friends.keyAt(i)));
             } catch (SmartMapClientException e) {
                 e.printStackTrace();
             }
