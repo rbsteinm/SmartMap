@@ -24,17 +24,20 @@ public class UpdateService extends Service {
     
     private final Handler mHandler = new Handler();
     private Intent mIntent;
+    private boolean mFriendsPosEnabled = true;
     private DatabaseHelper mHelper = DatabaseHelper.getInstance();
     private SettingsManager mManager = SettingsManager.getInstance();
     private NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
     
     private Runnable sendFriendsPosUpdate = new Runnable() {
         public void run() {
-        	AsyncFriendsPos task = new AsyncFriendsPos();
-            task.execute();
-            sendBroadcast(mIntent);
-            mHandler.postDelayed(this, UPDATE_DELAY);
-            Log.d("UpdateService", "FriendsPosUpdate");
+        	if (mFriendsPosEnabled) {
+	        	AsyncFriendsPos task = new AsyncFriendsPos();
+	            task.execute();
+	            sendBroadcast(mIntent);
+	            mHandler.postDelayed(this, UPDATE_DELAY);
+	            Log.d("UpdateService", "FriendsPosUpdate");
+        	}
         }
     };
     
@@ -70,6 +73,16 @@ public class UpdateService extends Service {
     public IBinder onBind(Intent arg0) {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    /** Enables/disables friends position updates
+     * @param isEnabled True if updates should be enabled
+     */
+    public void setFriendsPosUpdateEnabled(boolean isEnabled) {
+    	mFriendsPosEnabled = isEnabled;
+    	if (isEnabled) {
+    		mHandler.postDelayed(sendFriendsPosUpdate, HANDLER_DELAY);
+    	}
     }
     
     private class AsyncFriendsPos extends AsyncTask<Void, Void, Integer> {
