@@ -50,7 +50,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage The user is not authenticated.
      */
     public function testUnauthenticatedAllowFriend()
@@ -65,7 +65,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Post parameter friend_id is not set !
      */
     public function testInvalidParameterAllowFriend()
@@ -78,6 +78,27 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
         $controller = new AuthorizationController($this->mockRepo);
         
         $controller->allowFriend($request);
+    }
+    
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in allowFriend method.
+     */
+    public function testDatabaseException()
+    {
+        $this->mockRepo
+        ->method('setFriendshipStatus')
+        ->will($this->throwException(new SmartMap\DBInterface\DatabaseException('Argh !')));
+        
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new AuthorizationController($this->mockRepo);
+        
+        $response = $controller->allowFriend($request);
     }
     
     public function testValidDisallowFriend()
@@ -102,7 +123,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage The user is not authenticated.
      */
     public function testUnauthenticatedDisallowFriend()
@@ -117,7 +138,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Post parameter friend_id is not set !
      */
     public function testInvalidParameterDisallowFriend()
@@ -154,7 +175,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage The user is not authenticated.
      */
     public function testUnauthenticatedAllowFriendList()
@@ -169,7 +190,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Post parameter friend_id is not set !
      */
     public function testInvalidParameterAllowFriendList()
@@ -206,7 +227,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage The user is not authenticated.
      */
     public function testUnauthenticatedDisallowFriendList()
@@ -221,7 +242,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Post parameter friend_ids is not set !
      */
     public function testInvalidParameterDisallowFriendList()
@@ -258,7 +279,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage The user is not authenticated.
      */
     public function testUnauthenticatedFollowFriend()
@@ -273,7 +294,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Post parameter friend_id is not set !
      */
     public function testInvalidParameterFollowFriend()
@@ -310,7 +331,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage The user is not authenticated.
      */
     public function testUnauthenticatedUnfollowFriend()
@@ -325,7 +346,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Post parameter friend_id is not set !
      */
     public function testInvalidParameterUnfollowFriend()

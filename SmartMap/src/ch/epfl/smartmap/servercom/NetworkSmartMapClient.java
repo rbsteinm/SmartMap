@@ -669,7 +669,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 			}
 
 			if (connection.getResponseCode() != SERVER_RESPONSE_OK) {
-				throw new SmartMapClientException("error from server");
+				throw new SmartMapClientException("HTTP error with code " + connection.getResponseCode()
+				        + " during communication with client.");
 			}
 
 			// Get response
