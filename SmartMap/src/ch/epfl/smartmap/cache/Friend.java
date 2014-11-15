@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public class Friend implements User, Searchable {
+public class Friend implements User, Searchable, Displayable {
 
 	private long mId; // the user's unique ID
 	private String mName; // the user's name as it will be displayed
@@ -215,6 +215,12 @@ public class Friend implements User, Searchable {
     @Override
     public void setVisible(boolean isVisible) {
         mVisible = isVisible;
+    }
+
+    @Override
+    public String getInfo() {
+        // TODO Auto-generated method stub
+        return "";
     }
 
 }

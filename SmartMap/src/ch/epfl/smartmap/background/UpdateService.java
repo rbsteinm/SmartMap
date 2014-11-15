@@ -23,7 +23,7 @@ public class UpdateService extends Service {
     private static final int UPDATE_DELAY = 10000;
     
     private final Handler mHandler = new Handler();
-    private Intent mIntent;
+    private Intent mFriendsPosIntent;
     private boolean mFriendsPosEnabled = true;
     private DatabaseHelper mHelper = DatabaseHelper.getInstance();
     private SettingsManager mManager = SettingsManager.getInstance();
@@ -32,9 +32,8 @@ public class UpdateService extends Service {
     private Runnable sendFriendsPosUpdate = new Runnable() {
         public void run() {
         	if (mFriendsPosEnabled) {
-	        	AsyncFriendsPos task = new AsyncFriendsPos();
-	            task.execute();
-	            sendBroadcast(mIntent);
+	        	new AsyncFriendsPos().execute();
+	            sendBroadcast(mFriendsPosIntent);
 	            mHandler.postDelayed(this, UPDATE_DELAY);
 	            Log.d("UpdateService", "FriendsPosUpdate");
         	}
@@ -43,11 +42,7 @@ public class UpdateService extends Service {
     
     private Runnable sendOwnPosUpdate = new Runnable() {
         public void run() {
-            /*try {
-				mClient.updatePos(mManager.getLocation());
-			} catch (SmartMapClientException e) {
-				e.printStackTrace();
-			}*/
+            new AsyncOwnPos().execute();
             mHandler.postDelayed(this, UPDATE_DELAY);
             Log.d("UpdateService", "OwnPosUpdate");
         }
@@ -56,7 +51,8 @@ public class UpdateService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mIntent = new Intent(BROADCAST_POS);  
+        mFriendsPosIntent = new Intent(BROADCAST_POS);
+        mHelper.initializeAllFriends();
     }
     
     @Override
@@ -85,6 +81,10 @@ public class UpdateService extends Service {
     	}
     }
     
+    /**
+     * AsyncTask to get friends' positions
+     * @author ritterni
+     */
     private class AsyncFriendsPos extends AsyncTask<Void, Void, Integer> {
         @Override
         protected Integer doInBackground(Void... args0) {
@@ -93,7 +93,23 @@ public class UpdateService extends Service {
 
         @Override
         protected void onPostExecute(Integer result) {
-        	mIntent.putExtra(UPDATED_ROWS, result);
+        	mFriendsPosIntent.putExtra(UPDATED_ROWS, result);
+        }
+    }
+    
+    /**
+     * AsyncTask to send the user's own position to the server
+     * @author ritterni
+     */
+    private class AsyncOwnPos extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            try {
+                mClient.updatePos(mManager.getLocation());
+            } catch (SmartMapClientException e) {
+                Log.e("UpdateServie", "Position update failed!");
+            }
+            return null;
         }
     }
 }
