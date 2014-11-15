@@ -52,12 +52,11 @@ public class UpdateService extends Service {
     public void onCreate() {
         super.onCreate();
         mFriendsPosIntent = new Intent(BROADCAST_POS);
-        mHelper.initializeAllFriends();
+        new AsyncFriendsInit().execute();
     }
     
     @Override
     public void onStart(Intent intent, int startId) {
-    	mHelper.initializeAllFriends();
         mHandler.removeCallbacks(sendFriendsPosUpdate);
         mHandler.postDelayed(sendFriendsPosUpdate, HANDLER_DELAY);
         mHandler.removeCallbacks(sendOwnPosUpdate);
@@ -107,8 +106,20 @@ public class UpdateService extends Service {
             try {
                 mClient.updatePos(mManager.getLocation());
             } catch (SmartMapClientException e) {
-                Log.e("UpdateServie", "Position update failed!");
+                Log.e("UpdateService", "Position update failed!");
             }
+            return null;
+        }
+    }
+    
+    /**
+     * AsyncTask to send the user's own position to the server
+     * @author ritterni
+     */
+    private class AsyncFriendsInit extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            mHelper.initializeAllFriends();
             return null;
         }
     }
