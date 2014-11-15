@@ -117,6 +117,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + ")";
 
     private static DatabaseHelper mInstance;
+    private static SQLiteDatabase mDatabase;
     
     /**
      * DatabaseHelper constructor. Will be made private, so use initialize() or getInstance() instead.
@@ -134,6 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public static DatabaseHelper initialize(Context context) {
         mInstance = new DatabaseHelper(context);
+        mDatabase  = mInstance.getWritableDatabase();
         return mInstance;
     }
     
@@ -166,8 +168,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Clears the database. Mainly for testing purposes.
      */
     public void clearAll() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        onUpgrade(db, 1, 2);
+        //SQLiteDatabase db = this.getWritableDatabase();
+        onUpgrade(mDatabase, 1, 2);
     }
 
     /**
@@ -176,9 +178,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void addUser(User user) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
 
-        Cursor cursor = db.query(
+        Cursor cursor = mDatabase.query(
                 TABLE_USER,
                 USER_COLUMNS,
                 KEY_USER_ID + " = ?",
@@ -200,11 +202,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
             values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); //boolean to int
 
-            db.insert(TABLE_USER, null, values);
+            mDatabase.insert(TABLE_USER, null, values);
 
-            db.close();
+            //db.close();
         } else {
-            db.close();
+            //db.close();
             updateUser(user);
         }
 
@@ -218,9 +220,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public User getUser(long id) {
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        //SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(
+        Cursor cursor = mDatabase.query(
                 TABLE_USER,
                 USER_COLUMNS,
                 KEY_USER_ID + " = ?",
@@ -261,8 +263,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT  * FROM " + TABLE_USER;
 
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
+        //SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = mDatabase.rawQuery(query, null);
 
         Friend friend = null;
         if (cursor.moveToFirst()) {
@@ -294,7 +296,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public int updateUser(User user) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(KEY_USER_ID, user.getID());
@@ -307,12 +309,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
         values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); //boolean to int
 
-        int rows = db.update(TABLE_USER,
+        int rows = mDatabase.update(TABLE_USER,
                 values,
                 KEY_USER_ID + " = ?",
                 new String[] {String.valueOf(user.getID())});
 
-        db.close();
+        //db.close();
 
         return rows;
     }
@@ -323,13 +325,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteUser(long id) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
 
-        db.delete(TABLE_USER,
+        mDatabase.delete(TABLE_USER,
                 KEY_USER_ID + " = ?",
                 new String[] {String.valueOf(id)});
 
-        db.close();
+        //db.close();
     }
 
     /**
@@ -339,12 +341,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public long addFilter(UserList filter) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
 
         //First we insert the filter in the table of lists
         ContentValues filterValues = new ContentValues();
         filterValues.put(KEY_NAME, filter.getListName());
-        long filterID = db.insert(TABLE_FILTER, null, filterValues);
+        long filterID = mDatabase.insert(TABLE_FILTER, null, filterValues);
 
         //Then we add the filter-user pairs to another table
         ContentValues pairValues = null;
@@ -352,9 +354,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             pairValues = new ContentValues();
             pairValues.put(KEY_FILTER_ID, filterID);
             pairValues.put(KEY_USER_ID, id);
-            db.insert(TABLE_FILTER_USER, null, pairValues);
+            mDatabase.insert(TABLE_FILTER_USER, null, pairValues);
         }
-        db.close();
+        //db.close();
         filter.setID(filterID); //sets an ID so the filter can be easily accessed
         return filterID;
     }
@@ -366,10 +368,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public UserList getFilter(long id) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
 
         //First query to get the filter's name
-        Cursor cursor = db.query(
+        Cursor cursor = mDatabase.query(
                 TABLE_FILTER,
                 FILTER_COLUMNS,
                 KEY_ID + " = ?",
@@ -387,7 +389,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         filter.setID(id);
 
         //Second query to get the associated list of IDs
-        cursor = db.query(
+        cursor = mDatabase.query(
                 TABLE_FILTER_USER,
                 FILTER_USER_COLUMNS,
                 KEY_FILTER_ID + " = ?",
@@ -417,8 +419,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT  * FROM " + TABLE_FILTER;
 
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
+        //SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = mDatabase.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {
@@ -437,19 +439,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteFilter(long id) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
 
         //delete the filter from the table of filters
-        db.delete(TABLE_FILTER,
+        mDatabase.delete(TABLE_FILTER,
                 KEY_ID + " = ?",
                 new String[] {String.valueOf(id)});
 
         //then delete all the rows that reference this filter in the filter-user table
-        db.delete(TABLE_FILTER_USER,
+        mDatabase.delete(TABLE_FILTER_USER,
                 KEY_FILTER_ID + " = ?",
                 new String[] {String.valueOf(id)});
 
-        db.close();
+        //db.close();
     }
 
     /**
@@ -473,9 +475,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     		throw new IllegalArgumentException("Invalid event ID");
     	}
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
 
-        Cursor cursor = db.query(
+        Cursor cursor = mDatabase.query(
                 TABLE_EVENT,
                 EVENT_COLUMNS,
                 KEY_ID + " = ?",
@@ -499,11 +501,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
             values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
 
-            db.insert(TABLE_EVENT, null, values);
+            mDatabase.insert(TABLE_EVENT, null, values);
 
-            db.close();
+            //db.close();
         } else {
-            db.close();
+            //db.close();
             updateEvent(event);
         }
 
@@ -516,9 +518,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public Event getEvent(long id) {
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        //SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(
+        Cursor cursor = mDatabase.query(
                 TABLE_EVENT,
                 EVENT_COLUMNS,
                 KEY_ID + " = ?",
@@ -566,8 +568,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT  * FROM " + TABLE_EVENT;
 
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
+        //SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = mDatabase.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {
@@ -584,13 +586,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteEvent(long id) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
 
-        db.delete(TABLE_EVENT,
+        mDatabase.delete(TABLE_EVENT,
                 KEY_ID + " = ?",
                 new String[] {String.valueOf(id)});
 
-        db.close();
+        //db.close();
     }
 
     /**
@@ -600,7 +602,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public int updateEvent(Event event) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(KEY_ID, event.getID());
@@ -614,12 +616,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
         values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
 
-        int rows = db.update(TABLE_EVENT,
+        int rows = mDatabase.update(TABLE_EVENT,
                 values,
                 KEY_ID + " = ?",
                 new String[] {String.valueOf(event.getID())});
 
-        db.close();
+        //db.close();
 
         return rows;
     }

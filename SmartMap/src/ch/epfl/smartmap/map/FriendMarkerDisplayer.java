@@ -27,10 +27,10 @@ public interface FriendMarkerDisplayer {
 	 * @param context
 	 * @param mGoogleMap
 	 *            the map where we want to add markers
-	 * @param listOfFriends
+	 * @param friendsToDisplay
 	 *            the friends we want to display
 	 */
-	void setMarkersToMaps(Context context, GoogleMap googleMap, List<Friend> listOfFriends);
+	void setMarkersToMaps(Context context, GoogleMap googleMap, List<User> friendsToDisplay);
 
 	/**
 	 * This method updates the markers on the map with the given list of friends
@@ -38,10 +38,10 @@ public interface FriendMarkerDisplayer {
 	 * @param context
 	 * @param mGoogleMap
 	 *            the map where we want to update markers
-	 * @param listOfFriends
+	 * @param friendsToDisplay
 	 *            the updated friends
 	 */
-	void updateMarkers(Context context, GoogleMap googleMap, List<Friend> listOfFriends);
+	void updateMarkers(Context context, GoogleMap googleMap, List<User> friendsToDisplay);
 
 	/**
 	 * 
