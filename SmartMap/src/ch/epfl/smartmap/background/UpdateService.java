@@ -1,10 +1,15 @@
 package ch.epfl.smartmap.background;
 
 import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClientException;
 import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
 /**
  * A background service that updates friends' position periodically
@@ -18,34 +23,93 @@ public class UpdateService extends Service {
     private static final int UPDATE_DELAY = 10000;
     
     private final Handler mHandler = new Handler();
-    private Intent mIntent;
-    private DatabaseHelper mHelper = new DatabaseHelper(this);
+    private Intent mFriendsPosIntent;
+    private boolean mFriendsPosEnabled = true;
+    private DatabaseHelper mHelper = DatabaseHelper.getInstance();
+    private SettingsManager mManager = SettingsManager.getInstance();
+    private NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
     
     private Runnable sendFriendsPosUpdate = new Runnable() {
         public void run() {
-            int rows = mHelper.refreshFriendsPos();
-            mIntent.putExtra(UPDATED_ROWS, rows);
-            sendBroadcast(mIntent);
-            System.out.println(rows);
+        	if (mFriendsPosEnabled) {
+	        	new AsyncFriendsPos().execute();
+	            sendBroadcast(mFriendsPosIntent);
+	            mHandler.postDelayed(this, UPDATE_DELAY);
+	            Log.d("UpdateService", "FriendsPosUpdate");
+        	}
+        }
+    };
+    
+    private Runnable sendOwnPosUpdate = new Runnable() {
+        public void run() {
+            new AsyncOwnPos().execute();
             mHandler.postDelayed(this, UPDATE_DELAY);
+            Log.d("UpdateService", "OwnPosUpdate");
         }
     };  
     
     @Override
     public void onCreate() {
         super.onCreate();
-        mIntent = new Intent(BROADCAST_POS);  
+        mFriendsPosIntent = new Intent(BROADCAST_POS);
+        mHelper.initializeAllFriends();
     }
     
     @Override
     public void onStart(Intent intent, int startId) {
+    	mHelper.initializeAllFriends();
         mHandler.removeCallbacks(sendFriendsPosUpdate);
-        mHandler.postDelayed(sendFriendsPosUpdate, HANDLER_DELAY); 
+        mHandler.postDelayed(sendFriendsPosUpdate, HANDLER_DELAY);
+        mHandler.removeCallbacks(sendOwnPosUpdate);
+        mHandler.postDelayed(sendOwnPosUpdate, HANDLER_DELAY);
+        Log.d("UpdateService", "Service started");
     }
     
     @Override
     public IBinder onBind(Intent arg0) {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    /** Enables/disables friends position updates
+     * @param isEnabled True if updates should be enabled
+     */
+    public void setFriendsPosUpdateEnabled(boolean isEnabled) {
+    	mFriendsPosEnabled = isEnabled;
+    	if (isEnabled) {
+    		mHandler.postDelayed(sendFriendsPosUpdate, HANDLER_DELAY);
+    	}
+    }
+    
+    /**
+     * AsyncTask to get friends' positions
+     * @author ritterni
+     */
+    private class AsyncFriendsPos extends AsyncTask<Void, Void, Integer> {
+        @Override
+        protected Integer doInBackground(Void... args0) {
+        	return mHelper.refreshFriendsPos();
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+        	mFriendsPosIntent.putExtra(UPDATED_ROWS, result);
+        }
+    }
+    
+    /**
+     * AsyncTask to send the user's own position to the server
+     * @author ritterni
+     */
+    private class AsyncOwnPos extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            try {
+                mClient.updatePos(mManager.getLocation());
+            } catch (SmartMapClientException e) {
+                Log.e("UpdateServie", "Position update failed!");
+            }
+            return null;
+        }
     }
 }

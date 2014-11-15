@@ -116,10 +116,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_ENDDATE + " INTEGER"
             + ")";
 
+    private static DatabaseHelper mInstance;
+    
+    /**
+     * DatabaseHelper constructor. Will be made private, so use initialize() or getInstance() instead.
+     * @param context The application's context, used to access the files
+     */
+    @Deprecated
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    /**
+     * Initializes the database helper (should be called once when starting the app)
+     * @param context The app's context, needed to access the files
+     * @return The DatabaseHelper instance
+     */
+    public static DatabaseHelper initialize(Context context) {
+        mInstance = new DatabaseHelper(context);
+        return mInstance;
+    }
+    
+    /**
+     * @return The instance of DatabaseHelper
+     */
+    public static DatabaseHelper getInstance() {
+    	return mInstance;
+    }
+    
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_USER);
@@ -631,6 +655,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 //The keys are IDs, so we call getUserInfo for each key and update the db with the result
                 updateUser(client.getUserInfo(friends.keyAt(i)));
+            } catch (SmartMapClientException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    /**
+     * Fills the friend database
+     */
+    public void initializeAllFriends() {
+        LongSparseArray<User> friends = getAllUsers();
+        NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+        for (int i = 0; i < friends.size(); i++) {
+            try {
+                //The keys are IDs, so we call getUserInfo for each key and update the db with the result
+                addUser(client.getUserInfo(friends.keyAt(i)));
             } catch (SmartMapClientException e) {
                 e.printStackTrace();
             }

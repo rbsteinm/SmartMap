@@ -26,7 +26,9 @@ import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.Notifications;
 import ch.epfl.smartmap.background.UpdateService;
+
 import ch.epfl.smartmap.cache.DatabaseHelper;
+
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;
@@ -88,7 +90,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		mSearchEngine = new MockSearchEngine();
 		mSearchLayout.setSearchEngine(mSearchEngine);
 
-		mDbHelper = new DatabaseHelper(this);
+		mDbHelper = DatabaseHelper.getInstance();
 		// temporary, the database will not be filled here
 		for (Friend friend : MockDB.FRIENDS_LIST) {
 			mDbHelper.addUser(friend);

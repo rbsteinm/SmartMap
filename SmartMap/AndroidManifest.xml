@@ -59,7 +59,12 @@
             android:label="@string/title_activity_logged_in"
             android:screenOrientation="portrait" >
         </activity>
-
+        
+        <service
+            android:enabled="true"
+            android:name="ch.epfl.smartmap.background.UpdateService" >
+        </service>
+        
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/app_id" />
