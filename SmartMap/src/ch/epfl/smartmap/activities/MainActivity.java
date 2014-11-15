@@ -31,6 +31,7 @@ import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
+import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
@@ -156,8 +157,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		mMapZoomer.zoomOnLocation(location, mGoogleMap);
-		// updatePos
+		SettingsManager.getInstance().setLocation(location);
 	}
 
 	@Override
@@ -175,7 +175,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public void onResume() {
 		super.onResume();
 
-		startService(mUpdateServiceIntent);
+		//startService(mUpdateServiceIntent);
 		registerReceiver(mBroadcastReceiver, new IntentFilter(
 				UpdateService.BROADCAST_POS));
 
@@ -192,7 +192,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public void onPause() {
 		super.onPause();
 		unregisterReceiver(mBroadcastReceiver);
-		stopService(mUpdateServiceIntent);
+		//stopService(mUpdateServiceIntent);
 	}
 
 	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
