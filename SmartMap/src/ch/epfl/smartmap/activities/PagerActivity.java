@@ -5,6 +5,7 @@ import ch.epfl.smartmap.gui.PagerAdapter;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -79,6 +80,11 @@ public class PagerActivity extends FragmentActivity implements ActionBar.TabList
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+    public void startAddFriendActivity(MenuItem menu) {
+        Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
+        startActivity(displayActivityIntent);
+    }
 
 	@Override
 	public void onTabReselected(Tab arg0, FragmentTransaction arg1) {

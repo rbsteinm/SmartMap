@@ -8,12 +8,17 @@ import java.util.List;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.User;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class FriendsTab extends ListFragment {
 	 private List<User> mMockUsersList;
@@ -43,6 +48,15 @@ public class FriendsTab extends ListFragment {
 		return view;
 	}
 	
+//    public void onListItemClick(ListView listView, View view, int position, long id) {
+//        long userId = (Long) view.getTag();
+//        RelativeLayout rl = (RelativeLayout) view;
+//        TextView tv = (TextView) rl.getChildAt(1);
+//        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
+//        String name = tv.getText().toString();
+//        displayDeleteConfirmationDialog(name, userId);
+//    }
+	
 	private void sortByOnline(List<User> userList) {
         Collections.sort(userList, new Comparator<User>(){
 
@@ -52,5 +66,32 @@ public class FriendsTab extends ListFragment {
             }
         });
     }
+	
+//    private void displayDeleteConfirmationDialog(String name, long userId) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setMessage("remove " + name + " from your friends?");
+//        
+//        // Add positive button
+//        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int id) {
+//                /*try {
+//                    //TODO move this request in an asynch task, => interface? ask Marion
+//                    NetworkSmartMapClient.getInstance().inviteFriend(id);
+//                } catch (SmartMapClientException e) {
+//                    e.printStackTrace();
+//                }*/
+//            }
+//        });
+//        
+//        //Add negative button
+//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int id) {
+//                dialog.cancel();
+//            }
+//        });
+//        
+//        // display the AlertDialog
+//        builder.create().show();
+//    }
 	
 }
