@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
@@ -13,6 +14,7 @@
     <string name="loading_text">Logging In...</string>
     <string name="create_notif">Create Notification</string>
     <string name="search_text">Search</string>
+    <string name="add_friend">Add a friend</string>
 
     <string-array name="sideMenuElements">
         <item>Profile</item>
@@ -25,7 +27,7 @@
     <string name="title_activity_friends">FriendsActivity</string>
     <string name="search_bar_hint">Search...</string>
     <string name="title_activity_map_fragment">MapFragment</string>
-     <string name="title_activity_pager">PagerActivity</string>
+      <string name="title_activity_pager">PagerActivity</string>
     
     
     
@@ -91,5 +93,7 @@
     <string name="ShowEventsCheckBoxMyEv">My events</string>
     <string name="ShowEventsCheckBoxNearMe">Near me</string>
     <string name="ShowEventsCheckBoxStatus">Ongoing</string>
+    <string  name="title_activity_add_friend">Add a friend</string>
 
 </resources>
+
