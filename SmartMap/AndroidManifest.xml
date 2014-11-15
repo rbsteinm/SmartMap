@@ -59,6 +59,11 @@
             android:label="@string/title_activity_logged_in"
             android:screenOrientation="portrait" >
         </activity>
+        
+         <activity
+            android:name=".activities.PagerActivity"
+            android:label="@string/title_activity_pager" >
+        </activity>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

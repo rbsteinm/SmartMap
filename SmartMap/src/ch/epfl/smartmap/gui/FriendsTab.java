@@ -1,6 +1,8 @@
 package ch.epfl.smartmap.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import ch.epfl.smartmap.R;
@@ -31,7 +33,7 @@ public class FriendsTab extends ListFragment {
         }
         mMockUsersList.get(1).setOnline(true);
         mMockUsersList.get(3).setOnline(true);
-       // sortByOnline(mMockUsersList);
+        sortByOnline(mMockUsersList);
         
         // Create custom Adapter and pass it to the Activity
         FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mMockUsersList);
@@ -40,5 +42,15 @@ public class FriendsTab extends ListFragment {
 		
 		return view;
 	}
+	
+	private void sortByOnline(List<User> userList) {
+        Collections.sort(userList, new Comparator<User>(){
+
+            @Override
+            public int compare(User user1, User user2) {
+                return Boolean.compare(user2.isOnline(), user1.isOnline());
+            }
+        });
+    }
 	
 }
