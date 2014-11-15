@@ -151,7 +151,7 @@ public class Friend implements User, Searchable, Displayable {
 			pic = BitmapFactory.decodeFile(file.getAbsolutePath());
 		} else {
 			pic = BitmapFactory.decodeResource(context.getResources(),
-					DEFAULT_PICTURE); // placeholder
+					DEFAULT_PICTURE);
 		}
 		return pic;
 	}
@@ -219,7 +219,7 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public String getInfo() {
-        // TODO Auto-generated method stub
+        // TODO
         return "";
     }
 
