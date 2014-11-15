@@ -45,6 +45,9 @@ public class StartActivityTest extends
 				|| Session.getActiveSession().getPermissions().isEmpty()) {
 			onView(withId(R.id.loginButton)).check(matches(isDisplayed()));
 		}
+		else{
+			
+		}
 		
 	}
 }

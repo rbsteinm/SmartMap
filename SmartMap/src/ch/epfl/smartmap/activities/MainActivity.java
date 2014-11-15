@@ -7,6 +7,7 @@ import java.util.List;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -67,12 +68,22 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		mSideMenu = new SideMenu(this);
+		mSideMenu.initializeDrawerLayout();
+
+		// Set actionbar color
+		getActionBar().setBackgroundDrawable(
+				new ColorDrawable(getResources()
+						.getColor(R.color.mainBlueColor)));
+
+		// Enable button to open side menu
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeAsUpIndicator(
+				getResources().getDrawable(R.drawable.ic_drawer));
+		// TODO agpmilli : When click on actionbar left button, open side menu
 
 		// Get needed Views
 		final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
-
-		mSideMenu = new SideMenu(this);
-		mSideMenu.initializeDrawerLayout();
 
 		mSearchEngine = new MockSearchEngine();
 		mSearchLayout.setSearchEngine(mSearchEngine);
@@ -277,7 +288,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public void createAddNotification(View view) {
 		Notifications.newFriendNotification(view, this, MockDB.JULIEN);
 	}
-	
+
 	/**
 	 * Create an accepted invitation notification that appear in the
 	 * notifications tab
@@ -294,8 +305,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		Notifications.newEventNotification(view, this, MockDB.getEventsList()
 				.get(0));
 	}
-
-	
 
 	public void performQuery(Friend friend) {
 		// Get Views

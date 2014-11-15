@@ -32,10 +32,10 @@
                 android:layout_width="240dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
-                android:background="#111"
+                android:background="@color/mainBlueColor"
                 android:choiceMode="singleChoice"
                 android:divider="@android:color/transparent"
-                android:dividerHeight="0dp" />
+                android:dividerHeight="0dp"/>
         </android.support.v4.widget.DrawerLayout>
 
         <TextView
@@ -47,7 +47,7 @@
 
 
         <!-- 
-        The button that create notifications -->
+        The button that create notifications
         <Button
             android:id="@+id/create_add_notif_button"
             android:layout_width="wrap_content"
@@ -73,7 +73,7 @@
             android:layout_centerHorizontal="true"
             android:onClick="createEventNotification"
             android:text="@string/create_event_notif" >
-        </Button> <!--  -->
+        </Button>  -->
 
     </RelativeLayout>
 

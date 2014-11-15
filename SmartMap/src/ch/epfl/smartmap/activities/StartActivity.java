@@ -3,8 +3,6 @@ package ch.epfl.smartmap.activities;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import com.facebook.Session;
-
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -22,6 +20,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.FacebookFragment;
+
+import com.facebook.Session;
 
 /**
  * 
@@ -65,6 +65,10 @@ public class StartActivity extends FragmentActivity {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
+
+		// Set background color of activity
+		setActivityBackgroundColor(getResources().getColor(
+				R.color.mainBlueColor));
 
 		// Get all views
 		mLogoImage = (ImageView) findViewById(R.id.logo);
@@ -135,6 +139,17 @@ public class StartActivity extends FragmentActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	/**
+	 * Set background color of activity
+	 * 
+	 * @param color
+	 *            the color
+	 */
+	public void setActivityBackgroundColor(int color) {
+		View view = this.getWindow().getDecorView();
+		view.setBackgroundColor(color);
 	}
 
 	/**
