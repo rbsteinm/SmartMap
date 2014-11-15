@@ -131,8 +131,6 @@ $app->post('/findUsers', 'data.controller:findUsers');
 if ($app['debug'] == true)
 {
     $app->post('/fakeAuth', 'authentication.controller:fakeAuth');
-    
-    $app->get('/testFB', 'authentication.controller:testFB');
 }
 
 
