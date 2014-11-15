@@ -54,7 +54,7 @@ public class ShowEventsActivity extends ListActivity {
     private boolean mNearMeChecked;
 
     // Mock
-    private List<Event> mMockEventsList;
+    private List<Event> mEventsList;
     private List<Event> mCurrentList;
     private static String mMyName = "Robich";
     private Location mMyLocation;
@@ -161,10 +161,10 @@ public class ShowEventsActivity extends ListActivity {
         mDbHelper.addEvent(e2);
         mDbHelper.addEvent(e3);*/
 
-        mMockEventsList = mDbHelper.getAllEvents();
+        mEventsList = mDbHelper.getAllEvents();
 
         // Create custom Adapter and pass it to the Activity
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mMockEventsList, mMyLocation);
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
         setListAdapter(adapter);
     }
 
@@ -275,15 +275,15 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
-        mMockEventsList = mDbHelper.getAllEvents();
+        mEventsList = mDbHelper.getAllEvents();
         mCurrentList = new ArrayList<Event>();
 
         // Copy complete list into current list
-        for (Event e : mMockEventsList) {
+        for (Event e : mEventsList) {
             mCurrentList.add(e);
         }
 
-        for (Event e : mMockEventsList) {
+        for (Event e : mEventsList) {
             if (mMyEventsChecked) {
                 if (!e.getCreatorName().equals(mMyName)) {
                     mCurrentList.remove(e);

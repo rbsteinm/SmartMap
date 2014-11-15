@@ -240,35 +240,40 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
         }
 
-        boolean pickLocationForEvent = startingIntent.getBooleanExtra("pickLocationForEvent", false);
-        if (pickLocationForEvent) {
-            // TODO zoom to my position?
-            mGoogleMap.setOnMapLongClickListener(new OnMapLongClickListener() {
+        mGoogleMap.setOnMapLongClickListener(new OnMapLongClickListener() {
 
-                @Override
-                public void onMapLongClick(LatLng latLng) {
-                    Intent result = new Intent(getContext(), AddEventActivity.class);
-                    Bundle extras = new Bundle();
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                Intent result = new Intent(getContext(), AddEventActivity.class);
+                Bundle extras = new Bundle();
 
-                    Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-                    String cityName = "";
-                    List<Address> addresses;
-                    try {
-                        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                String cityName = "";
+                List<Address> addresses;
+                try {
+                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                    if (addresses.size() > 0) {
+                        // Makes sure that an address is associated to the coordinates, the user could have long
+                        // clicked int he middle of the sea after all :)
                         cityName = addresses.get(0).getLocality();
-                    } catch (IOException e) {
-                        // nothing
                     }
-                    extras.putString(CITY_NAME, cityName);
-                    extras.putParcelable(LOCATION_SERVICE, latLng);
-                    result.putExtras(extras);
+                } catch (IOException e) {
+                    // nothing
+                }
+                extras.putString(CITY_NAME, cityName);
+                extras.putParcelable(LOCATION_SERVICE, latLng);
+                result.putExtras(extras);
 
+                if (getIntent().getBooleanExtra("pickLocationForEvent", false)) {
                     // Return the result to the calling activity (AddEventActivity)
                     setResult(RESULT_OK, result);
                     finish();
+                } else {
+                    // The user was in MainActivity and long clicked to create an event
+                    startActivity(result);
                 }
-            });
-        }
+            }
+        });
     }
 
     /*

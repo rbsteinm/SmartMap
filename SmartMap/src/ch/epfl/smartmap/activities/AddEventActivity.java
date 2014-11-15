@@ -243,6 +243,12 @@ public class AddEventActivity extends FragmentActivity {
 
         initializeGUIComponents();
 
+        Bundle extras = getIntent().getExtras();
+        LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
+        if (Math.abs(latLng.latitude) > 0) {
+            // The user long clicked the map in MainActivity and wants to create an event
+            updateLocation(getIntent());
+        }
     }
 
     @Override
@@ -280,28 +286,41 @@ public class AddEventActivity extends FragmentActivity {
             case PICK_LOCATION_REQUEST:
                 if (resultCode == RESULT_OK) {
                     // All went smoothly, update location in this activity
+                    updateLocation(data);
 
-                    Bundle extras = data.getExtras();
-
-                    LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
-                    mLatitude.setText(String.valueOf(latLng.latitude));
-                    mLongitude.setText(String.valueOf(latLng.longitude));
-
-                    String cityName = extras.getString(CITY_NAME);
-                    if (cityName != null) {
-                        mPlaceName.setText(cityName);
-                        mPlaceName.setEnabled(false);
-                    } else {
-                        Toast.makeText(mContext, "Sorry, couldn't get the name of your event's place",
-                                Toast.LENGTH_LONG).show();
-                    }
                 } else {
                     Toast.makeText(mContext, "Sorry, couldn't get the location of your event", Toast.LENGTH_LONG)
                             .show();
+                    mLatitude.setText("");
+                    mLongitude.setText("");
+                    mPlaceName.setText("");
                 }
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     *
+     * @author SpicyCH
+     */
+    private void updateLocation(Intent data) {
+        Bundle extras = data.getExtras();
+
+        LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
+        mLatitude.setText(String.valueOf(latLng.latitude));
+        mLongitude.setText(String.valueOf(latLng.longitude));
+
+        String cityName = extras.getString(CITY_NAME);
+        if (cityName != null && !cityName.equals("")) {
+            mPlaceName.setText(cityName);
+            mPlaceName.setEnabled(false);
+        } else {
+            Toast.makeText(mContext,
+                    "Sorry, couldn't retrieve the name of your event's place. Please specify it manually.",
+                    Toast.LENGTH_LONG).show();
+            mPlaceName.setText("");
         }
     }
 
