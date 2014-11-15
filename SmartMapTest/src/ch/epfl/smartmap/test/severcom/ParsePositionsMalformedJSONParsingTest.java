@@ -43,19 +43,19 @@ public class ParsePositionsMalformedJSONParsingTest extends TestCase {
 		}
 	}
 
-	@Test
-	public void testParsePositionsMissingField() throws JSONException {
-		JSONObject jsonObject = new JSONObject(POSITIONS_LIST_JSON);
-		jsonObject.remove("positions");
-		SmartMapParser parser = new JsonSmartMapParser();
-
-		try {
-			parser.parseFriends(jsonObject.toString());
-			fail("missing positions");
-		} catch (SmartMapParseException e) {
-			// success
-		}
-	}
+//	@Test
+//	public void testParsePositionsMissingField() throws JSONException {
+//		JSONObject jsonObject = new JSONObject(POSITIONS_LIST_JSON);
+//		jsonObject.remove("positions");
+//		SmartMapParser parser = new JsonSmartMapParser();
+//
+//		try {
+//			parser.parseFriends(jsonObject.toString());
+//			fail("missing positions");
+//		} catch (SmartMapParseException e) {
+//			// success
+//		}
+//	}
 
 	@Test
 	public void testParsePositionsWrongId() throws JSONException {
