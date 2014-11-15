@@ -5,11 +5,17 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.User;
@@ -59,6 +65,15 @@ public class FriendsActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
     
+    protected void onListItemClick(ListView listView, View view, int position, long id) {
+        long userId = (Long) view.getTag();
+        RelativeLayout rl = (RelativeLayout) view;
+        TextView tv = (TextView) rl.getChildAt(1);
+        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
+        String name = tv.getText().toString();
+        displayDeleteConfirmationDialog(name, userId);
+    }
+    
     public void startAddFriendActivity(MenuItem menu) {
         Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
         startActivity(displayActivityIntent);
@@ -69,8 +84,41 @@ public class FriendsActivity extends ListActivity {
 
             @Override
             public int compare(User user1, User user2) {
-                return Boolean.compare(user2.isOnline(), user1.isOnline());
+                if (user1.isOnline()) {
+                    return -1;
+                }
+                if (user2.isOnline()) {
+                    return 1;
+                }
+                return 0;
             }
         });
+    }
+    
+    private void displayDeleteConfirmationDialog(String name, long userId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("remove " + name + " from your friends?");
+        
+        // Add positive button
+        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                /*try {
+                    //TODO move this request in an asynch task, => interface? ask Marion
+                    NetworkSmartMapClient.getInstance().inviteFriend(id);
+                } catch (SmartMapClientException e) {
+                    e.printStackTrace();
+                }*/
+            }
+        });
+        
+        //Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        
+        // display the AlertDialog
+        builder.create().show();
     }
 }

@@ -7,8 +7,6 @@ import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewA
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withTagValue;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 import org.hamcrest.Matcher;
@@ -17,6 +15,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
+import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
 
@@ -86,18 +85,20 @@ public class MainActivityTest extends
     }
     
     public void testOpenSideMenu() throws Exception{
-        onView(withId(R.id.left_drawer)).perform(actionOpenDrawer());
-        onView(withId(R.id.left_drawer)).check(matches(isDisplayed()));
+        onView(withId(R.id.drawer_layout)).perform(actionOpenDrawer());
+        onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()));
     }
     
     public void testOpenAndCloseSideMenu() throws Exception{
-        onView(withId(R.id.left_drawer)).perform(actionOpenDrawer());
-        onView(withId(R.id.left_drawer)).perform(actionCloseDrawer());
-        onView(withId(R.id.left_drawer)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.drawer_layout)).perform(actionOpenDrawer());
+        onView(withId(R.id.drawer_layout)).perform(actionCloseDrawer());
+        onView(withId(R.id.drawer_layout)).check(matches(not(isDisplayed())));
     }
     
     public void testOpenFriendsActivity() throws Exception{
-        onView(withTagValue(is((Object) "left_menu_tag_2"))).perform(click());
+        ListView lv = (ListView) getActivity().findViewById(R.id.left_drawer_listView);
+        View friendView = lv.getChildAt(1);
+        onView(withId(friendView.getId())).perform(click());
         //TODO check that FriendsActivity is the current Activity
     }
     

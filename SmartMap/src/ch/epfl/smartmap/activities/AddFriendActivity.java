@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
+import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
@@ -85,19 +86,14 @@ public class AddFriendActivity extends ListActivity {
         });
     }
     
-    private void displayConfirmationDialog(String name, long id) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(AddFriendActivity.this);
+    private void displayConfirmationDialog(String name, final long userId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Add " + name + " as a friend?");
         
         // Add positive button
         builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                /*try {
-                    //TODO move this request in an asynch task, => interface? ask Marion
-                    NetworkSmartMapClient.getInstance().inviteFriend(id);
-                } catch (SmartMapClientException e) {
-                    e.printStackTrace();
-                }*/
+                new SendFriendRequest().execute(userId);
             }
         });
         
@@ -129,15 +125,41 @@ public class AddFriendActivity extends ListActivity {
                     return NetworkSmartMapClient.getInstance().findUsers(params[0]);
                 }
             } catch (SmartMapClientException e) {
-                e.printStackTrace();
+                return Collections.emptyList();
             }
-            return null;
         }
         @Override
         protected void onPostExecute(List<User> refreshedList) {
             super.onPostExecute(refreshedList);
-            System.out.println("refreshedList length:" + refreshedList.size());
             setListAdapter(new FriendListItemAdapter(AddFriendActivity.this, refreshedList));
+        }
+        
+    }
+    
+    /**
+     * Asynchronous task that sends a friend request to the friend whose id is given in parameter
+     * @author rbsteinm
+     *
+     */
+    private class SendFriendRequest extends AsyncTask<Long, Void, String> {
+
+        @Override
+        protected String doInBackground(Long... params) {
+            String confirmString = "";
+            try {
+                NetworkSmartMapClient.getInstance().inviteFriend(params[0]);
+                confirmString = "You sent a friend request to" + NetworkSmartMapClient.
+                        getInstance().getUserInfo(params[0]).getName();
+            } catch (SmartMapClientException e) {
+                confirmString = "Error, friend request wasn't sent";
+            }
+            return confirmString;
+        }
+        
+        @Override
+        protected void onPostExecute(String confirmString) {
+            //TODO use handle because must do this in main thread
+            Toast.makeText(getApplicationContext(), confirmString, Toast.LENGTH_LONG).show();
         }
         
     }
