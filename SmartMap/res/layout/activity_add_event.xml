@@ -62,18 +62,6 @@
         android:hint="@string/addEventEndTime" />
 
     <EditText
-        android:id="@+id/addEventLatitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/addEventEndDate"
-        android:layout_alignRight="@+id/addEventEndDate"
-        android:layout_below="@+id/addEventEndDate"
-        android:layout_marginTop="58dp"
-        android:ems="10"
-        android:inputType="numberDecimal|numberSigned"
-        android:hint="@string/addEventLatitude" />
-
-    <EditText
         android:id="@+id/addEventLongitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -103,5 +91,27 @@
         android:layout_marginTop="24dp"
         android:ems="10"
         android:hint="@string/addEventDescription" />
+
+    <EditText
+        android:id="@+id/addEventLatitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/addEventEndDate"
+        android:layout_marginTop="96dp"
+        android:layout_toLeftOf="@+id/addEventEndTime"
+        android:ems="10"
+        android:hint="@string/addEventLatitude"
+        android:inputType="numberDecimal|numberSigned" />
+
+    <Button
+        android:id="@+id/addEventButtonPickLocation"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/addEventLongitude"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:text="@string/addEventButtonPickLocation"
+        android:onClick="pickLocation" />
 
 </RelativeLayout>

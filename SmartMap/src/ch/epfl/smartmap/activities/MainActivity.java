@@ -1,13 +1,17 @@
 package ch.epfl.smartmap.activities;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -38,13 +42,14 @@ import ch.epfl.smartmap.map.ProfilePictureFriendMarkerDisplayer;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 /**
- * This Activity displays the core features of the App. It displays the map and
- * the whole menu.
- * 
+ * This Activity displays the core features of the App. It displays the map and the whole menu.
+ *
  * @author jfperren
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
@@ -53,6 +58,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private static final int LOCATION_UPDATE_TIMEOUT = 10000;
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
     private static final int LOCATION_UPDATE_DISTANCE = 10;
+    private static final String CITY_NAME = "CITY_NAME";
 
     private SideMenu mSideMenu;
     private GoogleMap mGoogleMap;
@@ -97,6 +103,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
         final SlidingUpPanel mSearchPanel = (SlidingUpPanel) findViewById(R.id.search_panel);
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
+            @Override
             public boolean onQueryTextSubmit(String query) {
                 mSearchView.clearFocus();
                 return false;
@@ -105,8 +112,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Give the query results to searchLayout
-                mSearchLayout.updateSearchResults(mSearchView.getQuery()
-                    .toString());
+                mSearchLayout.updateSearchResults(mSearchView.getQuery().toString());
                 return false;
             }
         });
@@ -161,19 +167,16 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      * Display the map with the current location
      */
     public void displayMap() {
-        int status = GooglePlayServicesUtil
-            .isGooglePlayServicesAvailable(getBaseContext());
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
         // Showing status
         if (status != ConnectionResult.SUCCESS) { // Google Play Services are
             // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
-                GOOGLE_PLAY_REQUEST_CODE);
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
         } else {
             // Google Play Services are available.
             // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+            mFragmentMap = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
@@ -189,33 +192,26 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             // Getting Current Location
             // Location location =
             // locationManager.getLastKnownLocation(provider);
-            boolean isGPSEnabled = locationManager
-                .isProviderEnabled(LocationManager.GPS_PROVIDER);
+            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (isGPSEnabled) {
                 Log.d(TAG, "gps enabled");
-                locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
-            } else if (null != locationManager
-                .getProvider(LocationManager.NETWORK_PROVIDER)) {
-                locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
+                        LOCATION_UPDATE_DISTANCE, this);
+            } else if (null != locationManager.getProvider(LocationManager.NETWORK_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
+                        LOCATION_UPDATE_DISTANCE, this);
             }
         }
     }
 
     public void initializeMarkers() {
         mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
-        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-            MockDB.getEventsList());
+        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, MockDB.getEventsList());
         mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-            MockDB.FRIENDS_LIST);
+        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, MockDB.FRIENDS_LIST);
         mMapZoomer = new DefaultZoomManager(mFragmentMap);
         Log.i(TAG, "before enter to zoom according");
-        List<Marker> allMarkers = new ArrayList<Marker>(
-            mFriendMarkerDisplayer.getDisplayedMarkers());
+        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
         allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
         Intent startingIntent = getIntent();
         if (startingIntent.getParcelableExtra("location") == null) {
@@ -225,7 +221,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
      */
     @Override
@@ -243,11 +239,41 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         if (eventLocation != null) {
             mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
         }
+
+        boolean pickLocationForEvent = startingIntent.getBooleanExtra("pickLocationForEvent", false);
+        if (pickLocationForEvent) {
+            // TODO zoom to my position?
+            mGoogleMap.setOnMapLongClickListener(new OnMapLongClickListener() {
+
+                @Override
+                public void onMapLongClick(LatLng latLng) {
+                    Intent result = new Intent(getContext(), AddEventActivity.class);
+                    Bundle extras = new Bundle();
+
+                    Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                    String cityName = "";
+                    List<Address> addresses;
+                    try {
+                        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                        cityName = addresses.get(0).getLocality();
+                    } catch (IOException e) {
+                        // nothing
+                    }
+                    extras.putString(CITY_NAME, cityName);
+                    extras.putParcelable(LOCATION_SERVICE, latLng);
+                    result.putExtras(extras);
+
+                    // Return the result to the calling activity (AddEventActivity)
+                    setResult(RESULT_OK, result);
+                    finish();
+                }
+            });
+        }
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
      */
     @Override
@@ -257,7 +283,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
      */
     @Override
@@ -274,8 +300,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     public void performQuery(Friend friend) {
         // Get Views
-        final MenuItem mSearchView = (MenuItem) mMenu
-            .findItem(R.id.action_search);
+        final MenuItem mSearchView = mMenu.findItem(R.id.action_search);
 
         closeSearchPanel();
         mSearchView.collapseActionView();

@@ -104,5 +104,6 @@
     <string name="addEventLongitude">Longitude</string>
     <string name="addEventPlaceName">Place (town, canton, etc...)</string>
     <string name="addEventDescription">Description (optional)</string>
+    <string name="addEventButtonPickLocation">Set location</string>
 
 </resources>
