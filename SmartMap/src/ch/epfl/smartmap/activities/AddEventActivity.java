@@ -251,6 +251,7 @@ public class AddEventActivity extends FragmentActivity {
             dbHelper.addEvent(event);
 
             Toast.makeText(mContext, "Event created!", Toast.LENGTH_SHORT).show();
+            finish();
 
         }
     }

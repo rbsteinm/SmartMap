@@ -156,10 +156,10 @@ public class ShowEventsActivity extends ListActivity {
         e3.setDescription(descrE3);
 
         mDbHelper = new DatabaseHelper(this);
-        mDbHelper.addEvent(e0);
+        /*mDbHelper.addEvent(e0);
         mDbHelper.addEvent(e1);
         mDbHelper.addEvent(e2);
-        mDbHelper.addEvent(e3);
+        mDbHelper.addEvent(e3);*/
 
         mMockEventsList = mDbHelper.getAllEvents();
 
@@ -239,15 +239,14 @@ public class ShowEventsActivity extends ListActivity {
 
         switch (v.getId()) {
             case R.id.ShowEventsCheckBoxNearMe:
-                SeekBar seekBar = (SeekBar) findViewById(R.id.showEventSeekBar);
                 if (checkBox.isChecked()) {
                     mNearMeChecked = true;
                     // Show the seek bar
-                    seekBar.setEnabled(true);
+                    mSeekBar.setEnabled(true);
                 } else {
                     mNearMeChecked = false;
                     // Hide the seek bar
-                    seekBar.setEnabled(false);
+                    mSeekBar.setEnabled(false);
                 }
                 break;
             case R.id.ShowEventsCheckBoxMyEv:

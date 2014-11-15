@@ -81,7 +81,8 @@
         </activity>
         <activity
             android:name="ch.epfl.smartmap.activities.AddEventActivity"
-            android:label="@string/title_activity_add_event" >
+            android:label="@string/title_activity_add_event"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 
