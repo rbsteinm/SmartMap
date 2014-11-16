@@ -160,6 +160,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	@Override
 	public void onLocationChanged(Location location) {
 		SettingsManager.getInstance().setLocation(location);
+		Log.d(TAG, "location updated in the settings");
 	}
 
 	@Override
@@ -202,6 +203,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		public void onReceive(Context context, Intent intent) {
 			mFriendMarkerDisplayer.updateMarkers(getContext(), mGoogleMap,
 					getVisibleUsers(mDbHelper.getAllUsers()));
+			Log.d(TAG, "updated friend markers");
 		}
 
 	};
