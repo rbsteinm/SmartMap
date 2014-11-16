@@ -11,5 +11,9 @@
     "facebook": {
         "appId": "appId",
         "appSecret": "appSecret"
+    },
+    "monolog": {
+        "logfile": "logs/smartmap.log",
+        "name": "SmartMap server"
     }
 }
