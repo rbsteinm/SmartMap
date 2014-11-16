@@ -244,10 +244,12 @@ public class AddEventActivity extends FragmentActivity {
         initializeGUIComponents();
 
         Bundle extras = getIntent().getExtras();
-        LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
-        if (Math.abs(latLng.latitude) > 0) {
-            // The user long clicked the map in MainActivity and wants to create an event
-            updateLocation(getIntent());
+        if (extras != null) {
+            LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
+            if (latLng != null && Math.abs(latLng.latitude) > 0) {
+                // The user long clicked the map in MainActivity and wants to create an event
+                updateLocation(getIntent());
+            }
         }
     }
 
@@ -315,7 +317,6 @@ public class AddEventActivity extends FragmentActivity {
         String cityName = extras.getString(CITY_NAME);
         if (cityName != null && !cityName.equals("")) {
             mPlaceName.setText(cityName);
-            mPlaceName.setEnabled(false);
         } else {
             Toast.makeText(mContext,
                     "Sorry, couldn't retrieve the name of your event's place. Please specify it manually.",

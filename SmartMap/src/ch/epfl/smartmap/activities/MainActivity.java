@@ -51,6 +51,7 @@ import com.google.android.gms.maps.model.Marker;
  * This Activity displays the core features of the App. It displays the map and the whole menu.
  *
  * @author jfperren
+ * @author SpicyCH
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
 
@@ -250,16 +251,27 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
                 String cityName = "";
                 List<Address> addresses;
+
                 try {
                     addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
                     if (addresses.size() > 0) {
                         // Makes sure that an address is associated to the coordinates, the user could have long
-                        // clicked int he middle of the sea after all :)
+                        // clicked in the middle of the sea after all :)
                         cityName = addresses.get(0).getLocality();
                     }
                 } catch (IOException e) {
-                    // nothing
                 }
+                if (cityName == null) {
+                    // If google couldn't retrieve the city name, we use the country name instead
+                    try {
+                        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                        if (addresses.size() > 0) {
+                            cityName = addresses.get(0).getCountryName();
+                        }
+                    } catch (IOException e) {
+                    }
+                }
+
                 extras.putString(CITY_NAME, cityName);
                 extras.putParcelable(LOCATION_SERVICE, latLng);
                 result.putExtras(extras);
@@ -271,6 +283,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 } else {
                     // The user was in MainActivity and long clicked to create an event
                     startActivity(result);
+                    finish();
                 }
             }
         });
