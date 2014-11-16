@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.activities.FriendsActivity;
+import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
@@ -26,7 +26,7 @@ public class Notifications {
 		// notification is selected
 		PendingIntent pFriendIntent = PendingIntent.getActivity(activity
 				.getBaseContext(), 0, new Intent(activity,
-						FriendsActivity.class), 0);
+						FriendsPagerActivity.class), 0);
 
 		// Build notification
 		NotificationCompat.Builder noti = new NotificationCompat.Builder(
@@ -50,7 +50,7 @@ public class Notifications {
 		// notification is selected
 		PendingIntent pFriendIntent = PendingIntent.getActivity(activity
 				.getBaseContext(), 0, new Intent(activity,
-						FriendsActivity.class), 0);
+						FriendsPagerActivity.class), 0);
 
 		// Build notification
 		NotificationCompat.Builder noti = new NotificationCompat.Builder(

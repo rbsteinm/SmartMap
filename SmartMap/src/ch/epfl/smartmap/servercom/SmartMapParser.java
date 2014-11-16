@@ -25,13 +25,16 @@ public interface SmartMapParser {
 	 * Parses some text, and returns the list of friends
 	 * 
 	 * @param s
-	 *            the text to parse
+	 *            the list to parse
+	 * @param key
+	 *            the key word for the list to parse, if there is one, and null
+	 *            if not
 	 * @return the list of friends created from parsing s
 	 * @throws SmartMapParseException
 	 *             if s does not represent a valid list of friends (according to
 	 *             the format that the parser supports)
 	 */
-	List<User> parseFriends(String s) throws SmartMapParseException;
+	List<User> parseFriends(String s, String key) throws SmartMapParseException;
 
 	/**
 	 * Parses some text, and returns a map that maps id to positions

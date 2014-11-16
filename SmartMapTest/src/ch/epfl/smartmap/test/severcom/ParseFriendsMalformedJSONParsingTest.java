@@ -25,7 +25,7 @@ public class ParseFriendsMalformedJSONParsingTest extends TestCase {
 	public void testParseFriendsEmptyJson() {
 		SmartMapParser parser = new JsonSmartMapParser();
 		try {
-			parser.parseFriends(new JSONObject().toString());
+			parser.parseFriends(new JSONObject().toString(),"list");
 			fail("parsed empty Json");
 		} catch (SmartMapParseException e) {
 			// success
@@ -39,7 +39,7 @@ public class ParseFriendsMalformedJSONParsingTest extends TestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
-			parser.parseFriends(jsonObject.toString());
+			parser.parseFriends(new JSONObject().toString(),"list");
 			fail("missing list");
 		} catch (SmartMapParseException e) {
 			// success
@@ -55,7 +55,7 @@ public class ParseFriendsMalformedJSONParsingTest extends TestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
-			parser.parseFriends(jsonObject.toString());
+			parser.parseFriends(new JSONObject().toString(),"list");
 			fail("parsed wrong id");
 		} catch (SmartMapParseException e) {
 			// success
@@ -72,7 +72,7 @@ public class ParseFriendsMalformedJSONParsingTest extends TestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
-			parser.parseFriends(jsonObject.toString());
+			parser.parseFriends(new JSONObject().toString(),"list");
 			fail("parsed empty name");
 		} catch (SmartMapParseException e) {
 			// success
@@ -91,7 +91,7 @@ public class ParseFriendsMalformedJSONParsingTest extends TestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
-			parser.parseFriends(jsonObject.toString());
+			parser.parseFriends(new JSONObject().toString(),"list");
 			fail("parsed too long name");
 		} catch (SmartMapParseException e) {
 			// success
@@ -108,7 +108,7 @@ public class ParseFriendsMalformedJSONParsingTest extends TestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
-			parser.parseFriends(jsonObject.toString());
+			parser.parseFriends(new JSONObject().toString(),"list");
 			fail("parsed wrong latitude");
 		} catch (SmartMapParseException e) {
 			// success
@@ -125,7 +125,7 @@ public class ParseFriendsMalformedJSONParsingTest extends TestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
-			parser.parseFriends(jsonObject.toString());
+			parser.parseFriends(new JSONObject().toString(),"list");
 			fail("parsed wrong longitude");
 		} catch (SmartMapParseException e) {
 			// success
@@ -142,7 +142,7 @@ public class ParseFriendsMalformedJSONParsingTest extends TestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
-			parser.parseFriends(jsonObject.toString());
+			parser.parseFriends(new JSONObject().toString(),"list");
 			fail("parsed wrong email");
 		} catch (SmartMapParseException e) {
 			// success
@@ -159,7 +159,7 @@ public class ParseFriendsMalformedJSONParsingTest extends TestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
-			parser.parseFriends(jsonObject.toString());
+			parser.parseFriends(new JSONObject().toString(),"list");
 			fail("parsed wrong phonen number");
 		} catch (SmartMapParseException e) {
 			// success
