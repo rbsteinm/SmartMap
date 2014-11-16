@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -305,7 +306,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 * tab
 	 */
 	public void createAddNotification(View view) {
-		Notifications.newFriendNotification(view, this, MockDB.JULIEN);
+		Notifications.newFriendNotification(this.getContext(), MockDB.JULIEN);
 	}
 
 	/**
@@ -313,7 +314,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 * notifications tab
 	 */
 	public void createAcceptedNotification(View view) {
-		Notifications.acceptedNotification(view, this, MockDB.RAPHAEL);
+		Notifications.acceptedNotification(this.getContext(), MockDB.RAPHAEL);
 	}
 
 	/**
@@ -321,7 +322,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 * tab
 	 */
 	public void createEventNotification(View view) {
-		Notifications.newEventNotification(view, this, MockDB.getEventsList()
+		Notifications.newEventNotification(this.getContext(), MockDB.getEventsList()
 				.get(0));
 	}
 

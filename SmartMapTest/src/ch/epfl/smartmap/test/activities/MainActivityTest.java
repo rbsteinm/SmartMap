@@ -104,9 +104,9 @@ public class MainActivityTest extends
     public void testSideMenuViewExist() throws Exception{
         //TODO check that all the views in the side menu exist
     }
-    
-    public void testNotificationExist() throws Exception{
-    	//onView(withId(R.id.create_add_notif_button)).perform(click()).check(viewAssert)
+        
+    public void testOpenSideMenuUsingButton() throws Exception{
+    	onView(withId(android.R.id.home)).perform(click());
     }
     
 }
