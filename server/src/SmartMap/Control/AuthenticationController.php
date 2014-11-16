@@ -30,6 +30,9 @@ use Facebook\GraphUser;
  */
 class AuthenticationController
 {
+    private static $GRAPH_API_URL = 'http://graph.facebook.com/v2.2/';
+    private static $PICTURE_REQUEST = '/picture?width=480&height=480';
+    
     private $mAppSecret;
     private $mAppId;
     private $mRepo;
@@ -60,41 +63,41 @@ class AuthenticationController
         // Check if function called with proper parameters
         if ($name == null OR $facebookToken == null OR $facebookId == null)
         {
-            throw new ControlException('Missing POST parameter.');
+            throw new InvalidRequestException('Missing POST parameter.');
         }
         
         // Check if token is valid and matches name + ID
-        $session = new FacebookSession($facebookToken);
+        $fbSession = new FacebookSession($facebookToken);
         
         // Validate session
         try
         {
-            $session->validate();
+            $fbSession->validate();
         }
         catch (FacebookRequestException $ex)
         {
             // Session not valid, Graph API returned an exception with the reason.
-            throw new ControlException('Invalid Facebook session.');
+            throw new InvalidRequestException('Invalid Facebook session.');
         }
         catch (\Exception $ex)
         {
             // Graph API returned info, but it may mismatch the current app or have expired.
-            throw new ControlException('Mismatch or expired facebook data.');
+            throw new InvalidRequestException('Mismatch or expired facebook data.');
         }
         
         // At this point the session is valid. We check the session is associated with the user name and id.
         try
         {
-            $user_profile = (new FacebookRequest($session, 'GET', '/me'))->execute()->getGraphObject( 
+            $user_profile = (new FacebookRequest($fbSession, 'GET', '/me'))->execute()->getGraphObject( 
                              GraphUser::className());
             if ($name != $user_profile->getName() OR $facebookId != $user_profile->getId())
             {
-                throw new ControlException('Id and name do not match the fb access token.');
+                throw new InvalidRequestException('Id and name do not match the fb access token.');
             }
         }
         catch (FacebookRequestException $e)
         {
-            throw new ControlException($e->getMessage());
+            throw new ControlLogicException($e->getMessage());
         }
         
         // OK, at this point user is successfully authenticated!
@@ -103,7 +106,7 @@ class AuthenticationController
         $session = $request->getSession();
         if ($session == null)
         {
-            throw new ControlException('Session is null. Did you send session cookie ?');
+            throw new InvalidRequestException('Session is null. Did you send session cookie ?');
         }
         
         // Set session parameter or create new user
@@ -115,6 +118,11 @@ class AuthenticationController
             $user = new User(1 , $facebookId, $name, 'VISIBLE', 0.0, 0.0);
             $user = $this->mRepo->createUser($user);
             $session->set('userId', $user->getId());
+            
+            // Getting the user facebook profile image to set it as default.
+            $pic = file_get_contents(self::$GRAPH_API_URL . $user->getFbId() . self::$PICTURE_REQUEST);
+        
+            file_put_contents(ProfileController::$PICTURES_PATH . $user->getId() . '.jpg', $pic);
         }
         else
         {
@@ -134,12 +142,12 @@ class AuthenticationController
         $id = $request->request->get('user_id');
         if ($id === null)
         {
-            throw new \Exception('Field user_id is not set !');
+            throw new \InvalidRequestException('Field user_id is not set !');
         }
         $session = $request->getSession();
         if ($session == null)
         {
-            throw new \Exception('Session is null.');
+            throw new \InvalidRequestException('Session is null.');
         }
         $session->set('userId', $id);
         return new JsonResponse (array(

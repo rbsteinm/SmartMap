@@ -4,11 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-
 //import org.junit.FixMethodOrder;
 import org.junit.Test;
 //import org.junit.runners.MethodSorters;
-
 
 import android.location.Location;
 
@@ -21,22 +19,21 @@ import junit.framework.TestCase;
  * Tests whether we can interact with the real quiz server.
  * 
  * @author marion-S
- *
+ * 
  */
 
-//@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+// @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NetworkEndToEndTest extends TestCase {
 
 	private final long facebookId = 1482245642055847L;
 	private final String name = "SmartMap SwEng";
 	private final String fbAccessToken = "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
 	private Location location = new Location("SmartMapServers");
-	private static final double LATITUDE=45;
-	private static final double LONGITUDE=45;
-	private static final long VALID_ID_1=1;
-	private static final long VALID_ID_2=2;
-	private static final long VALID_ID_3=3;
-	
+	private static final double LATITUDE = 45;
+	private static final double LONGITUDE = 45;
+	private static final long VALID_ID_1 = 1;
+	private static final long VALID_ID_2 = 2;
+	private static final long VALID_ID_3 = 3;
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -66,12 +63,12 @@ public class NetworkEndToEndTest extends TestCase {
 	public void testC_InviteFriend() throws SmartMapClientException {
 		NetworkSmartMapClient networkClient = NetworkSmartMapClient
 				.getInstance();
-		try{
-		networkClient.inviteFriend(VALID_ID_1);
-		}catch(SmartMapClientException e){
-			//ok, already invited
+		try {
+			networkClient.inviteFriend(VALID_ID_1);
+		} catch (SmartMapClientException e) {
+			// ok, cannot invite yourself
 		}
-	
+
 	}
 
 	@Test
@@ -106,16 +103,16 @@ public class NetworkEndToEndTest extends TestCase {
 	public void ignoredtestH_AllowFriendList() throws SmartMapClientException {
 		NetworkSmartMapClient networkClient = NetworkSmartMapClient
 				.getInstance();
-		networkClient.allowFriendList(Arrays.asList((long) VALID_ID_1, (long) VALID_ID_2,
-				(long) VALID_ID_3));
+		networkClient.allowFriendList(Arrays.asList((long) VALID_ID_1,
+				(long) VALID_ID_2, (long) VALID_ID_3));
 	}
 
 	@Test
 	public void testI_DisallowFriendList() throws SmartMapClientException {
 		NetworkSmartMapClient networkClient = NetworkSmartMapClient
 				.getInstance();
-		networkClient.disallowFriendList(Arrays.asList((long) VALID_ID_1, (long) VALID_ID_2,
-				(long) VALID_ID_3));
+		networkClient.disallowFriendList(Arrays.asList((long) VALID_ID_1,
+				(long) VALID_ID_2, (long) VALID_ID_3));
 	}
 
 	@Test
@@ -131,23 +128,30 @@ public class NetworkEndToEndTest extends TestCase {
 	public void testK_GetInvitations() throws SmartMapClientException {
 		NetworkSmartMapClient networkClient = NetworkSmartMapClient
 				.getInstance();
-		List<User> inviters = networkClient.getInvitations();
+		List<List<User>> resultList = networkClient.getInvitations();
+		assertTrue("Null list", resultList != null);
 
-		assertTrue("Null list", inviters != null);
-		for (User user : inviters) {
-			assertValidIdAndName(user);
+		for (List<User> list : resultList) {
+			assertTrue("Null list", list != null);
+			for (User user : list) {
+				assertValidIdAndName(user);
+			}
 		}
 
 	}
 
-	// FIXME should simulate an invitation on server side
+	// FIXME should simulate an invitation on server side??
 	@Test
-	public void ignoredTestAcceptInvitation() throws SmartMapClientException {
+	public void testQ_AcceptInvitation() throws SmartMapClientException {
 		NetworkSmartMapClient networkClient = NetworkSmartMapClient
 				.getInstance();
-		User newFriend = networkClient.acceptInvitation(VALID_ID_1);
 
-		assertValidIdAndName(newFriend);
+		try {
+			networkClient.acceptInvitation(VALID_ID_1);
+		} catch (SmartMapClientException e) {
+			// ok because not invited by anyone
+		}
+
 	}
 
 	@Test
@@ -171,17 +175,41 @@ public class NetworkEndToEndTest extends TestCase {
 	}
 
 	@Test
-	public void testM_FindUsers() throws SmartMapClientException{
+	public void testM_FindUsers() throws SmartMapClientException {
 		NetworkSmartMapClient networkClient = NetworkSmartMapClient
 				.getInstance();
-		List<User> friends=networkClient.findUsers("s");
-		
+		List<User> friends = networkClient.findUsers("s");
+
 		assertTrue("Null list", friends != null);
 		for (User user : friends) {
 			assertValidIdAndName(user);
 		}
 	}
-	
+
+	// FIXME normal that no error whereas no invitation to decline?
+	@Test
+	public void testN_declineInvitation() throws SmartMapClientException {
+		NetworkSmartMapClient networkClient = NetworkSmartMapClient
+				.getInstance();
+		networkClient.declineInvitation(VALID_ID_3);
+	}
+
+	// FIXME normal that no error whereas no friend to remove?
+	@Test
+	public void testO_removeFriend() throws SmartMapClientException {
+		NetworkSmartMapClient networkClient = NetworkSmartMapClient
+				.getInstance();
+		networkClient.removeFriend(VALID_ID_3);
+	}
+
+	// FIXME normal that no error whereas no accepted invitation to ack?
+	@Test
+	public void testP_AckAcceptedInvitation() throws SmartMapClientException {
+		NetworkSmartMapClient networkClient = NetworkSmartMapClient
+				.getInstance();
+		networkClient.ackAcceptedInvitation(VALID_ID_3);
+	}
+
 	private void assertValidIdAndName(User user) {
 		assertTrue("Unexpected id", user.getID() >= 0);
 		assertTrue("Unexpected name", 0 < user.getName().length()

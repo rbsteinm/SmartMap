@@ -60,14 +60,14 @@ public class JsonSmartMapParser implements SmartMapParser {
 	 * ch.epfl.smartmap.servercom.SmartMapParser#parseFriends(java.lang.String)
 	 */
 	@Override
-	public List<User> parseFriends(String s) throws SmartMapParseException {
+	public List<User> parseFriends(String s,String key) throws SmartMapParseException {
 
 		List<User> friends = new ArrayList<User>();
 
 		try {
 			JSONObject jsonObject = new JSONObject(s);
 
-			JSONArray usersArray = jsonObject.getJSONArray("list");
+			JSONArray usersArray = jsonObject.getJSONArray(key);
 
 			for (int i = 0; i < usersArray.length(); i++) {
 				JSONObject userJSON = usersArray.getJSONObject(i);

@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -358,7 +359,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 	 * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getInvitations()
 	 */
 	@Override
-	public List<User> getInvitations() throws SmartMapClientException {
+	public List<List<User>> getInvitations() throws SmartMapClientException {
 
 		HttpURLConnection conn = getHttpURLConnection("/getInvitations");
 		String response = sendViaPost(new HashMap<String, String>(), conn);
@@ -379,12 +380,23 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
 		List<User> inviters = null;
 		try {
-			inviters = parser.parseFriends(response);
+			inviters = parser.parseFriends(response, "invitations");
 		} catch (SmartMapParseException e) {
 			throw new SmartMapClientException(e);
 		}
 
-		return inviters;
+		List<User> newFriends = null;
+		try {
+			newFriends = parser.parseFriends(response, "newFriends");
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		List<List<User>> list = new ArrayList<List<User>>();
+		list.add(inviters);
+		list.add(newFriends);
+
+		return list;
 	}
 
 	/*
@@ -518,7 +530,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 		
 		List<User> friends = null;
 		try {
-			friends = parser.parseFriends(response);
+			friends = parser.parseFriends(response,"list");
 		} catch (SmartMapParseException e) {
 			throw new SmartMapClientException(e);
 		}
@@ -526,6 +538,76 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 		return friends;
 	}
 
+
+	@Override
+	public void declineInvitation(long id) throws SmartMapClientException {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("friend_id", Long.toString(id));
+		HttpURLConnection conn = getHttpURLConnection("/declineInvitation");
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
+		try {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+
+	}
+
+	@Override
+	public void ackAcceptedInvitation(long id) throws SmartMapClientException {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("friend_id", Long.toString(id));
+		HttpURLConnection conn = getHttpURLConnection("/ackAcceptedInvitation");
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
+		try {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+
+	}
+
+	@Override
+	public void removeFriend(long id) throws SmartMapClientException {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("friend_id", Long.toString(id));
+		HttpURLConnection conn = getHttpURLConnection("/removeFriend");
+		String response = sendViaPost(params, conn);
+
+		SmartMapParser parser = null;
+		try {
+			parser = SmartMapParserFactory.parserForContentType(conn
+					.getContentType());
+		} catch (NoSuchFormatException e) {
+			throw new SmartMapClientException(e);
+		}
+
+		try {
+			parser.checkServerError(response);
+		} catch (SmartMapParseException e) {
+			throw new SmartMapClientException(e);
+		}
+
+	}
+	
 	private String longListToString(List<Long> list) {
 		String listString = "";
 
@@ -587,7 +669,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 			}
 
 			if (connection.getResponseCode() != SERVER_RESPONSE_OK) {
-				throw new SmartMapClientException("error from server");
+				throw new SmartMapClientException("HTTP error with code " + connection.getResponseCode()
+				        + " during communication with client.");
 			}
 
 			// Get response

@@ -16,6 +16,7 @@
     "require": {
         "silex/silex": "~1.2",
         "doctrine/dbal": "2.2.*",
+        "monolog/monolog": ">=1.0.0",
 	"facebook/php-sdk-v4" : "4.0.*"
     }
 }

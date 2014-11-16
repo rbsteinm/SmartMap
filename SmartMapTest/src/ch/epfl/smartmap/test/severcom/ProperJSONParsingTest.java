@@ -113,7 +113,7 @@ public class ProperJSONParsingTest extends TestCase {
 	@Test
 	public void testParseFriends() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<User> listFriends = parser.parseFriends(PROPER_FRIEND_LIST_JSON);
+		List<User> listFriends = parser.parseFriends(PROPER_FRIEND_LIST_JSON,"list");
 		assertEquals("First friend's id does not match", 13, listFriends.get(0)
 				.getID());
 		assertEquals("First friend's name does not match", "Georges",
@@ -149,7 +149,7 @@ public class ProperJSONParsingTest extends TestCase {
 	@Test
 	public void testParseFriendsWhenEmptyList() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<User> friends = parser.parseFriends(PROPER_FRIEND_EMPTY_LIST_JSON);
+		List<User> friends = parser.parseFriends(PROPER_FRIEND_EMPTY_LIST_JSON,"list");
 		assertTrue("Did not parsed empty friends list correctly",
 				friends.isEmpty());
 	}
