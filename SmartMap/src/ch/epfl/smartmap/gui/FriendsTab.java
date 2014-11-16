@@ -5,9 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.MockDB;
-import ch.epfl.smartmap.cache.User;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,10 +16,18 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.MockDB;
+import ch.epfl.smartmap.cache.User;
 
+/**
+ * Fragment displaying your friends
+ * @author rbsteinm
+ *
+ */
 public class FriendsTab extends ListFragment {
 	private List<User> mMockUsersList;
-	Context mContext;
+	private Context mContext;
 
 	public FriendsTab(Context context) {
 		// TODO Auto-generated constructor stub

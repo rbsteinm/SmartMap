@@ -158,7 +158,6 @@ public class AddFriendActivity extends ListActivity {
         
         @Override
         protected void onPostExecute(String confirmString) {
-            //TODO use handle because must do this in main thread
             Toast.makeText(getApplicationContext(), confirmString, Toast.LENGTH_LONG).show();
         }
         
