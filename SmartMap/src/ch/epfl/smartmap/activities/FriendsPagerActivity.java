@@ -12,53 +12,54 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
-	
-	private ViewPager pager ;
+public class FriendsPagerActivity extends FragmentActivity implements
+		ActionBar.TabListener {
+
+	private ViewPager pager;
 	private ActionBar actionBar;
-	private String[] tabs = { "Friends", "Invitations"};
+	private String[] tabs = { "Friends", "Invitations" };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_friends_pager);
-		
-		pager = (ViewPager)findViewById(R.id.myViewPager);
+
+		pager = (ViewPager) findViewById(R.id.myViewPager);
 		actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		PagerAdapter pageAdapter = new PagerAdapter(this, getSupportFragmentManager());
-		
+		PagerAdapter pageAdapter = new PagerAdapter(this,
+				getSupportFragmentManager());
+
 		pager.setAdapter(pageAdapter);
 		actionBar.setHomeButtonEnabled(false);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);   
-        
-     // Adding Tabs
-        for (String tab_name : tabs) {
-            actionBar.addTab(actionBar.newTab().setText(tab_name)
-                    .setTabListener(this));
-        }
-		
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        /**
-         * on swiping the viewpager make respective tab selected
-         * */
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+		// Adding Tabs
+		for (String tab_name : tabs) {
+			actionBar.addTab(actionBar.newTab().setText(tab_name)
+					.setTabListener(this));
+		}
 
-            @Override
-            public void onPageSelected(int position) {
-                // on changing the page
-                // make respected tab selected
-                actionBar.setSelectedNavigationItem(position);
-            }
+		/**
+		 * on swiping the viewpager make respective tab selected
+		 * */
+		pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-            }
+			@Override
+			public void onPageSelected(int position) {
+				// on changing the page
+				// make respected tab selected
+				actionBar.setSelectedNavigationItem(position);
+			}
 
-            @Override
-            public void onPageScrollStateChanged(int arg0) {
-            }
-        });
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+			}
+		});
 
 	}
 
@@ -80,29 +81,29 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-    public void startAddFriendActivity(MenuItem menu) {
-        Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
-        startActivity(displayActivityIntent);
-    }
+
+	public void startAddFriendActivity(MenuItem menu) {
+		Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
+		startActivity(displayActivityIntent);
+	}
 
 	@Override
 	public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onTabSelected(Tab tab, FragmentTransaction arg1) {
 		// on tab selected
-        // show respected fragment view
-        pager.setCurrentItem(tab.getPosition());
-		
+		// show respected fragment view
+		pager.setCurrentItem(tab.getPosition());
+
 	}
 
 	@Override
 	public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

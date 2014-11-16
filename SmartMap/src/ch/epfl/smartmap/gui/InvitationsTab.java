@@ -37,12 +37,14 @@ import android.support.v4.app.ListFragment;
 
 public class InvitationsTab extends ListFragment {
 
-	private List<User> mMockUsersList;
 	Context mContext;
+	NetworkSmartMapClient mNetworkClient;
+	DatabaseHelper mDataBaseHelper;
 
 	public InvitationsTab(Context context) {
-		// TODO Auto-generated constructor stub
 		mContext = context;
+		mNetworkClient = NetworkSmartMapClient.getInstance();
+		mDataBaseHelper = new DatabaseHelper(mContext);
 	}
 
 	@Override
@@ -51,18 +53,7 @@ public class InvitationsTab extends ListFragment {
 
 		View view = inflater.inflate(R.layout.list_fragment_invitations_tab,
 				container, false);
-		// mMockUsersList = new ArrayList<User>();
-		// for (User user : MockDB.FRIENDS_LIST) {
-		// mMockUsersList.add(user);
-		// }
-		// mMockUsersList.get(1).setOnline(true);
-		// mMockUsersList.get(3).setOnline(true);
-		// sortByOnline(mMockUsersList);
-		// // Create custom Adapter and pass it to the Activity
-		// FriendListItemAdapter adapter = new FriendListItemAdapter(mContext,
-		// mMockUsersList);
-		// setListAdapter(adapter);
-		new DisplayInvitationsList().execute();
+		new RefreshInvitationsList().execute();
 		return view;
 	}
 
@@ -80,7 +71,7 @@ public class InvitationsTab extends ListFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		new DisplayInvitationsList().execute();
+		new RefreshInvitationsList().execute();
 	}
 
 	private void displayAcceptFriendDialog(String name, final long userId) {
@@ -113,9 +104,9 @@ public class InvitationsTab extends ListFragment {
 		protected String doInBackground(Long... params) {
 			String confirmString = "";
 			try {
-				NetworkSmartMapClient.getInstance().acceptInvitation(params[0]);
-				new DatabaseHelper(getActivity()).addUser(NetworkSmartMapClient
-						.getInstance().getUserInfo(params[0]));
+				mNetworkClient.acceptInvitation(params[0]);
+				mDataBaseHelper.addUser(NetworkSmartMapClient.getInstance()
+						.getUserInfo(params[0]));
 				confirmString = "Accepted";
 			} catch (SmartMapClientException e) {
 				confirmString = "Error";
@@ -126,9 +117,9 @@ public class InvitationsTab extends ListFragment {
 		@Override
 		protected void onPostExecute(String confirmString) {
 			// TODO use handle because must do this in main thread
-			// TODO delete item from the list
 			Toast.makeText(getActivity(), confirmString, Toast.LENGTH_LONG)
 					.show();
+			new RefreshInvitationsList().execute();
 		}
 
 	}
@@ -154,24 +145,19 @@ public class InvitationsTab extends ListFragment {
 			// TODO delete item from the list
 			Toast.makeText(getActivity(), confirmString, Toast.LENGTH_LONG)
 					.show();
+			new RefreshInvitationsList().execute();
 		}
 
 	}
 
-	private class DisplayInvitationsList extends
+	private class RefreshInvitationsList extends
 			AsyncTask<String, Void, List<List<User>>> {
 
 		@Override
 		protected List<List<User>> doInBackground(String... params) {
 			try {
 
-				List<List<User>> list = NetworkSmartMapClient.getInstance()
-						.getInvitations();
-				for (User user : list.get(1)) {
-					NetworkSmartMapClient.getInstance().ackAcceptedInvitation(
-							user.getID());
-				}
-				return list;
+				return mNetworkClient.getInvitations();
 
 			} catch (SmartMapClientException e) {
 				return Collections.emptyList();
@@ -181,10 +167,25 @@ public class InvitationsTab extends ListFragment {
 		@Override
 		protected void onPostExecute(List<List<User>> list) {
 			super.onPostExecute(list);
-			setListAdapter(new FriendListItemAdapter(getActivity(), list.get(0)));
+			setListAdapter(new FriendListItemAdapter(mContext, list.get(0)));
 			for (User newFriend : list.get(1)) {
-				new DatabaseHelper(getActivity()).addUser(newFriend);
+				mDataBaseHelper.addUser(newFriend);
+				new AckAcceptedInvitations().execute(newFriend.getID());
 			}
+		}
+
+	}
+
+	private class AckAcceptedInvitations extends AsyncTask<Long, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Long... params) {
+			try {
+				mNetworkClient.ackAcceptedInvitation(params[0]);
+			} catch (SmartMapClientException e) {
+				// TODO Auto-generated catch block
+			}
+			return null;
 		}
 
 	}
