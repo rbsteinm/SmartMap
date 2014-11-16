@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public class Friend implements User {
+public class Friend implements User, Displayable {
 
 	private long mId; // the user's unique ID
 	private String mName; // the user's name as it will be displayed
@@ -215,6 +215,22 @@ public class Friend implements User {
     @Override
     public void setVisible(boolean isVisible) {
         mVisible = isVisible;
+    }
+
+    /* (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
+     */
+    @Override
+    public String getTitle() {
+        return mName;
+    }
+
+    /* (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getInfos()
+     */
+    @Override
+    public String getInfos() {
+        return "Seen 10 minutes ago near Lausanne";
     }
 
 }

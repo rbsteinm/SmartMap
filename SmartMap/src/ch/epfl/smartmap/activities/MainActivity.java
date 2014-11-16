@@ -14,10 +14,15 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
@@ -26,9 +31,10 @@ import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
+import ch.epfl.smartmap.gui.InformationPanel;
 import ch.epfl.smartmap.gui.SearchLayout;
+import ch.epfl.smartmap.gui.SearchPanel;
 import ch.epfl.smartmap.gui.SideMenu;
-import ch.epfl.smartmap.gui.SlidingUpPanel;
 import ch.epfl.smartmap.map.DefaultEventMarkerDisplayer;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 import ch.epfl.smartmap.map.EventMarkerDisplayer;
@@ -47,9 +53,9 @@ import com.google.android.gms.maps.model.Marker;
  * 
  * @author jfperren
  */
-public class MainActivity extends FragmentActivity implements LocationListener {
+public class MainActivity extends FragmentActivity implements LocationListener, OnTouchListener {
 
-    private static final String TAG = "GoogleMap";
+    private static final String TAG = "MAIN_ACTIVITY";
     private static final int LOCATION_UPDATE_TIMEOUT = 10000;
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
     private static final int LOCATION_UPDATE_DISTANCE = 10;
@@ -70,7 +76,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
         // Get needed Views
         final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
-
+        final InformationPanel mInformationPanel = (InformationPanel) findViewById(R.id.information_panel);
+        mInformationPanel.displayItem(MockDB.JULIEN);
+//        mInformationPanel.extend();
+        
         mSideMenu = new SideMenu(this);
         mSideMenu.initializeDrawerLayout();
 
@@ -80,9 +89,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         if (savedInstanceState == null) {
             displayMap();
         }
+        
         if (mGoogleMap != null) {
             initializeMarkers();
         }
+        
+        final FrameLayout mMainFrameLayout = (FrameLayout) findViewById(R.id.frame_layout_main);
+        final RelativeLayout mMapLayout = (RelativeLayout) findViewById(R.id.layout_map);
     }
 
     @Override
@@ -95,7 +108,9 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView mSearchView = (SearchView) searchItem.getActionView();
         final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
-        final SlidingUpPanel mSearchPanel = (SlidingUpPanel) findViewById(R.id.search_panel);
+        final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
+        final InformationPanel mInformationPanel = (InformationPanel) findViewById(R.id.information_panel);
+        
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
             public boolean onQueryTextSubmit(String query) {
                 mSearchView.clearFocus();
@@ -144,13 +159,15 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     @Override
     public void onBackPressed() {
-        final SlidingUpPanel mSearchPanel = (SlidingUpPanel) findViewById(R.id.search_panel);
-
-        if (mSearchPanel.isShown()) {
-            mSearchPanel.close();
-        } else {
-            super.onBackPressed();
-        }
+//        final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
+//
+//        if (mSearchPanel.isShown()) {
+//            mSearchPanel.close();
+//        } else {
+//            super.onBackPressed();
+//        }
+        final InformationPanel mPanel = (InformationPanel) findViewById(R.id.information_panel);
+        mPanel.collapse();
     }
 
     public Context getContext() {
@@ -276,17 +293,25 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         // Get Views
         final MenuItem mSearchView = (MenuItem) mMenu
             .findItem(R.id.action_search);
-
-        closeSearchPanel();
+        final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
+        final InformationPanel mInformationPanel = (InformationPanel) findViewById(R.id.information_panel);
+        // Close search interface
+        mSearchPanel.close();
         mSearchView.collapseActionView();
+        // Open information panel
+        mInformationPanel.displayItem(friend);
+        mInformationPanel.collapse();
+        
 
         mMapZoomer.zoomOnLocation(friend.getLocation(), mGoogleMap);
         // Add query to the searchEngine
         mSearchEngine.getHistory().addEntry(friend, new Date());
     }
-
-    public void closeSearchPanel() {
-        final SlidingUpPanel mSearchLayout = (SlidingUpPanel) findViewById(R.id.search_panel);
-        mSearchLayout.close();
+    
+    @Override
+    public boolean onTouch(View v, MotionEvent e) {
+        final RelativeLayout mMapLayout = (RelativeLayout) findViewById(R.id.layout_map);
+        
+        return mMapLayout.onTouchEvent(e);
     }
 }

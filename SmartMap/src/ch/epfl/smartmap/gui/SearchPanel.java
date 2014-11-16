@@ -14,7 +14,7 @@ import ch.epfl.smartmap.R;
  * 
  * @author jfperren
  */
-public class SlidingUpPanel extends RelativeLayout {
+public class SearchPanel extends RelativeLayout {
 
     private final static String TAG = "SLIDING_UP_PANEL";
     @SuppressWarnings("unused")
@@ -25,7 +25,7 @@ public class SlidingUpPanel extends RelativeLayout {
      * 
      * @param context The current context
      */
-    public SlidingUpPanel(Context context, AttributeSet attrs) {
+    public SearchPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.setVisibility(View.GONE);
     }
