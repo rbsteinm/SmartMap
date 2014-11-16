@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -49,6 +50,7 @@ public class ShowEventsActivity extends ListActivity {
 
     private SeekBar mSeekBar;
     private TextView mShowKilometers;
+    private CheckBox mNearMeCheckBox;
 
     private LocationListener mLocationListener;
     private LocationManager mLocationManager;
@@ -74,7 +76,7 @@ public class ShowEventsActivity extends ListActivity {
         // Makes the logo clickable (clicking it returns to previous activity)
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mMyLocation = new Location("Mock location Pully");
+        mMyLocation = new Location("GPS + NETWORK");
         /*
          * mMyLocation.setLatitude(46.509300); mMyLocation.setLongitude(6.661600);
          */
@@ -88,9 +90,17 @@ public class ShowEventsActivity extends ListActivity {
             public void onLocationChanged(Location loc) {
                 mMyLocation.set(loc);
                 updateCurrentList();
-                Log.i(TAG, "Location updated");
-                Toast.makeText(getApplicationContext(), "Position updated", Toast.LENGTH_LONG).show();
+                mNearMeCheckBox.setOnClickListener(new OnClickListener() {
 
+                    @Override
+                    public void onClick(View v) {
+                        // Since we were able to fetch the user's position, we reenable the function associated to this
+                        // View
+                        onCheckboxClicked(v);
+                    }
+
+                });
+                Log.i(TAG, "User's location updated");
             }
 
             @Override
@@ -115,6 +125,19 @@ public class ShowEventsActivity extends ListActivity {
         mMyEventsChecked = false;
         mOngoingChecked = false;
         mNearMeChecked = false;
+
+        // We only make this checkbox available as soon as we get the user's position
+        mNearMeCheckBox = (CheckBox) findViewById(R.id.ShowEventsCheckBoxNearMe);
+        mNearMeCheckBox.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(
+                        getApplicationContext(),
+                        "Your position hasn't been retrieved yet. Make sure your GPS or your cellular network is "
+                                + "turned on.", Toast.LENGTH_LONG).show();
+            }
+        });
 
         mShowKilometers = (TextView) findViewById(R.id.showEventKilometers);
         // By default, the seek bar is disabled. This is done programmatically
