@@ -1,10 +1,10 @@
 package ch.epfl.smartmap.gui;
 
-import ch.epfl.smartmap.activities.FriendsActivity;
+
 
 import ch.epfl.smartmap.activities.ShowEventsActivity;
 
-import ch.epfl.smartmap.activities.PagerActivity;
+import ch.epfl.smartmap.activities.FriendsPagerActivity;
 
 import android.content.Intent;
 import android.view.View;
@@ -30,7 +30,7 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
                 break;
             case INDEX_FRIENDS:
 
-                Intent displayActivityIntent = new Intent(view.getContext(), PagerActivity.class);
+                Intent displayActivityIntent = new Intent(view.getContext(), FriendsPagerActivity.class);
                 view.getContext().startActivity(displayActivityIntent);
 
                 break;

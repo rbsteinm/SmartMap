@@ -12,7 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class PagerActivity extends FragmentActivity implements ActionBar.TabListener {
+public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 	
 	private ViewPager pager ;
 	private ActionBar actionBar;
@@ -21,7 +21,7 @@ public class PagerActivity extends FragmentActivity implements ActionBar.TabList
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_pager);
+		setContentView(R.layout.activity_friends_pager);
 		
 		pager = (ViewPager)findViewById(R.id.myViewPager);
 		actionBar = getActionBar();
