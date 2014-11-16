@@ -1,7 +1,5 @@
 package ch.epfl.smartmap.activities;
 
-import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.gui.PagerAdapter;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
@@ -11,13 +9,21 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.gui.PagerAdapter;
 
+/**
+ * This activity displays your friends in one tab, and your 
+ * friend request (both sent and received) in another tab
+ * @author rbsteinm
+ *
+ */
 public class FriendsPagerActivity extends FragmentActivity implements
 		ActionBar.TabListener {
 
 	private ViewPager pager;
 	private ActionBar actionBar;
-	private String[] tabs = { "Friends", "Invitations" };
+	private String[] tabs = {"Friends", "Invitations"};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +41,8 @@ public class FriendsPagerActivity extends FragmentActivity implements
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		// Adding Tabs
-		for (String tab_name : tabs) {
-			actionBar.addTab(actionBar.newTab().setText(tab_name)
+		for (String tabName : tabs) {
+			actionBar.addTab(actionBar.newTab().setText(tabName)
 					.setTabListener(this));
 		}
 

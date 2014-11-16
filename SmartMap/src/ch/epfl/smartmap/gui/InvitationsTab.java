@@ -1,45 +1,37 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.R.id;
-import ch.epfl.smartmap.R.layout;
-import ch.epfl.smartmap.R.menu;
-
-import ch.epfl.smartmap.activities.AddFriendActivity;
-import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.MockDB;
-import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-import ch.epfl.smartmap.servercom.SmartMapClientException;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v4.app.ListFragment;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClientException;
 
+/**
+ * Frangment diplaying your invitations in FriendsActivity
+ * @author Marion-S
+ *
+ */
 public class InvitationsTab extends ListFragment {
 
-	Context mContext;
-	NetworkSmartMapClient mNetworkClient;
-	DatabaseHelper mDataBaseHelper;
+	private Context mContext;
+	private NetworkSmartMapClient mNetworkClient;
+	private DatabaseHelper mDataBaseHelper;
 
 	public InvitationsTab(Context context) {
 		mContext = context;
@@ -98,6 +90,12 @@ public class InvitationsTab extends ListFragment {
 		builder.create().show();
 	}
 
+	/**
+	 * AsyncTask that notifies the server when the user accepts a friend request
+	 * also stores the new friend in the application cache 
+	 * @author Marion-S
+	 *
+	 */
 	private class AcceptInvitation extends AsyncTask<Long, Void, String> {
 
 		@Override
@@ -124,6 +122,11 @@ public class InvitationsTab extends ListFragment {
 
 	}
 
+	/**
+	 * AsyncTask that notifies the server when the user declines a friend request
+	 * @author Marion-S
+	 *
+	 */
 	private class DeclineInvitation extends AsyncTask<Long, Void, String> {
 
 		@Override
@@ -150,6 +153,11 @@ public class InvitationsTab extends ListFragment {
 
 	}
 
+	/**
+	 * refreshes the invitations list after the user answered to an invitation
+	 * @author marion-S
+	 *
+	 */
 	private class RefreshInvitationsList extends
 			AsyncTask<String, Void, List<List<User>>> {
 
@@ -175,7 +183,8 @@ public class InvitationsTab extends ListFragment {
 		}
 
 	}
-
+	
+	//TODO write javadoc
 	private class AckAcceptedInvitations extends AsyncTask<Long, Void, Void> {
 
 		@Override
