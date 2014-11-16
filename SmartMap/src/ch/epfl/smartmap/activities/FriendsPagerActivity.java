@@ -13,49 +13,50 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.PagerAdapter;
 
 /**
- * This activity displays your friends in one tab, and your 
- * friend request (both sent and received) in another tab
+ * This activity displays your friends in one tab, and your friend request (both
+ * sent and received) in another tab
+ * 
  * @author rbsteinm
- *
+ * 
  */
 public class FriendsPagerActivity extends FragmentActivity implements
 		ActionBar.TabListener {
 
-	private ViewPager pager;
-	private ActionBar actionBar;
-	private String[] tabs = {"Friends", "Invitations"};
+	private ViewPager mPager;
+	private ActionBar mActionBar;
+	private String[] mTabs = { "Friends", "Invitations" };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_friends_pager);
 
-		pager = (ViewPager) findViewById(R.id.myViewPager);
-		actionBar = getActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		mPager = (ViewPager) findViewById(R.id.myViewPager);
+		mActionBar = getActionBar();
+		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		PagerAdapter pageAdapter = new PagerAdapter(this,
 				getSupportFragmentManager());
 
-		pager.setAdapter(pageAdapter);
-		actionBar.setHomeButtonEnabled(false);
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		mPager.setAdapter(pageAdapter);
+		mActionBar.setHomeButtonEnabled(false);
+		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		// Adding Tabs
-		for (String tabName : tabs) {
-			actionBar.addTab(actionBar.newTab().setText(tabName)
+		for (String tabName : mTabs) {
+			mActionBar.addTab(mActionBar.newTab().setText(tabName)
 					.setTabListener(this));
 		}
 
 		/**
-		 * on swiping the viewpager make respective tab selected
+		 * on swiping, the viewpager makes respective tab selected
 		 * */
-		pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+		mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
 			@Override
 			public void onPageSelected(int position) {
 				// on changing the page
 				// make respected tab selected
-				actionBar.setSelectedNavigationItem(position);
+				mActionBar.setSelectedNavigationItem(position);
 			}
 
 			@Override
@@ -95,21 +96,20 @@ public class FriendsPagerActivity extends FragmentActivity implements
 
 	@Override
 	public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
-		// TODO Auto-generated method stub
-
+		//nothing
 	}
 
 	@Override
 	public void onTabSelected(Tab tab, FragmentTransaction arg1) {
 		// on tab selected
 		// show respected fragment view
-		pager.setCurrentItem(tab.getPosition());
+		mPager.setCurrentItem(tab.getPosition());
 
 	}
 
 	@Override
 	public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
-		// TODO Auto-generated method stub
+		//nothing
 
 	}
 }

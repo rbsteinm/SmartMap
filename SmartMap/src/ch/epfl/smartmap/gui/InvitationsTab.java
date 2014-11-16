@@ -24,8 +24,9 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
  * Frangment diplaying your invitations in FriendsActivity
- * @author Marion-S
- *
+ * 
+ * @author marion-S
+ * 
  */
 public class InvitationsTab extends ListFragment {
 
@@ -39,6 +40,13 @@ public class InvitationsTab extends ListFragment {
 		mDataBaseHelper = new DatabaseHelper(mContext);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater
+	 * , android.view.ViewGroup, android.os.Bundle)
+	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -49,6 +57,17 @@ public class InvitationsTab extends ListFragment {
 		return view;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView
+	 * , android.view.View, int, long)
+	 * 
+	 * When a list item is clicked, display a dialog to ask whether to accept or
+	 * decline the invitation
+	 */
+	@Override
 	public void onListItemClick(ListView listView, View view, int position,
 			long id) {
 		long userId = (Long) view.getTag();
@@ -60,12 +79,26 @@ public class InvitationsTab extends ListFragment {
 		displayAcceptFriendDialog(name, userId);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.support.v4.app.Fragment#onResume()
+	 */
 	@Override
 	public void onResume() {
 		super.onResume();
 		new RefreshInvitationsList().execute();
 	}
 
+	/**
+	 * A dialog to ask whether to accept or decline the invitation of the given
+	 * user
+	 * 
+	 * @param name
+	 *            the user's name
+	 * @param userId
+	 *            the user's id
+	 */
 	private void displayAcceptFriendDialog(String name, final long userId) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setMessage("Accept " + name + " to become your friend?");
@@ -92,9 +125,10 @@ public class InvitationsTab extends ListFragment {
 
 	/**
 	 * AsyncTask that notifies the server when the user accepts a friend request
-	 * also stores the new friend in the application cache 
+	 * also stores the new friend in the application cache
+	 * 
 	 * @author Marion-S
-	 *
+	 * 
 	 */
 	private class AcceptInvitation extends AsyncTask<Long, Void, String> {
 
@@ -114,7 +148,6 @@ public class InvitationsTab extends ListFragment {
 
 		@Override
 		protected void onPostExecute(String confirmString) {
-			// TODO use handle because must do this in main thread
 			Toast.makeText(getActivity(), confirmString, Toast.LENGTH_LONG)
 					.show();
 			new RefreshInvitationsList().execute();
@@ -123,9 +156,11 @@ public class InvitationsTab extends ListFragment {
 	}
 
 	/**
-	 * AsyncTask that notifies the server when the user declines a friend request
-	 * @author Marion-S
-	 *
+	 * AsyncTask that notifies the server when the user declines a friend
+	 * request
+	 * 
+	 * @author marion-S
+	 * 
 	 */
 	private class DeclineInvitation extends AsyncTask<Long, Void, String> {
 
@@ -144,8 +179,6 @@ public class InvitationsTab extends ListFragment {
 
 		@Override
 		protected void onPostExecute(String confirmString) {
-			// TODO use handle because must do this in main thread
-			// TODO delete item from the list
 			Toast.makeText(getActivity(), confirmString, Toast.LENGTH_LONG)
 					.show();
 			new RefreshInvitationsList().execute();
@@ -154,9 +187,12 @@ public class InvitationsTab extends ListFragment {
 	}
 
 	/**
-	 * refreshes the invitations list after the user answered to an invitation
+	 * AsyncTask that refreshes the invitations list after the user answered to
+	 * an invitation and each time the activity is resumed. It also retrieves
+	 * accepted invitations and store them in the application cache.
+	 * 
 	 * @author marion-S
-	 *
+	 * 
 	 */
 	private class RefreshInvitationsList extends
 			AsyncTask<String, Void, List<List<User>>> {
@@ -183,8 +219,14 @@ public class InvitationsTab extends ListFragment {
 		}
 
 	}
-	
-	//TODO write javadoc
+
+	/**
+	 * AsyncTask that confirms the server that accepted invitations were
+	 * received
+	 * 
+	 * @author marion-S
+	 * 
+	 */
 	private class AckAcceptedInvitations extends AsyncTask<Long, Void, Void> {
 
 		@Override
@@ -192,7 +234,6 @@ public class InvitationsTab extends ListFragment {
 			try {
 				mNetworkClient.ackAcceptedInvitation(params[0]);
 			} catch (SmartMapClientException e) {
-				// TODO Auto-generated catch block
 			}
 			return null;
 		}
