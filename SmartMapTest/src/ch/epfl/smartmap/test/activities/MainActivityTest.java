@@ -106,9 +106,7 @@ public class MainActivityTest extends
     }
     
     public void testNotificationExist() throws Exception{
-    	/*
-    	 * Click on button and click on notification and see if callback is right
-    	 */
+    	//onView(withId(R.id.create_add_notif_button)).perform(click()).check(viewAssert)
     }
     
 }

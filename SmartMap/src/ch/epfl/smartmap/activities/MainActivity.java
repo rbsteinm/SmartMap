@@ -14,11 +14,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
@@ -56,6 +58,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	private static final int LOCATION_UPDATE_DISTANCE = 10;
 
 	private SideMenu mSideMenu;
+	private DrawerLayout mDrawerLayout;
+	private ListView mDrawerList;
 	private GoogleMap mGoogleMap;
 	private FriendMarkerDisplayer mFriendMarkerDisplayer;
 	private EventMarkerDisplayer mEventMarkerDisplayer;
@@ -68,22 +72,26 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		mSideMenu = new SideMenu(this);
-		mSideMenu.initializeDrawerLayout();
 
 		// Set actionbar color
 		getActionBar().setBackgroundDrawable(
 				new ColorDrawable(getResources()
 						.getColor(R.color.mainBlueColor)));
 
-		// Enable button to open side menu
+		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeAsUpIndicator(
 				getResources().getDrawable(R.drawable.ic_drawer));
-		// TODO agpmilli : When click on actionbar left button, open side menu
 
 		// Get needed Views
 		final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
+
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+		mSideMenu = new SideMenu(this.getContext());
+		mSideMenu.initializeDrawerLayout();
+		// TODO agpmilli : When click on actionbar icon button, open side menu
 
 		mSearchEngine = new MockSearchEngine();
 		mSearchLayout.setSearchEngine(mSearchEngine);
@@ -143,6 +151,17 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
 			return true;
+		}
+
+		// Handle clicks on home button
+		if (id == android.R.id.home) {
+			if (mDrawerList.isShown()) {
+				Log.d("TAG", "Close side menu");
+				mDrawerLayout.closeDrawer(mDrawerList);
+			} else {
+				Log.d("TAG", "Open side menu");
+				mDrawerLayout.openDrawer(mDrawerList);
+			}
 		}
 		return super.onOptionsItemSelected(item);
 	}
