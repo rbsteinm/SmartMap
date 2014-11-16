@@ -26,12 +26,14 @@ public class UpdateService extends Service {
     public static final String UPDATED_ROWS = "UpdatedRows";
     
     private static final int HANDLER_DELAY = 1000;
-    private static final int UPDATE_DELAY = 10000;
+    private static final int POS_UPDATE_DELAY = 10000;
+    private static final int INVITE_UPDATE_DELAY = 30000;
     
     private final Handler mHandler = new Handler();
     private Intent mFriendsPosIntent;
     private Intent mFriendNotifIntent;
     private boolean mFriendsPosEnabled = true;
+    private boolean mReady = false;
     private DatabaseHelper mHelper = DatabaseHelper.getInstance();
     private SettingsManager mManager = SettingsManager.getInstance();
     private NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
@@ -39,9 +41,11 @@ public class UpdateService extends Service {
     private Runnable sendFriendsPosUpdate = new Runnable() {
         public void run() {
         	if (mFriendsPosEnabled) {
-	        	new AsyncFriendsPos().execute();
-	            sendBroadcast(mFriendsPosIntent);
-	            mHandler.postDelayed(this, UPDATE_DELAY);
+        	    if (mReady) {
+    	        	new AsyncFriendsPos().execute();
+    	            sendBroadcast(mFriendsPosIntent);
+        	    }
+	            mHandler.postDelayed(this, POS_UPDATE_DELAY);
 	            Log.d("UpdateService", "Friends pos update");
         	}
         }
@@ -50,7 +54,7 @@ public class UpdateService extends Service {
     private Runnable sendOwnPosUpdate = new Runnable() {
         public void run() {
             new AsyncOwnPos().execute();
-            mHandler.postDelayed(this, UPDATE_DELAY);
+            mHandler.postDelayed(this, POS_UPDATE_DELAY);
             Log.d("UpdateService", "Own pos update");
         }
     };
@@ -58,8 +62,16 @@ public class UpdateService extends Service {
     private Runnable showFriendNotif = new Runnable() {
         public void run() {
             new AsyncRequestCheck().execute();
-            mHandler.postDelayed(this, UPDATE_DELAY);
-            Log.d("UpdateService", "Friend request check");
+            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
+            Log.d("UpdateService", "Friend requests check");
+        }
+    };
+    
+    private Runnable getReplies = new Runnable() {
+        public void run() {
+            new AsyncReplyCheck().execute();
+            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
+            Log.d("UpdateService", "Friend replies check");
         }
     };  
     
@@ -67,7 +79,7 @@ public class UpdateService extends Service {
     public void onCreate() {
         super.onCreate();
         mFriendsPosIntent = new Intent(BROADCAST_POS);
-        mFriendNotifIntent = new Intent(this, ch.epfl.smartmap.activities.FriendsActivity.class);
+        mFriendNotifIntent = new Intent(this, ch.epfl.smartmap.activities.FriendsPagerActivity.class);
         new AsyncFriendsInit().execute();
     }
     
@@ -79,6 +91,8 @@ public class UpdateService extends Service {
         mHandler.postDelayed(sendOwnPosUpdate, HANDLER_DELAY);
         mHandler.removeCallbacks(showFriendNotif);
         mHandler.postDelayed(showFriendNotif, HANDLER_DELAY);
+        mHandler.removeCallbacks(getReplies);
+        mHandler.postDelayed(getReplies, HANDLER_DELAY);
         Log.d("UpdateService", "Service started");
     }
     
@@ -105,7 +119,9 @@ public class UpdateService extends Service {
     private class AsyncFriendsPos extends AsyncTask<Void, Void, Integer> {
         @Override
         protected Integer doInBackground(Void... args0) {
-        	return mHelper.refreshFriendsPos();
+            int rows = 0;
+            rows = mHelper.refreshFriendsPos();
+        	return rows;
         }
 
         @Override
@@ -138,7 +154,13 @@ public class UpdateService extends Service {
         @Override
         protected Void doInBackground(Void... arg0) {
             mHelper.initializeAllFriends();
+            mHelper.refreshFriendsInfo();
             return null;
+        }
+        
+        @Override
+        protected void onPostExecute(Void result) {
+            mReady = true;
         }
     }
     
@@ -151,7 +173,8 @@ public class UpdateService extends Service {
         protected List<User> doInBackground(Void... arg0) {
             List<User> list = new ArrayList<User>();
             try {
-                list = mClient.getInvitations();
+                //First list, the list of received invitations
+                list = mClient.getInvitations().get(0);
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't retrieve invites!");
             }
@@ -162,7 +185,34 @@ public class UpdateService extends Service {
         protected void onPostExecute(List<User> result) {
             if (!result.isEmpty()) {
                 for (User user : result) {
-                    //TODO
+                    //TODO Create a notification
+                }
+            }
+        }
+    }
+    
+    /**
+     * AsyncTask to check if a friend request was received
+     * @author ritterni
+     */
+    private class AsyncReplyCheck extends AsyncTask<Void, Void, List<User>> {
+        @Override
+        protected List<User> doInBackground(Void... arg0) {
+            List<User> list = new ArrayList<User>();
+            try {
+                //Second list, the list of accepted invitations
+                list = mClient.getInvitations().get(1);
+            } catch (SmartMapClientException e) {
+                Log.e("UpdateService", "Couldn't retrieve replies!");
+            }
+            return list;
+        }
+        
+        @Override
+        protected void onPostExecute(List<User> result) {
+            if (!result.isEmpty()) {
+                for (User user : result) {
+                    mHelper.addUser(user);
                 }
             }
         }

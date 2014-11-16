@@ -667,18 +667,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     /**
-     * Fills the friend database
+     * Fills the friend database with server data
      */
     public void initializeAllFriends() {
-        LongSparseArray<User> friends = getAllUsers();
-        NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-        for (int i = 0; i < friends.size(); i++) {
-            try {
-                //The keys are IDs, so we call getUserInfo for each key and update the db with the result
-                addUser(client.getUserInfo(friends.keyAt(i)));
-            } catch (SmartMapClientException e) {
-                e.printStackTrace();
+        try {
+            Map<Long, Location> friends = NetworkSmartMapClient.getInstance().listFriendsPos();
+            for (long i : friends.keySet()) {
+                addUser(new Friend(i, ""));
             }
+            refreshFriendsInfo();
+        } catch (SmartMapClientException e) {
+            e.printStackTrace();
         }
     }
 }
