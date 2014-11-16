@@ -8,4 +8,5 @@
     <color name="searchResultTitle">#999999</color>
     <color name="searchResultOnSelect">#5581BEF7</color>
     <color name="mainBlueColor">#004356</color>
+    <color name="information_panel_background">#ffffff</color>
 </resources>

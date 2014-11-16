@@ -2,7 +2,6 @@ package ch.epfl.smartmap.gui;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
-import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -11,7 +10,6 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationSet;
 import android.widget.FrameLayout;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Displayable;
@@ -24,39 +22,36 @@ import ch.epfl.smartmap.cache.MockDB;
 public class InformationPanel extends FrameLayout {
     private static final String TAG = "INFORMATION_PANEL";
 
-    private static final int COLLAPSED_TO_EXTENDED_DURATION = 400;
-    private static final int FADE_ANIM_DURATION = 100;
-    private static final int FADE_IN_DELAY = 300;
+    private static final int TRANSLATION_EXTENDED_DURATION = 400;
+    private static final int FADE_IN_DELAY = 400;
+    private static final int FADE_IN_DURATION = 400;
+    private static final int FADE_OUT_DELAY = 0;
+    private static final int FADE_OUT_DURATION = 400;
 
     private enum VisualState {
         CLOSED, COLLAPSED, EXTENDED, ANIM_PERFORMED;
 
         private int mHeight;
-        private float mCollapsedViewAlpha;
-        private float mExtendedViewAlpha;
 
         private void setPosition(int height) {
             mHeight = height;
         }
-
-        private void setCollapsedViewAlpha(int alpha) {
-            mCollapsedViewAlpha = alpha;
-        }
-
-        private void setExtendedViewAlpha(int alpha) {
-            mExtendedViewAlpha = alpha;
-        }
     }
 
     private enum FadeState {
-        IN(0, 1), OUT(1, 0);
+        IN(0, 1, FADE_IN_DELAY, FADE_IN_DURATION), 
+        OUT(1, 0, FADE_OUT_DELAY, FADE_OUT_DURATION);
 
-        private float start;
-        private float end;
+        private float mStart;
+        private float mEnd;
+        private int mDelay;
+        private int mDuration;
 
-        private FadeState(float start, float end) {
-            this.start = start;
-            this.end = end;
+        private FadeState(float start, float end, int delay, int duration) {
+            this.mStart = start;
+            this.mEnd = end;
+            this.mDelay = delay;
+            this.mDuration = duration;
         }
     }
 
@@ -73,17 +68,12 @@ public class InformationPanel extends FrameLayout {
     private ValueAnimator mClosedToCollapsedAnim;
     private ValueAnimator mClosedToExtendedAnim;
 
-    private AlphaAnimation mCollapsedFadeInAnim;
-    private AlphaAnimation mCollapsedFadeOutAnim;
-    private AlphaAnimation mExtendedFadeInAnim;
-    private AlphaAnimation mExtendedFadeOutAnim;
-
     public InformationPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         this.displayItem(MockDB.ALAIN);
 
-        this.setBackgroundResource(R.color.com_facebook_blue);
+        this.setBackgroundResource(R.color.information_panel_background);
         this.setClipChildren(true);
         this.setFocusable(true);
         this.setClickable(true);
@@ -111,8 +101,10 @@ public class InformationPanel extends FrameLayout {
             mClosedToCollapsedAnim.start();
         } else if (mVisualState == VisualState.EXTENDED) {
             Log.d(TAG, "C to E");
-            mCollapsedView.setAnimation(createAlphaAnimation(mCollapsedView, FadeState.IN));
-            mExtendedView.setAnimation(createAlphaAnimation(mExtendedView, FadeState.OUT));
+            mCollapsedView.setAnimation(createAlphaAnimation(mCollapsedView,
+                FadeState.IN));
+            mExtendedView.setAnimation(createAlphaAnimation(mExtendedView,
+                FadeState.OUT));
             mExtendedToCollapsedAnim.start();
         } else {
             assert false : "Trying to collapse, but already in state COLLAPSED (or unknown state)";
@@ -128,8 +120,10 @@ public class InformationPanel extends FrameLayout {
         if (mVisualState == VisualState.CLOSED) {
             mClosedToExtendedAnim.start();
         } else if (mVisualState == VisualState.COLLAPSED) {
-            mCollapsedView.setAnimation(createAlphaAnimation(mCollapsedView, FadeState.OUT));
-            mExtendedView.setAnimation(createAlphaAnimation(mExtendedView, FadeState.IN));
+            mCollapsedView.setAnimation(createAlphaAnimation(mCollapsedView,
+                FadeState.OUT));
+            mExtendedView.setAnimation(createAlphaAnimation(mExtendedView,
+                FadeState.IN));
             mCollapsedToExtendedAnim.start();
         } else {
             assert (false) : "Trying to extend, but already in state EXTENDED (or unknown state)";
@@ -154,12 +148,6 @@ public class InformationPanel extends FrameLayout {
     }
 
     private void initializeAnimators() {
-        // Fade animations
-        mCollapsedFadeOutAnim = createAlphaAnimation(mCollapsedView, FadeState.OUT);
-        mCollapsedFadeInAnim = createAlphaAnimation(mExtendedView, FadeState.IN);
-        mExtendedFadeOutAnim = createAlphaAnimation(mExtendedView, FadeState.OUT);
-        mExtendedFadeInAnim = createAlphaAnimation(mCollapsedView, FadeState.IN);
-
         // Height animators
         mClosedToCollapsedAnim = createHeightAnimator(VisualState.CLOSED,
             VisualState.COLLAPSED);
@@ -179,7 +167,7 @@ public class InformationPanel extends FrameLayout {
         final VisualState end) {
         ValueAnimator animator = ValueAnimator
             .ofInt(start.mHeight, end.mHeight);
-        animator.setDuration(COLLAPSED_TO_EXTENDED_DURATION);
+        animator.setDuration(TRANSLATION_EXTENDED_DURATION);
 
         final InformationPanel thisPanel = this;
         Log.d(TAG, "new Animation  : " + start.mHeight + " to " + end.mHeight);
@@ -220,19 +208,19 @@ public class InformationPanel extends FrameLayout {
         return animator;
     }
 
-    private AlphaAnimation createAlphaAnimation(final View view, final FadeState fadeState) {
-        
-        final AlphaAnimation anim = new AlphaAnimation(fadeState.start, fadeState.end);
-        anim.setDuration(FADE_ANIM_DURATION);
-        
-        if(fadeState == FadeState.IN) {
-            anim.setStartOffset(FADE_IN_DELAY);
-        }
+    private AlphaAnimation createAlphaAnimation(final View view,
+        final FadeState fadeState) {
+
+        final AlphaAnimation anim = new AlphaAnimation(fadeState.mStart,
+            fadeState.mEnd);
+        anim.setDuration(fadeState.mDuration);
+        anim.setStartOffset(fadeState.mDelay);
 
         anim.setAnimationListener(new AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                Log.d(TAG, "Fade Animation Started with duration" + anim.getDuration());
+                Log.d(TAG,
+                    "Fade Animation Started with duration" + anim.getDuration());
                 if (fadeState == FadeState.IN) {
                     view.setVisibility(View.VISIBLE);
                 }
@@ -259,12 +247,5 @@ public class InformationPanel extends FrameLayout {
         VisualState.EXTENDED.setPosition(1800);
         VisualState.COLLAPSED.setPosition(200);
         VisualState.CLOSED.setPosition(0);
-        // Initialize alphas
-        VisualState.CLOSED.setCollapsedViewAlpha(0);
-        VisualState.CLOSED.setExtendedViewAlpha(0);
-        VisualState.COLLAPSED.setCollapsedViewAlpha(1);
-        VisualState.COLLAPSED.setExtendedViewAlpha(0);
-        VisualState.EXTENDED.setCollapsedViewAlpha(0);
-        VisualState.EXTENDED.setExtendedViewAlpha(1);
     }
 }
