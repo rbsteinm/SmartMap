@@ -169,7 +169,7 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 	@Override
 	public List<User> getDisplayedFriends() {
 
-		return new ArrayList<>(displayedMarkers.values());
+		return new ArrayList<User>(displayedMarkers.values());
 	}
 
 	/*

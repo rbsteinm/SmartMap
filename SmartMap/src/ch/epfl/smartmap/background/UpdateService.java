@@ -115,6 +115,10 @@ public class UpdateService extends Service {
         Notifications.newFriendNotification(this, user);
     }
     
+    private void showAcceptedNotif(User user) {
+        Notifications.acceptedNotification(this, user);
+    }
+    
     /**
      * AsyncTask to get friends' positions
      * @author ritterni
@@ -215,6 +219,7 @@ public class UpdateService extends Service {
             if (!result.isEmpty()) {
                 for (User user : result) {
                     mHelper.addUser(user);
+                    showAcceptedNotif(user);
                 }
             }
         }
