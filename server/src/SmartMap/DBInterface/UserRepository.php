@@ -304,7 +304,7 @@ class UserRepository
         
         while ($id = $stmt->fetch())
         {
-            $ids[] = $id['id2'];
+            $ids[] = (int) $id['id2'];
         }
         
         return $ids;

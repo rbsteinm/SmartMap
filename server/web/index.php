@@ -136,6 +136,8 @@ $app->post('/updatePos', 'data.controller:updatePos');
 
 $app->post('/findUsers', 'data.controller:findUsers');
 
+$app->post('/getFriendsIds', 'data.controller:getFriendsIds');
+
 if ($app['debug'] == true)
 {
     $app->post('/fakeAuth', 'authentication.controller:fakeAuth');

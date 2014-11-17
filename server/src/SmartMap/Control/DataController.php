@@ -115,6 +115,31 @@ class DataController
     }
     
     /**
+     * Get the user's friends ids.
+     * 
+     * @param Request $request
+     * @throws ControlLogicException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function getFriendsIds(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+        
+        try
+        {
+            $friendsIds = $this->mRepo->getFriendsIds($userId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in getFriendsIds.', 2, $e);
+        }
+        
+        $response = array('status' => 'Ok', 'message' => 'Fetched friends !', 'friends' => $friendsIds);
+        
+        return new JsonResponse($response);
+    }
+    
+    /**
      * Gets the information for the user whose id is passed in user_id POST parameter.
      * 
      * @param Request $request

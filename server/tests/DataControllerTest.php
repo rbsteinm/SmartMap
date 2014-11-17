@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 /** 
  * Tests for the DataController class.
  * To run them, run
- * $> phpunit --bootstrap vendor/autoload.php tests/DataControllerTest.php
+ * $> cd
  * from the server directory.
  *
  * @author Pamoi
@@ -128,7 +128,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         
         $returnUsers = array(
             new User(1, 2, 'Toto', 'VISIBLE', 1.0, 2.0, '2014-11-12 13:33:45'),
-            new User(2, 3, 'Titi', 'VISIBLE', 3.0, 4.0, '2014-11-13 01:56:22')
+            new User(2, 3, 'Titi', 'VISIBLE', 3.0, 4.0, '2014-11-13 01:56:22'),
         );
         
         $this->mockRepo
@@ -145,7 +145,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         
         $this->mockRepo->expects($this->once())
              ->method('getUsers')
-             ->with($this->equalTo($friendsIds));
+             ->with($this->equalTo($friendsIds), $this->equalTo(array('VISIBLE')));
         
         $request = new Request();
         
@@ -163,6 +163,33 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         );
         
         $validResponse = array('status' => 'Ok', 'message' => 'Fetched friends positions !', 'positions' => $list);
+        
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+    
+    public function testValidGetFriendsIds()
+    {
+        $friendsIds = array(2, 6, 12);
+        
+        $this->mockRepo
+             ->method('getFriendsIds')
+             ->willReturn($friendsIds);
+        
+        $this->mockRepo->expects($this->once())
+             ->method('getFriendsIds')
+             ->with($this->equalTo(14));
+        
+        $request = new Request();
+        
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+        
+        $controller = new DataController($this->mockRepo);
+        
+        $response = $controller->getFriendsIds($request);
+        
+        $validResponse = array('status' => 'Ok', 'message' => 'Fetched friends !', 'friends' => $friendsIds);
         
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
