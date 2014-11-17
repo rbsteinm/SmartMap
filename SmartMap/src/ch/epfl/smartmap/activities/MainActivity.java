@@ -4,20 +4,24 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
@@ -49,244 +53,294 @@ import com.google.android.gms.maps.model.Marker;
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
 
-    private static final String TAG = "GoogleMap";
-    private static final int LOCATION_UPDATE_TIMEOUT = 10000;
-    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-    private static final int LOCATION_UPDATE_DISTANCE = 10;
+	private static final String TAG = "GoogleMap";
+	private static final int LOCATION_UPDATE_TIMEOUT = 10000;
+	private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+	private static final int LOCATION_UPDATE_DISTANCE = 10;
 
-    private SideMenu mSideMenu;
-    private GoogleMap mGoogleMap;
-    private FriendMarkerDisplayer mFriendMarkerDisplayer;
-    private EventMarkerDisplayer mEventMarkerDisplayer;
-    private DefaultZoomManager mMapZoomer;
-    private SupportMapFragment mFragmentMap;
-    private SearchEngine mSearchEngine;
-    private Menu mMenu;
+	private SideMenu mSideMenu;
+	private DrawerLayout mDrawerLayout;
+	private ListView mDrawerList;
+	private GoogleMap mGoogleMap;
+	private FriendMarkerDisplayer mFriendMarkerDisplayer;
+	private EventMarkerDisplayer mEventMarkerDisplayer;
+	private DefaultZoomManager mMapZoomer;
+	private SupportMapFragment mFragmentMap;
+	private SearchEngine mSearchEngine;
+	private Menu mMenu;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-        // Get needed Views
-        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
+		// Set actionbar color
+		getActionBar().setBackgroundDrawable(
+				new ColorDrawable(getResources()
+						.getColor(R.color.mainBlueColor)));
 
-        mSideMenu = new SideMenu(this);
-        mSideMenu.initializeDrawerLayout();
+		getActionBar().setHomeButtonEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeAsUpIndicator(
+				getResources().getDrawable(R.drawable.ic_drawer));
 
-        mSearchEngine = new MockSearchEngine();
-        mSearchLayout.setSearchEngine(mSearchEngine);
+		// Get needed Views
+		final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
 
-        if (savedInstanceState == null) {
-            displayMap();
-        }
-        if (mGoogleMap != null) {
-            initializeMarkers();
-        }
-    }
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerList = (ListView) findViewById(R.id.left_drawer_listView);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        mMenu = menu;
+		mSideMenu = new SideMenu(this.getContext());
+		mSideMenu.initializeDrawerLayout();
+		// TODO agpmilli : When click on actionbar icon button, open side menu
 
-        // Get Views
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        final SearchView mSearchView = (SearchView) searchItem.getActionView();
-        final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
-        final SlidingUpPanel mSearchPanel = (SlidingUpPanel) findViewById(R.id.search_panel);
-        mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
-            public boolean onQueryTextSubmit(String query) {
-                mSearchView.clearFocus();
-                return false;
-            }
+		mSearchEngine = new MockSearchEngine();
+		mSearchLayout.setSearchEngine(mSearchEngine);
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                // Give the query results to searchLayout
-                mSearchLayout.updateSearchResults(mSearchView.getQuery()
-                    .toString());
-                return false;
-            }
-        });
+		if (savedInstanceState == null) {
+			displayMap();
+		}
+		if (mGoogleMap != null) {
+			initializeMarkers();
+		}
+	}
 
-        mSearchView.setOnSearchClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Open Sliding Panel and Displays the main search view
-                String query = mSearchView.getQuery().toString();
-                mSearchPanel.open();
-                mSearchLayout.showMainPanel(query);
-            }
-        });
-        // Configure the search info and add any event listeners
-        return super.onCreateOptionsMenu(menu);
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		mMenu = menu;
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+		// Get Views
+		MenuItem searchItem = menu.findItem(R.id.action_search);
+		final SearchView mSearchView = (SearchView) searchItem.getActionView();
+		final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
+		final SlidingUpPanel mSearchPanel = (SlidingUpPanel) findViewById(R.id.search_panel);
+		mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
+			public boolean onQueryTextSubmit(String query) {
+				mSearchView.clearFocus();
+				return false;
+			}
 
-    @Override
-    public void onLocationChanged(Location location) {
-        mMapZoomer.zoomOnLocation(location, mGoogleMap);
-        // updatePos
-    }
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				// Give the query results to searchLayout
+				mSearchLayout.updateSearchResults(mSearchView.getQuery()
+						.toString());
+				return false;
+			}
+		});
 
-    @Override
-    public void onBackPressed() {
-        final SlidingUpPanel mSearchPanel = (SlidingUpPanel) findViewById(R.id.search_panel);
+		mSearchView.setOnSearchClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// Open Sliding Panel and Displays the main search view
+				String query = mSearchView.getQuery().toString();
+				mSearchPanel.open();
+				mSearchLayout.showMainPanel(query);
+			}
+		});
+		// Configure the search info and add any event listeners
+		return super.onCreateOptionsMenu(menu);
+	}
 
-        if (mSearchPanel.isShown()) {
-            mSearchPanel.close();
-        } else {
-            super.onBackPressed();
-        }
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
 
-    public Context getContext() {
-        return this;
-    }
+		// Handle clicks on home button
+		if (id == android.R.id.home) {
+			if (mDrawerList.isShown()) {
+				Log.d("TAG", "Close side menu");
+				mDrawerLayout.closeDrawer(mDrawerList);
+			} else {
+				Log.d("TAG", "Open side menu");
+				mDrawerLayout.openDrawer(mDrawerList);
+			}
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
-    /**
-     * Display the map with the current location
-     */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil
-            .isGooglePlayServicesAvailable(getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
-                GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            // Enabling MyLocation Layer of Google Map
-            mGoogleMap.setMyLocationEnabled(true);
-            // Getting LocationManager object from System Service
-            // LOCATION_SERVICE
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            // Creating a criteria object to retrieve provider
-            Criteria criteria = new Criteria();
-            // Getting the name of the best provider
-            String provider = locationManager.getBestProvider(criteria, true);
-            Log.d(TAG, "provider : " + provider);
-            // Getting Current Location
-            // Location location =
-            // locationManager.getLastKnownLocation(provider);
-            boolean isGPSEnabled = locationManager
-                .isProviderEnabled(LocationManager.GPS_PROVIDER);
-            if (isGPSEnabled) {
-                Log.d(TAG, "gps enabled");
-                locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
-            } else if (null != locationManager
-                .getProvider(LocationManager.NETWORK_PROVIDER)) {
-                locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
-            }
-        }
-    }
+	@Override
+	public void onLocationChanged(Location location) {
+		mMapZoomer.zoomOnLocation(location, mGoogleMap);
+		// updatePos
+	}
 
-    public void initializeMarkers() {
-        mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
-        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-            MockDB.getEventsList());
-        mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-            MockDB.FRIENDS_LIST);
-        mMapZoomer = new DefaultZoomManager(mFragmentMap);
-        Log.i(TAG, "before enter to zoom according");
-        List<Marker> allMarkers = new ArrayList<Marker>(
-            mFriendMarkerDisplayer.getDisplayedMarkers());
-        allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
-        Intent startingIntent = getIntent();
-        if (startingIntent.getParcelableExtra("location") == null) {
-            mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
-        }
-    }
+	@Override
+	public void onBackPressed() {
+		final SlidingUpPanel mSearchPanel = (SlidingUpPanel) findViewById(R.id.search_panel);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
-     */
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // nothing
-    }
+		if (mSearchPanel.isShown()) {
+			mSearchPanel.close();
+		} else {
+			super.onBackPressed();
+		}
+	}
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        // get Intent that started this Activity
-        Intent startingIntent = getIntent();
-        // get the value of the user string
-        Location eventLocation = startingIntent.getParcelableExtra("location");
-        if (eventLocation != null) {
-            mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
-        }
-    }
+	public Context getContext() {
+		return this;
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
-     */
-    @Override
-    public void onProviderEnabled(String provider) {
-        // nothing
-    }
+	/**
+	 * Display the map with the current location
+	 */
+	public void displayMap() {
+		int status = GooglePlayServicesUtil
+				.isGooglePlayServicesAvailable(getBaseContext());
+		// Showing status
+		if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+			// not available
+			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
+					GOOGLE_PLAY_REQUEST_CODE);
+			dialog.show();
+		} else {
+			// Google Play Services are available.
+			// Getting reference to the SupportMapFragment of activity_main.xml
+			mFragmentMap = (SupportMapFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.map);
+			// Getting GoogleMap object from the fragment
+			mGoogleMap = mFragmentMap.getMap();
+			// Enabling MyLocation Layer of Google Map
+			mGoogleMap.setMyLocationEnabled(true);
+			// Getting LocationManager object from System Service
+			// LOCATION_SERVICE
+			LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+			// Creating a criteria object to retrieve provider
+			Criteria criteria = new Criteria();
+			// Getting the name of the best provider
+			String provider = locationManager.getBestProvider(criteria, true);
+			Log.d(TAG, "provider : " + provider);
+			// Getting Current Location
+			// Location location =
+			// locationManager.getLastKnownLocation(provider);
+			boolean isGPSEnabled = locationManager
+					.isProviderEnabled(LocationManager.GPS_PROVIDER);
+			if (isGPSEnabled) {
+				Log.d(TAG, "gps enabled");
+				locationManager.requestLocationUpdates(
+						LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
+						LOCATION_UPDATE_DISTANCE, this);
+			} else if (null != locationManager
+					.getProvider(LocationManager.NETWORK_PROVIDER)) {
+				locationManager
+						.requestLocationUpdates(
+								LocationManager.NETWORK_PROVIDER,
+								LOCATION_UPDATE_TIMEOUT,
+								LOCATION_UPDATE_DISTANCE, this);
+			}
+		}
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
-     */
-    @Override
-    public void onProviderDisabled(String provider) {
-        // nothing
-    }
+	public void initializeMarkers() {
+		mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
+		mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
+				MockDB.getEventsList());
+		mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
+		mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
+				MockDB.FRIENDS_LIST);
+		mMapZoomer = new DefaultZoomManager(mFragmentMap);
+		Log.i(TAG, "before enter to zoom according");
+		List<Marker> allMarkers = new ArrayList<Marker>(
+				mFriendMarkerDisplayer.getDisplayedMarkers());
+		allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
+		Intent startingIntent = getIntent();
+		if (startingIntent.getParcelableExtra("location") == null) {
+			mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
+		}
+	}
 
-    /**
-     * Create a notification that appear in the notifications tab
-     */
-    public void createNotification(View view) {
-        Notifications.newFriendNotification(view, this, MockDB.ALAIN);
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.location.LocationListener#onStatusChanged(java.lang.String,
+	 * int, android.os.Bundle)
+	 */
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// nothing
+	}
 
-    public void performQuery(Friend friend) {
-        // Get Views
-        final MenuItem mSearchView = (MenuItem) mMenu
-            .findItem(R.id.action_search);
+	@Override
+	public void onResume() {
+		super.onResume();
+		// get Intent that started this Activity
+		Intent startingIntent = getIntent();
+		// get the value of the user string
+		Location eventLocation = startingIntent.getParcelableExtra("location");
+		if (eventLocation != null) {
+			mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
+		}
+	}
 
-        closeSearchPanel();
-        mSearchView.collapseActionView();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.location.LocationListener#onProviderEnabled(java.lang.String)
+	 */
+	@Override
+	public void onProviderEnabled(String provider) {
+		// nothing
+	}
 
-        mMapZoomer.zoomOnLocation(friend.getLocation(), mGoogleMap);
-        // Add query to the searchEngine
-        mSearchEngine.getHistory().addEntry(friend, new Date());
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.location.LocationListener#onProviderDisabled(java.lang.String)
+	 */
+	@Override
+	public void onProviderDisabled(String provider) {
+		// nothing
+	}
 
-    public void closeSearchPanel() {
-        final SlidingUpPanel mSearchLayout = (SlidingUpPanel) findViewById(R.id.search_panel);
-        mSearchLayout.close();
-    }
+	/**
+	 * Create an friend invitation notification that appear in the notifications
+	 * tab
+	 */
+	public void createAddNotification(View view) {
+		Notifications.newFriendNotification(this.getContext(), MockDB.JULIEN);
+	}
+
+	/**
+	 * Create an accepted invitation notification that appear in the
+	 * notifications tab
+	 */
+	public void createAcceptedNotification(View view) {
+		Notifications.acceptedNotification(this.getContext(), MockDB.RAPHAEL);
+	}
+
+	/**
+	 * Create an event invitation notification that appear in the notifications
+	 * tab
+	 */
+	public void createEventNotification(View view) {
+		Notifications.newEventNotification(this.getContext(), MockDB.getEventsList()
+				.get(0));
+	}
+
+	public void performQuery(Friend friend) {
+		// Get Views
+		final MenuItem mSearchView = (MenuItem) mMenu
+				.findItem(R.id.action_search);
+
+		closeSearchPanel();
+		mSearchView.collapseActionView();
+
+		mMapZoomer.zoomOnLocation(friend.getLocation(), mGoogleMap);
+		// Add query to the searchEngine
+		mSearchEngine.getHistory().addEntry(friend, new Date());
+	}
+
+	public void closeSearchPanel() {
+		final SlidingUpPanel mSearchLayout = (SlidingUpPanel) findViewById(R.id.search_panel);
+		mSearchLayout.close();
+	}
 }

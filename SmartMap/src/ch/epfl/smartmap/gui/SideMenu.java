@@ -8,6 +8,7 @@ import ch.epfl.smartmap.R;
 
 /**
  * represents the side menu drawer
+ * 
  * @author rbsteinm
  */
 public class SideMenu extends DrawerLayout {
