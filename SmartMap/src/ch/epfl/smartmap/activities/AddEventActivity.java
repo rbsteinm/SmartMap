@@ -76,6 +76,7 @@ public class AddEventActivity extends FragmentActivity {
             GregorianCalendar end = getDateFromTextFormat(endDate.getText().toString(), endTime.getText().toString());
 
             GregorianCalendar now = new GregorianCalendar();
+            now.add(GregorianCalendar.MINUTE, -1);
 
             if (end.before(start)) {
                 // The user is trying to create the end of the event before its start!
