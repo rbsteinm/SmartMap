@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -20,6 +22,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,10 +31,14 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.UpdateService;
+import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
+import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingUpPanel;
@@ -56,6 +63,7 @@ import com.google.android.gms.maps.model.Marker;
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
 
+
     private static final String TAG = "GoogleMap";
     private static final int LOCATION_UPDATE_TIMEOUT = 10000;
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
@@ -65,6 +73,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private SideMenu mSideMenu;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
+
+    private DatabaseHelper mDbHelper;
     private GoogleMap mGoogleMap;
     private FriendMarkerDisplayer mFriendMarkerDisplayer;
     private EventMarkerDisplayer mEventMarkerDisplayer;
@@ -98,12 +108,17 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         mSearchEngine = new MockSearchEngine();
         mSearchLayout.setSearchEngine(mSearchEngine);
 
+        mDbHelper = DatabaseHelper.getInstance();
+
         if (savedInstanceState == null) {
             displayMap();
         }
         if (mGoogleMap != null) {
             initializeMarkers();
         }
+        
+        //starting the background service
+        startService(new Intent(this, UpdateService.class));
     }
 
     @Override
@@ -170,8 +185,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        mMapZoomer.zoomOnLocation(location, mGoogleMap);
-        // updatePos
+        SettingsManager.getInstance().setLocation(location);
     }
 
     @Override
@@ -185,6 +199,82 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        //startService(mUpdateServiceIntent);
+        registerReceiver(mBroadcastReceiver, new IntentFilter(
+                UpdateService.BROADCAST_POS));
+
+        // get Intent that started this Activity
+        Intent startingIntent = getIntent();
+        // get the value of the user string
+        Location eventLocation = startingIntent.getParcelableExtra("location");
+        if (eventLocation != null) {
+            mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
+            eventLocation=null;
+        }
+
+        mGoogleMap.setOnMapLongClickListener(new OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                Intent result = new Intent(getContext(), AddEventActivity.class);
+                Bundle extras = new Bundle();
+                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                String cityName = "";
+                List<Address> addresses;
+                try {
+                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                    if (addresses.size() > 0) {
+                        // Makes sure that an address is associated to the coordinates, the user could have long
+                        // clicked in the middle of the sea after all :)
+                        cityName = addresses.get(0).getLocality();
+                    }
+                } catch (IOException e) {
+                }
+                if (cityName == null) {
+                    // If google couldn't retrieve the city name, we use the country name instead
+                    try {
+                        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                        if (addresses.size() > 0) {
+                            cityName = addresses.get(0).getCountryName();
+                        }
+                    } catch (IOException e) {
+                    }
+                }
+                extras.putString(CITY_NAME, cityName);
+                extras.putParcelable(LOCATION_SERVICE, latLng);
+                result.putExtras(extras);
+                if (getIntent().getBooleanExtra("pickLocationForEvent", false)) {
+                    // Return the result to the calling activity (AddEventActivity)
+                    setResult(RESULT_OK, result);
+                    finish();
+                } else {
+                    // The user was in MainActivity and long clicked to create an event
+                    startActivity(result);
+                    finish();
+                }
+            }
+        });
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterReceiver(mBroadcastReceiver);
+        //stopService(mUpdateServiceIntent);
+    }
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mFriendMarkerDisplayer.updateMarkers(getContext(), mGoogleMap,
+                    getVisibleUsers(mDbHelper.getAllUsers()));
+        }
+
+    };
     public Context getContext() {
         return this;
     }
@@ -232,9 +322,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     public void initializeMarkers() {
         mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
-        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, MockDB.getEventsList());
+        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, mDbHelper.getAllEvents());
         mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, MockDB.FRIENDS_LIST);
+        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
+                getVisibleUsers(mDbHelper.getAllUsers()));
         mMapZoomer = new DefaultZoomManager(mFragmentMap);
         Log.i(TAG, "before enter to zoom according");
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
@@ -244,7 +335,17 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
         }
     }
-
+    
+    private List<User> getVisibleUsers(LongSparseArray<User> usersSparseArray) {
+        List<User> visibleUsers = new ArrayList<User>();
+        for (int i = 0; i < usersSparseArray.size(); i++) {
+            User user = usersSparseArray.valueAt(i);
+            if (user.isVisible()) {
+                visibleUsers.add(user);
+            }
+        }
+        return visibleUsers;
+    }
     /*
      * (non-Javadoc)
      *
@@ -253,60 +354,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // nothing
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // get Intent that started this Activity
-        Intent startingIntent = getIntent();
-        // get the value of the user string
-        Location eventLocation = startingIntent.getParcelableExtra("location");
-        if (eventLocation != null) {
-            mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
-        }
-
-        mGoogleMap.setOnMapLongClickListener(new OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                Intent result = new Intent(getContext(), AddEventActivity.class);
-                Bundle extras = new Bundle();
-                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-                String cityName = "";
-                List<Address> addresses;
-                try {
-                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                    if (addresses.size() > 0) {
-                        // Makes sure that an address is associated to the coordinates, the user could have long
-                        // clicked in the middle of the sea after all :)
-                        cityName = addresses.get(0).getLocality();
-                    }
-                } catch (IOException e) {
-                }
-                if (cityName == null) {
-                    // If google couldn't retrieve the city name, we use the country name instead
-                    try {
-                        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                        if (addresses.size() > 0) {
-                            cityName = addresses.get(0).getCountryName();
-                        }
-                    } catch (IOException e) {
-                    }
-                }
-                extras.putString(CITY_NAME, cityName);
-                extras.putParcelable(LOCATION_SERVICE, latLng);
-                result.putExtras(extras);
-                if (getIntent().getBooleanExtra("pickLocationForEvent", false)) {
-                    // Return the result to the calling activity (AddEventActivity)
-                    setResult(RESULT_OK, result);
-                    finish();
-                } else {
-                    // The user was in MainActivity and long clicked to create an event
-                    startActivity(result);
-                    finish();
-                }
-            }
-        });
     }
 
     /*

@@ -19,7 +19,7 @@ public class SettingsManagerTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mContext = new RenamingDelegatingContext(getContext(), "test_");
-        mManager = new SettingsManager(mContext);
+        mManager = SettingsManager.initialize(mContext);
     }
 	
 	@Test

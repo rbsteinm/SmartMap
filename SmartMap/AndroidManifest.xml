@@ -59,7 +59,12 @@
             android:screenOrientation="portrait" >
         </activity>
         
-         <activity
+        <service
+            android:enabled="true"
+            android:name="ch.epfl.smartmap.background.UpdateService" >
+        </service>
+        
+        <activity
             android:name=".activities.FriendsPagerActivity"
             android:label="@string/title_activity_pager"
             android:screenOrientation="portrait" >

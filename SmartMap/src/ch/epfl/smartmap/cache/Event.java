@@ -18,7 +18,7 @@ public interface Event {
     Location getLocation();
     
     /**
-	 * @return The user's latitude and longitude
+	 * @return The event's latitude and longitude in the LatLng format
 	 */
 	LatLng getLatLng();
     

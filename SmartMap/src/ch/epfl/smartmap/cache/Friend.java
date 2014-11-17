@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public class Friend implements User {
+public class Friend implements User, Searchable, Displayable {
 
 	private long mId; // the user's unique ID
 	private String mName; // the user's name as it will be displayed
@@ -151,7 +151,7 @@ public class Friend implements User {
 			pic = BitmapFactory.decodeFile(file.getAbsolutePath());
 		} else {
 			pic = BitmapFactory.decodeResource(context.getResources(),
-					DEFAULT_PICTURE); // placeholder
+					DEFAULT_PICTURE);
 		}
 		return pic;
 	}
@@ -216,5 +216,45 @@ public class Friend implements User {
     public void setVisible(boolean isVisible) {
         mVisible = isVisible;
     }
+
+    @Override
+    public String getInfo() {
+        // TODO
+        return "";
+    }
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (mId ^ (mId >>> 32));
+		result = prime * result + ((mName == null) ? 0 : mName.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Friend other = (Friend) obj;
+		if (mId != other.mId)
+			return false;
+		if (mName == null) {
+			if (other.mName != null)
+				return false;
+		} else if (!mName.equals(other.mName))
+			return false;
+		return true;
+	}
 
 }

@@ -10,6 +10,7 @@ import android.content.Context;
 
 import ch.epfl.smartmap.cache.Event;
 
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
@@ -31,10 +32,15 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 	public static final int HEIGHT = 50;
 
 	/**
-	 * A map that contains the displayed markers, associated with the event they
+	 * A map that contains the displayed markers' ids, associated with the event they
 	 * represent
 	 */
-	private Map<Marker, Event> displayedMarkers = new HashMap<Marker, Event>();
+	private Map<String, Event> displayedMarkers = new HashMap<String, Event>();
+	
+	/**
+	 * A map that maps each marker with its id
+	 */
+	private Map<String, Marker> dictionnaryMarkers=new HashMap<String, Marker>();
 
 	public DefaultEventMarkerDisplayer() {
 
@@ -48,18 +54,11 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 	 * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
 	 */
 	@Override
-	public void setMarkersToMaps(Context context, GoogleMap googleMap, List<Event> listOfEvent) {
+	public void setMarkersToMaps(Context context, GoogleMap googleMap, List<Event> eventsToDisplay) {
 
-		for (Event event : listOfEvent) {
+		for (Event event : eventsToDisplay) {
 
-			Marker marker = googleMap.addMarker(new MarkerOptions()
-			    					.position(event.getLatLng())
-			    					.title(event.getName())
-			    					.icon(BitmapDescriptorFactory
-			    					.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-			    					.anchor((float) MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
-
-			displayedMarkers.put(marker, event);
+			addMarker(event, context, googleMap);
 		}
 
 	}
@@ -87,7 +86,7 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 	@Override
 	public boolean isDisplayedMarker(Marker marker) {
 
-		return displayedMarkers.containsKey(marker);
+		return displayedMarkers.containsKey(marker.getId());
 	}
 
 	/*
@@ -97,7 +96,7 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 	 */
 	@Override
 	public List<Marker> getDisplayedMarkers() {
-		return new ArrayList<Marker>(displayedMarkers.keySet());
+		return new ArrayList<Marker>(dictionnaryMarkers.values());
 	}
 
 	/*
@@ -109,7 +108,7 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 	 */
 	@Override
 	public Event getEventForMarker(Marker marker) {
-		return displayedMarkers.get(marker);
+		return displayedMarkers.get(marker.getId());
 	}
 
 	/*
@@ -121,9 +120,9 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 	 */
 	@Override
 	public Marker getMarkerForEvent(Event event) {
-		for (Entry<Marker, Event> entry : displayedMarkers.entrySet()) {
+		for (Entry<String, Event> entry : displayedMarkers.entrySet()) {
 			if (entry.getValue().getID() == (event.getID())) {
-				return entry.getKey();
+				return dictionnaryMarkers.get(entry.getKey());
 			}
 		}
 		return null;
@@ -149,7 +148,7 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 	 * com.google.android.gms.maps.GoogleMap)
 	 */
 	@Override
-	public void addMarker(Event event, Context context, GoogleMap googleMap) {
+	public Marker addMarker(Event event, Context context, GoogleMap googleMap) {
 		Marker marker = googleMap.addMarker(new MarkerOptions()
 						.position(event.getLatLng())
 						.title(event.getName())
@@ -157,8 +156,9 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 						.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
 						.anchor((float) MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
 
-		displayedMarkers.put(marker, event);
-
+		displayedMarkers.put(marker.getId(), event);
+		dictionnaryMarkers.put(marker.getId(), marker);
+		return marker;
 	}
 
 	/*
@@ -170,10 +170,12 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 	 * com.google.android.gms.maps.GoogleMap)
 	 */
 	@Override
-	public void removeMarker(Event event) {
-		Marker marker= getMarkerForEvent(event);
+	public Marker removeMarker(Event event) {
+		Marker marker = getMarkerForEvent(event);
 		displayedMarkers.remove(marker);
 		marker.remove();
+		
+		return marker;
 
 	}
 
@@ -185,9 +187,22 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 	 * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
 	 */
 	@Override
-	public void updateMarkers(Context context, GoogleMap mGoogleMap, List<Event> listOfEvents) {
-		// TODO Auto-generated method stub
+	public void updateMarkers(Context context, GoogleMap googleMap, List<Event> eventsToDisplay) {
+
+		for (Event event : eventsToDisplay) {
+			if (isDisplayedEvent(event)) {
+				getMarkerForEvent(event).setPosition(event.getLatLng());
+			} else {
+				addMarker(event, context, googleMap);
+			}
+		}
+
+		for (Event event : getDisplayedEvents()) {
+			if ((!eventsToDisplay.contains(event))
+							&& (!getMarkerForEvent(event).isInfoWindowShown())) {
+				removeMarker(event);
+			}
+		}
 
 	}
-
 }
