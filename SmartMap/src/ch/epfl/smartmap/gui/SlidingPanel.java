@@ -20,7 +20,7 @@ import ch.epfl.smartmap.cache.MockDB;
  * @author jfperren
  *
  */
-public class InformationPanel extends FrameLayout {
+public class SlidingPanel extends FrameLayout {
     private static final String TAG = "INFORMATION_PANEL";
 
     private static final int ANYTHING_TO_EXTENDED_DURATION = 400;
@@ -71,7 +71,7 @@ public class InformationPanel extends FrameLayout {
     private ValueAnimator mClosedToCollapsedAnim;
     private ValueAnimator mClosedToExtendedAnim;
 
-    public InformationPanel(Context context, AttributeSet attrs) {
+    public SlidingPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
         // Create subviews
         mCollapsedView = new InformationViewCollapsed(context, this);
@@ -147,18 +147,22 @@ public class InformationPanel extends FrameLayout {
      * Hide panel
      */
     public void close() {
-        
-        if (mVisualState == VisualState.EXTENDED) {
-            mExtendedView.startAnimation(createAlphaAnimation(mExtendedView,
-                FadeState.OUT));
-            mExtendedToClosedAnim.start();
-        } else if (mVisualState == VisualState.COLLAPSED) {
-            mCollapsedView.startAnimation(createAlphaAnimation(mCollapsedView,
-                FadeState.OUT));
-            mCollapsedToClosedAnim.start();
-        } else {
-            assert (false) : "Trying to close, but already in state CLOSED (or unknown state)";
-        }
+//        
+//        if (mVisualState == VisualState.EXTENDED) {
+//            mExtendedView.startAnimation(createAlphaAnimation(mExtendedView,
+//                FadeState.OUT));
+//            mExtendedToClosedAnim.start();
+//        } else if (mVisualState == VisualState.COLLAPSED) {
+//            mCollapsedView.startAnimation(createAlphaAnimation(mCollapsedView,
+//                FadeState.OUT));
+//            mCollapsedToClosedAnim.start();
+//        } else {
+//            assert (false) : "Trying to close, but already in state CLOSED (or unknown state)";
+//        }
+        this.setVisibility(View.GONE);
+        mCollapsedView.setVisibility(View.GONE);
+        mExtendedView.setVisibility(View.GONE);
+        this.mVisualState = VisualState.CLOSED;
     }
 
     public boolean isExtended() {
@@ -227,7 +231,7 @@ public class InformationPanel extends FrameLayout {
         }
         
 
-        final InformationPanel thisPanel = this;
+        final SlidingPanel thisPanel = this;
         Log.d(TAG, "new Animation  : " + start.mHeight + " to " + end.mHeight);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -276,7 +280,7 @@ public class InformationPanel extends FrameLayout {
         anim.setDuration(fadeState.mDuration);
         anim.setStartOffset(fadeState.mDelay);
 
-        final InformationPanel thisPanel = this;
+        final SlidingPanel thisPanel = this;
 
         anim.setAnimationListener(new AlphaAnimation.AnimationListener() {
             @Override

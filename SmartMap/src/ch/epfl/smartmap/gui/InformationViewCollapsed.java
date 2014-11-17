@@ -30,7 +30,7 @@ public class InformationViewCollapsed extends RelativeLayout {
     private static final int MAX_IMAGE_SIZE = 125;
     private static final int MIN_IMAGE_SIZE = 125;
     
-    private InformationPanel mPanel;
+    private SlidingPanel mPanel;
     private ImageView mImageView;
     private TextView mTitleTextView;
     private TextView mInformationTextView;
@@ -43,13 +43,13 @@ public class InformationViewCollapsed extends RelativeLayout {
      * @param context
      */
     public InformationViewCollapsed(Context context, Displayable item,
-        InformationPanel panel) {
+        SlidingPanel panel) {
         super(context);
 
         mPanel = panel;
 
         // Layout Settings
-        this.setBackgroundResource(R.color.light_blue);
+        this.setBackgroundResource(R.drawable.view_group_background);
         this.setLayoutParams(new RelativeLayout.LayoutParams(
             LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         this.setPadding(PADDING, PADDING, PADDING, PADDING);
@@ -115,7 +115,7 @@ public class InformationViewCollapsed extends RelativeLayout {
     /**
      * @param context
      */
-    public InformationViewCollapsed(Context context, InformationPanel panel) {
+    public InformationViewCollapsed(Context context, SlidingPanel panel) {
         this(context, MockDB.ALAIN, panel);
     }
     

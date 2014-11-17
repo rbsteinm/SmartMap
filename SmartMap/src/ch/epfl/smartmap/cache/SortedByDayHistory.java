@@ -53,6 +53,14 @@ public class SortedByDayHistory implements History {
     public boolean isEmpty() {
         return mSize == 0;
     }
+    
+    public boolean contains(Friend friend) {
+        boolean contains = false;
+        for(Queue<Friend> e : mHistoryEntries) {
+            contains = contains || e.contains(friend);
+        }
+        return contains;
+    }
 
     /*
      * (non-Javadoc)

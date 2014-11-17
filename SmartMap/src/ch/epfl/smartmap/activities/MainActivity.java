@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Criteria;
 import android.location.Location;
@@ -33,7 +35,7 @@ import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
-import ch.epfl.smartmap.gui.InformationPanel;
+import ch.epfl.smartmap.gui.SlidingPanel;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SearchPanel;
 import ch.epfl.smartmap.gui.SideMenu;
@@ -63,6 +65,12 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
     private static final int LOCATION_UPDATE_DISTANCE = 10;
 
+    private enum MenuTheme {
+        MAP,
+        SEARCH,
+        ITEM;
+    }
+
     private SideMenu mSideMenu;
     private GoogleMap mGoogleMap;
     private FriendMarkerDisplayer mFriendMarkerDisplayer;
@@ -71,6 +79,8 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
     private SupportMapFragment mFragmentMap;
     private SearchEngine mSearchEngine;
     private Menu mMenu;
+    private MenuTheme mMenuTheme;
+    private Displayable mCurrentItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +107,8 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         if (mGoogleMap != null) {
             initializeMarkers();
         }
+        
+        mMenuTheme = MenuTheme.MAP;
     }
 
     @Override
@@ -104,6 +116,8 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         mMenu = menu;
+        final Menu mmenu = menu;
+        final MainActivity thisActivity = this;
 
         // Get Views
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -127,12 +141,15 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         });
 
         mSearchView.setOnSearchClickListener(new OnClickListener() {
+            
+            
             @Override
             public void onClick(View v) {
                 // Open Sliding Panel and Displays the main search view
                 String query = mSearchView.getQuery().toString();
                 mSearchPanel.open();
                 mSearchLayout.showMainPanel(query);
+                setSearchMenu();
             }
         });
         
@@ -160,18 +177,16 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
 
     @Override
     public void onBackPressed() {
-        final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
-        final InformationPanel mInformationPanel = (InformationPanel) findViewById(R.id.information_panel);
-
-        if (mSearchPanel.onBackPressed()){
-            return;
-        } 
-        
-        if (mInformationPanel.onBackPressed()){
-            return;
+        switch(mMenuTheme) {
+            case MAP:
+                super.onBackPressed();
+                break;
+            case SEARCH:
+            case ITEM:
+                setMainMenu(null);
+                break;
+            default : assert false;
         }
-        
-        super.onBackPressed();
     }
 
     public Context getContext() {
@@ -298,31 +313,16 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         final MenuItem mSearchView = (MenuItem) mMenu
             .findItem(R.id.action_search);
         final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
-        final InformationPanel mInformationPanel = (InformationPanel) findViewById(R.id.information_panel);
         // Close search interface
         mSearchPanel.close();
         mSearchView.collapseActionView();
         // Open information panel
-        mInformationPanel.displayItem(friend);
-        mInformationPanel.collapse();
         mMapZoomer.zoomOnLocation(friend.getLocation(), mGoogleMap);
+        setMainMenu(null);
+        setItemMenu(friend);
         
         // Add query to the searchEngine
         mSearchEngine.getHistory().addEntry(friend, new Date());
-    }
-    
-    /** 
-     * Tells the activity to focus on an item, this means
-     * - Zoom on it on the map
-     * - Display its information in the InformationView
-     * @param item
-     */
-    public void focusOnItem(Displayable item) {
-        final InformationPanel mInformationPanel = (InformationPanel) findViewById(R.id.information_panel);
-        
-        if (item instanceof Friend) {
-            
-        }
     }
     
     @Override
@@ -330,5 +330,79 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         final RelativeLayout mMapLayout = (RelativeLayout) findViewById(R.id.layout_map);
         
         return mMapLayout.onTouchEvent(e);
+    }
+    
+    public void setSearchMenu() {
+        final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
+        mSearchPanel.open();
+        ActionBar mActionBar = getActionBar();
+        mActionBar.setTitle(R.string.app_name);
+        mActionBar.setSubtitle(null);
+        mActionBar.setIcon(R.drawable.ic_launcher);
+        
+        mMenu.getItem(1).setVisible(false);
+        mMenu.getItem(2).setVisible(true);
+        mMenu.getItem(3).setVisible(false);
+        mMenu.getItem(4).setVisible(false);
+        mMenuTheme = MenuTheme.SEARCH;
+    }
+    
+    public void setMainMenu() {
+        final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
+        mSearchPanel.close();
+        ActionBar mActionBar = getActionBar();
+        mActionBar.setTitle(R.string.app_name);
+        mActionBar.setSubtitle(null);
+        mActionBar.setIcon(R.drawable.ic_launcher);
+        mMenu.getItem(0).collapseActionView();
+        mMenu.getItem(1).setVisible(true);
+        mMenu.getItem(2).setVisible(false);
+        mMenu.getItem(3).setVisible(false);
+        mMenu.getItem(4).setVisible(false);
+        mMenuTheme = MenuTheme.MAP;
+    }
+    
+    public void setMainMenu(MenuItem mi) {
+        setMainMenu();
+    }
+    
+    public void setItemMenu(Displayable item) {
+        mMenu.getItem(1).setVisible(false);
+        mMenu.getItem(2).setVisible(false);
+        mMenu.getItem(3).setVisible(true);
+        mMenu.getItem(4).setVisible(false);
+        
+        ActionBar mActionBar = getActionBar();
+        mActionBar.setTitle(item.getTitle());
+        mActionBar.setSubtitle(item.getInfos());
+        mActionBar.setIcon(new BitmapDrawable(getResources(), item.getPicture(this)));
+        mCurrentItem = item;
+        mMenuTheme = MenuTheme.ITEM;
+    }
+    
+    public void openInformationPanel(MenuItem mi) {
+        openInformationPanel();
+    }
+    
+    public void openInformationPanel() {
+        mMenu.getItem(3).setVisible(false);
+        mMenu.getItem(4).setVisible(true);
+        
+        final SlidingPanel mInformationPanel = (SlidingPanel) findViewById(R.id.information_panel);
+        
+        mInformationPanel.displayItem(mCurrentItem);
+        mInformationPanel.extend();
+    }
+    
+    public void closeInformationPanel() {
+        mMenu.getItem(3).setVisible(true);
+        mMenu.getItem(4).setVisible(false);
+        final SlidingPanel mInformationPanel = (SlidingPanel) findViewById(R.id.information_panel);
+        
+        mInformationPanel.close();
+    }
+    
+    public void closeInformationPanel(MenuItem mi) {
+        closeInformationPanel();
     }
 }

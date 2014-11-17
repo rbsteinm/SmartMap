@@ -18,13 +18,13 @@ import ch.epfl.smartmap.cache.MockDB;
 public class InformationViewExtended extends LinearLayout {
 
     private static final String TAG = "INFORMATION VIEW EXTENDED";
-    private InformationPanel mPanel;
+    private SlidingPanel mPanel;
 
     private int mWidth;
     private int mHeight;
 
     public InformationViewExtended(Context context, Displayable item,
-        InformationPanel panel) {
+        SlidingPanel panel) {
         super(context);
         // Layout Settings
         this.setOrientation(HORIZONTAL);
@@ -38,7 +38,7 @@ public class InformationViewExtended extends LinearLayout {
     /**
      * @param context
      */
-    public InformationViewExtended(Context context, InformationPanel panel) {
+    public InformationViewExtended(Context context, SlidingPanel panel) {
         this(context, MockDB.ALAIN, panel);
     }
 }
