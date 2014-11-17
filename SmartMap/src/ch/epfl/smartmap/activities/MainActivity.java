@@ -74,7 +74,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private ListView mDrawerList;
 
     private DatabaseHelper mDbHelper;
-
     private GoogleMap mGoogleMap;
     private FriendMarkerDisplayer mFriendMarkerDisplayer;
     private EventMarkerDisplayer mEventMarkerDisplayer;
@@ -110,8 +109,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
         mDbHelper = DatabaseHelper.getInstance();
 
-        
-        
         if (savedInstanceState == null) {
             displayMap();
         }
@@ -121,7 +118,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         
         //starting the background service
         startService(new Intent(this, UpdateService.class));
-        
     }
 
     @Override
@@ -261,6 +257,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         });
     }
 
+
     @Override
     public void onPause() {
         super.onPause();
@@ -327,7 +324,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
         mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
                 getVisibleUsers(mDbHelper.getAllUsers()));
-
         mMapZoomer = new DefaultZoomManager(mFragmentMap);
         Log.i(TAG, "before enter to zoom according");
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
@@ -337,7 +333,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
         }
     }
-
+    
     private List<User> getVisibleUsers(LongSparseArray<User> usersSparseArray) {
         List<User> visibleUsers = new ArrayList<User>();
         for (int i = 0; i < usersSparseArray.size(); i++) {
@@ -348,7 +344,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         }
         return visibleUsers;
     }
-
     /*
      * (non-Javadoc)
      *

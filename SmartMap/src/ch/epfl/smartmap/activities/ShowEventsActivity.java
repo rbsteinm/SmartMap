@@ -39,7 +39,6 @@ import ch.epfl.smartmap.gui.EventsListItemAdapter;
  */
 public class ShowEventsActivity extends ListActivity {
 
-    @SuppressWarnings("unused")
     private final static String TAG = ShowEventsActivity.class.getSimpleName();
 
     private final static double EARTH_RADIUS_KM = 6378.1;
@@ -166,56 +165,38 @@ public class ShowEventsActivity extends ListActivity {
 
         });
 
-        GregorianCalendar timeE0 = new GregorianCalendar();
-        timeE0.add(GregorianCalendar.MINUTE, -5);
-        GregorianCalendar timeEndE0 = new GregorianCalendar();
-        timeEndE0.add(GregorianCalendar.HOUR_OF_DAY, 5);
-        Location lutry = new Location("Lutry");
-        lutry.setLatitude(46.506038);
-        lutry.setLongitude(6.685314);
-
-        UserEvent e0 = new UserEvent("Now Event", 2, "Robich", timeE0, timeEndE0, lutry);
-        e0.setID(0);
-        e0.setPositionName("Lutry");
-
-        GregorianCalendar timeE1 = new GregorianCalendar();
-        timeE1.add(GregorianCalendar.DAY_OF_YEAR, 5);
-        GregorianCalendar timeEndE1 = new GregorianCalendar();
-        timeEndE1.add(GregorianCalendar.DAY_OF_YEAR, 10);
-        Location lausanne = new Location("Lausanne");
-        lausanne.setLatitude(46.519962);
-        lausanne.setLongitude(6.633597);
-
-        UserEvent e1 = new UserEvent("Swag party", 2, "Robich", timeE1, timeEndE1, lausanne);
-        e1.setID(1);
-        e1.setPositionName("Lausanne");
-
-        GregorianCalendar timeE2 = new GregorianCalendar();
-        timeE2.add(GregorianCalendar.HOUR_OF_DAY, 3);
-        GregorianCalendar timeEndE2 = new GregorianCalendar();
-        timeEndE2.add(GregorianCalendar.DAY_OF_YEAR, 2);
-        Location epfl = new Location("EPFL");
-        epfl.setLatitude(46.526120);
-        epfl.setLongitude(6.563778);
-
-        UserEvent e2 = new UserEvent("LOL Tournament", 1, "Alain", timeE2, timeEndE2, epfl);
-        e2.setID(2);
-        e2.setPositionName("EPFL");
-
-        GregorianCalendar timeE3 = new GregorianCalendar();
-        timeE3.add(GregorianCalendar.HOUR_OF_DAY, 1);
-        GregorianCalendar timeEndE3 = new GregorianCalendar();
-        timeEndE3.add(GregorianCalendar.HOUR, 5);
-        Location verbier = new Location("Verbier");
-        verbier.setLatitude(46.096076);
-        verbier.setLongitude(7.228875);
-
-        UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Julien", timeE3, timeEndE3, verbier);
-        e3.setID(3);
-        e3.setPositionName("Verbier");
-        String descrE3 = "It’s a vertical free-verse poem on the mountain. It’s the ultimate expression of all that"
-                + "is fun and liberating about sliding on snow in wintertime.";
-        e3.setDescription(descrE3);
+        /*
+         * GregorianCalendar timeE0 = new GregorianCalendar(); timeE0.add(GregorianCalendar.MINUTE, -5);
+         * GregorianCalendar timeEndE0 = new GregorianCalendar(); timeEndE0.add(GregorianCalendar.HOUR_OF_DAY, 5);
+         * Location lutry = new Location("Lutry"); lutry.setLatitude(46.506038); lutry.setLongitude(6.685314);
+         *
+         * UserEvent e0 = new UserEvent("Now Event", 2, "Robich", timeE0, timeEndE0, lutry); e0.setID(0);
+         * e0.setPositionName("Lutry");
+         *
+         * GregorianCalendar timeE1 = new GregorianCalendar(); timeE1.add(GregorianCalendar.DAY_OF_YEAR, 5);
+         * GregorianCalendar timeEndE1 = new GregorianCalendar(); timeEndE1.add(GregorianCalendar.DAY_OF_YEAR, 10);
+         * Location lausanne = new Location("Lausanne"); lausanne.setLatitude(46.519962);
+         * lausanne.setLongitude(6.633597);
+         *
+         * UserEvent e1 = new UserEvent("Swag party", 2, "Robich", timeE1, timeEndE1, lausanne); e1.setID(1);
+         * e1.setPositionName("Lausanne");
+         *
+         * GregorianCalendar timeE2 = new GregorianCalendar(); timeE2.add(GregorianCalendar.HOUR_OF_DAY, 3);
+         * GregorianCalendar timeEndE2 = new GregorianCalendar(); timeEndE2.add(GregorianCalendar.DAY_OF_YEAR, 2);
+         * Location epfl = new Location("EPFL"); epfl.setLatitude(46.526120); epfl.setLongitude(6.563778);
+         *
+         * UserEvent e2 = new UserEvent("LOL Tournament", 1, "Alain", timeE2, timeEndE2, epfl); e2.setID(2);
+         * e2.setPositionName("EPFL");
+         *
+         * GregorianCalendar timeE3 = new GregorianCalendar(); timeE3.add(GregorianCalendar.HOUR_OF_DAY, 1);
+         * GregorianCalendar timeEndE3 = new GregorianCalendar(); timeEndE3.add(GregorianCalendar.HOUR, 5); Location
+         * verbier = new Location("Verbier"); verbier.setLatitude(46.096076); verbier.setLongitude(7.228875);
+         *
+         * UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Julien", timeE3, timeEndE3, verbier); e3.setID(3);
+         * e3.setPositionName("Verbier"); String descrE3 =
+         * "It’s a vertical free-verse poem on the mountain. It’s the ultimate expression of all that" +
+         * "is fun and liberating about sliding on snow in wintertime."; e3.setDescription(descrE3);
+         */
 
         mDbHelper = new DatabaseHelper(this);
         /*
@@ -385,25 +366,25 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Computes the distance between two GPS locations (takes into consideration the earth radius)
+     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired by
+     * wikipedia
      *
      * @param lat1
      * @param lon1
      * @param lat2
      * @param lon2
-     * @return the distance in km, with 2 digits
+     * @return the distance in km, rounded to 2 digits
      * @author SpicyCH
      */
     public static double distance(double lat1, double lon1, double lat2, double lon2) {
-        double x1 = Math.toRadians(lat1);
-        double y1 = Math.toRadians(lon1);
-        double x2 = Math.toRadians(lat2);
-        double y2 = Math.toRadians(lon2);
+        double radLat1 = Math.toRadians(lat1);
+        double radLong1 = Math.toRadians(lon1);
+        double radLat2 = Math.toRadians(lat2);
+        double radLong2 = Math.toRadians(lon2);
 
-        double sec1 = Math.sin(x1) * Math.sin(x2);
-        double dl = Math.abs(y1 - y2);
-        double sec2 = Math.cos(x1) * Math.cos(x2);
-        // sec1, sec2, dl are in degree, need to convert to radians
+        double sec1 = Math.sin(radLat1) * Math.sin(radLat2);
+        double dl = Math.abs(radLong1 - radLong2);
+        double sec2 = Math.cos(radLat1) * Math.cos(radLat2);
         double centralAngle = Math.acos(sec1 + sec2 * Math.cos(dl));
         double distance = centralAngle * EARTH_RADIUS_KM;
 

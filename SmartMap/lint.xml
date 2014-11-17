@@ -4,4 +4,7 @@
         <ignore path="src/ch/epfl/smartmap/gui/InformationSlider.java" />
         <ignore path="src/ch/epfl/smartmap/gui/InformationSlider.java" />
     </issue>
+    <issue id="NewApi">
+        <ignore path="src/ch/epfl/smartmap/activities/ShowEventsActivity.java" />
+    </issue>
 </lint>
