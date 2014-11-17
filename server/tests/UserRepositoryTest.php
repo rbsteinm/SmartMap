@@ -150,7 +150,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	        new User(4, 12345, 'Tutu', 'VISIBLE', 156.85, -89.765, '2013-12-01 23:15:37')
 	    );
 	    
-	    $users = $repo->findUsersByPartialName('t');
+	    $users = $repo->findUsersByPartialName('t', $excluded = array());
 	    
 	    $this->assertEquals($correct, $users);
 	}
@@ -163,7 +163,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	        new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77, '2014-11-12 13:33:45')
 	    );
 	     
-	    $users = $repo->findUsersByPartialName('tO');
+	    $users = $repo->findUsersByPartialName('tO', $excluded = array());
 	     
 	    $this->assertEquals($correct, $users);
 	}
@@ -174,7 +174,22 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	     
 	    $correct = array();
 	     
-	    $users = $repo->findUsersByPartialName('toa');
+	    $users = $repo->findUsersByPartialName('toa', $excluded = array());
+	     
+	    $this->assertEquals($correct, $users);
+	}
+	
+	public function testFindUsersByPartialNameWithExcusion()
+	{
+	    $repo = new UserRepository(self::$doctrine);
+	     
+	    $correct = array(
+	        new User(1, 274, 'Toto', 'VISIBLE', 42.05, 23.77, '2014-11-12 13:33:45'),
+	        new User(2, 347876, 'Titi', 'INVISIBLE', 12.75645, 54.34556, '2014-04-12 01:34:22'),
+	        new User(4, 12345, 'Tutu', 'VISIBLE', 156.85, -89.765, '2013-12-01 23:15:37')
+	    );
+	     
+	    $users = $repo->findUsersByPartialName('t', $excluded = array(3));
 	     
 	    $this->assertEquals($correct, $users);
 	}
@@ -185,7 +200,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    
 	    $correct = array();
 	    
-	    $users = $repo->findUsersByPartialName('');
+	    $users = $repo->findUsersByPartialName('', $excluded = array());
 	    
 	    $this->assertEquals($correct, $users);
 	}
@@ -205,12 +220,16 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    $this->assertEquals(5, $this->getConnection()->getRowCount('users'), "Post-Condition");
 	}
 	
+	/*
+	 * This test may fail if the user is inserted in more than one second. I don't know how to fix this elegantly.
+	 */
 	public function testUpdateUser()
 	{
 	    $repo = new UserRepository(self::$doctrine);
 	     
-	    $user = new User(1, 123, 'Tete', 'INVISIBLE', 1.0, 2.0);
+	    $user = new User(1, 123, 'Tete', 'INVISIBLE', 1.0, 2.0, '2014-11-05 15:23:41');
 	    
+	    $date = date('Y-m-d H:i:s');
 	    $repo->updateUser($user);
 	    
 	    $correctRow = array(
@@ -220,7 +239,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	        'visibility' => 'INVISIBLE',
 	        'longitude' => 1.0,
 	        'latitude' => 2.0,
-	        'last_update' => date('Y-m-d H:i:s')
+	        'last_update' => $date
 	    );
 	    
 	    $queryTable = $this->getConnection()->createQueryTable('users', 'SELECT * FROM users WHERE idusers = 1');

@@ -384,13 +384,15 @@ class DataController
     public function findUsers(Request $request)
     {
         // We check that we are authenticated.
-        User::getIdFromRequest($request);
+        $id = User::getIdFromRequest($request);
         
         $partialName = $this->getPostParam($request, 'search_text');
         
         try
         {
-            $users = $this->mRepo->findUsersByPartialName($partialName);
+            $friendsIds = $this->mRepo->getFriendsIds($id);
+            
+            $users = $this->mRepo->findUsersByPartialName($partialName, $friendsIds);
         }
         catch (DatabaseException $e)
         {
