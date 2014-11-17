@@ -78,13 +78,12 @@
         -->
 
     </RelativeLayout>
-
+    
     <ch.epfl.smartmap.gui.SlidingPanel
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/information_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
         android:layout_gravity="bottom" />
 
     <ch.epfl.smartmap.gui.SearchPanel
@@ -101,5 +100,4 @@
             android:layout_marginLeft="0dp"
             android:layout_marginRight="0dp" />
     </ch.epfl.smartmap.gui.SearchPanel>
-
 </FrameLayout>
