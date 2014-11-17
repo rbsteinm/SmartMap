@@ -133,6 +133,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         if (savedInstanceState == null) {
             displayMap();
         }
+        
+        if (mGoogleMap != null) {
+            initializeMarkers();
+        }
 
         // starting the background service
         startService(new Intent(this, UpdateService.class));
