@@ -63,6 +63,7 @@ import com.google.android.gms.maps.model.Marker;
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
 
+
     private static final String TAG = "GoogleMap";
     private static final int LOCATION_UPDATE_TIMEOUT = 10000;
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
@@ -212,6 +213,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         Location eventLocation = startingIntent.getParcelableExtra("location");
         if (eventLocation != null) {
             mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
+            eventLocation=null;
         }
 
         mGoogleMap.setOnMapLongClickListener(new OnMapLongClickListener() {
@@ -320,7 +322,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     public void initializeMarkers() {
         mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
-        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, MockDB.getEventsList());
+        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, mDbHelper.getAllEvents());
         mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
         mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
                 getVisibleUsers(mDbHelper.getAllUsers()));
