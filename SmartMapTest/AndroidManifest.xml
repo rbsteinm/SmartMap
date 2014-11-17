@@ -26,5 +26,4 @@ the package of ch.epfl.smartmap. To run the tests use the command:
         android:name="com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
         android:label="Tests for ch.epfl.smartmap"
         android:targetPackage="ch.epfl.smartmap" />
-
 </manifest>

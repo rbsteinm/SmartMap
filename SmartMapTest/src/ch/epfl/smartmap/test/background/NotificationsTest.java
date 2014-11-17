@@ -27,8 +27,11 @@ public class NotificationsTest extends UiAutomatorTestCase {
 	    );
 	}
 	
+	/**
+	 * Test if notifications are created with success
+	 */
 	public void testNotificationExist() {
-		//getUiDevice().pressBack();
+		UiDevice.getInstance().openNotification();
 	}
 	
 }

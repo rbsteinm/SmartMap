@@ -82,6 +82,8 @@ public class MainActivityTest extends
     public void testOpenAndCloseSearchPanel() throws Exception {
         onView(withId(R.id.action_search)).perform(click());
         pressBack();
+        pressBack();
+        pressBack();
         onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
     }
     
@@ -104,9 +106,14 @@ public class MainActivityTest extends
     public void testSideMenuViewExist() throws Exception{
         //TODO check that all the views in the side menu exist
     }
-        
+    
+    /**
+     * 
+     * @throws Exception
+     */
     public void testOpenSideMenuUsingButton() throws Exception{
     	onView(withId(android.R.id.home)).perform(click());
+    	onView(withId(R.id.left_drawer)).check(matches(isDisplayed()));
     }
     
 }

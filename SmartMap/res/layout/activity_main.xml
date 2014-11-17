@@ -47,7 +47,7 @@
 
 
         <!-- 
-        The button that create notifications-->
+        The button that create notifications
         <Button
             android:id="@+id/create_add_notif_button"
             android:layout_width="wrap_content"
@@ -73,7 +73,7 @@
             android:layout_centerHorizontal="true"
             android:onClick="createEventNotification"
             android:text="@string/create_event_notif" >
-        </Button>
+        </Button>-->
 
     </RelativeLayout>
 
