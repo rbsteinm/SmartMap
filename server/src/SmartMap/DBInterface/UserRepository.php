@@ -155,7 +155,7 @@ class UserRepository
      * @param String $partialName
      * @return multitype:\SmartMap\DBInterface\User
      */
-    public function findUsersByPartialName($partialName)
+    public function findUsersByPartialName($partialName, $excludedIds)
     {
         $length = strlen($partialName);
         
@@ -164,13 +164,33 @@ class UserRepository
             return array();
         }
         
-        $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE SUBSTR(LOWER(name), 1, ?) = ? LIMIT 10";
+        if (!is_array($excludedIds))
+        {
+            throw new DatabaseException('Parameter $excludedIds must be array in findUsersByPartialName.');
+        }
         
         try
         {
-            $stmt = $this->mDb->executeQuery($req,
-                                             array($length, strtolower($partialName)),
-                                             array(\PDO::PARAM_INT, \PDO::PARAM_STR));
+            // We need to do two cases because mysql doesn't like IN () conditions with nothing in array.
+            if (!empty($excludedIds))
+            {
+                $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE idusers NOT IN (?) AND SUBSTR(LOWER(name), 1, ?)".
+                     " = ? LIMIT 10";
+                
+                $stmt = $this->mDb->executeQuery($req,
+                                                 array($excludedIds, $length, strtolower($partialName)),
+                                                 array(\Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
+                                                     \PDO::PARAM_INT,
+                                                     \PDO::PARAM_STR));
+            }
+            else
+            {
+                $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE SUBSTR(LOWER(name), 1, ?) = ? LIMIT 10";
+                
+                $stmt = $this->mDb->executeQuery($req,
+                    array($length, strtolower($partialName)),
+                    array(\PDO::PARAM_INT, \PDO::PARAM_STR));
+            }
         }
         catch (\Exception $e)
         {
@@ -284,7 +304,7 @@ class UserRepository
         
         while ($id = $stmt->fetch())
         {
-            $ids[] = $id['id2'];
+            $ids[] = (int) $id['id2'];
         }
         
         return $ids;
