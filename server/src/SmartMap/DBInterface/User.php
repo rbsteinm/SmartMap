@@ -55,7 +55,6 @@ class User
         {
             $lastUpdate = date(self::$DATE_FORMAT);
         }
-        $this->checkLastUpdate($lastUpdate);
         
         $this->mId = $id;
         $this->mFbId = $fbId;
@@ -63,7 +62,7 @@ class User
         $this->mVisibility = $visibility;
         $this->mLongitude = $longitude;
         $this->mLatitude = $latitude;
-        $this->mLastUpdate = $lastUpdate;
+        $this->mLastUpdate = $this->checkLastUpdate($lastUpdate);
     }
     
     /**
@@ -256,9 +255,9 @@ class User
     private function checkName($name)
     {
     	$length = strlen($name);
-    	if ($length == null OR $length > 60)
+    	if ($length < 2 OR $length > 60)
     	{
-    		throw new \InvalidArgumentException('Name must be no longer than 60 characters.');
+    		throw new \InvalidArgumentException('Name must be between 2 and 60 characters.');
     	}
     }
     
@@ -300,9 +299,19 @@ class User
     
     private function checkLastUpdate($date)
     {
-        if (strtotime($date) > time())
+        try
         {
-            throw new \InvalidArgumentException('Last update time cannot be in the future !');
+            $dt = new \DateTime($date);
         }
+        catch (\Exception $e)
+        {
+            throw new \InvalidArgumentException('Last update date must be in format ' . self::$DATE_FORMAT . '.');
+        }
+        if ($dt->getTimestamp() > time())
+        {
+            throw new \InvalidArgumentException('Last update date must not be in the future.');
+        }
+        // If we could create a date from the string, we return it in the right format.
+        return $dt->format(self::$DATE_FORMAT);
     }
 }
