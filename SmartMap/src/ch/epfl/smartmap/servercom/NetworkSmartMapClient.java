@@ -530,7 +530,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 		
 		List<User> friends = null;
 		try {
-			friends = parser.parseFriends(response,"list");
+			friends = parser.parseFriends(response, "list");
 		} catch (SmartMapParseException e) {
 			throw new SmartMapClientException(e);
 		}

@@ -60,7 +60,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 	 * ch.epfl.smartmap.servercom.SmartMapParser#parseFriends(java.lang.String)
 	 */
 	@Override
-	public List<User> parseFriends(String s,String key) throws SmartMapParseException {
+	public List<User> parseFriends(String s, String key) throws SmartMapParseException {
 
 		List<User> friends = new ArrayList<User>();
 
