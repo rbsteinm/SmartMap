@@ -91,10 +91,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		mSearchLayout.setSearchEngine(mSearchEngine);
 
 		mDbHelper = DatabaseHelper.getInstance();
-		// temporary, the database will not be filled here
-		for (Friend friend : MockDB.FRIENDS_LIST) {
-			mDbHelper.addUser(friend);
-		}
+		
 
 		if (savedInstanceState == null) {
 			displayMap();
@@ -188,6 +185,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		Location eventLocation = startingIntent.getParcelableExtra("location");
 		if (eventLocation != null) {
 			mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
+			eventLocation=null;
 		}
 	}
 
@@ -265,7 +263,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public void initializeMarkers() {
 		mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
 		mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-				MockDB.getEventsList());
+				mDbHelper.getAllEvents());
 
 		mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
 		mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
