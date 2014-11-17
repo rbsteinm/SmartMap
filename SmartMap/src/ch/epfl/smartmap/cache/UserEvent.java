@@ -184,4 +184,41 @@ public class UserEvent implements Event, Searchable, Displayable {
     public String getInfo() {
         return mDescription;
     }
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((mEvtName == null) ? 0 : mEvtName.hashCode());
+		result = prime * result + (int) (mID ^ (mID >>> 32));
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserEvent other = (UserEvent) obj;
+		if (mEvtName == null) {
+			if (other.mEvtName != null)
+				return false;
+		} else if (!mEvtName.equals(other.mEvtName))
+			return false;
+		if (mID != other.mID)
+			return false;
+		return true;
+	}
+    
+    
 }

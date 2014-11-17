@@ -67,7 +67,7 @@ public interface EventMarkerDisplayer {
 	 * @param event
 	 *            the event for which we want to add a marker
 	 */
-	void addMarker(Event event, Context context, GoogleMap googleMap);
+	Marker addMarker(Event event, Context context, GoogleMap googleMap);
 	
 	/**
 	 * Remove a marker  from the map
@@ -75,7 +75,7 @@ public interface EventMarkerDisplayer {
 	 * @param event
 	 *            the event for which we want to remove the marker
 	 */
-	void removeMarker(Event event);
+	Marker removeMarker(Event event);
 
 	/**
 	 * @param event 

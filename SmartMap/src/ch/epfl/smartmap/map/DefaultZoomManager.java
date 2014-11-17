@@ -47,8 +47,7 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 	@Override
 	public void zoomOnLocation(Location location, GoogleMap map) {
 		Log.d(TAG, "zoomMap called");
-		LatLng latLng1 = new LatLng(location.getLatitude(),
-				location.getLongitude());
+		LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
 		// Zoom in the Google Map
 		map.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
 		map.animateCamera(CameraUpdateFactory.zoomTo(GMAP_ZOOM_LEVEL)); // with
@@ -73,8 +72,7 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 	 * addOnGlobalLayoutListener
 	 */
 	@Override
-	public void zoomAccordingToMarkers(final GoogleMap map,
-			final List<Marker> markers) {
+	public void zoomAccordingToMarkers(final GoogleMap map, final List<Marker> markers) {
 		if (!markers.isEmpty()) {
 			Log.i(TAG, "after mapview enter to zoom according");
 			if (mapView.getViewTreeObserver().isAlive()) {
@@ -100,8 +98,7 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 											.removeOnGlobalLayoutListener(this);
 								}
 
-								CameraUpdate camUpdate = CameraUpdateFactory
-										.newLatLngBounds(bounds, PADDING);
+								CameraUpdate camUpdate = CameraUpdateFactory.newLatLngBounds(bounds, PADDING);
 								// mGoogleMap.moveCamera(camUpdate);
 								map.animateCamera(camUpdate);
 

@@ -68,7 +68,9 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	private Menu mMenu;
 
 	private DatabaseHelper mDbHelper;
-	private Intent mUpdateServiceIntent;
+	@SuppressWarnings("unused")
+	
+	private Intent mUpdateServiceIntent; //to get the friends position update
 
 	private GoogleMap mGoogleMap;
 	private FriendMarkerDisplayer mFriendMarkerDisplayer;
@@ -124,8 +126,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			@Override
 			public boolean onQueryTextChange(String newText) {
 				// Give the query results to searchLayout
-				mSearchLayout.updateSearchResults(mSearchView.getQuery()
-						.toString());
+				mSearchLayout.updateSearchResults(mSearchView.getQuery().toString());
 				return false;
 			}
 		});
@@ -201,7 +202,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			mFriendMarkerDisplayer.updateMarkers(getContext(), mGoogleMap,
-					getVisibleUsers(mDbHelper.getAllUsers()));
+							getVisibleUsers(mDbHelper.getAllUsers()));
 			Log.d(TAG, "updated friend markers");
 		}
 
@@ -216,12 +217,12 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 */
 	public void displayMap() {
 		int status = GooglePlayServicesUtil
-				.isGooglePlayServicesAvailable(getBaseContext());
+						.isGooglePlayServicesAvailable(getBaseContext());
 		// Showing status
 		if (status != ConnectionResult.SUCCESS) { // Google Play Services are
 			// not available
 			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
-					GOOGLE_PLAY_REQUEST_CODE);
+							GOOGLE_PLAY_REQUEST_CODE);
 			dialog.show();
 		} else {
 			// Google Play Services are available.
@@ -244,16 +245,16 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			// Location location =
 			// locationManager.getLastKnownLocation(provider);
 			boolean isGPSEnabled = locationManager
-					.isProviderEnabled(LocationManager.GPS_PROVIDER);
+							.isProviderEnabled(LocationManager.GPS_PROVIDER);
 			if (isGPSEnabled) {
 				Log.d(TAG, "gps enabled");
 				locationManager.requestLocationUpdates(
-						LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-						LOCATION_UPDATE_DISTANCE, this);
+								LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
+								LOCATION_UPDATE_DISTANCE, this);
 			} else if (null != locationManager
-					.getProvider(LocationManager.NETWORK_PROVIDER)) {
+							.getProvider(LocationManager.NETWORK_PROVIDER)) {
 				locationManager
-						.requestLocationUpdates(
+								.requestLocationUpdates(
 								LocationManager.NETWORK_PROVIDER,
 								LOCATION_UPDATE_TIMEOUT,
 								LOCATION_UPDATE_DISTANCE, this);
@@ -264,32 +265,36 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public void initializeMarkers() {
 		mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
 		mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-				mDbHelper.getAllEvents());
+						mDbHelper.getAllEvents());
 
 		mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
 		mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-				getVisibleUsers(mDbHelper.getAllUsers()));
+						getVisibleUsers(mDbHelper.getAllUsers()));
 
 		mMapZoomer = new DefaultZoomManager(mFragmentMap);
 
 		Log.i(TAG, "before enter to zoom according");
 		List<Marker> allMarkers = new ArrayList<Marker>(
-				mFriendMarkerDisplayer.getDisplayedMarkers());
+						mFriendMarkerDisplayer.getDisplayedMarkers());
 		allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
 		Intent startingIntent = getIntent();
 
 		if (startingIntent.getParcelableExtra("location") == null) {
 			mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
+			startingIntent=null;
 		}
 	}
 
 	private List<User> getVisibleUsers(LongSparseArray<User> usersSparseArray) {
+		Log.d(TAG, "in getVisibleUsers");
 		List<User> visibleUsers = new ArrayList<User>();
 		for (int i = 0; i < usersSparseArray.size(); i++) {
+
 			User user = usersSparseArray.valueAt(i);
-			if (user.isVisible()) {
-				visibleUsers.add(user);
-			}
+			Log.d(TAG, "Users in the sparsearray cache " + user.getName());
+			// if (user.isVisible()) {
+			visibleUsers.add(user);
+			// }
 		}
 		return visibleUsers;
 	}

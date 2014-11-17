@@ -223,4 +223,38 @@ public class Friend implements User, Searchable, Displayable {
         return "";
     }
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (mId ^ (mId >>> 32));
+		result = prime * result + ((mName == null) ? 0 : mName.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Friend other = (Friend) obj;
+		if (mId != other.mId)
+			return false;
+		if (mName == null) {
+			if (other.mName != null)
+				return false;
+		} else if (!mName.equals(other.mName))
+			return false;
+		return true;
+	}
+
 }
