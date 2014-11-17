@@ -51,6 +51,9 @@ public class AddEventActivity extends FragmentActivity {
     private EditText mDescription;
     private EditText mPlaceName;
     private Context mContext;
+    private TextWatcher mTextChangedListener;
+
+    private int mNewEventId = 0;
 
     /**
      * Ensures the end of the event is after its start.
@@ -72,22 +75,22 @@ public class AddEventActivity extends FragmentActivity {
 
             GregorianCalendar end = getDateFromTextFormat(endDate.getText().toString(), endTime.getText().toString());
 
-            GregorianCalendar now = getDateFromTextFormat(startDate.getText().toString(), startTime.getText()
-                    .toString());
+            GregorianCalendar now = new GregorianCalendar();
 
             if (end.before(start)) {
                 // The user is trying to create the end of the event before its start!
+
                 endDate.setText("End Date");
                 endTime.setText("End Time");
 
                 Toast.makeText(mContext, "The event cannot end before it begins!", Toast.LENGTH_LONG).show();
             } else if (end.before(now)) {
                 // The user is trying to create an event in the past
+
                 endDate.setText("End Date");
                 endTime.setText("End Time");
 
                 Toast.makeText(mContext, "The event's end cannot be in the past!", Toast.LENGTH_LONG).show();
-                Log.d(TAG, "Event in past! now is " + now);
             }
         }
 
@@ -115,17 +118,17 @@ public class AddEventActivity extends FragmentActivity {
             location.setLatitude(latitude);
             location.setLongitude(longitude);
 
-            SettingsManager setMng = new SettingsManager(getApplicationContext());
+            SettingsManager setMng = SettingsManager.getInstance();
             UserEvent event = new UserEvent(mEventName.getText().toString(), setMng.getUserID(), setMng.getUserName(),
                     startDate, endDate, location);
 
             // TODO send event to server (server-side code not written yet :( ), and use the returned event id
             // in setID
-            event.setID(5);
+            event.setID(mNewEventId++);
             event.setDescription(mDescription.getText().toString());
             event.setPositionName(mPlaceName.getText().toString());
 
-            DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+            DatabaseHelper dbHelper = DatabaseHelper.getInstance();
             dbHelper.addEvent(event);
 
             Toast.makeText(mContext, "Event created!", Toast.LENGTH_SHORT).show();
@@ -153,12 +156,20 @@ public class AddEventActivity extends FragmentActivity {
         mLongitude.setEnabled(false);
         mLatitude.setEnabled(false);
 
-        TextWatcher textChangedListener = new TextWatcher() {
+        mTextChangedListener = new TextWatcher() {
 
             @Override
             public void afterTextChanged(Editable s) {
+                // Remove the TextChangedListener to avoid useless calls triggered by the following code
+                mPickEndDate.removeTextChangedListener(mTextChangedListener);
+                mPickStartDate.removeTextChangedListener(mTextChangedListener);
+
                 checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
                 Log.d(TAG, "Text changed!");
+
+                // Reset the TextChangedListener
+                mPickEndDate.addTextChangedListener(mTextChangedListener);
+                mPickStartDate.addTextChangedListener(mTextChangedListener);
             }
 
             @Override
@@ -170,10 +181,10 @@ public class AddEventActivity extends FragmentActivity {
             }
         };
 
-        mPickStartDate.addTextChangedListener(textChangedListener);
-        mPickStartTime.addTextChangedListener(textChangedListener);
-        mPickEndDate.addTextChangedListener(textChangedListener);
-        mPickEndTime.addTextChangedListener(textChangedListener);
+        mPickStartDate.addTextChangedListener(mTextChangedListener);
+        mPickStartTime.addTextChangedListener(mTextChangedListener);
+        mPickEndDate.addTextChangedListener(mTextChangedListener);
+        mPickEndTime.addTextChangedListener(mTextChangedListener);
 
         GregorianCalendar now = new GregorianCalendar();
 
