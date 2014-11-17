@@ -108,12 +108,15 @@ public interface SmartMapClient {
 	void inviteFriend(long id) throws SmartMapClientException;
 
 	/**
-	 * Retrieve the invitations from the server
+	 * Retrieve the invitations from the server, and also the list of users that
+	 * accepted an invitation from us
 	 * 
-	 * @return the list of inviters
+	 * @return a list of two lists of users: the first list is the list of the
+	 *         inviters, the second list is the list of users that accepted our
+	 *         invitation
 	 * @throws SmartMapClientException
 	 */
-	List<User> getInvitations() throws SmartMapClientException;
+	List<List<User>> getInvitations() throws SmartMapClientException;
 
 	/**
 	 * Accepts the invitation of the friend with id id
@@ -141,6 +144,38 @@ public interface SmartMapClient {
 	 * @throws SmartMapClientException
 	 */
 	void updatePos(Location location) throws SmartMapClientException;
+	
+	/**
+	 * Asks the server for the friends whose name begin with the given text
+	 * @param text
+	 * @return the list of friends
+	 * @throws SmartMapClientException
+	 */
+	List<User> findUsers(String text) throws SmartMapClientException;
+	
+	/**
+	 * Decline the invitation of the user with the given id
+	 * 
+	 * @param id
+	 * @throws SmartMapClientException
+	 */
+	void declineInvitation(long id) throws SmartMapClientException;
+
+	/**
+	 * Confirm the server that the acception of the given friend was received
+	 * 
+	 * @param id
+	 * @throws SmartMapClientException
+	 */
+	void ackAcceptedInvitation(long id) throws SmartMapClientException;
+
+	/**
+	 * Remove the given friend
+	 * 
+	 * @param id
+	 * @throws SmartMapClientException
+	 */
+	void removeFriend(long id) throws SmartMapClientException;
 
 
 }

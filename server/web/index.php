@@ -53,6 +53,10 @@ $app['data.controller'] = $app->share(function() use($app) {
     return new SmartMap\Control\DataController($app['user.repository']);
 });
 
+$app['profile.controller'] = $app->share(function() use($app) {
+    return new SmartMap\Control\ProfileController();
+});
+
 // Error management
 $app->error(function (SmartMap\Control\ControlException $e, $code) use ($app) {
     $app['monolog']->addDebug('Deprecated ControlException thrown: ' . $e->__toString());
@@ -103,6 +107,8 @@ $app->post('/followFriend', 'authorization.controller:followFriend');
 $app->post('/unfollowFriend', 'authorization.controller:unfollowFriend');
 
 $app->post('/getUserInfo', 'data.controller:getUserInfo');
+
+$app->post('/getProfilePicture', 'profile.controller:getProfilePicture');
 
 $app->post('/inviteFriend', 'data.controller:inviteFriend');
 

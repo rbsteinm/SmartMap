@@ -30,6 +30,9 @@ use Facebook\GraphUser;
  */
 class AuthenticationController
 {
+    private static $GRAPH_API_URL = 'http://graph.facebook.com/v2.2/';
+    private static $PICTURE_REQUEST = '/picture?width=480&height=480';
+    
     private $mAppSecret;
     private $mAppId;
     private $mRepo;
@@ -64,12 +67,12 @@ class AuthenticationController
         }
         
         // Check if token is valid and matches name + ID
-        $session = new FacebookSession($facebookToken);
+        $fbSession = new FacebookSession($facebookToken);
         
         // Validate session
         try
         {
-            $session->validate();
+            $fbSession->validate();
         }
         catch (FacebookRequestException $ex)
         {
@@ -85,7 +88,7 @@ class AuthenticationController
         // At this point the session is valid. We check the session is associated with the user name and id.
         try
         {
-            $user_profile = (new FacebookRequest($session, 'GET', '/me'))->execute()->getGraphObject( 
+            $user_profile = (new FacebookRequest($fbSession, 'GET', '/me'))->execute()->getGraphObject( 
                              GraphUser::className());
             if ($name != $user_profile->getName() OR $facebookId != $user_profile->getId())
             {
@@ -115,6 +118,11 @@ class AuthenticationController
             $user = new User(1 , $facebookId, $name, 'VISIBLE', 0.0, 0.0);
             $user = $this->mRepo->createUser($user);
             $session->set('userId', $user->getId());
+            
+            // Getting the user facebook profile image to set it as default.
+            $pic = file_get_contents(self::$GRAPH_API_URL . $user->getFbId() . self::$PICTURE_REQUEST);
+        
+            file_put_contents(ProfileController::$PICTURES_PATH . $user->getId() . '.jpg', $pic);
         }
         else
         {

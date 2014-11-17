@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
+import android.util.Log;
 import android.util.LongSparseArray;
 
 /**
@@ -186,6 +187,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
             updateUser(user);
         }
+        
+        Log.d(DATABASE_NAME, "User added in the cache: " + user.getName());
 
         cursor.close();
     }

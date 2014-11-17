@@ -9,6 +9,7 @@ import java.util.Locale;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -17,15 +18,16 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.Notifications;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;
@@ -51,7 +53,6 @@ import com.google.android.gms.maps.model.Marker;
  * This Activity displays the core features of the App. It displays the map and the whole menu.
  *
  * @author jfperren
- * @author SpicyCH
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
 
@@ -62,6 +63,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private static final String CITY_NAME = "CITY_NAME";
 
     private SideMenu mSideMenu;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
     private GoogleMap mGoogleMap;
     private FriendMarkerDisplayer mFriendMarkerDisplayer;
     private EventMarkerDisplayer mEventMarkerDisplayer;
@@ -75,11 +78,22 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Set actionbar color
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.mainBlueColor)));
+
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeAsUpIndicator(getResources().getDrawable(R.drawable.ic_drawer));
+
         // Get needed Views
         final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
 
-        mSideMenu = new SideMenu(this);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer_listView);
+
+        mSideMenu = new SideMenu(this.getContext());
         mSideMenu.initializeDrawerLayout();
+        // TODO agpmilli : When click on actionbar icon button, open side menu
 
         mSearchEngine = new MockSearchEngine();
         mSearchLayout.setSearchEngine(mSearchEngine);
@@ -139,6 +153,17 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        }
+
+        // Handle clicks on home button
+        if (id == android.R.id.home) {
+            if (mDrawerList.isShown()) {
+                Log.d("TAG", "Close side menu");
+                mDrawerLayout.closeDrawer(mDrawerList);
+            } else {
+                Log.d("TAG", "Open side menu");
+                mDrawerLayout.openDrawer(mDrawerList);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -242,16 +267,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         }
 
         mGoogleMap.setOnMapLongClickListener(new OnMapLongClickListener() {
-
             @Override
             public void onMapLongClick(LatLng latLng) {
                 Intent result = new Intent(getContext(), AddEventActivity.class);
                 Bundle extras = new Bundle();
-
                 Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
                 String cityName = "";
                 List<Address> addresses;
-
                 try {
                     addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
                     if (addresses.size() > 0) {
@@ -271,11 +293,9 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                     } catch (IOException e) {
                     }
                 }
-
                 extras.putString(CITY_NAME, cityName);
                 extras.putParcelable(LOCATION_SERVICE, latLng);
                 result.putExtras(extras);
-
                 if (getIntent().getBooleanExtra("pickLocationForEvent", false)) {
                     // Return the result to the calling activity (AddEventActivity)
                     setResult(RESULT_OK, result);
@@ -307,13 +327,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
         // nothing
-    }
-
-    /**
-     * Create a notification that appear in the notifications tab
-     */
-    public void createNotification(View view) {
-        Notifications.newFriendNotification(view, this, MockDB.ALAIN);
     }
 
     public void performQuery(Friend friend) {

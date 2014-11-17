@@ -28,14 +28,14 @@
                 android:layout_alignParentTop="true" />
 
             <ListView
-                android:id="@+id/left_drawer"
+                android:id="@+id/left_drawer_listView"
                 android:layout_width="240dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
-                android:background="#111"
+                android:background="@color/mainBlueColor"
                 android:choiceMode="singleChoice"
                 android:divider="@android:color/transparent"
-                android:dividerHeight="0dp" />
+                android:dividerHeight="0dp"/>
         </android.support.v4.widget.DrawerLayout>
 
         <TextView
@@ -44,18 +44,6 @@
             android:layout_height="wrap_content" />
 
         <!-- <fragment xmlns:android="http://schemas.android.com/apk/res/android" -->
-
-
-        <!--
-        The button that create notifications
-        <Button
-            android:id="@+id/create_notif_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:onClick="createNotification"
-            android:text="@string/create_notif" >
-        </Button> -->
 
     </RelativeLayout>
 

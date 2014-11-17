@@ -40,8 +40,6 @@ import com.facebook.widget.LoginButton;
  */
 public class FacebookFragment extends Fragment {
 
-
-
 	private static final String TAG = FacebookFragment.class.getSimpleName();
 
 	private static final String FACEBOOK_ID_POST_NAME = "facebookId";
@@ -85,12 +83,11 @@ public class FacebookFragment extends Fragment {
 				.getActivity().getBaseContext(), R.anim.face_anim));
 		authButton.setFragment(this);
 
+		// Not logged in Facebook or permission to use Facebook in SmartMap not
+		// given
 		if (Session.getActiveSession() == null
 				|| Session.getActiveSession().getPermissions().isEmpty()) {
 			authButton.setReadPermissions(mPermissions);
-		} else {
-			view.findViewById(R.id.loadingTextView).setVisibility(View.VISIBLE);
-			view.findViewById(R.id.loadingBar).setVisibility(View.VISIBLE);
 		}
 		return view;
 	}
@@ -218,11 +215,10 @@ public class FacebookFragment extends Fragment {
 	}
 
 	private void startMainActivity() {
-	    Activity currentActivity = getActivity();
-	    Intent intent = new Intent(getActivity(),
-            MainActivity.class);
-	    startActivity(intent);
-	    currentActivity.finish();
+		Activity currentActivity = getActivity();
+		Intent intent = new Intent(getActivity(), MainActivity.class);
+		startActivity(intent);
+		currentActivity.finish();
 	}
 
 	private boolean sendDataToServer(Map<String, String> params) {
@@ -297,4 +293,3 @@ public class FacebookFragment extends Fragment {
 		}
 	}
 }
-
