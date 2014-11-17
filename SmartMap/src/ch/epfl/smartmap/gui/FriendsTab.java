@@ -49,8 +49,6 @@ public class FriendsTab extends ListFragment{
 		mCacheDB = new DatabaseHelper(mContext);
 		mFriendList = new ArrayList<User>();
 		mFriendList = asList(mCacheDB.getAllUsers());
-		//mFriendList.get(1).setOnline(true);
-		//mFriendList.get(2).setOnline(true);
 		sortByOnline(mFriendList);
 		
 		// Create custom Adapter and pass it to the Activity
@@ -70,6 +68,12 @@ public class FriendsTab extends ListFragment{
 				&& (tv.getId() == R.id.activity_friends_name);
 		String name = tv.getText().toString();
 		displayDeleteConfirmationDialog(name, userId);
+	}
+	
+	@Override
+	public void onResume() {
+	    super.onResume();
+	    setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
 	}
 	
 
@@ -143,7 +147,7 @@ public class FriendsTab extends ListFragment{
                         getInstance().getUserInfo(params[0]).getName();
                 
                 //remove friend from cache and update displayed list
-                //TODO find a way to do this only if no exception
+                //TODO should be done on the removeFriend method
                 mCacheDB.deleteUser(params[0]);
             } catch (SmartMapClientException e) {
                 confirmString = "Network error, operation failed";

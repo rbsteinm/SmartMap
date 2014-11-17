@@ -11,10 +11,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -38,12 +42,18 @@ public class ShowEventsActivity extends ListActivity {
     @SuppressWarnings("unused")
     private final static String TAG = ShowEventsActivity.class.getSimpleName();
 
-    private final static double EARTH_RADIUS = 6378.1;
+    private final static double EARTH_RADIUS_KM = 6378.1;
     private final static int SEEK_BAR_MIN_VALUE = 2;
     private final static int ONE_HUNDRED = 100;
+    private static final long LOCATION_REFRESH_TIME = 10000;
+    private static final long LOCATION_MIN_DISTANCE = 15;
 
     private SeekBar mSeekBar;
     private TextView mShowKilometers;
+    private CheckBox mNearMeCheckBox;
+
+    private LocationListener mLocationListener;
+    private LocationManager mLocationManager;
 
     private Context mContext;
 
@@ -53,8 +63,7 @@ public class ShowEventsActivity extends ListActivity {
     private boolean mOngoingChecked;
     private boolean mNearMeChecked;
 
-    // Mock
-    private List<Event> mMockEventsList;
+    private List<Event> mEventsList;
     private List<Event> mCurrentList;
     private static String mMyName = "Robich";
     private Location mMyLocation;
@@ -64,18 +73,75 @@ public class ShowEventsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_events);
 
-        mMyLocation = new Location("Mock location Pully");
-        mMyLocation.setLatitude(46.509300);
-        mMyLocation.setLongitude(6.661600);
+        // Makes the logo clickable (clicking it returns to previous activity)
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
+        mMyLocation = new Location("GPS + NETWORK");
+        /*
+         * mMyLocation.setLatitude(46.509300); mMyLocation.setLongitude(6.661600);
+         */
+        mMyLocation.setLatitude(0);
+        mMyLocation.setLongitude(0);
         mContext = getApplicationContext();
+
+        mLocationListener = new LocationListener() {
+
+            @Override
+            public void onLocationChanged(Location loc) {
+                mMyLocation.set(loc);
+                updateCurrentList();
+                mNearMeCheckBox.setOnClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        // Since we were able to fetch the user's position, we reenable the function associated to this
+                        // View
+                        onCheckboxClicked(v);
+                    }
+
+                });
+                Log.i(TAG, "User's location updated");
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+        };
+
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME,
+                LOCATION_MIN_DISTANCE, mLocationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_REFRESH_TIME,
+                LOCATION_MIN_DISTANCE, mLocationListener);
 
         mMyEventsChecked = false;
         mOngoingChecked = false;
         mNearMeChecked = false;
 
+        // We only make this checkbox available as soon as we get the user's position
+        mNearMeCheckBox = (CheckBox) findViewById(R.id.ShowEventsCheckBoxNearMe);
+        mNearMeCheckBox.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(
+                        getApplicationContext(),
+                        "Your position hasn't been retrieved yet. Make sure your GPS or your cellular network is "
+                                + "turned on.", Toast.LENGTH_LONG).show();
+            }
+        });
+
         mShowKilometers = (TextView) findViewById(R.id.showEventKilometers);
-        // By default, the seek bar is disabled. This is done programmatically as android:enabled="false" doesn't work
+        // By default, the seek bar is disabled. This is done programmatically
+        // as android:enabled="false" doesn't work
         // out in xml
         mSeekBar = (SeekBar) findViewById(R.id.showEventSeekBar);
         mSeekBar.setEnabled(false);
@@ -152,16 +218,22 @@ public class ShowEventsActivity extends ListActivity {
         e3.setDescription(descrE3);
 
         mDbHelper = new DatabaseHelper(this);
-        mDbHelper.addEvent(e0);
-        mDbHelper.addEvent(e1);
-        mDbHelper.addEvent(e2);
-        mDbHelper.addEvent(e3);
+        /*
+         * mDbHelper.addEvent(e0); mDbHelper.addEvent(e1); mDbHelper.addEvent(e2); mDbHelper.addEvent(e3);
+         */
 
-        mMockEventsList = mDbHelper.getAllEvents();
+        mEventsList = mDbHelper.getAllEvents();
 
         // Create custom Adapter and pass it to the Activity
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mMockEventsList, mMyLocation);
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
         setListAdapter(adapter);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // This is needed to show an update of the events' list after having created an event
+        updateCurrentList();
     }
 
     @Override
@@ -173,13 +245,23 @@ public class ShowEventsActivity extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
         }
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.showEventsMenuNewEvent:
+                Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
+                startActivity(showEventIntent);
+            default:
+                // No other menu items!
+                break;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -208,9 +290,9 @@ public class ShowEventsActivity extends ListActivity {
                 // TODO open event in map
                 Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
 
-                Intent displayActivityIntent = new Intent(mContext, MainActivity.class);
-                displayActivityIntent.putExtra("location", event.getLocation());
-                startActivity(displayActivityIntent);
+                Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                showEventIntent.putExtra("location", event.getLocation());
+                startActivity(showEventIntent);
 
             }
         });
@@ -225,15 +307,14 @@ public class ShowEventsActivity extends ListActivity {
 
         switch (v.getId()) {
             case R.id.ShowEventsCheckBoxNearMe:
-                SeekBar seekBar = (SeekBar) findViewById(R.id.showEventSeekBar);
                 if (checkBox.isChecked()) {
                     mNearMeChecked = true;
                     // Show the seek bar
-                    seekBar.setEnabled(true);
+                    mSeekBar.setEnabled(true);
                 } else {
                     mNearMeChecked = false;
                     // Hide the seek bar
-                    seekBar.setEnabled(false);
+                    mSeekBar.setEnabled(false);
                 }
                 break;
             case R.id.ShowEventsCheckBoxMyEv:
@@ -262,15 +343,15 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
-        mMockEventsList = mDbHelper.getAllEvents();
+        mEventsList = mDbHelper.getAllEvents();
         mCurrentList = new ArrayList<Event>();
 
         // Copy complete list into current list
-        for (Event e : mMockEventsList) {
+        for (Event e : mEventsList) {
             mCurrentList.add(e);
         }
 
-        for (Event e : mMockEventsList) {
+        for (Event e : mEventsList) {
             if (mMyEventsChecked) {
                 if (!e.getCreatorName().equals(mMyName)) {
                     mCurrentList.remove(e);
@@ -284,12 +365,17 @@ public class ShowEventsActivity extends ListActivity {
             }
 
             if (mNearMeChecked) {
-                double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
-                        mMyLocation.getLatitude(), mMyLocation.getLongitude());
-                String[] showKMContent = mShowKilometers.getText().toString().split(" ");
-                double distanceMax = Double.parseDouble(showKMContent[0]);
-                if (!(distanceMeEvent < distanceMax)) {
-                    mCurrentList.remove(e);
+                if (mMyLocation != null) {
+                    double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
+                            mMyLocation.getLatitude(), mMyLocation.getLongitude());
+                    String[] showKMContent = mShowKilometers.getText().toString().split(" ");
+                    double distanceMax = Double.parseDouble(showKMContent[0]);
+                    if (!(distanceMeEvent < distanceMax)) {
+                        mCurrentList.remove(e);
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Your current location cannot be retrieved. Please try again", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -319,7 +405,7 @@ public class ShowEventsActivity extends ListActivity {
         double sec2 = Math.cos(x1) * Math.cos(x2);
         // sec1, sec2, dl are in degree, need to convert to radians
         double centralAngle = Math.acos(sec1 + sec2 * Math.cos(dl));
-        double distance = centralAngle * EARTH_RADIUS;
+        double distance = centralAngle * EARTH_RADIUS_KM;
 
         return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;
     }

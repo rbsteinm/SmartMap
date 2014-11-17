@@ -1,0 +1,117 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="ch.epfl.smartmap.activities.AddEventActivity" >
+
+    <EditText
+        android:id="@+id/addEventEventName"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/event_name_border"
+        android:hint="@string/addEventEventName" />
+     
+     <EditText
+         android:id="@+id/addEventEventDate"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_below="@+id/addEventEventName"
+         android:focusable="false"
+         android:hint="@string/addEventEventDate"
+         android:inputType="date" >
+
+    </EditText>
+
+    <EditText
+        android:id="@+id/addEventEventTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/addEventEventDate"
+        android:layout_alignBottom="@+id/addEventEventDate"
+        android:layout_toRightOf="@+id/addEventEventDate"
+        android:focusable="false"
+        android:hint="@string/addEventEventTime" />
+
+    <EditText
+        android:id="@+id/addEventEndDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/addEventEventTime"
+        android:layout_toLeftOf="@+id/addEventEventTime"
+        android:ems="10"
+        android:focusable="false"
+        android:hint="@string/addEventEndDate"
+        android:inputType="date" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/addEventEndTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/addEventEventTime"
+        android:layout_below="@+id/addEventEventDate"
+        android:layout_toRightOf="@+id/addEventEventDate"
+        android:ems="10"
+        android:focusable="false"
+        android:hint="@string/addEventEndTime" />
+
+    <EditText
+        android:id="@+id/addEventLongitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/addEventLatitude"
+        android:layout_alignBottom="@+id/addEventLatitude"
+        android:layout_toRightOf="@+id/addEventLatitude"
+        android:ems="10"
+        android:hint="@string/addEventLongitude"
+        android:inputType="numberDecimal|numberSigned" />
+    
+    <EditText
+        android:id="@+id/addEventPlaceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/addEventDescription"
+        android:layout_below="@+id/addEventLatitude"
+        android:layout_marginTop="30dp"
+        android:ems="10"
+        android:hint="@string/addEventPlaceName" />
+
+    <EditText
+        android:id="@+id/addEventDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/addEventLatitude"
+        android:layout_below="@+id/addEventPlaceName"
+        android:layout_marginTop="24dp"
+        android:ems="10"
+        android:hint="@string/addEventDescription" />
+
+    <EditText
+        android:id="@+id/addEventLatitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/addEventEndDate"
+        android:layout_marginTop="96dp"
+        android:layout_toLeftOf="@+id/addEventEndTime"
+        android:ems="10"
+        android:hint="@string/addEventLatitude"
+        android:inputType="numberDecimal|numberSigned" />
+
+    <Button
+        android:id="@+id/addEventButtonPickLocation"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/addEventLongitude"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:text="@string/addEventButtonPickLocation"
+        android:onClick="pickLocation" />
+
+</RelativeLayout>
