@@ -5,4 +5,8 @@
     <item name="side_menu_events" type="id"/>
     <item name="side_menu_filters" type="id"/>
     <item name="side_menu_settings" type="id"/>
+    <item name="info_panel_collapsed_title" type="id"/>
+    <item name="info_panel_collapsed_infos" type="id"/>
+    <item name="info_panel_collapsed_photo" type="id"/>
+    <item name="info_panel_collapsed_button" type="id"/>
 </resources>

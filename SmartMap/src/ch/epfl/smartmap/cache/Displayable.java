@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 
 /**
  * Objects that can be displayed on the bottom menu
+ * 
  * @author ritterni
  */
 public interface Displayable {
@@ -23,5 +24,5 @@ public interface Displayable {
     /**
      * @return Text containing various information (description, last seen, etc.)
      */
-    String getInfo();
+    String getShortInfos();
 }

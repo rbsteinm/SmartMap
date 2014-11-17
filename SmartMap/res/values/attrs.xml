@@ -3,4 +3,5 @@
    <declare-styleable name="SearchResultView" />
    <declare-styleable name="SlidingUpPanel" />
    <declare-styleable name="SearchLayout" />
+   <declare-styleable name="SlidingPanel" />
 </resources>

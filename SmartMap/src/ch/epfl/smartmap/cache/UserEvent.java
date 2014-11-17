@@ -181,7 +181,7 @@ public class UserEvent implements Event, Searchable, Displayable {
     }
 
     @Override
-    public String getInfo() {
+    public String getShortInfos() {
         return mDescription;
     }
 
@@ -219,6 +219,4 @@ public class UserEvent implements Event, Searchable, Displayable {
 			return false;
 		return true;
 	}
-    
-    
 }
