@@ -7,4 +7,5 @@
     <color name="lastSeenConnectionTextColor">#999999</color>
     <color name="searchResultTitle">#999999</color>
     <color name="searchResultOnSelect">#5581BEF7</color>
+    <color name="mainBlueColor">#004356</color>
 </resources>
