@@ -637,12 +637,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int updatedFriends = 0;
         try {
             Map<Long, Location> locations = NetworkSmartMapClient.getInstance().listFriendsPos();
-            Set<Long> keySet = locations.keySet(); //the keys are friend IDs
+            LongSparseArray<User> friends = getAllUsers();
             User friend;
-            for (long i : keySet) {
-                friend = getUser(i);
-                friend.setLocation(locations.get(i));
-                updatedFriends += updateUser(friend);
+            for (int i = 0; i < friends.size(); i++) {
+                friend = friends.valueAt(i);
+                if (locations.containsKey(friend.getID())) {
+                    friend.setLocation(locations.get(friend.getID()));
+                    Log.d("Database", "Updated user " + friend.getID());
+                    updatedFriends += updateUser(friend);
+                }
             }
         } catch (SmartMapClientException e) {
             e.printStackTrace();
@@ -670,14 +673,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Fills the friend database with server data
      */
     public void initializeAllFriends() {
+        NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
         try {
-            Map<Long, Location> friends = NetworkSmartMapClient.getInstance().listFriendsPos();
+            Map<Long, Location> friends = client.listFriendsPos();
             for (long i : friends.keySet()) {
-                addUser(new Friend(i, ""));
+                addUser(client.getUserInfo(i));
+                Log.d("Database", i + " initialized");
             }
-            refreshFriendsInfo();
         } catch (SmartMapClientException e) {
-            e.printStackTrace();
+            Log.e("UpdateService", e.getMessage());
         }
     }
 }

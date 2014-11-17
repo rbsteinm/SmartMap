@@ -44,6 +44,7 @@ public class UpdateService extends Service {
         	    if (mReady) {
     	        	new AsyncFriendsPos().execute();
     	            sendBroadcast(mFriendsPosIntent);
+    	            Log.d("UpdateService", "Broadcast sent");
         	    }
 	            mHandler.postDelayed(this, POS_UPDATE_DELAY);
 	            Log.d("UpdateService", "Friends pos update");
@@ -154,7 +155,6 @@ public class UpdateService extends Service {
         @Override
         protected Void doInBackground(Void... arg0) {
             mHelper.initializeAllFriends();
-            mHelper.refreshFriendsInfo();
             return null;
         }
         

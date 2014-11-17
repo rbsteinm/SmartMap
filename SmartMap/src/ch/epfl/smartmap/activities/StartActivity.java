@@ -126,7 +126,6 @@ public class StartActivity extends FragmentActivity {
 		
 		SettingsManager.initialize(getApplicationContext());
 		DatabaseHelper.initialize(getApplicationContext());
-		startService(new Intent(this, UpdateService.class)); //test
 	}
 
 	@Override

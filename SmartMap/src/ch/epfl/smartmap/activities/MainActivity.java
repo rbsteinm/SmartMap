@@ -92,10 +92,12 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
 		mDbHelper = DatabaseHelper.getInstance();
 		// temporary, the database will not be filled here
-		for (Friend friend : MockDB.FRIENDS_LIST) {
-			mDbHelper.addUser(friend);
-		}
+		//for (Friend friend : MockDB.FRIENDS_LIST) {
+		//	mDbHelper.addUser(friend);
+		//}
 
+		startService(new Intent(this, UpdateService.class));
+		
 		if (savedInstanceState == null) {
 			displayMap();
 		}
