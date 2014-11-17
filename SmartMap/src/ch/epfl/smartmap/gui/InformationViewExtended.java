@@ -3,18 +3,11 @@
  */
 package ch.epfl.smartmap.gui;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.View;
-import android.view.Window;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.MockDB;
 
@@ -23,9 +16,13 @@ import ch.epfl.smartmap.cache.MockDB;
  *
  */
 public class InformationViewExtended extends LinearLayout {
-    
+
     private static final String TAG = "INFORMATION VIEW EXTENDED";
-    
+    private InformationPanel mPanel;
+
+    private int mWidth;
+    private int mHeight;
+
     public InformationViewExtended(Context context, Displayable item,
         InformationPanel panel) {
         super(context);
@@ -33,7 +30,9 @@ public class InformationViewExtended extends LinearLayout {
         this.setOrientation(HORIZONTAL);
         this.setLayoutParams(new LinearLayout.LayoutParams(
             LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        this.setBackgroundResource(R.color.searchResultBackground);
+        this.setBackgroundResource(R.color.light_blue);
+        this.addView(new TextView(context));
+        mPanel = panel;
     }
 
     /**

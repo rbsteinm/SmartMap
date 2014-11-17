@@ -68,7 +68,7 @@ public class StartActivity extends FragmentActivity {
 
 		// Set background color of activity
 		setActivityBackgroundColor(getResources().getColor(
-				R.color.mainBlueColor));
+				R.color.main_blue));
 
 		// Get all views
 		mLogoImage = (ImageView) findViewById(R.id.logo);

@@ -68,7 +68,7 @@ public class SearchLayout extends LinearLayout {
         this.setOrientation(HORIZONTAL);
         this.setLayoutParams(new LinearLayout.LayoutParams(
             LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-
+        this.setBackgroundResource(R.color.background_blue);
         mCurrentSearchType = FIRST_SEARCH_PANEL_TYPE;
         mScrollViews = new HashMap<SearchPanelType, ScrollView>();
         mSearchResultViewGroups = new HashMap<SearchPanelType, SearchResultViewGroup>();
@@ -258,7 +258,6 @@ public class SearchLayout extends LinearLayout {
         };
         scrollView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
             LayoutParams.MATCH_PARENT));
-        scrollView.setBackgroundResource(R.color.bottomSliderBackground);
         scrollView.setVerticalScrollBarEnabled(false);
         scrollView.setPadding(SCROLLVIEW_SIDE_PADDING, 0,
             SCROLLVIEW_SIDE_PADDING, 0);
@@ -277,7 +276,7 @@ public class SearchLayout extends LinearLayout {
             TextView titleView = new TextView(context);
             titleView.setTextSize(TITLE_TEXT_SIZE);
             titleView.setTextColor(getResources().getColor(
-                R.color.searchResultTitle));
+                R.color.main_blue));
             titleView.setText(searchPanelType.title());
             // SearchResultViewGroup
             SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(
@@ -292,7 +291,6 @@ public class SearchLayout extends LinearLayout {
         scrollView.addView(searchResultLayout);
         // Add in Lists
         mScrollViews.put(searchPanelType, scrollView);
-
     }
 
     /**

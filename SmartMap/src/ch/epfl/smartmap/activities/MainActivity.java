@@ -28,6 +28,7 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.Notifications;
+import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;
@@ -78,8 +79,6 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
 
         // Get needed Views
         final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
-        final InformationPanel mInformationPanel = (InformationPanel) findViewById(R.id.information_panel);
-        mInformationPanel.displayItem(MockDB.JULIEN);
         
         mSideMenu = new SideMenu(this);
         mSideMenu.initializeDrawerLayout();
@@ -87,8 +86,7 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         // Set actionbar color
         getActionBar().setBackgroundDrawable(
                 new ColorDrawable(getResources()
-                        .getColor(R.color.mainBlueColor)));
-
+                        .getColor(R.color.main_blue)));
         mSearchEngine = new MockSearchEngine();
         mSearchLayout.setSearchEngine(mSearchEngine);
 
@@ -99,9 +97,6 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         if (mGoogleMap != null) {
             initializeMarkers();
         }
-        
-        final FrameLayout mMainFrameLayout = (FrameLayout) findViewById(R.id.frame_layout_main);
-        final RelativeLayout mMapLayout = (RelativeLayout) findViewById(R.id.layout_map);
     }
 
     @Override
@@ -115,7 +110,6 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         final SearchView mSearchView = (SearchView) searchItem.getActionView();
         final SearchLayout mSearchLayout = (SearchLayout) findViewById(R.id.search_layout);
         final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
-        final InformationPanel mInformationPanel = (InformationPanel) findViewById(R.id.information_panel);
         
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
             public boolean onQueryTextSubmit(String query) {
@@ -141,6 +135,7 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
                 mSearchLayout.showMainPanel(query);
             }
         });
+        
         // Configure the search info and add any event listeners
         return super.onCreateOptionsMenu(menu);
     }
@@ -165,15 +160,18 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
 
     @Override
     public void onBackPressed() {
-//        final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
-//
-//        if (mSearchPanel.isShown()) {
-//            mSearchPanel.close();
-//        } else {
-//            super.onBackPressed();
-//        }
-        final InformationPanel mPanel = (InformationPanel) findViewById(R.id.information_panel);
-        mPanel.collapse();
+        final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
+        final InformationPanel mInformationPanel = (InformationPanel) findViewById(R.id.information_panel);
+
+        if (mSearchPanel.onBackPressed()){
+            return;
+        } 
+        
+        if (mInformationPanel.onBackPressed()){
+            return;
+        }
+        
+        super.onBackPressed();
     }
 
     public Context getContext() {
@@ -307,11 +305,24 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         // Open information panel
         mInformationPanel.displayItem(friend);
         mInformationPanel.collapse();
-        
-
         mMapZoomer.zoomOnLocation(friend.getLocation(), mGoogleMap);
+        
         // Add query to the searchEngine
         mSearchEngine.getHistory().addEntry(friend, new Date());
+    }
+    
+    /** 
+     * Tells the activity to focus on an item, this means
+     * - Zoom on it on the map
+     * - Display its information in the InformationView
+     * @param item
+     */
+    public void focusOnItem(Displayable item) {
+        final InformationPanel mInformationPanel = (InformationPanel) findViewById(R.id.information_panel);
+        
+        if (item instanceof Friend) {
+            
+        }
     }
     
     @Override

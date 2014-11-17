@@ -2,6 +2,7 @@ package ch.epfl.smartmap.gui;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -16,7 +17,7 @@ import ch.epfl.smartmap.R;
  */
 public class SearchPanel extends RelativeLayout {
 
-    private final static String TAG = "SLIDING_UP_PANEL";
+    private final static String TAG = "SearchPanel";
     @SuppressWarnings("unused")
     private final static String AUDIT_TAG = "AuditError : " + TAG;
 
@@ -50,6 +51,21 @@ public class SearchPanel extends RelativeLayout {
         this.startAnimation(topDown);
         this.setVisibility(View.GONE);
         clearFocus();
+    }
+    
+    /**
+     * Handle the event of a back button press
+     * 
+     * @return true if the event should not go further
+     */
+    public boolean onBackPressed() {
+        if (this.getVisibility() == View.VISIBLE) {
+            Log.d(TAG, "onBackPressed, true");
+            close();
+            return true;
+        } 
+        Log.d(TAG, "onBackPressed, false");
+        return false;
     }
 
     /**
