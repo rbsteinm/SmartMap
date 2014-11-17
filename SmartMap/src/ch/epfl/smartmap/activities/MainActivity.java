@@ -64,6 +64,12 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
     private static final int LOCATION_UPDATE_TIMEOUT = 10000;
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
     private static final int LOCATION_UPDATE_DISTANCE = 10;
+    
+    private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
+    private static final int MENU_ITEM_MYLOCATION_INDEX = 1;
+    private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
+    private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
+    private static final int MENU_ITEM_CLOSE_INFO_INDEX = 4;
 
     private enum MenuTheme {
         MAP,
@@ -354,11 +360,11 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         mActionBar.setTitle(R.string.app_name);
         mActionBar.setSubtitle(null);
         mActionBar.setIcon(R.drawable.ic_launcher);
-        mMenu.getItem(0).collapseActionView();
-        mMenu.getItem(1).setVisible(true);
-        mMenu.getItem(2).setVisible(false);
-        mMenu.getItem(3).setVisible(false);
-        mMenu.getItem(4).setVisible(false);
+        mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).collapseActionView();
+        mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(true);
+        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
         mMenuTheme = MenuTheme.MAP;
     }
     
@@ -367,10 +373,10 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
     }
     
     public void setItemMenu(Displayable item) {
-        mMenu.getItem(1).setVisible(false);
-        mMenu.getItem(2).setVisible(false);
-        mMenu.getItem(3).setVisible(true);
-        mMenu.getItem(4).setVisible(false);
+        mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
+        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
         
         ActionBar mActionBar = getActionBar();
         mActionBar.setTitle(item.getTitle());
@@ -385,18 +391,17 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
     }
     
     public void openInformationPanel() {
-        mMenu.getItem(3).setVisible(false);
-        mMenu.getItem(4).setVisible(true);
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(true);
         
         final SlidingPanel mInformationPanel = (SlidingPanel) findViewById(R.id.information_panel);
         
-        mInformationPanel.displayItem(mCurrentItem);
-        mInformationPanel.extend();
+        mInformationPanel.open();
     }
     
     public void closeInformationPanel() {
-        mMenu.getItem(3).setVisible(true);
-        mMenu.getItem(4).setVisible(false);
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
+        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
         final SlidingPanel mInformationPanel = (SlidingPanel) findViewById(R.id.information_panel);
         
         mInformationPanel.close();

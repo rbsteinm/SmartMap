@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -23,8 +24,7 @@ import ch.epfl.smartmap.cache.MockDB;
 public class SlidingPanel extends FrameLayout {
     private static final String TAG = "INFORMATION_PANEL";
 
-    private static final int ANYTHING_TO_EXTENDED_DURATION = 400;
-    private static final int CLOSED_TO_COLLAPSED_DURATION = 150;
+    private static final int EXTEND_DURATION = 400;
     
     private static final int FADE_IN_DELAY = 400;
     private static final int FADE_IN_DURATION = 400;
@@ -32,17 +32,13 @@ public class SlidingPanel extends FrameLayout {
     private static final int FADE_OUT_DURATION = 400;
 
     private enum VisualState {
-        CLOSED, COLLAPSED, EXTENDED, ANIM_PERFORMED;
-
-        private int mHeight;
-
-        private void setHeight(int height) {
-            mHeight = height;
-        }
+        CLOSED, OPEN, ANIM_PERFORMED;
+        int height;
     }
 
     private enum FadeState {
-        IN(0, 1, FADE_IN_DELAY, FADE_IN_DURATION), OUT(1, 0, FADE_OUT_DELAY,
+        IN(0, 1, FADE_IN_DELAY, FADE_IN_DURATION),
+        OUT(1, 0, FADE_OUT_DELAY,
             FADE_OUT_DURATION);
 
         private float mFromAlpha;
@@ -59,28 +55,19 @@ public class SlidingPanel extends FrameLayout {
         }
     }
 
-    private InformationViewCollapsed mCollapsedView;
     private InformationViewExtended mExtendedView;
 
     private VisualState mVisualState;
 
-    private ValueAnimator mCollapsedToExtendedAnim;
-    private ValueAnimator mCollapsedToClosedAnim;
-    private ValueAnimator mExtendedToClosedAnim;
-    private ValueAnimator mExtendedToCollapsedAnim;
-    private ValueAnimator mClosedToCollapsedAnim;
-    private ValueAnimator mClosedToExtendedAnim;
+    private ValueAnimator mCloseAnim;
+    private ValueAnimator mOpenAnim;
 
     public SlidingPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
         // Create subviews
-        mCollapsedView = new InformationViewCollapsed(context, this);
         mExtendedView = new InformationViewExtended(context, this);
-        this.addView(mCollapsedView);
         this.addView(mExtendedView);
-        // Initialize Position Animators
-        initializePositions();
-        initializeAnimators();
+       
         // Layout parameters
         this.setBackgroundResource(R.color.background_blue);
         this.setFocusable(true);
@@ -88,58 +75,34 @@ public class SlidingPanel extends FrameLayout {
         // Initial State should be CLOSED
         mVisualState = VisualState.CLOSED;
         this.setVisibility(GONE);
-        mExtendedView.setVisibility(GONE);
-        mCollapsedView.setVisibility(GONE);
+        VisualState.OPEN.height = -1;
     }
-
-    public void displayItem(Displayable item) {
-        mCollapsedView.setItem(item);
-        // mExtendedView.setItem(item);
-    }
-
-    /**
-     * Show collapsed view
-     */
-    public void collapse() {
-        // Need to set Views to VISIBLE to avoid anim problems
-        this.setVisibility(View.VISIBLE);
-        mCollapsedView.setVisibility(View.VISIBLE);
-        
-        if (mVisualState == VisualState.CLOSED) {
-            mCollapsedView.startAnimation(createAlphaAnimation(mCollapsedView,
-                FadeState.IN));
-            mClosedToCollapsedAnim.start();
-        } else if (mVisualState == VisualState.EXTENDED) {
-            mCollapsedView.startAnimation(createAlphaAnimation(mCollapsedView,
-                FadeState.IN));
-            mExtendedView.startAnimation(createAlphaAnimation(mExtendedView,
-                FadeState.OUT));
-            mExtendedToCollapsedAnim.start();
-        } else {
-            assert false : "Trying to collapse, but already in state COLLAPSED (or unknown state)";
-        }
+    
+    public void initView(){
+        // Initialize heights
+        FrameLayout parent = (FrameLayout) getParent();
+        this.measure(parent.getWidth(), parent.getHeight());
+        VisualState.CLOSED.height = 0;
+        VisualState.OPEN.height = 1800;
+        Log.d(TAG, "HEIGHT : " + this.getMeasuredHeight());
+        // Initialize Position Animators
+        initializeAnimators();
     }
 
     /**
      * Show full screen view
      */
-    public void extend() {
-        // Need to set Views to VISIBLE to avoid anim problems
-        this.setVisibility(View.VISIBLE);
-        mExtendedView.setVisibility(View.VISIBLE);
-
+    public void open() {
         if (mVisualState == VisualState.CLOSED) {
+            if(VisualState.OPEN.height == -1){
+                initView();
+            }
+            // Need to set Views to VISIBLE to avoid anim problems
+            this.setVisibility(View.VISIBLE);
+            // Start Animations
             mExtendedView.clearAnimation();
             mExtendedView.startAnimation(createAlphaAnimation(mExtendedView, FadeState.IN));
-        } else if (mVisualState == VisualState.COLLAPSED) {
-            mCollapsedView.clearAnimation();
-            mCollapsedView.startAnimation(createAlphaAnimation(mCollapsedView,
-                FadeState.OUT));
-            mExtendedView.startAnimation(createAlphaAnimation(mExtendedView,
-                FadeState.IN));
-            mCollapsedToExtendedAnim.start();
-        } else {
-            assert (false) : "Trying to extend, but already in state EXTENDED (or unknown state)";
+            mOpenAnim.start();
         }
     }
 
@@ -147,30 +110,15 @@ public class SlidingPanel extends FrameLayout {
      * Hide panel
      */
     public void close() {
-//        
-//        if (mVisualState == VisualState.EXTENDED) {
-//            mExtendedView.startAnimation(createAlphaAnimation(mExtendedView,
-//                FadeState.OUT));
-//            mExtendedToClosedAnim.start();
-//        } else if (mVisualState == VisualState.COLLAPSED) {
-//            mCollapsedView.startAnimation(createAlphaAnimation(mCollapsedView,
-//                FadeState.OUT));
-//            mCollapsedToClosedAnim.start();
-//        } else {
-//            assert (false) : "Trying to close, but already in state CLOSED (or unknown state)";
-//        }
-        this.setVisibility(View.GONE);
-        mCollapsedView.setVisibility(View.GONE);
-        mExtendedView.setVisibility(View.GONE);
-        this.mVisualState = VisualState.CLOSED;
+        if (mVisualState == VisualState.OPEN) {
+            mExtendedView.startAnimation(createAlphaAnimation(mExtendedView,
+                FadeState.OUT));
+            mCloseAnim.start();
+        } 
     }
 
-    public boolean isExtended() {
-        return mVisualState == VisualState.EXTENDED;
-    }
-
-    public boolean isCollapsed() {
-        return mVisualState == VisualState.COLLAPSED;
+    public boolean isOpened() {
+        return mVisualState == VisualState.OPEN;
     }
 
     public boolean isClosed() {
@@ -187,12 +135,8 @@ public class SlidingPanel extends FrameLayout {
             case ANIM_PERFORMED:
                 Log.d(TAG, "onBackPressed, true anim");
                 return true;
-            case EXTENDED:
+            case OPEN:
                 Log.d(TAG, "onBackPressed, true ext");
-                collapse();
-                return true;
-            case COLLAPSED:
-                Log.d(TAG, "onBackPressed, true col");
                 close();
                 return true;
             case CLOSED : 
@@ -206,33 +150,22 @@ public class SlidingPanel extends FrameLayout {
 
     private void initializeAnimators() {
         // Height animators
-        mClosedToCollapsedAnim = createHeightAnimator(VisualState.CLOSED,
-            VisualState.COLLAPSED);
-        mClosedToExtendedAnim = createHeightAnimator(VisualState.CLOSED,
-            VisualState.EXTENDED);
-        mCollapsedToClosedAnim = createHeightAnimator(VisualState.COLLAPSED,
+        mOpenAnim = createTranslateAnimator(VisualState.CLOSED,
+            VisualState.OPEN);
+        mCloseAnim = createTranslateAnimator(VisualState.OPEN,
             VisualState.CLOSED);
-        mCollapsedToExtendedAnim = createHeightAnimator(VisualState.COLLAPSED,
-            VisualState.EXTENDED);
-        mExtendedToClosedAnim = createHeightAnimator(VisualState.EXTENDED,
-            VisualState.CLOSED);
-        mExtendedToCollapsedAnim = createHeightAnimator(VisualState.EXTENDED,
-            VisualState.COLLAPSED);
     }
-
-    private ValueAnimator createHeightAnimator(final VisualState start,
+    
+    private ValueAnimator createTranslateAnimator(final VisualState start,
         final VisualState end) {
         ValueAnimator animator = ValueAnimator
-            .ofInt(start.mHeight, end.mHeight);
-        if (start == VisualState.EXTENDED || end == VisualState.EXTENDED) {
-            animator.setDuration(ANYTHING_TO_EXTENDED_DURATION);
-        } else {
-            animator.setDuration(CLOSED_TO_COLLAPSED_DURATION);
+            .ofInt(start.height, end.height);
+        if (start == VisualState.OPEN || end == VisualState.OPEN) {
+            animator.setDuration(EXTEND_DURATION);
         }
         
-
         final SlidingPanel thisPanel = this;
-        Log.d(TAG, "new Animation  : " + start.mHeight + " to " + end.mHeight);
+        Log.d(TAG, "new Animation  : " + start.height + " to " + end.height);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
                 Integer value = (Integer) animation.getAnimatedValue();
@@ -252,7 +185,7 @@ public class SlidingPanel extends FrameLayout {
             @Override
             public void onAnimationEnd(Animator animation) {
                 thisPanel.mVisualState = end;
-                thisPanel.getLayoutParams().height = end.mHeight;
+                thisPanel.getLayoutParams().height = end.height;
                 thisPanel.requestLayout();
                 if (end == VisualState.CLOSED) {
                     thisPanel.clearFocus();
@@ -296,11 +229,6 @@ public class SlidingPanel extends FrameLayout {
                 if (fadeState == FadeState.OUT) {
                     view.setVisibility(View.GONE);
                 }
-
-                if ((mExtendedView.getVisibility() == View.GONE)
-                    && (mCollapsedView.getVisibility() == View.GONE)) {
-                    thisPanel.setVisibility(View.GONE);
-                }
             }
 
             @Override
@@ -310,17 +238,5 @@ public class SlidingPanel extends FrameLayout {
         });
 
         return anim;
-    }
-
-    private void initializePositions() {
-        // Initialize heights
-        mExtendedView.measure(this.getWidth(), this.getHeight());
-        mCollapsedView.measure(this.getWidth(), this.getHeight());
-//        VisualState.EXTENDED.setHeight(mExtendedView.getMeasuredHeight());
-        VisualState.EXTENDED.setHeight(1800);
-        Log.d(TAG, "init EXT : " + mExtendedView.getMeasuredHeight());
-        VisualState.COLLAPSED.setHeight(mCollapsedView.getMeasuredHeight());
-        Log.d(TAG, "init COL : " + mCollapsedView.getMeasuredHeight());
-        VisualState.CLOSED.setHeight(0);
     }
 }

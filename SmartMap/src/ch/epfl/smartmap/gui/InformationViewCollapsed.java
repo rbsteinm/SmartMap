@@ -94,7 +94,7 @@ public class InformationViewCollapsed extends RelativeLayout {
         mMoreInfoButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPanel.extend();
+                mPanel.open();
             }
         });
 

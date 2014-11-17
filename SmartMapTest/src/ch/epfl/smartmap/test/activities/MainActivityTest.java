@@ -22,6 +22,7 @@ import ch.epfl.smartmap.activities.MainActivity;
 
 import com.google.android.apps.common.testing.ui.espresso.UiController;
 import com.google.android.apps.common.testing.ui.espresso.ViewAction;
+import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 
 public class MainActivityTest extends
     ActivityInstrumentationTestCase2<MainActivity> {
@@ -73,17 +74,6 @@ public class MainActivityTest extends
           }
         };
       }
-
-    public void testOpenSearchPanel() throws Exception {
-        onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.search_panel)).check(matches(isDisplayed()));
-    }
-
-    public void testOpenAndCloseSearchPanel() throws Exception {
-        onView(withId(R.id.action_search)).perform(click());
-        pressBack();
-        onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
-    }
     
     public void testOpenSideMenu() throws Exception{
         onView(withId(R.id.left_drawer)).perform(actionOpenDrawer());
@@ -111,4 +101,39 @@ public class MainActivityTest extends
     	 */
     }
     
+    public void testPanelsNotVisible() {
+        onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.information_panel)).check(matches(not(isDisplayed())));
+    }
+    public void testOpenSearchView() {
+        onView(withId(R.id.action_search)).perform(click());
+        onView(withId(R.id.search_panel)).check(matches(isDisplayed()));
+    }
+    
+    public void testCloseSearchViewWithMenuItem() {
+        onView(withId(R.id.action_search)).perform(click());
+        onView(withId(R.id.action_hide_search)).perform(click());
+        onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
+    }
+    
+    public void testCloseSearchViewWithBackButton() {
+        onView(withId(R.id.action_search)).perform(click());
+        // FIXME : This should require only 2 pressBack()
+        pressBack();
+        pressBack();
+        pressBack();
+        onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
+    }
+    
+    public void testNormalSearchQuery() {
+        onView(withId(R.id.action_search)).perform(click());
+        onView(withId(R.id.action_search)).perform(ViewActions.typeText("Julien Perrenoud"));
+        // TODO : Check there is only one result
+    }
+    
+    public void testWrongSearchQuery() {
+        onView(withId(R.id.action_search)).perform(click());
+        onView(withId(R.id.action_search)).perform(ViewActions.typeText("flksdhéfjkslkfshdfljkshfd"));
+        // TODO : Check no result is displayed
+    }
 }
