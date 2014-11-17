@@ -91,7 +91,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		mSearchLayout.setSearchEngine(mSearchEngine);
 
 		mDbHelper = DatabaseHelper.getInstance();
-		
+
+		startService(new Intent(this, UpdateService.class));
 
 		if (savedInstanceState == null) {
 			displayMap();
@@ -175,7 +176,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public void onResume() {
 		super.onResume();
 
-		//startService(mUpdateServiceIntent);
+		// startService(mUpdateServiceIntent);
 		registerReceiver(mBroadcastReceiver, new IntentFilter(
 				UpdateService.BROADCAST_POS));
 
@@ -185,7 +186,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		Location eventLocation = startingIntent.getParcelableExtra("location");
 		if (eventLocation != null) {
 			mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
-			eventLocation=null;
+			eventLocation = null;
 		}
 	}
 
@@ -193,7 +194,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public void onPause() {
 		super.onPause();
 		unregisterReceiver(mBroadcastReceiver);
-		//stopService(mUpdateServiceIntent);
+		// stopService(mUpdateServiceIntent);
 	}
 
 	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {

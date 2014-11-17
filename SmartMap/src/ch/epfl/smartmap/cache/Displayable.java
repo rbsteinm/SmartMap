@@ -16,7 +16,7 @@ public interface Displayable {
     Bitmap getPicture(Context context);
     
     /**
-     * @return The object's name (e.g. username)
+     * @return A name for the panel (e.g. the username, event name, etc.)
      */
     String getName();
     
