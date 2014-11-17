@@ -17,11 +17,8 @@ import ch.epfl.smartmap.cache.MockDB;
  */
 public class InformationViewExtended extends LinearLayout {
 
+    @SuppressWarnings("unused")
     private static final String TAG = "INFORMATION VIEW EXTENDED";
-    private SlidingPanel mPanel;
-
-    private int mWidth;
-    private int mHeight;
 
     public InformationViewExtended(Context context, Displayable item,
         SlidingPanel panel) {
@@ -32,7 +29,6 @@ public class InformationViewExtended extends LinearLayout {
             LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         this.setBackgroundResource(R.color.light_blue);
         this.addView(new TextView(context));
-        mPanel = panel;
     }
 
     /**

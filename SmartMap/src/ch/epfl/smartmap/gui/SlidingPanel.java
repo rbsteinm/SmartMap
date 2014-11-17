@@ -4,41 +4,47 @@ import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.Animation.AnimationListener;
 import android.widget.FrameLayout;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.cache.MockDB;
 
 /**
+ * Provides a Sliding Panel that slides from the bottom of the app, and 
+ * fades in component.
+ * 
  * @author jfperren
- *
  */
 public class SlidingPanel extends FrameLayout {
+
     private static final String TAG = "INFORMATION_PANEL";
 
     private static final int EXTEND_DURATION = 400;
-    
     private static final int FADE_IN_DELAY = 400;
     private static final int FADE_IN_DURATION = 400;
     private static final int FADE_OUT_DELAY = 0;
     private static final int FADE_OUT_DURATION = 400;
 
+    /**
+     * Visual State of a SlidingPanel
+     * 
+     * @author jfperren
+     */
     private enum VisualState {
         CLOSED, OPEN, ANIM_PERFORMED;
-        int height;
+        private int height;
     }
 
-    private enum FadeState {
-        IN(0, 1, FADE_IN_DELAY, FADE_IN_DURATION),
-        OUT(1, 0, FADE_OUT_DELAY,
+    /**
+     * Type of FadeAnimation
+     * 
+     * @author jfperren
+     */
+    private enum Fade {
+        IN(0, 1, FADE_IN_DELAY, FADE_IN_DURATION), OUT(1, 0, FADE_OUT_DELAY,
             FADE_OUT_DURATION);
 
         private float mFromAlpha;
@@ -46,8 +52,7 @@ public class SlidingPanel extends FrameLayout {
         private int mDelay;
         private int mDuration;
 
-        private FadeState(float fromAlpha, float toAlpha, int delay,
-            int duration) {
+        private Fade(float fromAlpha, float toAlpha, int delay, int duration) {
             this.mFromAlpha = fromAlpha;
             this.mToAlpha = toAlpha;
             this.mDelay = delay;
@@ -67,7 +72,7 @@ public class SlidingPanel extends FrameLayout {
         // Create subviews
         mExtendedView = new InformationViewExtended(context, this);
         this.addView(mExtendedView);
-       
+
         // Layout parameters
         this.setBackgroundResource(R.color.background_blue);
         this.setFocusable(true);
@@ -77,12 +82,16 @@ public class SlidingPanel extends FrameLayout {
         this.setVisibility(GONE);
         VisualState.OPEN.height = -1;
     }
-    
-    public void initView(){
+
+    /**
+     * Initialize Position Animations
+     */
+    public void initView() {
         // Initialize heights
         FrameLayout parent = (FrameLayout) getParent();
         this.measure(parent.getWidth(), parent.getHeight());
         VisualState.CLOSED.height = 0;
+        // FIXME : Shouldn't be hardcoded
         VisualState.OPEN.height = 1800;
         Log.d(TAG, "HEIGHT : " + this.getMeasuredHeight());
         // Initialize Position Animators
@@ -94,14 +103,15 @@ public class SlidingPanel extends FrameLayout {
      */
     public void open() {
         if (mVisualState == VisualState.CLOSED) {
-            if(VisualState.OPEN.height == -1){
+            if (VisualState.OPEN.height == -1) {
                 initView();
             }
             // Need to set Views to VISIBLE to avoid anim problems
             this.setVisibility(View.VISIBLE);
             // Start Animations
             mExtendedView.clearAnimation();
-            mExtendedView.startAnimation(createAlphaAnimation(mExtendedView, FadeState.IN));
+            mExtendedView.startAnimation(createAlphaAnimation(mExtendedView,
+                Fade.IN));
             mOpenAnim.start();
         }
     }
@@ -112,9 +122,9 @@ public class SlidingPanel extends FrameLayout {
     public void close() {
         if (mVisualState == VisualState.OPEN) {
             mExtendedView.startAnimation(createAlphaAnimation(mExtendedView,
-                FadeState.OUT));
+                Fade.OUT));
             mCloseAnim.start();
-        } 
+        }
     }
 
     public boolean isOpened() {
@@ -124,14 +134,14 @@ public class SlidingPanel extends FrameLayout {
     public boolean isClosed() {
         return mVisualState == VisualState.CLOSED;
     }
-    
+
     /**
      * Handle the event onBackPressed
      *
      * @return true if the event is handled and should not go further
      */
     public boolean onBackPressed() {
-        switch(mVisualState) {
+        switch (mVisualState) {
             case ANIM_PERFORMED:
                 Log.d(TAG, "onBackPressed, true anim");
                 return true;
@@ -139,12 +149,13 @@ public class SlidingPanel extends FrameLayout {
                 Log.d(TAG, "onBackPressed, true ext");
                 close();
                 return true;
-            case CLOSED : 
+            case CLOSED:
                 Log.d(TAG, "onBackPressed, false");
                 return false;
-            default : assert false;
+            default:
+                assert false;
         }
-        
+
         return false;
     }
 
@@ -155,15 +166,14 @@ public class SlidingPanel extends FrameLayout {
         mCloseAnim = createTranslateAnimator(VisualState.OPEN,
             VisualState.CLOSED);
     }
-    
+
     private ValueAnimator createTranslateAnimator(final VisualState start,
         final VisualState end) {
-        ValueAnimator animator = ValueAnimator
-            .ofInt(start.height, end.height);
+        ValueAnimator animator = ValueAnimator.ofInt(start.height, end.height);
         if (start == VisualState.OPEN || end == VisualState.OPEN) {
             animator.setDuration(EXTEND_DURATION);
         }
-        
+
         final SlidingPanel thisPanel = this;
         Log.d(TAG, "new Animation  : " + start.height + " to " + end.height);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -206,12 +216,19 @@ public class SlidingPanel extends FrameLayout {
         return animator;
     }
 
-    private AlphaAnimation createAlphaAnimation(final View view,
-        final FadeState fadeState) {
-        final AlphaAnimation anim = new AlphaAnimation(fadeState.mFromAlpha,
-            fadeState.mToAlpha);
-        anim.setDuration(fadeState.mDuration);
-        anim.setStartOffset(fadeState.mDelay);
+    /**
+     * Creates a Fade Animation on a View
+     * 
+     * @param view View to be fade in/out
+     * @param fadeState Fade
+     * @return
+     */
+    private AlphaAnimation
+        createAlphaAnimation(final View view, final Fade type) {
+        final AlphaAnimation anim = new AlphaAnimation(type.mFromAlpha,
+            type.mToAlpha);
+        anim.setDuration(type.mDuration);
+        anim.setStartOffset(type.mDelay);
 
         final SlidingPanel thisPanel = this;
 
@@ -226,7 +243,7 @@ public class SlidingPanel extends FrameLayout {
             public void onAnimationEnd(Animation animation) {
                 // NOTE : All views disappear with a fade out,
                 // so we can resolve Visibility issues here
-                if (fadeState == FadeState.OUT) {
+                if (type == Fade.OUT) {
                     view.setVisibility(View.GONE);
                 }
             }

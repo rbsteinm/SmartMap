@@ -229,7 +229,7 @@ public class Friend implements User, Displayable {
      * @see ch.epfl.smartmap.cache.Displayable#getInfos()
      */
     @Override
-    public String getInfos() {
+    public String getShortInfos() {
         return "Seen 10 minutes ago near Lausanne";
     }
 

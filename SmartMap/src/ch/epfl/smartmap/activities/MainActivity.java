@@ -71,6 +71,11 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
     private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
     private static final int MENU_ITEM_CLOSE_INFO_INDEX = 4;
 
+    /**
+     * Types of Menu that can be displayed on this activity
+     * 
+     * @author jfperren
+     */
     private enum MenuTheme {
         MAP,
         SEARCH,
@@ -86,6 +91,7 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
     private SearchEngine mSearchEngine;
     private Menu mMenu;
     private MenuTheme mMenuTheme;
+    @SuppressWarnings("unused")
     private Displayable mCurrentItem;
 
     @Override
@@ -122,8 +128,6 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         mMenu = menu;
-        final Menu mmenu = menu;
-        final MainActivity thisActivity = this;
 
         // Get Views
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -314,6 +318,11 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         //Notifications.createAddNotification(view, this);
     }
 
+    /**
+     * Computes the changes needed when a query is sent.
+     * 
+     * @param friend
+     */
     public void performQuery(Friend friend) {
         // Get Views
         final MenuItem mSearchView = (MenuItem) mMenu
@@ -322,11 +331,9 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         // Close search interface
         mSearchPanel.close();
         mSearchView.collapseActionView();
-        // Open information panel
+        // Focus on Friend
         mMapZoomer.zoomOnLocation(friend.getLocation(), mGoogleMap);
-        setMainMenu(null);
         setItemMenu(friend);
-        
         // Add query to the searchEngine
         mSearchEngine.getHistory().addEntry(friend, new Date());
     }
@@ -338,6 +345,9 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         return mMapLayout.onTouchEvent(e);
     }
     
+    /** 
+     * Sets the Menu that should be used when using Search Panel
+     */
     public void setSearchMenu() {
         final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
         mSearchPanel.open();
@@ -346,13 +356,16 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         mActionBar.setSubtitle(null);
         mActionBar.setIcon(R.drawable.ic_launcher);
         
-        mMenu.getItem(1).setVisible(false);
-        mMenu.getItem(2).setVisible(true);
-        mMenu.getItem(3).setVisible(false);
-        mMenu.getItem(4).setVisible(false);
+        mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(true);
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
         mMenuTheme = MenuTheme.SEARCH;
     }
     
+    /**
+     * Sets the main Menu of the Activity
+     */
     public void setMainMenu() {
         final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
         mSearchPanel.close();
@@ -372,6 +385,13 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         setMainMenu();
     }
     
+    /**
+     * Sets the view for Item Focus, this means
+     * - Write name / Display photo on ActionBar
+     * - Sets ActionMenu for Item Focus
+     * 
+     * @param item Item to be displayed
+     */
     public void setItemMenu(Displayable item) {
         mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(false);
         mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
@@ -380,16 +400,16 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         
         ActionBar mActionBar = getActionBar();
         mActionBar.setTitle(item.getTitle());
-        mActionBar.setSubtitle(item.getInfos());
+        mActionBar.setSubtitle(item.getShortInfos());
         mActionBar.setIcon(new BitmapDrawable(getResources(), item.getPicture(this)));
         mCurrentItem = item;
         mMenuTheme = MenuTheme.ITEM;
     }
+
     
-    public void openInformationPanel(MenuItem mi) {
-        openInformationPanel();
-    }
-    
+    /**
+     * Open Information Panel if closed
+     */
     public void openInformationPanel() {
         mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
         mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(true);
@@ -399,6 +419,16 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         mInformationPanel.open();
     }
     
+    /**
+     * Open Information Panel if closed
+     */
+    public void openInformationPanel(MenuItem mi) {
+        openInformationPanel();
+    }
+    
+    /**
+     * Close Information Panel if open
+     */
     public void closeInformationPanel() {
         mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
         mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
@@ -406,7 +436,9 @@ public class MainActivity extends FragmentActivity implements LocationListener, 
         
         mInformationPanel.close();
     }
-    
+    /**
+     * Close Information Panel if open
+     */
     public void closeInformationPanel(MenuItem mi) {
         closeInformationPanel();
     }

@@ -11,7 +11,19 @@ import android.graphics.Bitmap;
  *
  */
 public interface Displayable {
-    public Bitmap getPicture(Context context);
-    public String getTitle();
-    public String getInfos();
+    /**
+     * Image to be displayed
+     * 
+     * @param context Current Context
+     * @return Bitmap Image
+     */
+    Bitmap getPicture(Context context);
+    /**
+     * @return Title to be displayed
+     */
+    String getTitle();
+    /**
+     * @return Short Infos to be displayed
+     */
+    String getShortInfos();
 }
