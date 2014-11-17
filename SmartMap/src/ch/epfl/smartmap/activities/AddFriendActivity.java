@@ -151,7 +151,8 @@ public class AddFriendActivity extends ListActivity {
                 confirmString = "You sent a friend request to " + NetworkSmartMapClient.
                         getInstance().getUserInfo(params[0]).getName();
             } catch (SmartMapClientException e) {
-                confirmString = "Error, friend request wasn't sent";
+                //confirmString = "Error, friend request wasn't sent";
+                confirmString = e.getMessage();
             }
             return confirmString;
         }
