@@ -3,6 +3,7 @@ package ch.epfl.smartmap.activities;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import com.facebook.Session;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -19,9 +20,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.gui.FacebookFragment;
-
-import com.facebook.Session;
 
 /**
  * 
@@ -122,6 +123,9 @@ public class StartActivity extends FragmentActivity {
 			getSupportFragmentManager().beginTransaction()
 					.add(android.R.id.content, mFacebookFragment).commit();
 		}
+		
+		SettingsManager.initialize(getApplicationContext());
+		DatabaseHelper.initialize(getApplicationContext());
 	}
 
 	@Override

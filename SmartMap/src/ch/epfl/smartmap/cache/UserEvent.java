@@ -3,15 +3,20 @@ package ch.epfl.smartmap.cache;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import ch.epfl.smartmap.R;
+
 import com.google.android.gms.maps.model.LatLng;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 
 /**
  * An event that can be seen on the map
  * @author ritterni
  */
-public class UserEvent implements Event {
+public class UserEvent implements Event, Searchable, Displayable {
     private String mEvtName;
     private final long mEvtCreator; //the user who created the event
     private final GregorianCalendar mStartDate;
@@ -22,6 +27,8 @@ public class UserEvent implements Event {
     private String mCreatorName;
     private String mDescription;
     public final static long DEFAULT_ID = -1;
+    public final static int EVENT_ICON = R.drawable.ic_launcher;
+    
     /**
      * UserEvent constructor
      * @param name The name of the event
@@ -165,4 +172,16 @@ public class UserEvent implements Event {
 	public void setDescription(String desc) {
 		mDescription = desc;
 	}
+
+    @Override
+    public Bitmap getPicture(Context context) {
+        //Returns a generic event picture
+        return BitmapFactory.decodeResource(context.getResources(),
+                EVENT_ICON);
+    }
+
+    @Override
+    public String getInfo() {
+        return mDescription;
+    }
 }

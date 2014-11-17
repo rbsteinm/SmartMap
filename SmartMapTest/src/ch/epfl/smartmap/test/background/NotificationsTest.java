@@ -1,14 +1,14 @@
 package ch.epfl.smartmap.test.background;
 
 //Import the uiautomator libraries
-import com.android.uiautomator.core.UiDevice;
-import com.android.uiautomator.testrunner.UiAutomatorTestCase;
+//import com.android.uiautomator.core.UiDevice;
+//import com.android.uiautomator.testrunner.UiAutomatorTestCase;
 /**
  * Test Notifications
  * @author agpmilli
  *
  */
-public class NotificationsTest extends UiAutomatorTestCase {
+/*public class NotificationsTest extends UiAutomatorTestCase {
 	
 	public static void swipeDownNotificationBar () {
 	    UiDevice deviceInstance = UiDevice.getInstance();
@@ -26,12 +26,12 @@ public class NotificationsTest extends UiAutomatorTestCase {
 	        100
 	    );
 	}
-	
+	*/
 	/**
 	 * Test if notifications are created with success
 	 */
-	public void testNotificationExist() {
+	/*public void testNotificationExist() {
 		UiDevice.getInstance().openNotification();
 	}
 	
-}
+}*/

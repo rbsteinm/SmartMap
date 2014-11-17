@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public class Friend implements User {
+public class Friend implements User, Searchable, Displayable {
 
 	private long mId; // the user's unique ID
 	private String mName; // the user's name as it will be displayed
@@ -151,7 +151,7 @@ public class Friend implements User {
 			pic = BitmapFactory.decodeFile(file.getAbsolutePath());
 		} else {
 			pic = BitmapFactory.decodeResource(context.getResources(),
-					DEFAULT_PICTURE); // placeholder
+					DEFAULT_PICTURE);
 		}
 		return pic;
 	}
@@ -215,6 +215,12 @@ public class Friend implements User {
     @Override
     public void setVisible(boolean isVisible) {
         mVisible = isVisible;
+    }
+
+    @Override
+    public String getInfo() {
+        // TODO
+        return "";
     }
 
 }

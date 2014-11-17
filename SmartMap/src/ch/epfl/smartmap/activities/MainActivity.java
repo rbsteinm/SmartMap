@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,11 +27,16 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.Notifications;
+import ch.epfl.smartmap.background.UpdateService;
+
+import ch.epfl.smartmap.cache.DatabaseHelper;
+
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
+import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingUpPanel;
@@ -61,13 +68,17 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	private SideMenu mSideMenu;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
+	private SearchEngine mSearchEngine;
+	private Menu mMenu;
+
+	private DatabaseHelper mDbHelper;
+	private Intent mUpdateServiceIntent;
+
 	private GoogleMap mGoogleMap;
 	private FriendMarkerDisplayer mFriendMarkerDisplayer;
 	private EventMarkerDisplayer mEventMarkerDisplayer;
 	private DefaultZoomManager mMapZoomer;
 	private SupportMapFragment mFragmentMap;
-	private SearchEngine mSearchEngine;
-	private Menu mMenu;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,12 +108,20 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		mSearchEngine = new MockSearchEngine();
 		mSearchLayout.setSearchEngine(mSearchEngine);
 
+		mDbHelper = DatabaseHelper.getInstance();
+
+		startService(new Intent(this, UpdateService.class));
+		
 		if (savedInstanceState == null) {
 			displayMap();
 		}
 		if (mGoogleMap != null) {
 			initializeMarkers();
 		}
+		
+		//starting the background service
+		mUpdateServiceIntent = new Intent(this, UpdateService.class);
+		
 	}
 
 	@Override
@@ -153,7 +172,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		if (id == R.id.action_settings) {
 			return true;
 		}
-
 		// Handle clicks on home button
 		if (id == android.R.id.home) {
 			if (mDrawerList.isShown()) {
@@ -169,8 +187,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		mMapZoomer.zoomOnLocation(location, mGoogleMap);
-		// updatePos
+		SettingsManager.getInstance().setLocation(location);
 	}
 
 	@Override
@@ -184,6 +201,38 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		}
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		//startService(mUpdateServiceIntent);
+		registerReceiver(mBroadcastReceiver, new IntentFilter(
+				UpdateService.BROADCAST_POS));
+
+		// get Intent that started this Activity
+		Intent startingIntent = getIntent();
+		// get the value of the user string
+		Location eventLocation = startingIntent.getParcelableExtra("location");
+		if (eventLocation != null) {
+			mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
+		}
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		unregisterReceiver(mBroadcastReceiver);
+		//stopService(mUpdateServiceIntent);
+	}
+
+	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			mFriendMarkerDisplayer.updateMarkers(getContext(), mGoogleMap,
+					getVisibleUsers(mDbHelper.getAllUsers()));
+		}
+
+	};
 	public Context getContext() {
 		return this;
 	}
@@ -242,18 +291,33 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
 		mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
 				MockDB.getEventsList());
+
 		mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
 		mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-				MockDB.FRIENDS_LIST);
+				getVisibleUsers(mDbHelper.getAllUsers()));
+
 		mMapZoomer = new DefaultZoomManager(mFragmentMap);
+
 		Log.i(TAG, "before enter to zoom according");
 		List<Marker> allMarkers = new ArrayList<Marker>(
 				mFriendMarkerDisplayer.getDisplayedMarkers());
 		allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
 		Intent startingIntent = getIntent();
+		
 		if (startingIntent.getParcelableExtra("location") == null) {
 			mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
 		}
+	}
+
+	private List<User> getVisibleUsers(LongSparseArray<User> usersSparseArray) {
+		List<User> visibleUsers = new ArrayList<User>();
+		for (int i = 0; i < usersSparseArray.size(); i++) {
+			User user = usersSparseArray.valueAt(i);
+			if (user.isVisible()) {
+				visibleUsers.add(user);
+			}
+		}
+		return visibleUsers;
 	}
 
 	/*
@@ -265,18 +329,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		// nothing
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		// get Intent that started this Activity
-		Intent startingIntent = getIntent();
-		// get the value of the user string
-		Location eventLocation = startingIntent.getParcelableExtra("location");
-		if (eventLocation != null) {
-			mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
-		}
 	}
 
 	/*
