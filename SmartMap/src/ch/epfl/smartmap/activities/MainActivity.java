@@ -301,31 +301,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		// nothing
 	}
 
-	/**
-	 * Create an friend invitation notification that appear in the notifications
-	 * tab
-	 */
-	public void createAddNotification(View view) {
-		Notifications.newFriendNotification(this.getContext(), MockDB.JULIEN);
-	}
-
-	/**
-	 * Create an accepted invitation notification that appear in the
-	 * notifications tab
-	 */
-	public void createAcceptedNotification(View view) {
-		Notifications.acceptedNotification(this.getContext(), MockDB.RAPHAEL);
-	}
-
-	/**
-	 * Create an event invitation notification that appear in the notifications
-	 * tab
-	 */
-	public void createEventNotification(View view) {
-		Notifications.newEventNotification(this.getContext(), MockDB.getEventsList()
-				.get(0));
-	}
-
 	public void performQuery(Friend friend) {
 		// Get Views
 		final MenuItem mSearchView = (MenuItem) mMenu
