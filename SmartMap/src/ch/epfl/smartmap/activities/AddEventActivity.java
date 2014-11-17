@@ -13,6 +13,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,8 @@ public class AddEventActivity extends FragmentActivity {
 
     private static final String CITY_NAME = "CITY_NAME";
 
+    protected static final String TAG = AddEventActivity.class.getSimpleName();
+
     private EditText mEventName;
     private EditText mPickStartTime;
     private EditText mPickStartDate;
@@ -59,32 +62,26 @@ public class AddEventActivity extends FragmentActivity {
      * @author SpicyCH
      */
     private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
-        int[] startDateTag = (int[]) startDate.getTag();
-        int[] startTimeTag = (int[]) startTime.getTag();
 
-        int[] endDateTag = (int[]) endDate.getTag();
-        int[] endTimeTag = (int[]) endTime.getTag();
-
-        if (endDateTag != null && endTimeTag != null) {
+        if (isValidDate(endDate.getText().toString()) && isValidTime(endTime.getText().toString())) {
+            Log.d(TAG, "running the if of checkDatesValidity");
             // The end of the event has been set by the user
 
-            GregorianCalendar start = new GregorianCalendar(startDateTag[0], startDateTag[1], startDateTag[2],
-                    startTimeTag[0], startTimeTag[1], 0);
-            GregorianCalendar end = new GregorianCalendar(endDateTag[0], endDateTag[1], endDateTag[2], endTimeTag[0],
-                    endTimeTag[1], 0);
+            GregorianCalendar start = getDateFromTextFormat(startDate.getText().toString(), startTime.getText()
+                    .toString());
+
+            GregorianCalendar end = getDateFromTextFormat(endDate.getText().toString(), endTime.getText().toString());
+
+            GregorianCalendar now = new GregorianCalendar();
 
             if (end.before(start)) {
                 // The user is trying to create the end of the event before its start!
-                endDate.setTag(null);
-                endTime.setTag(null);
                 endDate.setText("End Date");
                 endTime.setText("End Time");
 
                 Toast.makeText(mContext, "The event cannot end before it begins!", Toast.LENGTH_LONG).show();
-            } else if (end.before(Calendar.getInstance())) {
+            } else if (end.before(now)) {
                 // The user is trying to create an event in the past
-                endDate.setTag(null);
-                endTime.setTag(null);
                 endDate.setText("End Date");
                 endTime.setText("End Time");
 
@@ -163,19 +160,15 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
-
+                Log.d(TAG, "Text changed!");
             }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Good
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Good
-
             }
         };
 
@@ -333,5 +326,36 @@ public class AddEventActivity extends FragmentActivity {
         pickLocationIntent.setType(Context.LOCATION_SERVICE);
         startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
 
+    }
+
+    /**
+     * @param dayMonthYear
+     *            a String like "16/09/1993"
+     * @param hourMinute
+     *            a String like "17:03"
+     * @return a GregorianDate constructed from the given parameters
+     * @author SpicyCH
+     */
+    private GregorianCalendar getDateFromTextFormat(String dayMonthYear, String hourMinute) {
+        assert isValidDate(dayMonthYear) : "The string dayMonthYear isn't in the expected format";
+        assert isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
+
+        String[] s1 = dayMonthYear.split("/");
+        String[] s2 = hourMinute.split(":");
+        // Don't forget to substract 1 to the month in text format
+        GregorianCalendar date = new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1,
+                Integer.parseInt(s1[0]), Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
+
+        return date;
+    }
+
+    private boolean isValidDate(String s) {
+        String[] sArray = s.split("/");
+        return sArray.length == 3;
+    }
+
+    private boolean isValidTime(String s) {
+        String[] sArray = s.split(":");
+        return sArray.length == 2;
     }
 }
