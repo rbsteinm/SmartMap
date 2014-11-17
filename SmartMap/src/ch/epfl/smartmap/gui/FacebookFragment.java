@@ -21,6 +21,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
+import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -188,6 +189,9 @@ public class FacebookFragment extends Fragment {
 					Log.i(TAG,
 							"user facebookId: "
 									+ params.get(FACEBOOK_ID_POST_NAME));
+
+					SettingsManager settingsManager = SettingsManager.getInstance();
+					settingsManager.setUserName(params.get("name"));
 
 					if (!sendDataToServer(params)) {
 						Toast.makeText(
