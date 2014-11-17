@@ -1,21 +1,21 @@
 package ch.epfl.smartmap.background;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.SettingsManager;
-import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-import ch.epfl.smartmap.servercom.SmartMapClientException;
-import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
  * A background service that updates friends' position periodically
@@ -36,6 +36,10 @@ public class UpdateService extends Service {
     private DatabaseHelper mHelper = DatabaseHelper.getInstance();
     private SettingsManager mManager = SettingsManager.getInstance();
     private NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
+    
+    // TWEAK FOR THE DEMO: MUST BE REMOVED AND REPLACED AFTERWARDS !!!
+    private Set<Long> notifiedInvitations = new HashSet<Long>();
+    // TWEAK !!!
     
     private Runnable sendFriendsPosUpdate = new Runnable() {
         public void run() {
@@ -191,7 +195,11 @@ public class UpdateService extends Service {
         protected void onPostExecute(List<User> result) {
             if (!result.isEmpty()) {
                 for (User user : result) {
-                    showFriendNotif(user);
+                    // TWEAK ! MUST BE REPLACED BY PROPER STORAGE IN THE DATABASE !
+                    if (!notifiedInvitations.contains(user.getID())) {
+                        notifiedInvitations.add(user.getID());
+                        showFriendNotif(user);
+                    }
                 }
             }
         }
