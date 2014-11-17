@@ -72,7 +72,8 @@ public class AddEventActivity extends FragmentActivity {
 
             GregorianCalendar end = getDateFromTextFormat(endDate.getText().toString(), endTime.getText().toString());
 
-            GregorianCalendar now = new GregorianCalendar();
+            GregorianCalendar now = getDateFromTextFormat(startDate.getText().toString(), startTime.getText()
+                    .toString());
 
             if (end.before(start)) {
                 // The user is trying to create the end of the event before its start!
@@ -86,6 +87,7 @@ public class AddEventActivity extends FragmentActivity {
                 endTime.setText("End Time");
 
                 Toast.makeText(mContext, "The event's end cannot be in the past!", Toast.LENGTH_LONG).show();
+                Log.d(TAG, "Event in past! now is " + now);
             }
         }
 
@@ -96,20 +98,16 @@ public class AddEventActivity extends FragmentActivity {
      * @author SpicyCH
      */
     private void createEvent() {
-        int[] startDateTag = (int[]) mPickStartDate.getTag();
-        int[] startTimeTag = (int[]) mPickStartTime.getTag();
 
-        int[] endDateTag = (int[]) mPickEndDate.getTag();
-        int[] endTimeTag = (int[]) mPickEndTime.getTag();
-
-        if (endDateTag == null || endTimeTag == null || mLatitude.getText().toString() == null
-                || mLongitude.getText().toString() == null || mPlaceName == null) {
+        if (!isValidDate(mPickEndDate.getText().toString()) || !isValidTime(mPickEndTime.getText().toString())
+                || mLatitude.getText().toString().equals("") || mLongitude.getText().toString().equals("")
+                || mPlaceName.getText().toString().equals("")) {
             Toast.makeText(mContext, "Cannot create event: please specify all fields!", Toast.LENGTH_SHORT).show();
         } else {
-            GregorianCalendar startDate = new GregorianCalendar(startDateTag[0], startDateTag[1], startDateTag[2],
-                    startTimeTag[0], startTimeTag[1], 0);
-            GregorianCalendar endDate = new GregorianCalendar(endDateTag[0], endDateTag[1], endDateTag[2],
-                    endTimeTag[0], endTimeTag[1], 0);
+            GregorianCalendar startDate = getDateFromTextFormat(mPickStartDate.getText().toString(), mPickStartTime
+                    .getText().toString());
+            GregorianCalendar endDate = getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime.getText()
+                    .toString());
 
             double latitude = Double.parseDouble(mLatitude.getText().toString());
             double longitude = Double.parseDouble(mLongitude.getText().toString());
@@ -177,11 +175,10 @@ public class AddEventActivity extends FragmentActivity {
         mPickEndDate.addTextChangedListener(textChangedListener);
         mPickEndTime.addTextChangedListener(textChangedListener);
 
-        Calendar now = Calendar.getInstance();
+        GregorianCalendar now = new GregorianCalendar();
 
         mPickStartTime.setText(TimePickerFragment.formatForClock(now.get(Calendar.HOUR_OF_DAY)) + ":"
                 + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));
-        mPickStartTime.setTag(new int[] { now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE) });
 
         mPickStartTime.setOnClickListener(new OnClickListener() {
 
@@ -195,8 +192,6 @@ public class AddEventActivity extends FragmentActivity {
 
         mPickStartDate.setText(now.get(Calendar.DAY_OF_MONTH) + "/" + (now.get(Calendar.MONTH) + 1) + "/"
                 + now.get(Calendar.YEAR));
-        mPickStartDate.setTag(new int[] { now.get(Calendar.YEAR), now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH) });
 
         mPickStartDate.setOnClickListener(new OnClickListener() {
 
