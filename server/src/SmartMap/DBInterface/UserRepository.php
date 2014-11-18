@@ -4,8 +4,6 @@ namespace SmartMap\DBInterface;
 
 use Doctrine\DBAL\Connection;
 
-use SmartMap\Control\ControlException;
-
 /**
  * Models the user repo.
  *
@@ -21,7 +19,7 @@ class UserRepository
     private static $TABLE_INVITATIONS = 'invitations';
     private static $TABLE_ACCEPTED_INVITATIONS = 'accepted_invitations';
     
-    private $mApp;
+    private $mDb;
     
     /**
      * Constructs a UserRepository with a Doctrine\DBAL\Connection object.
@@ -71,7 +69,7 @@ class UserRepository
      * Gets a user from the database, given it's id.
      * 
      * @param Long $id
-     * @throws SmartMap\DBInterface\DatabaseException when the user is not found
+     * @throws DatabaseException when the user is not found
      * @return \SmartMap\DBInterface\User
      */
     public function getUser($id)
@@ -117,8 +115,8 @@ class UserRepository
      * 
      * @param array $ids
      * @param array $visibility
-     * @throws \InvalidArgumentException if $ids or $visibility is not of the right type
-     * @return multitype:|multitype:\SmartMap\DBInterface\User
+     * @throws DatabaseException if $ids or $visibility is not of the right type
+     * @return User
      */
     public function getUsers($ids, $visibility = array('VISIBLE', 'INVISIBLE'))
     {
@@ -153,7 +151,8 @@ class UserRepository
      * Gets a list of users whose name is starting by $partialName
      * 
      * @param String $partialName
-     * @return multitype:\SmartMap\DBInterface\User
+     * @throws DatabaseException
+     * @return User
      */
     public function findUsersByPartialName($partialName, $excludedIds)
     {
@@ -205,6 +204,7 @@ class UserRepository
      * is not used. Returns the created user with it's id properly set.
      * 
      * @param User $user
+     * @throws DatabaseException
      * @return User
      */
     public function createUser(User $user)
@@ -237,6 +237,7 @@ class UserRepository
      * name, visibility, longitude and latitude.
      * 
      * @param User $user
+     * @throws DatabaseException
      */
     public function updateUser(User $user)
     {
@@ -270,8 +271,8 @@ class UserRepository
      * @param long $userId
      * @param array $status
      * @param array $follow
-     * @throws \InvalidArgumentException
-     * @return multitype:unknown
+     * @throws DatabaseException
+     * @return array
      */
     public function getFriendsIds($userId,
                                   $status = array('ALLOWED', 'DISALLOWED'),

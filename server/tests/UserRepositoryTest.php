@@ -6,7 +6,8 @@ use SmartMap\DBInterface\UserRepository;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
 
-/** Tests for the UserRepository class.
+/**
+ * Tests for the UserRepository class.
  * To run them, run 
  * $> phpunit --bootstrap vendor/autoload.php --configuration tests/phpunit.xml tests/UserRepositoryTest.php
  * from the server directory. You need to have a database configured in phpunit.xml running during the tests.
@@ -82,7 +83,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	 * @expectedException SmartMap\DBInterface\DatabaseException
 	 * @expectedExceptionMessage No user found with id 56 in method getUser.
 	 */
-	public function testGetNonexistingUser()
+	public function testGetNonExistingUser()
 	{
 	    $repo = new UserRepository(self::$doctrine);
 	    

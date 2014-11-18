@@ -25,6 +25,7 @@ server/tests/phpunit.xml
 server/logs/
 server/pictures/
 server/.checkstyle
+server/.idea
 Libraries/google-play-services_lib/local.properties
 Libraries/facebook/local.properties
 Libraries/facebook/bin/
