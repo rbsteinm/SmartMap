@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.gui;
 
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.content.Context;
@@ -49,23 +50,26 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
 
         // Get FriendItem fields
         TextView name = (TextView) convertView.findViewById(R.id.activity_friends_name);
-        TextView isOnline = (TextView) convertView.findViewById(R.id.activity_friends_isOnline);
+        TextView lastSeen = (TextView) convertView.findViewById(R.id.activity_friends_lastSeen);
         ImageView picture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
         
         //Set the User's ID to the tag of its View
         convertView.setTag(mItemsArrayList.get(position).getID());
 
         // Set fields with friend attributes
-        name.setText(mItemsArrayList.get(position).getName());
+        User user = mItemsArrayList.get(position);
+        name.setText(user.getName());
         picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
-        String status;
-        if (mItemsArrayList.get(position).isOnline()) {
-            status = "online";
-            isOnline.setTextColor(Color.GREEN);
-        } else {
-            status = "offline";
-        }
-        isOnline.setText(status);
+        
+        String lastSeenString = "Last seen " + user.getLastSeen().
+            get(GregorianCalendar.DAY_OF_MONTH) + "/" + (user.getLastSeen().
+                get(GregorianCalendar.MONTH) + 1) +  "/" + user.getLastSeen().
+                    get(GregorianCalendar.YEAR) + " at " + user.getLastSeen().
+                        get(GregorianCalendar.HOUR) + ":" + user.getLastSeen().
+                            get(GregorianCalendar.MINUTE);
+        
+        lastSeen.setText(lastSeenString);
+        lastSeen.setTextColor(Color.GRAY);
 
         return convertView;
     }

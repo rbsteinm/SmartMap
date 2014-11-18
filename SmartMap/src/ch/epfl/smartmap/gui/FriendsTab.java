@@ -1,8 +1,6 @@
 package ch.epfl.smartmap.gui;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -41,19 +39,15 @@ public class FriendsTab extends ListFragment{
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.list_fragment_friends_tab,
-				container, false);
-		mCacheDB = new DatabaseHelper(mContext);
+		View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
+		mCacheDB = DatabaseHelper.getInstance();
 		mFriendList = new ArrayList<User>();
 		mFriendList = asList(mCacheDB.getAllUsers());
-		sortByOnline(mFriendList);
 		
 		// Create custom Adapter and pass it to the Activity
-		FriendListItemAdapter adapter = new FriendListItemAdapter(mContext,
-				mFriendList);
+		FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
 		setListAdapter(adapter);
 
 		return view;
@@ -76,22 +70,6 @@ public class FriendsTab extends ListFragment{
 	    setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
 	}
 	
-
-	private void sortByOnline(List<User> userList) {
-		Collections.sort(userList, new Comparator<User>() {
-
-			@Override
-			public int compare(User user1, User user2) {
-                if (user1.isOnline()) {
-                    return -1;
-                }
-                if (user2.isOnline()) {
-                    return 1;
-                }
-                return 0;
-            }
-		});
-	}
 	
 	public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
 	    if (sparseArray == null) {
