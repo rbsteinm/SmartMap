@@ -154,4 +154,25 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 
         $repo->getEvent(3);
     }
+
+    public function testGetEventsInRadius()
+    {
+        $repo = new EventRepository(self::$doctrine);
+
+        $correct = array(new Event(
+            1,
+            3,
+            '2014-11-18 10:30:00',
+            '2014-11-18 12:00:00',
+            6.56186974,
+            46.51895762,
+            'UNIL',
+            'Seminar on usefulness of philosophy',
+            'Of course philosophy is useless !'
+        ));
+
+        $events = $repo->getEventsInRadius(6.76186181 ,46.81875763, 3735); // 3735 is just before second event
+
+        $this->assertEquals($correct, $events);
+    }
 }

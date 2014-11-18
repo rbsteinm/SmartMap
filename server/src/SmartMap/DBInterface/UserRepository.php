@@ -597,12 +597,13 @@ class UserRepository
     }
     
     // Utility functions
-    
+
     /**
      * Gets an array of users given a database query statement.
-     * 
-     * @param unknown $stmt
+     *
+     * @param $stmt
      * @return array
+     * @throws
      */
     private function userArrayFromStmt($stmt)
     {

@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 /** 
  * Tests for the DataController class.
  * To run them, run
- * $> cd
+ * $> phpunit --bootstrap vendor/autoload.php tests/DataControllerTest.php
  * from the server directory.
  *
  * @author Pamoi

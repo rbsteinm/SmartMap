@@ -27,50 +27,36 @@ use Doctrine\DBAL\Configuration;
 
 
 /**
- * To run these tests, you need to
- *  -Have a db named smartmap live on localhost, that has the user root with no pwd
- *  -Set these settings in web/index.php
- *  -Set the bootstrap to autoload.php : php phpunit.phar --bootstrap ..\..\vendor\autoload.php [TESTS TO RUN]
- *
- * In the case that some tests fail in the future, try connecting to SmartMap app with the mock user. It might need to
- * reaccept the permissions.
- *
- * The mock fb account is robin.genolet@epfl.ch hackerinside
- * name: Swag Sweng
- * ID: 1482245642055847
- * fb access token: CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCj
- * u2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZ
- * Cz69ZA2ohryEYy
+ * Tests for the AuthenticationController class.
+ * To run them, run
+ * $> phpunit --bootstrap vendor/autoload.php tests/AuthenticationControllerTest.php
+ * from the server directory.
  *
  * @author SpicyCH
  * 
  * @author Pamoi (code reviewed - 01.11.2014)
+ * @author Pamoi (modified tests to use a mock repo so this
+ * is really a unit test and we don't need a database to run it)
  *        
  */
 class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
 {
-    
+    private static $APP_ID = '305881779616905';
+    private static $APP_SECRET = 'b851a1eb3edcaf637f92fbb2af2b3b47';
+
     private $authController;
     private $validPostRequest;
     private $validFbToken;
+
+    private $mockRepo;
     
     public function setUp()
     {
-        $config = new Configuration();
-        $connectionParams = array(
-                        'dbname' => 'smartmap',
-                        'user' => 'root',
-                        'password' => '',
-                        'host' => 'localhost',
-                        'driver' => 'pdo_mysql' 
-        );
+        $this->mockRepo = $this->getMockBuilder('SmartMap\DBInterface\UserRepository')
+             ->disableOriginalConstructor()
+             ->getMock();
         
-        $conn = DriverManager::getConnection($connectionParams, $config);
-        
-        $userRepo = new UserRepository($conn);
-        $authContr = new AuthenticationController($userRepo, '305881779616905', 'b851a1eb3edcaf637f92fbb2af2b3b47');
-        
-        $this->authController = $authContr;
+        $this->authController = new AuthenticationController($this->mockRepo, self::$APP_ID, self::$APP_SECRET);
         
         $this->validFbToken = 'CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7' .
                         'FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQ' .
@@ -85,21 +71,30 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     
     public function testCanLoginWithGoodRequestParams()
     {
+        $this->mockRepo
+             ->method('getUserIdFromFb')
+             ->willReturn(1);
+
+        $this->mockRepo->expects($this->once())
+             ->method('getUserIdFromFb')
+             ->with($this->equalTo(1482245642055847));
+
         $request = new Request($getRequest = array(), $this->validPostRequest);
         
         $session = new Session(new MockFileSessionStorage());
         $request->setSession($session);
+
+        $response = $this->authController->authenticate($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Successfully authenticated !');
         
-        $serverResponse = $this->authController->authenticate($request);
-        $json = json_decode($serverResponse->getContent());
-        
-        $this->assertEquals( 'Ok', $json->status);
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
     
     }
     
     /**
      * @expectedException SmartMap\Control\InvalidRequestException
-     * @expectedExceptionMessage Session is null.
+     * @expectedExceptionMessage Session is null. Did you send session cookie ?
      */
     public function testNoSessionYieldsException()
     {
@@ -109,7 +104,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     
     /**
      * @expectedException SmartMap\Control\InvalidRequestException
-     * @expectedExceptionMessage Mismatch or expired facebook data
+     * @expectedExceptionMessage Mismatch or expired facebook data.
      */
     public function testCannotLoginWithBadSession()
     {
@@ -123,10 +118,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
         $session = new Session(new MockFileSessionStorage());
         $request->setSession($session);
         
-        $serverResponse = $this->authController->authenticate($request);
-        $json = json_decode($serverResponse->getContent());
-        
-        $this->assertEquals("error", $json->status);
+        $this->authController->authenticate($request);
     }
     
     /**
@@ -145,15 +137,12 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
         $session = new Session(new MockFileSessionStorage());
         $request->setSession($session);
         
-        $serverResponse = $this->authController->authenticate($request);
-        $json = json_decode($serverResponse->getContent());
-        
-        $this->assertEquals("error", $json->status);
+        $this->authController->authenticate($request);
     }
     
     /**
      * @expectedException SmartMap\Control\InvalidRequestException
-     * @expectedExceptionMessage do not match the fb access token
+     * @expectedExceptionMessage Id and name do not match the fb access token.
      */
     public function testCannotLoginWithGoodSessionButBadId()
     {
@@ -167,44 +156,33 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
         $session = new Session(new MockFileSessionStorage());
         $request->setSession($session);
         
-        $serverResponse = $this->authController->authenticate($request);
-        $json = json_decode($serverResponse->getContent());
-        
-        $this->assertEquals('error', $json->status);
+        $this->authController->authenticate($request);
     }
     
     /**
      * @expectedException SmartMap\DBInterface\DatabaseException
+     * @expectedExceptionMessage toto
      */
     public function testDatabaseErrorYieldsDBException()
     {
-        $config = new Configuration ();
-        $connectionParams = array (
-                        'dbname' => 'smartmap',
-                        'user' => 'Robich',
-                        'password' => 'LetMeIn',
-                        'host' => 'localhost',
-                        'driver' => 'pdo_mysql' 
-        );
-        
-        $conn = DriverManager::getConnection($connectionParams, $config);
-        
-        $userRepo = new UserRepository($conn);
-        $authContr = new AuthenticationController($userRepo, '305881779616905', 'b851a1eb3edcaf637f92fbb2af2b3b47');
+        $this->mockRepo
+             ->method('getUserIdFromFb')
+             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException('toto')));
+
         
         $request = new Request($getRequest = array(), $this->validPostRequest);
         
         $session = new Session(new MockFileSessionStorage());
         $request->setSession($session);
         
-        $serverResponse = $authContr->authenticate($request);
+        $this->authController->authenticate($request);
     }
     
     /**
      * @expectedException SmartMap\Control\InvalidRequestException
-     * @expectedExceptionMessage Missing POST parameter
+     * @expectedExceptionMessage Missing POST parameter.
      */
-    public function testNoPostParamsYieldException()
+    public function testNoPostParamsYieldsException()
     {
         $request = new Request($getRequest = array (), $postParams = array());
         
@@ -216,15 +194,23 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     
     public function testSessionUserIdIsSetAfterLogin()
     {
+        $this->mockRepo
+             ->method('getUserIdFromFb')
+             ->willReturn(1);
+
+        $this->mockRepo->expects($this->once())
+             ->method('getUserIdFromFb')
+             ->with($this->equalTo(1482245642055847));
+
         $request = new Request($getRequest = array(), $this->validPostRequest);
         
         $session = new Session(new MockFileSessionStorage());
         $request->setSession($session);
         
-        $this->assertTrue ( $session->get ( 'userId' ) == null );
+        $this->assertTrue($session->get('userId') == null);
         
         $serverResponse = $this->authController->authenticate($request);
         
-        $this->assertTrue($session->get('userId') > 0 );
+        $this->assertTrue($session->get('userId') == 1);
     }
 }

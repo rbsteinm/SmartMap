@@ -12,6 +12,8 @@ use Doctrine\DBAL\Connection;
 class EventRepository
 {
     private static $TABLE_EVENT = 'events';
+
+    private static $EARTH_RADIUS = 6373;
     
     private $mDb;
     
@@ -135,8 +137,73 @@ class EventRepository
         return $event;
     }
 
+    /**
+     * Gets the events in a radius of $radius kilometers around position given by
+     * $longitude and $latitude.
+     *
+     * @param $longitude
+     * @param $latitude
+     * @param $radius
+     * @return array
+     * @throws DatabaseException
+     */
     public function getEventsInRadius($longitude, $latitude, $radius)
     {
-        // TODO ?
+        $req = "SELECT  * FROM events";
+
+        try
+        {
+            $stmt = $this->mDb->executeQuery($req);
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error in getEventsInRadius.', 1, $e);
+        }
+
+        $events = array();
+
+        $lat1 = deg2rad($latitude);
+        $long1 = deg2rad($longitude);
+
+        while ($eventData = $stmt->fetch())
+        {
+            $lat2 = deg2rad($eventData['latitude']);
+            $long2 = deg2rad($eventData['longitude']);
+
+            $dlat = $lat1 - $lat2;
+            $dlon = $long1 - $long2;
+
+            $a = sin($dlat/2) * sin($dlat/2) + cos($lat1) * cos($lat2) * sin($dlon/2) * sin($dlon/2);
+
+            $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+            $d = self::$EARTH_RADIUS * $c;
+
+            if ($d <= $radius)
+            {
+                try {
+                    $event = new Event(
+                        $eventData['id'],
+                        $eventData['creator_id'],
+                        $eventData['starting_date'],
+                        $eventData['ending_date'],
+                        $eventData['longitude'],
+                        $eventData['latitude'],
+                        $eventData['position_name'],
+                        $eventData['name'],
+                        $eventData['description']
+                    );
+                }
+                catch (\InvalidArgumentException $e)
+                {
+                    throw new DatabaseException('Event with invalid state in database with id '
+                        . $eventData['id'] . '.');
+                }
+
+                $events[] = $event;
+            }
+        }
+
+        return $events;
     }
 }
