@@ -107,7 +107,6 @@ public class SearchLayout extends LinearLayout {
         if (mCurrentSearchType != SearchPanelType.HISTORY) {
             SearchResultViewGroup nextSearchResultViewGroup = mSearchResultViewGroups
                 .get(mCurrentSearchType);
-
             nextSearchResultViewGroup.displayMinimized();
             nextSearchResultViewGroup.setResultList(mCurrentSearchResults);
         }
@@ -326,5 +325,4 @@ public class SearchLayout extends LinearLayout {
             return result;
         }
     }
-
 }
