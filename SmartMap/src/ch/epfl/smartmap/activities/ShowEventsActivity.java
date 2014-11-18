@@ -236,7 +236,6 @@ public class ShowEventsActivity extends ListActivity {
             @Override
             public void onClick(DialogInterface dialog, int id) {
 
-                // TODO open event in map
                 Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
 
                 Intent showEventIntent = new Intent(mContext, MainActivity.class);
