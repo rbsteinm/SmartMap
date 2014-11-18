@@ -3,8 +3,6 @@ package ch.epfl.smartmap.activities;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -13,7 +11,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +23,8 @@ import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.UserEvent;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
+
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * This activity lets the user create a new event.
@@ -40,6 +39,10 @@ public class AddEventActivity extends FragmentActivity {
     private static final String CITY_NAME = "CITY_NAME";
 
     protected static final String TAG = AddEventActivity.class.getSimpleName();
+
+    private static final int ELEMENTS_JJ_DD_YYYY = 3;
+
+    private static final int ELEMENTS_HH_MM = 2;
 
     private EditText mEventName;
     private EditText mPickStartTime;
@@ -356,11 +359,11 @@ public class AddEventActivity extends FragmentActivity {
 
     private boolean isValidDate(String s) {
         String[] sArray = s.split("/");
-        return sArray.length == 3;
+        return sArray.length == ELEMENTS_JJ_DD_YYYY;
     }
 
     private boolean isValidTime(String s) {
         String[] sArray = s.split(":");
-        return sArray.length == 2;
+        return sArray.length == ELEMENTS_HH_MM;
     }
 }
