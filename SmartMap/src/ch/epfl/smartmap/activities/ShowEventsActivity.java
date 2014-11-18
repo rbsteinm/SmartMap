@@ -11,14 +11,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -28,6 +24,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.UserEvent;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 
@@ -39,20 +36,15 @@ import ch.epfl.smartmap.gui.EventsListItemAdapter;
  */
 public class ShowEventsActivity extends ListActivity {
 
+    @SuppressWarnings("unused")
     private final static String TAG = ShowEventsActivity.class.getSimpleName();
 
     private final static double EARTH_RADIUS_KM = 6378.1;
     private final static int SEEK_BAR_MIN_VALUE = 2;
     private final static int ONE_HUNDRED = 100;
-    private static final long LOCATION_REFRESH_TIME = 10000;
-    private static final long LOCATION_MIN_DISTANCE = 15;
 
     private SeekBar mSeekBar;
     private TextView mShowKilometers;
-    private CheckBox mNearMeCheckBox;
-
-    private LocationListener mLocationListener;
-    private LocationManager mLocationManager;
 
     private Context mContext;
 
@@ -75,68 +67,12 @@ public class ShowEventsActivity extends ListActivity {
         // Makes the logo clickable (clicking it returns to previous activity)
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mMyLocation = new Location("GPS + NETWORK");
-        /*
-         * mMyLocation.setLatitude(46.509300); mMyLocation.setLongitude(6.661600);
-         */
-        mMyLocation.setLatitude(0);
-        mMyLocation.setLongitude(0);
+        mMyLocation = SettingsManager.getInstance().getLocation();
         mContext = getApplicationContext();
-
-        mLocationListener = new LocationListener() {
-
-            @Override
-            public void onLocationChanged(Location loc) {
-                mMyLocation.set(loc);
-                updateCurrentList();
-                mNearMeCheckBox.setOnClickListener(new OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        // Since we were able to fetch the user's position, we reenable the function associated to this
-                        // View
-                        onCheckboxClicked(v);
-                    }
-
-                });
-                Log.i(TAG, "User's location updated");
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-        };
-
-        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME,
-                LOCATION_MIN_DISTANCE, mLocationListener);
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_REFRESH_TIME,
-                LOCATION_MIN_DISTANCE, mLocationListener);
 
         mMyEventsChecked = false;
         mOngoingChecked = false;
         mNearMeChecked = false;
-
-        // We only make this checkbox available as soon as we get the user's position
-        mNearMeCheckBox = (CheckBox) findViewById(R.id.ShowEventsCheckBoxNearMe);
-        mNearMeCheckBox.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(
-                        getApplicationContext(),
-                        "Your position hasn't been retrieved yet. Make sure your GPS or your cellular network is "
-                                + "turned on.", Toast.LENGTH_LONG).show();
-            }
-        });
 
         mShowKilometers = (TextView) findViewById(R.id.showEventKilometers);
         // By default, the seek bar is disabled. This is done programmatically
@@ -165,11 +101,7 @@ public class ShowEventsActivity extends ListActivity {
 
         });
 
-
         mDbHelper = DatabaseHelper.getInstance();
-        /*
-         * mDbHelper.addEvent(e0); mDbHelper.addEvent(e1); mDbHelper.addEvent(e2); mDbHelper.addEvent(e3);
-         */
 
         mEventsList = mDbHelper.getAllEvents();
 
@@ -291,6 +223,7 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
+        mMyLocation = SettingsManager.getInstance().getLocation();
         mEventsList = mDbHelper.getAllEvents();
         mCurrentList = new ArrayList<Event>();
 
