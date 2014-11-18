@@ -11,7 +11,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,8 +39,9 @@ public class AddEventActivity extends FragmentActivity {
 
 	protected static final String TAG = AddEventActivity.class.getSimpleName();
 
-	private static final int VALID_TIME_LENGTH = 2;
-	private static final int VALID_DATE_LENGTH = 3;
+	private static final int ELEMENTS_JJ_DD_YYYY = 3;
+
+	private static final int ELEMENTS_HH_MM = 2;
 
 	private EditText mEventName;
 	private EditText mPickStartTime;
@@ -71,7 +71,6 @@ public class AddEventActivity extends FragmentActivity {
 
 		if (this.isValidDate(endDate.getText().toString())
 		    && this.isValidTime(endTime.getText().toString())) {
-			Log.d(TAG, "running the if of checkDatesValidity");
 			// The end of the event has been set by the user
 
 			GregorianCalendar start = this.getDateFromTextFormat(startDate
@@ -87,8 +86,8 @@ public class AddEventActivity extends FragmentActivity {
 				// The user is trying to create the end of the event before its
 				// start!
 
-				endDate.setText("End Date");
-				endTime.setText("End Time");
+				endDate.setText("");
+				endTime.setText("");
 
 				Toast
 				    .makeText(mContext,
@@ -97,8 +96,8 @@ public class AddEventActivity extends FragmentActivity {
 			} else if (end.before(now)) {
 				// The user is trying to create an event in the past
 
-				endDate.setText("End Date");
-				endTime.setText("End Time");
+				endDate.setText("");
+				endTime.setText("");
 
 				Toast
 				    .makeText(mContext,
@@ -188,7 +187,6 @@ public class AddEventActivity extends FragmentActivity {
 
 				AddEventActivity.this.checkDatesValidity(mPickStartDate,
 				    mPickStartTime, mPickEndDate, mPickEndTime);
-				Log.d(TAG, "Text changed!");
 
 				// Reset the TextChangedListener
 				mPickEndDate.addTextChangedListener(mTextChangedListener);
@@ -403,11 +401,11 @@ public class AddEventActivity extends FragmentActivity {
 
 	private boolean isValidDate(String s) {
 		String[] sArray = s.split("/");
-		return sArray.length == VALID_DATE_LENGTH;
+		return sArray.length == ELEMENTS_JJ_DD_YYYY;
 	}
 
 	private boolean isValidTime(String s) {
 		String[] sArray = s.split(":");
-		return sArray.length == VALID_TIME_LENGTH;
+		return sArray.length == ELEMENTS_HH_MM;
 	}
 }

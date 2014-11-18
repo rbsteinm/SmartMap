@@ -59,7 +59,7 @@ public class FacebookFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mUiHelper = new UiLifecycleHelper(getActivity(), callback);
+		mUiHelper = new UiLifecycleHelper(this.getActivity(), callback);
 		mUiHelper.onCreate(savedInstanceState);
 	}
 
@@ -85,7 +85,7 @@ public class FacebookFragment extends Fragment {
 
 		// Not logged in Facebook or permission to use Facebook in SmartMap not
 		// given
-		if (Session.getActiveSession() == null
+		if ((Session.getActiveSession() == null)
 		    || Session.getActiveSession().getPermissions().isEmpty()) {
 			authButton.setReadPermissions(mPermissions);
 		}
@@ -100,8 +100,8 @@ public class FacebookFragment extends Fragment {
 		// session is not null, the session state change notification
 		// may not be triggered. Trigger it if it's open/closed.
 		Session session = Session.getActiveSession();
-		if (session != null && (session.isOpened() || session.isClosed())) {
-			onSessionStateChange(session, session.getState(), null);
+		if ((session != null) && (session.isOpened() || session.isClosed())) {
+			this.onSessionStateChange(session, session.getState(), null);
 		}
 
 		mUiHelper.onResume();
@@ -139,15 +139,16 @@ public class FacebookFragment extends Fragment {
 			Log.i(TAG, "Logged in...");
 
 			// Display the loading Bar and Text
-			getView().findViewById(R.id.loadingBar).setVisibility(View.VISIBLE);
-			getView().findViewById(R.id.loadingTextView).setVisibility(
-			    View.VISIBLE);
+			this.getView().findViewById(R.id.loadingBar)
+			    .setVisibility(View.VISIBLE);
+			this.getView().findViewById(R.id.loadingTextView)
+			    .setVisibility(View.VISIBLE);
 
 			// Disable facebook log out button (CLOSE ISSUE #16)
-			getView().findViewById(R.id.loginButton).setAlpha(0f);
+			this.getView().findViewById(R.id.loginButton).setAlpha(0f);
 
 			// Display the authenticated UI here
-			makeMeRequest();
+			this.makeMeRequest();
 
 		} else if (state.isClosed()) {
 			Log.i(TAG, "Logged out...");
@@ -159,78 +160,72 @@ public class FacebookFragment extends Fragment {
 		@Override
 		public void call(Session session, SessionState state,
 		    Exception exception) {
-			onSessionStateChange(session, state, exception);
+			FacebookFragment.this.onSessionStateChange(session, state,
+			    exception);
 		}
 	};
 
 	protected void makeMeRequest() {
 		Request request = Request.newMeRequest(Session.getActiveSession(),
-		    new Request.GraphUserCallback() {
-			    @Override
-			    public void onCompleted(GraphUser user, Response response) {
 
-				    if (user != null) {
+		new Request.GraphUserCallback() {
 
-					    // This portable token is used by the server
-					    String facebookToken = Session.getActiveSession()
-					        .getAccessToken();
+			@Override
+			public void onCompleted(GraphUser user, Response response) {
 
-					    // Send user's infos to SmartMap server
-					    Map<String, String> params = new LinkedHashMap<String, String>();
-					    params.put(FACEBOOK_ID_POST_NAME, user.getId());
-					    params.put(FACEBOOK_NAME_POST_NAME, user.getName());
-					    params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
-					    // TODO put user's friends?
+				if (user != null) {
 
-					    // Debug
-					    Log.i(TAG, "user name: " + params.get("name"));
-					    Log.i(
-					        TAG,
-					        "user facebookId: "
-					            + params.get(FACEBOOK_ID_POST_NAME));
+					// This portable token is used by the server
+					String facebookToken = Session.getActiveSession()
+					    .getAccessToken();
 
-					    SettingsManager settingsManager = SettingsManager
-					        .getInstance();
-					    settingsManager.setUserName(params.get("name"));
+					// Send user's infos to SmartMap server
+					Map<String, String> params = new LinkedHashMap<String, String>();
+					params.put(FACEBOOK_ID_POST_NAME, user.getId());
+					params.put(FACEBOOK_NAME_POST_NAME, user.getName());
+					params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
+					// TODO put user's friends?
 
-					    if (!sendDataToServer(params)) {
-						    Toast.makeText(getActivity(),
-						        "Failed to log in to the SmartMap server.",
-						        Toast.LENGTH_LONG).show();
-					    } else {
-						    // Create and start the next activity
-						    Toast
-						        .makeText(
-						            getActivity(),
-						            "You logged in successfully, "
-						                + user.getName(), Toast.LENGTH_LONG)
-						        .show();
-						    startMainActivity();
-					    }
+					// Debug
+					Log.i(TAG, "user name: " + params.get("name"));
+					Log.i(TAG,
+					    "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
 
-				    } else if (response.getError() != null) {
-					    Log.e(TAG, "The user is null (authentication aborted?)");
-				    }
-			    }
-		    });
+					SettingsManager settingsManager = SettingsManager
+					    .getInstance();
+					settingsManager.setUserName(params.get("name"));
+
+					if (!FacebookFragment.this.sendDataToServer(params)) {
+						Toast.makeText(FacebookFragment.this.getActivity(),
+						    "Failed to log in to the SmartMap server.",
+						    Toast.LENGTH_LONG).show();
+					} else {
+						// Create and start the next activity
+						FacebookFragment.this.startMainActivity();
+					}
+
+				} else if (response.getError() != null) {
+					Log.e(TAG, "The user is null (authentication aborted?)");
+				}
+			}
+		});
 
 		request.executeAsync();
 	}
 
 	private void startMainActivity() {
-		Activity currentActivity = getActivity();
-		Intent intent = new Intent(getActivity(), MainActivity.class);
-		startActivity(intent);
+		Activity currentActivity = this.getActivity();
+		Intent intent = new Intent(this.getActivity(), MainActivity.class);
+		this.startActivity(intent);
 		currentActivity.finish();
 	}
 
 	private boolean sendDataToServer(Map<String, String> params) {
 
-		ConnectivityManager connMgr = (ConnectivityManager) getActivity()
+		ConnectivityManager connMgr = (ConnectivityManager) this.getActivity()
 		    .getSystemService(Context.CONNECTIVITY_SERVICE);
-
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-		if (networkInfo != null && networkInfo.isConnected()) {
+		if ((networkInfo != null) && networkInfo.isConnected()) {
 			// Send data
 			SendDataTask task = new SendDataTask(params);
 			task.execute();
@@ -238,7 +233,7 @@ public class FacebookFragment extends Fragment {
 		} else {
 			// An error occured
 			Log.e(TAG, "Could not send user's data to server. Net down?");
-			Toast.makeText(getActivity(),
+			Toast.makeText(this.getActivity(),
 			    "Your internet connection seems down. Please try again!",
 			    Toast.LENGTH_LONG).show();
 			return false;

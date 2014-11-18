@@ -11,14 +11,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -28,6 +24,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.UserEvent;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 
@@ -38,62 +35,164 @@ import ch.epfl.smartmap.gui.EventsListItemAdapter;
  */
 public class ShowEventsActivity extends ListActivity {
 
+	@SuppressWarnings("unused")
 	private final static String TAG = ShowEventsActivity.class.getSimpleName();
 
 	private final static double EARTH_RADIUS_KM = 6378.1;
 	private final static int SEEK_BAR_MIN_VALUE = 2;
 	private final static int ONE_HUNDRED = 100;
-	private static final long LOCATION_REFRESH_TIME = 10000;
-	private static final long LOCATION_MIN_DISTANCE = 15;
-
-	/**
-	 * Computes the distance between two GPS locations (takes into consideration
-	 * the earth radius), inspired by
-	 * wikipedia
-	 * 
-	 * @param lat1
-	 * @param lon1
-	 * @param lat2
-	 * @param lon2
-	 * @return the distance in km, rounded to 2 digits
-	 * @author SpicyCH
-	 */
-	public static double distance(double lat1, double lon1, double lat2,
-	    double lon2) {
-		double radLat1 = Math.toRadians(lat1);
-		double radLong1 = Math.toRadians(lon1);
-		double radLat2 = Math.toRadians(lat2);
-		double radLong2 = Math.toRadians(lon2);
-
-		double sec1 = Math.sin(radLat1) * Math.sin(radLat2);
-		double dl = Math.abs(radLong1 - radLong2);
-		double sec2 = Math.cos(radLat1) * Math.cos(radLat2);
-		double centralAngle = Math.acos(sec1 + (sec2 * Math.cos(dl)));
-		double distance = centralAngle * EARTH_RADIUS_KM;
-
-		return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;
-	}
 
 	private SeekBar mSeekBar;
 	private TextView mShowKilometers;
 
-	private CheckBox mNearMeCheckBox;
-	private LocationListener mLocationListener;
-
-	private LocationManager mLocationManager;
-
 	private Context mContext;
 
 	private DatabaseHelper mDbHelper;
+
 	private boolean mMyEventsChecked;
 	private boolean mOngoingChecked;
-
 	private boolean mNearMeChecked;
+
 	private List<Event> mEventsList;
 	private List<Event> mCurrentList;
 	private static String mMyName = "Robich";
-
 	private Location mMyLocation;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		this.setContentView(R.layout.activity_show_events);
+
+		// Makes the logo clickable (clicking it returns to previous activity)
+		this.getActionBar().setDisplayHomeAsUpEnabled(true);
+
+		mMyLocation = SettingsManager.getInstance().getLocation();
+		mContext = this.getApplicationContext();
+
+		mMyEventsChecked = false;
+		mOngoingChecked = false;
+		mNearMeChecked = false;
+
+		mShowKilometers = (TextView) this
+		    .findViewById(R.id.showEventKilometers);
+		// By default, the seek bar is disabled. This is done programmatically
+		// as android:enabled="false" doesn't work
+		// out in xml
+		mSeekBar = (SeekBar) this.findViewById(R.id.showEventSeekBar);
+		mSeekBar.setEnabled(false);
+		mSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+			    boolean fromUser) {
+				if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
+					seekBar.setProgress(SEEK_BAR_MIN_VALUE);
+				}
+				mShowKilometers.setText(mSeekBar.getProgress() + " km");
+				ShowEventsActivity.this.updateCurrentList();
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+			}
+
+		});
+
+		mDbHelper = DatabaseHelper.getInstance();
+
+		mEventsList = mDbHelper.getAllEvents();
+
+		// Create custom Adapter and pass it to the Activity
+		EventsListItemAdapter adapter = new EventsListItemAdapter(this,
+		    mEventsList, mMyLocation);
+		this.setListAdapter(adapter);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		// This is needed to show an update of the events' list after having
+		// created an event
+		this.updateCurrentList();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		this.getMenuInflater().inflate(R.menu.show_events, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				this.finish();
+				break;
+			case R.id.showEventsMenuNewEvent:
+				Intent showEventIntent = new Intent(mContext,
+				    AddEventActivity.class);
+				this.startActivity(showEventIntent);
+			default:
+				// No other menu items!
+				break;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		final Event event = (UserEvent) this.findViewById(position).getTag();
+
+		String message = EventsListItemAdapter.setTextFromDate(
+		    event.getStartDate(), event.getEndDate(), "start")
+		    + " - "
+		    + EventsListItemAdapter.setTextFromDate(event.getStartDate(),
+		        event.getEndDate(), "end")
+		    + "\nCreated by "
+		    + event.getCreatorName() + "\n\n" + event.getDescription();
+
+		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+		alertDialog.setTitle(event.getName()
+		    + " @ "
+		    + event.getPositionName()
+		    + "\n"
+		    + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
+		        event.getLocation().getLatitude(), event.getLocation()
+		            .getLongitude()) + " km away");
+		alertDialog.setMessage(message);
+		final Activity activity = this;
+		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show on the map",
+		    new DialogInterface.OnClickListener() {
+
+			    @Override
+			    public void onClick(DialogInterface dialog, int id) {
+
+				    Toast.makeText(activity, "Opening event on the map...",
+				        Toast.LENGTH_SHORT).show();
+
+				    Intent showEventIntent = new Intent(mContext,
+				        MainActivity.class);
+				    showEventIntent.putExtra("location", event.getLocation());
+				    ShowEventsActivity.this.startActivity(showEventIntent);
+
+			    }
+		    });
+
+		alertDialog.show();
+
+		super.onListItemClick(l, v, position, id);
+	}
 
 	public void onCheckboxClicked(View v) {
 		CheckBox checkBox = (CheckBox) v;
@@ -131,217 +230,12 @@ public class ShowEventsActivity extends ListActivity {
 		this.updateCurrentList();
 	}
 
-	@SuppressWarnings("deprecation")
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.activity_show_events);
-
-		// Makes the logo clickable (clicking it returns to previous activity)
-		this.getActionBar().setDisplayHomeAsUpEnabled(true);
-
-		mMyLocation = new Location("GPS + NETWORK");
-		/*
-		 * mMyLocation.setLatitude(46.509300);
-		 * mMyLocation.setLongitude(6.661600);
-		 */
-		mMyLocation.setLatitude(0);
-		mMyLocation.setLongitude(0);
-		mContext = this.getApplicationContext();
-
-		mLocationListener = new LocationListener() {
-
-			@Override
-			public void onLocationChanged(Location loc) {
-				mMyLocation.set(loc);
-				ShowEventsActivity.this.updateCurrentList();
-				mNearMeCheckBox.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						// Since we were able to fetch the user's position, we
-						// reenable the function associated to this
-						// View
-						ShowEventsActivity.this.onCheckboxClicked(v);
-					}
-
-				});
-				Log.i(TAG, "User's location updated");
-			}
-
-			@Override
-			public void onProviderDisabled(String provider) {
-			}
-
-			@Override
-			public void onProviderEnabled(String provider) {
-			}
-
-			@Override
-			public void onStatusChanged(String provider, int status,
-			    Bundle extras) {
-			}
-		};
-
-		mLocationManager = (LocationManager) this
-		    .getSystemService(LOCATION_SERVICE);
-		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-		    LOCATION_REFRESH_TIME, LOCATION_MIN_DISTANCE, mLocationListener);
-		mLocationManager.requestLocationUpdates(
-		    LocationManager.NETWORK_PROVIDER, LOCATION_REFRESH_TIME,
-		    LOCATION_MIN_DISTANCE, mLocationListener);
-
-		mMyEventsChecked = false;
-		mOngoingChecked = false;
-		mNearMeChecked = false;
-
-		// We only make this checkbox available as soon as we get the user's
-		// position
-		mNearMeCheckBox = (CheckBox) this
-		    .findViewById(R.id.ShowEventsCheckBoxNearMe);
-		mNearMeCheckBox.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Toast
-				    .makeText(
-				        ShowEventsActivity.this.getApplicationContext(),
-				        "Your position hasn't been retrieved yet. Make sure your GPS or your cellular network is "
-				            + "turned on.", Toast.LENGTH_LONG).show();
-			}
-		});
-
-		mShowKilometers = (TextView) this
-		    .findViewById(R.id.showEventKilometers);
-		// By default, the seek bar is disabled. This is done programmatically
-		// as android:enabled="false" doesn't work
-		// out in xml
-		mSeekBar = (SeekBar) this.findViewById(R.id.showEventSeekBar);
-		mSeekBar.setEnabled(false);
-		mSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,
-			    boolean fromUser) {
-				if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
-					seekBar.setProgress(SEEK_BAR_MIN_VALUE);
-				}
-				mShowKilometers.setText(mSeekBar.getProgress() + " km");
-				ShowEventsActivity.this.updateCurrentList();
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-			}
-
-		});
-
-		mDbHelper = new DatabaseHelper(this);
-		/*
-		 * mDbHelper.addEvent(e0); mDbHelper.addEvent(e1);
-		 * mDbHelper.addEvent(e2); mDbHelper.addEvent(e3);
-		 */
-
-		mEventsList = mDbHelper.getAllEvents();
-
-		// Create custom Adapter and pass it to the Activity
-		EventsListItemAdapter adapter = new EventsListItemAdapter(this,
-		    mEventsList, mMyLocation);
-		this.setListAdapter(adapter);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		this.getMenuInflater().inflate(R.menu.show_events, menu);
-		return true;
-	}
-
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		final Event event = (UserEvent) this.findViewById(position).getTag();
-
-		String message = EventsListItemAdapter.setTextFromDate(
-		    event.getStartDate(), event.getEndDate(), "start")
-		    + " - "
-		    + EventsListItemAdapter.setTextFromDate(event.getStartDate(),
-		        event.getEndDate(), "end")
-		    + "\nCreated by "
-		    + event.getCreatorName() + "\n\n" + event.getDescription();
-
-		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-		alertDialog.setTitle(event.getName()
-		    + " @ "
-		    + event.getPositionName()
-		    + "\n"
-		    + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
-		        event.getLocation().getLatitude(), event.getLocation()
-		            .getLongitude()) + " km away");
-		alertDialog.setMessage(message);
-		final Activity activity = this;
-		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show on the map",
-		    new DialogInterface.OnClickListener() {
-
-			    @Override
-			    public void onClick(DialogInterface dialog, int id) {
-
-				    // TODO open event in map
-				    Toast.makeText(activity, "Opening event on the map...",
-				        Toast.LENGTH_SHORT).show();
-
-				    Intent showEventIntent = new Intent(mContext,
-				        MainActivity.class);
-				    showEventIntent.putExtra("location", event.getLocation());
-				    ShowEventsActivity.this.startActivity(showEventIntent);
-
-			    }
-		    });
-
-		alertDialog.show();
-
-		super.onListItemClick(l, v, position, id);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				this.finish();
-				break;
-			case R.id.showEventsMenuNewEvent:
-				Intent showEventIntent = new Intent(mContext,
-				    AddEventActivity.class);
-				this.startActivity(showEventIntent);
-			default:
-				// No other menu items!
-				break;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		// This is needed to show an update of the events' list after having
-		// created an event
-		this.updateCurrentList();
-	}
-
 	/**
 	 * This runs in O(n), can we do better?
 	 */
 	private void updateCurrentList() {
 
+		mMyLocation = SettingsManager.getInstance().getLocation();
 		mEventsList = mDbHelper.getAllEvents();
 		mCurrentList = new ArrayList<Event>();
 
@@ -387,5 +281,33 @@ public class ShowEventsActivity extends ListActivity {
 		EventsListItemAdapter adapter = new EventsListItemAdapter(this,
 		    mCurrentList, mMyLocation);
 		this.setListAdapter(adapter);
+	}
+
+	/**
+	 * Computes the distance between two GPS locations (takes into consideration
+	 * the earth radius), inspired by
+	 * wikipedia
+	 * 
+	 * @param lat1
+	 * @param lon1
+	 * @param lat2
+	 * @param lon2
+	 * @return the distance in km, rounded to 2 digits
+	 * @author SpicyCH
+	 */
+	public static double distance(double lat1, double lon1, double lat2,
+	    double lon2) {
+		double radLat1 = Math.toRadians(lat1);
+		double radLong1 = Math.toRadians(lon1);
+		double radLat2 = Math.toRadians(lat2);
+		double radLong2 = Math.toRadians(lon2);
+
+		double sec1 = Math.sin(radLat1) * Math.sin(radLat2);
+		double dl = Math.abs(radLong1 - radLong2);
+		double sec2 = Math.cos(radLat1) * Math.cos(radLat2);
+		double centralAngle = Math.acos(sec1 + (sec2 * Math.cos(dl)));
+		double distance = centralAngle * EARTH_RADIUS_KM;
+
+		return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;
 	}
 }
