@@ -19,7 +19,6 @@ import ch.epfl.smartmap.cache.User;
  * A {@link SmartMapParser} implementation that parses objects from Json format
  * 
  * @author marion-S
- * 
  * @author SpicyCH (code reviewed 02.11.2014) : changed Error to error as the
  *         server uses a lowercase e.
  */
@@ -38,7 +37,6 @@ public class JsonSmartMapParser implements SmartMapParser {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.servercom.SmartMapParser#parseFriend(java.lang.String)
 	 */
@@ -55,12 +53,12 @@ public class JsonSmartMapParser implements SmartMapParser {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.servercom.SmartMapParser#parseFriends(java.lang.String)
 	 */
 	@Override
-	public List<User> parseFriends(String s, String key) throws SmartMapParseException {
+	public List<User> parseFriends(String s, String key)
+	    throws SmartMapParseException {
 
 		List<User> friends = new ArrayList<User>();
 
@@ -77,21 +75,20 @@ public class JsonSmartMapParser implements SmartMapParser {
 		} catch (JSONException e) {
 			throw new SmartMapParseException(e);
 		}
-		
+
 		Log.d(TAG, Integer.toString(friends.size()));
 		return friends;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.servercom.SmartMapParser#checkServerError(java.lang.
 	 * String)
 	 */
 	@Override
 	public void checkServerError(String s) throws SmartMapParseException,
-			SmartMapClientException {
+	    SmartMapClientException {
 
 		String status = null;
 		String message = null;
@@ -110,8 +107,9 @@ public class JsonSmartMapParser implements SmartMapParser {
 
 	}
 
+	@Override
 	public Map<Long, Location> parsePositions(String s)
-			throws SmartMapParseException {
+	    throws SmartMapParseException {
 		Map<Long, Location> positions = new HashMap<Long, Location>();
 
 		try {
@@ -136,9 +134,10 @@ public class JsonSmartMapParser implements SmartMapParser {
 				Location location = new Location("SmartMapServers");
 				location.setLatitude(latitude);
 				location.setLongitude(longitude);
-				positions.put((long) userId, location);
+				positions.put(userId, location);
 			}
-			Log.d(TAG + "number of positions in the list", Integer.toString(positions.size()));
+			Log.d(TAG + "number of positions in the list",
+			    Integer.toString(positions.size()));
 		} catch (JSONException e) {
 			throw new SmartMapParseException(e);
 		}
@@ -154,7 +153,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 	 * @throws SmartMapParseException
 	 */
 	private User parseFriendFromJSON(JSONObject jsonObject)
-			throws SmartMapParseException {
+	    throws SmartMapParseException {
 		long id = 0;
 		String name = null;
 		String phoneNumber = null;
@@ -168,7 +167,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 			name = jsonObject.getString("name");
 			latitude = jsonObject.optDouble("latitude", UINITIALIZED_LATITUDE);
 			longitude = jsonObject
-					.optDouble("longitude", UNITIALIZED_LONGITUDE);
+			    .optDouble("longitude", UNITIALIZED_LONGITUDE);
 			phoneNumber = jsonObject.optString("phoneNumber", null);
 			email = jsonObject.optString("email", null);
 			online = jsonObject.optString("online", null);
@@ -283,7 +282,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 	 *             if invalid phone number
 	 */
 	private void checkPhoneNumber(String phoneNumber)
-			throws SmartMapParseException {
+	    throws SmartMapParseException {
 		// TODO
 	}
 

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import android.location.Location;
-
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -13,7 +12,6 @@ import ch.epfl.smartmap.cache.User;
  * all share this common interface.
  * 
  * @author marion-S
- * 
  * @author Pamoi (code reviewed : 9.11.2014)
  */
 
@@ -60,7 +58,7 @@ public interface SmartMapParser {
 	 *             does not represent a valid server's response
 	 */
 	void checkServerError(String s) throws SmartMapParseException,
-			SmartMapClientException;
+	    SmartMapClientException;
 
 	// TODO if necessary add a method to parse an event
 

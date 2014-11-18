@@ -4,7 +4,6 @@ package ch.epfl.smartmap.servercom;
  * This factory class knows about supported formats.
  * 
  * @author marion-S
- * 
  * @author Pamoi (code reviewed : 9.11.2014)
  */
 public class SmartMapParserFactory {
@@ -20,7 +19,7 @@ public class SmartMapParserFactory {
 	 *             If no known parser supports this content type
 	 */
 	public static SmartMapParser parserForContentType(String contentType)
-		throws NoSuchFormatException {
+	    throws NoSuchFormatException {
 
 		if (contentType.equals("application/json")) {
 			return new JsonSmartMapParser();

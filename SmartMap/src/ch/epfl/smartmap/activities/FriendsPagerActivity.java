@@ -17,23 +17,24 @@ import ch.epfl.smartmap.gui.PagerAdapter;
  * sent and received) in another tab
  * 
  * @author rbsteinm
- * 
  */
-public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
+public class FriendsPagerActivity extends FragmentActivity implements
+    ActionBar.TabListener {
 
 	private ViewPager mPager;
 	private ActionBar mActionBar;
-	private String[] mTabs = {"Friends", "Invitations"};
+	private final String[] mTabs = {"Friends", "Invitations"};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_friends_pager);
+		this.setContentView(R.layout.activity_friends_pager);
 
-		mPager = (ViewPager) findViewById(R.id.myViewPager);
-		mActionBar = getActionBar();
+		mPager = (ViewPager) this.findViewById(R.id.myViewPager);
+		mActionBar = this.getActionBar();
 		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		PagerAdapter pageAdapter = new PagerAdapter(this, getSupportFragmentManager());
+		PagerAdapter pageAdapter = new PagerAdapter(this,
+		    this.getSupportFragmentManager());
 
 		mPager.setAdapter(pageAdapter);
 		mActionBar.setHomeButtonEnabled(false);
@@ -41,20 +42,14 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
 		// Adding Tabs
 		for (String tabName : mTabs) {
-			mActionBar.addTab(mActionBar.newTab().setText(tabName).setTabListener(this));
+			mActionBar.addTab(mActionBar.newTab().setText(tabName)
+			    .setTabListener(this));
 		}
 
 		/**
 		 * on swiping, the viewpager makes respective tab selected
-		 * */
+		 */
 		mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-			@Override
-			public void onPageSelected(int position) {
-				// on changing the page
-				// make respected tab selected
-				mActionBar.setSelectedNavigationItem(position);
-			}
 
 			@Override
 			public void onPageScrolled(int arg0, float arg1, int arg2) {
@@ -63,6 +58,13 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
 			}
+
+			@Override
+			public void onPageSelected(int position) {
+				// on changing the page
+				// make respected tab selected
+				mActionBar.setSelectedNavigationItem(position);
+			}
 		});
 
 	}
@@ -70,7 +72,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.pager, menu);
+		this.getMenuInflater().inflate(R.menu.pager, menu);
 		return true;
 	}
 
@@ -86,14 +88,9 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void startAddFriendActivity(MenuItem menu) {
-		Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
-		startActivity(displayActivityIntent);
-	}
-
 	@Override
 	public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
-		//nothing
+		// nothing
 	}
 
 	@Override
@@ -106,7 +103,12 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
 	@Override
 	public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
-		//nothing
+		// nothing
 
+	}
+
+	public void startAddFriendActivity(MenuItem menu) {
+		Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
+		this.startActivity(displayActivityIntent);
 	}
 }

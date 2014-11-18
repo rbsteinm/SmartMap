@@ -3,14 +3,11 @@ package ch.epfl.smartmap.servercom;
 /**
  * Thrown to indicate a problem encountered by a SmartMap client when
  * communicating to the SmartMap server.
- *
  */
 
 /**
  * @author marion-S
- * 
  * @author Pamoi (code reviewed : 9.11.2014)
- * 
  */
 public class SmartMapClientException extends Exception {
 

@@ -1,9 +1,6 @@
 package ch.epfl.smartmap.servercom;
 
-
 import java.io.IOException;
-
-
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -13,7 +10,6 @@ import java.net.URL;
  * {@link HttpURLConnection} objects.
  * 
  * @author SpicyCH
- * 
  * @author Pamoi (code reviewed : 9.11.2014)
  */
 public class DefaultNetworkProvider implements NetworkProvider {
@@ -26,14 +22,11 @@ public class DefaultNetworkProvider implements NetworkProvider {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see ch.epfl.sweng.quizapp.NetworkProvider#getConnection(java.net.URL)
 	 */
 	@Override
 	public HttpURLConnection getConnection(URL url) throws IOException {
 		return (HttpURLConnection) url.openConnection();
 	}
-	
-	
 
 }

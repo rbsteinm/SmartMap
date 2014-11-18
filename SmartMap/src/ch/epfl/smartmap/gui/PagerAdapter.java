@@ -4,17 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 /**
  * @author marion-S
- * 
  */
 public class PagerAdapter extends FragmentPagerAdapter {
-	private List<Fragment> mFragments;
+	private final List<Fragment> mFragments;
 	private final Context mContext;
 
 	public PagerAdapter(Context context, FragmentManager fm) {

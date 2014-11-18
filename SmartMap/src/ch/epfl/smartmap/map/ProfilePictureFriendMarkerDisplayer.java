@@ -1,6 +1,3 @@
-/**
- * 
- */
 package ch.epfl.smartmap.map;
 
 import java.util.ArrayList;
@@ -17,7 +14,6 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-
 import ch.epfl.smartmap.cache.User;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -31,9 +27,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * A class that creates friend's marker as their profile picture
  * 
  * @author hugo-S
- * 
  */
-public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplayer {
+public class ProfilePictureFriendMarkerDisplayer implements
+    FriendMarkerDisplayer {
 
 	public static final String TAG = "FRIEND MARKERS";
 
@@ -47,12 +43,12 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 	 * A map that contains the displayed markers' ids, associated with the
 	 * friend they represent
 	 */
-	private Map<String, User> displayedMarkers = new HashMap<String, User>();
+	private final Map<String, User> displayedMarkers = new HashMap<String, User>();
 
 	/**
 	 * A map that maps each marker with its id
 	 */
-	private Map<String, Marker> dictionnaryMarkers = new HashMap<String, Marker>();
+	private final Map<String, Marker> dictionnaryMarkers = new HashMap<String, Marker>();
 
 	public ProfilePictureFriendMarkerDisplayer() {
 
@@ -60,13 +56,13 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.map.FriendMarkerDisplayer#setMarkersToMaps(android.content
 	 * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
 	 */
 	@Override
-	public void setMarkersToMaps(Context context, GoogleMap googleMap, List<User> friendsToDisplay) {
+	public void setMarkersToMaps(Context context, GoogleMap googleMap,
+	    List<User> friendsToDisplay) {
 		Log.d(TAG, "set markers to map");
 		// Add marker with profile picture for each friend
 		for (User friend : friendsToDisplay) {
@@ -76,11 +72,11 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#isDisplayedFriend(ch.epfl.
 	 * smartmap.cache.User)
 	 */
+	@Override
 	public boolean isDisplayedFriend(User friend) {
 
 		return displayedMarkers.containsValue(friend);
@@ -89,38 +85,37 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#isDisplayedMarker(com.google
 	 * .android.gms.maps.model.Marker)
 	 */
+	@Override
 	public boolean isDisplayedMarker(Marker marker) {
 		return displayedMarkers.containsKey(marker.getId());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see ch.epfl.smartmap.gui.FriendMarkerDisplayer#getDisplayedMarkers()
 	 */
+	@Override
 	public List<Marker> getDisplayedMarkers() {
 		return new ArrayList<Marker>(dictionnaryMarkers.values());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#getFriendForMarker(com.google
 	 * .android.gms.maps.model.Marker)
 	 */
+	@Override
 	public User getFriendForMarker(Marker marker) {
 		return displayedMarkers.get(marker.getId());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#addMarker(ch.epfl.smartmap
 	 * .cache.User, android.content.Context,
@@ -131,12 +126,11 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 		Log.d(TAG, "add marker for friend " + friend.getName());
 
 		Bitmap friendProfilePicture = Bitmap.createScaledBitmap(
-						friend.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT,
-						false);
+		    friend.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
 		Marker marker = googleMap.addMarker(new MarkerOptions()
-						.position(friend.getLatLng()).title(friend.getName())
-						.icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
-						.anchor((float) MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
+		    .position(friend.getLatLng()).title(friend.getName())
+		    .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
+		    .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
 
 		displayedMarkers.put(marker.getId(), friend);
 		dictionnaryMarkers.put(marker.getId(), marker);
@@ -145,7 +139,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#getMarkerForFriend(ch.epfl
 	 * .smartmap.cache.User)
@@ -163,7 +156,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see ch.epfl.smartmap.gui.FriendMarkerDisplayer#getDisplayedFriends()
 	 */
 	@Override
@@ -174,7 +166,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#removeMarker(ch.epfl.smartmap
 	 * .cache.User, android.content.Context,
@@ -192,18 +183,16 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * ch.epfl.smartmap.gui.FriendMarkerDisplayer#updateMarkers(android.content
 	 * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
-	 * 
 	 * This method updates the markers on the map with the given list of
 	 * friends. It uses an auxiliary method animateMarkers to move the marker
 	 * with an animation instead of changing place roughly
 	 */
 	@Override
 	public void updateMarkers(Context context, GoogleMap googleMap,
-					List<User> friendsToDisplay) {
+	    List<User> friendsToDisplay) {
 		Log.d(TAG, "in updatemarkers");
 
 		// In the list friendsToDisplay, search if each friend s already
@@ -226,7 +215,7 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 		// remove the markers that are not longer in the list to display
 		for (User friend : getDisplayedFriends()) {
 			if ((!friendsToDisplay.contains(friend))
-							&& (!getMarkerForFriend(friend).isInfoWindowShown())) {
+			    && (!getMarkerForFriend(friend).isInfoWindowShown())) {
 				Marker marker = removeMarker(friend);
 				animateMarker(marker, friend.getLatLng(), true, googleMap);
 			}
@@ -242,7 +231,8 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 	 * @param hideMarker
 	 * @param map
 	 */
-	private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker, GoogleMap map) {
+	private void animateMarker(final Marker marker, final LatLng toPosition,
+	    final boolean hideMarker, GoogleMap map) {
 		final Handler handler = new Handler();
 		final long start = SystemClock.uptimeMillis();
 		Projection proj = map.getProjection();
@@ -256,13 +246,16 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 			@Override
 			public void run() {
 				long elapsed = SystemClock.uptimeMillis() - start;
-				float t = interpolator.getInterpolation((float) elapsed / duration);
-				double lng = t * toPosition.longitude + (1 - t) * startLatLng.longitude;
-				double lat = t * toPosition.latitude + (1 - t) * startLatLng.latitude;
+				float t = interpolator.getInterpolation((float) elapsed
+				    / duration);
+				double lng = t * toPosition.longitude + (1 - t)
+				    * startLatLng.longitude;
+				double lat = t * toPosition.latitude + (1 - t)
+				    * startLatLng.latitude;
 				marker.setPosition(new LatLng(lat, lng));
-//				Log.d(TAG, "Set marker position for friend "
-//								+ getFriendForMarker(marker).getName() + " "
-//								+ marker.getPosition().toString());
+				// Log.d(TAG, "Set marker position for friend "
+				// + getFriendForMarker(marker).getName() + " "
+				// + marker.getPosition().toString());
 
 				if (t < 1.0) {
 					// Post again 16ms later.

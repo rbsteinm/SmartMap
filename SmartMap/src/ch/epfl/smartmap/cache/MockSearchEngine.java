@@ -11,47 +11,46 @@ import java.util.Locale;
  */
 public class MockSearchEngine implements SearchEngine {
 
-    private static final String TAG = "MOCK_SEARCH_ENGINE";
-    @SuppressWarnings("unused")
-    private static final String AUDIT_TAG = "Audit : " + TAG;
+	private static final String TAG = "MOCK_SEARCH_ENGINE";
+	@SuppressWarnings("unused")
+	private static final String AUDIT_TAG = "Audit : " + TAG;
 
-    private History mHistory;
-    private List<User> mUsers;
+	private final History mHistory;
+	private final List<User> mUsers;
 
-    /**
-     * Constructor
-     */
-    public MockSearchEngine(List<User> users) {
-        mHistory = new SortedByDayHistory();
-        mUsers = users;
-    }
+	/**
+	 * Constructor
+	 */
+	public MockSearchEngine(List<User> users) {
+		mHistory = new SortedByDayHistory();
+		mUsers = users;
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ch.epfl.smartmap.cache.SearchEngine#sendQuery(java.lang.String)
-     */
-    @Override
-    public List<Friend> sendQuery(String query) {
-        query = query.toLowerCase(Locale.US);
-        ArrayList<Friend> result = new ArrayList<Friend>();
+	/*
+	 * (non-Javadoc)
+	 * @see ch.epfl.smartmap.cache.SearchEngine#sendQuery(java.lang.String)
+	 */
+	@Override
+	public List<Friend> sendQuery(String query) {
+		query = query.toLowerCase(Locale.US);
+		ArrayList<Friend> result = new ArrayList<Friend>();
 
-        for (User f : mUsers) {
-            if (f.getName().toLowerCase(Locale.US).contains(query) || query.equals("")) {
-                result.add((Friend) f);
-            }
-        }
+		for (User f : mUsers) {
+			if (f.getName().toLowerCase(Locale.US).contains(query)
+			    || query.equals("")) {
+				result.add((Friend) f);
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ch.epfl.smartmap.cache.SearchEngine#getHistory()
-     */
-    @Override
-    public History getHistory() {
-        return mHistory;
-    }
+	/*
+	 * (non-Javadoc)
+	 * @see ch.epfl.smartmap.cache.SearchEngine#getHistory()
+	 */
+	@Override
+	public History getHistory() {
+		return mHistory;
+	}
 }

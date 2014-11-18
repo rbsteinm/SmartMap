@@ -2,11 +2,11 @@ package ch.epfl.smartmap.cache;
 
 import java.util.GregorianCalendar;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
+
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Describes a generic user of the app
@@ -44,7 +44,7 @@ public interface User {
 	 * @return The user's latitude and longitude
 	 */
 	LatLng getLatLng();
-	
+
 	/**
 	 * @return The user's position as a String (e.g. 'Lausanne')
 	 */
@@ -62,11 +62,12 @@ public interface User {
 
 	/**
 	 * Deprecated. Use getLastSeen() instead.
+	 * 
 	 * @return True if the user is online
 	 */
 	@Deprecated
 	boolean isOnline();
-	
+
 	/**
 	 * @return True if the user's location is visible
 	 */
@@ -142,22 +143,24 @@ public interface User {
 	void deletePicture(Context context);
 
 	/**
-	 * 
-	 * 
 	 * @param date
 	 *            The date/hour at which the user was last seen
 	 */
 	void setLastSeen(GregorianCalendar date);
 
 	/**
-	 * Sets whether or not the user is online. (Deprecated, use setLastSeen() instead)
-	 * @param isOnline True if the user is online
+	 * Sets whether or not the user is online. (Deprecated, use setLastSeen()
+	 * instead)
+	 * 
+	 * @param isOnline
+	 *            True if the user is online
 	 */
 	@Deprecated
 	void setOnline(boolean isOnline);
-	
+
 	/**
-	 * @param isVisible True if the user is visible
+	 * @param isVisible
+	 *            True if the user is visible
 	 */
 	void setVisible(boolean isVisible);
 }

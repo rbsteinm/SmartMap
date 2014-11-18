@@ -4,22 +4,17 @@ import java.util.List;
 import java.util.Map;
 
 import android.location.Location;
-
-
 import ch.epfl.smartmap.cache.User;
 
 /**
  * A client object to a SmartMap server that abstracts the underlying
  * communication protocol and data formats.
- *
- * @author marion-S
- *
  * 
+ * @author marion-S
  * @author Pamoi (code reviewed : 9.11.2014)
  */
 
 public interface SmartMapClient {
-
 
 	/**
 	 * Send to the server the user's name, id and token
@@ -32,7 +27,7 @@ public interface SmartMapClient {
 	 * @throws SmartMapClientException
 	 */
 	void authServer(String name, long facebookId, String fbAccessToken)
-			throws SmartMapClientException;
+	    throws SmartMapClientException;
 
 	/**
 	 * Asks to the server the friends positions
@@ -144,15 +139,16 @@ public interface SmartMapClient {
 	 * @throws SmartMapClientException
 	 */
 	void updatePos(Location location) throws SmartMapClientException;
-	
+
 	/**
 	 * Asks the server for the friends whose name begin with the given text
+	 * 
 	 * @param text
 	 * @return the list of friends
 	 * @throws SmartMapClientException
 	 */
 	List<User> findUsers(String text) throws SmartMapClientException;
-	
+
 	/**
 	 * Decline the invitation of the user with the given id
 	 * 
@@ -176,6 +172,5 @@ public interface SmartMapClient {
 	 * @throws SmartMapClientException
 	 */
 	void removeFriend(long id) throws SmartMapClientException;
-
 
 }
