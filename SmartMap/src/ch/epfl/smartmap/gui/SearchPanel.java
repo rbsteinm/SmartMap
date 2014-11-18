@@ -2,6 +2,7 @@ package ch.epfl.smartmap.gui;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -14,9 +15,9 @@ import ch.epfl.smartmap.R;
  * 
  * @author jfperren
  */
-public class SlidingUpPanel extends RelativeLayout {
+public class SearchPanel extends RelativeLayout {
 
-    private final static String TAG = "SLIDING_UP_PANEL";
+    private final static String TAG = "SearchPanel";
     @SuppressWarnings("unused")
     private final static String AUDIT_TAG = "AuditError : " + TAG;
 
@@ -25,7 +26,7 @@ public class SlidingUpPanel extends RelativeLayout {
      * 
      * @param context The current context
      */
-    public SlidingUpPanel(Context context, AttributeSet attrs) {
+    public SearchPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.setVisibility(View.GONE);
     }
@@ -34,22 +35,41 @@ public class SlidingUpPanel extends RelativeLayout {
      * Opens the panel and displays it full screen
      */
     public void open() {
-        this.setVisibility(View.VISIBLE);
-        Animation bottomUp = AnimationUtils.loadAnimation(getContext(),
-            R.anim.bottom_up);
-        this.startAnimation(bottomUp);
+        if (this.getVisibility() != View.VISIBLE){
+            this.setVisibility(View.VISIBLE);
+            Animation bottomUp = AnimationUtils.loadAnimation(getContext(),
+                R.anim.bottom_up);
+            this.startAnimation(bottomUp);
+        }
     }
 
     /**
      * Closes the panel and hides it.
      */
     public void close() {
-        Animation topDown = AnimationUtils.loadAnimation(getContext(),
-            R.anim.top_down);
-
-        this.startAnimation(topDown);
-        this.setVisibility(View.GONE);
-        clearFocus();
+        if(this.getVisibility() != View.GONE){
+            Animation topDown = AnimationUtils.loadAnimation(getContext(),
+                R.anim.top_down);
+    
+            this.startAnimation(topDown);
+            this.setVisibility(View.GONE);
+            clearFocus();
+        }
+    }
+    
+    /**
+     * Handle the event of a back button press
+     * 
+     * @return true if the event should not go further
+     */
+    public boolean onBackPressed() {
+        if (this.getVisibility() == View.VISIBLE) {
+            Log.d(TAG, "onBackPressed, true");
+            close();
+            return true;
+        } 
+        Log.d(TAG, "onBackPressed, false");
+        return false;
     }
 
     /**

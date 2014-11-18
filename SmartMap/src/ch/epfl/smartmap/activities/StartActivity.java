@@ -19,7 +19,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.gui.FacebookFragment;
+
+import com.facebook.Session;
 
 /**
  * 
@@ -29,22 +33,17 @@ import ch.epfl.smartmap.gui.FacebookFragment;
  */
 public class StartActivity extends FragmentActivity {
 
+    private static final String TAG = StartActivity.class.getSimpleName();
+
     private FacebookFragment mFacebookFragment;
     private ImageView mLogoImage;
     private TextView mWelcomeText;
     private ProgressBar mProgressBar;
     private TextView mProgressText;
-    /*
-     * // TEST private ProgressDialog mProgressDialog; private int mProgress = 0; private Handler
-     * mProgressHandler;
-     */
-
     private com.facebook.widget.LoginButton mLoginButton;
-    private static final String TAG = StartActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         // Displays the facebook app hash in LOG.d
         try {
             Log.d(TAG, "Retrieving sha1 app hash...");
@@ -69,43 +68,67 @@ public class StartActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
+        // Set background color of activity
+        setActivityBackgroundColor(getResources().getColor(R.color.main_blue));
+
+        // Get all views
         mLogoImage = (ImageView) findViewById(R.id.logo);
         mWelcomeText = (TextView) findViewById(R.id.welcome);
         mLoginButton = (com.facebook.widget.LoginButton) findViewById(R.id.loginButton);
         mProgressBar = (ProgressBar) findViewById(R.id.loadingBar);
         mProgressText = (TextView) findViewById(R.id.loadingTextView);
 
-        // Start logo and text animation
-        mLogoImage.startAnimation(AnimationUtils.loadAnimation(this,
-            R.anim.logo_anim));
-        mWelcomeText.startAnimation(AnimationUtils.loadAnimation(this,
-            R.anim.welcome_anim));
+        // Not logged in Facebook or permission to use Facebook in SmartMap not
+        // given
+        if (Session.getActiveSession() == null
+            || Session.getActiveSession().getPermissions().isEmpty()) {
 
-        // Set facebook button's, progress bar's and progress text's visibility to invisible
-        mLoginButton.setVisibility(View.INVISIBLE);
-        mProgressBar.setVisibility(View.INVISIBLE);
-        mProgressText.setVisibility(View.INVISIBLE);
+            // Start logo and text animation
+            mLogoImage.startAnimation(AnimationUtils.loadAnimation(this,
+                R.anim.logo_anim));
+            mWelcomeText.startAnimation(AnimationUtils.loadAnimation(this,
+                R.anim.welcome_anim));
 
-        // We set a time out to use postDelayed method
-        int timeOut = this.getResources().getInteger(R.integer.offset_runnable);
+            // Set facebook button's, progress bar's and progress text's
+            // visibility to invisible
+            mLoginButton.setVisibility(View.INVISIBLE);
+            mProgressBar.setVisibility(View.INVISIBLE);
+            mProgressText.setVisibility(View.INVISIBLE);
 
-        // Wait for the end of facebook animation before testing if already
-        // logged in or not
-        mWelcomeText.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Login button
-                mFacebookFragment = new FacebookFragment();
-                getSupportFragmentManager().beginTransaction()
-                    .add(android.R.id.content, mFacebookFragment).commit();
-                Log.d(TAG, "facebook session is open");
-            }
-        }, timeOut);
+            // We set a time out to use postDelayed method
+            int timeOut = this.getResources().getInteger(
+                R.integer.offset_runnable);
 
+            // Wait for the end of welcome animation before instantiate the
+            // facebook fragment and use it
+            mWelcomeText.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mFacebookFragment = new FacebookFragment();
+                    getSupportFragmentManager().beginTransaction()
+                        .add(android.R.id.content, mFacebookFragment).commit();
+                    Log.d(TAG, "facebook session is open");
+                }
+            }, timeOut);
+        } else {
+            // Hide all views except progress bar and text
+            mLoginButton.setVisibility(View.INVISIBLE);
+            mWelcomeText.setVisibility(View.INVISIBLE);
+            mLogoImage.setVisibility(View.INVISIBLE);
+
+            mFacebookFragment = new FacebookFragment();
+            getSupportFragmentManager().beginTransaction()
+                .add(android.R.id.content, mFacebookFragment).commit();
+        }
+
+        SettingsManager.initialize(getApplicationContext());
+        DatabaseHelper.initialize(getApplicationContext());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -122,8 +145,22 @@ public class StartActivity extends FragmentActivity {
     }
 
     /**
+     * Set background color of activity
+     * 
+     * @param color
+     *            the color
+     */
+    public void setActivityBackgroundColor(int color) {
+        View view = this.getWindow().getDecorView();
+        view.setBackgroundColor(color);
+    }
+
+    /**
      * Checks that the Representation Invariant is not violated.
-     * @param depth represents how deep the audit check is done (use 1 to check this object only)
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
      * @return The number of audit errors in this object
      */
     public int auditErrors(int depth) {

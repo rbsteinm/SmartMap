@@ -36,7 +36,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        dbh = new DatabaseHelper(new RenamingDelegatingContext(getContext(), "test_"));
+        dbh = DatabaseHelper.initialize(new RenamingDelegatingContext(getContext(), "test_"));
         //to avoid erasing the actual database
         
         filter = new FriendList(name);

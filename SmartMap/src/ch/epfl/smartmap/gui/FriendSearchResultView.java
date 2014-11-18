@@ -27,6 +27,7 @@ public class FriendSearchResultView extends SearchResultView {
 
     private final static int NAME_VIEW_BOTTOM_PADDING = 5;
     private final static float NAME_VIEW_TEXT_SIZE = 17f;
+    private static final int CLICK_DISTANCE_THRESHHOLD = 10;
 
     private final Friend mFriend;
     private final LinearLayout mInfoLayout;
@@ -86,7 +87,6 @@ public class FriendSearchResultView extends SearchResultView {
     @Override
     public OnTouchListener getOnTouchListener(final SearchResultView v) {
         return new OnTouchListener() {
-            private static final int CLICK_DISTANCE_THRESHHOLD = 50;
             private float startX;
             private float startY;
 

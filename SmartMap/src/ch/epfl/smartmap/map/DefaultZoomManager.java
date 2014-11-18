@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 
-
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -74,39 +73,39 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 	 */
 	@Override
 	public void zoomAccordingToMarkers(final GoogleMap map, final List<Marker> markers) {
+		if (!markers.isEmpty()) {
+			Log.i(TAG, "after mapview enter to zoom according");
+			if (mapView.getViewTreeObserver().isAlive()) {
+				mapView.getViewTreeObserver().addOnGlobalLayoutListener(
+						new OnGlobalLayoutListener() {
+							@SuppressWarnings("deprecation")
+							@SuppressLint("NewApi")
+							@Override
+							public void onGlobalLayout() {
+								Log.d(TAG, "enter to zoom according on glpbal");
+								// LatLng centre = new LatLng(CENTER_LATTITUDE,
+								// CENTER_LONGITUDE);
+								LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+								for (Marker marker : markers) {
+									boundsBuilder.include(marker.getPosition());
+								}
+								LatLngBounds bounds = boundsBuilder.build();
+								if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+									mapView.getViewTreeObserver()
+											.removeGlobalOnLayoutListener(this);
+								} else {
+									mapView.getViewTreeObserver()
+											.removeOnGlobalLayoutListener(this);
+								}
 
-		Log.i(TAG, "after mapview enter to zoom according");
-		if (mapView.getViewTreeObserver().isAlive()) {
-			mapView.getViewTreeObserver().addOnGlobalLayoutListener(
-					new OnGlobalLayoutListener() {
-						@SuppressWarnings("deprecation")
-						@SuppressLint("NewApi")
-						@Override
-						public void onGlobalLayout() {
-							Log.d(TAG, "enter to zoom according on glpbal");
-							// LatLng centre = new LatLng(CENTER_LATTITUDE,
-							// CENTER_LONGITUDE);
-							LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-							for (Marker marker : markers) {
-								boundsBuilder.include(marker.getPosition());
+								CameraUpdate camUpdate = CameraUpdateFactory.newLatLngBounds(bounds, PADDING);
+								// mGoogleMap.moveCamera(camUpdate);
+								map.animateCamera(camUpdate);
+
 							}
-							LatLngBounds bounds = boundsBuilder.build();
-							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-								mapView.getViewTreeObserver()
-										.removeGlobalOnLayoutListener(this);
-							} else {
-								mapView.getViewTreeObserver()
-										.removeOnGlobalLayoutListener(this);
-							}
+						});
+			}
 
-							CameraUpdate camUpdate = CameraUpdateFactory.newLatLngBounds(bounds, PADDING);
-							// mGoogleMap.moveCamera(camUpdate);
-							map.animateCamera(camUpdate);
-
-						}
-					});
 		}
-
 	}
 }
-

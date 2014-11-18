@@ -16,12 +16,14 @@ public class MockSearchEngine implements SearchEngine {
     private static final String AUDIT_TAG = "Audit : " + TAG;
 
     private History mHistory;
+    private List<User> mUsers;
 
     /**
      * Constructor
      */
-    public MockSearchEngine() {
+    public MockSearchEngine(List<User> users) {
         mHistory = new SortedByDayHistory();
+        mUsers = users;
     }
 
     /*
@@ -31,15 +33,12 @@ public class MockSearchEngine implements SearchEngine {
      */
     @Override
     public List<Friend> sendQuery(String query) {
-        if (query.equals("")) {
-            return MockDB.FRIENDS_LIST;
-        }
         query = query.toLowerCase(Locale.US);
         ArrayList<Friend> result = new ArrayList<Friend>();
 
-        for (Friend f : MockDB.FRIENDS_LIST) {
-            if (f.getName().toLowerCase(Locale.US).contains(query)) {
-                result.add(f);
+        for (User f : mUsers) {
+            if (f.getName().toLowerCase(Locale.US).contains(query) || query.equals("")) {
+                result.add((Friend) f);
             }
         }
 

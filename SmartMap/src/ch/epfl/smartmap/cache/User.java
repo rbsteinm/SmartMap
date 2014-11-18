@@ -61,8 +61,10 @@ public interface User {
 	GregorianCalendar getLastSeen();
 
 	/**
+	 * Deprecated. Use getLastSeen() instead.
 	 * @return True if the user is online
 	 */
+	@Deprecated
 	boolean isOnline();
 	
 	/**
@@ -148,9 +150,10 @@ public interface User {
 	void setLastSeen(GregorianCalendar date);
 
 	/**
-	 * Sets whether or not the user is online
+	 * Sets whether or not the user is online. (Deprecated, use setLastSeen() instead)
 	 * @param isOnline True if the user is online
 	 */
+	@Deprecated
 	void setOnline(boolean isOnline);
 	
 	/**

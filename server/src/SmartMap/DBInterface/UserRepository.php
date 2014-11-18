@@ -19,6 +19,7 @@ class UserRepository
     private static $TABLE_USER = 'users';
     private static $TABLE_FRIENDSHIP = 'friendships';
     private static $TABLE_INVITATIONS = 'invitations';
+    private static $TABLE_ACCEPTED_INVITATIONS = 'accepted_invitations';
     
     private $mApp;
     
@@ -44,7 +45,15 @@ class UserRepository
     public function getUserIdFromFb($fbId)
     {
         $req = "SELECT idusers FROM " . self::$TABLE_USER . " WHERE fbid = ?";
-        $userData = $this->mDb->fetchAssoc($req, array((int) $fbId));
+        
+        try
+        {
+            $userData = $this->mDb->fetchAssoc($req, array((int) $fbId));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error retrieving user in getUserFromFbId.', 1, $e);
+        }
         
         if (!$userData)
         {
@@ -62,27 +71,43 @@ class UserRepository
      * Gets a user from the database, given it's id.
      * 
      * @param Long $id
-     * @throws \Exception when the user is not found
+     * @throws SmartMap\DBInterface\DatabaseException when the user is not found
      * @return \SmartMap\DBInterface\User
      */
     public function getUser($id)
     {
         $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE idusers = ?";
-        $userData = $this->mDb->fetchAssoc($req, array((int) $id));
+        
+        try
+        {
+            $userData = $this->mDb->fetchAssoc($req, array((int) $id));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error retrieving user in getUser.', 1, $e);
+        }
         
         if (!$userData)
         {
-            throw new \Exception('No user found with id ' . $id . '.');
+            throw new DatabaseException('No user found with id ' . $id . ' in method getUser.');
         }
         
-        $user = new User(
-                            $userData['idusers'], 
-                            $userData['fbid'],
-                            $userData['name'],
-                            $userData['visibility'],
-                            $userData['longitude'],
-                            $userData['latitude']
-                        );
+        try
+        {
+            $user = new User(
+                $userData['idusers'],
+                $userData['fbid'],
+                $userData['name'],
+                $userData['visibility'],
+                $userData['longitude'],
+                $userData['latitude'],
+                $userData['last_update']
+            );
+        }
+        catch (\InvalidArgumentException $e)
+        {
+            throw new DatabaseException('User with invalid state in database with id ' . $id . '.');
+        }
                         
         return $user;
     }
@@ -99,7 +124,7 @@ class UserRepository
     {
         if (!is_array($ids) OR !is_array($visibility))
         {
-            throw new \InvalidArgumentException('Arguments $ids and $visibility must be arrays.');
+            throw new DatabaseException('Arguments $ids and $visibility must be arrays.');
         }
         
         // If $ids is empty, we will find no user
@@ -109,9 +134,17 @@ class UserRepository
         }
         
         $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE idusers IN (?) AND visibility in (?)";
-        $stmt = $this->mDb->executeQuery($req, array($ids, $visibility),
-                                         array(\Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
-                                               \Doctrine\DBAL\Connection::PARAM_STR_ARRAY));
+        
+        try
+        {
+            $stmt = $this->mDb->executeQuery($req, array($ids, $visibility),
+                                             array(\Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
+                                                   \Doctrine\DBAL\Connection::PARAM_STR_ARRAY));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error retrieving users in getUsers.', 1, $e);
+        }
         
         return $this->userArrayFromStmt($stmt);
     }
@@ -122,14 +155,47 @@ class UserRepository
      * @param String $partialName
      * @return multitype:\SmartMap\DBInterface\User
      */
-    public function findUsersByPartialName($partialName)
+    public function findUsersByPartialName($partialName, $excludedIds)
     {
         $length = strlen($partialName);
         
-        $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE SUBSTR(LOWER(name), 1, ?) = ? LIMIT 10";
-        $stmt = $this->mDb->executeQuery($req,
-                                         array($length, strtolower($partialName)),
-                                         array(\PDO::PARAM_INT, \PDO::PARAM_STR));
+        if ($length == 0)
+        {
+            return array();
+        }
+        
+        if (!is_array($excludedIds))
+        {
+            throw new DatabaseException('Parameter $excludedIds must be array in findUsersByPartialName.');
+        }
+        
+        try
+        {
+            // We need to do two cases because mysql doesn't like IN () conditions with nothing in array.
+            if (!empty($excludedIds))
+            {
+                $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE idusers NOT IN (?) AND SUBSTR(LOWER(name), 1, ?)".
+                     " = ? LIMIT 10";
+                
+                $stmt = $this->mDb->executeQuery($req,
+                                                 array($excludedIds, $length, strtolower($partialName)),
+                                                 array(\Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
+                                                     \PDO::PARAM_INT,
+                                                     \PDO::PARAM_STR));
+            }
+            else
+            {
+                $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE SUBSTR(LOWER(name), 1, ?) = ? LIMIT 10";
+                
+                $stmt = $this->mDb->executeQuery($req,
+                    array($length, strtolower($partialName)),
+                    array(\PDO::PARAM_INT, \PDO::PARAM_STR));
+            }
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error retrieving users in findUsersByPartialName.', 1, $e);
+        }
         
         return $this->userArrayFromStmt($stmt);
     }
@@ -143,14 +209,23 @@ class UserRepository
      */
     public function createUser(User $user)
     {
-        $this->mDb->insert(self::$TABLE_USER,
-            array(
-                'fbid' => $user->getFbid(),
-                'name' => $user->getName(),
-                'visibility' => $user->getVisibility(),
-                'longitude' => $user->getLongitude(),
-                'latitude' => $user->getLatitude()
-            ));
+        try
+        {
+            // We do not need to check the validity of parameters as it is done in the User class.
+            $this->mDb->insert(self::$TABLE_USER,
+                array(
+                    'fbid' => $user->getFbid(),
+                    'name' => $user->getName(),
+                    'visibility' => $user->getVisibility(),
+                    'longitude' => $user->getLongitude(),
+                    'latitude' => $user->getLatitude(),
+                    'last_update' => date(User::$DATE_FORMAT)
+                ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error creating user in createUser.', 1, $e);
+        }
         
         $user->setId($this->mDb->fetchColumn('SELECT LAST_INSERT_ID()', array(), 0));
         
@@ -165,13 +240,22 @@ class UserRepository
      */
     public function updateUser(User $user)
     {
-        $this->mDb->update(self::$TABLE_USER, 
-            array(
-                'name' => $user->getName(),
-                'visibility' => $user->getVisibility(),
-                'longitude' => $user->getLongitude(),
-                'latitude' => $user->getLatitude()
-            ), array('idusers' => $user->getId()));
+        try
+        {
+            // We do not need to check the validity of parameters as it is done in the User class.
+            $this->mDb->update(self::$TABLE_USER, 
+                array(
+                    'name' => $user->getName(),
+                    'visibility' => $user->getVisibility(),
+                    'longitude' => $user->getLongitude(),
+                    'latitude' => $user->getLatitude(),
+                    'last_update' => date(User::$DATE_FORMAT)
+                ), array('idusers' => $user->getId()));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error updating user in updateUser.', 1, $e);
+        }
     }
     
     // Friendship management
@@ -195,24 +279,32 @@ class UserRepository
     {
         if (!is_array($status) OR !is_array($follow))
         {
-            throw new \InvalidArgumentException('Arguments $status and $follow must be arrays.');
+            throw new DatabaseException('Arguments $status and $follow must be arrays.');
         }
         
         $req = "SELECT id2 FROM " . self::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND ".
         "status IN (?) AND follow IN (?)";
-        $stmt = $this->mDb->executeQuery($req,
-                                         array((int) $userId, $status, $follow),
-                                         array(
-                                               \PDO::PARAM_INT,
-                                               \Doctrine\DBAL\Connection::PARAM_STR_ARRAY, 
-                                               \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
-                                        );
+        
+        try
+        {
+            $stmt = $this->mDb->executeQuery($req,
+                                             array((int) $userId, $status, $follow),
+                                             array(
+                                                   \PDO::PARAM_INT,
+                                                   \Doctrine\DBAL\Connection::PARAM_STR_ARRAY, 
+                                                   \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+                                            );
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error getting friends ids in getFriendsIds.', 1, $e);
+        }
         
         $ids = array();
         
         while ($id = $stmt->fetch())
         {
-            $ids[] = $id['id2'];
+            $ids[] = (int) $id['id2'];
         }
         
         return $ids;
@@ -224,7 +316,7 @@ class UserRepository
      * 
      * @param long $idUser
      * @param long $idFriend
-     * @throws \Exception if the friendship link already exists.
+     * @throws DatabaseException if the friendship link already exists.
      */
     public function addFriendshipLink($idUser, $idFriend)
     {
@@ -234,16 +326,38 @@ class UserRepository
         
         if ($data)
         {
-            throw new \Exception('This friendship link already exists !');
+            throw new DatabaseException('This friendship link already exists !');
         }
         
-        $this->mDb->insert(self::$TABLE_FRIENDSHIP,
-                           array(
-                            'id1' => (int) $idUser,
-                            'id2' => (int) $idFriend,
-                            'status' => 'ALLOWED',
-                            'follow' => 'FOLLOWED'
-                          ));
+        try
+        {
+            $this->mDb->insert(self::$TABLE_FRIENDSHIP,
+                array(
+                    'id1' => (int) $idUser,
+                    'id2' => (int) $idFriend,
+                    'status' => 'ALLOWED',
+                    'follow' => 'FOLLOWED'
+                ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error adding a firendship link in addFriendshipLink.', 1, $e);
+        }
+    }
+    
+    public function removeFriendshipLink($idUser, $idFriend)
+    {
+        try
+        {
+            $this->mDb->delete(self::$TABLE_FRIENDSHIP, array(
+                'id1' => (int) $idUser,
+                'id2' => (int) $idFriend
+            ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error removing a firendship link in removeFriendshipLink.', 1, $e);
+        }
     }
     
     /**
@@ -252,19 +366,26 @@ class UserRepository
      * @param long $idUser
      * @param long $idFriend
      * @param string $status
-     * @throws \Exception when the status is invalid, i.e. not ALLOWED, DISALLOWED or BLOCKED
+     * @throws DatabaseException when the status is invalid, i.e. not ALLOWED, DISALLOWED or BLOCKED
      */
     public function setFriendshipStatus($idUser, $idFriend, $status)
     {
         if (!in_array($status, array('ALLOWED', 'DISALLOWED', 'BLOCKED')))
         {
-            throw new \Exception('Invalid value for status !');
+            throw new DatabaseException('Invalid value for status !');
         }
         
-        $this->mDb->update(self::$TABLE_FRIENDSHIP,
-                           array('status' => $status),
-                           array('id1' => (int) $idFriend, 'id2' => (int) $idUser)
-                          );
+        try
+        {
+            $this->mDb->update(self::$TABLE_FRIENDSHIP,
+                               array('status' => $status),
+                               array('id1' => (int) $idFriend, 'id2' => (int) $idUser)
+                              );
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error setting friendship status in setFriendshipStatus.', 1, $e);
+        }
     }
     
     /**
@@ -272,27 +393,36 @@ class UserRepository
      * @param long $idUser
      * @param array $idsFriends
      * @param array $status
-     * @throws \Exception when either $status or $idsFreinds is invalid.
+     * @throws DatabaseException when either $status or $idsFreinds is invalid.
      */
     public function setFriendshipsStatus($idUser, $idsFriends, $status)
     {
         if (!in_array($status, array('ALLOWED', 'DISALLOWED', 'BLOCKED')))
         {
-            throw new \Exception('Invalid value for status !');
+            throw new DatabaseException('Invalid value for status !');
         }
         
         if (!is_array($idsFriends))
         {
-            throw new \Exception('Argument $idsFriends must be an array !');
+            throw new DatabaseException('Argument $idsFriends must be an array !');
         }
         
         $req = "UPDATE " . self::$TABLE_FRIENDSHIP .
                " SET status = ? WHERE id1 IN (?) AND id2 = ?";
-        $stmt = $this->mDb->executeQuery($req,
-                                    array($status, $idsFriends, $idUser),
-                                    array(\PDO::PARAM_STR,
-                                          \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
-                                          \PDO::PARAM_INT,));
+        
+        try
+        {
+            $stmt = $this->mDb->executeQuery($req,
+                array($status, $idsFriends, $idUser),
+                array(\PDO::PARAM_STR,
+                    \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
+                    \PDO::PARAM_INT
+                ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error setting friendships status in setFriendshipsStatus.', 1, $e);
+        }
     }
     
     /**
@@ -300,19 +430,26 @@ class UserRepository
      * @param long $idUser
      * @param long $friendId
      * @param string $follow
-     * @throws \Exception when $follow is invalid.
+     * @throws DatabaseException when $follow is invalid.
      */
     public function setFriendshipFollow($idUser, $friendId, $follow)
     {
         if (!in_array($follow, array('FOLLOWED', 'UNFOLLOWED')))
         {
-            throw new \Exception('Invalid value for follow status !');
+            throw new DatabaseException('Invalid value for follow status !');
         }
         
-        $this->mDb->update(self::$TABLE_FRIENDSHIP,
-                           array('follow' => $follow),
-                           array('id1' => (int) $idUser, 'id2' => (int) $friendId)
-                          );
+        try
+        {
+            $this->mDb->update(self::$TABLE_FRIENDSHIP,
+                array('follow' => $follow),
+                array('id1' => (int) $idUser, 'id2' => (int) $friendId)
+            );
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error setting frienship follow status in setFreindshipFollow.', 1, $e);
+        }
     }
     
     // Invitations management
@@ -327,7 +464,15 @@ class UserRepository
     public function getInvitationIds($userId)
     {
         $req = "SELECT id1 FROM " . self::$TABLE_INVITATIONS .  " WHERE id2 = ?";
-        $stmt = $this->mDb->executeQuery($req, array((int) $userId));
+        
+        try
+        {
+            $stmt = $this->mDb->executeQuery($req, array((int) $userId));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error getting invitations ids in getInvitationIds.', 1, $e);
+        }
         
         $ids = array();
         
@@ -348,11 +493,17 @@ class UserRepository
      */
     public function addInvitation($idUser, $idFriend)
     {
-        $this->mDb->insert(self::$TABLE_INVITATIONS,
-                          array(
-                            'id1' => (int) $idUser,
-                            'id2' => (int) $idFriend
-                         ));
+        try
+        {
+            $this->mDb->insert(self::$TABLE_INVITATIONS, array(
+                'id1' => (int) $idUser,
+                'id2' => (int) $idFriend
+            ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error adding invitation in addInvitations.', 1, $e);
+        }
     }
     
     /**
@@ -364,10 +515,84 @@ class UserRepository
      */
     public function removeInvitation($idUser, $idFriend)
     {
-        $this->mDb->delete(self::$TABLE_INVITATIONS, array(
-                                'id1' => (int) $idUser,
-                                'id2' => (int) $idFriend
-                           ));
+        try
+        {
+            $this->mDb->delete(self::$TABLE_INVITATIONS, array(
+                'id1' => (int) $idUser,
+                'id2' => (int) $idFriend
+            ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error removing invitation in removeInvitations.', 1, $e);
+        }
+    }
+    
+    /**
+     * Adds an accepted invitation.
+     * 
+     * @param long $idUser
+     * @param long $idFriend
+     * @throws DatabaseExeption
+     */
+    public function addAcceptedInvitation($idUser, $idFriend)
+    {
+        try
+        {
+            $this->mDb->insert(self::$TABLE_ACCEPTED_INVITATIONS, array(
+                'id1' => (int) $idUser,
+                'id2' => (int) $idFriend
+            ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseExeption('Error in addAcceptedInvitation.', 1, $e);
+        }
+    }
+    
+    /**
+     * Gets the accepted invitations and deletes them from the database as the info is only needed once.
+     * 
+     * @param long $idUser
+     * @throws DatabaseExeption
+     * @return array
+     */
+    public function getAcceptedInvitations($idUser)
+    {
+        $req = "SELECT id1 FROM " . self::$TABLE_ACCEPTED_INVITATIONS .  " WHERE id2 = ?";
+        
+        try
+        {
+            $stmt = $this->mDb->executeQuery($req, array((int) $idUser));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseExeption('Error in addAcceptedInvitation.', 1, $e);
+        }
+        
+        $ids = array();
+        
+        while ($id = $stmt->fetch())
+        {
+            $ids[] = $id['id1'];
+        }
+        
+        return $ids;
+    }
+    
+    public function removeAcceptedInvitation($idUser, $friendId)
+    {
+        try
+        {
+            $this->mDb->delete(self::$TABLE_ACCEPTED_INVITATIONS, array(
+                'id1' => (int) $friendId,
+                'id2' => (int) $idUser
+            ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseExeption('Error in removeAcceptedInvitation.', 1, $e);
+        }
     }
     
     // Utility functions
@@ -384,14 +609,22 @@ class UserRepository
         
         while ($userData = $stmt->fetch())
         {
-            $users[] = new User(
-                                    $userData['idusers'], 
-                                    $userData['fbid'],
-                                    $userData['name'],
-                                    $userData['visibility'],
-                                    $userData['longitude'],
-                                    $userData['latitude']
-                                );
+            try
+            {
+                $users[] = new User(
+                    $userData['idusers'], 
+                    $userData['fbid'],
+                    $userData['name'],
+                    $userData['visibility'],
+                    $userData['longitude'],
+                    $userData['latitude'],
+                    $userData['last_update']
+                );
+            }
+            catch (\Exception $e)
+            {
+                throw DatabaseException('User with invalid state in database with id ' . $userData['idusers'] . '.');
+            }
         }
         
         return $users;

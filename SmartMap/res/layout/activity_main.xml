@@ -6,6 +6,7 @@
     tools:context=".DemoActivity" >
 
     <RelativeLayout
+        android:id="@+id/layout_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
@@ -19,12 +20,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
+            <fragment
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true" />
+
             <ListView
-                android:id="@+id/left_drawer"
+                android:id="@+id/left_drawer_listView"
                 android:layout_width="240dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
-                android:background="#111"
+                android:background="@color/main_blue"
                 android:choiceMode="singleChoice"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="0dp" />
@@ -36,30 +45,16 @@
             android:layout_height="wrap_content" />
 
         <!-- <fragment xmlns:android="http://schemas.android.com/apk/res/android" -->
-
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" />
-
-        <!-- 
-        The button that create notifications
-        <Button
-            android:id="@+id/create_notif_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:onClick="createNotification"
-            android:text="@string/create_notif" >
-        </Button>
-		-->
-		
     </RelativeLayout>
 
-    <ch.epfl.smartmap.gui.SlidingUpPanel
+    <ch.epfl.smartmap.gui.SlidingPanel
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/information_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom" />
+
+    <ch.epfl.smartmap.gui.SearchPanel
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/search_panel"
         android:layout_width="match_parent"
@@ -71,8 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            android:orientation="horizontal" />
+            android:layout_marginRight="0dp" />
+    </ch.epfl.smartmap.gui.SearchPanel>
 
-    </ch.epfl.smartmap.gui.SlidingUpPanel>
 </FrameLayout>

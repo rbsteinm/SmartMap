@@ -3,8 +3,14 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
-$app = new Silex\Application();
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+use Silex\Application;
+
+$app = new Application();
 
 // Options
 $options = json_decode(file_get_contents(__DIR__ . '/../config.json'), true);
@@ -31,6 +37,13 @@ $app['user.repository'] = $app->share(function() use($app) {
     return new SmartMap\DBInterface\UserRepository($app['db']);
 });
 
+// Injecting logging service
+$app['logging'] = $app->share(function() use($app, $options) {
+    $logger = new Logger('logging');
+    $logger->pushHandler(new StreamHandler('../' . $options['monolog']['logfile'], Logger::INFO));
+   return $logger;
+});
+
 // Injecting controllers
 $app->register(new Silex\Provider\ServiceControllerServiceProvider());
 
@@ -48,16 +61,39 @@ $app['data.controller'] = $app->share(function() use($app) {
     return new SmartMap\Control\DataController($app['user.repository']);
 });
 
-// Error management
-$app->error(function (SmartMap\Control\ControlException $e, $code) use ($app) {
-    return new JsonResponse(array('status' => 'error', 'message' => $e->getMessage()));
+$app['profile.controller'] = $app->share(function() use($app) {
+    return new SmartMap\Control\ProfileController();
 });
 
-$app->error(function (\Exception $e, $code) use ($app) {
+// Error management
+$app->error(function (SmartMap\Control\ControlException $e, $code) use ($app) {
+    $app['logging']->addDebug('Deprecated ControlException thrown: ' . $e->__toString());
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occured.', 500,
+        array('X-Status-Code' => 200)));
+});
+
+$app->error(function (SmartMap\Control\InvalidRequestException $e, $code) use ($app) {
+    $app['logging']->addWarning('Invalid request: ' . $e->__toString());
+    return new JsonResponse(array('status' => 'error', 'message' => $e->getMessage()), 200,
+        array('X-Status-Code' => 200));
+});
+
+$app->error(function (SmartMap\Control\ControlLogicException $e, $code) use ($app) {
+    $app['logging']->addError($e->__toString());
     if ($app['debug'] == true) {
         return;
     }
-    return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occured'));
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occured.'), 500,
+        array('X-Status-Code' => 200));
+});
+
+$app->error(function (\Exception $e, $code) use ($app) {
+    $app['logging']->addCritical('Unexpected exception: ' . $e->__toString());
+    if ($app['debug'] == true) {
+        return;
+    }
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occured'), 500,
+        array('X-Status-Code' => 200));
 });
 
 
@@ -80,11 +116,19 @@ $app->post('/unfollowFriend', 'authorization.controller:unfollowFriend');
 
 $app->post('/getUserInfo', 'data.controller:getUserInfo');
 
+$app->post('/getProfilePicture', 'profile.controller:getProfilePicture');
+
 $app->post('/inviteFriend', 'data.controller:inviteFriend');
 
 $app->post('/getInvitations', 'data.controller:getInvitations');
 
 $app->post('/acceptInvitation', 'data.controller:acceptInvitation');
+
+$app->post('/declineInvitation', 'data.controller:declineInvitation');
+
+$app->post('/ackAcceptedInvitation', 'data.controller:ackAcceptedInvitation');
+
+$app->post('/removeFriend', 'data.controller:removeFriend');
 
 $app->post('/listFriendsPos', 'data.controller:listFriendsPos');
 
@@ -92,10 +136,17 @@ $app->post('/updatePos', 'data.controller:updatePos');
 
 $app->post('/findUsers', 'data.controller:findUsers');
 
-if ($app['debug'])
+$app->post('/getFriendsIds', 'data.controller:getFriendsIds');
+
+if ($app['debug'] == true)
 {
     $app->post('/fakeAuth', 'authentication.controller:fakeAuth');
 }
 
+// Logging of requests
+$app->before(function(Request $request, Application $app) {
+    $app['logging']->addInfo('New request: ' . $request->getRequestUri() .
+        ' from ip ' . $request->getClientIp() . '.');
+});
 
 $app->run();

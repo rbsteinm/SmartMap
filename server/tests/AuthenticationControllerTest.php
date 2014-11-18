@@ -98,7 +98,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Session is null.
      */
     public function testNoSessionYieldsException()
@@ -108,7 +108,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Mismatch or expired facebook data
      */
     public function testCannotLoginWithBadSession()
@@ -130,8 +130,8 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
-     * @expectedExceptionMessage do not match the fb access token
+     * @expectedException SmartMap\Control\InvalidRequestException
+     * @expectedExceptionMessage Id and name do not match the fb access token.
      */
     public function testCannotLoginWithGoodSessionButBadName()
     {
@@ -152,7 +152,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage do not match the fb access token
      */
     public function testCannotLoginWithGoodSessionButBadId()
@@ -174,9 +174,9 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException \PDOException
+     * @expectedException SmartMap\DBInterface\DatabaseException
      */
-    public function testDatabaseErrorYieldsPDOException()
+    public function testDatabaseErrorYieldsDBException()
     {
         $config = new Configuration ();
         $connectionParams = array (
@@ -201,7 +201,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\ControlException
+     * @expectedException SmartMap\Control\InvalidRequestException
      * @expectedExceptionMessage Missing POST parameter
      */
     public function testNoPostParamsYieldException()

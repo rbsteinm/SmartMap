@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use SmartMap\DBInterface\User;
 use SmartMap\DBInterface\UserRepository;
+use SmartMap\DBInterface\DatabaseException;
 
 /**
  * 
@@ -28,7 +29,7 @@ class DataController
      * Updates the user's position.
      * 
      * @param Request $request
-     * @throws ControlException
+     * @throws InvalidRequestException
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function updatePos(Request $request)
@@ -39,7 +40,14 @@ class DataController
         
         $latitude = $this->getPostParam($request, 'latitude');
         
-        $user = $this->mRepo->getUser($userId);
+        try
+        {
+            $user = $this->mRepo->getUser($userId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in updatePos.', 2, $e);
+        }
         
         try
         {
@@ -48,11 +56,17 @@ class DataController
         }
         catch (\InvalidArgumentException $e)
         {
-            throw new ControlException('Invalid coordinates.');
+            throw new InvalidRequestException('Invalid coordinates.');
         }
         
-        $this->mRepo->updateUser($user);
-        
+        try
+        {
+            $this->mRepo->updateUser($user);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in updatePos.', 2, $e);
+        }
         $response = array('status' => 'Ok', 'message' => 'Updated position !');
         
         return new JsonResponse($response);
@@ -68,26 +82,59 @@ class DataController
     {
         $userId = User::getIdFromRequest($request);
         
-        $friendIds = $this->mRepo->getFriendsIds($userId, array('ALLOWED'), array('FOLLOWED'));
-        
-        $friends = $this->mRepo->getUsers($friendIds, array('VISIBLE'));
+        try
+        {
+            $friendIds = $this->mRepo->getFriendsIds($userId, array('ALLOWED'), array('FOLLOWED'));
+            
+            $friends = $this->mRepo->getUsers($friendIds, array('VISIBLE'));
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in listFriendsPos.', 2, $e);
+        }
         
         $list = array();
         
         foreach ($friends as $friend)
         {
             $list[] = array(
-                                'id' => $friend->getId(),
-                                'longitude' => $friend->getLongitude(),
-                                'latitude' => $friend->getLatitude()
-                            );
+                'id' => $friend->getId(),
+                'longitude' => $friend->getLongitude(),
+                'latitude' => $friend->getLatitude(),
+                'lastUpdate' => $friend->getLastUpdate()
+            );
         }
         
         $response = array(
-                            'status' => 'Ok',
-                            'message' => 'Fetched friends positions !',
-                            'positions' => $list
-                         );
+            'status' => 'Ok',
+            'message' => 'Fetched friends positions !',
+            'positions' => $list
+        );
+        
+        return new JsonResponse($response);
+    }
+    
+    /**
+     * Get the user's friends ids.
+     * 
+     * @param Request $request
+     * @throws ControlLogicException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function getFriendsIds(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+        
+        try
+        {
+            $friendsIds = $this->mRepo->getFriendsIds($userId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in getFriendsIds.', 2, $e);
+        }
+        
+        $response = array('status' => 'Ok', 'message' => 'Fetched friends !', 'friends' => $friendsIds);
         
         return new JsonResponse($response);
     }
@@ -96,15 +143,21 @@ class DataController
      * Gets the information for the user whose id is passed in user_id POST parameter.
      * 
      * @param Request $request
-     * @throws ControlException
+     * @throws InvalidRequestException
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getUserInfo(Request $request)
     {
         $id = $this->getPostParam($request, 'user_id');
         
-        $user = $this->mRepo->getUser($id);
-        
+        try
+        {
+            $user = $this->mRepo->getUser($id);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in getUserInfo.', 2, $e);
+        }
         // We only send public data
         $response = array(
             'status' => 'Ok',
@@ -120,7 +173,7 @@ class DataController
      * Sets an invitation for user with friend_id POST parameter.
      * 
      * @param Request $request
-     * @throws ControlException
+     * @throws InvalidRequestException
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function inviteFriend(Request $request)
@@ -131,26 +184,35 @@ class DataController
         
         if ($userId == $friendId)
         {
-            throw new ControlException('You cannot invite yourself !');
+            throw new InvalidRequestException('You cannot invite yourself !');
         }
         
-        // Check if the user is already friend or already invited or already inviting
-        $friendsIds = $this->mRepo->getFriendsIds($userId,
-                                                  array('BLOCKED', 'ALLOWED', 'DISALLOWED'));
-        
-        $userInvitingIds = $this->mRepo->getInvitationIds($userId);
-        $friendInvitingIds = $this->mRepo->getInvitationIds($friendId);
-        
-        if (!in_array($friendId, $friendsIds) AND !in_array($friendId, $userInvitingIds) AND
-            !in_array($userId, $friendInvitingIds))
+        try
         {
-            $this->mRepo->addInvitation($userId, $friendId);
-            $response = array('status' => 'Ok', 'message' => 'Invited friend !');
+            // Check if the user is already friend or already invited or already inviting
+            $friendsIds = $this->mRepo->getFriendsIds($userId,
+                                                      array('BLOCKED', 'ALLOWED', 'DISALLOWED'));
+            
+            $userInvitingIds = $this->mRepo->getInvitationIds($userId);
+            $friendInvitingIds = $this->mRepo->getInvitationIds($friendId);
+            
+            if (!in_array($friendId, $friendsIds) AND !in_array($friendId, $userInvitingIds) AND
+                !in_array($userId, $friendInvitingIds))
+            {
+                $this->mRepo->addInvitation($userId, $friendId);
+            }
+            else
+            {
+                throw new InvalidRequestException('You are already friends or invited.');
+            }
+            
         }
-        else
+        catch (DatabaseException $e)
         {
-            $response = array('status' => 'error', 'message' => 'You are already friends or invited.');
+            throw new ControlLogicException('Error in inviteFriend.', 2, $e);
         }
+        
+        $response = array('status' => 'Ok', 'message' => 'Invited friend !');
         
         return new JsonResponse($response);
     }
@@ -166,9 +228,20 @@ class DataController
     {
         $userId = User::getIdFromRequest($request);
         
-        $inviterIds = $this->mRepo->getInvitationIds($userId);
-        
-        $inviters = $this->mRepo->getUsers($inviterIds);
+        try
+        {
+            $inviterIds = $this->mRepo->getInvitationIds($userId);
+            
+            $inviters = $this->mRepo->getUsers($inviterIds);
+            
+            $acceptedInvitationIds = $this->mRepo->getAcceptedInvitations($userId);
+            
+            $newFriends = $this->mRepo->getUsers($acceptedInvitationIds);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in getInvitations.', 2, $e);
+        }
         
         $invitersList = array();
         
@@ -177,11 +250,25 @@ class DataController
             $invitersList[] = array('id' => $inviter->getId(), 'name' => $inviter->getName());
         }
         
+        $friendsList = array();
+        
+        foreach ($newFriends as $friend)
+        {
+            $friendsList[] = array(
+                'id' => $friend->getId(),
+                'name' => $friend->getName(),
+                'longitude' => $friend->getLongitude(),
+                'latitude' => $friend->getLatitude(),
+                'lastUpdate' => $friend->getLastUpdate()
+            );
+        }
+        
         $response = array(
-                            'status' => 'Ok',
-                            'message' => 'Fetched invitations !',
-                            'list' => $invitersList
-                         );
+            'status' => 'Ok',
+            'message' => 'Fetched invitations !',
+            'invitations' => $invitersList,
+            'newFriends' => $friendsList
+        );
         
         return new JsonResponse($response);
     }
@@ -190,7 +277,7 @@ class DataController
      * Accpets the invitation from the user with in POST parameter friend_id.
      * 
      * @param Request $request
-     * @throws ControlException
+     * @throws InvalidRequestException
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function acceptInvitation(Request $request)
@@ -199,36 +286,114 @@ class DataController
         
         $friendId = $this->getPostParam($request, 'friend_id');
         
-        // We check that the friend invited the user
-        $invitersIds = $this->mRepo->getInvitationIds($userId);
-        
-        if (!in_array($friendId, $invitersIds))
+        try
         {
-            throw new ControlException('Not invited by user with id ' . $friendId .' !');
+            // We check that the friend invited the user
+            $invitersIds = $this->mRepo->getInvitationIds($userId);
+            
+            if (!in_array($friendId, $invitersIds))
+            {
+                throw new InvalidRequestException('Not invited by user with id ' . $friendId .' !');
+            }
+            
+            $this->mRepo->removeInvitation($friendId, $userId);
+        
+            $this->mRepo->addFriendshipLink($userId, $friendId);
+            $this->mRepo->addFriendshipLink($friendId, $userId);
+            
+            $this->mRepo->addAcceptedInvitation($userId, $friendId);
+        
+            $user = $this->mRepo->getUser($friendId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in acceptInvitation.', 2, $e);
         }
         
-        $this->mRepo->removeInvitation($friendId, $userId);
+        $response = array(
+            'status' => 'Ok',
+            'message' => 'Accepted invitation !',
+            'id' => $user->getId(),
+            'name' => $user->getName(),
+            'longitude' => $user->getLongitude(),
+            'latitude' => $user->getLatitude(),
+            'lastUpdate' => $user->getLastUpdate()
+        );
+        
+        return new JsonResponse($response);
+    }
+    
+    /**
+     * Declines an invitation.
+     * 
+     * @param Request $request
+     * @throws ControlLogicException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function declineInvitation(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+        
+        $friendId = $this->getPostParam($request, 'friend_id');
         
         try
         {
-            $this->mRepo->addFriendshipLink($userId, $friendId);
-            $this->mRepo->addFriendshipLink($friendId, $userId);
+            $this->mRepo->removeInvitation($friendId, $userId);
         }
-        catch (\Exception $e)
+        catch (DatabaseException $e)
         {
-            throw new ControlException('You are already friends !');
+            throw new ControlLogicException('Error in declineInvitation.', 2, $e);
         }
         
-        $user = $this->mRepo->getUser($friendId);
+        $response = array('status' => 'Ok', 'message' => 'Declined invitation !');
         
-        $response = array(
-                            'status' => 'Ok',
-                            'message' => 'Accepted invitation !',
-                            'id' => $user->getId(),
-                            'name' => $user->getName(),
-                            'longitude' => $user->getLongitude(),
-                            'latitude' => $user->getLatitude()
-                         );
+        return new JsonResponse($response);
+    }
+    
+    public function ackAcceptedInvitation(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+        
+        $friendId = $this->getPostParam($request, 'friend_id');
+        
+        try
+        {
+            $this->mRepo->removeAcceptedInvitation($userId, $friendId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in ackAcceptedInvitation.', 2, $e);
+        }
+        
+        $response = array('status' => 'Ok', 'message' => 'Acknowledged accepted invitation !');
+        
+        return new JsonResponse($response);
+    }
+    
+    /**
+     * Removes a friend.
+     * 
+     * @param Request $request
+     * @throws ControlLogicException
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function removeFriend(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+        
+        $friendId = $this->getPostParam($request, 'friend_id');
+        
+        try
+        {
+            $this->mRepo->removeFriendshipLink($userId, $friendId);
+            $this->mRepo->removeFriendshipLink($friendId, $userId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in removeFriend.', 2, $e);
+        }
+        
+        $response = array('status' => 'Ok', 'message' => 'Removed friend !');
         
         return new JsonResponse($response);
     }
@@ -238,17 +403,26 @@ class DataController
      * search_text (ignores case). 
      * 
      * @param Request $request
-     * @throws ControlException
+     * @throws InvalidRequestException
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function findUsers(Request $request)
     {
         // We check that we are authenticated.
-        User::getIdFromRequest($request);
+        $id = User::getIdFromRequest($request);
         
         $partialName = $this->getPostParam($request, 'search_text');
         
-        $users = $this->mRepo->findUsersByPartialName($partialName);
+        try
+        {
+            $friendsIds = $this->mRepo->getFriendsIds($id);
+            
+            $users = $this->mRepo->findUsersByPartialName($partialName, $friendsIds);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in findUsers.', 2, $e);
+        }
         
         $data = array();
         foreach ($users as $user)
@@ -267,7 +441,7 @@ class DataController
      *
      * @param Request $request
      * @param string $param
-     * @throws ControlException
+     * @throws InvalidRequestException
      * @return string
      */
     private function getPostParam(Request $request, $param)
@@ -276,7 +450,7 @@ class DataController
         
         if ($value === null)
         {
-            throw new ControlException('Post parameter ' . $param . ' is not set !');
+            throw new InvalidRequestException('Post parameter ' . $param . ' is not set !');
         }
         
         return $value;

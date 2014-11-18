@@ -20,192 +20,193 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public class Friend implements User {
+public class Friend implements User, Searchable, Displayable {
 
-	private long mId; // the user's unique ID
-	private String mName; // the user's name as it will be displayed
-	private String mPhoneNumber;
-	private String mEmail;
-	private String mPositionName;
-	private GregorianCalendar mLastSeen;
-	private boolean mOnline;
-	private Location mLocation;
-	private boolean mVisible;
+    private long mId; // the user's unique ID
+    private String mName; // the user's name as it will be displayed
+    private String mPhoneNumber;
+    private String mEmail;
+    private String mPositionName;
+    private GregorianCalendar mLastSeen;
+    private boolean mOnline;
+    private Location mLocation;
+    private boolean mVisible;
 
-	public static final String NO_NUMBER = "No phone number specified";
-	public static final String NO_EMAIL = "No email address specified";
-	public static final String POSITION_UNKNOWN = "Unknown position";
-	public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
-	public static final int IMAGE_QUALITY = 100;
-	public static final String PROVIDER_NAME = "SmartMapServers";
+    public static final String NO_NUMBER = "No phone number specified";
+    public static final String NO_EMAIL = "No email address specified";
+    public static final String POSITION_UNKNOWN = "Unknown position";
+    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
+    public static final int IMAGE_QUALITY = 100;
+    public static final String PROVIDER_NAME = "SmartMapServers";
 
-	/**
-	 * Friend constructor
-	 * 
-	 * @param userID
-	 *            The id of the contact we're creating
-	 * @param userName
-	 *            The name of the friend
-	 * @param userNumber
-	 *            The friend's phone number
-	 * @author ritterni
-	 */
-	public Friend(long userID, String userName) {
-		mId = userID;
-		mName = userName;
-		mPhoneNumber = NO_NUMBER;
-		mEmail = NO_EMAIL;
-		mPositionName = POSITION_UNKNOWN;
-		mLastSeen = new GregorianCalendar();
-		mLocation = new Location(PROVIDER_NAME);
-		mVisible = true;
-		mOnline = false;
-	}
+    /**
+     * Friend constructor
+     * 
+     * @param userID
+     *            The id of the contact we're creating
+     * @param userName
+     *            The name of the friend
+     * @param userNumber
+     *            The friend's phone number
+     * @author ritterni
+     */
+    public Friend(long userID, String userName) {
+        mId = userID;
+        mName = userName;
+        mPhoneNumber = NO_NUMBER;
+        mEmail = NO_EMAIL;
+        mPositionName = POSITION_UNKNOWN;
+        mLastSeen = new GregorianCalendar();
+        mLocation = new Location(PROVIDER_NAME);
+        mVisible = true;
+        mOnline = false;
+    }
 
-	public Friend(long userID, String userName, double latitude, double longitude) {
-		this(userID, userName);
-		setLatitude(latitude);
-		setLongitude(longitude);
-	}
+    public Friend(long userID, String userName, double latitude,
+        double longitude) {
+        this(userID, userName);
+        setLatitude(latitude);
+        setLongitude(longitude);
+    }
 
-	@Override
-	public long getID() {
-		return mId;
-	}
+    @Override
+    public long getID() {
+        return mId;
+    }
 
-	@Override
-	public String getName() {
-		return mName;
-	}
+    @Override
+    public String getName() {
+        return mName;
+    }
 
-	@Override
-	public String getNumber() {
-		return mPhoneNumber;
-	}
+    @Override
+    public String getNumber() {
+        return mPhoneNumber;
+    }
 
-	@Override
-	public String getEmail() {
-		return mEmail;
-	}
+    @Override
+    public String getEmail() {
+        return mEmail;
+    }
 
-	@Override
-	public Location getLocation() {
-		return mLocation;
-	}
+    @Override
+    public Location getLocation() {
+        return mLocation;
+    }
 
-	@Override
-	public void setName(String newName) {
-		mName = newName;
-	}
+    @Override
+    public void setName(String newName) {
+        mName = newName;
+    }
 
-	@Override
-	public void setNumber(String newNumber) {
-		mPhoneNumber = newNumber;
-	}
+    @Override
+    public void setNumber(String newNumber) {
+        mPhoneNumber = newNumber;
+    }
 
-	@Override
-	public void setEmail(String newEmail) {
-		mEmail = newEmail;
-	}
+    @Override
+    public void setEmail(String newEmail) {
+        mEmail = newEmail;
+    }
 
-	@Override
-	public void setLocation(Location p) {
-		mLocation.set(p);
-	}
+    @Override
+    public void setLocation(Location p) {
+        mLocation.set(p);
+    }
 
-	@Override
-	public String getPositionName() {
-		return mPositionName;
-	}
+    @Override
+    public String getPositionName() {
+        return mPositionName;
+    }
 
-	@Override
-	public void setPositionName(String posName) {
-		mPositionName = posName;
-	}
+    @Override
+    public void setPositionName(String posName) {
+        mPositionName = posName;
+    }
 
-	@Override
-	public void setLatitude(double latitude) {
-		mLocation.setLatitude(latitude);
+    @Override
+    public void setLatitude(double latitude) {
+        mLocation.setLatitude(latitude);
 
-	}
+    }
 
-	@Override
-	public void setLongitude(double longitude) {
-		mLocation.setLongitude(longitude);
+    @Override
+    public void setLongitude(double longitude) {
+        mLocation.setLongitude(longitude);
 
-	}
-	
-	@Override
-	public LatLng getLatLng() {
-	    return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-	}
+    }
 
-	@Override
-	public Bitmap getPicture(Context context) {
+    @Override
+    public LatLng getLatLng() {
+        return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+    }
 
-		File file = new File(context.getFilesDir(), mId + ".png");
+    @Override
+    public Bitmap getPicture(Context context) {
 
-		Bitmap pic = null;
+        File file = new File(context.getFilesDir(), mId + ".png");
 
-		if (file.exists()) {
-			pic = BitmapFactory.decodeFile(file.getAbsolutePath());
-		} else {
-			pic = BitmapFactory.decodeResource(context.getResources(),
-					DEFAULT_PICTURE); // placeholder
-		}
-		return pic;
-	}
+        Bitmap pic = null;
 
-	@Override
-	public void setPicture(Bitmap pic, Context context) {
+        if (file.exists()) {
+            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
+        } else {
+            pic = BitmapFactory.decodeResource(context.getResources(),
+                DEFAULT_PICTURE);
+        }
+        return pic;
+    }
 
-		File file = new File(context.getFilesDir(), mId + ".png");
+    @Override
+    public void setPicture(Bitmap pic, Context context) {
 
-		if (file.exists()) {
-			file.delete();
-		}
+        File file = new File(context.getFilesDir(), mId + ".png");
 
-		try {
-			FileOutputStream out = context.openFileOutput(mId + ".png",
-					Context.MODE_PRIVATE);
-			pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        if (file.exists()) {
+            file.delete();
+        }
 
-	@Override
-	public GregorianCalendar getLastSeen() {
-		return mLastSeen;
-	}
+        try {
+            FileOutputStream out = context.openFileOutput(mId + ".png",
+                Context.MODE_PRIVATE);
+            pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	@Override
-	public boolean isOnline() {
-		return mOnline;
-	}
+    @Override
+    public GregorianCalendar getLastSeen() {
+        return mLastSeen;
+    }
 
-	@Override
-	public void setLastSeen(GregorianCalendar date) {
-		mLastSeen.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH),
-				date.get(Calendar.DATE), date.get(Calendar.HOUR),
-				date.get(Calendar.MINUTE));
-	}
+    @Override
+    public boolean isOnline() {
+        return mOnline;
+    }
 
-	@Override
-	public void setOnline(boolean status) {
-		mOnline = status;
-	}
+    @Override
+    public void setLastSeen(GregorianCalendar date) {
+        mLastSeen.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH),
+            date.get(Calendar.DATE), date.get(Calendar.HOUR),
+            date.get(Calendar.MINUTE));
+    }
 
-	@Override
-	public void deletePicture(Context context) {
-		File file = new File(context.getFilesDir(), mId + ".png");
-		if (file.exists()) {
-			file.delete();
-		}
-	}
+    @Override
+    public void setOnline(boolean status) {
+        mOnline = status;
+    }
+
+    @Override
+    public void deletePicture(Context context) {
+        File file = new File(context.getFilesDir(), mId + ".png");
+        if (file.exists()) {
+            file.delete();
+        }
+    }
 
     @Override
     public boolean isVisible() {
@@ -217,4 +218,47 @@ public class Friend implements User {
         mVisible = isVisible;
     }
 
+    @Override
+    public String getShortInfos() {
+        // TODO
+        return "Seen 10 minutes ago near Lausanne";
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (mId ^ (mId >>> 32));
+        result = prime * result + ((mName == null) ? 0 : mName.hashCode());
+        return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Friend other = (Friend) obj;
+        if (mId != other.mId)
+            return false;
+        if (mName == null) {
+            if (other.mName != null)
+                return false;
+        } else if (!mName.equals(other.mName))
+            return false;
+        return true;
+    }
 }
