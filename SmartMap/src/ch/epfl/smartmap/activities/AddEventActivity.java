@@ -67,7 +67,6 @@ public class AddEventActivity extends FragmentActivity {
     private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
 
         if (isValidDate(endDate.getText().toString()) && isValidTime(endTime.getText().toString())) {
-            Log.d(TAG, "running the if of checkDatesValidity");
             // The end of the event has been set by the user
 
             GregorianCalendar start = getDateFromTextFormat(startDate.getText().toString(), startTime.getText()
@@ -166,7 +165,6 @@ public class AddEventActivity extends FragmentActivity {
                 mPickStartDate.removeTextChangedListener(mTextChangedListener);
 
                 checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
-                Log.d(TAG, "Text changed!");
 
                 // Reset the TextChangedListener
                 mPickEndDate.addTextChangedListener(mTextChangedListener);

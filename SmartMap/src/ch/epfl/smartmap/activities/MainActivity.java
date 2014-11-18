@@ -63,6 +63,7 @@ import com.google.android.gms.maps.model.Marker;
  * This Activity displays the core features of the App. It displays the map and the whole menu.
  *
  * @author jfperren
+ * @author SpicyCH
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
 
@@ -80,7 +81,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     /**
      * Types of Menu that can be displayed on this activity
-     * 
+     *
      * @author jfperren
      */
     private enum MenuTheme {
@@ -108,12 +109,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         setContentView(R.layout.activity_main);
 
         // Set actionbar color
-        getActionBar().setBackgroundDrawable(
-            new ColorDrawable(getResources().getColor(R.color.main_blue)));
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.main_blue)));
         getActionBar().setHomeButtonEnabled(true);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeAsUpIndicator(
-            getResources().getDrawable(R.drawable.ic_drawer));
+        getActionBar().setHomeAsUpIndicator(getResources().getDrawable(R.drawable.ic_drawer));
         mMenuTheme = MenuTheme.MAP;
 
         // Get needed Views
@@ -129,11 +128,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
         mSearchEngine = new MockSearchEngine(getVisibleUsers(mDbHelper.getAllUsers()));
         mSearchLayout.setSearchEngine(mSearchEngine);
-        
+
         if (savedInstanceState == null) {
             displayMap();
         }
-        
+
         if (mGoogleMap != null) {
             initializeMarkers();
         }
@@ -155,6 +154,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
 
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
+            @Override
             public boolean onQueryTextSubmit(String query) {
                 mSearchView.clearFocus();
                 return false;
@@ -163,8 +163,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Give the query results to searchLayout
-                mSearchLayout.updateSearchResults(mSearchView.getQuery()
-                    .toString());
+                mSearchLayout.updateSearchResults(mSearchView.getQuery().toString());
                 return false;
             }
         });
@@ -215,15 +214,15 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     @Override
     public void onBackPressed() {
         switch (mMenuTheme) {
-        case MAP:
-            super.onBackPressed();
-            break;
-        case SEARCH:
-        case ITEM:
-            setMainMenu(null);
-            break;
-        default:
-            assert false;
+            case MAP:
+                super.onBackPressed();
+                break;
+            case SEARCH:
+            case ITEM:
+                setMainMenu(null);
+                break;
+            default:
+                assert false;
         }
     }
 
@@ -232,8 +231,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         super.onResume();
 
         // startService(mUpdateServiceIntent);
-        registerReceiver(mBroadcastReceiver, new IntentFilter(
-            UpdateService.BROADCAST_POS));
+        registerReceiver(mBroadcastReceiver, new IntentFilter(UpdateService.BROADCAST_POS));
 
         // get Intent that started this Activity
         Intent startingIntent = getIntent();
@@ -249,13 +247,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             public void onMapLongClick(LatLng latLng) {
                 Intent result = new Intent(getContext(), AddEventActivity.class);
                 Bundle extras = new Bundle();
-                Geocoder geocoder = new Geocoder(getContext(), Locale
-                    .getDefault());
+                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
                 String cityName = "";
                 List<Address> addresses;
                 try {
-                    addresses = geocoder.getFromLocation(latLng.latitude,
-                        latLng.longitude, 1);
+                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
                     if (addresses.size() > 0) {
                         // Makes sure that an address is associated to the coordinates, the user could have
                         // long
@@ -267,8 +263,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 if (cityName == null) {
                     // If google couldn't retrieve the city name, we use the country name instead
                     try {
-                        addresses = geocoder.getFromLocation(latLng.latitude,
-                            latLng.longitude, 1);
+                        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
                         if (addresses.size() > 0) {
                             cityName = addresses.get(0).getCountryName();
                         }
@@ -298,11 +293,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         // stopService(mUpdateServiceIntent);
     }
 
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mFriendMarkerDisplayer.updateMarkers(getContext(), mGoogleMap,
-                getVisibleUsers(mDbHelper.getAllUsers()));
+            mFriendMarkerDisplayer.updateMarkers(getContext(), mGoogleMap, getVisibleUsers(mDbHelper.getAllUsers()));
         }
 
     };
@@ -315,19 +309,16 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      * Display the map with the current location
      */
     public void displayMap() {
-        int status = GooglePlayServicesUtil
-            .isGooglePlayServicesAvailable(getBaseContext());
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getBaseContext());
         // Showing status
         if (status != ConnectionResult.SUCCESS) { // Google Play Services are
             // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this,
-                GOOGLE_PLAY_REQUEST_CODE);
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
         } else {
             // Google Play Services are available.
             // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+            mFragmentMap = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
@@ -343,33 +334,26 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             // Getting Current Location
             // Location location =
             // locationManager.getLastKnownLocation(provider);
-            boolean isGPSEnabled = locationManager
-                .isProviderEnabled(LocationManager.GPS_PROVIDER);
+            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (isGPSEnabled) {
                 Log.d(TAG, "gps enabled");
-                locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
-            } else if (null != locationManager
-                .getProvider(LocationManager.NETWORK_PROVIDER)) {
-                locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
+                        LOCATION_UPDATE_DISTANCE, this);
+            } else if (null != locationManager.getProvider(LocationManager.NETWORK_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
+                        LOCATION_UPDATE_DISTANCE, this);
             }
         }
     }
 
     public void initializeMarkers() {
         mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
-        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-            mDbHelper.getAllEvents());
+        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, mDbHelper.getAllEvents());
         mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-            getVisibleUsers(mDbHelper.getAllUsers()));
+        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, getVisibleUsers(mDbHelper.getAllUsers()));
         mMapZoomer = new DefaultZoomManager(mFragmentMap);
         Log.i(TAG, "before enter to zoom according");
-        List<Marker> allMarkers = new ArrayList<Marker>(
-            mFriendMarkerDisplayer.getDisplayedMarkers());
+        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
         allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
         Intent startingIntent = getIntent();
         if (startingIntent.getParcelableExtra("location") == null) {
@@ -390,7 +374,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
      */
     @Override
@@ -400,7 +384,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
      */
     @Override
@@ -410,7 +394,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
      */
     @Override
@@ -427,13 +411,12 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     /**
      * Computes the changes needed when a query is sent.
-     * 
+     *
      * @param friend
      */
     public void performQuery(Friend friend) {
         // Get Views
-        final MenuItem mSearchView = (MenuItem) mMenu
-            .findItem(R.id.action_search);
+        final MenuItem mSearchView = mMenu.findItem(R.id.action_search);
         final SearchPanel mSearchPanel = (SearchPanel) findViewById(R.id.search_panel);
         // Close search interface
         mSearchPanel.close();
@@ -445,7 +428,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         mSearchEngine.getHistory().addEntry(friend, new Date());
     }
 
-    /** 
+    /**
      * Sets the Menu that should be used when using Search Panel
      */
     public void setSearchMenu() {
@@ -486,11 +469,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     }
 
     /**
-     * Sets the view for Item Focus, this means
-     * - Write name / Display photo on ActionBar
-     * - Sets ActionMenu for Item Focus
-     * 
-     * @param item Item to be displayed
+     * Sets the view for Item Focus, this means - Write name / Display photo on ActionBar - Sets ActionMenu for Item
+     * Focus
+     *
+     * @param item
+     *            Item to be displayed
      */
     public void setItemMenu(Displayable item) {
         mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(false);
@@ -501,8 +484,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         ActionBar mActionBar = getActionBar();
         mActionBar.setTitle(item.getName());
         mActionBar.setSubtitle(item.getShortInfos());
-        mActionBar.setIcon(new BitmapDrawable(getResources(), item
-            .getPicture(this)));
+        mActionBar.setIcon(new BitmapDrawable(getResources(), item.getPicture(this)));
         mCurrentItem = item;
         mMenuTheme = MenuTheme.ITEM;
     }
