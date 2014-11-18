@@ -125,11 +125,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         mSideMenu.initializeDrawerLayout();
         // TODO agpmilli : When click on actionbar icon button, open side menu
 
-        mSearchEngine = new MockSearchEngine();
-        mSearchLayout.setSearchEngine(mSearchEngine);
-
         mDbHelper = DatabaseHelper.getInstance();
 
+        mSearchEngine = new MockSearchEngine(getVisibleUsers(mDbHelper.getAllUsers()));
+        mSearchLayout.setSearchEngine(mSearchEngine);
+        
         if (savedInstanceState == null) {
             displayMap();
         }

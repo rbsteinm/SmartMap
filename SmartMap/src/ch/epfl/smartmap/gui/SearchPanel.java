@@ -35,22 +35,26 @@ public class SearchPanel extends RelativeLayout {
      * Opens the panel and displays it full screen
      */
     public void open() {
-        this.setVisibility(View.VISIBLE);
-        Animation bottomUp = AnimationUtils.loadAnimation(getContext(),
-            R.anim.bottom_up);
-        this.startAnimation(bottomUp);
+        if (this.getVisibility() != View.VISIBLE){
+            this.setVisibility(View.VISIBLE);
+            Animation bottomUp = AnimationUtils.loadAnimation(getContext(),
+                R.anim.bottom_up);
+            this.startAnimation(bottomUp);
+        }
     }
 
     /**
      * Closes the panel and hides it.
      */
     public void close() {
-        Animation topDown = AnimationUtils.loadAnimation(getContext(),
-            R.anim.top_down);
-
-        this.startAnimation(topDown);
-        this.setVisibility(View.GONE);
-        clearFocus();
+        if(this.getVisibility() != View.GONE){
+            Animation topDown = AnimationUtils.loadAnimation(getContext(),
+                R.anim.top_down);
+    
+            this.startAnimation(topDown);
+            this.setVisibility(View.GONE);
+            clearFocus();
+        }
     }
     
     /**
