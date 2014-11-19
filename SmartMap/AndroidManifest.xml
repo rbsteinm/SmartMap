@@ -65,6 +65,7 @@
         
         <activity
             android:name=".activities.FriendsPagerActivity"
+            android:parentActivityName="ch.epfl.smartmap.activities.MainActivity"
             android:label="@string/title_activity_pager"
             android:screenOrientation="portrait" >
         </activity>
@@ -95,6 +96,7 @@
         </activity>
         <activity
             android:name="ch.epfl.smartmap.activities.AddFriendActivity"
+            android:parentActivityName="ch.epfl.smartmap.activities.FriendsPagerActivity"
             android:label="@string/title_activity_add_friend" >
         </activity>
     </application>
