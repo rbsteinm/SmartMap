@@ -108,6 +108,7 @@ public class FriendsTab extends ListFragment {
         builder.create().show();
     }
 
+
     /**
      * Asynchronous task that removes a friend from the users friendList
      * both from the server and from the cache

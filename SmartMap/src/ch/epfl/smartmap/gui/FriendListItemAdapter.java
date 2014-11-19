@@ -67,16 +67,16 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         name.setText(user.getName());
         picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
 
+
         String lastSeenString = "Last seen " + user.getLastSeen().
                 get(GregorianCalendar.DAY_OF_MONTH) + "/" + (user.getLastSeen().
                         get(GregorianCalendar.MONTH) + 1) +  "/" + user.getLastSeen().
                         get(GregorianCalendar.YEAR) + " at " + user.getLastSeen().
-                        get(GregorianCalendar.HOUR_OF_DAY) + ":" + user.getLastSeen().
+                        get(GregorianCalendar.HOUR) + ":" + user.getLastSeen().
                         get(GregorianCalendar.MINUTE);
 
         lastSeen.setText(lastSeenString);
         lastSeen.setTextColor(Color.GRAY);
-
 
         return convertView;
     }
