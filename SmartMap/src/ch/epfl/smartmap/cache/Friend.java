@@ -28,7 +28,6 @@ public class Friend implements User, Searchable, Displayable {
     private String mEmail;
     private String mPositionName;
     private final GregorianCalendar mLastSeen;
-    private boolean mOnline;
     private final Location mLocation;
     private boolean mVisible;
 
@@ -38,6 +37,10 @@ public class Friend implements User, Searchable, Displayable {
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
+    public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
+                                                             // until a user is
+                                                             // considered
+                                                             // offline
 
     private static final int LEFT_SHIFT_COUNT = 32;
 
@@ -61,7 +64,6 @@ public class Friend implements User, Searchable, Displayable {
         mLastSeen = new GregorianCalendar();
         mLocation = new Location(PROVIDER_NAME);
         mVisible = true;
-        mOnline = false;
     }
 
     public Friend(long userID, String userName, double latitude,
@@ -178,14 +180,15 @@ public class Friend implements User, Searchable, Displayable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + (int) (mId ^ (mId >>> LEFT_SHIFT_COUNT));
-        result = (prime * result) + ((mName == null) ? 0 : mName.hashCode());
+        result = prime * result + (int) (mId ^ mId >>> LEFT_SHIFT_COUNT);
+        result = prime * result + (mName == null ? 0 : mName.hashCode());
         return result;
     }
 
     @Override
     public boolean isOnline() {
-        return mOnline;
+        return new GregorianCalendar().getTimeInMillis()
+            - mLastSeen.getTimeInMillis() < ONLINE_TIMEOUT;
     }
 
     @Override
@@ -233,8 +236,9 @@ public class Friend implements User, Searchable, Displayable {
     }
 
     @Override
+    @Deprecated
     public void setOnline(boolean status) {
-        mOnline = status;
+        // deprecated
     }
 
     @Override

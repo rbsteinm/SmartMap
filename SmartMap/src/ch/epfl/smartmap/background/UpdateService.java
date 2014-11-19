@@ -266,6 +266,11 @@ public class UpdateService extends Service {
         Log.d("UpdateService", "Service started");
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
+
     /**
      * Enables/disables friends position updates
      * 
