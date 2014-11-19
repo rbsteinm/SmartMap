@@ -10,21 +10,21 @@ import android.graphics.Bitmap;
  */
 public interface Displayable {
 
-	/**
-	 * @param context
-	 *            The application's context, needed to access the memory
-	 * @return The object's picture
-	 */
-	Bitmap getPicture(Context context);
+    /**
+     * @param context
+     *            The application's context, needed to access the memory
+     * @return The object's picture
+     */
+    Bitmap getPicture(Context context);
 
-	/**
-	 * @return A name for the panel (e.g. the username, event name, etc.)
-	 */
-	String getName();
+    /**
+     * @return A name for the panel (e.g. the username, event name, etc.)
+     */
+    String getName();
 
-	/**
-	 * @return Text containing various information (description, last seen,
-	 *         etc.)
-	 */
-	String getShortInfos();
+    /**
+     * @return Text containing various information (description, last seen,
+     *         etc.)
+     */
+    String getShortInfos();
 }

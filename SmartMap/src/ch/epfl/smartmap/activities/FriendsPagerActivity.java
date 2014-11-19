@@ -18,106 +18,99 @@ import ch.epfl.smartmap.gui.PagerAdapter;
  * 
  * @author rbsteinm
  */
-public class FriendsPagerActivity extends FragmentActivity implements
-    ActionBar.TabListener {
+public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 
-	private ViewPager mPager;
-	private ActionBar mActionBar;
-	private final String[] mTabs = {"Friends", "Invitations"};
+    private ViewPager mPager;
+    private ActionBar mActionBar;
+    private final String[] mTabs = { "Friends", "Invitations" };
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-	    
-	    // Makes the logo clickable (clicking it returns to previous activity)
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
-	    
-		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.activity_friends_pager);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
-		mPager = (ViewPager) this.findViewById(R.id.myViewPager);
-		mActionBar = this.getActionBar();
-		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		PagerAdapter pageAdapter = new PagerAdapter(this,
-		    this.getSupportFragmentManager());
+        // Makes the logo clickable (clicking it returns to previous activity)
+        // getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		mPager.setAdapter(pageAdapter);
-		mActionBar.setHomeButtonEnabled(false);
-		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_friends_pager);
 
-		// Adding Tabs
-		for (String tabName : mTabs) {
-			mActionBar.addTab(mActionBar.newTab().setText(tabName)
-			    .setTabListener(this));
-		}
+        mPager = (ViewPager) this.findViewById(R.id.myViewPager);
+        mActionBar = this.getActionBar();
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        PagerAdapter pageAdapter = new PagerAdapter(this, this.getSupportFragmentManager());
 
-		/**
-		 * on swiping, the viewpager makes respective tab selected
-		 */
-		mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mPager.setAdapter(pageAdapter);
+        mActionBar.setHomeButtonEnabled(false);
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-			}
+        // Adding Tabs
+        for (String tabName : mTabs) {
+            mActionBar.addTab(mActionBar.newTab().setText(tabName).setTabListener(this));
+        }
 
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-			}
+        /**
+         * on swiping, the viewpager makes respective tab selected
+         */
+        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-			@Override
-			public void onPageSelected(int position) {
-				// on changing the page
-				// make respected tab selected
-				mActionBar.setSelectedNavigationItem(position);
-			}
-		});
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {
+            }
 
-	}
+            @Override
+            public void onPageScrollStateChanged(int arg0) {
+            }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		this.getMenuInflater().inflate(R.menu.pager, menu);
-		return true;
-	}
+            @Override
+            public void onPageSelected(int position) {
+                // on changing the page
+                // make respected tab selected
+                mActionBar.setSelectedNavigationItem(position);
+            }
+        });
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		/*int id = item.getItemId();
-		switch(id) {
-		    case R.id.activity_friends_add_button:
-		        startAddFriendActivity(null);
-		    case android.R.id.home:
-		        finish();
-		    default:
-		        break;
-		}*/
-		return super.onOptionsItemSelected(item);
-	}
+    }
 
-	@Override
-	public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
-		// nothing
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.pager, menu);
+        return true;
+    }
 
-	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction arg1) {
-		// on tab selected
-		// show respected fragment view
-		mPager.setCurrentItem(tab.getPosition());
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        /*
+         * int id = item.getItemId(); switch(id) { case
+         * R.id.activity_friends_add_button: startAddFriendActivity(null); case
+         * android.R.id.home: finish(); default: break; }
+         */
+        return super.onOptionsItemSelected(item);
+    }
 
-	}
+    @Override
+    public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
+        // nothing
+    }
 
-	@Override
-	public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
-		// nothing
+    @Override
+    public void onTabSelected(Tab tab, FragmentTransaction arg1) {
+        // on tab selected
+        // show respected fragment view
+        mPager.setCurrentItem(tab.getPosition());
 
-	}
+    }
 
-	public void startAddFriendActivity(MenuItem menu) {
-		Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
-		this.startActivity(displayActivityIntent);
-	}
+    @Override
+    public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
+        // nothing
+
+    }
+
+    public void startAddFriendActivity(MenuItem menu) {
+        Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
+        this.startActivity(displayActivityIntent);
+    }
 }

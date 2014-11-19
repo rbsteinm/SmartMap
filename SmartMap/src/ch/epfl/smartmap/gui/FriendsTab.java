@@ -54,13 +54,11 @@ public class FriendsTab extends ListFragment {
     }
 
     @Override
-    public void onListItemClick(ListView listView, View view, int position,
-            long id) {
+    public void onListItemClick(ListView listView, View view, int position, long id) {
         long userId = (Long) view.getTag();
         RelativeLayout rl = (RelativeLayout) view;
         TextView tv = (TextView) rl.getChildAt(1);
-        assert (tv instanceof TextView)
-        && (tv.getId() == R.id.activity_friends_name);
+        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         String name = tv.getText().toString();
         displayDeleteConfirmationDialog(name, userId);
     }
@@ -68,8 +66,7 @@ public class FriendsTab extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        setListAdapter(new FriendListItemAdapter(mContext,
-                asList(mCacheDB.getAllUsers())));
+        setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
     }
 
     public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
@@ -108,10 +105,9 @@ public class FriendsTab extends ListFragment {
         builder.create().show();
     }
 
-
     /**
-     * Asynchronous task that removes a friend from the users friendList
-     * both from the server and from the cache
+     * Asynchronous task that removes a friend from the users friendList both
+     * from the server and from the cache
      * 
      * @author rbsteinm
      */
@@ -136,8 +132,7 @@ public class FriendsTab extends ListFragment {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            setListAdapter(new FriendListItemAdapter(mContext,
-                    asList(mCacheDB.getAllUsers())));
+            setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
             Toast.makeText(mContext, confirmString, Toast.LENGTH_LONG).show();
         }
 

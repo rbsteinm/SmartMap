@@ -10,16 +10,16 @@ import java.util.List;
  */
 public interface SearchEngine {
 
-	/**
-	 * Sends a Query, computes it and return matched results
-	 * 
-	 * @param query
-	 * @return a List containing the result
-	 */
-	List<Friend> sendQuery(String query);
+    /**
+     * Sends a Query, computes it and return matched results
+     * 
+     * @param query
+     * @return a List containing the result
+     */
+    List<Friend> sendQuery(String query);
 
-	/**
-	 * @return History of searches of this SearchEngine
-	 */
-	History getHistory();
+    /**
+     * @return History of searches of this SearchEngine
+     */
+    History getHistory();
 }

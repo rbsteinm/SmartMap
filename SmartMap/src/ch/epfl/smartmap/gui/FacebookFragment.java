@@ -77,7 +77,8 @@ public class FacebookFragment extends Fragment {
         view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 
         // Start animation and set login button
-        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(), R.anim.face_anim));
+        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(),
+                R.anim.face_anim));
         authButton.setFragment(this);
 
         // Not logged in Facebook or permission to use Facebook in SmartMap not
@@ -181,8 +182,8 @@ public class FacebookFragment extends Fragment {
                     SettingsManager.getInstance().setUserName(params.get("name"));
 
                     if (!FacebookFragment.this.sendDataToServer(params)) {
-                        Toast.makeText(FacebookFragment.this.getActivity(), "Failed to log in to the SmartMap server.",
-                                Toast.LENGTH_LONG).show();
+                        Toast.makeText(FacebookFragment.this.getActivity(),
+                                "Failed to log in to the SmartMap server.", Toast.LENGTH_LONG).show();
                     } else {
                         // Create and start the next activity
                         FacebookFragment.this.startMainActivity();
@@ -225,7 +226,8 @@ public class FacebookFragment extends Fragment {
     }
 
     /**
-     * An AsyncTask to send the facebook user data to the SmartMap server asynchronously
+     * An AsyncTask to send the facebook user data to the SmartMap server
+     * asynchronously
      * 
      * @author SpicyCH
      */
