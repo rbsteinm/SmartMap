@@ -23,8 +23,7 @@ import com.google.android.apps.common.testing.ui.espresso.UiController;
 import com.google.android.apps.common.testing.ui.espresso.ViewAction;
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 
-public class MainActivityTest extends
-    ActivityInstrumentationTestCase2<MainActivity> {
+public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
     public MainActivityTest() {
         super(MainActivity.class);
     }
@@ -87,8 +86,7 @@ public class MainActivityTest extends
     }
 
     public void testOpenFriendsActivity() throws Exception {
-        ListView lv = (ListView) getActivity().findViewById(
-            R.id.left_drawer_listView);
+        ListView lv = (ListView) getActivity().findViewById(R.id.left_drawer_listView);
         View friendView = lv.getChildAt(1);
         onView(withId(friendView.getId())).perform(click());
         // TODO check that FriendsActivity is the current Activity
@@ -99,7 +97,6 @@ public class MainActivityTest extends
     }
 
     /**
-     * 
      * @throws Exception
      */
     public void testOpenSideMenuUsingButton() throws Exception {
@@ -109,8 +106,7 @@ public class MainActivityTest extends
 
     public void testPanelsNotVisible() {
         onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.information_panel)).check(
-            matches(not(isDisplayed())));
+        onView(withId(R.id.information_panel)).check(matches(not(isDisplayed())));
     }
 
     public void testOpenSearchView() {
@@ -135,15 +131,13 @@ public class MainActivityTest extends
 
     public void testNormalSearchQuery() {
         onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.action_search)).perform(
-            ViewActions.typeText("Julien Perrenoud"));
+        onView(withId(R.id.action_search)).perform(ViewActions.typeText("Julien Perrenoud"));
         // TODO : Check there is only one result
     }
 
     public void testWrongSearchQuery() {
         onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.action_search)).perform(
-            ViewActions.typeText("flksdhéfjkslkfshdfljkshfd"));
+        onView(withId(R.id.action_search)).perform(ViewActions.typeText("flksdhéfjkslkfshdfljkshfd"));
         // TODO : Check no result is displayed
     }
 }

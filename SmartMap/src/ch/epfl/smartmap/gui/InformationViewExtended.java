@@ -12,24 +12,24 @@ import ch.epfl.smartmap.cache.MockDB;
  */
 public class InformationViewExtended extends LinearLayout {
 
-	@SuppressWarnings("unused")
-	private static final String TAG = "INFORMATION VIEW EXTENDED";
+    @SuppressWarnings("unused")
+    private static final String TAG = "INFORMATION VIEW EXTENDED";
 
-	public InformationViewExtended(Context context, Displayable item,
-	    SlidingPanel panel) {
-		super(context);
-		// Layout Settings
-		this.setOrientation(HORIZONTAL);
-		this.setLayoutParams(new LinearLayout.LayoutParams(
-		    LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-		this.setBackgroundResource(R.color.light_blue);
-		this.addView(new TextView(context));
-	}
+    public InformationViewExtended(Context context, Displayable item,
+        SlidingPanel panel) {
+        super(context);
+        // Layout Settings
+        this.setOrientation(HORIZONTAL);
+        this.setLayoutParams(new LinearLayout.LayoutParams(
+            LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        this.setBackgroundResource(R.color.light_blue);
+        this.addView(new TextView(context));
+    }
 
-	/**
-	 * @param context
-	 */
-	public InformationViewExtended(Context context, SlidingPanel panel) {
-		this(context, MockDB.ALAIN, panel);
-	}
+    /**
+     * @param context
+     */
+    public InformationViewExtended(Context context, SlidingPanel panel) {
+        this(context, MockDB.ALAIN, panel);
+    }
 }
