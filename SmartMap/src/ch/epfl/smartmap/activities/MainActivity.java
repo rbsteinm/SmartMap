@@ -15,11 +15,9 @@ import android.content.IntentFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
@@ -348,29 +346,32 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             mGoogleMap.setMyLocationEnabled(true);
             // Getting LocationManager object from System Service
             // LOCATION_SERVICE
-            LocationManager locationManager = (LocationManager) this
-                .getSystemService(Context.LOCATION_SERVICE);
-            // Creating a criteria object to retrieve provider
-            Criteria criteria = new Criteria();
-            // Getting the name of the best provider
-            String provider = locationManager.getBestProvider(criteria, true);
-            Log.d(TAG, "provider : " + provider);
-            // Getting Current Location
-            // Location location =
-            // locationManager.getLastKnownLocation(provider);
-            boolean isGPSEnabled = locationManager
-                .isProviderEnabled(LocationManager.GPS_PROVIDER);
-            if (isGPSEnabled) {
-                Log.d(TAG, "gps enabled");
-                locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
-            } else if (null != locationManager
-                .getProvider(LocationManager.NETWORK_PROVIDER)) {
-                locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
-            }
+            /*
+             * LocationManager locationManager = (LocationManager) this
+             * .getSystemService(Context.LOCATION_SERVICE);
+             * // Creating a criteria object to retrieve provider
+             * Criteria criteria = new Criteria();
+             * // Getting the name of the best provider
+             * String provider = locationManager.getBestProvider(criteria,
+             * true);
+             * Log.d(TAG, "provider : " + provider);
+             * // Getting Current Location
+             * // Location location =
+             * // locationManager.getLastKnownLocation(provider);
+             * boolean isGPSEnabled = locationManager
+             * .isProviderEnabled(LocationManager.GPS_PROVIDER);
+             * if (isGPSEnabled) {
+             * Log.d(TAG, "gps enabled");
+             * locationManager.requestLocationUpdates(
+             * LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
+             * LOCATION_UPDATE_DISTANCE, this);
+             * } else if (null != locationManager
+             * .getProvider(LocationManager.NETWORK_PROVIDER)) {
+             * locationManager.requestLocationUpdates(
+             * LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
+             * LOCATION_UPDATE_DISTANCE, this);
+             * }
+             */
         }
     }
 
