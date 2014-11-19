@@ -34,7 +34,6 @@ public class SearchResultViewGroup<T extends Displayable> extends LinearLayout {
         EMPTY;
     }
 
-    @SuppressWarnings("unused")
     private static final String TAG = "SEARCH_RESULT_VIEW_GROUP";
 
     private static final int ITEMS_PER_PAGE = 10;
@@ -60,7 +59,8 @@ public class SearchResultViewGroup<T extends Displayable> extends LinearLayout {
     public SearchResultViewGroup(Context context, List<T> results, String name) {
         super(context);
         // Layout parameters
-        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT));
         this.setOrientation(VERTICAL);
         this.setBackgroundResource(R.drawable.view_group_background);
         mContext = context;

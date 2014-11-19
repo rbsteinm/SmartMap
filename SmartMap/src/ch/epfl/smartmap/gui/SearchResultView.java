@@ -1,89 +1,152 @@
 package ch.epfl.smartmap.gui;
 
 import android.content.Context;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.graphics.Bitmap;
+import android.graphics.Typeface;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.activities.MainActivity;
+import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.Friend;
 
 /**
  * This class is a basic Layout that will be used to display search results in
  * {@code SearchLayout}.
  * 
+ * @param <T>
+ *            Type of Displayable this SearchResultView shows.
  * @author jfperren
  */
-public abstract class SearchResultView extends LinearLayout {
+public class SearchResultView<T extends Displayable> extends RelativeLayout {
 
-	// FIXME : Should define
-	private static final int PADDING_BOTTOM = 20;
-	private static final int PADDING_RIGHT = 20;
-	private static final int PADDING_LEFT = 20;
-	private static final int PADDING_TOP = 20;
-	private static final float MAIN_LAYOUT_WEIGHTSUM = 10f;
-	private final static int PHOTO_RIGHT_MARGIN = 40;
-	private final static int PHOTO_SIZE = 150;
+    private static final String TAG = "SEARCH RESULT VIEW";
+    @SuppressWarnings("unused")
+    private final static String AUDIT_TAG = "AuditError : " + TAG;
 
-	private final ImageView mImageView;
+    // TODO : Image size should depend on size of layout without image
+    private static final int IMAGE_SIZE = 150;
+    private final static int PHOTO_RIGHT_MARGIN = 40;
 
-	/**
+    private static final int PADDING_RIGHT = 20;
+    private static final int PADDING_LEFT = 20;
+    private static final int PADDING_TOP = 20;
+    private static final int PADDING_BOTTOM = 20;
+
+    private final static int TITLE_BOTTOM_PADDING = 5;
+    private final static float TITLE_TEXT_SIZE = 17f;
+
+    private static final int CLICK_DISTANCE_THRESHHOLD = 10;
+
+    private final T mItem;
+    private final Bitmap mImage;
+
+    private final ImageView mImageView;
+
+    /**
+     * Constructor
      * 
+     * @param context
+     *            Context of the Application
      */
-	public enum ChildrenState {
-		EMPTY,
-		ADDED
-	}
+    public SearchResultView(Context context, T item) {
+        super(context);
 
-	@SuppressWarnings("unused")
-	private ChildrenState mChildrenState;
+        mItem = item;
+        mImage = item.getPicture(context);
 
-	/**
-	 * Constructor
-	 * 
-	 * @param context
-	 *            Context of the Application
-	 */
-	public SearchResultView(Context context) {
-		super(context);
-		mChildrenState = ChildrenState.EMPTY;
+        // Layout Parameters
+        this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
 
-		// Layout Parameters
-		this.setLayoutParams(new AbsListView.LayoutParams(
-		    LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-		this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT,
-		    PADDING_BOTTOM);
-		this.setOrientation(LinearLayout.HORIZONTAL);
-		this.setWeightSum(MAIN_LAYOUT_WEIGHTSUM);
+        // Create mImageView
+        mImageView = new ImageView(context);
+        mImageView.setId(R.id.search_result_image);
+        mImageView.setAdjustViewBounds(true);
+        mImageView.setImageBitmap(mImage);
+        mImageView.setScaleType(ScaleType.FIT_XY);
+        LayoutParams imageParams = new LayoutParams(IMAGE_SIZE, IMAGE_SIZE);
+        imageParams.setMargins(0, 0, PHOTO_RIGHT_MARGIN, 0);
+        imageParams.addRule(ALIGN_PARENT_LEFT);
+        mImageView.setLayoutParams(imageParams);
 
-		// ImageView Parameters
-		mImageView = new ImageView(context);
-		mImageView.setAdjustViewBounds(true);
-		mImageView.setImageResource(this.getImageResource());
-		LayoutParams mPhotoViewLayoutParams = new LayoutParams(PHOTO_SIZE,
-		    PHOTO_SIZE);
-		mPhotoViewLayoutParams.setMargins(0, 0, PHOTO_RIGHT_MARGIN, 0);
-		mImageView.setLayoutParams(mPhotoViewLayoutParams);
-		mImageView.setScaleType(ScaleType.FIT_XY);
+        // Create mTitleView
+        TextView mTitleView = new TextView(context);
+        mTitleView.setId(R.id.search_result_title);
+        mTitleView.setText(mItem.getName());
+        mTitleView.setTextSize(TITLE_TEXT_SIZE);
+        mTitleView.setTypeface(null, Typeface.BOLD);
+        mTitleView.setPadding(0, 0, 0, TITLE_BOTTOM_PADDING);
+        LayoutParams titleParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        titleParams.addRule(ALIGN_PARENT_TOP);
+        titleParams.addRule(RIGHT_OF, R.id.search_result_image);
+        mTitleView.setLayoutParams(titleParams);
 
-		this.setOnTouchListener(this.getOnTouchListener(this));
-	}
+        // Create mShortInfoView
+        TextView mShortInfoView = new TextView(context);
+        mShortInfoView.setId(R.id.search_result_short_info);
+        mShortInfoView.setText(item.getShortInfos());
+        mShortInfoView.setTextColor(this.getResources().getColor(R.color.lastSeenConnectionTextColor));
+        LayoutParams shortInfoParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        shortInfoParams.addRule(RIGHT_OF, R.id.search_result_image);
+        shortInfoParams.addRule(BELOW, R.id.search_result_title);
+        mShortInfoView.setLayoutParams(shortInfoParams);
 
-	public void initViews() {
-		mImageView.setImageResource(this.getImageResource());
-		this.addView(mImageView);
-		this.addView(this.getInfosLayout());
-		mChildrenState = ChildrenState.ADDED;
-	}
+        // Add subViews
+        this.addView(mImageView);
+        this.addView(mTitleView);
+        this.addView(mShortInfoView);
 
-	/**
-	 * Define the OnClickListener that will be called when touching this View.
-	 * Needs to be overriden
-	 * 
-	 * @return
-	 */
-	public abstract OnTouchListener getOnTouchListener(final SearchResultView v);
+        this.setOnTouchListener(new OnTouchListener() {
+            private float startX;
+            private float startY;
 
-	public abstract int getImageResource();
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
+                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+                    startX = ev.getAxisValue(MotionEvent.AXIS_X);
+                    startY = ev.getAxisValue(MotionEvent.AXIS_Y);
+                    v.setBackgroundColor(SearchResultView.this.getResources().getColor(
+                        R.color.searchResultOnSelect));
 
-	public abstract ViewGroup getInfosLayout();
+                } else if (ev.getAction() == MotionEvent.ACTION_UP) {
+                    float endX = ev.getAxisValue(MotionEvent.AXIS_X);
+                    float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
+
+                    double clickDistance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                    if (clickDistance < CLICK_DISTANCE_THRESHHOLD) {
+                        ((MainActivity) SearchResultView.this.getContext()).performQuery((Friend) mItem);
+                    }
+                    v.setBackgroundResource(0);
+                } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
+                    v.setBackgroundResource(0);
+                }
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        // TODO : Decomment when auditErrors coded for other classes
+        if (depth == 0) {
+            return 0;
+        }
+
+        int auditErrors = 0;
+        // auditErrors += mFriend.auditErrors(depth - 1);
+
+        return auditErrors;
+    }
 }

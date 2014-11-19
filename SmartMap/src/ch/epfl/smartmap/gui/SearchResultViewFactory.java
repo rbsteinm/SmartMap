@@ -11,11 +11,10 @@ import ch.epfl.smartmap.cache.Friend;
  * @author jfperren
  */
 public abstract class SearchResultViewFactory {
-	@SuppressWarnings("unused")
-	private static final String TAG = "SEARCH_RESULT_VIEW_FACTORY";
+    @SuppressWarnings("unused")
+    private static final String TAG = "SEARCH_RESULT_VIEW_FACTORY";
 
-	public static SearchResultView getSearchResultView(Context context,
-	    Displayable item) {
-		return new FriendSearchResultView(context, (Friend) item);
-	}
+    public static SearchResultView getSearchResultView(Context context, Displayable item) {
+        return new SearchResultView<Friend>(context, (Friend) item);
+    }
 }
