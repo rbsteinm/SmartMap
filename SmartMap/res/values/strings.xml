@@ -28,7 +28,8 @@
     <string name="title_activity_pager">PagerActivity</string>
 
     <!-- User interface labels and strings -->
-
+    <string name="no_search_result">No results</string>
+    <string name="more_results">See More</string>
 
     <!-- Address format -->
     <string name="address_output_string">%1$s %2$s %3$s</string>

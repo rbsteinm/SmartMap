@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.gui;
 
 import android.content.Context;
+import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Friend;
 
 /**
@@ -14,11 +15,7 @@ public abstract class SearchResultViewFactory {
 	private static final String TAG = "SEARCH_RESULT_VIEW_FACTORY";
 
 	public static SearchResultView getSearchResultView(Context context,
-	    Object item) {
-		if (item instanceof Friend) {
-			return new FriendSearchResultView(context, (Friend) item);
-		} else {
-			throw new IllegalArgumentException("Bad type item");
-		}
+	    Displayable item) {
+		return new FriendSearchResultView(context, (Friend) item);
 	}
 }
