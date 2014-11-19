@@ -15,7 +15,7 @@ use Doctrine\DBAL\Configuration;
  * @author Pamoi
  *
  */
-class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
+class EventRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 {
     // only instantiate doctrine connection once
     static private $doctrine = null;

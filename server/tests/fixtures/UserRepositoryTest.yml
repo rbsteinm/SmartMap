@@ -60,3 +60,7 @@ accepted_invitations:
   -
     id1: 2
     id2: 3
+removed_friends:
+  -
+    id1: 4
+    id2: 1

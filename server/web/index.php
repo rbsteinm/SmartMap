@@ -83,7 +83,7 @@ $app->error(function (SmartMap\Control\ControlLogicException $e, $code) use ($ap
     if ($app['debug'] == true) {
         return;
     }
-    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occured.'), 500,
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occurred.'), 500,
         array('X-Status-Code' => 200));
 });
 
@@ -92,7 +92,7 @@ $app->error(function (\Exception $e, $code) use ($app) {
     if ($app['debug'] == true) {
         return;
     }
-    return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occured'), 500,
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occurred'), 500,
         array('X-Status-Code' => 200));
 });
 
@@ -127,6 +127,8 @@ $app->post('/acceptInvitation', 'data.controller:acceptInvitation');
 $app->post('/declineInvitation', 'data.controller:declineInvitation');
 
 $app->post('/ackAcceptedInvitation', 'data.controller:ackAcceptedInvitation');
+
+$app->post('/ackRemovedFriend', 'data.controller:ackRemovedFriend');
 
 $app->post('/removeFriend', 'data.controller:removeFriend');
 

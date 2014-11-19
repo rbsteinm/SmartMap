@@ -505,4 +505,35 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	     
 	    $this->assertEquals(0, $this->getConnection()->getRowCount('accepted_invitations'), "Post-Condition");
 	}
+
+    public function testAddRemovedFriend()
+    {
+        $this->assertEquals(1, $this->getConnection()->getRowCount('removed_friends'), "Pre-Condition");
+
+        $repo = new UserRepository(self::$doctrine);
+
+        $repo->addRemovedFriend(2, 4);
+
+        $this->assertEquals(2, $this->getConnection()->getRowCount('removed_friends'), "Post-Condition");
+    }
+
+    public function testGetRemovedFriends()
+    {
+        $repo = new UserRepository(self::$doctrine);
+
+        $ids = $repo->getRemovedFriends(1);
+
+        $this->assertEquals(array(4), $ids);
+    }
+
+    public function testRemoveRemovedFriend()
+    {
+        $this->assertEquals(1, $this->getConnection()->getRowCount('removed_friends'), "Pre-Condition");
+
+        $repo = new UserRepository(self::$doctrine);
+
+        $repo->removeRemovedFriend(1, 4);
+
+        $this->assertEquals(0, $this->getConnection()->getRowCount('removed_friends'), "Post-Condition");
+    }
 }

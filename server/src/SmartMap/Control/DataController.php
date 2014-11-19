@@ -216,13 +216,16 @@ class DataController
         
         return new JsonResponse($response);
     }
-    
+
     /**
-     * Gets a list of user ids and names which are wanting to be friend
-     * with the current user.
-     * 
+     * Gets a list of the pending invitations, a list of the friends that
+     * accepted the user's invitation and a list of the ids of the friends
+     * that removed the user.
+     *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
      */
     public function getInvitations(Request $request)
     {
@@ -237,6 +240,8 @@ class DataController
             $acceptedInvitationIds = $this->mRepo->getAcceptedInvitations($userId);
             
             $newFriends = $this->mRepo->getUsers($acceptedInvitationIds);
+
+            $removedIds = $this->mRepo->getRemovedFriends($userId);
         }
         catch (DatabaseException $e)
         {
@@ -267,18 +272,20 @@ class DataController
             'status' => 'Ok',
             'message' => 'Fetched invitations !',
             'invitations' => $invitersList,
-            'newFriends' => $friendsList
+            'newFriends' => $friendsList,
+            'removedFriends' => $removedIds
         );
         
         return new JsonResponse($response);
     }
-    
+
     /**
-     * Accpets the invitation from the user with in POST parameter friend_id.
-     * 
+     * Accepts an invitation.
+     *
      * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
      * @throws InvalidRequestException
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function acceptInvitation(Request $request)
     {
@@ -349,7 +356,15 @@ class DataController
         
         return new JsonResponse($response);
     }
-    
+
+    /**
+     * Acknowledges an accepted invitation so it is no more sent in getInvitations.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
     public function ackAcceptedInvitation(Request $request)
     {
         $userId = User::getIdFromRequest($request);
@@ -365,7 +380,7 @@ class DataController
             throw new ControlLogicException('Error in ackAcceptedInvitation.', 2, $e);
         }
         
-        $response = array('status' => 'Ok', 'message' => 'Acknowledged accepted invitation !');
+        $response = array('status' => 'Ok', 'message' => 'Acknowledged accepted invitation.');
         
         return new JsonResponse($response);
     }
@@ -387,6 +402,8 @@ class DataController
         {
             $this->mRepo->removeFriendshipLink($userId, $friendId);
             $this->mRepo->removeFriendshipLink($friendId, $userId);
+
+            $this->mRepo->addRemovedFriend($userId, $friendId);
         }
         catch (DatabaseException $e)
         {
@@ -397,14 +414,43 @@ class DataController
         
         return new JsonResponse($response);
     }
-    
+
+    /**
+     * Acknowledges a removed friend so it is no longer sent in getInvitations
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
+    public function ackRemovedFriend(Request $request)
+    {
+        $userId = User::getIdFromRequest($request);
+
+        $friendId = $this->getPostParam($request, 'friend_id');
+
+        try
+        {
+            $this->mRepo->removeRemovedFriend($userId, $friendId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in ackRemovedFriend.', 2, $e);
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Acknowledged removed friend.');
+
+        return new JsonResponse($response);
+    }
+
     /**
      * Gets a list of user names and ids where name begins with post parameter
-     * search_text (ignores case). 
-     * 
+     * search_text (ignores case).
+     *
      * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
      * @throws InvalidRequestException
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function findUsers(Request $request)
     {
