@@ -14,10 +14,8 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.SettingsManager;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On handset devices, settings are presented
@@ -35,10 +33,6 @@ public class SettingsActivity extends PreferenceActivity {
      * tablets.
      */
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
-
-    // TODO
-    // The following constants match the ones in strings_activity_settings.xml
-    private final static String NOTIFICATIONS_ENABLED = "notifications_enabled";
 
     protected static final String TAG = SettingsActivity.class.getSimpleName();
 
@@ -166,22 +160,6 @@ public class SettingsActivity extends PreferenceActivity {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
-            }
-
-            String key = preference.getKey().toString();
-            Log.d(TAG, "onPreferenceChangeListener, key : " + key);
-
-            // The value associated to the checkbox. Equal to false and unused if preference wasn't a checkbox
-            // boolean booleanValue = preference.getSharedPreferences().getBoolean(key, false);
-            boolean booleanValue = true;
-            switch (key) {
-                case NOTIFICATIONS_ENABLED:
-                    SettingsManager.getInstance().setNotificationsEnabled(booleanValue);
-                    break;
-                // TODO
-                default:
-                    break;
-
             }
             return true;
         }
