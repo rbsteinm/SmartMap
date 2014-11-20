@@ -24,21 +24,22 @@ class DataController
     {
         $this->mRepo = $repo;
     }
-    
+
     /**
      * Updates the user's position.
-     * 
+     *
      * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
      * @throws InvalidRequestException
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function updatePos(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $longitude = $this->getPostParam($request, 'longitude');
+        $longitude = RequestUtils::getPostParam($request, 'longitude');
         
-        $latitude = $this->getPostParam($request, 'latitude');
+        $latitude = RequestUtils::getPostParam($request, 'latitude');
         
         try
         {
@@ -80,7 +81,7 @@ class DataController
      */
     public function listFriendsPos(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
         try
         {
@@ -123,7 +124,7 @@ class DataController
      */
     public function getFriendsIds(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
         try
         {
@@ -148,7 +149,7 @@ class DataController
      */
     public function getUserInfo(Request $request)
     {
-        $id = $this->getPostParam($request, 'user_id');
+        $id = RequestUtils::getPostParam($request, 'user_id');
         
         try
         {
@@ -178,9 +179,9 @@ class DataController
      */
     public function inviteFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         if ($userId == $friendId)
         {
@@ -229,7 +230,7 @@ class DataController
      */
     public function getInvitations(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
         try
         {
@@ -289,9 +290,9 @@ class DataController
      */
     public function acceptInvitation(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -339,9 +340,9 @@ class DataController
      */
     public function declineInvitation(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -367,9 +368,9 @@ class DataController
      */
     public function ackAcceptedInvitation(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -394,9 +395,9 @@ class DataController
      */
     public function removeFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -425,9 +426,9 @@ class DataController
      */
     public function ackRemovedFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
 
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
 
         try
         {
@@ -455,9 +456,9 @@ class DataController
     public function findUsers(Request $request)
     {
         // We check that we are authenticated.
-        $id = User::getIdFromRequest($request);
+        $id = RequestUtils::getIdFromRequest($request);
         
-        $partialName = $this->getPostParam($request, 'search_text');
+        $partialName = RequestUtils::getPostParam($request, 'search_text');
         
         try
         {

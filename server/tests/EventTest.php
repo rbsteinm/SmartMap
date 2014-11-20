@@ -342,4 +342,47 @@ class EventTest extends PHPUnit_Framework_TestCase
             'SmartMap is an app that shows you your friends and events on a map.'
         );
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Event ending date must be after starting date !
+     */
+    public function testSetInvalidStartingDate()
+    {
+        $e = new Event(
+            1,
+            12345,
+            '2014-11-18 08:15:00',
+            '2014-11-18 08:40:00',
+            6.56186974,
+            46.51895762,
+            'EPFL',
+            'Presentation of SmartMap app.',
+            'SmartMap is an app that shows you your friends and events on a map.'
+        );
+
+        $e->setStartingDate('2014-11-19 00:00:00');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Event ending date must be after starting date !
+     */
+    public function testSetInvalidEndingDate()
+    {
+        $e = new Event(
+            1,
+            12345,
+            '2014-11-18 08:15:00',
+            '2014-11-18 08:40:00',
+            6.56186974,
+            46.51895762,
+            'EPFL',
+            'Presentation of SmartMap app.',
+            'SmartMap is an app that shows you your friends and events on a map.'
+        );
+
+        $e->setEndingDate('2014-11-12 00:00:00');
+    }
+
 }

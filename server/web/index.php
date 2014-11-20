@@ -37,6 +37,10 @@ $app['user.repository'] = $app->share(function() use($app) {
     return new SmartMap\DBInterface\UserRepository($app['db']);
 });
 
+$app['event.repository'] = $app->share(function() use($app) {
+    return new SmartMap\DBInterface\EventRepository($app['db']);
+});
+
 // Injecting logging service
 $app['logging'] = $app->share(function() use($app, $options) {
     $logger = new Logger('logging');
@@ -63,6 +67,10 @@ $app['data.controller'] = $app->share(function() use($app) {
 
 $app['profile.controller'] = $app->share(function() use($app) {
     return new SmartMap\Control\ProfileController();
+});
+
+$app['event.controller'] = $app->share(function() use($app) {
+    return new SmartMap\Control\EventController($app['event.repository']);
 });
 
 // Error management
@@ -139,6 +147,12 @@ $app->post('/updatePos', 'data.controller:updatePos');
 $app->post('/findUsers', 'data.controller:findUsers');
 
 $app->post('/getFriendsIds', 'data.controller:getFriendsIds');
+
+$app->post('/createEvent', 'event.controller:createEvent');
+
+$app->post('/updateEvent', 'event.controller:updateEvent');
+
+$app->post('/getPublicEvents', 'event.controller:getPublicEvents');
 
 if ($app['debug'] == true)
 {

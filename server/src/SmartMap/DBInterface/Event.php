@@ -117,6 +117,11 @@ class Event
     public function setStartingDate($date)
     {
         $this->mStartingDate = $this->checkDate($date);
+
+        if (strtotime($this->mStartingDate) > strtotime($this->mEndingDate))
+        {
+            throw new \InvalidArgumentException('Event ending date must be after starting date !');
+        }
         
         return $this;
     }
@@ -138,6 +143,11 @@ class Event
     public function setEndingDate($date)
     {
         $this->mEndingDate = $this->checkDate($date);
+
+        if (strtotime($this->mStartingDate) > strtotime($this->mEndingDate))
+        {
+            throw new \InvalidArgumentException('Event ending date must be after starting date !');
+        }
     
         return $this;
     }
@@ -227,7 +237,7 @@ class Event
      */
     public function setName($name)
     {
-        $this->checkPositionName($name);
+        $this->checkName($name);
     
         $this->mName = $name;
     

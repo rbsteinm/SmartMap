@@ -61,7 +61,7 @@ class UserRepository
         }
         else
         {
-            return $userData['idusers'];
+            return (int) $userData['idusers'];
         }
     }
     
@@ -95,12 +95,12 @@ class UserRepository
         try
         {
             $user = new User(
-                $userData['idusers'],
-                $userData['fbid'],
+                (int) $userData['idusers'],
+                (int) $userData['fbid'],
                 $userData['name'],
                 $userData['visibility'],
-                $userData['longitude'],
-                $userData['latitude'],
+                (double) $userData['longitude'],
+                (double) $userData['latitude'],
                 $userData['last_update']
             );
         }
@@ -456,13 +456,14 @@ class UserRepository
     }
     
     // Invitations management
-    
+
     /**
-     * Gets a list of the ids of users who sent a friend invitation to 
+     * Gets a list of the ids of users who sent a friend invitation to
      * the user with id $userId.
-     * 
-     * @param long $userId
-     * @return an array of user ids who sent an invitation to the user $userId
+     *
+     * @param $userId
+     * @return array
+     * @throws DatabaseException
      */
     public function getInvitationIds($userId)
     {
@@ -481,7 +482,7 @@ class UserRepository
         
         while ($id = $stmt->fetch())
         {
-            $ids[] = $id['id1'];
+            $ids[] = (int) $id['id1'];
         }
         
         return $ids;
@@ -699,12 +700,12 @@ class UserRepository
             try
             {
                 $users[] = new User(
-                    $userData['idusers'], 
-                    $userData['fbid'],
+                    (int) $userData['idusers'],
+                    (int) $userData['fbid'],
                     $userData['name'],
                     $userData['visibility'],
-                    $userData['longitude'],
-                    $userData['latitude'],
+                    (double) $userData['longitude'],
+                    (double) $userData['latitude'],
                     $userData['last_update']
                 );
             }

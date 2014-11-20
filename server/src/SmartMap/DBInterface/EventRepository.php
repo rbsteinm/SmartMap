@@ -118,12 +118,12 @@ class EventRepository
         try
         {
             $event = new Event(
-                $eventData['id'],
-                $eventData['creator_id'],
+                (int) $eventData['id'],
+                (int) $eventData['creator_id'],
                 $eventData['starting_date'],
                 $eventData['ending_date'],
-                $eventData['longitude'],
-                $eventData['latitude'],
+                (double) $eventData['longitude'],
+                (double) $eventData['latitude'],
                 $eventData['position_name'],
                 $eventData['name'],
                 $eventData['description']
@@ -167,42 +167,43 @@ class EventRepository
 
         while ($eventData = $stmt->fetch())
         {
-            $lat2 = deg2rad($eventData['latitude']);
-            $long2 = deg2rad($eventData['longitude']);
+            // We keep only events that are not finished yet.
+            //if (strtotime($eventData['ending_date']) > time())
+            //{
+                $lat2 = deg2rad($eventData['latitude']);
+                $long2 = deg2rad($eventData['longitude']);
 
-            $dlat = $lat1 - $lat2;
-            $dlon = $long1 - $long2;
+                $dlat = $lat1 - $lat2;
+                $dlon = $long1 - $long2;
 
-            $a = sin($dlat/2) * sin($dlat/2) + cos($lat1) * cos($lat2) * sin($dlon/2) * sin($dlon/2);
+                $a = sin($dlat / 2) * sin($dlat / 2) + cos($lat1) * cos($lat2) * sin($dlon / 2) * sin($dlon / 2);
 
-            $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
-            $d = self::$EARTH_RADIUS * $c;
+                $d = self::$EARTH_RADIUS * $c;
 
-            if ($d <= $radius)
-            {
-                try {
-                    $event = new Event(
-                        $eventData['id'],
-                        $eventData['creator_id'],
-                        $eventData['starting_date'],
-                        $eventData['ending_date'],
-                        $eventData['longitude'],
-                        $eventData['latitude'],
-                        $eventData['position_name'],
-                        $eventData['name'],
-                        $eventData['description']
-                    );
+                if ($d <= $radius) {
+                    try {
+                        $event = new Event(
+                            (int) $eventData['id'],
+                            (int) $eventData['creator_id'],
+                            $eventData['starting_date'],
+                            $eventData['ending_date'],
+                            (double) $eventData['longitude'],
+                            (double) $eventData['latitude'],
+                            $eventData['position_name'],
+                            $eventData['name'],
+                            $eventData['description']
+                        );
+                    } catch (\InvalidArgumentException $e) {
+                        throw new DatabaseException('Event with invalid state in database with id '
+                            . $eventData['id'] . '.');
+                    }
+
+                    $events[] = $event;
                 }
-                catch (\InvalidArgumentException $e)
-                {
-                    throw new DatabaseException('Event with invalid state in database with id '
-                        . $eventData['id'] . '.');
-                }
-
-                $events[] = $event;
             }
-        }
+        //}
 
         return $events;
     }
