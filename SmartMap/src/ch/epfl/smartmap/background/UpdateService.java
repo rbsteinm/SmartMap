@@ -198,9 +198,8 @@ public class UpdateService extends Service {
 
     private boolean mReady = false;
 
-    private final DatabaseHelper mHelper = DatabaseHelper.getInstance();
-
-    private final SettingsManager mManager = SettingsManager.getInstance();
+    private DatabaseHelper mHelper;
+    private SettingsManager mManager;
 
     private final NetworkSmartMapClient mClient = NetworkSmartMapClient
         .getInstance();
@@ -209,7 +208,7 @@ public class UpdateService extends Service {
     private final Set<Long> notifiedInvitations = new HashSet<Long>();
     // TWEAK !!!
 
-    private final Runnable sendFriendsPosUpdate = new Runnable() {
+    private final Runnable friendsPosUpdate = new Runnable() {
         @Override
         public void run() {
             if (mFriendsPosEnabled) {
@@ -247,6 +246,8 @@ public class UpdateService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mManager = SettingsManager.initialize(this.getApplicationContext());
+        mHelper = DatabaseHelper.initialize(this.getApplicationContext());
         mFriendsPosIntent = new Intent(BROADCAST_POS);
         mLocManager = (LocationManager) this
             .getSystemService(Context.LOCATION_SERVICE);
@@ -256,18 +257,15 @@ public class UpdateService extends Service {
     }
 
     @Override
-    public void onStart(Intent intent, int startId) {
-        mHandler.removeCallbacks(sendFriendsPosUpdate);
-        mHandler.postDelayed(sendFriendsPosUpdate, HANDLER_DELAY);
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        mHandler.removeCallbacks(friendsPosUpdate);
+        mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
         mHandler.removeCallbacks(showFriendNotif);
         mHandler.postDelayed(showFriendNotif, HANDLER_DELAY);
         mHandler.removeCallbacks(getReplies);
         mHandler.postDelayed(getReplies, HANDLER_DELAY);
         Log.d("UpdateService", "Service started");
-    }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
     }
 
@@ -280,7 +278,7 @@ public class UpdateService extends Service {
     public void setFriendsPosUpdateEnabled(boolean isEnabled) {
         mFriendsPosEnabled = isEnabled;
         if (isEnabled) {
-            mHandler.postDelayed(sendFriendsPosUpdate, HANDLER_DELAY);
+            mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
         }
     }
 
