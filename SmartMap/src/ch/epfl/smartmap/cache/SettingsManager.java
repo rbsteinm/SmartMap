@@ -43,6 +43,7 @@ public class SettingsManager {
     private final static String KEY_EVENT_INVITATIONS = "notifications_event_invitations";
     private final static String KEY_EVENT_PROXIMITY = "notifications_event_proximity";
     private final static String KEY_VIBRATE = "notifications_vibrate";
+    private static final String KEY_ALWAYS_SHARE = "general_always_share";
 
     /**
      * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
@@ -144,6 +145,17 @@ public class SettingsManager {
     public boolean notificationsVibrate() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
                 KEY_VIBRATE, true) : false;
+    }
+
+    /**
+     * 
+     * @return <code>true</code> if the user agreed to share his position even when the app is closed,
+     *         <code>false</code> otherwise.
+     * 
+     * @author SpicyCH
+     */
+    public boolean alwaysShare() {
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_ALWAYS_SHARE, true);
     }
 
     /**

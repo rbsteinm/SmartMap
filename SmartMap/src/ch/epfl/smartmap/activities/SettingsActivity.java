@@ -78,6 +78,7 @@ public class SettingsActivity extends PreferenceActivity {
      * Shows the simplified settings UI if the device configuration if the device configuration dictates that a
      * simplified, single-pane UI should be shown.
      */
+    @SuppressWarnings("deprecation")
     private void setupSimplePreferencesScreen() {
         if (!isSimplePreferences(this)) {
             return;
@@ -86,7 +87,7 @@ public class SettingsActivity extends PreferenceActivity {
         // In the simplified UI, fragments are not used at all and we instead
         // use the older PreferenceActivity APIs.
 
-        // Add 'general' preferences.
+        // Add 'general' preferences
         this.addPreferencesFromResource(R.xml.pref_general);
 
         // Add 'notifications' preferences, and a corresponding header.
@@ -97,16 +98,16 @@ public class SettingsActivity extends PreferenceActivity {
 
         // Add 'data and sync' preferences, and a corresponding header.
         fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_data_sync);
+        fakeHeader.setTitle(R.string.pref_header_events);
         this.getPreferenceScreen().addPreference(fakeHeader);
-        this.addPreferencesFromResource(R.xml.pref_data_sync);
+        this.addPreferencesFromResource(R.xml.pref_events);
 
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
         // their values. When their values change, their summaries are updated
         // to reflect the new value, per the Android Design guidelines.
         bindPreferenceSummaryToValue(this.findPreference("example_text"));
         bindPreferenceSummaryToValue(this.findPreference("example_list"));
-        bindPreferenceSummaryToValue(this.findPreference("sync_frequency"));
+        bindPreferenceSummaryToValue(this.findPreference("refresh_frequency"));
         // crash bindPreferenceSummaryToValue(this.findPreference("notifications_enabled"));
     }
 
@@ -202,6 +203,7 @@ public class SettingsActivity extends PreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(this.findPreference("example_text"));
             bindPreferenceSummaryToValue(this.findPreference("example_list"));
+            bindPreferenceSummaryToValue(this.findPreference("refresh_frequency"));
         }
     }
 
@@ -229,17 +231,16 @@ public class SettingsActivity extends PreferenceActivity {
      * UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class DataSyncPreferenceFragment extends PreferenceFragment {
+    public static class EventsPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            this.addPreferencesFromResource(R.xml.pref_data_sync);
+            this.addPreferencesFromResource(R.xml.pref_events);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // Bind the summaries of EditText/List/Dialog preferences
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(this.findPreference("sync_frequency"));
         }
     }
 }
