@@ -42,7 +42,7 @@ public class SettingsManager {
     private final static String KEY_FRIENDSHIP_CONFIRMATIONS = "notifications_friendship_confirmations";
     private final static String KEY_EVENT_INVITATIONS = "notifications_event_invitations";
     private final static String KEY_EVENT_PROXIMITY = "notifications_event_proximity";
-    private final static String KEY_VIBRATE = "notifications_new_message_vibrate";
+    private final static String KEY_VIBRATE = "notifications_vibrate";
 
     /**
      * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
