@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
  * Used to get and set settings and local info using SharedPreferences
  * 
  * @author ritterni
- * @author SpicyCH (add support for the user settings, sprint 5)
  */
 public class SettingsManager {
     public static final String PREFS_NAME = "settings";
@@ -78,7 +77,6 @@ public class SettingsManager {
     }
 
     /**
-     * 
      * @return <code>true</code> if the user enabled the notifications, <code>false</code> otherwise.
      * 
      * @author SpicyCH

@@ -14,19 +14,19 @@ import java.net.URL;
  */
 public class DefaultNetworkProvider implements NetworkProvider {
 
-	/**
-	 * The default constructor.
-	 */
-	public DefaultNetworkProvider() {
-	}
+    /**
+     * The default constructor.
+     */
+    public DefaultNetworkProvider() {
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see ch.epfl.sweng.quizapp.NetworkProvider#getConnection(java.net.URL)
-	 */
-	@Override
-	public HttpURLConnection getConnection(URL url) throws IOException {
-		return (HttpURLConnection) url.openConnection();
-	}
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.sweng.quizapp.NetworkProvider#getConnection(java.net.URL)
+     */
+    @Override
+    public HttpURLConnection getConnection(URL url) throws IOException {
+        return (HttpURLConnection) url.openConnection();
+    }
 
 }
