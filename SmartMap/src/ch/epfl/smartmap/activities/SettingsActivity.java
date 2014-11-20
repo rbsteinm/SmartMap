@@ -105,9 +105,8 @@ public class SettingsActivity extends PreferenceActivity {
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
         // their values. When their values change, their summaries are updated
         // to reflect the new value, per the Android Design guidelines.
-        bindPreferenceSummaryToValue(this.findPreference("example_text"));
-        bindPreferenceSummaryToValue(this.findPreference("example_list"));
         bindPreferenceSummaryToValue(this.findPreference("refresh_frequency"));
+        bindPreferenceSummaryToValue(this.findPreference("last_seen_max"));
         // crash bindPreferenceSummaryToValue(this.findPreference("notifications_enabled"));
     }
 
@@ -201,9 +200,8 @@ public class SettingsActivity extends PreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(this.findPreference("example_text"));
-            bindPreferenceSummaryToValue(this.findPreference("example_list"));
             bindPreferenceSummaryToValue(this.findPreference("refresh_frequency"));
+            bindPreferenceSummaryToValue(this.findPreference("last_seen_max"));
         }
     }
 

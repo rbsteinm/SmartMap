@@ -9,6 +9,8 @@ import android.preference.PreferenceManager;
  * Used to get and set settings and local info using SharedPreferences
  * 
  * @author ritterni
+ * @author SpicyCH (add support for the user settings - we might want to change the design if my methods are
+ *         bottlenecks)
  */
 public class SettingsManager {
     public static final String PREFS_NAME = "settings";
