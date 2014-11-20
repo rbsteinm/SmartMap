@@ -1,13 +1,16 @@
 package ch.epfl.smartmap.background;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -158,6 +161,19 @@ public class UpdateService extends Service {
             if (mOwnPosEnabled) {
                 new AsyncOwnPos().execute();
             }
+            // Sets the location name
+            try {
+                String locName = mGeocoder
+                    .getFromLocation(locFromGps.getLatitude(),
+                        locFromGps.getLongitude(), 1).get(0).getLocality();
+                if (locName == null) {
+                    mManager.setLocationName(SettingsManager.DEFAULT_LOC_NAME);
+                } else {
+                    mManager.setLocationName(locName);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -200,6 +216,7 @@ public class UpdateService extends Service {
 
     private DatabaseHelper mHelper;
     private SettingsManager mManager;
+    private Geocoder mGeocoder;
 
     private final NetworkSmartMapClient mClient = NetworkSmartMapClient
         .getInstance();
@@ -248,6 +265,7 @@ public class UpdateService extends Service {
         super.onCreate();
         mManager = SettingsManager.initialize(this.getApplicationContext());
         mHelper = DatabaseHelper.initialize(this.getApplicationContext());
+        mGeocoder = new Geocoder(getBaseContext(), Locale.US);
         mFriendsPosIntent = new Intent(BROADCAST_POS);
         mLocManager = (LocationManager) this
             .getSystemService(Context.LOCATION_SERVICE);

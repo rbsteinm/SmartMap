@@ -21,6 +21,7 @@ public class SettingsManager {
     public static final String HIDDEN = "Hidden";
     public static final String LONGITUDE = "Longitude";
     public static final String LATITUDE = "Latitude";
+    public static final String LOCATION_NAME = "LocName";
 
     public static final long DEFAULT_ID = -1;
     public static final String DEFAULT_NAME = "No name";
@@ -29,6 +30,7 @@ public class SettingsManager {
     public static final String DEFAULT_TOKEN = "No token";
     public static final long DEFAULT_FB_ID = -1;
     public static final String DEFAULT_COOKIE = "No cookie";
+    public static final String DEFAULT_LOC_NAME = "Unknown location";
 
     private final Context mContext;
     private final SharedPreferences mSharedPref;
@@ -135,6 +137,13 @@ public class SettingsManager {
         loc.setLatitude(Double.longBitsToDouble(mSharedPref
             .getLong(LATITUDE, 0)));
         return loc;
+    }
+
+    /**
+     * @return The location name (e.g. city)
+     */
+    public String getLocationName() {
+        return mSharedPref.getString(LOCATION_NAME, DEFAULT_LOC_NAME);
     }
 
     /**
@@ -252,6 +261,11 @@ public class SettingsManager {
             Double.doubleToRawLongBits(loc.getLongitude()));
         mEditor
             .putLong(LATITUDE, Double.doubleToRawLongBits(loc.getLatitude()));
+        return mEditor.commit();
+    }
+
+    public boolean setLocationName(String locName) {
+        mEditor.putString(LOCATION_NAME, locName);
         return mEditor.commit();
     }
 
