@@ -25,7 +25,7 @@ public class SideMenu extends DrawerLayout {
 	 */
 	public SideMenu(Context context) {
 		super(context);
-		mListItemsNames = getResources().getStringArray(
+		mListItemsNames = this.getResources().getStringArray(
 		    R.array.sideMenuElements);
 		mDrawerListView = (ListView) ((Activity) context)
 		    .findViewById(R.id.left_drawer_listView);

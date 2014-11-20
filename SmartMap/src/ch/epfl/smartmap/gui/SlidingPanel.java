@@ -36,9 +36,7 @@ public class SlidingPanel extends FrameLayout {
 	 * @author jfperren
 	 */
 	private enum VisualState {
-		CLOSED,
-		OPEN,
-		ANIM_PERFORMED;
+		CLOSED, OPEN, ANIM_PERFORMED;
 		private int height;
 	}
 

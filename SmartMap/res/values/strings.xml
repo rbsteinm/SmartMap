@@ -2,18 +2,16 @@
 <resources>
 
     <string name="app_name">SmartMap</string>
-    <string name="hello_world"></string>
     <string name="action_settings">Settings</string>
     <string name="action_showfriends">Show friends</string>
     <string name="app_id">305881779616905</string>
     <string name="title_activity_logged_in">LoggedInActivity</string>
     <string name="greet_user">Log In successful!</string>
-    <string name="logo_description">Logo</string>
-    <string name="welcome">W E L C O M E</string>
-    <string name="loading_text">Logging In...</string>
     <string name="search_text">Search</string>
     <string name="add_friend">Add a friend</string>
-
+    
+    
+	<!-- Side menu Strings -->
     <string-array name="sideMenuElements">
         <item>Profile</item>
         <item>Friends</item>
@@ -22,10 +20,10 @@
         <item>Settings</item>
     </string-array>
 
-    <string name="title_activity_friends">FriendsActivity</string>
+    
+    <string name="title_activity_friends">Friends</string>
     <string name="search_bar_hint">Search...</string>
     <string name="title_activity_map_fragment">MapFragment</string>
-    <string name="title_activity_pager">PagerActivity</string>
 
     <!-- User interface labels and strings -->
 
@@ -72,14 +70,19 @@
     <string name="unknown">--Unknown--</string>
     <string name="unknown_activity_request_code">        Received an unknown activity request code %1$d in onActivityResult.</string>
     <string name="title_activity_add_friend">Add a friend</string>
-
+	
+    <!-- StartActivity -->
+    <string name="welcome">W E L C O M E</string>
+    <string name="loading_text">Logging In...</string>
+    <string name="logo_description">logo</string>
+    
     <!-- ShowEventsActivity -->
     <string name="title_activity_show_events">Events</string>
     <string name="ShowEventsCheckBoxMyEv">My events</string>
     <string name="ShowEventsCheckBoxNearMe">Near me</string>
     <string name="ShowEventsCheckBoxStatus">Ongoing</string>
     <string name="showEventsMenuNewEvent">Create a new event</string>
-    
+
     <!-- AddEventActivity -->
     <string name="title_activity_add_event">Create a new event</string>
     <string name="addEventEventName">Event name</string>
@@ -93,5 +96,16 @@
     <string name="addEventPlaceName">Place (town, canton, etc...)</string>
     <string name="addEventDescription">Description (optional)</string>
     <string name="addEventButtonPickLocation">Set location</string>
+    
+    <!-- Notification texts -->
+    <string name="notification_acceptedfriend_title">Friend invitation accepted</string>
+    <string name="notification_acceptedevent_title">Event invitation accepted</string>
+    <string name="notification_invitefriend_title">SmartMap Friend invitation</string>
+    <string name="notification_inviteevent_title">SmartMap Event Invitation</string>
+    <string name="notification_event_invitation">invite you to </string>
+    <string name="notification_friend_invitation">wants to be your friend</string>
+    <string name="notification_invitation_accepted"> accepted your invitation</string>
+    <string name="notification_open_friend_list">Click here to open your list of friends.</string>
+    <string name="notification_open_event_list">Click here to open your list of events.</string>
 
 </resources>

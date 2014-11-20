@@ -17,6 +17,7 @@
             android:showAsAction="always"
             android:title="My Position"/>
     </group>
+    
     <group 
         android:id="@+id/search_menu_group"
         android:visible="false" >

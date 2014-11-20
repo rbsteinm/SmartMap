@@ -65,6 +65,7 @@ import com.google.android.gms.maps.model.Marker;
  * 
  * @author jfperren
  * @author SpicyCH
+ * @author agpmilli
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
 
@@ -86,12 +87,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	 * @author jfperren
 	 */
 	private enum MenuTheme {
-		MAP,
-		SEARCH,
-		ITEM;
+		MAP, SEARCH, ITEM;
 	}
 
 	private DrawerLayout mDrawerLayout;
+	private ActionBar mActionBar;
 	private ListView mDrawerList;
 	private DatabaseHelper mDbHelper;
 	private SideMenu mSideMenu;
@@ -111,13 +111,25 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.activity_main);
 
-		// Set actionbar color
-		this.getActionBar().setBackgroundDrawable(
-		    new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-		this.getActionBar().setHomeButtonEnabled(true);
-		this.getActionBar().setDisplayHomeAsUpEnabled(true);
-		this.getActionBar().setHomeAsUpIndicator(
-		    this.getResources().getDrawable(R.drawable.ic_drawer));
+		// TODO ENLEVER
+		DatabaseHelper.initialize(this.getApplicationContext());
+		SettingsManager.initialize(this.getApplicationContext());
+
+		mActionBar = this.getActionBar();
+		// Set action bar color to main color
+		mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources()
+		    .getColor(R.color.main_blue)));
+
+		// Makes the logo clickable (clicking it opens side menu)
+		mActionBar.setHomeButtonEnabled(true);
+		mActionBar.setDisplayHomeAsUpEnabled(true);
+		mActionBar.setHomeAsUpIndicator(this.getResources().getDrawable(
+		    R.drawable.ic_drawer));
+
+		// TODO agpmilli, essayer de pas faire lagger le bouton
+		// mActionBar.setIcon(this.getResources().getDrawable(
+		// R.drawable.ic_launcher1));
+
 		mMenuTheme = MenuTheme.MAP;
 
 		// Get needed Views
@@ -128,7 +140,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
 		mSideMenu = new SideMenu(this.getContext());
 		mSideMenu.initializeDrawerLayout();
-		// TODO agpmilli : When click on actionbar icon button, open side menu
 
 		mDbHelper = DatabaseHelper.getInstance();
 

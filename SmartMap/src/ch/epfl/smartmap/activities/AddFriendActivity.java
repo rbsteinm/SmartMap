@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -37,6 +38,9 @@ public class AddFriendActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.activity_add_friend);
+		// Set action bar color to main color
+		this.getActionBar().setBackgroundDrawable(
+		    new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
 	}
 
 	@Override

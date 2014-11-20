@@ -245,7 +245,7 @@ public class UpdateService extends Service {
 	}
 
 	private void showAcceptedNotif(User user) {
-		Notifications.acceptedNotification(this, user);
+		Notifications.acceptedFriendNotification(this, user);
 	}
 
 	private void showFriendNotif(User user) {

@@ -62,6 +62,6 @@ public class TimePickerFragment extends DialogFragment implements
 	public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 		mPickTimeEditText.setText(formatForClock(hourOfDay) + ":"
 		    + formatForClock(minute));
-		mPickTimeEditText.setTag(new int[]{hourOfDay, minute});
+		mPickTimeEditText.setTag(new int[] {hourOfDay, minute});
 	}
 }

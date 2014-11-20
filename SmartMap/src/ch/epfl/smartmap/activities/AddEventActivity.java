@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -276,6 +277,9 @@ public class AddEventActivity extends FragmentActivity {
 
 		// Makes the logo clickable (clicking it returns to previous activity)
 		this.getActionBar().setDisplayHomeAsUpEnabled(true);
+		// Set action bar color to main color
+		this.getActionBar().setBackgroundDrawable(
+		    new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
 
 		this.initializeGUIComponents();
 

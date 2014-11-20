@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 
@@ -46,20 +47,25 @@ public class SideMenuAdapter extends ArrayAdapter<String> {
 		convertView = inflater
 		    .inflate(R.layout.drawer_list_item, parent, false);
 
-		// Get item field
-		TextView sideMenuView = (TextView) convertView
-		    .findViewById(R.id.side_menu_view_item);
-		/*
-		 * if(sideMenuView == null){
-		 * Log.d("sideMenuView is null", "NULLVIEW");
-		 * }
-		 */
+		// Get text view field
+		TextView sideMenuTextView = (TextView) convertView
+		    .findViewById(R.id.side_menu_text_view);
+
+		// Get image view field
+		ImageView sideMenuImageView = (ImageView) convertView
+		    .findViewById(R.id.side_menu_img_view);
+
 		// Set item field + id
-		sideMenuView.setText(mListItems[position]);
+		sideMenuTextView.setText(mListItems[position]);
 		// set tag to each View
-		sideMenuView.setTag("side_menu_tag_" + position);
+		sideMenuTextView.setTag("side_menu_tag_" + position);
+
+		// TODO mettre le bon numéro sur le bon menu
+		if (sideMenuTextView.getText() == mListItems[1]) {
+			sideMenuImageView.setImageDrawable(this.getContext().getResources()
+			    .getDrawable(R.drawable.ic_number1));
+		}
 
 		return convertView;
 	}
-
 }

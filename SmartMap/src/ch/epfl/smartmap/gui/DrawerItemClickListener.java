@@ -27,11 +27,8 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
 			case INDEX_PROFILE:
 				break;
 			case INDEX_FRIENDS:
-
-				Intent displayActivityIntent = new Intent(view.getContext(),
-				    FriendsPagerActivity.class);
-				view.getContext().startActivity(displayActivityIntent);
-
+				view.getContext().startActivity(
+				    new Intent(view.getContext(), FriendsPagerActivity.class));
 				break;
 			case INDEX_EVENTS:
 				view.getContext().startActivity(

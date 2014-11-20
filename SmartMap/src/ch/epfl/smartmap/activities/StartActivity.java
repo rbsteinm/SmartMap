@@ -26,7 +26,7 @@ import ch.epfl.smartmap.gui.FacebookFragment;
 import com.facebook.Session;
 
 /**
- * @author Alain
+ * @author agpmilli
  * @author SpicyCH
  */
 public class StartActivity extends FragmentActivity {
