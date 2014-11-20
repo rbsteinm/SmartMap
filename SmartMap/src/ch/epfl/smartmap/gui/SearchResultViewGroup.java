@@ -51,7 +51,7 @@ public class SearchResultViewGroup extends LinearLayout {
 
         mMoreResultsButton = new MoreResultsButton(context, this);
 
-        displayMinimized();
+        this.displayMinimized();
     }
 
     public SearchResultViewGroup(Context context) {
@@ -80,7 +80,7 @@ public class SearchResultViewGroup extends LinearLayout {
             mState = State.EXPANDED;
             int newItemsNb = Math.min(ITEMS_PER_PAGE, mList.size() - mCurrentItemNb);
             this.removeViewAt(this.getChildCount() - 1);
-            for (int i = mCurrentItemNb; i < mCurrentItemNb + newItemsNb; i++) {
+            for (int i = mCurrentItemNb; i < (mCurrentItemNb + newItemsNb); i++) {
                 this.addView(SearchResultViewFactory.getSearchResultView(mContext, mList.get(i)));
                 this.addView(new Divider(mContext));
             }
@@ -98,7 +98,7 @@ public class SearchResultViewGroup extends LinearLayout {
     public void setResultList(List<Friend> newResultList) {
         mList.clear();
         mList.addAll(newResultList);
-        displayMinimized();
+        this.displayMinimized();
     }
 
     /**

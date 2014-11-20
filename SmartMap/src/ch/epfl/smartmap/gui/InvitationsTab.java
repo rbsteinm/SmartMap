@@ -69,7 +69,7 @@ public class InvitationsTab extends ListFragment {
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         String name = tv.getText().toString();
-        displayAcceptFriendDialog(name, userId);
+        this.displayAcceptFriendDialog(name, userId);
     }
 
     /*
@@ -92,7 +92,7 @@ public class InvitationsTab extends ListFragment {
      *            the user's id
      */
     private void displayAcceptFriendDialog(String name, final long userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
         builder.setMessage("Accept " + name + " to become your friend?");
 
         // Add positive button
@@ -138,7 +138,7 @@ public class InvitationsTab extends ListFragment {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            Toast.makeText(getActivity(), confirmString, Toast.LENGTH_LONG).show();
+            Toast.makeText(InvitationsTab.this.getActivity(), confirmString, Toast.LENGTH_LONG).show();
             new RefreshInvitationsList().execute();
         }
 
@@ -166,7 +166,7 @@ public class InvitationsTab extends ListFragment {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            Toast.makeText(getActivity(), confirmString, Toast.LENGTH_LONG).show();
+            Toast.makeText(InvitationsTab.this.getActivity(), confirmString, Toast.LENGTH_LONG).show();
             new RefreshInvitationsList().execute();
         }
 
@@ -195,7 +195,7 @@ public class InvitationsTab extends ListFragment {
         @Override
         protected void onPostExecute(List<List<User>> list) {
             super.onPostExecute(list);
-            setListAdapter(new FriendListItemAdapter(mContext, list.get(0)));
+            InvitationsTab.this.setListAdapter(new FriendListItemAdapter(mContext, list.get(0)));
             for (User newFriend : list.get(1)) {
                 mDataBaseHelper.addUser(newFriend);
                 new AckAcceptedInvitations().execute(newFriend.getID());

@@ -48,7 +48,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
-        return parseFriendFromJSON(jsonObject);
+        return this.parseFriendFromJSON(jsonObject);
     }
 
     /*
@@ -68,7 +68,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 
             for (int i = 0; i < usersArray.length(); i++) {
                 JSONObject userJSON = usersArray.getJSONObject(i);
-                User friend = parseFriendFromJSON(userJSON);
+                User friend = this.parseFriendFromJSON(userJSON);
                 friends.add(friend);
             }
         } catch (JSONException e) {
@@ -120,9 +120,9 @@ public class JsonSmartMapParser implements SmartMapParser {
                 double latitude = position.getDouble("latitude");
                 double longitude = position.getDouble("longitude");
 
-                checkId(userId);
-                checkLatitude(latitude);
-                checkLongitude(longitude);
+                this.checkId(userId);
+                this.checkLatitude(latitude);
+                this.checkLongitude(longitude);
 
                 Log.d(TAG, Long.toString(userId));
                 Log.d(TAG, Double.toString(latitude));
@@ -170,35 +170,35 @@ public class JsonSmartMapParser implements SmartMapParser {
             throw new SmartMapParseException(e);
         }
 
-        checkId(id);
-        checkName(name);
+        this.checkId(id);
+        this.checkName(name);
         Log.d(TAG, Long.toString(id));
         Log.d(TAG, name);
         Friend friend = new Friend(id, name);
 
         if (latitude != UINITIALIZED_LATITUDE) {
-            checkLatitude(latitude);
+            this.checkLatitude(latitude);
             Log.d(TAG, Double.toString(latitude));
             friend.setLatitude(latitude);
         }
         if (longitude != UNITIALIZED_LONGITUDE) {
-            checkLongitude(longitude);
+            this.checkLongitude(longitude);
             Log.d(TAG, Double.toString(longitude));
             friend.setLongitude(longitude);
         }
 
         if (phoneNumber != null) {
-            checkPhoneNumber(phoneNumber);
+            this.checkPhoneNumber(phoneNumber);
             Log.d(TAG, phoneNumber);
             friend.setNumber(phoneNumber);
         }
         if (email != null) {
-            checkEmail(email);
+            this.checkEmail(email);
             Log.d(TAG, email);
             friend.setEmail(email);
         }
         if (online != null) {
-            checkOnLine(online);
+            this.checkOnLine(online);
             // TODO see with Mathieu
         }
 
@@ -213,7 +213,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      *             if invalid latitude
      */
     private void checkLatitude(double latitude) throws SmartMapParseException {
-        if (!(MIN_LATITUDE <= latitude && latitude <= MAX_LATITUDE)) {
+        if (!((MIN_LATITUDE <= latitude) && (latitude <= MAX_LATITUDE))) {
             throw new SmartMapParseException("invalid latitude");
         }
     }
@@ -226,7 +226,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      *             if invalid longitude
      */
     private void checkLongitude(double longitude) throws SmartMapParseException {
-        if (!(MIN_LONGITUDE <= longitude && longitude <= MAX_LONGITUDE)) {
+        if (!((MIN_LONGITUDE <= longitude) && (longitude <= MAX_LONGITUDE))) {
             throw new SmartMapParseException("invalid longitude");
         }
     }
@@ -252,7 +252,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      *             if invalid name
      */
     private void checkName(String name) throws SmartMapParseException {
-        if (name.length() >= MAX_NAME_LENGTH || name.length() == 0) {
+        if ((name.length() >= MAX_NAME_LENGTH) || (name.length() == 0)) {
             throw new SmartMapParseException("invalid name");
         }
     }

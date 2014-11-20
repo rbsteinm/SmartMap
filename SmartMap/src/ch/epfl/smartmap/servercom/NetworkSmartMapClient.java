@@ -86,8 +86,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         params.put("name", name);
         params.put("facebookId", Long.toString(facebookId));
         params.put("facebookToken", fbAccessToken);
-        HttpURLConnection conn = getHttpURLConnection("/auth");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/auth");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -112,8 +112,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public Map<Long, Location> listFriendsPos() throws SmartMapClientException {
 
-        HttpURLConnection conn = getHttpURLConnection("/listFriendsPos");
-        String response = sendViaPost(new HashMap<String, String>(), conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/listFriendsPos");
+        String response = this.sendViaPost(new HashMap<String, String>(), conn);
         Map<Long, Location> positions = null;
 
         SmartMapParser parser = null;
@@ -148,8 +148,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
-        HttpURLConnection conn = getHttpURLConnection("/followFriend");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/followFriend");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -174,8 +174,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void unfollowFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
-        HttpURLConnection conn = getHttpURLConnection("/unfollowFriend");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/unfollowFriend");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -200,8 +200,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void allowFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
-        HttpURLConnection conn = getHttpURLConnection("/allowFriend");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/allowFriend");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -225,8 +225,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void disallowFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
-        HttpURLConnection conn = getHttpURLConnection("/disallowFriend");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/disallowFriend");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -252,9 +252,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void allowFriendList(List<Long> ids) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("friend_ids", longListToString(ids));
-        HttpURLConnection conn = getHttpURLConnection("/allowFriendList");
-        String response = sendViaPost(params, conn);
+        params.put("friend_ids", this.longListToString(ids));
+        HttpURLConnection conn = this.getHttpURLConnection("/allowFriendList");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -280,9 +280,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void disallowFriendList(List<Long> ids) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("friend_ids", longListToString(ids));
-        HttpURLConnection conn = getHttpURLConnection("/disallowFriendList");
-        String response = sendViaPost(params, conn);
+        params.put("friend_ids", this.longListToString(ids));
+        HttpURLConnection conn = this.getHttpURLConnection("/disallowFriendList");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -307,8 +307,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void inviteFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
-        HttpURLConnection conn = getHttpURLConnection("/inviteFriend");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/inviteFriend");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -332,8 +332,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public List<List<User>> getInvitations() throws SmartMapClientException {
 
-        HttpURLConnection conn = getHttpURLConnection("/getInvitations");
-        String response = sendViaPost(new HashMap<String, String>(), conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/getInvitations");
+        String response = this.sendViaPost(new HashMap<String, String>(), conn);
 
         SmartMapParser parser = null;
         try {
@@ -379,8 +379,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
-        HttpURLConnection conn = getHttpURLConnection("/acceptInvitation");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/acceptInvitation");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -414,8 +414,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("user_id", Long.toString(id));
-        HttpURLConnection conn = getHttpURLConnection("/getUserInfo");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/getUserInfo");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -453,8 +453,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         params.put("longitude", Double.toString(location.getLongitude()));
         params.put("latitude", Double.toString(location.getLatitude()));
 
-        HttpURLConnection conn = getHttpURLConnection("/updatePos");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/updatePos");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -475,8 +475,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public List<User> findUsers(String text) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("search_text", text);
-        HttpURLConnection conn = getHttpURLConnection("/findUsers");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/findUsers");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -505,8 +505,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void declineInvitation(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
-        HttpURLConnection conn = getHttpURLConnection("/declineInvitation");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/declineInvitation");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -527,8 +527,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void ackAcceptedInvitation(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
-        HttpURLConnection conn = getHttpURLConnection("/ackAcceptedInvitation");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/ackAcceptedInvitation");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {
@@ -549,8 +549,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void removeFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
-        HttpURLConnection conn = getHttpURLConnection("/removeFriend");
-        String response = sendViaPost(params, conn);
+        HttpURLConnection conn = this.getHttpURLConnection("/removeFriend");
+        String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
         try {

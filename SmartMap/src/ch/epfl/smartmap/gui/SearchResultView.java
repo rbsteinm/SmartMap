@@ -56,19 +56,19 @@ public abstract class SearchResultView extends LinearLayout {
         // ImageView Parameters
         mImageView = new ImageView(context);
         mImageView.setAdjustViewBounds(true);
-        mImageView.setImageResource(getImageResource());
+        mImageView.setImageResource(this.getImageResource());
         LayoutParams mPhotoViewLayoutParams = new LayoutParams(PHOTO_SIZE, PHOTO_SIZE);
         mPhotoViewLayoutParams.setMargins(0, 0, PHOTO_RIGHT_MARGIN, 0);
         mImageView.setLayoutParams(mPhotoViewLayoutParams);
         mImageView.setScaleType(ScaleType.FIT_XY);
 
-        this.setOnTouchListener(getOnTouchListener(this));
+        this.setOnTouchListener(this.getOnTouchListener(this));
     }
 
     public void initViews() {
-        mImageView.setImageResource(getImageResource());
+        mImageView.setImageResource(this.getImageResource());
         this.addView(mImageView);
-        this.addView(getInfosLayout());
+        this.addView(this.getInfosLayout());
         mChildrenState = ChildrenState.ADDED;
     }
 

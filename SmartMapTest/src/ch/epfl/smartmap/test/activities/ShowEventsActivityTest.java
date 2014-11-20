@@ -7,7 +7,6 @@ import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMat
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 
-
 import static org.hamcrest.Matchers.not;
 
 import java.util.GregorianCalendar;
@@ -29,14 +28,13 @@ import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertio
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
 /**
- * Test different features of ShowEventActivity. I might need to rethink the tests if the server interferes with them
+ * Test different features of ShowEventActivity. I might need to rethink the
+ * tests if the server interferes with them
  * later.
- *
+ * 
  * @author SpicyCH
- *
  */
-public class ShowEventsActivityTest extends
-        ActivityInstrumentationTestCase2<ShowEventsActivity> {
+public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<ShowEventsActivity> {
 
     private ListActivity mActivity;
 
@@ -57,8 +55,7 @@ public class ShowEventsActivityTest extends
         lutry.setLatitude(46.506038);
         lutry.setLongitude(6.685314);
 
-        UserEvent e0 = new UserEvent("Now Event", 2, "Robich", timeE0,
-                timeEndE0, lutry);
+        UserEvent e0 = new UserEvent("Now Event", 2, "Robich", timeE0, timeEndE0, lutry);
         e0.setID(0);
         e0.setPositionName("Lutry");
 
@@ -70,8 +67,7 @@ public class ShowEventsActivityTest extends
         lausanne.setLatitude(46.519962);
         lausanne.setLongitude(6.633597);
 
-        UserEvent e1 = new UserEvent("Swag party", 2, "Robich", timeE1,
-                timeEndE1, lausanne);
+        UserEvent e1 = new UserEvent("Swag party", 2, "Robich", timeE1, timeEndE1, lausanne);
         e1.setID(1);
         e1.setPositionName("Lausanne");
 
@@ -83,8 +79,7 @@ public class ShowEventsActivityTest extends
         epfl.setLatitude(46.526120);
         epfl.setLongitude(6.563778);
 
-        UserEvent e2 = new UserEvent("LOL Tournament", 1, "Alain", timeE2,
-                timeEndE2, epfl);
+        UserEvent e2 = new UserEvent("LOL Tournament", 1, "Alain", timeE2, timeEndE2, epfl);
         e2.setID(2);
         e2.setPositionName("EPFL");
 
@@ -96,16 +91,15 @@ public class ShowEventsActivityTest extends
         verbier.setLatitude(46.096076);
         verbier.setLongitude(7.228875);
 
-        UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Julien",
-                timeE3, timeEndE3, verbier);
+        UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Julien", timeE3, timeEndE3, verbier);
         e3.setID(3);
         e3.setPositionName("Verbier");
-        String descrE3 = "It’s a vertical free-verse poem on the mountain. It’s the ultimate expression of all that"
+        String descrE3 =
+            "It’s a vertical free-verse poem on the mountain. It’s the ultimate expression of all that"
                 + "is fun and liberating about sliding on snow in wintertime.";
         e3.setDescription(descrE3);
 
-        DatabaseHelper dbHelper = new DatabaseHelper(getActivity()
-                .getBaseContext());
+        DatabaseHelper dbHelper = new DatabaseHelper(getActivity().getBaseContext());
         dbHelper.clearAll();
         dbHelper.addEvent(e0);
         dbHelper.addEvent(e1);
@@ -121,81 +115,66 @@ public class ShowEventsActivityTest extends
 
     public void testSeekBarChangesKilometersShown() {
         onView(withId(R.id.showEventSeekBar)).perform(setProgress(10));
-        onView(withId(R.id.showEventKilometers)).check(
-                matches(ViewMatchers.withText("10 km")));
+        onView(withId(R.id.showEventKilometers)).check(matches(ViewMatchers.withText("10 km")));
         onView(withId(R.id.showEventSeekBar)).perform(setProgress(15));
-        onView(withId(R.id.showEventKilometers)).check(
-                matches(ViewMatchers.withText("15 km")));
+        onView(withId(R.id.showEventKilometers)).check(matches(ViewMatchers.withText("15 km")));
     }
 
     public void testSeekBarCannotGoToZero() {
         onView(withId(R.id.showEventSeekBar)).perform(setProgress(0));
-        onView(withId(R.id.showEventKilometers)).check(
-                matches(not(ViewMatchers.withText("0 km"))));
+        onView(withId(R.id.showEventKilometers)).check(matches(not(ViewMatchers.withText("0 km"))));
     }
 
     public void testSeekBarChangesListSize() {
         int initialSize = mActivity.getListView().getCount();
-        onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(
-                ViewActions.click());
+        onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(ViewActions.click());
         onView(withId(R.id.showEventSeekBar)).perform(setProgress(0));
         mActivity = getActivity();
         int finalSize = mActivity.getListView().getCount();
-        assertTrue("finalSize: " + finalSize
-                + " wasn't smaller than initialSize: " + initialSize,
-                finalSize < initialSize);
+        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
+            finalSize < initialSize);
 
         onView(withId(R.id.showEventSeekBar)).perform(setProgress(100));
         mActivity = getActivity();
         int newFinalSize = mActivity.getListView().getCount();
-        assertTrue("finalSize: " + finalSize
-                + " wasn't smaller than newFinalSize: " + initialSize,
-                finalSize < newFinalSize);
+        assertTrue("finalSize: " + finalSize + " wasn't smaller than newFinalSize: " + initialSize,
+            finalSize < newFinalSize);
     }
 
     public void testCheckingNearMeChangesListSize() {
         // FIXME this test fails sometimes for NO REASONS, wtf???
         int initialSize = mActivity.getListView().getCount();
-        onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(
-                ViewActions.click());
+        onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(ViewActions.click());
         mActivity = getActivity();
         int finalSize = mActivity.getListView().getCount();
-        assertTrue("finalSize: " + finalSize
-                + " wasn't smaller than initialSize: " + initialSize,
-                finalSize < initialSize);
+        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
+            finalSize < initialSize);
     }
 
     public void testCheckingOnGoingChangesListSize() {
         int initialSize = mActivity.getListView().getCount();
-        onView(withId(R.id.ShowEventscheckBoxStatus)).perform(
-                ViewActions.click());
+        onView(withId(R.id.ShowEventscheckBoxStatus)).perform(ViewActions.click());
         mActivity = getActivity();
         int finalSize = mActivity.getListView().getCount();
-        assertTrue("finalSize: " + finalSize
-                + " wasn't smaller than initialSize: " + initialSize,
-                finalSize < initialSize);
+        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
+            finalSize < initialSize);
     }
 
     public void testCheckingMyEventsChangesListSize() {
         int initialSize = mActivity.getListView().getCount();
-        onView(withId(R.id.ShowEventsCheckBoxMyEv))
-                .perform(ViewActions.click());
+        onView(withId(R.id.ShowEventsCheckBoxMyEv)).perform(ViewActions.click());
         mActivity = getActivity();
         int finalSize = mActivity.getListView().getCount();
-        assertTrue("finalSize: " + finalSize
-                + " wasn't smaller than initialSize: " + initialSize,
-                finalSize < initialSize);
+        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
+            finalSize < initialSize);
     }
 
     public void testCanOpenAddEventActivity() {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
-        onView(withText("Create a new event"))
-          .perform(ViewActions.click());
+        onView(withText("Create a new event")).perform(ViewActions.click());
 
-        onView(withId(R.id.addEventDescription)).check(
-                ViewAssertions.matches(ViewMatchers.isDisplayed()));
-
+        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
     }
 
