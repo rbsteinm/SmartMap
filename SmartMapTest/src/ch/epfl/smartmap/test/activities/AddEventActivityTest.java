@@ -5,13 +5,16 @@ import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMat
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.AddEventActivity;
-import ch.epfl.smartmap.activities.MainActivity;
 
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
-import static org.hamcrest.Matchers.not;
 
+/**
+ * Tests the correctness of AddEventActivity
+ * 
+ * @author SpicyCH
+ */
 public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
     public AddEventActivityTest() {
         super(AddEventActivity.class);
@@ -21,7 +24,7 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        getActivity();
+        this.getActivity();
     }
 
     public void testCannotCreateEventWithoutFields() {

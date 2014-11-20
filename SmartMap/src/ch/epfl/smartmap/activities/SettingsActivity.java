@@ -5,6 +5,7 @@ import java.util.List;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -50,6 +51,9 @@ public class SettingsActivity extends PreferenceActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             // Show the Up button in the action bar.
             this.getActionBar().setDisplayHomeAsUpEnabled(true);
+            // Set action bar color to main color
+            this.getActionBar().setBackgroundDrawable(
+                    new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         }
     }
 
