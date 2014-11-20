@@ -9,8 +9,8 @@ import java.util.Comparator;
  */
 public class UserComparator implements Comparator<User> {
 
-	@Override
-	public int compare(User a, User b) {
-		return a.getName().compareToIgnoreCase(b.getName());
-	}
+    @Override
+    public int compare(User a, User b) {
+        return a.getName().compareToIgnoreCase(b.getName());
+    }
 }

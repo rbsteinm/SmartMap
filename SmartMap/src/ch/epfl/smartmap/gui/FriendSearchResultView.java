@@ -19,121 +19,114 @@ import ch.epfl.smartmap.cache.Friend;
  */
 public class FriendSearchResultView extends SearchResultView {
 
-	private final static String TAG = "FriendSearchResultView";
-	@SuppressWarnings("unused")
-	private final static String AUDIT_TAG = "AuditError : " + TAG;
+    private final static String TAG = "FriendSearchResultView";
+    @SuppressWarnings("unused")
+    private final static String AUDIT_TAG = "AuditError : " + TAG;
 
-	private final static int NAME_VIEW_BOTTOM_PADDING = 5;
-	private final static float NAME_VIEW_TEXT_SIZE = 17f;
-	private static final int CLICK_DISTANCE_THRESHHOLD = 10;
+    private final static int NAME_VIEW_BOTTOM_PADDING = 5;
+    private final static float NAME_VIEW_TEXT_SIZE = 17f;
+    private static final int CLICK_DISTANCE_THRESHHOLD = 10;
 
-	private final Friend mFriend;
-	private final LinearLayout mInfoLayout;
-	private final int mImageResource;
+    private final Friend mFriend;
+    private final LinearLayout mInfoLayout;
+    private final int mImageResource;
 
-	/**
-	 * @param context
-	 * @param attrs
-	 */
-	public FriendSearchResultView(Context context, Friend friend) {
-		super(context);
+    /**
+     * @param context
+     * @param attrs
+     */
+    public FriendSearchResultView(Context context, Friend friend) {
+        super(context);
 
-		mFriend = friend;
-		mImageResource = R.drawable.ic_default_user;
+        mFriend = friend;
+        mImageResource = R.drawable.ic_default_user;
 
-		// Creates mNameView
-		TextView nameView = new TextView(context);
-		nameView.setText(mFriend.getName());
-		nameView.setTextSize(NAME_VIEW_TEXT_SIZE);
-		nameView.setTypeface(null, Typeface.BOLD);
-		nameView.setPadding(0, 0, 0, NAME_VIEW_BOTTOM_PADDING);
+        // Creates mNameView
+        TextView nameView = new TextView(context);
+        nameView.setText(mFriend.getName());
+        nameView.setTextSize(NAME_VIEW_TEXT_SIZE);
+        nameView.setTypeface(null, Typeface.BOLD);
+        nameView.setPadding(0, 0, 0, NAME_VIEW_BOTTOM_PADDING);
 
-		// Creates mLastConnectionView
-		TextView lastConnectionView = new TextView(context);
-		lastConnectionView.setText("last seen "
-		    + friend.getLastSeen().getTime().toString() + ".");
-		lastConnectionView.setTextColor(getResources().getColor(
-		    R.color.lastSeenConnectionTextColor));
+        // Creates mLastConnectionView
+        TextView lastConnectionView = new TextView(context);
+        lastConnectionView.setText("last seen " + friend.getLastSeen().getTime().toString() + ".");
+        lastConnectionView.setTextColor(getResources().getColor(R.color.lastSeenConnectionTextColor));
 
-		// Create mInfoLayout and add everything
-		mInfoLayout = new LinearLayout(context);
-		mInfoLayout.setOrientation(VERTICAL);
-		mInfoLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-		    LayoutParams.WRAP_CONTENT));
-		mInfoLayout.addView(nameView);
-		mInfoLayout.addView(lastConnectionView);
+        // Create mInfoLayout and add everything
+        mInfoLayout = new LinearLayout(context);
+        mInfoLayout.setOrientation(VERTICAL);
+        mInfoLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        mInfoLayout.addView(nameView);
+        mInfoLayout.addView(lastConnectionView);
 
-		// Add view on the parent class
-		this.initViews();
-	}
+        // Add view on the parent class
+        this.initViews();
+    }
 
-	@Override
-	public ViewGroup getInfosLayout() {
-		return mInfoLayout;
-	}
+    @Override
+    public ViewGroup getInfosLayout() {
+        return mInfoLayout;
+    }
 
-	@Override
-	public int getImageResource() {
-		return mImageResource;
-	}
+    @Override
+    public int getImageResource() {
+        return mImageResource;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see ch.epfl.smartmap.gui.SearchResultView#getOnClickListener()
-	 */
-	@Override
-	public OnTouchListener getOnTouchListener(final SearchResultView v) {
-		return new OnTouchListener() {
-			private float startX;
-			private float startY;
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.gui.SearchResultView#getOnClickListener()
+     */
+    @Override
+    public OnTouchListener getOnTouchListener(final SearchResultView v) {
+        return new OnTouchListener() {
+            private float startX;
+            private float startY;
 
-			@Override
-			public boolean onTouch(View v, MotionEvent ev) {
-				if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-					Log.d(TAG, "Action DOWN");
-					startX = ev.getAxisValue(MotionEvent.AXIS_X);
-					startY = ev.getAxisValue(MotionEvent.AXIS_Y);
-					v.setBackgroundColor(getResources().getColor(
-					    R.color.searchResultOnSelect));
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
+                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Action DOWN");
+                    startX = ev.getAxisValue(MotionEvent.AXIS_X);
+                    startY = ev.getAxisValue(MotionEvent.AXIS_Y);
+                    v.setBackgroundColor(getResources().getColor(R.color.searchResultOnSelect));
 
-				} else if (ev.getAction() == MotionEvent.ACTION_UP) {
-					Log.d(TAG, "Action UP");
-					float endX = ev.getAxisValue(MotionEvent.AXIS_X);
-					float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
+                } else if (ev.getAction() == MotionEvent.ACTION_UP) {
+                    Log.d(TAG, "Action UP");
+                    float endX = ev.getAxisValue(MotionEvent.AXIS_X);
+                    float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
 
-					if (Math.sqrt(Math.pow(endX - startX, 2)
-					    + Math.pow(endY - startY, 2)) < CLICK_DISTANCE_THRESHHOLD) {
-						((MainActivity) getContext()).performQuery(mFriend);
-					}
-					v.setBackgroundColor(getResources().getColor(
-					    R.color.searchResultBackground));
-				} else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
-					Log.d(TAG, "Action CANCEL");
-					v.setBackgroundColor(getResources().getColor(
-					    R.color.searchResultBackground));
-				}
-				return true;
-			}
-		};
-	}
+                    if (Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)) < CLICK_DISTANCE_THRESHHOLD) {
+                        ((MainActivity) getContext()).performQuery(mFriend);
+                    }
+                    v.setBackgroundColor(getResources().getColor(R.color.searchResultBackground));
+                } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
+                    Log.d(TAG, "Action CANCEL");
+                    v.setBackgroundColor(getResources().getColor(R.color.searchResultBackground));
+                }
+                return true;
+            }
+        };
+    }
 
-	/**
-	 * Checks that the Representation Invariant is not violated.
-	 * 
-	 * @param depth
-	 *            represents how deep the audit check is done (use 1 to check
-	 *            this object only)
-	 * @return The number of audit errors in this object
-	 */
-	public int auditErrors(int depth) {
-		// TODO : Decomment when auditErrors coded for other classes
-		if (depth == 0) {
-			return 0;
-		}
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        // TODO : Decomment when auditErrors coded for other classes
+        if (depth == 0) {
+            return 0;
+        }
 
-		int auditErrors = 0;
-		// auditErrors += mFriend.auditErrors(depth - 1);
+        int auditErrors = 0;
+        // auditErrors += mFriend.auditErrors(depth - 1);
 
-		return auditErrors;
-	}
+        return auditErrors;
+    }
 }

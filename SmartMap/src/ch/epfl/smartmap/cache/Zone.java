@@ -9,13 +9,13 @@ import android.location.Location;
  */
 public interface Zone {
 
-	/**
-	 * @return The zone's first corner
-	 */
-	Location getPointA();
+    /**
+     * @return The zone's first corner
+     */
+    Location getPointA();
 
-	/**
-	 * @return The zone's second corner
-	 */
-	Location getPointB();
+    /**
+     * @return The zone's second corner
+     */
+    Location getPointB();
 }
