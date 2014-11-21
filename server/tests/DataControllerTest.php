@@ -258,8 +258,8 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\InvalidRequestException
-     * @expectedExceptionMessage You cannot invite yourself !
+     * @expectedException SmartMap\Control\ServerFeedbackException
+     * @expectedExceptionMessage You cannot invite yourself.
      */
     public function testInvalidSelfInviteFriend()
     {
@@ -275,8 +275,8 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException SmartMap\Control\InvalidRequestException
-     * @expectedExceptionMessage You are already friends or invited.
+     * @expectedException SmartMap\Control\ServerFeedbackException
+     * @expectedExceptionMessage There is already a pending invitation or you are already friends.
      */
     public function testInvalidInviteFriend()
     {

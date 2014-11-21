@@ -175,12 +175,13 @@ class DataController
     }
 
     /**
-     * Sets an invitation for user with friend_id POST parameter.
+     * Sends an invitation to the user with id request parameter.
      *
      * @param Request $request
      * @return JsonResponse
      * @throws ControlLogicException
      * @throws InvalidRequestException
+     * @throws ServerFeedbackException
      */
     public function inviteFriend(Request $request)
     {
@@ -190,7 +191,7 @@ class DataController
         
         if ($userId == $friendId)
         {
-            throw new InvalidRequestException('You cannot invite yourself !');
+            throw new ServerFeedbackException('You cannot invite yourself.');
         }
         
         try
@@ -209,7 +210,8 @@ class DataController
             }
             else
             {
-                throw new InvalidRequestException('You are already friends or invited.');
+                throw new ServerFeedbackException('There is already a pending invitation ' .
+                    'or you are already friends.');
             }
             
         }
