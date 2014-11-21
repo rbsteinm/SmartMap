@@ -108,8 +108,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return The DatabaseHelper instance
      */
     public static DatabaseHelper initialize(Context context) {
-        mInstance = new DatabaseHelper(context);
-        mDatabase = mInstance.getWritableDatabase();
+        if (mInstance == null) {
+            mInstance = new DatabaseHelper(context);
+            mDatabase = mInstance.getWritableDatabase();
+        }
         return mInstance;
     }
 
@@ -228,6 +230,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
 
+        Log.d("LISTENER", "addUser Called !");
         this.notifyFriendListeners();
     }
 
@@ -694,19 +697,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void notifyFriendListeners() {
-        for (FriendsLocationListener listener : mLocationsListeners) {
+        for (FriendsListener listener : mFriendsListeners) {
             listener.onChange();
         }
     }
 
     public void notifyEventListeners() {
-        for (FriendsLocationListener listener : mLocationsListeners) {
+        for (EventsListener listener : mEventsListeners) {
             listener.onChange();
         }
     }
 
     public void notifyFilterListeners() {
-        for (FriendsLocationListener listener : mLocationsListeners) {
+        for (FiltersListener listener : mFiltersListeners) {
             listener.onChange();
         }
     }

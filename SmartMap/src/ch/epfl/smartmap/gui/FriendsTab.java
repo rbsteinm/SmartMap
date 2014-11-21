@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.FriendsListener;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -28,7 +30,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * 
  * @author rbsteinm
  */
-public class FriendsTab extends ListFragment {
+public class FriendsTab extends ListFragment implements FriendsListener{
     private List<User> mFriendList;
     private final Context mContext;
     private DatabaseHelper mCacheDB;
@@ -50,6 +52,9 @@ public class FriendsTab extends ListFragment {
         FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
         this.setListAdapter(adapter);
 
+        //Initialize the listener
+        mCacheDB.addFriendsListener(this);
+
         return view;
     }
 
@@ -61,6 +66,12 @@ public class FriendsTab extends ListFragment {
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         String name = tv.getText().toString();
         this.displayDeleteConfirmationDialog(name, userId);
+    }
+
+    @Override
+    public void onChange() {
+        this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+        Log.d("ONCHANGE IS CALLED", "ONCHANGE");
     }
 
     @Override
@@ -138,5 +149,4 @@ public class FriendsTab extends ListFragment {
         }
 
     }
-
 }
