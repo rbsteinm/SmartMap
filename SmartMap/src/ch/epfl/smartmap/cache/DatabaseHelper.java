@@ -837,19 +837,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void notifyFriendListeners() {
-        for (FriendsLocationListener listener : mLocationsListeners) {
+        for (FriendsListener listener : mFriendsListeners) {
             listener.onChange();
         }
     }
 
     public void notifyEventListeners() {
-        for (FriendsLocationListener listener : mLocationsListeners) {
+        for (EventsListener listener : mEventsListeners) {
             listener.onChange();
         }
     }
 
     public void notifyFilterListeners() {
-        for (FriendsLocationListener listener : mLocationsListeners) {
+        for (FiltersListener listener : mFiltersListeners) {
             listener.onChange();
         }
     }
