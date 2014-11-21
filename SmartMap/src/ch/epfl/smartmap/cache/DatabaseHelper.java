@@ -72,10 +72,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_DATE, KEY_ENDDATE};
 
     // Columns for the Invitations table
-    private static final String[] INVITATION_COLUMNS = {KEY_ID, KEY_NAME};
+    private static final String[] INVITATION_COLUMNS = {KEY_USER_ID, KEY_NAME};
 
     // Columns for the Invitations table
-    private static final String[] PENDING_COLUMNS = {KEY_ID, KEY_NAME};
+    private static final String[] PENDING_COLUMNS = {KEY_USER_ID, KEY_NAME};
 
     // Table of users
     private static final String CREATE_TABLE_USER = "CREATE TABLE IF NOT EXISTS " + TABLE_USER + "(" + KEY_USER_ID
@@ -99,10 +99,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Table of invitations
     private static final String CREATE_TABLE_INVITATIONS = "CREATE TABLE IF NOT EXISTS " + TABLE_INVITATIONS + "("
-        + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
+        + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
 
     // Table of invitations
-    private static final String CREATE_TABLE_PENDING = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING + "(" + KEY_ID
+    private static final String CREATE_TABLE_PENDING = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING + "(" + KEY_USER_ID
         + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
 
     private static DatabaseHelper mInstance;
@@ -124,8 +124,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return The DatabaseHelper instance
      */
     public static DatabaseHelper initialize(Context context) {
-        mInstance = new DatabaseHelper(context);
-        mDatabase = mInstance.getWritableDatabase();
+        if (mInstance == null) {
+            mInstance = new DatabaseHelper(context);
+            mDatabase = mInstance.getWritableDatabase();
+        }
         return mInstance;
     }
 

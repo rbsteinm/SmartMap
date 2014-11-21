@@ -144,6 +144,7 @@ public class UpdateService extends Service {
                         notifiedInvitations.add(user.getID());
                         UpdateService.this.showFriendNotif(user);
                     }
+                    mHelper.addInvitation(user);
                 }
             }
         }
