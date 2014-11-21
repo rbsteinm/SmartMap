@@ -114,7 +114,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
         HttpURLConnection conn = this.getHttpURLConnection("/listFriendsPos");
         String response = this.sendViaPost(new HashMap<String, String>(), conn);
-        Map<Long, Location> positions = null;
 
         SmartMapParser parser = null;
         try {
@@ -589,7 +588,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      *             in case the response could not be retrieved for any reason
      *             external to the application (network failure etc.)
      */
-    private String sendViaPost(Map<String, String> params, HttpURLConnection connection) throws SmartMapClientException {
+    private String sendViaPost(Map<String, String> params, HttpURLConnection connection)
+        throws SmartMapClientException {
         StringBuffer response = null;
         Log.d("sendViaPost", "start");
 

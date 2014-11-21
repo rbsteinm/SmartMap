@@ -3,7 +3,6 @@ package ch.epfl.smartmap.cache;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -163,7 +162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
 
-        notifyEventListeners();
+        this.notifyEventListeners();
     }
 
     /**
@@ -192,7 +191,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         filter.setID(filterID); // sets an ID so the filter can be easily
                                 // accessed
 
-        notifyFilterListeners();
+        this.notifyFilterListeners();
         return filterID;
     }
 
@@ -228,7 +227,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
 
-        notifyFriendListeners();
+        this.notifyFriendListeners();
     }
 
     /**
@@ -242,10 +241,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.onCreate(mDatabase);
 
-        notifyFriendListeners();
-        notifyLocationsListeners();
-        notifyEventListeners();
-        notifyFilterListeners();
+        this.notifyFriendListeners();
+        this.notifyLocationsListeners();
+        this.notifyEventListeners();
+        this.notifyFilterListeners();
     }
 
     /**
@@ -258,7 +257,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         mDatabase.delete(TABLE_EVENT, KEY_ID + " = ?", new String[]{String.valueOf(id)});
 
-        notifyEventListeners();
+        this.notifyEventListeners();
     }
 
     /**
@@ -275,7 +274,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // filter-user table
         mDatabase.delete(TABLE_FILTER_USER, KEY_FILTER_ID + " = ?", new String[]{String.valueOf(id)});
 
-        notifyFilterListeners();
+        this.notifyFilterListeners();
     }
 
     /**
@@ -288,8 +287,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         mDatabase.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
 
-        notifyFriendListeners();
-        notifyLocationsListeners();
+        this.notifyFriendListeners();
+        this.notifyLocationsListeners();
     }
 
     /**
@@ -496,17 +495,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void initializeAllFriends() {
         NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
         try {
-            Map<Long, Location> friends = client.listFriendsPos();
-            for (long i : friends.keySet()) {
-                this.addUser(client.getUserInfo(i));
-                Log.d("Database", i + " initialized");
+            List<User> friends = client.listFriendsPos();
+            for (User user : friends) {
+                this.addUser(client.getUserInfo(user.getID()));
             }
         } catch (SmartMapClientException e) {
             Log.e("UpdateService", e.getMessage());
         }
 
-        notifyFriendListeners();
-        notifyLocationsListeners();
+        this.notifyFriendListeners();
+        this.notifyLocationsListeners();
     }
 
     @Override
@@ -516,10 +514,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_FILTER_USER);
         db.execSQL(CREATE_TABLE_EVENT);
 
-        notifyFriendListeners();
-        notifyLocationsListeners();
-        notifyEventListeners();
-        notifyFilterListeners();
+        this.notifyFriendListeners();
+        this.notifyLocationsListeners();
+        this.notifyEventListeners();
+        this.notifyFilterListeners();
     }
 
     @Override
@@ -530,10 +528,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
         this.onCreate(db);
 
-        notifyFriendListeners();
-        notifyLocationsListeners();
-        notifyEventListeners();
-        notifyFilterListeners();
+        this.notifyFriendListeners();
+        this.notifyLocationsListeners();
+        this.notifyEventListeners();
+        this.notifyFilterListeners();
     }
 
     /**
@@ -562,14 +560,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int refreshFriendsPos() {
         int updatedRows = 0;
         try {
-            Map<Long, Location> locations = NetworkSmartMapClient.getInstance().listFriendsPos();
-            LongSparseArray<User> friends = this.getAllUsers();
-            long id;
-            for (int i = 0; i < friends.size(); i++) {
-                id = friends.keyAt(i);
-                if (locations.containsKey(id)) {
-                    updatedRows += this.updateUserPos(id, locations.get(id));
-                }
+            List<User> updatedUsers = NetworkSmartMapClient.getInstance().listFriendsPos();
+
+            for (User user : updatedUsers) {
+                this.updateUser(user);
             }
         } catch (SmartMapClientException e) {
             e.printStackTrace();
@@ -601,7 +595,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int rows = mDatabase.update(TABLE_EVENT, values, KEY_ID + " = ?", new String[]{String.valueOf(event.getID())});
 
         if (rows > 0) {
-            notifyEventListeners();
+            this.notifyEventListeners();
         }
 
         return rows;
@@ -619,7 +613,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.addFilter(filter);
         // not sure if there's a more efficient way
 
-        notifyFilterListeners();
+        this.notifyFilterListeners();
     }
 
     /**
@@ -630,8 +624,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return The number of rows that were updated
      */
     public int updateUser(User user) {
-
+        // Check that user exists ??
         ContentValues values = new ContentValues();
+        // Check for default values
         values.put(KEY_USER_ID, user.getID());
         values.put(KEY_NAME, user.getName());
         values.put(KEY_NUMBER, user.getNumber());
@@ -646,7 +641,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getID())});
 
         if (rows > 0) {
-            notifyFriendListeners();
+            this.notifyFriendListeners();
         }
         return rows;
     }
@@ -667,7 +662,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int rows = mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
 
-        notifyLocationsListeners();
+        this.notifyLocationsListeners();
         return rows;
     }
 

@@ -313,19 +313,19 @@ public class JsonSmartMapParser implements SmartMapParser {
      */
     private GregorianCalendar parseDate(String date) throws SmartMapParseException {
 
-        String[] dateTime = date.split("/ /");
+        String[] dateTime = date.split(" ");
 
         if (dateTime.length != DATETIME_FORMAT_PARTS) {
             throw new SmartMapParseException("Invalid datetime format !");
         }
 
-        String[] datePart = dateTime[0].split("/-/");
+        String[] datePart = dateTime[0].split("-");
 
         if (datePart.length != DATE_FORMAT_PARTS) {
             throw new SmartMapParseException("Invalid date format !");
         }
 
-        String[] timePart = dateTime[1].split("/:/");
+        String[] timePart = dateTime[1].split(":");
 
         if (timePart.length != TIME_FORMAT_PARTS) {
             throw new SmartMapParseException("Invalid time format !");

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.content.Context;
@@ -27,7 +26,7 @@ public class Friend implements User, Searchable, Displayable {
     private String mPhoneNumber;
     private String mEmail;
     private String mPositionName;
-    private final GregorianCalendar mLastSeen;
+    private GregorianCalendar mLastSeen;
     private boolean mOnline;
     private final Location mLocation;
     private boolean mVisible;
@@ -119,7 +118,9 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public GregorianCalendar getLastSeen() {
-        return mLastSeen;
+        GregorianCalendar g = new GregorianCalendar();
+        g.setTimeInMillis(mLastSeen.getTimeInMillis());
+        return g;
     }
 
     @Override
@@ -198,8 +199,9 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public void setLastSeen(GregorianCalendar date) {
-        mLastSeen.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE),
-            date.get(Calendar.HOUR), date.get(Calendar.MINUTE));
+        GregorianCalendar g = new GregorianCalendar();
+        g.setTimeInMillis(date.getTimeInMillis());
+        mLastSeen = g;
     }
 
     @Override
