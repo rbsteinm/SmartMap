@@ -19,8 +19,9 @@ import junit.framework.TestCase;
 public class ParsePositionsMalformedJSONParsingTest extends TestCase {
 
     private static final String POSITIONS_LIST_JSON = "{\n" + " \"positions\" : [\n" + "{\n" + " \"id\" : \"13\", \n"
-        + " \"latitude\" : \"20.03\", \n" + " \"longitude\" : \"26.85\" \n" + "},\n" + "{\n" + " \"id\" : \"18\", \n"
-        + " \"latitude\" : \"40.0\", \n" + " \"longitude\" : \"3.0\" \n" + "}\n" + "  ]\n" + "}\n";
+        + " \"latitude\" : \"20.03\", \n" + " \"longitude\" : \"26.85\", \n" + "\"lastUpdate\": \"2014-11-14 15:22:37\"" +
+        "},\n" + "{\n" + " \"id\" : \"18\", \n" + " \"latitude\" : \"40.0\", \n" + " \"longitude\" : \"3.0\", \n" + 
+        "\"lastUpdate\": \"2014-09-22 02:07:56\"" + "}\n" + "  ]\n" + "}\n";
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -66,7 +67,6 @@ public class ParsePositionsMalformedJSONParsingTest extends TestCase {
         } catch (SmartMapParseException e) {
             // success
         }
-
     }
 
     @Test
@@ -83,7 +83,6 @@ public class ParsePositionsMalformedJSONParsingTest extends TestCase {
         } catch (SmartMapParseException e) {
             // success
         }
-
     }
 
     @Test
@@ -100,7 +99,53 @@ public class ParsePositionsMalformedJSONParsingTest extends TestCase {
         } catch (SmartMapParseException e) {
             // success
         }
+    }
+    
+    @Test
+    public void testParsePositionsWrongDateFormat() throws JSONException {
+        JSONObject jsonObject = new JSONObject(POSITIONS_LIST_JSON);
+        JSONArray jsonArray = jsonObject.getJSONArray("positions");
+        JSONObject jsonPosition = (JSONObject) jsonArray.get(0);
+        jsonPosition.put("lastUpdate", "2014-11-23 23:23:34:23");
+        SmartMapParser parser = new JsonSmartMapParser();
 
+        try {
+            parser.parsePositions(jsonObject.toString());
+            fail("parsed wrong date");
+        } catch (SmartMapParseException e) {
+            // success
+        }
+    }
+    
+    @Test
+    public void testParsePositionsWrongDateMonth() throws JSONException {
+        JSONObject jsonObject = new JSONObject(POSITIONS_LIST_JSON);
+        JSONArray jsonArray = jsonObject.getJSONArray("positions");
+        JSONObject jsonPosition = (JSONObject) jsonArray.get(0);
+        jsonPosition.put("lastUpdate", "2014-13-23 23:23:34");
+        SmartMapParser parser = new JsonSmartMapParser();
+
+        try {
+            parser.parsePositions(jsonObject.toString());
+            fail("parsed wrong date");
+        } catch (SmartMapParseException e) {
+            // success
+        }
     }
 
+    @Test
+    public void testParsePositionsWrongDateInFuture() throws JSONException {
+        JSONObject jsonObject = new JSONObject(POSITIONS_LIST_JSON);
+        JSONArray jsonArray = jsonObject.getJSONArray("positions");
+        JSONObject jsonPosition = (JSONObject) jsonArray.get(0);
+        jsonPosition.put("lastUpdate", "2500-11-23 23:23:34");
+        SmartMapParser parser = new JsonSmartMapParser();
+
+        try {
+            parser.parsePositions(jsonObject.toString());
+            fail("parsed wrong date");
+        } catch (SmartMapParseException e) {
+            // success
+        }
+    }
 }
