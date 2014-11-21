@@ -140,6 +140,14 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
             .getInstance().notificationsForEventProximity());
     }
 
+    public void testCannotActivateVibrateNotificationsIfNotifDisabled() {
+        this.disableNotifications();
+        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_vibrate)))
+            .perform(ViewActions.click());
+        assertEquals("Can enable a checkbox when its dependency is disabled", false, SettingsManager
+            .getInstance().notificationsVibrate());
+    }
+
     private void disableNotifications() {
         onView(
             ViewMatchers.withText(mContext
