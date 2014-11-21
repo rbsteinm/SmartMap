@@ -169,6 +169,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         String online = null;
         double latitude = UINITIALIZED_LATITUDE;
         double longitude = UNITIALIZED_LONGITUDE;
+        String datetime = null;
 
         try {
             id = jsonObject.getLong("id");
@@ -178,6 +179,7 @@ public class JsonSmartMapParser implements SmartMapParser {
             phoneNumber = jsonObject.optString("phoneNumber", null);
             email = jsonObject.optString("email", null);
             online = jsonObject.optString("online", null);
+            datetime = jsonObject.optString("lastSeen", null);
             // something else??
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
@@ -213,6 +215,11 @@ public class JsonSmartMapParser implements SmartMapParser {
         if (online != null) {
             this.checkOnLine(online);
             // TODO see with Mathieu
+        }
+        if (datetime != null) {
+            GregorianCalendar lastSeen = this.parseDate(datetime);
+            this.checkLastSeen(lastSeen);
+            friend.setLastSeen(lastSeen);
         }
 
         return friend;
@@ -301,6 +308,19 @@ public class JsonSmartMapParser implements SmartMapParser {
      */
     private void checkOnLine(String online) throws SmartMapParseException {
         // TODO
+    }
+
+    /**
+     * Checks if the parameter lastSeen is valid
+     * 
+     * @param lastSeen
+     * @throws SmartMapParseException
+     */
+    private void checkLastSeen(GregorianCalendar lastSeen) throws SmartMapParseException {
+        GregorianCalendar now = new GregorianCalendar();
+        if (now.getTimeInMillis() < lastSeen.getTimeInMillis()) {
+            throw new SmartMapParseException("Invalid last seen date");
+        }
     }
 
     /**
