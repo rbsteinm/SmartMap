@@ -80,7 +80,7 @@
     <string name="ShowEventsCheckBoxNearMe">Near me</string>
     <string name="ShowEventsCheckBoxStatus">Ongoing</string>
     <string name="showEventsMenuNewEvent">Create a new event</string>
-    
+
     <!-- AddEventActivity -->
     <string name="title_activity_add_event">Create a new event</string>
     <string name="addEventEventName">Event name</string>
@@ -94,5 +94,6 @@
     <string name="addEventPlaceName">Place (town, canton, etc...)</string>
     <string name="addEventDescription">Description (optional)</string>
     <string name="addEventButtonPickLocation">Set location</string>
+    <string name="title_activity_information">InformationActivity</string>
 
 </resources>

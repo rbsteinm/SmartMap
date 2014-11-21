@@ -31,7 +31,7 @@
     <item
         android:id="@+id/action_item_more"
         android:icon="@drawable/ic_drawer"
-        android:onClick="openInformationPanel"
+        android:onClick="openInformationActivity"
         android:showAsAction="always"
         android:title="Open Infos"
         android:visible="false"/>

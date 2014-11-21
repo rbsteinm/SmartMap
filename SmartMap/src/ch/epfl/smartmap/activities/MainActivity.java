@@ -536,4 +536,15 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     public void closeInformationPanel(MenuItem mi) {
         this.closeInformationPanel();
     }
+
+    /**
+     * Opens Information Activity (called from MenuItem on Item view)
+     * 
+     * @author jfperren
+     */
+    public void openInformationActivity(MenuItem mi) {
+        Intent intent = new Intent(this, InformationActivity.class);
+        intent.putExtra("CURRENT_DISPLAYABLE", mCurrentItem);
+        this.startActivity(intent);
+    }
 }
