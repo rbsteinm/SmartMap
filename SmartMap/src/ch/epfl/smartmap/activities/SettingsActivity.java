@@ -17,6 +17,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.SettingsManager;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On handset devices, settings are presented
@@ -37,10 +39,15 @@ public class SettingsActivity extends PreferenceActivity {
 
     protected static final String TAG = SettingsActivity.class.getSimpleName();
 
+    @SuppressWarnings("static-access")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setupActionBar();
+
+        // Needed for the espresso tests
+        SettingsManager.initialize(this.getApplicationContext());
+        DatabaseHelper.initialize(this.getApplicationContext());
     }
 
     /**

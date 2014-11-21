@@ -46,6 +46,8 @@ public class SettingsManager {
     private final static String KEY_EVENT_PROXIMITY = "notifications_event_proximity";
     private final static String KEY_VIBRATE = "notifications_vibrate";
     private static final String KEY_ALWAYS_SHARE = "general_always_share";
+    private static final String KEY_REFRESH_FREQUENCY = "refresh_frequency";
+    private static final String KEY_TIME_TO_WAIT_BEFORE_HIDING_FRIENDS = "last_seen_max";
 
     /**
      * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
@@ -158,6 +160,28 @@ public class SettingsManager {
      */
     public boolean alwaysShare() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_ALWAYS_SHARE, true);
+    }
+
+    /**
+     * 
+     * @return the frequence in seconds at which we fetch and upload the datas. Used by the service.
+     * 
+     * @author SpicyCH
+     */
+    public int getRefreshFrequency() {
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
+                KEY_REFRESH_FREQUENCY, "10"));
+    }
+
+    /**
+     * 
+     * @return the time to wait in minutes before hiding inactive friends from the map.
+     * 
+     * @author SpicyCH
+     */
+    public int getTimeToWaitBeforeHidingFriends() {
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
+                KEY_TIME_TO_WAIT_BEFORE_HIDING_FRIENDS, "30"));
     }
 
     /**

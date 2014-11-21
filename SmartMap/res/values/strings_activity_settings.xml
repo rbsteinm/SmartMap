@@ -28,7 +28,7 @@
     
     <string-array name="pref_last_seen_max_titles">
         <item>10 minutes</item>
-        <item>30 minutes (recommended)</item>
+        <item>30 minutes (default)</item>
         <item>1 hour</item>
         <item>3 hours</item>
         <item>12 hours</item>
@@ -55,7 +55,7 @@
 
     <string-array name="pref_sync_frequency_titles">
         <item>5 seconds</item>
-        <item>10 seconds (recommended)</item>
+        <item>10 seconds (default)</item>
         <item>30 seconds</item>
         <item>1 minute</item>
         <item>2 minutes</item>
