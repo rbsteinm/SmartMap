@@ -55,7 +55,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.map.FriendMarkerDisplayer#setMarkersToMaps(android.content
      * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
@@ -71,7 +70,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.FriendMarkerDisplayer#isDisplayedFriend(ch.epfl.
      * smartmap.cache.User)
@@ -85,7 +83,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.FriendMarkerDisplayer#isDisplayedMarker(com.google
      * .android.gms.maps.model.Marker)
@@ -97,7 +94,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.gui.FriendMarkerDisplayer#getDisplayedMarkers()
      */
     @Override
@@ -107,7 +103,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.FriendMarkerDisplayer#getFriendForMarker(com.google
      * .android.gms.maps.model.Marker)
@@ -119,7 +114,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.FriendMarkerDisplayer#addMarker(ch.epfl.smartmap
      * .cache.User, android.content.Context,
@@ -129,10 +123,11 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
     public Marker addMarker(User friend, Context context, GoogleMap googleMap) {
         Log.d(TAG, "add marker for friend " + friend.getName());
 
-        Bitmap friendProfilePicture = Bitmap.createScaledBitmap(friend.getPicture(context), PICTURE_WIDTH,
-                PICTURE_HEIGHT, false);
-        Marker marker = googleMap.addMarker(new MarkerOptions().position(friend.getLatLng())
-                .title(friend.getName()).icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
+        Bitmap friendProfilePicture =
+            Bitmap.createScaledBitmap(friend.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+        Marker marker =
+            googleMap.addMarker(new MarkerOptions().position(friend.getLatLng()).title(friend.getName())
+                .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
                 .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
 
         displayedMarkers.put(marker.getId(), friend);
@@ -142,7 +137,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.FriendMarkerDisplayer#getMarkerForFriend(ch.epfl
      * .smartmap.cache.User)
@@ -160,7 +154,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.gui.FriendMarkerDisplayer#getDisplayedFriends()
      */
     @Override
@@ -171,7 +164,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.FriendMarkerDisplayer#removeMarker(ch.epfl.smartmap
      * .cache.User, android.content.Context,
@@ -189,7 +181,6 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.FriendMarkerDisplayer#updateMarkers(android.content
      * .Context, com.google.android.gms.maps.GoogleMap, java.util.List) This
@@ -236,8 +227,7 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
      * @param hideMarker
      * @param map
      */
-    private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker,
-            GoogleMap map) {
+    private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker, GoogleMap map) {
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
         Projection proj = map.getProjection();

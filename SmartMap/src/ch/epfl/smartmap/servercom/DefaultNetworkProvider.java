@@ -22,7 +22,6 @@ public class DefaultNetworkProvider implements NetworkProvider {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.sweng.quizapp.NetworkProvider#getConnection(java.net.URL)
      */
     @Override

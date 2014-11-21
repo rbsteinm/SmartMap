@@ -6,7 +6,8 @@ use SmartMap\DBInterface\UserRepository;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
 
-/** Tests for the UserRepository class.
+/**
+ * Tests for the UserRepository class.
  * To run them, run 
  * $> phpunit --bootstrap vendor/autoload.php --configuration tests/phpunit.xml tests/UserRepositoryTest.php
  * from the server directory. You need to have a database configured in phpunit.xml running during the tests.
@@ -82,7 +83,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	 * @expectedException SmartMap\DBInterface\DatabaseException
 	 * @expectedExceptionMessage No user found with id 56 in method getUser.
 	 */
-	public function testGetNonexistingUser()
+	public function testGetNonExistingUser()
 	{
 	    $repo = new UserRepository(self::$doctrine);
 	    
@@ -504,4 +505,35 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	     
 	    $this->assertEquals(0, $this->getConnection()->getRowCount('accepted_invitations'), "Post-Condition");
 	}
+
+    public function testAddRemovedFriend()
+    {
+        $this->assertEquals(1, $this->getConnection()->getRowCount('removed_friends'), "Pre-Condition");
+
+        $repo = new UserRepository(self::$doctrine);
+
+        $repo->addRemovedFriend(2, 4);
+
+        $this->assertEquals(2, $this->getConnection()->getRowCount('removed_friends'), "Post-Condition");
+    }
+
+    public function testGetRemovedFriends()
+    {
+        $repo = new UserRepository(self::$doctrine);
+
+        $ids = $repo->getRemovedFriends(1);
+
+        $this->assertEquals(array(4), $ids);
+    }
+
+    public function testRemoveRemovedFriend()
+    {
+        $this->assertEquals(1, $this->getConnection()->getRowCount('removed_friends'), "Pre-Condition");
+
+        $repo = new UserRepository(self::$doctrine);
+
+        $repo->removeRemovedFriend(1, 4);
+
+        $this->assertEquals(0, $this->getConnection()->getRowCount('removed_friends'), "Post-Condition");
+    }
 }

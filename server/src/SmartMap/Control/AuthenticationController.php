@@ -42,15 +42,15 @@ class AuthenticationController
         $this->mAppId = $appId;
         $this->mAppSecret = $appSecret;
     }
-    
+
     /**
      * Authenticates the caller to the SmartMap server.
-     * 
+     *
      * @param Request $request
-     *            This must include the $_POST parameters: name, facebookId, facebookToken.
-     * @throws ControlException When something goes wrong during the authentication procedure.
-     * @return \Symfony\Component\HttpFoundation\JsonResponse A json with the field "status": "Ok" or "error" and
-     *  a field "message" giving details about the status.
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     * @throws \SmartMap\DBInterface\DatabaseException
      */
     public function authenticate(Request $request)
     {

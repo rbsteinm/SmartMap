@@ -48,7 +48,7 @@ public class FriendsTab extends ListFragment {
 
         // Create custom Adapter and pass it to the Activity
         FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
-        setListAdapter(adapter);
+        this.setListAdapter(adapter);
 
         return view;
     }
@@ -60,13 +60,13 @@ public class FriendsTab extends ListFragment {
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         String name = tv.getText().toString();
-        displayDeleteConfirmationDialog(name, userId);
+        this.displayDeleteConfirmationDialog(name, userId);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+        this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
     }
 
     public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
@@ -81,7 +81,7 @@ public class FriendsTab extends ListFragment {
     }
 
     private void displayDeleteConfirmationDialog(String name, final long userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
         builder.setMessage("remove " + name + " from your friends?");
 
         // Add positive button
@@ -118,7 +118,8 @@ public class FriendsTab extends ListFragment {
             String confirmString = "";
             try {
                 NetworkSmartMapClient.getInstance().removeFriend(params[0]);
-                confirmString = "You're no longer friend with "
+                confirmString =
+                    "You're no longer friend with "
                         + NetworkSmartMapClient.getInstance().getUserInfo(params[0]).getName();
 
                 // remove friend from cache and update displayed list
@@ -132,7 +133,7 @@ public class FriendsTab extends ListFragment {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+            FriendsTab.this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
             Toast.makeText(mContext, confirmString, Toast.LENGTH_LONG).show();
         }
 

@@ -80,7 +80,6 @@ public class Friend implements User, Searchable, Displayable {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -171,7 +170,6 @@ public class Friend implements User, Searchable, Displayable {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -201,7 +199,7 @@ public class Friend implements User, Searchable, Displayable {
     @Override
     public void setLastSeen(GregorianCalendar date) {
         mLastSeen.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE),
-                date.get(Calendar.HOUR), date.get(Calendar.MINUTE));
+            date.get(Calendar.HOUR), date.get(Calendar.MINUTE));
     }
 
     @Override

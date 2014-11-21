@@ -76,7 +76,6 @@ public class FriendSearchResultView extends SearchResultView {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.gui.SearchResultView#getOnClickListener()
      */
     @Override

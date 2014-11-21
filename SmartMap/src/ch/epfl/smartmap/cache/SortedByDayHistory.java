@@ -66,7 +66,6 @@ public class SortedByDayHistory implements History {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.History#nbOfDates()
      */
     @Override

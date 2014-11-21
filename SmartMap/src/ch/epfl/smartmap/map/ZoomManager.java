@@ -11,7 +11,6 @@ import android.location.Location;
  * This interface offers different ways to zomm on the map
  * 
  * @author hugo-S
- * 
  */
 public interface ZoomManager {
 

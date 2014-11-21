@@ -47,15 +47,17 @@ public class UserEvent implements Event, Searchable, Displayable {
      *            The event's location on the map
      */
     public UserEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
-            GregorianCalendar endDate, Location p) {
+        GregorianCalendar endDate, Location p) {
         mEvtName = name;
         mEvtCreator = creator;
-        mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
+        mStartDate =
+            new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
                 startDate.get(Calendar.DATE), startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
 
         mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
-        mEndDate = new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH),
-                endDate.get(Calendar.DATE), endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
+        mEndDate =
+            new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH), endDate.get(Calendar.DATE),
+                endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
 
         mEndDate.set(GregorianCalendar.HOUR_OF_DAY, endDate.get(GregorianCalendar.HOUR_OF_DAY));
 
@@ -68,7 +70,6 @@ public class UserEvent implements Event, Searchable, Displayable {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -159,7 +160,6 @@ public class UserEvent implements Event, Searchable, Displayable {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -184,7 +184,7 @@ public class UserEvent implements Event, Searchable, Displayable {
     @Override
     public void setEndDate(GregorianCalendar newDate) {
         mEndDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
-                newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
+            newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
     }
 
     @Override
@@ -221,6 +221,6 @@ public class UserEvent implements Event, Searchable, Displayable {
     @Override
     public void setStartDate(GregorianCalendar newDate) {
         mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
-                newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
+            newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
     }
 }

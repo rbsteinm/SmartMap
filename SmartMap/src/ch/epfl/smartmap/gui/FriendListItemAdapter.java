@@ -42,7 +42,6 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
 
     /*
      * (non-Javadoc)
-     * 
      * @see android.widget.ArrayAdapter#getView(int, android.view.View,
      * android.view.ViewGroup) callback function automatically called one time
      * for each user in the list
@@ -67,7 +66,8 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
 
         // build String "Last seen d/m/y at hour/min"
-        String lastSeenString = "Last seen " + user.getLastSeen().get(GregorianCalendar.DAY_OF_MONTH) + "/"
+        String lastSeenString =
+            "Last seen " + user.getLastSeen().get(GregorianCalendar.DAY_OF_MONTH) + "/"
                 + (user.getLastSeen().get(GregorianCalendar.MONTH) + 1) + "/"
                 + user.getLastSeen().get(GregorianCalendar.YEAR) + " at "
                 + user.getLastSeen().get(GregorianCalendar.HOUR) + ":"
