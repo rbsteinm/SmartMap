@@ -34,12 +34,7 @@ public class SearchLayout extends LinearLayout {
      * @author jfperren
      */
     private enum SearchPanelType {
-        HISTORY("History"),
-        QUICK("All"),
-        USERS("Users"),
-        EVENTS("Events"),
-        TAGS("Tags"),
-        GROUPS("Groups");
+        HISTORY("History"), QUICK("All"), USERS("Users"), EVENTS("Events"), TAGS("Tags"), GROUPS("Groups");
 
         private String mTitle;
 
@@ -71,8 +66,8 @@ public class SearchLayout extends LinearLayout {
         super(context, attrs);
         // Layout relative informations
         this.setOrientation(HORIZONTAL);
-        this.setLayoutParams(new LinearLayout.LayoutParams(
-            LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT));
         this.setBackgroundResource(R.color.background_blue);
         mCurrentSearchType = FIRST_SEARCH_PANEL_TYPE;
         mScrollViews = new HashMap<SearchPanelType, ScrollView>();
@@ -104,23 +99,20 @@ public class SearchLayout extends LinearLayout {
         // Get current and next ScrollViews (circularily)
         Log.d(TAG, mCurrentSearchType.title());
         ScrollView currentScrollView = mScrollViews.get(mCurrentSearchType);
-        mCurrentSearchType = SearchPanelType.values()[(mCurrentSearchType
-            .ordinal() + 1) % SearchPanelType.values().length];
+        mCurrentSearchType = SearchPanelType.values()[(mCurrentSearchType.ordinal() + 1)
+                % SearchPanelType.values().length];
         Log.d(TAG, mCurrentSearchType.title());
         ScrollView nextScrollView = mScrollViews.get(mCurrentSearchType);
         nextScrollView.scrollTo(0, 0);
         if (mCurrentSearchType != SearchPanelType.HISTORY) {
-            SearchResultViewGroup nextSearchResultViewGroup = mSearchResultViewGroups
-                .get(mCurrentSearchType);
+            SearchResultViewGroup nextSearchResultViewGroup = mSearchResultViewGroups.get(mCurrentSearchType);
             nextSearchResultViewGroup.displayMinimized();
             nextSearchResultViewGroup.setResultList(mCurrentSearchResults);
         }
 
         this.addView(nextScrollView);
-        nextScrollView.startAnimation(AnimationUtils.loadAnimation(
-            getContext(), R.anim.swipe_left_in));
-        currentScrollView.startAnimation(AnimationUtils.loadAnimation(
-            getContext(), R.anim.swipe_left_out));
+        nextScrollView.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.swipe_left_in));
+        currentScrollView.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.swipe_left_out));
         this.removeViewAt(0);
     }
 
@@ -165,8 +157,7 @@ public class SearchLayout extends LinearLayout {
         } else if (mCurrentSearchType == SearchPanelType.HISTORY) {
             onSwipeLeft();
         }
-        mSearchResultViewGroups.get(mCurrentSearchType).setResultList(
-            mCurrentSearchResults);
+        mSearchResultViewGroups.get(mCurrentSearchType).setResultList(mCurrentSearchResults);
     }
 
     /**
@@ -209,20 +200,19 @@ public class SearchLayout extends LinearLayout {
     private void updateHistoryPanel() {
         // History Panel
         History history = mSearchEngine.getHistory();
-        LinearLayout searchResultLayout = (LinearLayout) mScrollViews.get(
-            SearchPanelType.HISTORY).getChildAt(0);
+        LinearLayout searchResultLayout = (LinearLayout) mScrollViews.get(SearchPanelType.HISTORY)
+                .getChildAt(0);
         searchResultLayout.removeAllViews();
 
         for (int i = 0; i < history.nbOfDates(); i++) {
             // TextView displaying Date
             TextView titleView = new TextView(getContext());
             titleView.setTextSize(TITLE_TEXT_SIZE);
-            titleView.setTextColor(getResources().getColor(
-                R.color.searchResultTitle));
+            titleView.setTextColor(getResources().getColor(R.color.searchResultTitle));
             titleView.setText(history.getDateForIndex(i).toString());
             // SearchResultViewGroup grouping all queries of this date
-            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(
-                getContext(), history.getEntriesForIndex(i));
+            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(getContext(),
+                    history.getEntriesForIndex(i));
             // Put views together
             searchResultLayout.addView(titleView);
             searchResultLayout.addView(searchResultViewGroup);
@@ -235,13 +225,12 @@ public class SearchLayout extends LinearLayout {
      * @param context
      * @param searchPanelType
      */
-    private void createSearchResultLayout(Context context,
-        SearchPanelType searchPanelType) {
+    private void createSearchResultLayout(Context context, SearchPanelType searchPanelType) {
 
         // ScrollView with TouchEvent passing handling
         ScrollView scrollView = new ScrollView(context) {
-            private final GestureDetector gestureDetector = new GestureDetector(
-                getContext(), new HorizontalGestureListener());
+            private final GestureDetector gestureDetector = new GestureDetector(getContext(),
+                    new HorizontalGestureListener());
 
             @Override
             public boolean onTouchEvent(MotionEvent ev) {
@@ -264,19 +253,16 @@ public class SearchLayout extends LinearLayout {
                 return false;
             }
         };
-        scrollView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-            LayoutParams.MATCH_PARENT));
+        scrollView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         scrollView.setVerticalScrollBarEnabled(false);
-        scrollView.setPadding(SCROLLVIEW_SIDE_PADDING, 0,
-            SCROLLVIEW_SIDE_PADDING, 0);
+        scrollView.setPadding(SCROLLVIEW_SIDE_PADDING, 0, SCROLLVIEW_SIDE_PADDING, 0);
 
         // Layout contained in ScrollView
         LinearLayout searchResultLayout = new LinearLayout(context);
-        searchResultLayout.setLayoutParams(new LayoutParams(
-            LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        searchResultLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT));
         searchResultLayout.setOrientation(VERTICAL);
-        searchResultLayout.setPadding(0, SCROLLVIEW_LAYOUT_TOP_PADDING, 0,
-            SCROLLVIEW_LAYOUT_BOTTOM_PADDING);
+        searchResultLayout.setPadding(0, SCROLLVIEW_LAYOUT_TOP_PADDING, 0, SCROLLVIEW_LAYOUT_BOTTOM_PADDING);
 
         if (searchPanelType != SearchPanelType.HISTORY) {
             // Normal Search Panel
@@ -286,8 +272,8 @@ public class SearchLayout extends LinearLayout {
             titleView.setTextColor(getResources().getColor(R.color.main_blue));
             titleView.setText(searchPanelType.title());
             // SearchResultViewGroup
-            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(
-                context, MockDB.FRIENDS_LIST);
+            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(context,
+                    MockDB.FRIENDS_LIST);
             // Put views together
             searchResultLayout.addView(titleView);
             searchResultLayout.addView(searchResultViewGroup);
@@ -305,23 +291,20 @@ public class SearchLayout extends LinearLayout {
      * 
      * @author jfperren
      */
-    private final class HorizontalGestureListener extends
-        SimpleOnGestureListener {
+    private final class HorizontalGestureListener extends SimpleOnGestureListener {
 
         private static final int SWIPE_THRESHOLD = 100;
         private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
         @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-            float velocityY) {
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             Log.d(TAG, "Analysing Gesture");
             boolean result = false;
 
             float diffY = e2.getY() - e1.getY();
             float diffX = e2.getX() - e1.getX();
             if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (Math.abs(diffX) > SWIPE_THRESHOLD
-                    && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                     if (diffX > 0) {
                         onSwipeRight();
                     } else {

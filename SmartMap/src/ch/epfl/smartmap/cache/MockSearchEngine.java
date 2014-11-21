@@ -28,6 +28,7 @@ public class MockSearchEngine implements SearchEngine {
 
     /*
      * (non-Javadoc)
+     * 
      * @see ch.epfl.smartmap.cache.SearchEngine#sendQuery(java.lang.String)
      */
     @Override
@@ -36,8 +37,7 @@ public class MockSearchEngine implements SearchEngine {
         ArrayList<Friend> result = new ArrayList<Friend>();
 
         for (User f : mUsers) {
-            if (f.getName().toLowerCase(Locale.US).contains(query)
-                || query.equals("")) {
+            if (f.getName().toLowerCase(Locale.US).contains(query) || query.equals("")) {
                 result.add((Friend) f);
             }
         }
@@ -47,6 +47,7 @@ public class MockSearchEngine implements SearchEngine {
 
     /*
      * (non-Javadoc)
+     * 
      * @see ch.epfl.smartmap.cache.SearchEngine#getHistory()
      */
     @Override

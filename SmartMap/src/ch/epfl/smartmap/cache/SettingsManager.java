@@ -36,7 +36,8 @@ public class SettingsManager {
     private final SharedPreferences.Editor mEditor;
     private static SettingsManager mInstance;
 
-    // The following constant Strings must match the keys defined in res/xml/pref_notifications.xml
+    // The following constant Strings must match the keys defined in
+    // res/xml/pref_notifications.xml
     private final static String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
     private final static String KEY_FRIEND_REQUEST = "notifications_friend_requests";
     private final static String KEY_FRIENDSHIP_CONFIRMATIONS = "notifications_friendship_confirmations";
@@ -45,7 +46,8 @@ public class SettingsManager {
     private final static String KEY_VIBRATE = "notifications_new_message_vibrate";
 
     /**
-     * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
+     * SettingsManager constructor. Will be made private, use initialize() or
+     * getInstance() instead.
      * 
      * @param context
      *            The app's context, needed to access the shared preferences
@@ -58,7 +60,8 @@ public class SettingsManager {
     }
 
     /**
-     * Initializes the settings manager (should be called once when starting the app)
+     * Initializes the settings manager (should be called once when starting the
+     * app)
      * 
      * @param context
      *            The app's context, needed to access the shared preferences
@@ -77,77 +80,86 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications,
+     *         <code>false</code> otherwise.
      * 
      * @author SpicyCH
      */
     public boolean notificationsEnabled() {
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_NOTIFICATIONS_ENABLED, true);
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_NOTIFICATIONS_ENABLED,
+                true);
     }
 
     /**
      * 
-     * @return <code>true</code> if the user enabled the notifications for friend requests and the user activated the
-     *         notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for
+     *         friend requests and the user activated the notifications in
+     *         general, <code>false</code> otherwise.
      * 
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                KEY_FRIEND_REQUEST, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+                .getBoolean(KEY_FRIEND_REQUEST, true) : false;
     }
 
     /**
-     * A friendship confirmation happens when another user accepts your friend request.
+     * A friendship confirmation happens when another user accepts your friend
+     * request.
      * 
-     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the user
-     *         activated the notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for
+     *         friendship confirmations and the user activated the notifications
+     *         in general, <code>false</code> otherwise.
      * 
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                KEY_FRIENDSHIP_CONFIRMATIONS, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+                .getBoolean(KEY_FRIENDSHIP_CONFIRMATIONS, true) : false;
     }
 
     /**
      * 
-     * @return <code>true</code> if the user enabled the notifications for event invitations and the user activated the
-     *         notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for event
+     *         invitations and the user activated the notifications in general,
+     *         <code>false</code> otherwise.
      * 
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                KEY_EVENT_INVITATIONS, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+                .getBoolean(KEY_EVENT_INVITATIONS, true) : false;
     }
 
     /**
      * 
-     * @return <code>true</code> if the user enabled the notifications for event proximity and the user activated the
-     *         notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for event
+     *         proximity and the user activated the notifications in general,
+     *         <code>false</code> otherwise.
      * 
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                KEY_EVENT_PROXIMITY, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+                .getBoolean(KEY_EVENT_PROXIMITY, true) : false;
     }
 
     /**
      * 
-     * @return <code>true</code> if the user enabled the notifications vibrations and the user activated the
-     *         notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications
+     *         vibrations and the user activated the notifications in general,
+     *         <code>false</code> otherwise.
      * 
      * @author SpicyCH
      */
     public boolean notificationsVibrate() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                KEY_VIBRATE, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+                .getBoolean(KEY_VIBRATE, true) : false;
     }
 
     /**
-     * @return The local user's name if it is found, DEFAULT_NAME value otherwise
+     * @return The local user's name if it is found, DEFAULT_NAME value
+     *         otherwise
      */
     public String getUserName() {
         return mSharedPref.getString(USER_NAME, DEFAULT_NAME);
@@ -161,28 +173,32 @@ public class SettingsManager {
     }
 
     /**
-     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value otherwise
+     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
+     *         otherwise
      */
     public long getFacebookID() {
         return mSharedPref.getLong(FB_ID, DEFAULT_FB_ID);
     }
 
     /**
-     * @return The local user's phone number if it is found, DEFAULT_NUMBER value otherwise
+     * @return The local user's phone number if it is found, DEFAULT_NUMBER
+     *         value otherwise
      */
     public String getUPhoneNumber() {
         return mSharedPref.getString(PHONE_NUMBER, DEFAULT_NUMBER);
     }
 
     /**
-     * @return The local user's email if it is found, DEFAULT_EMAIL value otherwise
+     * @return The local user's email if it is found, DEFAULT_EMAIL value
+     *         otherwise
      */
     public String getEmail() {
         return mSharedPref.getString(EMAIL, DEFAULT_EMAIL);
     }
 
     /**
-     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN value otherwise
+     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN
+     *         value otherwise
      */
     public String getToken() {
         return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);

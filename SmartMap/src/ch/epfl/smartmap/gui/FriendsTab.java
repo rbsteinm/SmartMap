@@ -42,32 +42,27 @@ public class FriendsTab extends ListFragment {
 
     @SuppressWarnings("deprecation")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-        Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.list_fragment_friends_tab,
-            container, false);
+        View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
         mCacheDB = new DatabaseHelper(mContext);
         mFriendList = new ArrayList<User>();
         mFriendList = asList(mCacheDB.getAllUsers());
         sortByOnline(mFriendList);
 
         // Create custom Adapter and pass it to the Activity
-        FriendListItemAdapter adapter = new FriendListItemAdapter(mContext,
-            mFriendList);
+        FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
         setListAdapter(adapter);
 
         return view;
     }
 
     @Override
-    public void onListItemClick(ListView listView, View view, int position,
-        long id) {
+    public void onListItemClick(ListView listView, View view, int position, long id) {
         long userId = (Long) view.getTag();
         RelativeLayout rl = (RelativeLayout) view;
         TextView tv = (TextView) rl.getChildAt(1);
-        assert (tv instanceof TextView)
-            && (tv.getId() == R.id.activity_friends_name);
+        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         String name = tv.getText().toString();
         displayDeleteConfirmationDialog(name, userId);
     }
@@ -75,8 +70,7 @@ public class FriendsTab extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        setListAdapter(new FriendListItemAdapter(mContext,
-            asList(mCacheDB.getAllUsers())));
+        setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
     }
 
     private void sortByOnline(List<User> userList) {
@@ -112,31 +106,29 @@ public class FriendsTab extends ListFragment {
         builder.setMessage("remove " + name + " from your friends?");
 
         // Add positive button
-        builder.setPositiveButton("Remove",
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    new RemoveFriend().execute(userId);
-                    // TODO refresh the userList
-                }
-            });
+        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                new RemoveFriend().execute(userId);
+                // TODO refresh the userList
+            }
+        });
 
         // Add negative button
-        builder.setNegativeButton("Cancel",
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.cancel();
-                }
-            });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
 
         // display the AlertDialog
         builder.create().show();
     }
 
     /**
-     * Asynchronous task that removes a friend from the users friendList
-     * both from the server and from the cache
+     * Asynchronous task that removes a friend from the users friendList both
+     * from the server and from the cache
      * 
      * @author rbsteinm
      */
@@ -148,8 +140,7 @@ public class FriendsTab extends ListFragment {
             try {
                 NetworkSmartMapClient.getInstance().removeFriend(params[0]);
                 confirmString = "You're no longer friend with "
-                    + NetworkSmartMapClient.getInstance()
-                        .getUserInfo(params[0]).getName();
+                        + NetworkSmartMapClient.getInstance().getUserInfo(params[0]).getName();
 
                 // remove friend from cache and update displayed list
                 // TODO should be done on the removeFriend method
@@ -162,8 +153,7 @@ public class FriendsTab extends ListFragment {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            setListAdapter(new FriendListItemAdapter(mContext,
-                asList(mCacheDB.getAllUsers())));
+            setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
             Toast.makeText(mContext, confirmString, Toast.LENGTH_LONG).show();
         }
 

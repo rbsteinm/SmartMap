@@ -57,8 +57,7 @@ public interface SmartMapParser {
      *             if the server returned Error , SmartMapParseException if s
      *             does not represent a valid server's response
      */
-    void checkServerError(String s) throws SmartMapParseException,
-        SmartMapClientException;
+    void checkServerError(String s) throws SmartMapParseException, SmartMapClientException;
 
     // TODO if necessary add a method to parse an event
 

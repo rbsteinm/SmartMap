@@ -65,49 +65,39 @@ public class StartActivity extends FragmentActivity {
         // Displays the facebook app hash in LOG.d
         try {
             Log.d(TAG, "Retrieving sha1 app hash...");
-            PackageInfo info = this.getPackageManager().getPackageInfo(
-                "ch.epfl.smartmap", PackageManager.GET_SIGNATURES);
+            PackageInfo info = this.getPackageManager().getPackageInfo("ch.epfl.smartmap",
+                    PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
-                Log.d(
-                    TAG,
-                    "SHA1 hash of the app : "
-                        + Base64.encodeToString(md.digest(), Base64.DEFAULT));
+                Log.d(TAG, "SHA1 hash of the app : " + Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
         } catch (NameNotFoundException e) {
-            Log.e(TAG,
-                "Cannot retrieve the sha1 hash for this app (used by fb)");
+            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
         } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG,
-                "Cannot retrieve the sha1 hash for this app (used by fb)");
+            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
         }
 
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_start);
 
         // Set background color of activity
-        this.setActivityBackgroundColor(this.getResources().getColor(
-            R.color.main_blue));
+        this.setActivityBackgroundColor(this.getResources().getColor(R.color.main_blue));
 
         // Get all views
         mLogoImage = (ImageView) this.findViewById(R.id.logo);
         mWelcomeText = (TextView) this.findViewById(R.id.welcome);
-        mLoginButton = (com.facebook.widget.LoginButton) this
-            .findViewById(R.id.loginButton);
+        mLoginButton = (com.facebook.widget.LoginButton) this.findViewById(R.id.loginButton);
         mProgressBar = (ProgressBar) this.findViewById(R.id.loadingBar);
         mProgressText = (TextView) this.findViewById(R.id.loadingTextView);
 
         // Not logged in Facebook or permission to use Facebook in SmartMap not
         // given
-        if ((Session.getActiveSession() == null)
-            || Session.getActiveSession().getPermissions().isEmpty()) {
+        if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
 
             // Start logo and text animation
-            mLogoImage.startAnimation(AnimationUtils.loadAnimation(this,
-                R.anim.logo_anim));
-            mWelcomeText.startAnimation(AnimationUtils.loadAnimation(this,
-                R.anim.welcome_anim));
+            mLogoImage.startAnimation(AnimationUtils.loadAnimation(this, R.anim.logo_anim));
+            mWelcomeText.startAnimation(AnimationUtils.loadAnimation(this, R.anim.welcome_anim));
 
             // Set facebook button's, progress bar's and progress text's
             // visibility to invisible
@@ -116,8 +106,7 @@ public class StartActivity extends FragmentActivity {
             mProgressText.setVisibility(View.INVISIBLE);
 
             // We set a time out to use postDelayed method
-            int timeOut = this.getResources().getInteger(
-                R.integer.offset_runnable);
+            int timeOut = this.getResources().getInteger(R.integer.offset_runnable);
 
             // Wait for the end of welcome animation before instantiate the
             // facebook fragment and use it
@@ -125,9 +114,8 @@ public class StartActivity extends FragmentActivity {
                 @Override
                 public void run() {
                     mFacebookFragment = new FacebookFragment();
-                    StartActivity.this.getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(android.R.id.content, mFacebookFragment).commit();
+                    StartActivity.this.getSupportFragmentManager().beginTransaction()
+                            .add(android.R.id.content, mFacebookFragment).commit();
                     Log.d(TAG, "facebook session is open");
                 }
             }, timeOut);
@@ -138,8 +126,8 @@ public class StartActivity extends FragmentActivity {
             mLogoImage.setVisibility(View.INVISIBLE);
 
             mFacebookFragment = new FacebookFragment();
-            this.getSupportFragmentManager().beginTransaction()
-                .add(android.R.id.content, mFacebookFragment).commit();
+            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment)
+                    .commit();
         }
 
         SettingsManager.initialize(this.getApplicationContext());

@@ -14,9 +14,9 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * Customized adapter that displays a list of users in a target activity
- * This adapter dynamically creates a row in the activity for each user
- * It displays in each row: user name, user status, TODO user picture
+ * Customized adapter that displays a list of users in a target activity This
+ * adapter dynamically creates a row in the activity for each user It displays
+ * in each row: user name, user status, TODO user picture
  * 
  * @author rbsteinm
  */
@@ -41,35 +41,30 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
 
     /*
      * (non-Javadoc)
+     * 
      * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-     * android.view.ViewGroup)
-     * callback function automatically called one time for each user in the list
+     * android.view.ViewGroup) callback function automatically called one time
+     * for each user in the list
      */
     @SuppressWarnings("deprecation")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         // Create inflater,get item to construct
-        LayoutInflater inflater = (LayoutInflater) mContext
-            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.gui_friend_list_item, parent,
-            false);
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
 
         // Get FriendItem fields
-        TextView name = (TextView) convertView
-            .findViewById(R.id.activity_friends_name);
-        TextView isOnline = (TextView) convertView
-            .findViewById(R.id.activity_friends_isOnline);
-        ImageView picture = (ImageView) convertView
-            .findViewById(R.id.activity_friends_picture);
+        TextView name = (TextView) convertView.findViewById(R.id.activity_friends_name);
+        TextView isOnline = (TextView) convertView.findViewById(R.id.activity_friends_isOnline);
+        ImageView picture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
 
         // Set the User's ID to the tag of its View
         convertView.setTag(mItemsArrayList.get(position).getID());
 
         // Set fields with friend attributes
         name.setText(mItemsArrayList.get(position).getName());
-        picture.setImageBitmap(mItemsArrayList.get(position).getPicture(
-            mContext));
+        picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
         String status;
         if (mItemsArrayList.get(position).isOnline()) {
             status = "online";

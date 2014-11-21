@@ -24,8 +24,7 @@ public interface EventMarkerDisplayer {
      * @param eventsToDisplay
      *            the events we want to display
      */
-    void setMarkersToMaps(Context context, GoogleMap googleMap,
-        List<Event> eventsToDisplay);
+    void setMarkersToMaps(Context context, GoogleMap googleMap, List<Event> eventsToDisplay);
 
     /**
      * This method updates the markers on the map with the given list of events
@@ -36,8 +35,7 @@ public interface EventMarkerDisplayer {
      * @param eventsToDisplay
      *            the updated events
      */
-    void updateMarkers(Context context, GoogleMap googleMap,
-        List<Event> eventsToDisplay);
+    void updateMarkers(Context context, GoogleMap googleMap, List<Event> eventsToDisplay);
 
     /**
      * @param event

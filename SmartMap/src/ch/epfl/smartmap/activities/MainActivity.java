@@ -60,7 +60,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 /**
- * This Activity displays the core features of the App. It displays the map and the whole menu.
+ * This Activity displays the core features of the App. It displays the map and
+ * the whole menu.
  * 
  * @author jfperren
  * @author SpicyCH
@@ -109,7 +110,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         this.setContentView(R.layout.activity_main);
 
         // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+                new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         this.getActionBar().setHomeButtonEnabled(true);
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setHomeAsUpIndicator(this.getResources().getDrawable(R.drawable.ic_drawer));
@@ -330,7 +332,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             mGoogleMap.setMyLocationEnabled(true);
             // Getting LocationManager object from System Service
             // LOCATION_SERVICE
-            LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            LocationManager locationManager = (LocationManager) this
+                    .getSystemService(Context.LOCATION_SERVICE);
             // Creating a criteria object to retrieve provider
             Criteria criteria = new Criteria();
             // Getting the name of the best provider
@@ -345,8 +348,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
                         LOCATION_UPDATE_DISTANCE, this);
             } else if (null != locationManager.getProvider(LocationManager.NETWORK_PROVIDER)) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                        LOCATION_UPDATE_DISTANCE, this);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                        LOCATION_UPDATE_TIMEOUT, LOCATION_UPDATE_DISTANCE, this);
             }
         }
     }
@@ -355,7 +358,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
         mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, mDbHelper.getAllEvents());
         mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, this.getVisibleUsers(mDbHelper.getAllUsers()));
+        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
+                this.getVisibleUsers(mDbHelper.getAllUsers()));
         mMapZoomer = new DefaultZoomManager(mFragmentMap);
         Log.i(TAG, "before enter to zoom according");
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
@@ -380,7 +384,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     /*
      * (non-Javadoc)
      * 
-     * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
+     * @see android.location.LocationListener#onStatusChanged(java.lang.String,
+     * int, android.os.Bundle)
      */
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -390,7 +395,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     /*
      * (non-Javadoc)
      * 
-     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
+     * @see
+     * android.location.LocationListener#onProviderEnabled(java.lang.String)
      */
     @Override
     public void onProviderEnabled(String provider) {
@@ -400,7 +406,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     /*
      * (non-Javadoc)
      * 
-     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
+     * @see
+     * android.location.LocationListener#onProviderDisabled(java.lang.String)
      */
     @Override
     public void onProviderDisabled(String provider) {
@@ -474,8 +481,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     }
 
     /**
-     * Sets the view for Item Focus, this means - Write name / Display photo on ActionBar - Sets ActionMenu for Item
-     * Focus
+     * Sets the view for Item Focus, this means - Write name / Display photo on
+     * ActionBar - Sets ActionMenu for Item Focus
      * 
      * @param item
      *            Item to be displayed
