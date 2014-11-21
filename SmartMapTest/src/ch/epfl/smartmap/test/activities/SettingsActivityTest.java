@@ -94,7 +94,64 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
     }
 
     public void testActivateNotifications() {
+        this.disableNotifications();
+        boolean initValue = SettingsManager.getInstance().notificationsEnabled();
+        assertEquals("Failed to disable notifications", false, initValue);
 
+        onView(
+            ViewMatchers.withText(mContext
+                .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
+            ViewActions.click());
+        assertEquals("Failed to enable notifications", true, SettingsManager.getInstance()
+            .notificationsEnabled());
+    }
+
+    public void testCannotActivateFriendRequestsNotificationsIfNotifDisabled() {
+        this.disableNotifications();
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_friend_requests)))
+            .perform(ViewActions.click());
+        assertEquals("Can enable a checkbox when its dependency is disabled", false, SettingsManager
+            .getInstance().notificationsForFriendRequests());
+    }
+
+    public void testCannotActivateFriendshipNotificationsIfNotifDisabled() {
+        this.disableNotifications();
+        onView(
+            ViewMatchers.withText(mContext
+                .getString(ch.epfl.smartmap.R.string.pref_title_friendship_confirmations))).perform(
+            ViewActions.click());
+        assertEquals("Can enable a checkbox when its dependency is disabled", false, SettingsManager
+            .getInstance().notificationsForFriendshipConfirmations());
+    }
+
+    public void testCannotActivateEventsNotificationsIfNotifDisabled() {
+        this.disableNotifications();
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_invitations)))
+            .perform(ViewActions.click());
+        assertEquals("Can enable a checkbox when its dependency is disabled", false, SettingsManager
+            .getInstance().notificationsForEventInvitations());
+
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_proximity)))
+            .perform(ViewActions.click());
+        assertEquals("Can enable a checkbox when its dependency is disabled", false, SettingsManager
+            .getInstance().notificationsForEventProximity());
+    }
+
+    private void disableNotifications() {
+        onView(
+            ViewMatchers.withText(mContext
+                .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
+            ViewActions.click());
+        boolean initValue = SettingsManager.getInstance().notificationsEnabled();
+        if (initValue) {
+            onView(
+                ViewMatchers.withText(mContext
+                    .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
+                ViewActions.click());
+        }
     }
 
 }

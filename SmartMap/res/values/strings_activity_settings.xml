@@ -9,9 +9,6 @@
     <string name="pref_header_general">General</string>
     <string name="pref_title_always_share">Always share my position</string>
     <string name="pref_description_always_share">To save your battery, when you close SmartMap, we will only refresh your position every 30 minutes</string>
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     
     <string-array name="pref_example_list_titles">
         <item>Always</item>
@@ -68,7 +65,6 @@
         <item>120</item>
     </string-array>
 
-    <string name="pref_title_system_sync_settings">System sync settings</string>
 
     <!-- Notifications -->
     <string name="pref_header_notifications">Notifications</string>
