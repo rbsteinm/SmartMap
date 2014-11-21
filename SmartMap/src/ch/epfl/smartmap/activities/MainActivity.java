@@ -111,11 +111,12 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.activity_main);
 
-		// TODO ENLEVER
+		// TODO Resolution du problème des tests
 		DatabaseHelper.initialize(this.getApplicationContext());
 		SettingsManager.initialize(this.getApplicationContext());
 
 		mActionBar = this.getActionBar();
+
 		// Set action bar color to main color
 		mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources()
 		    .getColor(R.color.main_blue)));
@@ -127,8 +128,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		    R.drawable.ic_drawer));
 
 		// TODO agpmilli, essayer de pas faire lagger le bouton
-		// mActionBar.setIcon(this.getResources().getDrawable(
-		// R.drawable.ic_launcher1));
+		mActionBar.setIcon(this.getResources().getDrawable(
+		    R.drawable.ic_launcher1));
 
 		mMenuTheme = MenuTheme.MAP;
 

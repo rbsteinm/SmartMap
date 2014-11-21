@@ -31,19 +31,17 @@ public class FriendsPagerActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.activity_friends_pager);
 
-		// Set action bar color to main color
-
 		mPager = (ViewPager) this.findViewById(R.id.myViewPager);
 		mActionBar = this.getActionBar();
+
+		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
 		// Set action bar and tab color to main color
 		mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources()
 		    .getColor(R.color.main_blue)));
 		mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this
 		    .getResources().getColor(R.color.main_blue)));
 
-		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this
-		    .getResources().getColor(R.color.main_blue)));
 		PagerAdapter pageAdapter = new PagerAdapter(this,
 		    this.getSupportFragmentManager());
 		mPager.setAdapter(pageAdapter);

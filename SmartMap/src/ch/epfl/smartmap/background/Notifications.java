@@ -19,11 +19,13 @@ import ch.epfl.smartmap.cache.User;
  */
 public class Notifications {
 
-	private static final int EVENT_NOTIFICATION_ID = 3;
 	private static final int VIBRATE_NOTIFICATION_TIME = 500;
 	private static final int SILENT_NOTIFICATION_TIME = 100;
 	private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME,
 	    SILENT_NOTIFICATION_TIME, VIBRATE_NOTIFICATION_TIME};
+	private static int notificationID = 0;
+	private static int numberOfEventNotification = 0;
+	private static int numberOfFriendNotification = 0;
 
 	/**
 	 * Create an accepted friend invitation notification and notify it
@@ -36,6 +38,9 @@ public class Notifications {
 	 *            The invited
 	 */
 	public static void acceptedFriendNotification(Context context, User user) {
+
+		// Get ID of notifications
+		notificationID++;
 
 		// Prepare intent that redirects the user to FriendActivity
 		PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0,
@@ -81,7 +86,7 @@ public class Notifications {
 		                .getString(R.string.notification_invitation_accepted))
 		    .setVibrate(PATTERN).setContentIntent(pFriendIntent);
 
-		displayNotification(context, noti.build(), 2);
+		displayNotification(context, noti.build(), notificationID);
 	}
 
 	/**
@@ -112,6 +117,10 @@ public class Notifications {
 	 *            the Event
 	 */
 	public static void newEventNotification(Context context, Event event) {
+
+		// Get ID and the number of ongoing Event notifications
+		notificationID++;
+		numberOfEventNotification++;
 
 		// Prepare intent that redirect the user to EventActivity
 		PendingIntent pEventIntent = PendingIntent.getActivity(context, 0,
@@ -155,7 +164,7 @@ public class Notifications {
 		            + event.getName()).setVibrate(PATTERN)
 		    .setContentIntent(pEventIntent);
 
-		displayNotification(context, noti.build(), EVENT_NOTIFICATION_ID);
+		displayNotification(context, noti.build(), notificationID);
 	}
 
 	/**
@@ -169,6 +178,11 @@ public class Notifications {
 	 *            The inviter
 	 */
 	public static void newFriendNotification(Context context, User user) {
+
+		// Get ID and the number of ongoing Friend notifications
+		notificationID++;
+		numberOfFriendNotification++;
+
 		// Prepare intent that redirects the user to FriendActivity
 		PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0,
 		    new Intent(context, FriendsPagerActivity.class),
@@ -217,6 +231,6 @@ public class Notifications {
 		// TODO : determine if we need those buttons
 		// noti.addAction(0, "Decline", pIntent);
 		// noti.addAction(0, "Accept", pIntent).build();
-		displayNotification(context, noti.build(), 1);
+		displayNotification(context, noti.build(), notificationID);
 	}
 }
