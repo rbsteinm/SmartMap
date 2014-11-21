@@ -87,7 +87,7 @@ $app->error(function (SmartMap\Control\InvalidRequestException $e, $code) use ($
 });
 
 $app->error(function (SmartMap\Control\ServerFeedbackException $e, $code) use ($app) {
-    $app['logging']->addWarning('Unexpected request: ' . $e->__toString());
+    $app['logging']->addWarning('Invalid request with feedback: ' . $e->__toString());
     return new JsonResponse(array('status' => 'feedback', 'message' => $e->getMessage()), 200,
         array('X-Status-Code' => 200));
 });
