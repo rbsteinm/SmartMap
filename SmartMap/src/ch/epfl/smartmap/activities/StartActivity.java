@@ -65,8 +65,8 @@ public class StartActivity extends FragmentActivity {
         // Displays the facebook app hash in LOG.d
         try {
             Log.d(TAG, "Retrieving sha1 app hash...");
-            PackageInfo info = this.getPackageManager().getPackageInfo("ch.epfl.smartmap",
-                    PackageManager.GET_SIGNATURES);
+            PackageInfo info =
+                this.getPackageManager().getPackageInfo("ch.epfl.smartmap", PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
@@ -115,7 +115,7 @@ public class StartActivity extends FragmentActivity {
                 public void run() {
                     mFacebookFragment = new FacebookFragment();
                     StartActivity.this.getSupportFragmentManager().beginTransaction()
-                            .add(android.R.id.content, mFacebookFragment).commit();
+                        .add(android.R.id.content, mFacebookFragment).commit();
                     Log.d(TAG, "facebook session is open");
                 }
             }, timeOut);
@@ -126,8 +126,7 @@ public class StartActivity extends FragmentActivity {
             mLogoImage.setVisibility(View.INVISIBLE);
 
             mFacebookFragment = new FacebookFragment();
-            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment)
-                    .commit();
+            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment).commit();
         }
 
         SettingsManager.initialize(this.getApplicationContext());

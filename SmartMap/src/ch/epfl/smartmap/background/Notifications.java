@@ -34,8 +34,9 @@ public class Notifications {
     public static void acceptedNotification(Context context, User user) {
 
         // Prepare intent that redirects the user to FriendActivity
-        PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0, new Intent(context,
-                FriendsPagerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pFriendIntent =
+            PendingIntent.getActivity(context, 0, new Intent(context, FriendsPagerActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Add Big View Specific Configuration
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -52,14 +53,14 @@ public class Notifications {
         }
 
         // Build notification
-        NotificationCompat.Builder noti = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder noti =
+            new NotificationCompat.Builder(context)
                 // Sets all notification's specifications in the builder
                 .setStyle(inboxStyle)
                 .setAutoCancel(true)
                 .setContentTitle("Friend invitation accepted")
                 .setContentText(
-                        user.getName()
-                                + " accepted your invitation. \n Click here to open your list of friends")
+                    user.getName() + " accepted your invitation. \n Click here to open your list of friends")
                 .setSmallIcon(R.drawable.ic_launcher).setTicker(user.getName() + " accepted your invitation")
                 .setContentIntent(pFriendIntent);
 
@@ -77,8 +78,8 @@ public class Notifications {
      *            id of current notification
      */
     private static void displayNotification(Context context, Notification notification, int notificationId) {
-        NotificationManager notificationManager = (NotificationManager) context
-                .getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager =
+            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(notificationId, notification);
     }
 
@@ -95,8 +96,9 @@ public class Notifications {
     public static void newEventNotification(Context context, Event event) {
 
         // Prepare intent that redirect the user to EventActivity
-        PendingIntent pEventIntent = PendingIntent.getActivity(context, 0, new Intent(context,
-                ShowEventsActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pEventIntent =
+            PendingIntent.getActivity(context, 0, new Intent(context, ShowEventsActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Add Big View Specific Configuration
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -113,15 +115,15 @@ public class Notifications {
         }
 
         // Build notification
-        NotificationCompat.Builder noti = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder noti =
+            new NotificationCompat.Builder(context)
                 // Sets all notification's specifications in the builder
                 .setStyle(inboxStyle)
                 .setAutoCancel(true)
                 .setContentTitle("SmartMap Event Invitation")
                 .setContentText(
-                        event.getCreatorName() + " invite you to " + event.getName()
-                                + "\n Click here to open your list of events")
-                .setSmallIcon(R.drawable.ic_launcher)
+                    event.getCreatorName() + " invite you to " + event.getName()
+                        + "\n Click here to open your list of events").setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(event.getCreatorName() + " invites you to " + event.getName())
                 .setContentIntent(pEventIntent);
 
@@ -140,8 +142,9 @@ public class Notifications {
      */
     public static void newFriendNotification(Context context, User user) {
         // Prepare intent that redirects the user to FriendActivity
-        PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0, new Intent(context,
-                FriendsPagerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pFriendIntent =
+            PendingIntent.getActivity(context, 0, new Intent(context, FriendsPagerActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Add Big View Specific Configuration
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -158,18 +161,14 @@ public class Notifications {
         }
 
         // Build notification
-        NotificationCompat.Builder noti = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder noti =
+            new NotificationCompat.Builder(context)
                 // Add all notification's specifications in the builder
-                .setStyle(inboxStyle)
-                .setAutoCancel(true)
-                .setContentIntent(pFriendIntent)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setTicker(user.getName() + " wants to be your friend")
+                .setStyle(inboxStyle).setAutoCancel(true).setContentIntent(pFriendIntent)
+                .setSmallIcon(R.drawable.ic_launcher).setTicker(user.getName() + " wants to be your friend")
 
                 .setContentTitle("SmartMap Friend Invitation")
-                .setContentText(
-                        user.getName()
-                                + " wants to be your friend \n Click here to open your list of friends");
+                .setContentText(user.getName() + " wants to be your friend \n Click here to open your list of friends");
 
         // TODO : determine if we need those buttons
         // noti.addAction(0, "Decline", pIntent);

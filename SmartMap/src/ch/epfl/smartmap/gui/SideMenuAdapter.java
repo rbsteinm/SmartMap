@@ -33,7 +33,6 @@ public class SideMenuAdapter extends ArrayAdapter<String> {
 
     /*
      * (non-Javadoc)
-     * 
      * @see android.widget.ArrayAdapter#getView(int, android.view.View,
      * android.view.ViewGroup)
      */

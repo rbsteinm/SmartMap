@@ -45,7 +45,6 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.EventMarkerDisplayer#setMarkersToMaps(android.content
      * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
@@ -62,7 +61,6 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.EventMarkerDisplayer#isDisplayedEvent(ch.epfl.smartmap
      * .cache.Event)
@@ -75,7 +73,6 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.EventMarkerDisplayer#isDisplayedMarker(com.google
      * .android.gms.maps.model.Marker)
@@ -88,7 +85,6 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.gui.EventMarkerDisplayer#getDisplayedMarkers()
      */
     @Override
@@ -98,7 +94,6 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.EventMarkerDisplayer#getEventForMarker(com.google
      * .android.gms.maps.model.Marker)
@@ -110,7 +105,6 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.EventMarkerDisplayer#getMarkerForEvent(ch.epfl.smartmap
      * .cache.Event)
@@ -127,7 +121,6 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.gui.EventMarkerDisplayer#getDisplayedEvents()
      */
     @Override
@@ -138,7 +131,6 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.EventMarkerDisplayer#addMarker(ch.epfl.smartmap.
      * cache.Event, android.content.Context,
@@ -146,8 +138,8 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
      */
     @Override
     public Marker addMarker(Event event, Context context, GoogleMap googleMap) {
-        Marker marker = googleMap.addMarker(new MarkerOptions().position(event.getLatLng())
-                .title(event.getName())
+        Marker marker =
+            googleMap.addMarker(new MarkerOptions().position(event.getLatLng()).title(event.getName())
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
                 .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
 
@@ -158,7 +150,6 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.EventMarkerDisplayer#removeMarker(ch.epfl.smartmap
      * .cache.Event, android.content.Context,
@@ -176,7 +167,6 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.EventMarkerDisplayer#updateMarkers(android.content
      * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)

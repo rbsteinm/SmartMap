@@ -71,7 +71,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.servercom.SmartMapClient#authServer(java.lang.String,
      * long, java.lang.String)
@@ -104,7 +103,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#listFriendPos()
      */
     @SuppressLint("UseSparseArrays")
@@ -140,7 +138,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#followFriend(int)
      */
     @Override
@@ -168,7 +165,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#unfollowFriend(int)
      */
     @Override
@@ -195,7 +191,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#allowFriend(int)
      */
     @Override
@@ -221,7 +216,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.severcom.SmartMapFriendsClient#disallowFriend(int)
      */
     @Override
@@ -248,7 +242,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.severcom.SmartMapFriendsClient#allowFriendList(java.
      * util.List)
@@ -277,7 +270,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.severcom.SmartMapFriendsClient#disallowFriendList(java
      * .util.List)
@@ -306,7 +298,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.servercom.SmartMapClient#inviteFriend(int)
      */
     @Override
@@ -333,7 +324,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getInvitations()
      */
     @Override
@@ -378,7 +368,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.severcom.SmartMapInvitationsClient#acceptInvitation(int)
      */
@@ -415,7 +404,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getUserInfo(int)
      */
     @Override
@@ -451,7 +439,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.servercom.SmartMapClient#updatePos(ch.epfl.smartmap.
      * cache.Point)
@@ -599,8 +586,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      *             in case the response could not be retrieved for any reason
      *             external to the application (network failure etc.)
      */
-    private String sendViaPost(Map<String, String> params, HttpURLConnection connection)
-            throws SmartMapClientException {
+    private String sendViaPost(Map<String, String> params, HttpURLConnection connection) throws SmartMapClientException {
         StringBuffer response = null;
         Log.d("sendViaPost", "start");
 
@@ -639,7 +625,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
             if (connection.getResponseCode() != SERVER_RESPONSE_OK) {
                 throw new SmartMapClientException("HTTP error with code " + connection.getResponseCode()
-                        + " during communication with client.");
+                    + " during communication with client.");
             }
 
             // Get response

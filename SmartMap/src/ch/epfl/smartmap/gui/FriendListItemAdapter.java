@@ -41,7 +41,6 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
 
     /*
      * (non-Javadoc)
-     * 
      * @see android.widget.ArrayAdapter#getView(int, android.view.View,
      * android.view.ViewGroup) callback function automatically called one time
      * for each user in the list

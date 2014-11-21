@@ -36,7 +36,9 @@ public class SlidingPanel extends FrameLayout {
      * @author jfperren
      */
     private enum VisualState {
-        CLOSED, OPEN, ANIM_PERFORMED;
+        CLOSED,
+        OPEN,
+        ANIM_PERFORMED;
         private int height;
     }
 
@@ -46,7 +48,8 @@ public class SlidingPanel extends FrameLayout {
      * @author jfperren
      */
     private enum Fade {
-        IN(0, 1, FADE_IN_DELAY, FADE_IN_DURATION), OUT(1, 0, FADE_OUT_DELAY, FADE_OUT_DURATION);
+        IN(0, 1, FADE_IN_DELAY, FADE_IN_DURATION),
+        OUT(1, 0, FADE_OUT_DELAY, FADE_OUT_DURATION);
 
         private float mFromAlpha;
         private float mToAlpha;

@@ -34,7 +34,12 @@ public class SearchLayout extends LinearLayout {
      * @author jfperren
      */
     private enum SearchPanelType {
-        HISTORY("History"), QUICK("All"), USERS("Users"), EVENTS("Events"), TAGS("Tags"), GROUPS("Groups");
+        HISTORY("History"),
+        QUICK("All"),
+        USERS("Users"),
+        EVENTS("Events"),
+        TAGS("Tags"),
+        GROUPS("Groups");
 
         private String mTitle;
 
@@ -66,8 +71,7 @@ public class SearchLayout extends LinearLayout {
         super(context, attrs);
         // Layout relative informations
         this.setOrientation(HORIZONTAL);
-        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT));
+        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         this.setBackgroundResource(R.color.background_blue);
         mCurrentSearchType = FIRST_SEARCH_PANEL_TYPE;
         mScrollViews = new HashMap<SearchPanelType, ScrollView>();
@@ -99,8 +103,8 @@ public class SearchLayout extends LinearLayout {
         // Get current and next ScrollViews (circularily)
         Log.d(TAG, mCurrentSearchType.title());
         ScrollView currentScrollView = mScrollViews.get(mCurrentSearchType);
-        mCurrentSearchType = SearchPanelType.values()[(mCurrentSearchType.ordinal() + 1)
-                % SearchPanelType.values().length];
+        mCurrentSearchType =
+            SearchPanelType.values()[(mCurrentSearchType.ordinal() + 1) % SearchPanelType.values().length];
         Log.d(TAG, mCurrentSearchType.title());
         ScrollView nextScrollView = mScrollViews.get(mCurrentSearchType);
         nextScrollView.scrollTo(0, 0);
@@ -200,8 +204,7 @@ public class SearchLayout extends LinearLayout {
     private void updateHistoryPanel() {
         // History Panel
         History history = mSearchEngine.getHistory();
-        LinearLayout searchResultLayout = (LinearLayout) mScrollViews.get(SearchPanelType.HISTORY)
-                .getChildAt(0);
+        LinearLayout searchResultLayout = (LinearLayout) mScrollViews.get(SearchPanelType.HISTORY).getChildAt(0);
         searchResultLayout.removeAllViews();
 
         for (int i = 0; i < history.nbOfDates(); i++) {
@@ -211,8 +214,8 @@ public class SearchLayout extends LinearLayout {
             titleView.setTextColor(getResources().getColor(R.color.searchResultTitle));
             titleView.setText(history.getDateForIndex(i).toString());
             // SearchResultViewGroup grouping all queries of this date
-            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(getContext(),
-                    history.getEntriesForIndex(i));
+            SearchResultViewGroup searchResultViewGroup =
+                new SearchResultViewGroup(getContext(), history.getEntriesForIndex(i));
             // Put views together
             searchResultLayout.addView(titleView);
             searchResultLayout.addView(searchResultViewGroup);
@@ -230,7 +233,7 @@ public class SearchLayout extends LinearLayout {
         // ScrollView with TouchEvent passing handling
         ScrollView scrollView = new ScrollView(context) {
             private final GestureDetector gestureDetector = new GestureDetector(getContext(),
-                    new HorizontalGestureListener());
+                new HorizontalGestureListener());
 
             @Override
             public boolean onTouchEvent(MotionEvent ev) {
@@ -259,8 +262,7 @@ public class SearchLayout extends LinearLayout {
 
         // Layout contained in ScrollView
         LinearLayout searchResultLayout = new LinearLayout(context);
-        searchResultLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT));
+        searchResultLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         searchResultLayout.setOrientation(VERTICAL);
         searchResultLayout.setPadding(0, SCROLLVIEW_LAYOUT_TOP_PADDING, 0, SCROLLVIEW_LAYOUT_BOTTOM_PADDING);
 
@@ -272,8 +274,7 @@ public class SearchLayout extends LinearLayout {
             titleView.setTextColor(getResources().getColor(R.color.main_blue));
             titleView.setText(searchPanelType.title());
             // SearchResultViewGroup
-            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(context,
-                    MockDB.FRIENDS_LIST);
+            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(context, MockDB.FRIENDS_LIST);
             // Put views together
             searchResultLayout.addView(titleView);
             searchResultLayout.addView(searchResultViewGroup);

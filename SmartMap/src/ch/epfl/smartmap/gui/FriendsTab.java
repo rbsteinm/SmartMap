@@ -139,7 +139,8 @@ public class FriendsTab extends ListFragment {
             String confirmString = "";
             try {
                 NetworkSmartMapClient.getInstance().removeFriend(params[0]);
-                confirmString = "You're no longer friend with "
+                confirmString =
+                    "You're no longer friend with "
                         + NetworkSmartMapClient.getInstance().getUserInfo(params[0]).getName();
 
                 // remove friend from cache and update displayed list

@@ -22,7 +22,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
     private ViewPager mPager;
     private ActionBar mActionBar;
-    private final String[] mTabs = { "Friends", "Invitations" };
+    private final String[] mTabs = {"Friends", "Invitations"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

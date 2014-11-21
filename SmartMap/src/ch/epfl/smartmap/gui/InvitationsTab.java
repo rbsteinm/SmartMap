@@ -42,7 +42,6 @@ public class InvitationsTab extends ListFragment {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater
      * , android.view.ViewGroup, android.os.Bundle)
@@ -57,7 +56,6 @@ public class InvitationsTab extends ListFragment {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView
      * , android.view.View, int, long) When a list item is clicked, display a
@@ -75,7 +73,6 @@ public class InvitationsTab extends ListFragment {
 
     /*
      * (non-Javadoc)
-     * 
      * @see android.support.v4.app.Fragment#onResume()
      */
     @Override

@@ -37,7 +37,6 @@ public class JsonSmartMapParser implements SmartMapParser {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.servercom.SmartMapParser#parseFriend(java.lang.String)
      */
@@ -54,7 +53,6 @@ public class JsonSmartMapParser implements SmartMapParser {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.servercom.SmartMapParser#parseFriends(java.lang.String)
      */
@@ -83,7 +81,6 @@ public class JsonSmartMapParser implements SmartMapParser {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.servercom.SmartMapParser#checkServerError(java.lang.
      * String)

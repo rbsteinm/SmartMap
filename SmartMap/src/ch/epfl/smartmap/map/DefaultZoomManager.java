@@ -37,7 +37,6 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.ZoomManager#zoomOnLocation(android.location.Location
      * , com.google.android.gms.maps.GoogleMap)
@@ -60,7 +59,6 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * ch.epfl.smartmap.gui.ZoomManager#zoomAccordingToMarkers(com.google.android
      * .gms.maps.GoogleMap, java.util.List) Almost all movement methods require
