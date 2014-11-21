@@ -19,6 +19,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.History;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
+import ch.epfl.smartmap.cache.SearchEngine.Type;
 
 /**
  * Layout that contains different SearchResultLists, that can be swapped with a
@@ -39,15 +40,16 @@ public class SearchLayout extends LinearLayout {
 
     private static final float TITLE_TEXT_SIZE = 15f;
 
-    private final HashMap<SearchEngine.Type, ScrollView> mScrollViews;
-    private final HashMap<SearchEngine.Type, SearchResultViewGroup> mSearchResultViewGroups;
-    private final HashMap<SearchEngine.Type, Integer> mSearchTypeIndexes;
+    private final HashMap<Type, ScrollView> mScrollViews;
+    private final HashMap<Type, SearchResultViewGroup> mSearchResultViewGroups;
+    private final HashMap<Type, Integer> mSearchTypeIndexes;
+    private final HashMap<Type, TextView> mTitleTextViews;
 
-    private SearchEngine.Type mCurrentSearchType;
+    private Type mCurrentSearchType;
 
     private SearchEngine mSearchEngine;
     private LinearLayout mTitleBar;
-    private List<SearchEngine.Type> mActiveSearchTypes;
+    private List<Type> mActiveSearchTypes;
 
     private String mCurrentQuery;
 
@@ -59,22 +61,21 @@ public class SearchLayout extends LinearLayout {
             LayoutParams.MATCH_PARENT));
         this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
         this.setBackgroundResource(R.color.background_blue);
-        // Initialize data structures
+
         mCurrentQuery = "";
-        mCurrentSearchType = SearchEngine.Type.FRIENDS;
-        mScrollViews = new HashMap<SearchEngine.Type, ScrollView>();
-        mSearchResultViewGroups = new HashMap<SearchEngine.Type, SearchResultViewGroup>();
-        mSearchTypeIndexes = new HashMap<SearchEngine.Type, Integer>();
-        mActiveSearchTypes = new LinkedList<SearchEngine.Type>();
+        mCurrentSearchType = Type.FRIENDS;
+        // Initialize data structures
+        mScrollViews = new HashMap<Type, ScrollView>();
+        mSearchResultViewGroups = new HashMap<Type, SearchResultViewGroup>();
+        mSearchTypeIndexes = new HashMap<Type, Integer>();
+        mActiveSearchTypes = new LinkedList<Type>();
+        mTitleTextViews = new HashMap<Type, TextView>();
 
         this.setSearchEngine(new MockSearchEngine());
 
         mTitleBar = new LinearLayout(context);
-
-        this.addSearchType(context, SearchEngine.Type.ALL);
-        this.addSearchType(context, SearchEngine.Type.FRIENDS);
-        this.addSearchType(context, SearchEngine.Type.EVENTS);
-        this.setSearchType(SearchEngine.Type.ALL);
+        this.addSearchTypes(Type.ALL, Type.FRIENDS, Type.EVENTS, Type.TAGS);
+        this.setSearchType(Type.ALL);
     }
 
     /**
@@ -86,7 +87,7 @@ public class SearchLayout extends LinearLayout {
         mSearchEngine = searchEngine;
     }
 
-    public void setSearchType(SearchEngine.Type searchType) {
+    public void setSearchType(Type searchType) {
         // Add new Views
         this.removeAllViews();
         this.addView(mTitleBar);
@@ -94,6 +95,11 @@ public class SearchLayout extends LinearLayout {
         // Update search type
         mCurrentSearchType = searchType;
         this.updateCurrentPanel();
+        // Set title colors
+        for (TextView textView : mTitleTextViews.values()) {
+            textView.setTextColor(this.getResources().getColor(R.color.bottomSliderBackground));
+        }
+        mTitleTextViews.get(searchType).setTextColor(this.getResources().getColor(R.color.main_blue));
         // Scroll up
         mScrollViews.get(searchType).scrollTo(0, 0);
     }
@@ -109,7 +115,7 @@ public class SearchLayout extends LinearLayout {
     private void onSwipeLeft() {
         int nextSearchTypeIndex =
             (mSearchTypeIndexes.get(mCurrentSearchType).intValue() + 1) % mActiveSearchTypes.size();
-        SearchEngine.Type nextSearchType = mActiveSearchTypes.get(nextSearchTypeIndex);
+        Type nextSearchType = mActiveSearchTypes.get(nextSearchTypeIndex);
         this.setSearchType(nextSearchType);
 
         // ScrollView currentScrollView = mScrollViews.get(mCurrentSearchType);
@@ -177,22 +183,8 @@ public class SearchLayout extends LinearLayout {
      * @param query
      */
     public void resetView(String query) {
-        if (mSearchEngine.getHistory().isEmpty() || !query.equals("")) {
-            this.setSearchType(SearchEngine.Type.FRIENDS);
-            this.setSearchQuery(query);
-        } else {
-            this.showHistoryPanel();
-            this.updateHistoryPanel();
-        }
-    }
-
-    /**
-     * Replace current View by HISTORY View
-     */
-    private void showHistoryPanel() {
-        this.removeAllViews();
-        this.addView(mScrollViews.get(SearchEngine.Type.HISTORY));
-        mCurrentSearchType = SearchEngine.Type.HISTORY;
+        this.setSearchType(Type.FRIENDS);
+        this.setSearchQuery(query);
     }
 
     /**
@@ -201,8 +193,7 @@ public class SearchLayout extends LinearLayout {
     private void updateHistoryPanel() {
         // History Panel
         History history = mSearchEngine.getHistory();
-        LinearLayout searchResultLayout =
-            (LinearLayout) mScrollViews.get(SearchEngine.Type.HISTORY).getChildAt(0);
+        LinearLayout searchResultLayout = (LinearLayout) mScrollViews.get(Type.HISTORY).getChildAt(0);
         searchResultLayout.removeAllViews();
 
         for (int i = 0; i < history.nbOfDates(); i++) {
@@ -221,31 +212,49 @@ public class SearchLayout extends LinearLayout {
     }
 
     /**
-     * Create a new SearchResultViewGroup for a given {@code SearchPanelType}
+     * Create all Views to handle multiple Search Types
      * 
      * @param context
+     *            Context of the Application
      * @param searchType
+     *            Search Types that need to be implemented
      */
-    private void addSearchType(Context context, SearchEngine.Type searchType) {
+    private void addSearchTypes(Type... searchTypes) {
+        // Add all titles into mTitleBar
+        for (Type searchType : searchTypes) {
+            // create titleTextView
+            TextView titleTextView = new TextView(this.getContext());
+            titleTextView.setText(searchType.getTitle());
+            titleTextView.setTextSize(TITLE_TEXT_SIZE);
+            titleTextView.setTextColor(this.getResources().getColor(R.color.bottomSliderBackground));
+            // Add it
+            mTitleTextViews.put(searchType, titleTextView);
+            mTitleBar.addView(titleTextView);
+        }
+
+        for (Type searchType : searchTypes) {
+            this.addSearchResultScrollView(searchType);
+        }
+    }
+
+    /**
+     * Creates a new ScrollView containing the results of a certain Type
+     * 
+     * @param context
+     *            Context of the Application
+     * @param searchType
+     *            Type of Search Results the ScrollView should display
+     */
+    private void addSearchResultScrollView(Type searchType) {
         if (!mActiveSearchTypes.contains(searchType)) {
-            // Add name in Title Bar
-            TextView titleView = new TextView(context);
-            titleView.setText(searchType.getTitle());
-            titleView.setTextSize(TITLE_TEXT_SIZE);
-            LayoutParams titleParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            titleParams.setMarginEnd(MARGIN_BELOW_TITLE);
-            titleView.setLayoutParams(titleParams);
-            mTitleBar.addView(titleView);
-
-            ScrollView scrollView = new SwipeableScrollView(context);
-
+            ScrollView scrollView = new SwipeableScrollView(this.getContext());
             // Create & Add Views
-            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(context);
+            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(this.getContext());
             LayoutParams searchParams =
                 new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
             searchParams.setMargins(0, 0, 0, MARGIN_BELOW_SEARCHVIEWGROUP);
             searchResultViewGroup.setLayoutParams(searchParams);
-            SearchOnlineButton searchOnlineButton = new SearchOnlineButton(context);
+            SearchOnlineButton searchOnlineButton = new SearchOnlineButton(this.getContext());
             scrollView.addView(searchResultViewGroup);
             scrollView.addView(searchOnlineButton);
             // Add ViewGroup entry

@@ -66,6 +66,7 @@ public class SearchResultViewGroup extends LinearLayout {
         mMoreResultsButton = new MoreResultsButton(context, this);
         mEmptyListTextView = new TextView(context);
         mEmptyListTextView.setText(R.string.no_search_result);
+        mEmptyListTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 600));
         // Sets list and displayMinimized
         this.setResultList(results);
     }
