@@ -18,12 +18,11 @@ import ch.epfl.smartmap.gui.PagerAdapter;
  * 
  * @author rbsteinm
  */
-public class FriendsPagerActivity extends FragmentActivity implements
-    ActionBar.TabListener {
+public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 
     private ViewPager mPager;
     private ActionBar mActionBar;
-    private final String[] mTabs = { "Friends", "Invitations" };
+    private final String[] mTabs = {"Friends", "Invitations"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +32,7 @@ public class FriendsPagerActivity extends FragmentActivity implements
         mPager = (ViewPager) this.findViewById(R.id.myViewPager);
         mActionBar = this.getActionBar();
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        PagerAdapter pageAdapter = new PagerAdapter(this,
-            this.getSupportFragmentManager());
+        PagerAdapter pageAdapter = new PagerAdapter(this, this.getSupportFragmentManager());
 
         mPager.setAdapter(pageAdapter);
         mActionBar.setHomeButtonEnabled(false);
@@ -42,8 +40,7 @@ public class FriendsPagerActivity extends FragmentActivity implements
 
         // Adding Tabs
         for (String tabName : mTabs) {
-            mActionBar.addTab(mActionBar.newTab().setText(tabName)
-                .setTabListener(this));
+            mActionBar.addTab(mActionBar.newTab().setText(tabName).setTabListener(this));
         }
 
         /**

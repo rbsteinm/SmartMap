@@ -10,6 +10,7 @@ import java.util.Set;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -163,9 +164,9 @@ public class UpdateService extends Service {
             }
             // Sets the location name
             try {
-                String locName = mGeocoder
-                    .getFromLocation(locFromGps.getLatitude(),
-                        locFromGps.getLongitude(), 1).get(0).getLocality();
+                String locName =
+                    mGeocoder.getFromLocation(locFromGps.getLatitude(), locFromGps.getLongitude(), 1).get(0)
+                        .getLocality();
                 if (locName == null) {
                     mManager.setLocationName(SettingsManager.DEFAULT_LOC_NAME);
                 } else {
@@ -189,8 +190,7 @@ public class UpdateService extends Service {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             // stop sending position if provider isn't available
-            if (status == LocationProvider.OUT_OF_SERVICE
-                || status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
+            if (status == LocationProvider.OUT_OF_SERVICE || status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
                 mOwnPosEnabled = false;
             } else if (status == LocationProvider.AVAILABLE) {
                 mOwnPosEnabled = true;
@@ -218,8 +218,7 @@ public class UpdateService extends Service {
     private SettingsManager mManager;
     private Geocoder mGeocoder;
 
-    private final NetworkSmartMapClient mClient = NetworkSmartMapClient
-        .getInstance();
+    private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
 
     // TWEAK FOR THE DEMO: MUST BE REMOVED AND REPLACED AFTERWARDS !!!
     private final Set<Long> notifiedInvitations = new HashSet<Long>();
@@ -267,10 +266,11 @@ public class UpdateService extends Service {
         mHelper = DatabaseHelper.initialize(this.getApplicationContext());
         mGeocoder = new Geocoder(getBaseContext(), Locale.US);
         mFriendsPosIntent = new Intent(BROADCAST_POS);
-        mLocManager = (LocationManager) this
-            .getSystemService(Context.LOCATION_SERVICE);
-        mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-            POS_UPDATE_DELAY, MIN_DISTANCE, new MyLocationListener());
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY, MIN_DISTANCE,
+            new MyLocationListener());
         new AsyncFriendsInit().execute();
     }
 

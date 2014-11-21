@@ -50,26 +50,20 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         // Create inflater,get item to construct
-        LayoutInflater inflater = (LayoutInflater) mContext
-            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.gui_friend_list_item, parent,
-            false);
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
 
         // Get FriendItem fields
-        TextView name = (TextView) convertView
-            .findViewById(R.id.activity_friends_name);
-        TextView isOnline = (TextView) convertView
-            .findViewById(R.id.activity_friends_isOnline);
-        ImageView picture = (ImageView) convertView
-            .findViewById(R.id.activity_friends_picture);
+        TextView name = (TextView) convertView.findViewById(R.id.activity_friends_name);
+        TextView isOnline = (TextView) convertView.findViewById(R.id.activity_friends_isOnline);
+        ImageView picture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
 
         // Set the User's ID to the tag of its View
         convertView.setTag(mItemsArrayList.get(position).getID());
 
         // Set fields with friend attributes
         name.setText(mItemsArrayList.get(position).getName());
-        picture.setImageBitmap(mItemsArrayList.get(position).getPicture(
-            mContext));
+        picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
         String status;
         if (mItemsArrayList.get(position).isOnline()) {
             status = "online";

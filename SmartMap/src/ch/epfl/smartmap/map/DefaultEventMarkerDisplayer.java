@@ -51,8 +51,7 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
      * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
      */
     @Override
-    public void setMarkersToMaps(Context context, GoogleMap googleMap,
-        List<Event> eventsToDisplay) {
+    public void setMarkersToMaps(Context context, GoogleMap googleMap, List<Event> eventsToDisplay) {
 
         for (Event event : eventsToDisplay) {
 
@@ -140,13 +139,10 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
      */
     @Override
     public Marker addMarker(Event event, Context context, GoogleMap googleMap) {
-        Marker marker = googleMap.addMarker(new MarkerOptions()
-            .position(event.getLatLng())
-            .title(event.getName())
-            .icon(
-                BitmapDescriptorFactory
-                    .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
+        Marker marker =
+            googleMap.addMarker(new MarkerOptions().position(event.getLatLng()).title(event.getName())
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
 
         displayedMarkers.put(marker.getId(), event);
         dictionnaryMarkers.put(marker.getId(), marker);
@@ -177,8 +173,7 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
      * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
      */
     @Override
-    public void updateMarkers(Context context, GoogleMap googleMap,
-        List<Event> eventsToDisplay) {
+    public void updateMarkers(Context context, GoogleMap googleMap, List<Event> eventsToDisplay) {
 
         for (Event event : eventsToDisplay) {
             if (isDisplayedEvent(event)) {
@@ -189,8 +184,7 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
         }
 
         for (Event event : getDisplayedEvents()) {
-            if ((!eventsToDisplay.contains(event))
-                && (!getMarkerForEvent(event).isInfoWindowShown())) {
+            if ((!eventsToDisplay.contains(event)) && (!getMarkerForEvent(event).isInfoWindowShown())) {
                 removeMarker(event);
             }
         }

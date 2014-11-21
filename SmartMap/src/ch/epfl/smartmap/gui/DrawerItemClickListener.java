@@ -21,21 +21,18 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     private static final int INDEX_SETTINGS = 4;
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position,
-        long id) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         switch (position) {
             case INDEX_PROFILE:
                 break;
             case INDEX_FRIENDS:
 
-                Intent displayActivityIntent = new Intent(view.getContext(),
-                    FriendsPagerActivity.class);
+                Intent displayActivityIntent = new Intent(view.getContext(), FriendsPagerActivity.class);
                 view.getContext().startActivity(displayActivityIntent);
 
                 break;
             case INDEX_EVENTS:
-                view.getContext().startActivity(
-                    new Intent(view.getContext(), ShowEventsActivity.class));
+                view.getContext().startActivity(new Intent(view.getContext(), ShowEventsActivity.class));
                 break;
             case INDEX_FILTERS:
                 break;

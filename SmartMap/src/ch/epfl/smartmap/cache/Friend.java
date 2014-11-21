@@ -66,8 +66,7 @@ public class Friend implements User, Searchable, Displayable {
         mVisible = true;
     }
 
-    public Friend(long userID, String userName, double latitude,
-        double longitude) {
+    public Friend(long userID, String userName, double latitude, double longitude) {
         this(userID, userName);
         this.setLatitude(latitude);
         this.setLongitude(longitude);
@@ -155,8 +154,7 @@ public class Friend implements User, Searchable, Displayable {
         if (file.exists()) {
             pic = BitmapFactory.decodeFile(file.getAbsolutePath());
         } else {
-            pic = BitmapFactory.decodeResource(context.getResources(),
-                DEFAULT_PICTURE);
+            pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE);
         }
         return pic;
     }
@@ -168,8 +166,17 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public String getShortInfos() {
-        // TODO
-        return "Seen 10 minutes ago near Lausanne";
+        String info = "";
+        if (isOnline() && !getPositionName().equals("")) {
+            info = "Currently in " + getPositionName();
+        } else if (isOnline()) {
+            info = "Online right now";
+        } else if (!getPositionName().equals("")) {
+            info = "Last seen near " + getPositionName();
+        } else {
+            info = "Currently offline";
+        }
+        return info;
     }
 
     /*
@@ -187,8 +194,7 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public boolean isOnline() {
-        return new GregorianCalendar().getTimeInMillis()
-            - mLastSeen.getTimeInMillis() < ONLINE_TIMEOUT;
+        return new GregorianCalendar().getTimeInMillis() - mLastSeen.getTimeInMillis() < ONLINE_TIMEOUT;
     }
 
     @Override
@@ -203,9 +209,8 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public void setLastSeen(GregorianCalendar date) {
-        mLastSeen.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH),
-            date.get(Calendar.DATE), date.get(Calendar.HOUR),
-            date.get(Calendar.MINUTE));
+        mLastSeen.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE),
+            date.get(Calendar.HOUR), date.get(Calendar.MINUTE));
     }
 
     @Override
@@ -251,8 +256,7 @@ public class Friend implements User, Searchable, Displayable {
         }
 
         try {
-            FileOutputStream out = context.openFileOutput(mId + ".png",
-                Context.MODE_PRIVATE);
+            FileOutputStream out = context.openFileOutput(mId + ".png", Context.MODE_PRIVATE);
             pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
             out.close();
         } catch (FileNotFoundException e) {
