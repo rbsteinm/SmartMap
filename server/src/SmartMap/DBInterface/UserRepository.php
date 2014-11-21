@@ -4,8 +4,6 @@ namespace SmartMap\DBInterface;
 
 use Doctrine\DBAL\Connection;
 
-use SmartMap\Control\ControlException;
-
 /**
  * Models the user repo.
  *
@@ -20,8 +18,9 @@ class UserRepository
     private static $TABLE_FRIENDSHIP = 'friendships';
     private static $TABLE_INVITATIONS = 'invitations';
     private static $TABLE_ACCEPTED_INVITATIONS = 'accepted_invitations';
+    private static $TABLE_REMOVED_FRIENDS = 'removed_friends';
     
-    private $mApp;
+    private $mDb;
     
     /**
      * Constructs a UserRepository with a Doctrine\DBAL\Connection object.
@@ -34,13 +33,14 @@ class UserRepository
     }
     
     // Authentication
-    
+
     /**
      * Gets a user id given it's facebook id, or returns false if such user
      * does not exist.
-     * 
-     * @param Long $fbId
-     * @return false if we couldn't fetch the user's data and the user id otherwise.
+     *
+     * @param $fbId
+     * @return bool
+     * @throws DatabaseException
      */
     public function getUserIdFromFb($fbId)
     {
@@ -61,7 +61,7 @@ class UserRepository
         }
         else
         {
-            return $userData['idusers'];
+            return (int) $userData['idusers'];
         }
     }
     
@@ -71,7 +71,7 @@ class UserRepository
      * Gets a user from the database, given it's id.
      * 
      * @param Long $id
-     * @throws SmartMap\DBInterface\DatabaseException when the user is not found
+     * @throws DatabaseException when the user is not found
      * @return \SmartMap\DBInterface\User
      */
     public function getUser($id)
@@ -95,12 +95,12 @@ class UserRepository
         try
         {
             $user = new User(
-                $userData['idusers'],
-                $userData['fbid'],
+                (int) $userData['idusers'],
+                (int) $userData['fbid'],
                 $userData['name'],
                 $userData['visibility'],
-                $userData['longitude'],
-                $userData['latitude'],
+                (double) $userData['longitude'],
+                (double) $userData['latitude'],
                 $userData['last_update']
             );
         }
@@ -117,8 +117,8 @@ class UserRepository
      * 
      * @param array $ids
      * @param array $visibility
-     * @throws \InvalidArgumentException if $ids or $visibility is not of the right type
-     * @return multitype:|multitype:\SmartMap\DBInterface\User
+     * @throws DatabaseException if $ids or $visibility is not of the right type
+     * @return User
      */
     public function getUsers($ids, $visibility = array('VISIBLE', 'INVISIBLE'))
     {
@@ -153,7 +153,8 @@ class UserRepository
      * Gets a list of users whose name is starting by $partialName
      * 
      * @param String $partialName
-     * @return multitype:\SmartMap\DBInterface\User
+     * @throws DatabaseException
+     * @return User
      */
     public function findUsersByPartialName($partialName, $excludedIds)
     {
@@ -205,6 +206,7 @@ class UserRepository
      * is not used. Returns the created user with it's id properly set.
      * 
      * @param User $user
+     * @throws DatabaseException
      * @return User
      */
     public function createUser(User $user)
@@ -237,6 +239,7 @@ class UserRepository
      * name, visibility, longitude and latitude.
      * 
      * @param User $user
+     * @throws DatabaseException
      */
     public function updateUser(User $user)
     {
@@ -270,8 +273,8 @@ class UserRepository
      * @param long $userId
      * @param array $status
      * @param array $follow
-     * @throws \InvalidArgumentException
-     * @return multitype:unknown
+     * @throws DatabaseException
+     * @return array
      */
     public function getFriendsIds($userId,
                                   $status = array('ALLOWED', 'DISALLOWED'),
@@ -453,13 +456,14 @@ class UserRepository
     }
     
     // Invitations management
-    
+
     /**
-     * Gets a list of the ids of users who sent a friend invitation to 
+     * Gets a list of the ids of users who sent a friend invitation to
      * the user with id $userId.
-     * 
-     * @param long $userId
-     * @return an array of user ids who sent an invitation to the user $userId
+     *
+     * @param $userId
+     * @return array
+     * @throws DatabaseException
      */
     public function getInvitationIds($userId)
     {
@@ -478,7 +482,7 @@ class UserRepository
         
         while ($id = $stmt->fetch())
         {
-            $ids[] = $id['id1'];
+            $ids[] = (int) $id['id1'];
         }
         
         return $ids;
@@ -488,8 +492,9 @@ class UserRepository
      * Adds an nvitation from the user with id $idUser to the user with
      * id $idFriend.
      * 
-     * @param long $idUser
-     * @param long $idFriend
+     * @param int $idUser
+     * @param int $idFriend
+     * @throws DatabaseException
      */
     public function addInvitation($idUser, $idFriend)
     {
@@ -512,6 +517,7 @@ class UserRepository
      * 
      * @param long $idUser
      * @param long $idFriend
+     * @throws DatabaseException
      */
     public function removeInvitation($idUser, $idFriend)
     {
@@ -533,7 +539,7 @@ class UserRepository
      * 
      * @param long $idUser
      * @param long $idFriend
-     * @throws DatabaseExeption
+     * @throws DatabaseException
      */
     public function addAcceptedInvitation($idUser, $idFriend)
     {
@@ -546,7 +552,7 @@ class UserRepository
         }
         catch (\Exception $e)
         {
-            throw new DatabaseExeption('Error in addAcceptedInvitation.', 1, $e);
+            throw new DatabaseException('Error in addAcceptedInvitation.', 1, $e);
         }
     }
     
@@ -554,7 +560,7 @@ class UserRepository
      * Gets the accepted invitations and deletes them from the database as the info is only needed once.
      * 
      * @param long $idUser
-     * @throws DatabaseExeption
+     * @throws DatabaseException
      * @return array
      */
     public function getAcceptedInvitations($idUser)
@@ -567,19 +573,26 @@ class UserRepository
         }
         catch (\Exception $e)
         {
-            throw new DatabaseExeption('Error in addAcceptedInvitation.', 1, $e);
+            throw new DatabaseException('Error in addAcceptedInvitation.', 1, $e);
         }
         
         $ids = array();
         
         while ($id = $stmt->fetch())
         {
-            $ids[] = $id['id1'];
+            $ids[] = (int) $id['id1'];
         }
         
         return $ids;
     }
-    
+
+    /**
+     * Remove an accepted friend invitation.
+     *
+     * @param $idUser
+     * @param $friendId
+     * @throws DatabaseException
+     */
     public function removeAcceptedInvitation($idUser, $friendId)
     {
         try
@@ -591,17 +604,92 @@ class UserRepository
         }
         catch (\Exception $e)
         {
-            throw new DatabaseExeption('Error in removeAcceptedInvitation.', 1, $e);
+            throw new DatabaseException('Error in removeAcceptedInvitation.', 1, $e);
         }
     }
-    
+
+    /**
+     * Add a removed friend notification.
+     *
+     * @param $idUser
+     * @param $idFriend
+     * @throws DatabaseException
+     */
+    public function addRemovedFriend($idUser, $idFriend)
+    {
+        try
+        {
+            $this->mDb->insert(self::$TABLE_REMOVED_FRIENDS, array(
+                'id1' => (int) $idUser,
+                'id2' => (int) $idFriend
+            ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error in addRemovedFriend.', 1, $e);
+        }
+    }
+
+    /**
+     * Get an array of the id of the friends that removed the user.
+     *
+     * @param $idUser
+     * @return array
+     * @throws DatabaseException
+     */
+    public function getRemovedFriends($idUser)
+    {
+        $req = "SELECT id1 FROM " . self::$TABLE_REMOVED_FRIENDS .  " WHERE id2 = ?";
+
+        try
+        {
+            $stmt = $this->mDb->executeQuery($req, array((int) $idUser));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error in getRemovedFriends.', 1, $e);
+        }
+
+        $ids = array();
+
+        while ($id = $stmt->fetch())
+        {
+            $ids[] = (int) $id['id1'];
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Remove a removed friend notification.
+     *
+     * @param $idUser
+     * @param $friendId
+     * @throws DatabaseException
+     */
+    public function removeRemovedFriend($idUser, $friendId)
+    {
+        try
+        {
+            $this->mDb->delete(self::$TABLE_REMOVED_FRIENDS, array(
+                'id1' => (int) $friendId,
+                'id2' => (int) $idUser
+            ));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error in removeRemovedFriend.', 1, $e);
+        }
+    }
+
     // Utility functions
-    
+
     /**
      * Gets an array of users given a database query statement.
-     * 
-     * @param unknown $stmt
+     *
+     * @param $stmt
      * @return array
+     * @throws
      */
     private function userArrayFromStmt($stmt)
     {
@@ -612,12 +700,12 @@ class UserRepository
             try
             {
                 $users[] = new User(
-                    $userData['idusers'], 
-                    $userData['fbid'],
+                    (int) $userData['idusers'],
+                    (int) $userData['fbid'],
                     $userData['name'],
                     $userData['visibility'],
-                    $userData['longitude'],
-                    $userData['latitude'],
+                    (double) $userData['longitude'],
+                    (double) $userData['latitude'],
                     $userData['last_update']
                 );
             }

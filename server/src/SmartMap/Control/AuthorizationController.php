@@ -33,9 +33,9 @@ class AuthorizationController
      */
     public function allowFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -59,9 +59,9 @@ class AuthorizationController
      */
     public function disallowFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -86,9 +86,9 @@ class AuthorizationController
      */
     public function allowFriendList(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendsIds = $this->getPostParam($request, 'friend_ids');
+        $friendsIds = RequestUtils::getPostParam($request, 'friend_ids');
         
         $friendsIds = $this->getIntArrayFromString($friendsIds);
         
@@ -115,9 +115,9 @@ class AuthorizationController
      */
     public function disallowFriendList(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendsIds = $this->getPostParam($request, 'friend_ids');
+        $friendsIds = RequestUtils::getPostParam($request, 'friend_ids');
         
         $friendsIds = $this->getIntArrayFromString($friendsIds);
         
@@ -143,9 +143,9 @@ class AuthorizationController
      */
     public function followFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -169,9 +169,9 @@ class AuthorizationController
      */
     public function unfollowFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {

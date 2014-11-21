@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 /** 
  * Tests for the DataController class.
  * To run them, run
- * $> cd
+ * $> phpunit --bootstrap vendor/autoload.php tests/DataControllerTest.php
  * from the server directory.
  *
  * @author Pamoi
@@ -313,58 +313,68 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     public function testValidGetInvitations()
     {
         $invitIds = array(1, 2);
-        
+
+        $removedIds = array(6, 7, 8);
+
         $returnUsers = array(
             new User(1, 2, 'Toto', 'VISIBLE', 1.0, 2.0),
             new User(2, 3, 'Titi', 'VISIBLE', 3.0, 4.0)
         );
-        
+
         $acceptedInvitationIds = array(3);
-        
+
         $acceptingUsers = array(new User(3, 4, 'Tutu', 'VISIBLE', 5.0, 6.0, '2014-11-12 13:33:45'));
-        
+
         $this->mockRepo
-             ->method('getInvitationIds')
-             ->willReturn($invitIds);
-        
+            ->method('getInvitationIds')
+            ->willReturn($invitIds);
+
         $this->mockRepo->expects($this->once())
-             ->method('getInvitationIds')
-             ->with($this->equalTo(14));
-        
+            ->method('getInvitationIds')
+            ->with($this->equalTo(14));
+
         $this->mockRepo
-             ->method('getAcceptedInvitations')
-             ->willReturn($acceptedInvitationIds);
-        
+            ->method('getAcceptedInvitations')
+            ->willReturn($acceptedInvitationIds);
+
         $this->mockRepo->expects($this->once())
-             ->method('getAcceptedInvitations')
-             ->with($this->equalTo(14));
-        
+            ->method('getAcceptedInvitations')
+            ->with($this->equalTo(14));
+
         $this->mockRepo
-             ->method('getUsers')
-             ->will($this->onConsecutiveCalls($returnUsers, $acceptingUsers));
-        
+            ->method('getUsers')
+            ->will($this->onConsecutiveCalls($returnUsers, $acceptingUsers));
+
         $this->mockRepo->expects($this->exactly(2))
-             ->method('getUsers')
-             ->withConsecutive(
-                 array($this->equalTo($invitIds)),
-                 array($this->equalTo($acceptedInvitationIds))
-             );
-        
+            ->method('getUsers')
+            ->withConsecutive(
+                array($this->equalTo($invitIds)),
+                array($this->equalTo($acceptedInvitationIds))
+            );
+
+        $this->mockRepo
+            ->method('getRemovedFriends')
+            ->willReturn($removedIds);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getRemovedFriends')
+            ->with($this->equalTo(14));
+
         $request = new Request();
-        
-        $session =  new Session(new MockArraySessionStorage());
+
+        $session = new Session(new MockArraySessionStorage());
         $session->set('userId', 14);
         $request->setSession($session);
-        
+
         $controller = new DataController($this->mockRepo);
-        
+
         $response = $controller->getInvitations($request);
-        
+
         $invitations = array(
             array('id' => 1, 'name' => 'Toto'),
             array('id' => 2, 'name' => 'Titi')
         );
-        
+
         $newFriends = array(
             array('id' => 3,
                 'name' => 'Tutu',
@@ -372,35 +382,15 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
                 'latitude' => 6.0,
                 'lastUpdate' => '2014-11-12 13:33:45'
             ));
-        
+
         $validResponse = array(
             'status' => 'Ok',
             'message' => 'Fetched invitations !',
             'invitations' => $invitations,
-            'newFriends' => $newFriends
+            'newFriends' => $newFriends,
+            'removedFriends' => $removedIds
         );
-        
-        $this->assertEquals($response->getContent(), json_encode($validResponse));
-    }
-    
-    public function testValidAckAcceptedInvitation()
-    {
-        $this->mockRepo->expects($this->once())
-             ->method('removeAcceptedInvitation')
-             ->with($this->equalTo(14), $this->equalTo(1));
-        
-        $request = new Request($query = array(), $request = array('friend_id' => 1));
-        
-        $session =  new Session(new MockArraySessionStorage());
-        $session->set('userId', 14);
-        $request->setSession($session);
-        
-        $controller = new DataController($this->mockRepo);
-        
-        $response = $controller->ackAcceptedInvitation($request);
-        
-        $validResponse = array('status' => 'Ok', 'message' => 'Acknowledged accepted invitation !');
-        
+
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
     
@@ -556,6 +546,10 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
                  array($this->equalTo(14), $this->equalTo(1)),
                  array($this->equalTo(1), $this->equalTo(14))
                  );
+
+        $this->mockRepo->expects($this->once())
+             ->method('addRemovedFriend')
+             ->with($this->equalTo(14), $this->equalTo(1));
         
         $request = new Request($query = array(), $request = array('friend_id' => 1));
         
@@ -570,6 +564,69 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $validResponse = array('status' => 'Ok', 'message' => 'Removed friend !');
         
         $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    public function testValidAckAcceptedFriend()
+    {
+        $this->mockRepo->expects($this->once())
+             ->method('removeAcceptedInvitation')
+             ->with($this->equalTo(14), $this->equalTo(15));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new DataController($this->mockRepo);
+
+        $response = $controller->ackAcceptedInvitation($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Acknowledged accepted invitation.');
+
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    public function testAckRemovedFriend()
+    {
+        $this->mockRepo->expects($this->once())
+            ->method('removeRemovedFriend')
+            ->with($this->equalTo(14), $this->equalTo(15));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new DataController($this->mockRepo);
+
+        $response = $controller->ackRemovedFriend($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Acknowledged removed friend.');
+
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in ackRemovedFriend.
+     */
+    public function testAckRemovedFriendDBException()
+    {
+        $this->mockRepo
+            ->method('removeRemovedFriend')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException('urgh')));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new DataController($this->mockRepo);
+
+        $controller->ackRemovedFriend($request);
     }
     
     public function testValidFindUsers()
