@@ -36,8 +36,7 @@ public class MockSearchEngine implements SearchEngine {
         ArrayList<Friend> result = new ArrayList<Friend>();
 
         for (User f : mUsers) {
-            if (f.getName().toLowerCase(Locale.US).contains(query)
-                || query.equals("")) {
+            if (f.getName().toLowerCase(Locale.US).contains(query) || query.equals("")) {
                 result.add((Friend) f);
             }
         }

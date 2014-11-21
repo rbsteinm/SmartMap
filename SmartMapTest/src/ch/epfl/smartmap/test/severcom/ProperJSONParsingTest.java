@@ -35,7 +35,8 @@ public class ProperJSONParsingTest extends TestCase {
         + " \"message\" : \"wrong parameters\" \n" + "}\n";
 
     private static final String PROPER_FRIEND_LIST_JSON = "{\n" + " \"list\" : [\n" + "{\n" + " \"id\" : \"13\", \n"
-        + " \"name\" : \"Georges\" \n" + "},\n" + "{\n" + " \"id\" : \"18\", \n" + " \"name\" : \"Alice\" \n" + "}\n"
+        + " \"name\" : \"Georges\" \n" + "\"lastSeen\": \"2014-11-12 23:54:22\"" + "},\n" + "{\n" + 
+        " \"id\" : \"18\", \n" + " \"name\" : \"Alice\" \n" + "\"lastSeen\": \"2014-10-23 05:07:54\"" + "}\n"
         + "  ]\n" + "}\n";
 
     private static final String PROPER_POSITIONS_LIST_JSON = "{\n" + " \"positions\" : [\n" + "{\n"
@@ -70,9 +71,8 @@ public class ProperJSONParsingTest extends TestCase {
         assertEquals("Friend's name does not match", "Georges", friend.getName());
         assertEquals("Friend's email does not match", "georges@gmail.com", friend.getEmail());
         assertEquals("Friend's phone number does not match", "0782678654", friend.getNumber());
-        // FIXME
-        // assertEquals("Friend's latitude or longitude does not match", new
-        // LatLng(20.03, 26.85), friend.getLatLng());
+        assertEquals("Friend's latitude does not match", 20.03, friend.getLatLng().latitude);
+        assertEquals("Friend's longitude does not match", 26.85, friend.getLatLng().longitude);
     }
 
     @Test
