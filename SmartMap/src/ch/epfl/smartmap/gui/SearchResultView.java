@@ -12,7 +12,6 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.cache.Friend;
 
 /**
  * This class is a basic Layout that will be used to display search results in
@@ -22,7 +21,7 @@ import ch.epfl.smartmap.cache.Friend;
  *            Type of Displayable this SearchResultView shows.
  * @author jfperren
  */
-public class SearchResultView<T extends Displayable> extends RelativeLayout {
+public class SearchResultView extends RelativeLayout {
 
     private static final String TAG = "SEARCH RESULT VIEW";
     @SuppressWarnings("unused")
@@ -42,7 +41,7 @@ public class SearchResultView<T extends Displayable> extends RelativeLayout {
 
     private static final int CLICK_DISTANCE_THRESHHOLD = 10;
 
-    private final T mItem;
+    private final Displayable mItem;
     private final Bitmap mImage;
 
     private final ImageView mImageView;
@@ -53,7 +52,7 @@ public class SearchResultView<T extends Displayable> extends RelativeLayout {
      * @param context
      *            Context of the Application
      */
-    public SearchResultView(Context context, T item) {
+    public SearchResultView(Context context, Displayable item) {
         super(context);
 
         mItem = item;
@@ -119,7 +118,7 @@ public class SearchResultView<T extends Displayable> extends RelativeLayout {
 
                     double clickDistance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
                     if (clickDistance < CLICK_DISTANCE_THRESHHOLD) {
-                        ((MainActivity) SearchResultView.this.getContext()).performQuery((Friend) mItem);
+                        ((MainActivity) SearchResultView.this.getContext()).performQuery(mItem);
                     }
                     v.setBackgroundResource(0);
                 } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {

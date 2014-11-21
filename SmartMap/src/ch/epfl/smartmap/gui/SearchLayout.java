@@ -1,7 +1,7 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import android.content.Context;
@@ -10,14 +10,14 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
-import android.view.animation.AnimationUtils;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.History;
-import ch.epfl.smartmap.cache.MockDB;
+import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
 
 /**
@@ -28,63 +28,53 @@ import ch.epfl.smartmap.cache.SearchEngine;
  */
 public class SearchLayout extends LinearLayout {
 
-    /**
-     * Type of Search Filter
-     * 
-     * @author jfperren
-     */
-    private enum SearchPanelType {
-        HISTORY("History"),
-        QUICK("All"),
-        USERS("Users"),
-        EVENTS("Events"),
-        TAGS("Tags"),
-        GROUPS("Groups");
-
-        private String mTitle;
-
-        private SearchPanelType(String title) {
-            mTitle = title;
-        }
-
-        public String title() {
-            return mTitle;
-        }
-    }
-
     private static final String TAG = "SEARCH_RESULT_SWIPEABLE_CONTAINER";
 
-    private static final SearchPanelType FIRST_SEARCH_PANEL_TYPE = SearchPanelType.HISTORY;
-    private static final int SCROLLVIEW_SIDE_PADDING = 20;
-    private static final int SCROLLVIEW_LAYOUT_BOTTOM_PADDING = 20;
-    private static final int SCROLLVIEW_LAYOUT_TOP_PADDING = 3;
+    private static final int PADDING_LEFT = 20;
+    private static final int PADDING_RIGHT = 20;
+    private static final int PADDING_BOTTOM = 20;
+    private static final int PADDING_TOP = 10;
+    private static final int MARGIN_BELOW_TITLE = 5;
+    private static final int MARGIN_BELOW_SEARCHVIEWGROUP = 20;
+
     private static final float TITLE_TEXT_SIZE = 15f;
 
-    private final HashMap<SearchPanelType, ScrollView> mScrollViews;
-    private final HashMap<SearchPanelType, SearchResultViewGroup<Friend>> mSearchResultViewGroups;
+    private final HashMap<SearchEngine.Type, ScrollView> mScrollViews;
+    private final HashMap<SearchEngine.Type, SearchResultViewGroup> mSearchResultViewGroups;
+    private final HashMap<SearchEngine.Type, Integer> mSearchTypeIndexes;
 
-    private List<Friend> mCurrentSearchResults;
-    private SearchPanelType mCurrentSearchType;
+    private SearchEngine.Type mCurrentSearchType;
+
     private SearchEngine mSearchEngine;
+    private LinearLayout mTitleBar;
+    private List<SearchEngine.Type> mActiveSearchTypes;
+
+    private String mCurrentQuery;
 
     public SearchLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         // Layout relative informations
-        this.setOrientation(HORIZONTAL);
-        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        this.setOrientation(VERTICAL);
+        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT));
+        this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
         this.setBackgroundResource(R.color.background_blue);
-        mCurrentSearchType = FIRST_SEARCH_PANEL_TYPE;
-        mScrollViews = new HashMap<SearchPanelType, ScrollView>();
-        mSearchResultViewGroups = new HashMap<SearchPanelType, SearchResultViewGroup<Friend>>();
-        mCurrentSearchResults = new ArrayList<Friend>();
+        // Initialize data structures
+        mCurrentQuery = "";
+        mCurrentSearchType = SearchEngine.Type.FRIENDS;
+        mScrollViews = new HashMap<SearchEngine.Type, ScrollView>();
+        mSearchResultViewGroups = new HashMap<SearchEngine.Type, SearchResultViewGroup>();
+        mSearchTypeIndexes = new HashMap<SearchEngine.Type, Integer>();
+        mActiveSearchTypes = new LinkedList<SearchEngine.Type>();
 
-        // Create different Search Panels
-        for (SearchPanelType type : SearchPanelType.values()) {
-            Log.d(TAG, "Create SearchPanel : " + type.ordinal());
-            this.createSearchResultLayout(context, type);
-        }
+        this.setSearchEngine(new MockSearchEngine());
 
-        this.addView(mScrollViews.get(mCurrentSearchType));
+        mTitleBar = new LinearLayout(context);
+
+        this.addSearchType(context, SearchEngine.Type.ALL);
+        this.addSearchType(context, SearchEngine.Type.FRIENDS);
+        this.addSearchType(context, SearchEngine.Type.EVENTS);
+        this.setSearchType(SearchEngine.Type.ALL);
     }
 
     /**
@@ -96,28 +86,52 @@ public class SearchLayout extends LinearLayout {
         mSearchEngine = searchEngine;
     }
 
+    public void setSearchType(SearchEngine.Type searchType) {
+        // Add new Views
+        this.removeAllViews();
+        this.addView(mTitleBar);
+        this.addView(mScrollViews.get(searchType));
+        // Update search type
+        mCurrentSearchType = searchType;
+        this.updateCurrentPanel();
+        // Scroll up
+        mScrollViews.get(searchType).scrollTo(0, 0);
+    }
+
+    private void updateCurrentPanel() {
+        mSearchResultViewGroups.get(mCurrentSearchType).setResultList(
+            mSearchEngine.sendQuery(mCurrentQuery, mCurrentSearchType));
+    }
+
     /**
      * Go to next View
      */
     private void onSwipeLeft() {
-        // Get current and next ScrollViews (circularily)
-        Log.d(TAG, mCurrentSearchType.title());
-        ScrollView currentScrollView = mScrollViews.get(mCurrentSearchType);
-        mCurrentSearchType =
-            SearchPanelType.values()[(mCurrentSearchType.ordinal() + 1) % SearchPanelType.values().length];
-        Log.d(TAG, mCurrentSearchType.title());
-        ScrollView nextScrollView = mScrollViews.get(mCurrentSearchType);
-        nextScrollView.scrollTo(0, 0);
-        if (mCurrentSearchType != SearchPanelType.HISTORY) {
-            SearchResultViewGroup<Friend> nextSearchResultViewGroup = mSearchResultViewGroups.get(mCurrentSearchType);
-            nextSearchResultViewGroup.displayMinimized();
-            nextSearchResultViewGroup.setResultList(mCurrentSearchResults);
-        }
+        int nextSearchTypeIndex =
+            (mSearchTypeIndexes.get(mCurrentSearchType).intValue() + 1) % mActiveSearchTypes.size();
+        SearchEngine.Type nextSearchType = mActiveSearchTypes.get(nextSearchTypeIndex);
+        this.setSearchType(nextSearchType);
 
-        this.addView(nextScrollView);
-        nextScrollView.startAnimation(AnimationUtils.loadAnimation(this.getContext(), R.anim.swipe_left_in));
-        currentScrollView.startAnimation(AnimationUtils.loadAnimation(this.getContext(), R.anim.swipe_left_out));
-        this.removeViewAt(0);
+        // ScrollView currentScrollView = mScrollViews.get(mCurrentSearchType);
+        // mCurrentSearchType =
+        // SearchType.values()[(mCurrentSearchType.ordinal() + 1) %
+        // SearchType.values().length];
+        // Log.d(TAG, mCurrentSearchType.mTitle);
+        // ScrollView nextScrollView = mScrollViews.get(mCurrentSearchType);
+        // nextScrollView.scrollTo(0, 0);
+        // if (mCurrentSearchType != SearchType.HISTORY) {
+        // SearchResultViewGroup<Friend> nextSearchResultViewGroup =
+        // mSearchResultViewGroups.get(mCurrentSearchType);
+        // nextSearchResultViewGroup.displayMinimized();
+        // nextSearchResultViewGroup.setResultList(mCurrentSearchResults);
+        // }
+        //
+        // this.addView(nextScrollView);
+        // nextScrollView.startAnimation(AnimationUtils.loadAnimation(this.getContext(),
+        // R.anim.swipe_left_in));
+        // currentScrollView.startAnimation(AnimationUtils.loadAnimation(this.getContext(),
+        // R.anim.swipe_left_out));
+        // this.removeViewAt(0);
     }
 
     /**
@@ -149,19 +163,11 @@ public class SearchLayout extends LinearLayout {
     }
 
     /**
-     * Takes the value in the search bar and display the results of the
-     * searchEngine query in the result list.
+     * Updates the current panel with the new search query.
      */
-    public void updateSearchResults(String query) {
-        mCurrentSearchResults = mSearchEngine.sendQuery(query);
-        Log.d(TAG, mCurrentSearchType.title());
-        if ((mCurrentSearchType == SearchPanelType.HISTORY) && query.equals("")) {
-            return;
-        } else if (mCurrentSearchType == SearchPanelType.HISTORY) {
-            this.onSwipeLeft();
-        }
-        Log.d(TAG, "updateSearchResult " + mCurrentSearchType.title() + "with query : " + query);
-        mSearchResultViewGroups.get(mCurrentSearchType).setResultList(mSearchEngine.sendQuery(query));
+    public void setSearchQuery(String query) {
+        mCurrentQuery = query;
+        this.updateCurrentPanel();
     }
 
     /**
@@ -170,10 +176,10 @@ public class SearchLayout extends LinearLayout {
      * 
      * @param query
      */
-    public void showMainPanel(String query) {
+    public void resetView(String query) {
         if (mSearchEngine.getHistory().isEmpty() || !query.equals("")) {
-            this.showQuickPanel();
-            this.updateSearchResults(query);
+            this.setSearchType(SearchEngine.Type.FRIENDS);
+            this.setSearchQuery(query);
         } else {
             this.showHistoryPanel();
             this.updateHistoryPanel();
@@ -181,21 +187,12 @@ public class SearchLayout extends LinearLayout {
     }
 
     /**
-     * Replace current View by QUICK View
-     */
-    private void showQuickPanel() {
-        this.removeAllViews();
-        this.addView(mScrollViews.get(SearchPanelType.QUICK));
-        mCurrentSearchType = SearchPanelType.QUICK;
-    }
-
-    /**
      * Replace current View by HISTORY View
      */
     private void showHistoryPanel() {
         this.removeAllViews();
-        this.addView(mScrollViews.get(SearchPanelType.HISTORY));
-        mCurrentSearchType = SearchPanelType.HISTORY;
+        this.addView(mScrollViews.get(SearchEngine.Type.HISTORY));
+        mCurrentSearchType = SearchEngine.Type.HISTORY;
     }
 
     /**
@@ -204,7 +201,8 @@ public class SearchLayout extends LinearLayout {
     private void updateHistoryPanel() {
         // History Panel
         History history = mSearchEngine.getHistory();
-        LinearLayout searchResultLayout = (LinearLayout) mScrollViews.get(SearchPanelType.HISTORY).getChildAt(0);
+        LinearLayout searchResultLayout =
+            (LinearLayout) mScrollViews.get(SearchEngine.Type.HISTORY).getChildAt(0);
         searchResultLayout.removeAllViews();
 
         for (int i = 0; i < history.nbOfDates(); i++) {
@@ -214,8 +212,8 @@ public class SearchLayout extends LinearLayout {
             titleView.setTextColor(this.getResources().getColor(R.color.searchResultTitle));
             titleView.setText(history.getDateForIndex(i).toString());
             // SearchResultViewGroup grouping all queries of this date
-            SearchResultViewGroup<Friend> searchResultViewGroup =
-                new SearchResultViewGroup<Friend>(this.getContext(), history.getEntriesForIndex(i), "lol");
+            SearchResultViewGroup searchResultViewGroup =
+                new SearchResultViewGroup(this.getContext(), history.getEntriesForIndex(i));
             // Put views together
             searchResultLayout.addView(titleView);
             searchResultLayout.addView(searchResultViewGroup);
@@ -226,66 +224,40 @@ public class SearchLayout extends LinearLayout {
      * Create a new SearchResultViewGroup for a given {@code SearchPanelType}
      * 
      * @param context
-     * @param searchPanelType
+     * @param searchType
      */
-    private void createSearchResultLayout(Context context, SearchPanelType searchPanelType) {
-
-        // ScrollView with TouchEvent passing handling
-        ScrollView scrollView = new ScrollView(context) {
-            private final GestureDetector gestureDetector = new GestureDetector(this.getContext(),
-                new HorizontalGestureListener());
-
-            @Override
-            public boolean onTouchEvent(MotionEvent ev) {
-                this.getChildAt(0).onTouchEvent(ev);
-
-                if (gestureDetector.onTouchEvent(ev)) {
-                    return true;
-                } else {
-                    // If not scrolling vertically (more y than x), don't hijack
-                    // the event.
-                    return super.onTouchEvent(ev);
-                }
-            }
-
-            @Override
-            public boolean onInterceptTouchEvent(MotionEvent ev) {
-                if (!this.onTouchEvent(ev)) {
-                    return super.onInterceptTouchEvent(ev);
-                }
-                return false;
-            }
-        };
-        scrollView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        scrollView.setVerticalScrollBarEnabled(false);
-        scrollView.setPadding(SCROLLVIEW_SIDE_PADDING, 0, SCROLLVIEW_SIDE_PADDING, 0);
-
-        // Layout contained in ScrollView
-        LinearLayout searchResultLayout = new LinearLayout(context);
-        searchResultLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        searchResultLayout.setOrientation(VERTICAL);
-        searchResultLayout.setPadding(0, SCROLLVIEW_LAYOUT_TOP_PADDING, 0, SCROLLVIEW_LAYOUT_BOTTOM_PADDING);
-
-        if (searchPanelType != SearchPanelType.HISTORY) {
-            // Normal Search Panel
-            // TextView displaying Name
+    private void addSearchType(Context context, SearchEngine.Type searchType) {
+        if (!mActiveSearchTypes.contains(searchType)) {
+            // Add name in Title Bar
             TextView titleView = new TextView(context);
+            titleView.setText(searchType.getTitle());
             titleView.setTextSize(TITLE_TEXT_SIZE);
-            titleView.setTextColor(this.getResources().getColor(R.color.main_blue));
-            titleView.setText(searchPanelType.title());
-            // SearchResultViewGroup
-            SearchResultViewGroup<Friend> searchResultViewGroup =
-                new SearchResultViewGroup<Friend>(context, MockDB.FRIENDS_LIST, "Lol");
-            // Put views together
-            searchResultLayout.addView(titleView);
-            searchResultLayout.addView(searchResultViewGroup);
-            // Add ViewGroup entry
-            mSearchResultViewGroups.put(searchPanelType, searchResultViewGroup);
-        }
+            LayoutParams titleParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            titleParams.setMarginEnd(MARGIN_BELOW_TITLE);
+            titleView.setLayoutParams(titleParams);
+            mTitleBar.addView(titleView);
 
-        scrollView.addView(searchResultLayout);
-        // Add in Lists
-        mScrollViews.put(searchPanelType, scrollView);
+            ScrollView scrollView = new SwipeableScrollView(context);
+
+            // Create & Add Views
+            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(context);
+            LayoutParams searchParams =
+                new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            searchParams.setMargins(0, 0, 0, MARGIN_BELOW_SEARCHVIEWGROUP);
+            searchResultViewGroup.setLayoutParams(searchParams);
+            SearchOnlineButton searchOnlineButton = new SearchOnlineButton(context);
+            scrollView.addView(searchResultViewGroup);
+            scrollView.addView(searchOnlineButton);
+            // Add ViewGroup entry
+            mSearchResultViewGroups.put(searchType, searchResultViewGroup);
+
+            // Add ScrollView entry
+            mScrollViews.put(searchType, scrollView);
+
+            // Add refenrences to the new searchType
+            mActiveSearchTypes.add(searchType);
+            mSearchTypeIndexes.put(searchType, mActiveSearchTypes.size() - 1);
+        }
     }
 
     /**
@@ -316,6 +288,84 @@ public class SearchLayout extends LinearLayout {
                 }
             }
             return result;
+        }
+    }
+
+    /**
+     * Provides a Vertical ScrollView that listens to Horizontal Swipes and
+     * switch search panels when happening.
+     * 
+     * @author jfperren
+     */
+    private final class SwipeableScrollView extends ScrollView {
+
+        private final GestureDetector mGestureDetector;
+        private final LinearLayout mLayout;
+
+        public SwipeableScrollView(Context context) {
+            super(context);
+
+            mLayout = new LinearLayout(context);
+            mLayout.setOrientation(VERTICAL);
+            this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+            this.setVerticalScrollBarEnabled(false);
+            super.addView(mLayout);
+
+            mGestureDetector = new GestureDetector(this.getContext(), new HorizontalGestureListener());
+        }
+
+        @Override
+        public void addView(View child) {
+            mLayout.addView(child);
+        }
+
+        @Override
+        public void removeViewAt(int index) {
+            mLayout.removeViewAt(index);
+        }
+
+        @Override
+        public void removeAllViews() {
+            mLayout.removeAllViews();
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent ev) {
+            this.getChildAt(0).onTouchEvent(ev);
+
+            if (mGestureDetector.onTouchEvent(ev)) {
+                return true;
+            } else {
+                // If not scrolling vertically (more y than x), don't hijack
+                // the event.
+                return super.onTouchEvent(ev);
+            }
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(MotionEvent ev) {
+            if (!this.onTouchEvent(ev)) {
+                return super.onInterceptTouchEvent(ev);
+            }
+            return false;
+        }
+    };
+
+    private final class SearchOnlineButton extends Button {
+        public SearchOnlineButton(Context context) {
+            super(context);
+
+            this.setBackgroundResource(R.drawable.view_group_background);
+            this.setText("Search on SmartMap");
+            this.setTextSize(20f);
+            this.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    // open friendsactivity
+
+                }
+            });
         }
     }
 }

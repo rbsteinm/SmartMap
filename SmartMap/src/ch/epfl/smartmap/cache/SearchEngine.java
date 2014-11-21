@@ -10,16 +10,35 @@ import java.util.List;
  */
 public interface SearchEngine {
 
-	/**
-	 * Sends a Query, computes it and return matched results
-	 * 
-	 * @param query
-	 * @return a List containing the result
-	 */
-	List<Friend> sendQuery(String query);
+    public enum Type {
+        FRIENDS("Friends"),
+        EVENTS("Events"),
+        TAGS("Filters"),
+        GROUPS("Groups"),
+        HISTORY("History"),
+        ALL("All");
 
-	/**
-	 * @return History of searches of this SearchEngine
-	 */
-	History getHistory();
+        private final String mTitle;
+
+        private Type(String title) {
+            this.mTitle = title;
+        }
+
+        public String getTitle() {
+            return mTitle;
+        }
+    }
+
+    /**
+     * Sends a Query, computes it and return matched results
+     * 
+     * @param query
+     * @return a List containing the result
+     */
+    List<Displayable> sendQuery(String query, Type searchType);
+
+    /**
+     * @return History of searches of this SearchEngine
+     */
+    History getHistory();
 }

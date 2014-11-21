@@ -16,14 +16,16 @@ public class MockSearchEngine implements SearchEngine {
     private static final String AUDIT_TAG = "Audit : " + TAG;
 
     private final History mHistory;
-    private final List<User> mUsers;
+    private final List<Displayable> mUsers;
+    private final List<Displayable> mEvents;
 
     /**
      * Constructor
      */
-    public MockSearchEngine(List<User> users) {
+    public MockSearchEngine() {
         mHistory = new SortedByDayHistory();
-        mUsers = users;
+        mEvents = MockDB.EVENTS_LIST;
+        mUsers = MockDB.FRIENDS_LIST;
     }
 
     /*
@@ -31,13 +33,45 @@ public class MockSearchEngine implements SearchEngine {
      * @see ch.epfl.smartmap.cache.SearchEngine#sendQuery(java.lang.String)
      */
     @Override
-    public List<Friend> sendQuery(String query) {
+    public List<Displayable> sendQuery(String query, SearchEngine.Type searchType) {
         query = query.toLowerCase(Locale.US);
-        ArrayList<Friend> result = new ArrayList<Friend>();
+        ArrayList<Displayable> result = new ArrayList<Displayable>();
 
-        for (User f : mUsers) {
-            if (f.getName().toLowerCase(Locale.US).contains(query) || query.equals("")) {
-                result.add((Friend) f);
+        if (searchType == Type.ALL) {
+            if (query.equals("")) {
+                result.addAll(mUsers);
+                result.addAll(mEvents);
+            } else {
+                for (Displayable f : mUsers) {
+                    if (f.getName().toLowerCase(Locale.US).contains(query)) {
+                        result.add(f);
+                    }
+                }
+                for (Displayable f : mEvents) {
+                    if (f.getName().toLowerCase(Locale.US).contains(query)) {
+                        result.add(f);
+                    }
+                }
+            }
+        } else if (searchType == Type.FRIENDS) {
+            if (query.equals("")) {
+                result.addAll(mUsers);
+            } else {
+                for (Displayable f : mUsers) {
+                    if (f.getName().toLowerCase(Locale.US).contains(query)) {
+                        result.add(f);
+                    }
+                }
+            }
+        } else if (searchType == Type.EVENTS) {
+            if (query.equals("")) {
+                result.addAll(mEvents);
+            } else {
+                for (Displayable f : mEvents) {
+                    if (f.getName().toLowerCase(Locale.US).contains(query)) {
+                        result.add(f);
+                    }
+                }
             }
         }
 

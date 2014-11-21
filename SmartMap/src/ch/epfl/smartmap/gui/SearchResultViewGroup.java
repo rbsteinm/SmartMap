@@ -20,7 +20,7 @@ import ch.epfl.smartmap.cache.Displayable;
  *            Type of Search results
  * @author jfperren
  */
-public class SearchResultViewGroup<T extends Displayable> extends LinearLayout {
+public class SearchResultViewGroup extends LinearLayout {
 
     /**
      * Visual state of a ViewGroup
@@ -37,14 +37,13 @@ public class SearchResultViewGroup<T extends Displayable> extends LinearLayout {
     private static final String TAG = "SEARCH_RESULT_VIEW_GROUP";
 
     private static final int ITEMS_PER_PAGE = 10;
+
     private int mCurrentItemNb;
 
-    private final Context mContext;
-    private List<T> mResults;
+    private List<Displayable> mResults;
     private final Button mMoreResultsButton;
     private final TextView mEmptyListTextView;
     private State mState;
-    private String mName;
 
     /**
      * Constructor
@@ -56,21 +55,19 @@ public class SearchResultViewGroup<T extends Displayable> extends LinearLayout {
      * @param name
      *            The name of this SearchResultViewGroup
      */
-    public SearchResultViewGroup(Context context, List<T> results, String name) {
+    public SearchResultViewGroup(Context context, List<Displayable> results) {
         super(context);
         // Layout parameters
         this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
             LayoutParams.MATCH_PARENT));
         this.setOrientation(VERTICAL);
         this.setBackgroundResource(R.drawable.view_group_background);
-        mContext = context;
         // Create button and TextView to display when list is empty
-        mMoreResultsButton = new MoreResultsButton<T>(context, this);
+        mMoreResultsButton = new MoreResultsButton(context, this);
         mEmptyListTextView = new TextView(context);
         mEmptyListTextView.setText(R.string.no_search_result);
         // Sets list and displayMinimized
         this.setResultList(results);
-        mName = name;
     }
 
     /**
@@ -81,8 +78,8 @@ public class SearchResultViewGroup<T extends Displayable> extends LinearLayout {
      * @param name
      *            The name of this SearchResultViewGroup
      */
-    public SearchResultViewGroup(Context context, String name) {
-        this(context, new ArrayList<T>(), name);
+    public SearchResultViewGroup(Context context) {
+        this(context, new ArrayList<Displayable>());
     }
 
     /**
@@ -90,23 +87,6 @@ public class SearchResultViewGroup<T extends Displayable> extends LinearLayout {
      */
     public boolean isEmpty() {
         return mResults.isEmpty();
-    }
-
-    /**
-     * Sets the name of this SearchResultViewGroup
-     * 
-     * @param name
-     *            The name to be set
-     */
-    public void setName(String name) {
-        mName = name;
-    }
-
-    /**
-     * @return The name of this SearchResultViewGroup
-     */
-    public String getName() {
-        return mName;
     }
 
     /**
@@ -139,13 +119,14 @@ public class SearchResultViewGroup<T extends Displayable> extends LinearLayout {
     }
 
     private void addMoreViews() {
+        this.removeView(mMoreResultsButton);
         // Computes the number of items to add
         int newItemsNb = Math.min(ITEMS_PER_PAGE, mResults.size() - mCurrentItemNb);
         // Add SearchResultViews
         for (int i = mCurrentItemNb; i < (mCurrentItemNb + newItemsNb); i++) {
             Log.d(TAG, "add" + mResults.get(i).getName());
-            this.addView(SearchResultViewFactory.getSearchResultView(mContext, mResults.get(i)));
-            this.addView(new Divider(mContext));
+            this.addView(new SearchResultView(this.getContext(), mResults.get(i)));
+            this.addView(new Divider(this.getContext()));
         }
         // Removes last Divider
         // this.removeViewAt(this.getChildCount() - 1);
@@ -166,8 +147,8 @@ public class SearchResultViewGroup<T extends Displayable> extends LinearLayout {
      * @param newResultList
      *            New list of results
      */
-    public void setResultList(List<T> newResultList) {
-        mResults = new ArrayList<T>(newResultList);
+    public void setResultList(List<Displayable> newResultList) {
+        mResults = new ArrayList<Displayable>(newResultList);
         this.displayMinimized();
     }
 
@@ -176,8 +157,8 @@ public class SearchResultViewGroup<T extends Displayable> extends LinearLayout {
      * 
      * @author jfperren
      */
-    private static class MoreResultsButton<T extends Displayable> extends Button {
-        public MoreResultsButton(Context context, final SearchResultViewGroup<T> searchResultViewGroup) {
+    private static class MoreResultsButton extends Button {
+        public MoreResultsButton(Context context, final SearchResultViewGroup searchResultViewGroup) {
             super(context);
             this.setText(R.string.more_results);
             this.setBackgroundResource(0);
