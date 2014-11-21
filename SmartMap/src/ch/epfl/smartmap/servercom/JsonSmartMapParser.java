@@ -391,6 +391,7 @@ public class JsonSmartMapParser implements SmartMapParser {
             throw new SmartMapParseException("Invalid second number !");
         }
 
+        // Server time is in GMT+01:00
         GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
 
         g.set(year, month, day, hour, minutes, seconds);

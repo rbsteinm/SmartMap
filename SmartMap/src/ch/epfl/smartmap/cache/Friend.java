@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -118,7 +119,7 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public GregorianCalendar getLastSeen() {
-        GregorianCalendar g = new GregorianCalendar();
+        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
         g.setTimeInMillis(mLastSeen.getTimeInMillis());
         return g;
     }
@@ -199,7 +200,7 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public void setLastSeen(GregorianCalendar date) {
-        GregorianCalendar g = new GregorianCalendar();
+        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
         g.setTimeInMillis(date.getTimeInMillis());
         mLastSeen = g;
     }

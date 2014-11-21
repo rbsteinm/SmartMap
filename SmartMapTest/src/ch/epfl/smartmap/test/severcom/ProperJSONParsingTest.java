@@ -2,6 +2,7 @@ package ch.epfl.smartmap.test.severcom;
 
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -52,8 +53,8 @@ public class ProperJSONParsingTest extends TestCase {
     private Location location1 = new Location("SmartMapServers");
     private Location location2 = new Location("SmartMapServers");
     
-    private GregorianCalendar date1 = new GregorianCalendar(2014, 10, 12, 23, 54, 22);
-    private GregorianCalendar date2 = new GregorianCalendar(2014, 9, 23, 5, 7, 54);
+    private GregorianCalendar date1 = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
+    private GregorianCalendar date2 = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -63,6 +64,9 @@ public class ProperJSONParsingTest extends TestCase {
 
         location2.setLatitude(40.0);
         location2.setLongitude(3.0);
+        
+        date1.set(2014, 10, 12, 23, 54, 22);
+        date2.set(2014, 9, 23, 5, 7, 54);
 
     }
 
@@ -118,14 +122,16 @@ public class ProperJSONParsingTest extends TestCase {
             .getLocation().getLatitude());
         assertEquals("First location's longitude does not match", location1.getLongitude(), users.get(0)
             .getLocation().getLongitude());
-        assertEquals("Last seen of first user does not match", date1.getTimeInMillis(), users.get(0)
-            .getLastSeen().getTimeInMillis());
+        // GMT+01:00 conversion changes a few milliseconds in GregorainCalendar, so we cannot test for
+        // exact equality...
+        assertTrue("Last seen of first user does not match", Math.abs(date1.getTimeInMillis() - 
+            users.get(0).getLastSeen().getTimeInMillis()) < 1000);
         assertEquals("Second location's latitude does not match", location2.getLatitude(), users.get(1)
             .getLocation().getLatitude());
         assertEquals("Second location's longitude does not match", location2.getLongitude(), users.get(1)
             .getLocation().getLongitude());
-        assertEquals("Last seen of second user does not match", date2.getTimeInMillis(), users.get(1).
-            getLastSeen().getTimeInMillis());
+        assertTrue("Last seen of second user does not match", Math.abs(date2.getTimeInMillis() - 
+            users.get(1).getLastSeen().getTimeInMillis()) < 1000);
 
     }
 
