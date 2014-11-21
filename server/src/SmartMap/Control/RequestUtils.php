@@ -21,6 +21,7 @@ class RequestUtils
      *
      * @param Request $request
      * @param $name
+     * @param $throw
      * @return mixed
      * @throws InvalidRequestException
      */

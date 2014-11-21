@@ -650,7 +650,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         
         $this->mockRepo->expects($this->once())
              ->method('findUsersByPartialName')
-             ->with($this->equalTo('t'), $this->equalTo(array(3, 4)));
+             ->with($this->equalTo('t'), $this->equalTo(array(3, 4, 14)));
         
         $request = new Request($query = array(), $request = array('search_text' => 't'));
         

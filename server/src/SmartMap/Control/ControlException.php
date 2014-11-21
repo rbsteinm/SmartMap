@@ -3,6 +3,8 @@
 namespace SmartMap\Control;
 
 /**
+ * -- deprecated
+ *
  * A ControlException is thrown when an error occurs between the server and the client (bad parameters,
  * missing parameters and so on).
  *

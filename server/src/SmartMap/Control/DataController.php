@@ -72,12 +72,14 @@ class DataController
         
         return new JsonResponse($response);
     }
-    
+
     /**
      * Gets the position of followed friends allowing it.
-     * 
+     *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
      */
     public function listFriendsPos(Request $request)
     {
@@ -114,13 +116,14 @@ class DataController
         
         return new JsonResponse($response);
     }
-    
+
     /**
      * Get the user's friends ids.
-     * 
+     *
      * @param Request $request
+     * @return JsonResponse
      * @throws ControlLogicException
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @throws InvalidRequestException
      */
     public function getFriendsIds(Request $request)
     {
@@ -139,13 +142,14 @@ class DataController
         
         return new JsonResponse($response);
     }
-    
+
     /**
-     * Gets the information for the user whose id is passed in user_id POST parameter.
-     * 
+     * Gets the information for the user whose id is given in user_id POST parameter.
+     *
      * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
      * @throws InvalidRequestException
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getUserInfo(Request $request)
     {
@@ -169,13 +173,14 @@ class DataController
         
         return new JsonResponse($response);
     }
-    
+
     /**
      * Sets an invitation for user with friend_id POST parameter.
-     * 
+     *
      * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
      * @throws InvalidRequestException
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function inviteFriend(Request $request)
     {
@@ -463,6 +468,8 @@ class DataController
         try
         {
             $friendsIds = $this->mRepo->getFriendsIds($id);
+
+            $friendsIds[] = $id; // We do not want to show the user in the search results.
             
             $users = $this->mRepo->findUsersByPartialName($partialName, $friendsIds);
         }
@@ -480,26 +487,5 @@ class DataController
         $response = array('status' => 'Ok', 'message' => 'Fetched users !', 'list' => $data);
         
         return new JsonResponse($response);
-    }
-    
-    /**
-     * Utility function getting a post parameter and throwing a ControlException
-     * if the parameter is not set in the request.
-     *
-     * @param Request $request
-     * @param string $param
-     * @throws InvalidRequestException
-     * @return string
-     */
-    private function getPostParam(Request $request, $param)
-    {
-        $value = $request->request->get($param);
-        
-        if ($value === null)
-        {
-            throw new InvalidRequestException('Post parameter ' . $param . ' is not set !');
-        }
-        
-        return $value;
     }
 }
