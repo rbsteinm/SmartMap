@@ -163,7 +163,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
 
-        notifyEventListeners();
+        this.notifyEventListeners();
     }
 
     /**
@@ -190,9 +190,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         filter.setID(filterID); // sets an ID so the filter can be easily
-                                // accessed
+        // accessed
 
-        notifyFilterListeners();
+        this.notifyFilterListeners();
         return filterID;
     }
 
@@ -228,7 +228,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
 
-        notifyFriendListeners();
+        this.notifyFriendListeners();
     }
 
     /**
@@ -242,10 +242,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.onCreate(mDatabase);
 
-        notifyFriendListeners();
-        notifyLocationsListeners();
-        notifyEventListeners();
-        notifyFilterListeners();
+        this.notifyFriendListeners();
+        this.notifyLocationsListeners();
+        this.notifyEventListeners();
+        this.notifyFilterListeners();
     }
 
     /**
@@ -258,7 +258,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         mDatabase.delete(TABLE_EVENT, KEY_ID + " = ?", new String[]{String.valueOf(id)});
 
-        notifyEventListeners();
+        this.notifyEventListeners();
     }
 
     /**
@@ -275,7 +275,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // filter-user table
         mDatabase.delete(TABLE_FILTER_USER, KEY_FILTER_ID + " = ?", new String[]{String.valueOf(id)});
 
-        notifyFilterListeners();
+        this.notifyFilterListeners();
     }
 
     /**
@@ -288,8 +288,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         mDatabase.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
 
-        notifyFriendListeners();
-        notifyLocationsListeners();
+        this.notifyFriendListeners();
+        this.notifyLocationsListeners();
     }
 
     /**
@@ -363,8 +363,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
                 friend.setLastSeen(cal);
                 friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); // int
-                                                                                           // to
-                                                                                           // boolean
+                // to
+                // boolean
 
                 friends.put(friend.getID(), friend);
             } while (cursor.moveToNext());
@@ -482,8 +482,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
         friend.setLastSeen(cal);
         friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); // int
-                                                                                   // to
-                                                                                   // boolean
+        // to
+        // boolean
 
         cursor.close();
 
@@ -505,8 +505,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e("UpdateService", e.getMessage());
         }
 
-        notifyFriendListeners();
-        notifyLocationsListeners();
+        this.notifyFriendListeners();
+        this.notifyLocationsListeners();
     }
 
     @Override
@@ -516,10 +516,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_FILTER_USER);
         db.execSQL(CREATE_TABLE_EVENT);
 
-        notifyFriendListeners();
-        notifyLocationsListeners();
-        notifyEventListeners();
-        notifyFilterListeners();
+        this.notifyFriendListeners();
+        this.notifyLocationsListeners();
+        this.notifyEventListeners();
+        this.notifyFilterListeners();
     }
 
     @Override
@@ -530,10 +530,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
         this.onCreate(db);
 
-        notifyFriendListeners();
-        notifyLocationsListeners();
-        notifyEventListeners();
-        notifyFilterListeners();
+        this.notifyFriendListeners();
+        this.notifyLocationsListeners();
+        this.notifyEventListeners();
+        this.notifyFilterListeners();
     }
 
     /**
@@ -601,7 +601,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int rows = mDatabase.update(TABLE_EVENT, values, KEY_ID + " = ?", new String[]{String.valueOf(event.getID())});
 
         if (rows > 0) {
-            notifyEventListeners();
+            this.notifyEventListeners();
         }
 
         return rows;
@@ -619,7 +619,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.addFilter(filter);
         // not sure if there's a more efficient way
 
-        notifyFilterListeners();
+        this.notifyFilterListeners();
     }
 
     /**
@@ -646,7 +646,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getID())});
 
         if (rows > 0) {
-            notifyFriendListeners();
+            this.notifyFriendListeners();
         }
         return rows;
     }
@@ -667,7 +667,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int rows = mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
 
-        notifyLocationsListeners();
+        this.notifyLocationsListeners();
         return rows;
     }
 
