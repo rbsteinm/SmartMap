@@ -55,7 +55,7 @@ public class ShowEventsActivity extends ListActivity {
 
     private List<Event> mEventsList;
     private List<Event> mCurrentList;
-    private static String mMyName = "Robich";
+    private static String mMyName;
     private Location mMyLocation;
 
     @Override
@@ -74,6 +74,7 @@ public class ShowEventsActivity extends ListActivity {
         mContext = this.getApplicationContext();
         SettingsManager.initialize(mContext);
         DatabaseHelper.initialize(mContext);
+        mMyName = SettingsManager.getInstance().getUserName();
 
         mMyLocation = SettingsManager.getInstance().getLocation();
 

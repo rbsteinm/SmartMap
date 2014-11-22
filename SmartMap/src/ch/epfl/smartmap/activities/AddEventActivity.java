@@ -37,25 +37,65 @@ public class AddEventActivity extends FragmentActivity {
 
     private static final String CITY_NAME = "CITY_NAME";
 
-    protected static final String TAG = AddEventActivity.class.getSimpleName();
+    private static final int ELEMENTS_HH_MM = 2;
 
     private static final int ELEMENTS_JJ_DD_YYYY = 3;
 
-    private static final int ELEMENTS_HH_MM = 2;
+    @SuppressWarnings("unused")
+    private static final String TAG = AddEventActivity.class.getSimpleName();
 
+    private Context mContext;
+    private EditText mDescription;
     private EditText mEventName;
-    private EditText mPickStartTime;
-    private EditText mPickStartDate;
-    private EditText mPickEndTime;
-    private EditText mPickEndDate;
     private EditText mLatitude;
     private EditText mLongitude;
-    private EditText mDescription;
+    private int mNewEventId = 0;
+    private EditText mPickEndDate;
+    private EditText mPickEndTime;
+    private EditText mPickStartDate;
+    private EditText mPickStartTime;
     private EditText mPlaceName;
-    private Context mContext;
+
     private TextWatcher mTextChangedListener;
 
-    private int mNewEventId = 0;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.add_event, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                break;
+            case R.id.addEventButtonCreateEvent:
+                this.createEvent();
+                break;
+            default:
+                // No other menu items!
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void pickLocation(View v) {
+        Toast.makeText(mContext, "Long click the map at the location of your event", Toast.LENGTH_LONG).show();
+
+        Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
+        pickLocationIntent.putExtra("pickLocationForEvent", true);
+        pickLocationIntent.setType(Context.LOCATION_SERVICE);
+        this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
+
+    }
 
     /**
      * Ensures the end of the event is after its start.
@@ -71,11 +111,11 @@ public class AddEventActivity extends FragmentActivity {
         if (this.isValidDate(endDate.getText().toString()) && this.isValidTime(endTime.getText().toString())) {
             // The end of the event has been set by the user
 
-            GregorianCalendar start =
-                this.getDateFromTextFormat(startDate.getText().toString(), startTime.getText().toString());
+            GregorianCalendar start = this.getDateFromTextFormat(startDate.getText().toString(), startTime.getText()
+                    .toString());
 
-            GregorianCalendar end =
-                this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText().toString());
+            GregorianCalendar end = this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText()
+                    .toString());
 
             GregorianCalendar now = new GregorianCalendar();
             now.add(GregorianCalendar.MINUTE, -1);
@@ -106,14 +146,14 @@ public class AddEventActivity extends FragmentActivity {
     private void createEvent() {
 
         if (!this.isValidDate(mPickEndDate.getText().toString())
-            || !this.isValidTime(mPickEndTime.getText().toString()) || mLatitude.getText().toString().equals("")
-            || mLongitude.getText().toString().equals("") || mPlaceName.getText().toString().equals("")) {
+                || !this.isValidTime(mPickEndTime.getText().toString()) || mLatitude.getText().toString().equals("")
+                || mLongitude.getText().toString().equals("") || mPlaceName.getText().toString().equals("")) {
             Toast.makeText(mContext, "Cannot create event: please specify all fields!", Toast.LENGTH_SHORT).show();
         } else {
-            GregorianCalendar startDate =
-                this.getDateFromTextFormat(mPickStartDate.getText().toString(), mPickStartTime.getText().toString());
-            GregorianCalendar endDate =
-                this.getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime.getText().toString());
+            GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
+                    mPickStartTime.getText().toString());
+            GregorianCalendar endDate = this.getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime
+                    .getText().toString());
 
             double latitude = Double.parseDouble(mLatitude.getText().toString());
             double longitude = Double.parseDouble(mLongitude.getText().toString());
@@ -122,9 +162,8 @@ public class AddEventActivity extends FragmentActivity {
             location.setLongitude(longitude);
 
             SettingsManager setMng = SettingsManager.getInstance();
-            UserEvent event =
-                new UserEvent(mEventName.getText().toString(), setMng.getUserID(), setMng.getUserName(), startDate,
-                    endDate, location);
+            UserEvent event = new UserEvent(mEventName.getText().toString(), setMng.getUserID(), setMng.getUserName(),
+                    startDate, endDate, location);
 
             // TODO send event to server (server-side code not written yet :( ),
             // and use the returned event id
@@ -140,6 +179,27 @@ public class AddEventActivity extends FragmentActivity {
             this.finish();
 
         }
+    }
+
+    /**
+     * @param dayMonthYear
+     *            a String like "16/09/1993"
+     * @param hourMinute
+     *            a String like "17:03"
+     * @return a GregorianDate constructed from the given parameters
+     * @author SpicyCH
+     */
+    private GregorianCalendar getDateFromTextFormat(String dayMonthYear, String hourMinute) {
+        assert this.isValidDate(dayMonthYear) : "The string dayMonthYear isn't in the expected format";
+        assert this.isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
+
+        String[] s1 = dayMonthYear.split("/");
+        String[] s2 = hourMinute.split(":");
+        // Don't forget to substract 1 to the month in text format
+        GregorianCalendar date = new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1,
+                Integer.parseInt(s1[0]), Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
+
+        return date;
     }
 
     /**
@@ -193,7 +253,7 @@ public class AddEventActivity extends FragmentActivity {
         GregorianCalendar now = new GregorianCalendar();
 
         mPickStartTime.setText(TimePickerFragment.formatForClock(now.get(Calendar.HOUR_OF_DAY)) + ":"
-            + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));
+                + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));
 
         mPickStartTime.setOnClickListener(new OnClickListener() {
 
@@ -206,7 +266,7 @@ public class AddEventActivity extends FragmentActivity {
         });
 
         mPickStartDate.setText(now.get(Calendar.DAY_OF_MONTH) + "/" + (now.get(Calendar.MONTH) + 1) + "/"
-            + now.get(Calendar.YEAR));
+                + now.get(Calendar.YEAR));
 
         mPickStartDate.setOnClickListener(new OnClickListener() {
 
@@ -236,6 +296,58 @@ public class AddEventActivity extends FragmentActivity {
         });
     }
 
+    private boolean isValidDate(String s) {
+        String[] sArray = s.split("/");
+        return sArray.length == ELEMENTS_JJ_DD_YYYY;
+    }
+
+    private boolean isValidTime(String s) {
+        String[] sArray = s.split(":");
+        return sArray.length == ELEMENTS_HH_MM;
+    }
+
+    /**
+     * @author SpicyCH
+     */
+    private void updateLocation(Intent data) {
+        Bundle extras = data.getExtras();
+
+        LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
+        mLatitude.setText(String.valueOf(latLng.latitude));
+        mLongitude.setText(String.valueOf(latLng.longitude));
+
+        String cityName = extras.getString(CITY_NAME);
+        if ((cityName != null) && !cityName.equals("")) {
+            mPlaceName.setText(cityName);
+        } else {
+            Toast.makeText(mContext,
+                    "Sorry, couldn't retrieve the name of your event's place. Please specify it manually.",
+                    Toast.LENGTH_LONG).show();
+            mPlaceName.setText("");
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case PICK_LOCATION_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    // All went smoothly, update location in this activity
+                    this.updateLocation(data);
+
+                } else {
+                    Toast.makeText(mContext, "Sorry, couldn't get the location of your event", Toast.LENGTH_LONG)
+                            .show();
+                    mLatitude.setText("");
+                    mLongitude.setText("");
+                    mPlaceName.setText("");
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -255,118 +367,5 @@ public class AddEventActivity extends FragmentActivity {
                 this.updateLocation(this.getIntent());
             }
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.add_event, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                break;
-            case R.id.addEventButtonCreateEvent:
-                this.createEvent();
-                break;
-            default:
-                // No other menu items!
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case PICK_LOCATION_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    // All went smoothly, update location in this activity
-                    this.updateLocation(data);
-
-                } else {
-                    Toast.makeText(mContext, "Sorry, couldn't get the location of your event", Toast.LENGTH_LONG)
-                        .show();
-                    mLatitude.setText("");
-                    mLongitude.setText("");
-                    mPlaceName.setText("");
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    /**
-     * @author SpicyCH
-     */
-    private void updateLocation(Intent data) {
-        Bundle extras = data.getExtras();
-
-        LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
-        mLatitude.setText(String.valueOf(latLng.latitude));
-        mLongitude.setText(String.valueOf(latLng.longitude));
-
-        String cityName = extras.getString(CITY_NAME);
-        if ((cityName != null) && !cityName.equals("")) {
-            mPlaceName.setText(cityName);
-        } else {
-            Toast.makeText(mContext,
-                "Sorry, couldn't retrieve the name of your event's place. Please specify it manually.",
-                Toast.LENGTH_LONG).show();
-            mPlaceName.setText("");
-        }
-    }
-
-    public void pickLocation(View v) {
-        Toast.makeText(mContext, "Long click the map at the location of your event", Toast.LENGTH_LONG).show();
-
-        Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
-        pickLocationIntent.putExtra("pickLocationForEvent", true);
-        pickLocationIntent.setType(Context.LOCATION_SERVICE);
-        this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
-
-    }
-
-    /**
-     * @param dayMonthYear
-     *            a String like "16/09/1993"
-     * @param hourMinute
-     *            a String like "17:03"
-     * @return a GregorianDate constructed from the given parameters
-     * @author SpicyCH
-     */
-    private GregorianCalendar getDateFromTextFormat(String dayMonthYear, String hourMinute) {
-        assert this.isValidDate(dayMonthYear) : "The string dayMonthYear isn't in the expected format";
-        assert this.isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
-
-        String[] s1 = dayMonthYear.split("/");
-        String[] s2 = hourMinute.split(":");
-        // Don't forget to substract 1 to the month in text format
-        GregorianCalendar date =
-            new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1, Integer.parseInt(s1[0]),
-                Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
-
-        return date;
-    }
-
-    private boolean isValidDate(String s) {
-        String[] sArray = s.split("/");
-        return sArray.length == ELEMENTS_JJ_DD_YYYY;
-    }
-
-    private boolean isValidTime(String s) {
-        String[] sArray = s.split(":");
-        return sArray.length == ELEMENTS_HH_MM;
     }
 }
