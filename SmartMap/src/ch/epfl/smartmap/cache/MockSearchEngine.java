@@ -16,12 +16,12 @@ public class MockSearchEngine implements SearchEngine {
     private static final String AUDIT_TAG = "Audit : " + TAG;
 
     private final History mHistory;
-    private final List<User> mUsers;
+    private final List<Friend> mUsers;
 
     /**
      * Constructor
      */
-    public MockSearchEngine(List<User> users) {
+    public MockSearchEngine(List<Friend> users) {
         mHistory = new SortedByDayHistory();
         mUsers = users;
     }

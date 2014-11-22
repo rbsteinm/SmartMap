@@ -41,15 +41,13 @@ import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserEvent;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SearchPanel;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
-import ch.epfl.smartmap.map.DefaultEventMarkerDisplayer;
+import ch.epfl.smartmap.map.DefaultMarkerManager;
 import ch.epfl.smartmap.map.DefaultZoomManager;
-import ch.epfl.smartmap.map.EventMarkerDisplayer;
-import ch.epfl.smartmap.map.FriendMarkerDisplayer;
-import ch.epfl.smartmap.map.ProfilePictureFriendMarkerDisplayer;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -97,8 +95,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private DatabaseHelper mDbHelper;
     private SideMenu mSideMenu;
     private GoogleMap mGoogleMap;
-    private FriendMarkerDisplayer mFriendMarkerDisplayer;
-    private EventMarkerDisplayer mEventMarkerDisplayer;
+    private DefaultMarkerManager<Friend> mFriendMarkerManager;
+    private DefaultMarkerManager<UserEvent> mEventMarkerManager;
     private DefaultZoomManager mMapZoomer;
     private SupportMapFragment mFragmentMap;
     private SearchEngine mSearchEngine;
@@ -138,11 +136,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         }
 
         if (mGoogleMap != null) {
-            mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
-            mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
+            mEventMarkerManager = new DefaultMarkerManager<UserEvent>(mGoogleMap);
+            mFriendMarkerManager = new DefaultMarkerManager<Friend>(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
-            List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
-            allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
+            List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
+            allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
             Intent startingIntent = this.getIntent();
             if (startingIntent.getParcelableExtra("location") == null) {
                 mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
@@ -313,7 +311,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mFriendMarkerDisplayer.updateMarkers(MainActivity.this.getContext(), mGoogleMap,
+            mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
                 MainActivity.this.getVisibleUsers(mDbHelper.getAllUsers()));
         }
 
@@ -364,12 +362,12 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         }
     }
 
-    private List<User> getVisibleUsers(LongSparseArray<User> usersSparseArray) {
-        List<User> visibleUsers = new ArrayList<User>();
+    private List<Friend> getVisibleUsers(LongSparseArray<User> usersSparseArray) {
+        List<Friend> visibleUsers = new ArrayList<Friend>();
         for (int i = 0; i < usersSparseArray.size(); i++) {
             User user = usersSparseArray.valueAt(i);
             if (user.isVisible()) {
-                visibleUsers.add(user);
+                visibleUsers.add((Friend) user);
             }
         }
         return visibleUsers;
@@ -529,4 +527,5 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     public void closeInformationPanel(MenuItem mi) {
         this.closeInformationPanel();
     }
+
 }
