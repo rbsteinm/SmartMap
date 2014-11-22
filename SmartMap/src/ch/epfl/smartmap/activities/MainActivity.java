@@ -37,6 +37,7 @@ import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.FriendsLocationListener;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
 import ch.epfl.smartmap.cache.SettingsManager;
@@ -61,12 +62,17 @@ import com.google.android.gms.maps.model.Marker;
 /**
  * This Activity displays the core features of the App. It displays the map and
  * the whole menu.
+ * It is a FriendsLocationListener to update the map when friends positions
+ * change
  * 
  * @author jfperren
  * @author hugo-S
  * @author SpicyCH
  */
-public class MainActivity extends FragmentActivity implements LocationListener {
+
+// TODO MainActivity will no longer be a LocationListener when everything will
+// be ready in the service
+public class MainActivity extends FragmentActivity implements FriendsLocationListener, LocationListener {
 
     private static final String TAG = "MAIN_ACTIVITY";
     private static final int LOCATION_UPDATE_TIMEOUT = 10000;
@@ -225,6 +231,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         return super.onOptionsItemSelected(item);
     }
 
+    // will be removed
     @Override
     public void onLocationChanged(Location location) {
         SettingsManager.getInstance().setLocation(location);
@@ -270,6 +277,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         // stopService(mUpdateServiceIntent);
     }
 
+    // will be removed
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -278,6 +286,16 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         }
 
     };
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FriendsLocationListener#onChange()
+     */
+    @Override
+    public void onChange() {
+        mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
+            MainActivity.this.getVisibleUsers(mDbHelper.getAllUsers()));
+    }
 
     public Context getContext() {
         return this;
@@ -301,6 +319,9 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
             mGoogleMap.setMyLocationEnabled(true);
+
+            // the code below will be deleted
+
             // Getting LocationManager object from System Service
             // LOCATION_SERVICE
             LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -334,6 +355,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         }
         return visibleUsers;
     }
+
+    // the 3 methods below will be removed
 
     /*
      * (non-Javadoc)

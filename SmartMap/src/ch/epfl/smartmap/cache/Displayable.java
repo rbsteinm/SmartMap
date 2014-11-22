@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * Objects that can be displayed on the bottom menu
+ * Objects that can be displayed on the bottom menu, and as a marker on the map
  * 
  * @author ritterni
  */
