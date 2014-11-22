@@ -9,9 +9,9 @@ import java.util.Date;
  * @author jfperren
  */
 public interface History {
-    void addEntry(Friend friend, Date date);
+    void addEntry(Displayable item, Date date);
 
-    ArrayList<Friend> getEntriesForIndex(int index);
+    ArrayList<Displayable> getEntriesForIndex(int index);
 
     Date getDateForIndex(int index);
 
@@ -26,7 +26,7 @@ public interface History {
      * @author jfperren
      */
     public static class HistoryEntry {
-        private final Friend mFriend;
+        private final Displayable mItem;
         private final Date mDate;
 
         /**
@@ -35,13 +35,13 @@ public interface History {
          * @param friend
          * @param date
          */
-        public HistoryEntry(Friend friend, Date date) {
-            mFriend = friend;
+        public HistoryEntry(Displayable item, Date date) {
+            mItem = item;
             mDate = date;
         }
 
-        public Friend getFriend() {
-            return mFriend;
+        public Displayable getItem() {
+            return mItem;
         }
 
         public Date getDate() {

@@ -113,7 +113,12 @@ public class AddFriendActivity extends ListActivity {
 
     /**
      * Asynchronous task that refreshes the list of users displayed every time a
+     * <<<<<<< HEAD
      * new character is typed in the searchbar
+     * =======
+     * new
+     * character is typed in the searchbar
+     * >>>>>>> gui-info
      * 
      * @author rbsteinm
      */

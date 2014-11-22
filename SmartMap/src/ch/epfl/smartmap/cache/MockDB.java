@@ -27,8 +27,23 @@ public class MockDB {
     public static final Friend CHRISTIE = new Friend(11, "Christie Palmer", 46.5162802, 6.6698749);
     public static final Friend MARIE = new Friend(12, "Marie Wermeille", 45.2547877, 45.004577);
     public static final Friend HUGO = new Friend(13, "Hugo Sbai", 47.5547877, 4.4255457);
-    public static final ArrayList<Friend> FRIENDS_LIST = new ArrayList<Friend>(Arrays.asList(JULIEN, ALAIN,
-        ROBIN, MATTHIEU, NICOLAS, MARION, RAPHAEL, HUGO, GUILLAUME, SELINE, CYRIL, PIETRO, CHRISTIE, MARIE));
+
+    public static final UserEvent FOOTBALL_TOURNAMENT = new UserEvent("Football Tournament", HUGO.getID(),
+        HUGO.getName(), new GregorianCalendar(2014, 11, 23), new GregorianCalendar(2014, 11, 27),
+        new Location("SmartMapServers"));
+    public static final UserEvent CONFERENCE = new UserEvent("Conference on cellular networks", HUGO.getID(),
+        HUGO.getName(), new GregorianCalendar(2014, 11, 26), new GregorianCalendar(2014, 11, 26),
+        new Location("Lausanne"));
+    public static final UserEvent MARION_BIRTHDAY = new UserEvent("Marion's birthday", MARION.getID(),
+        MARION.getName(), new GregorianCalendar(2014, 11, 20), new GregorianCalendar(2014, 11, 20),
+        new Location("Marion's"));
+
+    public static final ArrayList<Displayable> FRIENDS_LIST = new ArrayList<Displayable>(Arrays.asList(
+        JULIEN, ALAIN, ROBIN, MATTHIEU, NICOLAS, MARION, RAPHAEL, HUGO, GUILLAUME, SELINE, CYRIL, PIETRO,
+        CHRISTIE, MARIE));
+
+    public static final ArrayList<Displayable> EVENTS_LIST = new ArrayList<Displayable>(Arrays.asList(
+        FOOTBALL_TOURNAMENT, CONFERENCE, MARION_BIRTHDAY));
 
     public static List<Event> getEventsList() {
         Location locationFootball = new Location("SmartMapServers");

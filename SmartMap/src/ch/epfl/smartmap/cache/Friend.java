@@ -11,6 +11,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
 import ch.epfl.smartmap.R;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -20,7 +22,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public class Friend implements User, Searchable, Displayable {
+public class Friend implements User, Searchable, Displayable, Parcelable {
 
     private final long mId; // the user's unique ID
     private String mName; // the user's name as it will be displayed
@@ -40,6 +42,18 @@ public class Friend implements User, Searchable, Displayable {
     public static final String PROVIDER_NAME = "SmartMapServers";
 
     private static final int LEFT_SHIFT_COUNT = 32;
+
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+        @Override
+        public Friend createFromParcel(Parcel source) {
+            return new Friend(source);
+        }
+
+        @Override
+        public Friend[] newArray(int size) {
+            return new Friend[size];
+        }
+    };
 
     /**
      * Friend constructor
@@ -68,6 +82,21 @@ public class Friend implements User, Searchable, Displayable {
         this(userID, userName);
         this.setLatitude(latitude);
         this.setLongitude(longitude);
+    }
+
+    public Friend(Parcel in) {
+        mId = in.readLong();
+        mName = in.readString();
+        mPhoneNumber = in.readString();
+        mEmail = in.readString();
+        mLocation = in.readParcelable(Location.class.getClassLoader());
+        mPositionName = in.readString();
+        mLastSeen = new GregorianCalendar();
+        mLastSeen.setTimeInMillis(in.readLong());
+        boolean[] booleans = new boolean[2];
+        in.readBooleanArray(booleans);
+        mVisible = booleans[0];
+        mOnline = booleans[1];
     }
 
     @Override
@@ -262,5 +291,31 @@ public class Friend implements User, Searchable, Displayable {
     @Override
     public void setVisible(boolean isVisible) {
         mVisible = isVisible;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.os.Parcelable#describeContents()
+     */
+    @Override
+    public int describeContents() {
+        return 1;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(mId);
+        dest.writeString(mName);
+        dest.writeString(mPhoneNumber);
+        dest.writeString(mEmail);
+        dest.writeParcelable(mLocation, flags);
+        dest.writeString(mPositionName);
+        dest.writeLong(mLastSeen.getTimeInMillis());
+        boolean[] booleans = new boolean[]{mVisible, mOnline};
+        dest.writeBooleanArray(booleans);
     }
 }

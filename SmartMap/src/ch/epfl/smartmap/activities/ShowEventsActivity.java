@@ -115,7 +115,6 @@ public class ShowEventsActivity extends ListActivity {
         // Create custom Adapter and pass it to the Activity
         EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
         this.setListAdapter(adapter);
-
     }
 
     @Override
@@ -279,8 +278,13 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
+     * <<<<<<< HEAD
      * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired
      * by
+     * =======
+     * Computes the distance between two GPS locations (takes into consideration
+     * the earth radius), inspired by
+     * >>>>>>> gui-info
      * wikipedia
      * 
      * @param lat1

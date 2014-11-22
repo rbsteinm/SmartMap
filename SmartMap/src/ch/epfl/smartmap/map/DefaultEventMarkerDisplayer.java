@@ -30,7 +30,12 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /**
      * A map that contains the displayed markers' ids, associated with the event
+     * <<<<<<< HEAD
      * they represent
+     * =======
+     * they
+     * represent
+     * >>>>>>> gui-info
      */
     private final Map<String, Event> displayedMarkers = new HashMap<String, Event>();
 

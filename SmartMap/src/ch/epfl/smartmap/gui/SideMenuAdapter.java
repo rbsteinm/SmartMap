@@ -47,7 +47,12 @@ public class SideMenuAdapter extends ArrayAdapter<String> {
         // Get item field
         TextView sideMenuView = (TextView) convertView.findViewById(R.id.side_menu_view_item);
         /*
+         * <<<<<<< HEAD
          * if(sideMenuView == null){ Log.d("sideMenuView is null", "NULLVIEW");
+         * =======
+         * if(sideMenuView == null){
+         * Log.d("sideMenuView is null", "NULLVIEW");
+         * >>>>>>> gui-info
          * }
          */
         // Set item field + id

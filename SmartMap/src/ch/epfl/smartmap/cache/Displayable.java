@@ -2,6 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.location.Location;
 
 /**
  * Objects that can be displayed on the bottom menu
@@ -27,4 +28,9 @@ public interface Displayable {
      *         etc.)
      */
     String getShortInfos();
+
+    /**
+     * @return GoogleMap Location of the Displayable
+     */
+    Location getLocation();
 }

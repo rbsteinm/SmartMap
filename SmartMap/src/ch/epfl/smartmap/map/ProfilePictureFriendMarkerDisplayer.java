@@ -183,10 +183,17 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
      * (non-Javadoc)
      * @see
      * ch.epfl.smartmap.gui.FriendMarkerDisplayer#updateMarkers(android.content
+     * <<<<<<< HEAD
      * .Context, com.google.android.gms.maps.GoogleMap, java.util.List) This
      * method updates the markers on the map with the given list of friends. It
      * uses an auxiliary method animateMarkers to move the marker with an
      * animation instead of changing place roughly
+     * =======
+     * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
+     * This method updates the markers on the map with the given list of
+     * friends. It uses an auxiliary method animateMarkers to move the marker
+     * with an animation instead of changing place roughly
+     * >>>>>>> gui-info
      */
     @Override
     public void updateMarkers(Context context, GoogleMap googleMap, List<User> friendsToDisplay) {

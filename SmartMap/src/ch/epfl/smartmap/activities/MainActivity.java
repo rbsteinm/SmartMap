@@ -2,7 +2,6 @@ package ch.epfl.smartmap.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,6 +20,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -36,13 +36,11 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
-import ch.epfl.smartmap.gui.SearchPanel;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
 import ch.epfl.smartmap.map.DefaultEventMarkerDisplayer;
@@ -103,7 +101,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private SearchEngine mSearchEngine;
     private Menu mMenu;
     private MenuTheme mMenuTheme;
-    @SuppressWarnings("unused")
     private Displayable mCurrentItem;
 
     @Override
@@ -130,7 +127,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
         mDbHelper = DatabaseHelper.getInstance();
 
-        mSearchEngine = new MockSearchEngine(this.getVisibleUsers(mDbHelper.getAllUsers()));
+        // mSearchEngine = new MockSearchEngine(this.getVisibleUsers(mDbHelper.getAllUsers()));
+        mSearchEngine = new MockSearchEngine();
         mSearchLayout.setSearchEngine(mSearchEngine);
 
         if (savedInstanceState == null) {
@@ -155,7 +153,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView mSearchView = (SearchView) searchItem.getActionView();
         final SearchLayout mSearchLayout = (SearchLayout) this.findViewById(R.id.search_layout);
-        final SearchPanel mSearchPanel = (SearchPanel) this.findViewById(R.id.search_panel);
+        final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
 
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
@@ -167,7 +165,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Give the query results to searchLayout
-                mSearchLayout.updateSearchResults(mSearchView.getQuery().toString());
+
+                mSearchLayout.setSearchQuery(mSearchView.getQuery().toString());
                 return false;
             }
         });
@@ -178,7 +177,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 // Open Sliding Panel and Displays the main search view
                 String query = mSearchView.getQuery().toString();
                 mSearchPanel.open();
-                mSearchLayout.showMainPanel(query);
+                mSearchLayout.resetView(query);
                 MainActivity.this.setSearchMenu();
             }
         });
@@ -425,25 +424,25 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      * 
      * @param friend
      */
-    public void performQuery(Friend friend) {
+    public void performQuery(Displayable item) {
         // Get Views
         final MenuItem mSearchView = mMenu.findItem(R.id.action_search);
-        final SearchPanel mSearchPanel = (SearchPanel) this.findViewById(R.id.search_panel);
+        final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
         // Close search interface
         mSearchPanel.close();
         mSearchView.collapseActionView();
         // Focus on Friend
-        mMapZoomer.zoomOnLocation(friend.getLocation(), mGoogleMap);
-        this.setItemMenu(friend);
+        mMapZoomer.zoomOnLocation(item.getLocation(), mGoogleMap);
+        this.setItemMenu(item);
         // Add query to the searchEngine
-        mSearchEngine.getHistory().addEntry(friend, new Date());
+        // mSearchEngine.getHistory().addEntryy(item, new Date());
     }
 
     /**
      * Sets the Menu that should be used when using Search Panel
      */
     public void setSearchMenu() {
-        final SearchPanel mSearchPanel = (SearchPanel) this.findViewById(R.id.search_panel);
+        final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
         mSearchPanel.open();
         ActionBar mActionBar = this.getActionBar();
         mActionBar.setTitle(R.string.app_name);
@@ -461,7 +460,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      * Sets the main Menu of the Activity
      */
     public void setMainMenu() {
-        final SearchPanel mSearchPanel = (SearchPanel) this.findViewById(R.id.search_panel);
+        final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
         mSearchPanel.close();
         ActionBar mActionBar = this.getActionBar();
         mActionBar.setTitle(R.string.app_name);
@@ -481,7 +480,12 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
     /**
      * Sets the view for Item Focus, this means - Write name / Display photo on
+     * <<<<<<< HEAD
      * ActionBar - Sets ActionMenu for Item Focus
+     * =======
+     * ActionBar - Sets ActionMenu for Item
+     * Focus
+     * >>>>>>> gui-info
      * 
      * @param item
      *            Item to be displayed
@@ -535,5 +539,17 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      */
     public void closeInformationPanel(MenuItem mi) {
         this.closeInformationPanel();
+    }
+
+    /**
+     * Opens Information Activity (called from MenuItem on Item view)
+     * 
+     * @author jfperren
+     */
+    public void openInformationActivity(MenuItem mi) {
+        Intent intent = new Intent(this, InformationActivity.class);
+        intent.putExtra("CURRENT_DISPLAYABLE", (Parcelable) mCurrentItem);
+        this.startActivity(intent);
+        this.finish();
     }
 }

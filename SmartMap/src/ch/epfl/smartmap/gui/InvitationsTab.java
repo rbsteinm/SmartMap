@@ -58,8 +58,14 @@ public class InvitationsTab extends ListFragment {
      * (non-Javadoc)
      * @see
      * android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView
+     * <<<<<<< HEAD
      * , android.view.View, int, long) When a list item is clicked, display a
      * dialog to ask whether to accept or decline the invitation
+     * =======
+     * , android.view.View, int, long)
+     * When a list item is clicked, display a dialog to ask whether to accept or
+     * decline the invitation
+     * >>>>>>> gui-info
      */
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
