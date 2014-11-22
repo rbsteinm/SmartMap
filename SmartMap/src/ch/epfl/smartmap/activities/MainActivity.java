@@ -141,6 +141,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             mEventMarkerManager = new DefaultMarkerManager<UserEvent>(mGoogleMap);
             mFriendMarkerManager = new DefaultMarkerManager<Friend>(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
+
+            // Zoom according to markers
             List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
             allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
             Intent startingIntent = this.getIntent();
