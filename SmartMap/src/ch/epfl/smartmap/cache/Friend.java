@@ -56,6 +56,12 @@ public class Friend implements User, Searchable, Displayable {
      * @author ritterni
      */
     public Friend(long userID, String userName) {
+        if (userID < 0) {
+            throw new IllegalArgumentException("Invalid user ID!");
+        }
+        if (userName.isEmpty() || userName == null) {
+            throw new IllegalArgumentException("Invalid user name!");
+        }
         mId = userID;
         mName = userName;
         mPhoneNumber = NO_NUMBER;
@@ -232,6 +238,9 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public void setName(String newName) {
+        if (newName.isEmpty() || newName == null) {
+            throw new IllegalArgumentException("Invalid user name!");
+        }
         mName = newName;
     }
 
