@@ -16,8 +16,6 @@ import ch.epfl.smartmap.cache.Displayable;
  * Layout that contains different SearchResultViews that can be dynamically
  * added/removed.
  * 
- * @param <T>
- *            Type of Search results
  * @author jfperren
  */
 public class SearchResultViewGroup extends LinearLayout {
@@ -27,7 +25,7 @@ public class SearchResultViewGroup extends LinearLayout {
      * 
      * @author jfperren
      */
-    private enum State {
+    private enum VisualState {
         MINIMIZED,
         EXPANDED,
         MAX,
@@ -35,15 +33,24 @@ public class SearchResultViewGroup extends LinearLayout {
     }
 
     private static final String TAG = "SEARCH_RESULT_VIEW_GROUP";
-
+    // Margins & Paddings
+    private static final int NO_RESULT_VIEW_VERTICAL_PADDING = 150;
+    private static final int SEPARATOR_LEFT_PADDING = 10;
+    private static final int SEPARATOR_RIGHT_PADDING = 10;
+    // Colors
+    private static final int SEPARATOR_BACKGROUND_COLOR = R.color.bottomSliderBackground;
+    // Text Sizes
+    private static final float NO_RESULT_VIEW_TEXT_SIZE = 25f;
+    // Others
     private static final int ITEMS_PER_PAGE = 10;
 
-    private int mCurrentItemNb;
-
-    private List<Displayable> mResults;
+    // Children Views
     private final Button mMoreResultsButton;
     private final TextView mEmptyListTextView;
-    private State mState;
+    // Informations about current state
+    private int mCurrentItemNb;
+    private List<Displayable> mCurrentResultList;
+    private VisualState mCurrentVisualState;
 
     /**
      * Constructor
@@ -52,8 +59,6 @@ public class SearchResultViewGroup extends LinearLayout {
      *            Context this View lives in
      * @param results
      *            List of results that will be displayed
-     * @param name
-     *            The name of this SearchResultViewGroup
      */
     public SearchResultViewGroup(Context context, List<Displayable> results) {
         super(context);
@@ -61,23 +66,29 @@ public class SearchResultViewGroup extends LinearLayout {
         this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
             LayoutParams.MATCH_PARENT));
         this.setOrientation(VERTICAL);
-        this.setBackgroundResource(R.drawable.view_group_background);
-        // Create button and TextView to display when list is empty
+        this.setBackgroundResource(R.drawable.div_background);
+
+        // Create button
         mMoreResultsButton = new MoreResultsButton(context, this);
+        // Create TextView that needs to be displayed when no result is found
         mEmptyListTextView = new TextView(context);
         mEmptyListTextView.setText(R.string.no_search_result);
-        mEmptyListTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 600));
-        // Sets list and displayMinimized
+        mEmptyListTextView.setTextColor(this.getResources().getColor(R.color.main_blue));
+        mEmptyListTextView.setTextSize(NO_RESULT_VIEW_TEXT_SIZE);
+        mEmptyListTextView.setPadding(0, NO_RESULT_VIEW_VERTICAL_PADDING, 0, NO_RESULT_VIEW_VERTICAL_PADDING);
+        mEmptyListTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+            LayoutParams.WRAP_CONTENT));
+        mEmptyListTextView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+
+        // Create all SearchresultViews
         this.setResultList(results);
     }
 
     /**
-     * Constructor
+     * Constructor with empty list
      * 
      * @param context
      *            Context this View lives in
-     * @param name
-     *            The name of this SearchResultViewGroup
      */
     public SearchResultViewGroup(Context context) {
         this(context, new ArrayList<Displayable>());
@@ -87,7 +98,7 @@ public class SearchResultViewGroup extends LinearLayout {
      * @return True if there is no result to display
      */
     public boolean isEmpty() {
-        return mResults.isEmpty();
+        return mCurrentResultList.isEmpty();
     }
 
     /**
@@ -96,12 +107,12 @@ public class SearchResultViewGroup extends LinearLayout {
     public void displayMinimized() {
         mCurrentItemNb = 0;
         this.removeAllViews();
-        if (mResults.isEmpty()) {
+        if (mCurrentResultList.isEmpty()) {
             this.setBackgroundResource(0);
             this.addView(mEmptyListTextView);
-            mState = State.EMPTY;
+            mCurrentVisualState = VisualState.EMPTY;
         } else {
-            this.setBackgroundResource(R.drawable.view_group_background);
+            this.setBackgroundResource(R.drawable.div_background);
             this.addMoreViews();
         }
     }
@@ -110,35 +121,36 @@ public class SearchResultViewGroup extends LinearLayout {
      * Extend the searchResultViewGroup if there are more results to show
      */
     public void showMoreResults() {
-        if (mState == State.EMPTY) {
+        if (mCurrentVisualState == VisualState.EMPTY) {
             assert false : "Cannot expand an empty SearchResultViewGroup";
-        } else if (mState == State.MAX) {
+        } else if (mCurrentVisualState == VisualState.MAX) {
             assert false : "Cannot expand a SearchResultViewGroup that is already fully expanded";
         } else {
             this.addMoreViews();
         }
     }
 
+    /**
+     * If possible, add {@code ITEMS_PER_PAGE} more {@code SearchResultView}s
+     */
     private void addMoreViews() {
         this.removeView(mMoreResultsButton);
         // Computes the number of items to add
-        int newItemsNb = Math.min(ITEMS_PER_PAGE, mResults.size() - mCurrentItemNb);
+        int newItemsNb = Math.min(ITEMS_PER_PAGE, mCurrentResultList.size() - mCurrentItemNb);
         // Add SearchResultViews
         for (int i = mCurrentItemNb; i < (mCurrentItemNb + newItemsNb); i++) {
-            Log.d(TAG, "add" + mResults.get(i).getName());
-            this.addView(new SearchResultView(this.getContext(), mResults.get(i)));
+            Log.d(TAG, "add" + mCurrentResultList.get(i).getName());
+            this.addView(new SearchResultView(this.getContext(), mCurrentResultList.get(i)));
             this.addView(new Divider(this.getContext()));
         }
-        // Removes last Divider
-        // this.removeViewAt(this.getChildCount() - 1);
 
         mCurrentItemNb += newItemsNb;
         // Sets the new visual state
-        if (mCurrentItemNb == mResults.size()) {
-            mState = State.MAX;
+        if (mCurrentItemNb == mCurrentResultList.size()) {
+            mCurrentVisualState = VisualState.MAX;
         } else {
             this.addView(mMoreResultsButton);
-            mState = State.EXPANDED;
+            mCurrentVisualState = VisualState.EXPANDED;
         }
     }
 
@@ -149,8 +161,52 @@ public class SearchResultViewGroup extends LinearLayout {
      *            New list of results
      */
     public void setResultList(List<Displayable> newResultList) {
-        mResults = new ArrayList<Displayable>(newResultList);
+        mCurrentResultList = new ArrayList<Displayable>(newResultList);
         this.displayMinimized();
+    }
+
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        if (depth == 0) {
+            return 0;
+        }
+
+        int auditErrors = 0;
+        if ((mCurrentVisualState == VisualState.EMPTY) && !this.isEmpty()) {
+            Log.e(TAG, "State is Empty but result list isn't");
+            auditErrors++;
+        }
+        if ((mCurrentVisualState != VisualState.EMPTY) && this.isEmpty()) {
+            Log.e(TAG, "State is not Empty but result list is");
+            auditErrors++;
+        }
+        if ((this.getChildAt(this.getChildCount() - 1) instanceof Button)
+            && (mCurrentVisualState == VisualState.MAX)) {
+            Log.e(TAG, "Button is displayed in MAX mode");
+            auditErrors++;
+        }
+        if ((this.getChildAt(this.getChildCount() - 1) instanceof Button)
+            && (mCurrentVisualState == VisualState.EMPTY)) {
+            Log.e(TAG, "Button is displayed in EMPTY mode");
+            auditErrors++;
+        }
+        if (this.getChildCount() == 0) {
+            Log.e(TAG, "A SearchResultViewGroup should always have at least one child");
+            auditErrors++;
+        }
+
+        for (Displayable d : mCurrentResultList) {
+            // auditErrors += d.auditErrors();
+        }
+
+        return auditErrors;
     }
 
     /**
@@ -178,14 +234,11 @@ public class SearchResultViewGroup extends LinearLayout {
      * @author jfperren
      */
     private static class Divider extends LinearLayout {
-        private static final int LEFT_PADDING = 10;
-        private static final int RIGHT_PADDING = 10;
-
         public Divider(Context context) {
             super(context);
-            this.setPadding(LEFT_PADDING, 0, RIGHT_PADDING, 0);
+            this.setPadding(SEPARATOR_LEFT_PADDING, 0, SEPARATOR_RIGHT_PADDING, 0);
             this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
-            this.setBackgroundResource(R.color.searchResultShadow);
+            this.setBackgroundResource(SEPARATOR_BACKGROUND_COLOR);
         }
     }
 }

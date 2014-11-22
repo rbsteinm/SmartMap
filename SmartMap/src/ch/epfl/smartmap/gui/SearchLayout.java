@@ -6,7 +6,6 @@ import java.util.List;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
@@ -16,41 +15,48 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.History;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine.Type;
 
 /**
- * Layout that contains different SearchResultLists, that can be swapped with a
+ * Layout that contains different SearchResult lists with different result types, change result type with
  * horizontal swipe.
  * 
  * @author jfperren
  */
 public class SearchLayout extends LinearLayout {
 
+    @SuppressWarnings("unused")
     private static final String TAG = "SEARCH_RESULT_SWIPEABLE_CONTAINER";
-
+    // Margins & Paddings
     private static final int PADDING_LEFT = 20;
     private static final int PADDING_RIGHT = 20;
     private static final int PADDING_BOTTOM = 20;
     private static final int PADDING_TOP = 10;
-    private static final int MARGIN_BELOW_TITLE = 5;
     private static final int MARGIN_BELOW_SEARCHVIEWGROUP = 20;
-
+    // Colors
+    private static final int BACKGROUND_COLOR = R.color.background_blue;
+    private static final int TITLE_NORMAL_COLOR = R.color.shadow_blue;
+    private static final int TITLE_HIGHLIGHTED_COLOR = R.color.main_blue;
+    // Text size
     private static final float TITLE_TEXT_SIZE = 15f;
+    private static final float SEARCH_ONLINE_TEXT_SIZE = 20f;
+    // Default values
+    private static final String DEFAULT_SEARCH_QUERY = "";
+    private static final Type DEFAULT_SEARCH_TYPE = Type.ALL;
 
+    // Data structures
     private final HashMap<Type, ScrollView> mScrollViews;
     private final HashMap<Type, SearchResultViewGroup> mSearchResultViewGroups;
     private final HashMap<Type, Integer> mSearchTypeIndexes;
     private final HashMap<Type, TextView> mTitleTextViews;
-
-    private Type mCurrentSearchType;
-
+    private final List<Type> mActiveSearchTypes;
     private SearchEngine mSearchEngine;
+    // Extra views
     private LinearLayout mTitleBar;
-    private List<Type> mActiveSearchTypes;
-
+    // Information about current state
+    private Type mCurrentSearchType;
     private String mCurrentQuery;
 
     public SearchLayout(Context context, AttributeSet attrs) {
@@ -60,22 +66,22 @@ public class SearchLayout extends LinearLayout {
         this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
             LayoutParams.MATCH_PARENT));
         this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
-        this.setBackgroundResource(R.color.background_blue);
+        this.setBackgroundResource(BACKGROUND_COLOR);
 
-        mCurrentQuery = "";
-        mCurrentSearchType = Type.FRIENDS;
         // Initialize data structures
         mScrollViews = new HashMap<Type, ScrollView>();
         mSearchResultViewGroups = new HashMap<Type, SearchResultViewGroup>();
         mSearchTypeIndexes = new HashMap<Type, Integer>();
         mActiveSearchTypes = new LinkedList<Type>();
         mTitleTextViews = new HashMap<Type, TextView>();
-
         this.setSearchEngine(new MockSearchEngine());
-
+        // Initialize Views
         mTitleBar = new LinearLayout(context);
+        // Initialize search types
         this.addSearchTypes(Type.ALL, Type.FRIENDS, Type.EVENTS, Type.TAGS, Type.GROUPS);
-        this.setSearchType(Type.ALL);
+        // Set default State
+        this.setSearchType(DEFAULT_SEARCH_TYPE);
+        mCurrentQuery = DEFAULT_SEARCH_QUERY;
     }
 
     /**
@@ -102,9 +108,9 @@ public class SearchLayout extends LinearLayout {
         this.updateCurrentPanel();
         // Set title colors
         for (TextView textView : mTitleTextViews.values()) {
-            textView.setTextColor(this.getResources().getColor(R.color.bottomSliderBackground));
+            textView.setTextColor(this.getResources().getColor(TITLE_NORMAL_COLOR));
         }
-        mTitleTextViews.get(searchType).setTextColor(this.getResources().getColor(R.color.main_blue));
+        mTitleTextViews.get(searchType).setTextColor(this.getResources().getColor(TITLE_HIGHLIGHTED_COLOR));
         // Scroll up
         mScrollViews.get(searchType).scrollTo(0, 0);
     }
@@ -125,8 +131,7 @@ public class SearchLayout extends LinearLayout {
     }
 
     private Type previousSearchType() {
-        // Need to add mActiveSearchTypes.size() to avoid negative numbers with
-        // % operator
+        // Need to add mActiveSearchTypes.size() to avoid negative numbers with % operator
         int previousSearchTypeIndex =
             ((mSearchTypeIndexes.get(mCurrentSearchType).intValue() - 1) + mActiveSearchTypes.size())
                 % mActiveSearchTypes.size();
@@ -157,38 +162,14 @@ public class SearchLayout extends LinearLayout {
     }
 
     /**
-     * Show the View that needs to be displayed when opening the
-     * {@code SearchPanel}, according to the query
+     * Show the {@code ScrollView} that needs to be displayed when opening the {@code SearchPanel}, according
+     * to the query
      * 
      * @param query
      */
     public void resetView(String query) {
-        this.setSearchType(Type.FRIENDS);
+        this.setSearchType(DEFAULT_SEARCH_TYPE);
         this.setSearchQuery(query);
-    }
-
-    /**
-     * Updates the HISTORY Panel according to the {@code SearchEngine}
-     */
-    private void updateHistoryPanel() {
-        // History Panel
-        History history = mSearchEngine.getHistory();
-        LinearLayout searchResultLayout = (LinearLayout) mScrollViews.get(Type.HISTORY).getChildAt(0);
-        searchResultLayout.removeAllViews();
-
-        for (int i = 0; i < history.nbOfDates(); i++) {
-            // TextView displaying Date
-            TextView titleView = new TextView(this.getContext());
-            titleView.setTextSize(TITLE_TEXT_SIZE);
-            titleView.setTextColor(this.getResources().getColor(R.color.searchResultTitle));
-            titleView.setText(history.getDateForIndex(i).toString());
-            // SearchResultViewGroup grouping all queries of this date
-            SearchResultViewGroup searchResultViewGroup =
-                new SearchResultViewGroup(this.getContext(), history.getEntriesForIndex(i));
-            // Put views together
-            searchResultLayout.addView(titleView);
-            searchResultLayout.addView(searchResultViewGroup);
-        }
     }
 
     /**
@@ -206,7 +187,7 @@ public class SearchLayout extends LinearLayout {
             TextView titleTextView = new TextView(this.getContext());
             titleTextView.setText(searchType.getTitle());
             titleTextView.setTextSize(TITLE_TEXT_SIZE);
-            titleTextView.setTextColor(this.getResources().getColor(R.color.bottomSliderBackground));
+            titleTextView.setTextColor(this.getResources().getColor(TITLE_NORMAL_COLOR));
             // Create a spacer
             TextView spacer = new TextView(this.getContext());
             LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -269,7 +250,6 @@ public class SearchLayout extends LinearLayout {
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            Log.d(TAG, "Analysing Gesture");
             boolean result = false;
 
             float diffY = e2.getY() - e1.getY();
@@ -305,7 +285,9 @@ public class SearchLayout extends LinearLayout {
             mLayout = new LinearLayout(context);
             mLayout.setOrientation(VERTICAL);
             this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+            // Remove scrollbar and shadow when the scrollview can't be scrolled.
             this.setVerticalScrollBarEnabled(false);
+            this.setVerticalFadingEdgeEnabled(false);
             super.addView(mLayout);
 
             mGestureDetector = new GestureDetector(this.getContext(), new HorizontalGestureListener());
@@ -348,19 +330,23 @@ public class SearchLayout extends LinearLayout {
         }
     };
 
+    /**
+     * Button that redirects to the activities in charge of server search.
+     * 
+     * @author jfperren
+     */
     private final class SearchOnlineButton extends Button {
         public SearchOnlineButton(Context context) {
             super(context);
 
-            this.setBackgroundResource(R.drawable.view_group_background);
+            this.setBackgroundResource(R.drawable.div_background);
             this.setText("Search on SmartMap");
-            this.setTextSize(20f);
+            this.setTextSize(SEARCH_ONLINE_TEXT_SIZE);
             this.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-                    // open friendsactivity
-
+                    // TODO : Implement the redirection towards corresponding activity.
                 }
             });
         }

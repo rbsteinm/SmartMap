@@ -14,11 +14,8 @@ import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.cache.Displayable;
 
 /**
- * This class is a basic Layout that will be used to display search results in
- * {@code SearchLayout}.
+ * This class is a basic Layout that will be used to display search results in {@code SearchLayout}.
  * 
- * @param <T>
- *            Type of Displayable this SearchResultView shows.
  * @author jfperren
  */
 public class SearchResultView extends RelativeLayout {
@@ -30,20 +27,20 @@ public class SearchResultView extends RelativeLayout {
     // TODO : Image size should depend on size of layout without image
     private static final int IMAGE_SIZE = 150;
     private final static int PHOTO_RIGHT_MARGIN = 40;
-
+    // Margins & Paddings
     private static final int PADDING_RIGHT = 20;
     private static final int PADDING_LEFT = 20;
     private static final int PADDING_TOP = 20;
     private static final int PADDING_BOTTOM = 20;
-
     private final static int TITLE_BOTTOM_PADDING = 5;
+    // Text Sizes
     private final static float TITLE_TEXT_SIZE = 17f;
-
+    // Distances
     private static final int CLICK_DISTANCE_THRESHHOLD = 10;
 
+    // Children Views
     private final Displayable mItem;
     private final Bitmap mImage;
-
     private final ImageView mImageView;
 
     /**
@@ -100,6 +97,7 @@ public class SearchResultView extends RelativeLayout {
         this.addView(mTitleView);
         this.addView(mShortInfoView);
 
+        // This touch listener sends the query and displays the item
         this.setOnTouchListener(new OnTouchListener() {
             private float startX;
             private float startY;
