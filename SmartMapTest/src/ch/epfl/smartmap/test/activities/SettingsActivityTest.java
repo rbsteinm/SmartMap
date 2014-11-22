@@ -1,12 +1,17 @@
 package ch.epfl.smartmap.test.activities;
 
+import static com.google.android.apps.common.testing.ui.espresso.Espresso.onData;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
+
+import org.hamcrest.Matchers;
+
 import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.activities.SettingsActivity;
 import ch.epfl.smartmap.cache.SettingsManager;
 
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
+import com.google.android.apps.common.testing.ui.espresso.matcher.PreferenceMatchers;
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
 /**
@@ -16,12 +21,14 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  * <p>
  * A boolean preference that has a dependency to another boolean preference will
  * have its value set as follows: booleanValue = dependencyIsEnabled ?
- * valueSetByUser : false For example if the checkbox vibrate is checked but the
- * notifications checkbox is unchecked, the value of the vibrate checkbox will
- * be false.
+ * valueSetByUser : false
  * </p>
  * <p>
- * For some reason, using withId instead of withText makes espresso crash.
+ * For example if the checkbox vibrate is checked but the notifications checkbox
+ * is unchecked, the value of the vibrate checkbox will be false.
+ * </p>
+ * <p>
+ * Note: for some reason, using withId instead of withText makes espresso crash.
  * </p>
  * 
  * @author SpicyCH
@@ -140,12 +147,102 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
             .getInstance().notificationsForEventProximity());
     }
 
+    @SuppressWarnings("unchecked")
     public void testCannotActivateVibrateNotificationsIfNotifDisabled() {
+        // todo use ondata to load listview
         this.disableNotifications();
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_vibrate)))
-            .perform(ViewActions.click());
+
+        // Here vibrate is not on the screen, so we must use onData
+        onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("notifications_vibrate"))).perform(
+            ViewActions.click());
         assertEquals("Can enable a checkbox when its dependency is disabled", false, SettingsManager
             .getInstance().notificationsVibrate());
+
+    }
+
+    public void testCanActivateFriendRequests() {
+        this.enableNotifications();
+        assertEquals("Cannot enable notifications", true, SettingsManager.getInstance()
+            .notificationsEnabled());
+
+        boolean initValue = SettingsManager.getInstance().notificationsForFriendRequests();
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_friend_requests)))
+            .perform(ViewActions.click());
+        assertTrue("Couldn't change boolean status of notifications for friend requests",
+            initValue != SettingsManager.getInstance().notificationsForFriendRequests());
+
+    }
+
+    public void testCanActivateFriendshipConfirmations() {
+        this.enableNotifications();
+        assertEquals("Cannot enable notifications", true, SettingsManager.getInstance()
+            .notificationsEnabled());
+
+        boolean initValue = SettingsManager.getInstance().notificationsForFriendshipConfirmations();
+        onView(
+            ViewMatchers.withText(mContext
+                .getString(ch.epfl.smartmap.R.string.pref_title_friendship_confirmations))).perform(
+            ViewActions.click());
+        assertTrue("Couldn't change boolean status of notifications for friendship confirmations",
+            initValue != SettingsManager.getInstance().notificationsForFriendshipConfirmations());
+
+    }
+
+    public void testCanActivateEventNotifications() {
+        this.enableNotifications();
+        assertEquals("Cannot enable notifications", true, SettingsManager.getInstance()
+            .notificationsEnabled());
+
+        boolean initValue = SettingsManager.getInstance().notificationsForEventInvitations();
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_invitations)))
+            .perform(ViewActions.click());
+        assertTrue("Couldn't change boolean status of notifications for event invitations",
+            initValue != SettingsManager.getInstance().notificationsForEventInvitations());
+
+        boolean initValue2 = SettingsManager.getInstance().notificationsForEventProximity();
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_proximity)))
+            .perform(ViewActions.click());
+        assertTrue("Couldn't change boolean status of notifications for event proximity",
+            initValue2 != SettingsManager.getInstance().notificationsForEventProximity());
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public void testCanEnableVibrations() {
+        this.enableNotifications();
+        assertEquals("Cannot enable notifications", true, SettingsManager.getInstance()
+            .notificationsEnabled());
+
+        // Here vibrate is not on the screen, so we must use onData
+        boolean initValue = SettingsManager.getInstance().notificationsVibrate();
+        onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("notifications_vibrate"))).perform(
+            ViewActions.click());
+        assertTrue("Couldn't change boolean status of notifications for vibrations",
+            initValue != SettingsManager.getInstance().notificationsVibrate());
+    }
+
+    @SuppressWarnings("unchecked")
+    public void testCanSetPublicAndPrivateEvents() {
+        onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("events_show_public"))).perform(
+            ViewActions.click());
+        boolean initValue = SettingsManager.getInstance().showPublicEvents();
+        onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("events_show_public"))).perform(
+            ViewActions.click());
+
+        assertTrue("Couldn't change boolean status of public events", initValue != SettingsManager
+            .getInstance().showPublicEvents());
+
+        onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("events_show_private"))).perform(
+            ViewActions.click());
+        boolean initValue2 = SettingsManager.getInstance().showPrivateEvents();
+        onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("events_show_private"))).perform(
+            ViewActions.click());
+
+        assertTrue("Couldn't change boolean status of private events", initValue2 != SettingsManager
+            .getInstance().showPrivateEvents());
     }
 
     private void disableNotifications() {
@@ -155,6 +252,20 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
             ViewActions.click());
         boolean initValue = SettingsManager.getInstance().notificationsEnabled();
         if (initValue) {
+            onView(
+                ViewMatchers.withText(mContext
+                    .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
+                ViewActions.click());
+        }
+    }
+
+    private void enableNotifications() {
+        onView(
+            ViewMatchers.withText(mContext
+                .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
+            ViewActions.click());
+        boolean initValue = SettingsManager.getInstance().notificationsEnabled();
+        if (!initValue) {
             onView(
                 ViewMatchers.withText(mContext
                     .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(

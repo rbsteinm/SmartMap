@@ -48,6 +48,8 @@ public class SettingsManager {
     private static final String KEY_ALWAYS_SHARE = "general_always_share";
     private static final String KEY_REFRESH_FREQUENCY = "refresh_frequency";
     private static final String KEY_TIME_TO_WAIT_BEFORE_HIDING_FRIENDS = "last_seen_max";
+    private static final String KEY_PUBLIC_EVENTS = "events_show_public";
+    private static final String KEY_PRIVATE_EVENTS = "events_show_private";
 
     /**
      * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
@@ -182,6 +184,26 @@ public class SettingsManager {
     public int getTimeToWaitBeforeHidingFriends() {
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
                 KEY_TIME_TO_WAIT_BEFORE_HIDING_FRIENDS, "30"));
+    }
+
+    /**
+     * 
+     * @return <code>true</code> if the user wants to see public events on his map, <code>false</code> otherwise.
+     * 
+     * @author SpicyCH
+     */
+    public boolean showPublicEvents() {
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_PUBLIC_EVENTS, true);
+    }
+
+    /**
+     * 
+     * @return <code>true</code> if the user wants to see his private events on his map, <code>false</code> otherwise.
+     * 
+     * @author SpicyCH
+     */
+    public boolean showPrivateEvents() {
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_PRIVATE_EVENTS, true);
     }
 
     /**
