@@ -64,6 +64,7 @@ import com.google.android.gms.maps.model.Marker;
  * the whole menu.
  * 
  * @author jfperren
+ * @author hugo-S
  * @author SpicyCH
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
@@ -137,7 +138,16 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         }
 
         if (mGoogleMap != null) {
-            this.initializeMarkers();
+            mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
+            mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
+            mMapZoomer = new DefaultZoomManager(mFragmentMap);
+            List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
+            allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
+            Intent startingIntent = this.getIntent();
+            if (startingIntent.getParcelableExtra("location") == null) {
+                mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
+            }
+
         }
 
         // starting the background service
@@ -351,21 +361,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
                     LOCATION_UPDATE_DISTANCE, this);
             }
-        }
-    }
-
-    public void initializeMarkers() {
-        mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
-        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, mDbHelper.getAllEvents());
-        mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, this.getVisibleUsers(mDbHelper.getAllUsers()));
-        mMapZoomer = new DefaultZoomManager(mFragmentMap);
-        Log.i(TAG, "before enter to zoom according");
-        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
-        allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
-        Intent startingIntent = this.getIntent();
-        if (startingIntent.getParcelableExtra("location") == null) {
-            mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
         }
     }
 
