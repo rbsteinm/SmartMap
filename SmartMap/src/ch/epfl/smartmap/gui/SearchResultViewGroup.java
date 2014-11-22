@@ -95,6 +95,17 @@ public class SearchResultViewGroup extends LinearLayout {
     }
 
     /**
+     * Sets a new list of results
+     * 
+     * @param newResultList
+     *            New list of results
+     */
+    public void setResultList(List<Displayable> newResultList) {
+        mCurrentResultList = new ArrayList<Displayable>(newResultList);
+        this.displayMinimized();
+    }
+
+    /**
      * @return True if there is no result to display
      */
     public boolean isEmpty() {
@@ -120,7 +131,7 @@ public class SearchResultViewGroup extends LinearLayout {
     /**
      * Extend the searchResultViewGroup if there are more results to show
      */
-    public void showMoreResults() {
+    private void showMoreResults() {
         if (mCurrentVisualState == VisualState.EMPTY) {
             assert false : "Cannot expand an empty SearchResultViewGroup";
         } else if (mCurrentVisualState == VisualState.MAX) {
@@ -152,17 +163,6 @@ public class SearchResultViewGroup extends LinearLayout {
             this.addView(mMoreResultsButton);
             mCurrentVisualState = VisualState.EXPANDED;
         }
-    }
-
-    /**
-     * Sets a new list of results
-     * 
-     * @param newResultList
-     *            New list of results
-     */
-    public void setResultList(List<Displayable> newResultList) {
-        mCurrentResultList = new ArrayList<Displayable>(newResultList);
-        this.displayMinimized();
     }
 
     /**
@@ -200,10 +200,6 @@ public class SearchResultViewGroup extends LinearLayout {
         if (this.getChildCount() == 0) {
             Log.e(TAG, "A SearchResultViewGroup should always have at least one child");
             auditErrors++;
-        }
-
-        for (Displayable d : mCurrentResultList) {
-            // auditErrors += d.auditErrors();
         }
 
         return auditErrors;

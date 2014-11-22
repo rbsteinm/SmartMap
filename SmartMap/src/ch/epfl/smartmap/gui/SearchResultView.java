@@ -14,7 +14,8 @@ import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.cache.Displayable;
 
 /**
- * This class is a basic Layout that will be used to display search results in {@code SearchLayout}.
+ * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
+ * immutable.
  * 
  * @author jfperren
  */

@@ -27,7 +27,7 @@ public interface SearchEngine {
         private final String mTitle;
 
         private Type(String title) {
-            this.mTitle = title;
+            mTitle = title;
         }
 
         public String getTitle() {

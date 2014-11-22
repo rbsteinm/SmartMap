@@ -58,10 +58,10 @@ public class SlidingPanel extends FrameLayout {
         private int mDuration;
 
         private Fade(float fromAlpha, float toAlpha, int delay, int duration) {
-            this.mFromAlpha = fromAlpha;
-            this.mToAlpha = toAlpha;
-            this.mDelay = delay;
-            this.mDuration = duration;
+            mFromAlpha = fromAlpha;
+            mToAlpha = toAlpha;
+            mDelay = delay;
+            mDuration = duration;
         }
     }
 

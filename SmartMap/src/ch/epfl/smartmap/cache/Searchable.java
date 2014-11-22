@@ -6,5 +6,5 @@ package ch.epfl.smartmap.cache;
  * @author ritterni
  */
 public interface Searchable {
-	String getName();
+    String getName();
 }

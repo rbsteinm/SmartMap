@@ -85,18 +85,18 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
     }
 
     public Friend(Parcel in) {
-        this.mId = in.readLong();
-        this.mName = in.readString();
-        this.mPhoneNumber = in.readString();
-        this.mEmail = in.readString();
-        this.mLocation = in.readParcelable(Location.class.getClassLoader());
-        this.mPositionName = in.readString();
-        this.mLastSeen = new GregorianCalendar();
-        this.mLastSeen.setTimeInMillis(in.readLong());
+        mId = in.readLong();
+        mName = in.readString();
+        mPhoneNumber = in.readString();
+        mEmail = in.readString();
+        mLocation = in.readParcelable(Location.class.getClassLoader());
+        mPositionName = in.readString();
+        mLastSeen = new GregorianCalendar();
+        mLastSeen.setTimeInMillis(in.readLong());
         boolean[] booleans = new boolean[2];
         in.readBooleanArray(booleans);
-        this.mVisible = booleans[0];
-        this.mOnline = booleans[1];
+        mVisible = booleans[0];
+        mOnline = booleans[1];
     }
 
     @Override

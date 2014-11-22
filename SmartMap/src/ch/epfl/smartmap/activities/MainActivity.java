@@ -102,7 +102,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private SearchEngine mSearchEngine;
     private Menu mMenu;
     private MenuTheme mMenuTheme;
-    @SuppressWarnings("unused")
     private Displayable mCurrentItem;
 
     @Override

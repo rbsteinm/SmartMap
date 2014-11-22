@@ -12,26 +12,26 @@ import android.support.v4.app.FragmentPagerAdapter;
  * @author marion-S
  */
 public class PagerAdapter extends FragmentPagerAdapter {
-	private final List<Fragment> mFragments;
-	private final Context mContext;
+    private final List<Fragment> mFragments;
+    private final Context mContext;
 
-	public PagerAdapter(Context context, FragmentManager fm) {
-		super(fm);
-		mContext = context;
-		mFragments = new ArrayList<Fragment>();
-		mFragments.add(new FriendsTab(this.mContext));
-		mFragments.add(new InvitationsTab(this.mContext));
+    public PagerAdapter(Context context, FragmentManager fm) {
+        super(fm);
+        mContext = context;
+        mFragments = new ArrayList<Fragment>();
+        mFragments.add(new FriendsTab(mContext));
+        mFragments.add(new InvitationsTab(mContext));
 
-	}
+    }
 
-	@Override
-	public Fragment getItem(int position) {
-		return mFragments.get(position);
-	}
+    @Override
+    public Fragment getItem(int position) {
+        return mFragments.get(position);
+    }
 
-	@Override
-	public int getCount() {
-		return mFragments.size();
-	}
+    @Override
+    public int getCount() {
+        return mFragments.size();
+    }
 
 }

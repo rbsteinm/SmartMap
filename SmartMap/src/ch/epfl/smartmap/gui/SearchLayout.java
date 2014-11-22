@@ -67,7 +67,8 @@ public class SearchLayout extends LinearLayout {
             LayoutParams.MATCH_PARENT));
         this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
         this.setBackgroundResource(BACKGROUND_COLOR);
-
+        // Set default search query (needs to be done addSearchTypes)
+        mCurrentQuery = DEFAULT_SEARCH_QUERY;
         // Initialize data structures
         mScrollViews = new HashMap<Type, ScrollView>();
         mSearchResultViewGroups = new HashMap<Type, SearchResultViewGroup>();
@@ -79,9 +80,8 @@ public class SearchLayout extends LinearLayout {
         mTitleBar = new LinearLayout(context);
         // Initialize search types
         this.addSearchTypes(Type.ALL, Type.FRIENDS, Type.EVENTS, Type.TAGS, Type.GROUPS);
-        // Set default State
+        // Set default search type
         this.setSearchType(DEFAULT_SEARCH_TYPE);
-        mCurrentQuery = DEFAULT_SEARCH_QUERY;
     }
 
     /**
@@ -94,11 +94,30 @@ public class SearchLayout extends LinearLayout {
     }
 
     /**
+     * Updates the current panel with the new search query.
+     */
+    public void setSearchQuery(String query) {
+        mCurrentQuery = query;
+        this.updateCurrentPanel();
+    }
+
+    /**
+     * Show the {@code ScrollView} that needs to be displayed when opening the {@code SlidingPanel}, according
+     * to the query
+     * 
+     * @param query
+     */
+    public void resetView(String query) {
+        this.setSearchType(DEFAULT_SEARCH_TYPE);
+        this.setSearchQuery(query);
+    }
+
+    /**
      * Change to a different search type and displays it
      * 
      * @param searchType
      */
-    public void setSearchType(Type searchType) {
+    private void setSearchType(Type searchType) {
         // Add new Views
         this.removeAllViews();
         this.addView(mTitleBar);
@@ -151,25 +170,6 @@ public class SearchLayout extends LinearLayout {
      */
     private void onSwipeRight() {
         this.setSearchType(this.previousSearchType());
-    }
-
-    /**
-     * Updates the current panel with the new search query.
-     */
-    public void setSearchQuery(String query) {
-        mCurrentQuery = query;
-        this.updateCurrentPanel();
-    }
-
-    /**
-     * Show the {@code ScrollView} that needs to be displayed when opening the {@code SearchPanel}, according
-     * to the query
-     * 
-     * @param query
-     */
-    public void resetView(String query) {
-        this.setSearchType(DEFAULT_SEARCH_TYPE);
-        this.setSearchQuery(query);
     }
 
     /**
@@ -287,7 +287,6 @@ public class SearchLayout extends LinearLayout {
             this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
             // Remove scrollbar and shadow when the scrollview can't be scrolled.
             this.setVerticalScrollBarEnabled(false);
-            this.setVerticalFadingEdgeEnabled(false);
             super.addView(mLayout);
 
             mGestureDetector = new GestureDetector(this.getContext(), new HorizontalGestureListener());
