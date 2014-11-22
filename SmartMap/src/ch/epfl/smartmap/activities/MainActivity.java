@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -22,17 +23,17 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.Notifications;
+import ch.epfl.smartmap.background.Notifications.NotificationListener;
 import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
@@ -44,7 +45,9 @@ import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SearchPanel;
 import ch.epfl.smartmap.gui.SideMenu;
+import ch.epfl.smartmap.gui.SideMenuAdapter;
 import ch.epfl.smartmap.gui.SlidingPanel;
+import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.map.DefaultEventMarkerDisplayer;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 import ch.epfl.smartmap.map.EventMarkerDisplayer;
@@ -90,9 +93,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		MAP, SEARCH, ITEM;
 	}
 
-	private DrawerLayout mDrawerLayout;
 	private ActionBar mActionBar;
-	private ListView mDrawerList;
 	private DatabaseHelper mDbHelper;
 	private SideMenu mSideMenu;
 	private GoogleMap mGoogleMap;
@@ -105,6 +106,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	private MenuTheme mMenuTheme;
 	@SuppressWarnings("unused")
 	private Displayable mCurrentItem;
+	private Context mContext;
+	private LayerDrawable mIcon;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -127,17 +130,23 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		mActionBar.setHomeAsUpIndicator(this.getResources().getDrawable(
 		    R.drawable.ic_drawer));
 
-		// TODO agpmilli, essayer de pas faire lagger le bouton
-		mActionBar.setIcon(this.getResources().getDrawable(
-		    R.drawable.ic_launcher1));
+		// Add listener when notifications arrive and "redraw" left drawer when
+		// there is a new one
+		mContext = this.getContext();
+		Notifications.addNotificationListener(new NotificationListener() {
+			@Override
+			public void onNewNotification() {
+				mSideMenu.getDrawerListView().setAdapter(
+				    new SideMenuAdapter(mContext, mContext.getResources()
+				        .getStringArray(R.array.sideMenuElements)));
+			}
+		});
 
 		mMenuTheme = MenuTheme.MAP;
 
 		// Get needed Views
 		final SearchLayout mSearchLayout = (SearchLayout) this
 		    .findViewById(R.id.search_layout);
-		mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer_layout);
-		mDrawerList = (ListView) this.findViewById(R.id.left_drawer_listView);
 
 		mSideMenu = new SideMenu(this.getContext());
 		mSideMenu.initializeDrawerLayout();
@@ -164,6 +173,29 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		this.getMenuInflater().inflate(R.menu.main, menu);
+
+		// Get the notifications MenuItem and
+		// its LayerDrawable (layer-list)
+		MenuItem item = menu.findItem(R.id.action_notifications);
+		mIcon = (LayerDrawable) item.getIcon();
+
+		// Update LayerDrawable's BadgeDrawable
+		Utils.setBadgeCount(
+		    this,
+		    mIcon,
+		    Notifications.getNumberOfEventNotification()
+		        + Notifications.getNumberOfFriendNotification());
+
+		Notifications.addNotificationListener(new NotificationListener() {
+			@Override
+			public void onNewNotification() {
+				// Update LayerDrawable's BadgeDrawable
+				Utils.setBadgeCount(mContext, mIcon,
+				    Notifications.getNumberOfEventNotification()
+				        + Notifications.getNumberOfFriendNotification());
+			}
+		});
+
 		mMenu = menu;
 
 		// Get Views
@@ -215,14 +247,26 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			return true;
 		}
 
+		// Handle click on notifications button
+		if (item.getItemId() == R.id.action_notifications) {
+			Notifications.setNumberOfUnreadEventNotification(0);
+			Notifications.setNumberOfUnreadFriendNotification(0);
+			Intent pNotifIntent = new Intent(mContext,
+			    NotificationsActivity.class);
+			this.startActivity(pNotifIntent);
+			return true;
+		}
+
 		// Handle clicks on home button
 		if (id == android.R.id.home) {
-			if (mDrawerList.isShown()) {
+			if (mSideMenu.getDrawerListView().isShown()) {
 				Log.d("TAG", "Close side menu");
-				mDrawerLayout.closeDrawer(mDrawerList);
+				mSideMenu.getDrawerLayout().closeDrawer(
+				    mSideMenu.getDrawerListView());
 			} else {
 				Log.d("TAG", "Open side menu");
-				mDrawerLayout.openDrawer(mDrawerList);
+				mSideMenu.getDrawerLayout().openDrawer(
+				    mSideMenu.getDrawerListView());
 			}
 		}
 		return super.onOptionsItemSelected(item);

@@ -46,6 +46,7 @@ public class FriendsPagerActivity extends FragmentActivity implements
 		    this.getSupportFragmentManager());
 		mPager.setAdapter(pageAdapter);
 		mActionBar.setHomeButtonEnabled(true);
+		mActionBar.setDisplayHomeAsUpEnabled(true);
 
 		// Adding Tabs
 		for (String tabName : mTabs) {
@@ -91,6 +92,9 @@ public class FriendsPagerActivity extends FragmentActivity implements
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
 			return true;
+		}
+		if (id == android.R.id.home) {
+			this.finish();
 		}
 		return super.onOptionsItemSelected(item);
 	}

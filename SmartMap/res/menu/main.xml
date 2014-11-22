@@ -9,14 +9,6 @@
         android:singleLine="true"
         android:textSize="25sp"
         android:title="Search"/>
-
-    <group android:id="@+id/map_menu_group" >
-        <item
-            android:id="@+id/action_compose"
-            android:icon="@drawable/ic_my_location"
-            android:showAsAction="always"
-            android:title="My Position"/>
-    </group>
     
     <group 
         android:id="@+id/search_menu_group"
@@ -43,5 +35,10 @@
         android:showAsAction="always"
         android:title="Hide Infos"
         android:visible="false"/>
+    
+    <item android:id="@+id/action_notifications"
+        android:title="Notifications"
+        android:icon="@drawable/ic_menu_notifications"
+        android:showAsAction="always"/>
 
 </menu>

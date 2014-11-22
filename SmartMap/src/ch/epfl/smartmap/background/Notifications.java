@@ -1,11 +1,15 @@
 package ch.epfl.smartmap.background;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
@@ -23,9 +27,10 @@ public class Notifications {
 	private static final int SILENT_NOTIFICATION_TIME = 100;
 	private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME,
 	    SILENT_NOTIFICATION_TIME, VIBRATE_NOTIFICATION_TIME};
-	private static int notificationID = 0;
+	private static long notificationID = 0;
 	private static int numberOfEventNotification = 0;
 	private static int numberOfFriendNotification = 0;
+	private static List<NotificationListener> listeners = new ArrayList<NotificationListener>();
 
 	/**
 	 * Create an accepted friend invitation notification and notify it
@@ -87,6 +92,8 @@ public class Notifications {
 		    .setVibrate(PATTERN).setContentIntent(pFriendIntent);
 
 		displayNotification(context, noti.build(), notificationID);
+
+		notifyListeners();
 	}
 
 	/**
@@ -100,10 +107,10 @@ public class Notifications {
 	 *            id of current notification
 	 */
 	private static void displayNotification(Context context,
-	    Notification notification, int notificationId) {
+	    Notification notification, long notificationId) {
 		NotificationManager notificationManager = (NotificationManager) context
 		    .getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.notify(notificationId, notification);
+		notificationManager.notify((int) notificationId, notification);
 	}
 
 	/**
@@ -120,7 +127,7 @@ public class Notifications {
 
 		// Get ID and the number of ongoing Event notifications
 		notificationID++;
-		numberOfEventNotification++;
+		setNumberOfUnreadEventNotification(getNumberOfEventNotification() + 1);
 
 		// Prepare intent that redirect the user to EventActivity
 		PendingIntent pEventIntent = PendingIntent.getActivity(context, 0,
@@ -165,6 +172,8 @@ public class Notifications {
 		    .setContentIntent(pEventIntent);
 
 		displayNotification(context, noti.build(), notificationID);
+
+		notifyListeners();
 	}
 
 	/**
@@ -181,7 +190,8 @@ public class Notifications {
 
 		// Get ID and the number of ongoing Friend notifications
 		notificationID++;
-		numberOfFriendNotification++;
+		setNumberOfUnreadFriendNotification(getNumberOfFriendNotification() + 1);
+		Log.d("BABOUIN", "" + getNumberOfFriendNotification());
 
 		// Prepare intent that redirects the user to FriendActivity
 		PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0,
@@ -227,10 +237,45 @@ public class Notifications {
 		                .getString(R.string.notification_friend_invitation)
 		            + "\n"
 		            + context.getString(R.string.notification_open_friend_list));
-
-		// TODO : determine if we need those buttons
-		// noti.addAction(0, "Decline", pIntent);
-		// noti.addAction(0, "Accept", pIntent).build();
 		displayNotification(context, noti.build(), notificationID);
+
+		notifyListeners();
+	}
+
+	public static int getNumberOfEventNotification() {
+		return numberOfEventNotification;
+	}
+
+	public static void setNumberOfUnreadEventNotification(int numberOfEvent) {
+		Notifications.numberOfEventNotification = numberOfEvent;
+	}
+
+	public static int getNumberOfFriendNotification() {
+		return numberOfFriendNotification;
+	}
+
+	public static void setNumberOfUnreadFriendNotification(int numberOfFriend) {
+		Notifications.numberOfFriendNotification = numberOfFriend;
+	}
+
+	public static void addNotificationListener(NotificationListener listener) {
+		listeners.add(listener);
+	}
+
+	private static void notifyListeners() {
+		for (NotificationListener l : listeners) {
+			l.onNewNotification();
+		}
+	}
+
+	/**
+	 * Listener use to listen when notifications arrive
+	 * 
+	 * @author agpmilli
+	 */
+	public static class NotificationListener {
+		public void onNewNotification() {
+
+		}
 	}
 }

@@ -107,5 +107,8 @@
     <string name="notification_invitation_accepted"> accepted your invitation</string>
     <string name="notification_open_friend_list">Click here to open your list of friends.</string>
     <string name="notification_open_event_list">Click here to open your list of events.</string>
+    
+    <!-- Notification Activity -->
+    <string name="title_activity_notifications">Notifications</string>
 
 </resources>

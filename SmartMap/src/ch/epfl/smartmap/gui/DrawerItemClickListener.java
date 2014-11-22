@@ -6,6 +6,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
+import ch.epfl.smartmap.background.Notifications;
 
 /**
  * Listener handling the clics on each element in the left drawer menu
@@ -29,10 +30,12 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
 			case INDEX_FRIENDS:
 				view.getContext().startActivity(
 				    new Intent(view.getContext(), FriendsPagerActivity.class));
+				Notifications.setNumberOfUnreadFriendNotification(0);
 				break;
 			case INDEX_EVENTS:
 				view.getContext().startActivity(
 				    new Intent(view.getContext(), ShowEventsActivity.class));
+				Notifications.setNumberOfUnreadEventNotification(0);
 				break;
 			case INDEX_FILTERS:
 				break;
