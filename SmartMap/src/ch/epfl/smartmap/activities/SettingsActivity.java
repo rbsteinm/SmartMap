@@ -39,7 +39,6 @@ public class SettingsActivity extends PreferenceActivity {
 
     protected static final String TAG = SettingsActivity.class.getSimpleName();
 
-    @SuppressWarnings("static-access")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -203,10 +202,6 @@ public class SettingsActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             this.addPreferencesFromResource(R.xml.pref_general);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
             bindPreferenceSummaryToValue(this.findPreference("refresh_frequency"));
             bindPreferenceSummaryToValue(this.findPreference("last_seen_max"));
         }
@@ -223,10 +218,6 @@ public class SettingsActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             this.addPreferencesFromResource(R.xml.pref_notification);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
             bindPreferenceSummaryToValue(this.findPreference("notifications_enabled"));
         }
     }
@@ -241,11 +232,6 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             this.addPreferencesFromResource(R.xml.pref_events);
-
-            // Bind the summaries of EditText/List/Dialog preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
         }
     }
 }

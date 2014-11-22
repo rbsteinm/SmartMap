@@ -11,7 +11,9 @@ import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertio
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
 /**
- * Tests the correctness of AddEventActivity
+ * Tests for AddEventActivity
+ * For some reason, espresso sometimes fail to click on a view. Just relaunch
+ * the test if this happens.
  * 
  * @author SpicyCH
  */
@@ -43,10 +45,12 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
+    @SuppressWarnings("unchecked")
     public void testCannotCreateEventWith2Field() {
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("TEST_NAME"));
 
-        onView(withId(R.id.addEventDescription)).perform(ViewActions.typeText("TEST_DESCRIPTION"));
+        onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
+        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
 
         onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
 
@@ -66,23 +70,4 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
 
         onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
-
-    public void testCanCreateEventWithGoodFields() {
-        // HELP PLS! How to click on google maps?
-        /*
-         * onView(withId(R.id.addEventEventName)).perform(
-         * ViewActions.typeText("TEST_NAME"));
-         * onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
-         * onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
-         * onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
-         * onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
-         * onView(withId(R.id.addEventPlaceName)).perform(ViewActions.typeText(
-         * "TEST LOCATION"));
-         * onView(withId(R.id.addEventButtonCreateEvent)).perform(
-         * ViewActions.click());
-         * onView(withId(R.id.addEventDescription)).check(
-         * ViewAssertions.matches(not(ViewMatchers.isDisplayed())));
-         */
-    }
-
 }
