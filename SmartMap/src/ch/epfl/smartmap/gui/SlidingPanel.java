@@ -13,8 +13,8 @@ import android.widget.FrameLayout;
 import ch.epfl.smartmap.R;
 
 /**
- * Provides a Sliding Panel that slides from the bottom of the app, and
- * fades in component.
+ * Provides a Sliding Panel that slides from the bottom of the app, and fades in
+ * component.
  * 
  * @author jfperren
  */
@@ -36,7 +36,9 @@ public class SlidingPanel extends FrameLayout {
      * @author jfperren
      */
     private enum VisualState {
-        CLOSED, OPEN, ANIM_PERFORMED;
+        CLOSED,
+        OPEN,
+        ANIM_PERFORMED;
         private int height;
     }
 
@@ -76,6 +78,7 @@ public class SlidingPanel extends FrameLayout {
         this.addView(mExtendedView);
 
         // Layout parameters
+
         this.setBackgroundResource(R.color.background_blue);
         this.setFocusable(true);
         this.setClickable(true);
@@ -90,14 +93,15 @@ public class SlidingPanel extends FrameLayout {
      */
     public void initView() {
         // Initialize heights
-        FrameLayout parent = (FrameLayout) getParent();
+        FrameLayout parent = (FrameLayout) this.getParent();
+
         this.measure(parent.getWidth(), parent.getHeight());
         VisualState.CLOSED.height = 0;
         // FIXME : Shouldn't be hardcoded
         VisualState.OPEN.height = OPEN_HEIGHT;
         Log.d(TAG, "HEIGHT : " + this.getMeasuredHeight());
         // Initialize Position Animators
-        initializeAnimators();
+        this.initializeAnimators();
     }
 
     /**
@@ -106,14 +110,13 @@ public class SlidingPanel extends FrameLayout {
     public void open() {
         if (mVisualState == VisualState.CLOSED) {
             if (VisualState.OPEN.height == -1) {
-                initView();
+                this.initView();
             }
             // Need to set Views to VISIBLE to avoid anim problems
             this.setVisibility(View.VISIBLE);
             // Start Animations
             mExtendedView.clearAnimation();
-            mExtendedView.startAnimation(createAlphaAnimation(mExtendedView,
-                Fade.IN));
+            mExtendedView.startAnimation(this.createAlphaAnimation(mExtendedView, Fade.IN));
             mOpenAnim.start();
         }
     }
@@ -123,8 +126,7 @@ public class SlidingPanel extends FrameLayout {
      */
     public void close() {
         if (mVisualState == VisualState.OPEN) {
-            mExtendedView.startAnimation(createAlphaAnimation(mExtendedView,
-                Fade.OUT));
+            mExtendedView.startAnimation(this.createAlphaAnimation(mExtendedView, Fade.OUT));
             mCloseAnim.start();
         }
     }
@@ -149,7 +151,7 @@ public class SlidingPanel extends FrameLayout {
                 return true;
             case OPEN:
                 Log.d(TAG, "onBackPressed, true ext");
-                close();
+                this.close();
                 return true;
             case CLOSED:
                 Log.d(TAG, "onBackPressed, false");
@@ -163,16 +165,13 @@ public class SlidingPanel extends FrameLayout {
 
     private void initializeAnimators() {
         // Height animators
-        mOpenAnim = createTranslateAnimator(VisualState.CLOSED,
-            VisualState.OPEN);
-        mCloseAnim = createTranslateAnimator(VisualState.OPEN,
-            VisualState.CLOSED);
+        mOpenAnim = this.createTranslateAnimator(VisualState.CLOSED, VisualState.OPEN);
+        mCloseAnim = this.createTranslateAnimator(VisualState.OPEN, VisualState.CLOSED);
     }
 
-    private ValueAnimator createTranslateAnimator(final VisualState start,
-        final VisualState end) {
+    private ValueAnimator createTranslateAnimator(final VisualState start, final VisualState end) {
         ValueAnimator animator = ValueAnimator.ofInt(start.height, end.height);
-        if (start == VisualState.OPEN || end == VisualState.OPEN) {
+        if ((start == VisualState.OPEN) || (end == VisualState.OPEN)) {
             animator.setDuration(EXTEND_DURATION);
         }
 
@@ -229,16 +228,14 @@ public class SlidingPanel extends FrameLayout {
      * @return
      */
     private AlphaAnimation createAlphaAnimation(final View view, final Fade type) {
-        final AlphaAnimation anim = new AlphaAnimation(type.mFromAlpha,
-            type.mToAlpha);
+        final AlphaAnimation anim = new AlphaAnimation(type.mFromAlpha, type.mToAlpha);
         anim.setDuration(type.mDuration);
         anim.setStartOffset(type.mDelay);
 
         anim.setAnimationListener(new AlphaAnimation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                Log.d(TAG,
-                    "Fade Animation Started with duration" + anim.getDuration());
+                Log.d(TAG, "Fade Animation Started with duration" + anim.getDuration());
             }
 
             @Override

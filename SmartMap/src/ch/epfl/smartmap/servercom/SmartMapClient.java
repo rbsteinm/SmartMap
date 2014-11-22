@@ -26,8 +26,7 @@ public interface SmartMapClient {
      * @param fbAccessToken
      * @throws SmartMapClientException
      */
-    void authServer(String name, long facebookId, String fbAccessToken)
-        throws SmartMapClientException;
+    void authServer(String name, long facebookId, String fbAccessToken) throws SmartMapClientException;
 
     /**
      * Asks to the server the friends positions

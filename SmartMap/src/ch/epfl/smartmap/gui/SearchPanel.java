@@ -11,8 +11,8 @@ import ch.epfl.smartmap.R;
 
 /**
  * Represents a Panel that can can be opened or closed from the bottom of the
- * activity. It contains A search bar
- * and a view that displays the queries sent using the search bar.
+ * activity. It contains A search bar and a view that displays the queries sent
+ * using the search bar.
  * 
  * @author jfperren
  */
@@ -39,8 +39,7 @@ public class SearchPanel extends RelativeLayout {
     public void open() {
         if (this.getVisibility() != View.VISIBLE) {
             this.setVisibility(View.VISIBLE);
-            Animation bottomUp = AnimationUtils.loadAnimation(getContext(),
-                R.anim.bottom_up);
+            Animation bottomUp = AnimationUtils.loadAnimation(getContext(), R.anim.bottom_up);
             this.startAnimation(bottomUp);
         }
     }
@@ -50,8 +49,7 @@ public class SearchPanel extends RelativeLayout {
      */
     public void close() {
         if (this.getVisibility() != View.GONE) {
-            Animation topDown = AnimationUtils.loadAnimation(getContext(),
-                R.anim.top_down);
+            Animation topDown = AnimationUtils.loadAnimation(getContext(), R.anim.top_down);
 
             this.startAnimation(topDown);
             this.setVisibility(View.GONE);

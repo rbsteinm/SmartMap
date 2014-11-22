@@ -27,8 +27,7 @@ public interface FriendMarkerDisplayer {
      * @param friendsToDisplay
      *            the friends we want to display
      */
-    void setMarkersToMaps(Context context, GoogleMap googleMap,
-        List<User> friendsToDisplay);
+    void setMarkersToMaps(Context context, GoogleMap googleMap, List<User> friendsToDisplay);
 
     /**
      * This method updates the markers on the map with the given list of friends
@@ -39,8 +38,7 @@ public interface FriendMarkerDisplayer {
      * @param friendsToDisplay
      *            the updated friends
      */
-    void updateMarkers(Context context, GoogleMap googleMap,
-        List<User> friendsToDisplay);
+    void updateMarkers(Context context, GoogleMap googleMap, List<User> friendsToDisplay);
 
     /**
      * @param friend

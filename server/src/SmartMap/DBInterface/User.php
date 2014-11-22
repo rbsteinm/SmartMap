@@ -27,13 +27,13 @@ class User
     
     /**
      * Constructor
-     * @param Long $id
-     * @param Long $fbId
+     * @param int $id
+     * @param int $fbId
      * @param String $name
-     * @param enum $visibility
+     * @param string $visibility
      * @param double $longitude
      * @param double $latitude
-     * @param string $date A string representation of a date in format $DATE_FORMAT
+     * @param string $lastUpdate A string representation of a date in format $DATE_FORMAT
      */
     function __construct(
         $id,
@@ -63,34 +63,6 @@ class User
         $this->mLongitude = $longitude;
         $this->mLatitude = $latitude;
         $this->mLastUpdate = $this->checkLastUpdate($lastUpdate);
-    }
-    
-    /**
-     * Gets the current user id from the server request. Throws an exception
-     * if the session parameter userId is not set.
-     * 
-     * @param Request $request
-     * @throws InvalidRequestException 
-     * @return a Long representing the user id
-     */
-    public static function getIdFromRequest(Request $request)
-    {
-        if (!$request->hasSession())
-        {
-            throw new InvalidRequestException('Trying to access session but the session is not started.');
-        }
-        
-        $session = $request->getSession();
-        
-        // The userId is set in the session when successfully authenticated
-        $id = $session->get('userId');
-        
-        if ($id == null)
-        {
-            throw new InvalidRequestException('The user is not authenticated.');
-        }
-        
-        return $id;
     }
     
     /**

@@ -47,11 +47,9 @@ public class InvitationsTab extends ListFragment {
      * , android.view.ViewGroup, android.os.Bundle)
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-        Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.list_fragment_invitations_tab,
-            container, false);
+        View view = inflater.inflate(R.layout.list_fragment_invitations_tab, container, false);
         new RefreshInvitationsList().execute();
         return view;
     }
@@ -60,18 +58,15 @@ public class InvitationsTab extends ListFragment {
      * (non-Javadoc)
      * @see
      * android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView
-     * , android.view.View, int, long)
-     * When a list item is clicked, display a dialog to ask whether to accept or
-     * decline the invitation
+     * , android.view.View, int, long) When a list item is clicked, display a
+     * dialog to ask whether to accept or decline the invitation
      */
     @Override
-    public void onListItemClick(ListView listView, View view, int position,
-        long id) {
+    public void onListItemClick(ListView listView, View view, int position, long id) {
         long userId = (Long) view.getTag();
         RelativeLayout rl = (RelativeLayout) view;
         TextView tv = (TextView) rl.getChildAt(1);
-        assert (tv instanceof TextView)
-            && (tv.getId() == R.id.activity_friends_name);
+        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         String name = tv.getText().toString();
         displayAcceptFriendDialog(name, userId);
     }
@@ -100,22 +95,20 @@ public class InvitationsTab extends ListFragment {
         builder.setMessage("Accept " + name + " to become your friend?");
 
         // Add positive button
-        builder.setPositiveButton("Yes, accept",
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    new AcceptInvitation().execute(userId);
-                }
-            });
+        builder.setPositiveButton("Yes, accept", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                new AcceptInvitation().execute(userId);
+            }
+        });
 
         // Add negative button
-        builder.setNegativeButton("No, decline",
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    new DeclineInvitation().execute(userId);
-                }
-            });
+        builder.setNegativeButton("No, decline", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                new DeclineInvitation().execute(userId);
+            }
+        });
 
         // display the AlertDialog
         builder.create().show();
@@ -134,8 +127,7 @@ public class InvitationsTab extends ListFragment {
             String confirmString = "";
             try {
                 mNetworkClient.acceptInvitation(params[0]);
-                mDataBaseHelper.addUser(NetworkSmartMapClient.getInstance()
-                    .getUserInfo(params[0]));
+                mDataBaseHelper.addUser(NetworkSmartMapClient.getInstance().getUserInfo(params[0]));
                 confirmString = "Accepted";
             } catch (SmartMapClientException e) {
                 confirmString = "Error";
@@ -145,8 +137,7 @@ public class InvitationsTab extends ListFragment {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            Toast.makeText(getActivity(), confirmString, Toast.LENGTH_LONG)
-                .show();
+            Toast.makeText(getActivity(), confirmString, Toast.LENGTH_LONG).show();
             new RefreshInvitationsList().execute();
         }
 
@@ -164,8 +155,7 @@ public class InvitationsTab extends ListFragment {
         protected String doInBackground(Long... params) {
             String confirmString = "";
             try {
-                NetworkSmartMapClient.getInstance()
-                    .declineInvitation(params[0]);
+                NetworkSmartMapClient.getInstance().declineInvitation(params[0]);
                 confirmString = "Declined";
             } catch (SmartMapClientException e) {
                 confirmString = "Error";
@@ -175,8 +165,7 @@ public class InvitationsTab extends ListFragment {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            Toast.makeText(getActivity(), confirmString, Toast.LENGTH_LONG)
-                .show();
+            Toast.makeText(getActivity(), confirmString, Toast.LENGTH_LONG).show();
             new RefreshInvitationsList().execute();
         }
 
@@ -189,8 +178,7 @@ public class InvitationsTab extends ListFragment {
      * 
      * @author marion-S
      */
-    private class RefreshInvitationsList extends
-        AsyncTask<String, Void, List<List<User>>> {
+    private class RefreshInvitationsList extends AsyncTask<String, Void, List<List<User>>> {
 
         @Override
         protected List<List<User>> doInBackground(String... params) {

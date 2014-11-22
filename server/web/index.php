@@ -37,6 +37,10 @@ $app['user.repository'] = $app->share(function() use($app) {
     return new SmartMap\DBInterface\UserRepository($app['db']);
 });
 
+$app['event.repository'] = $app->share(function() use($app) {
+    return new SmartMap\DBInterface\EventRepository($app['db']);
+});
+
 // Injecting logging service
 $app['logging'] = $app->share(function() use($app, $options) {
     $logger = new Logger('logging');
@@ -65,6 +69,10 @@ $app['profile.controller'] = $app->share(function() use($app) {
     return new SmartMap\Control\ProfileController();
 });
 
+$app['event.controller'] = $app->share(function() use($app) {
+    return new SmartMap\Control\EventController($app['event.repository']);
+});
+
 // Error management
 $app->error(function (SmartMap\Control\ControlException $e, $code) use ($app) {
     $app['logging']->addDebug('Deprecated ControlException thrown: ' . $e->__toString());
@@ -78,12 +86,18 @@ $app->error(function (SmartMap\Control\InvalidRequestException $e, $code) use ($
         array('X-Status-Code' => 200));
 });
 
+$app->error(function (SmartMap\Control\ServerFeedbackException $e, $code) use ($app) {
+    $app['logging']->addWarning('Invalid request with feedback: ' . $e->__toString());
+    return new JsonResponse(array('status' => 'feedback', 'message' => $e->getMessage()), 200,
+        array('X-Status-Code' => 200));
+});
+
 $app->error(function (SmartMap\Control\ControlLogicException $e, $code) use ($app) {
     $app['logging']->addError($e->__toString());
     if ($app['debug'] == true) {
         return;
     }
-    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occured.'), 500,
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occurred.'), 500,
         array('X-Status-Code' => 200));
 });
 
@@ -92,7 +106,7 @@ $app->error(function (\Exception $e, $code) use ($app) {
     if ($app['debug'] == true) {
         return;
     }
-    return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occured'), 500,
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occurred'), 500,
         array('X-Status-Code' => 200));
 });
 
@@ -128,6 +142,8 @@ $app->post('/declineInvitation', 'data.controller:declineInvitation');
 
 $app->post('/ackAcceptedInvitation', 'data.controller:ackAcceptedInvitation');
 
+$app->post('/ackRemovedFriend', 'data.controller:ackRemovedFriend');
+
 $app->post('/removeFriend', 'data.controller:removeFriend');
 
 $app->post('/listFriendsPos', 'data.controller:listFriendsPos');
@@ -137,6 +153,12 @@ $app->post('/updatePos', 'data.controller:updatePos');
 $app->post('/findUsers', 'data.controller:findUsers');
 
 $app->post('/getFriendsIds', 'data.controller:getFriendsIds');
+
+$app->post('/createEvent', 'event.controller:createEvent');
+
+$app->post('/updateEvent', 'event.controller:updateEvent');
+
+$app->post('/getPublicEvents', 'event.controller:getPublicEvents');
 
 if ($app['debug'] == true)
 {

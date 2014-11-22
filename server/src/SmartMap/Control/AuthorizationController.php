@@ -24,18 +24,20 @@ class AuthorizationController
     {
         $this->mRepo = $repo;
     }
-    
-    /** 
+
+    /**
      * Allow a friend to see the user's location.
-     * 
+     *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
      */
     public function allowFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -50,18 +52,20 @@ class AuthorizationController
         
         return new JsonResponse($response);
     }
-    
-    /** 
+
+    /**
      * Disallow a friend to see the user's location.
-     * 
+     *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
      */
     public function disallowFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -76,19 +80,21 @@ class AuthorizationController
         
         return new JsonResponse($response);
     }
-    
-    /** 
+
+    /**
      * Allow friends in a list of ids separated by commas to see
      * the user's location.
-     * 
+     *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
      */
     public function allowFriendList(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendsIds = $this->getPostParam($request, 'friend_ids');
+        $friendsIds = RequestUtils::getPostParam($request, 'friend_ids');
         
         $friendsIds = $this->getIntArrayFromString($friendsIds);
         
@@ -105,19 +111,21 @@ class AuthorizationController
         
         return new JsonResponse($response);
     }
-    
-    /** 
+
+    /**
      * Disallow friends in a list of ids separaed by commas to see
      * the user's location.
-     * 
+     *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
      */
     public function disallowFriendList(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendsIds = $this->getPostParam($request, 'friend_ids');
+        $friendsIds = RequestUtils::getPostParam($request, 'friend_ids');
         
         $friendsIds = $this->getIntArrayFromString($friendsIds);
         
@@ -134,18 +142,20 @@ class AuthorizationController
         
         return new JsonResponse($response);
     }
-    
-    /** 
+
+    /**
      * Follow a friend to be notified of his position.
-     * 
+     *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
      */
     public function followFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -160,18 +170,20 @@ class AuthorizationController
         
         return new JsonResponse($response);
     }
-    
-    /** 
+
+    /**
      * Unfollow a friend to be no longer notified of his position.
-     * 
+     *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
      */
     public function unfollowFriend(Request $request)
     {
-        $userId = User::getIdFromRequest($request);
+        $userId = RequestUtils::getIdFromRequest($request);
         
-        $friendId = $this->getPostParam($request, 'friend_id');
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
         
         try
         {
@@ -204,26 +216,5 @@ class AuthorizationController
         }
         
         return $array;
-    }
-    
-    /** 
-     * Utility function getting a post parameter and throwing a ControlException
-     * if the parameter is not set in the request.
-     * 
-     * @param Request $request
-     * @param string $param
-     * @throws ControlException
-     * @return string
-     */
-    private function getPostParam(Request $request, $param)
-    {
-        $value = $request->request->get($param);
-        
-        if ($value === null)
-        {
-            throw new InvalidRequestException('Post parameter ' . $param . ' is not set !');
-        }
-        
-        return $value;
     }
 }

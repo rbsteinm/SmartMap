@@ -38,7 +38,8 @@ public class SettingsManager {
     private final SharedPreferences.Editor mEditor;
     private static SettingsManager mInstance;
 
-    // The following constant Strings must match the keys defined in res/xml/pref_notifications.xml
+    // The following constant Strings must match the keys defined in
+    // res/xml/pref_notifications.xml
     private final static String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
     private final static String KEY_FRIEND_REQUEST = "notifications_friend_requests";
     private final static String KEY_FRIENDSHIP_CONFIRMATIONS = "notifications_friendship_confirmations";
@@ -85,7 +86,6 @@ public class SettingsManager {
 
     /**
      * @return <code>true</code> if the user enabled the notifications, <code>false</code> otherwise.
-     * 
      * @author SpicyCH
      */
     public boolean notificationsEnabled() {
@@ -93,10 +93,8 @@ public class SettingsManager {
     }
 
     /**
-     * 
      * @return <code>true</code> if the user enabled the notifications for friend requests and the user activated the
      *         notifications in general, <code>false</code> otherwise.
-     * 
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
@@ -109,7 +107,6 @@ public class SettingsManager {
      * 
      * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the user
      *         activated the notifications in general, <code>false</code> otherwise.
-     * 
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
@@ -118,10 +115,8 @@ public class SettingsManager {
     }
 
     /**
-     * 
      * @return <code>true</code> if the user enabled the notifications for event invitations and the user activated the
      *         notifications in general, <code>false</code> otherwise.
-     * 
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
@@ -130,10 +125,8 @@ public class SettingsManager {
     }
 
     /**
-     * 
      * @return <code>true</code> if the user enabled the notifications for event proximity and the user activated the
      *         notifications in general, <code>false</code> otherwise.
-     * 
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
@@ -142,10 +135,8 @@ public class SettingsManager {
     }
 
     /**
-     * 
      * @return <code>true</code> if the user enabled the notifications vibrations and the user activated the
      *         notifications in general, <code>false</code> otherwise.
-     * 
      * @author SpicyCH
      */
     public boolean notificationsVibrate() {

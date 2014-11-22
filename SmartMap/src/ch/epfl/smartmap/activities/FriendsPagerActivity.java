@@ -18,23 +18,25 @@ import ch.epfl.smartmap.gui.PagerAdapter;
  * 
  * @author rbsteinm
  */
-public class FriendsPagerActivity extends FragmentActivity implements
-    ActionBar.TabListener {
+public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 
     private ViewPager mPager;
     private ActionBar mActionBar;
-    private final String[] mTabs = { "Friends", "Invitations" };
+    private final String[] mTabs = {"Friends", "Invitations"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // Makes the logo clickable (clicking it returns to previous activity)
+        // getActionBar().setDisplayHomeAsUpEnabled(true);
+
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_friends_pager);
 
-        mPager = (ViewPager) this.findViewById(R.id.myViewPager);
-        mActionBar = this.getActionBar();
+        mPager = (ViewPager) findViewById(R.id.myViewPager);
+        mActionBar = getActionBar();
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        PagerAdapter pageAdapter = new PagerAdapter(this,
-            this.getSupportFragmentManager());
+        PagerAdapter pageAdapter = new PagerAdapter(this, getSupportFragmentManager());
 
         mPager.setAdapter(pageAdapter);
         mActionBar.setHomeButtonEnabled(false);
@@ -42,8 +44,7 @@ public class FriendsPagerActivity extends FragmentActivity implements
 
         // Adding Tabs
         for (String tabName : mTabs) {
-            mActionBar.addTab(mActionBar.newTab().setText(tabName)
-                .setTabListener(this));
+            mActionBar.addTab(mActionBar.newTab().setText(tabName).setTabListener(this));
         }
 
         /**
@@ -72,7 +73,7 @@ public class FriendsPagerActivity extends FragmentActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.pager, menu);
+        getMenuInflater().inflate(R.menu.pager, menu);
         return true;
     }
 
@@ -81,10 +82,17 @@ public class FriendsPagerActivity extends FragmentActivity implements
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.activity_friends_add_button:
+                startAddFriendActivity(null);
+            case android.R.id.home:
+                finish();
+            default:
+                break;
         }
+
         return super.onOptionsItemSelected(item);
     }
 

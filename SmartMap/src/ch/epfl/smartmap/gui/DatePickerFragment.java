@@ -20,8 +20,7 @@ import android.widget.EditText;
  * 
  * @author SpicyCH
  */
-public class DatePickerFragment extends DialogFragment implements
-    DatePickerDialog.OnDateSetListener {
+public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
     private final EditText mPickDate;
 
@@ -49,9 +48,9 @@ public class DatePickerFragment extends DialogFragment implements
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        mPickDate.setText(TimePickerFragment.formatForClock(day) + "/"
-            + TimePickerFragment.formatForClock(month + 1) + "/" + year);
-        mPickDate.setTag(new int[] { year, month, day });
+        mPickDate.setText(TimePickerFragment.formatForClock(day) + "/" + TimePickerFragment.formatForClock(month + 1)
+            + "/" + year);
+        mPickDate.setTag(new int[]{year, month, day});
     }
 
 }
