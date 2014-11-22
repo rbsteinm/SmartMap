@@ -229,6 +229,13 @@ public class UserEvent implements Event, Searchable, Displayable {
             newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
     }
 
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
+     * )
+     * @author hugo-S
+     */
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
         MarkerOptions markerOptions = new MarkerOptions();

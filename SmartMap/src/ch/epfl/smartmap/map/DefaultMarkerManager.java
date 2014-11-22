@@ -64,9 +64,8 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * .Displayable)
      */
     @Override
-    public boolean isDisplayedItem(Displayable Item) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean isDisplayedItem(Displayable item) {
+        return displayedItems.containsValue(item);
     }
 
     /*
@@ -77,8 +76,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      */
     @Override
     public boolean isDisplayedMarker(Marker marker) {
-        // TODO Auto-generated method stub
-        return false;
+        return displayedItems.containsKey(marker.getId());
     }
 
     /*
@@ -86,7 +84,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * @see ch.epfl.smartmap.map.MarkerManager#getDisplayedMarkers()
      */
     @Override
-    public List getDisplayedMarkers() {
+    public List<Marker> getDisplayedMarkers() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -96,7 +94,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * @see ch.epfl.smartmap.map.MarkerManager#getDisplayedItems()
      */
     @Override
-    public List getDisplayedItems() {
+    public List<T> getDisplayedItems() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -107,7 +105,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * Displayable, android.content.Context)
      */
     @Override
-    public Marker addMarker(Displayable item, Context context) {
+    public Marker addMarker(T item, Context context) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -119,7 +117,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * .Displayable)
      */
     @Override
-    public Marker removeMarker(Displayable item) {
+    public Marker removeMarker(T item) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -143,7 +141,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * cache.Displayable)
      */
     @Override
-    public Marker getMarkerForItem(Displayable item) {
+    public Marker getMarkerForItem(T item) {
         // TODO Auto-generated method stub
         return null;
     }

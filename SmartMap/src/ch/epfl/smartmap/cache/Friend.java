@@ -271,6 +271,13 @@ public class Friend implements User, Searchable, Displayable {
         mVisible = isVisible;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
+     * )
+     * @author hugo-S
+     */
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
         Bitmap friendProfilePicture =

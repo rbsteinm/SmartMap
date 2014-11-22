@@ -29,13 +29,13 @@ public interface MarkerManager<T extends Displayable> {
      * @param friendsToDisplay
      *            the updated friends
      */
-    void updateMarkers(Context context, List<Displayable> itemsToDisplay);
+    void updateMarkers(Context context, List<T> itemsToDisplay);
 
     /**
      * @param item
      * @return true if the item is displayed
      */
-    boolean isDisplayedItem(Displayable item);
+    boolean isDisplayedItem(T item);
 
     /**
      * @param marker
@@ -51,7 +51,7 @@ public interface MarkerManager<T extends Displayable> {
     /**
      * @return the list of items that are displayed
      */
-    List<Displayable> getDisplayedItems();
+    List<T> getDisplayedItems();
 
     /**
      * Add a marker to the map
@@ -59,7 +59,7 @@ public interface MarkerManager<T extends Displayable> {
      * @param event
      *            the item for which we want to add a marker
      */
-    Marker addMarker(Displayable item, Context context);
+    Marker addMarker(T item, Context context);
 
     /**
      * Remove a marker from the map
@@ -67,7 +67,7 @@ public interface MarkerManager<T extends Displayable> {
      * @param event
      *            the item for which we want to remove a marker
      */
-    Marker removeMarker(Displayable item);
+    Marker removeMarker(T item);
 
     /**
      * @param marker
@@ -79,6 +79,6 @@ public interface MarkerManager<T extends Displayable> {
      * @param event
      * @return the marker that represents the given item
      */
-    Marker getMarkerForItem(Displayable item);
+    Marker getMarkerForItem(T item);
 
 }
