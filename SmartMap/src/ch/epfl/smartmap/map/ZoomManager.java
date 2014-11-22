@@ -2,10 +2,8 @@ package ch.epfl.smartmap.map;
 
 import java.util.List;
 
-import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-
-import android.location.Location;
 
 /**
  * This interface offers different ways to zomm on the map
@@ -22,7 +20,7 @@ public interface ZoomManager {
      * @param map
      *            the map on which we want to zoom
      */
-    void zoomOnLocation(Location location, GoogleMap map);
+    void zoomOnLocation(LatLng latlng);
 
     /**
      * Set bound and zoom with regards to all markers positions on the map
@@ -32,6 +30,6 @@ public interface ZoomManager {
      * @param markers
      *            the list of markers to take in account
      */
-    void zoomAccordingToMarkers(GoogleMap map, final List<Marker> markers);
+    void zoomAccordingToMarkers(final List<Marker> markers);
 
 }

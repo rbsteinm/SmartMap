@@ -53,6 +53,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -136,6 +137,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         }
 
         if (mGoogleMap != null) {
+            // Set different tools for the GoogleMap
             mEventMarkerManager = new DefaultMarkerManager<UserEvent>(mGoogleMap);
             mFriendMarkerManager = new DefaultMarkerManager<Friend>(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
@@ -143,10 +145,12 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
             Intent startingIntent = this.getIntent();
             if (startingIntent.getParcelableExtra("location") == null) {
-                mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
+                mMapZoomer.zoomAccordingToMarkers(allMarkers);
             }
 
-            mGoogleMap.setOnMapLongClickListener(new DefaultOnMapLongClickListener());
+            // Add listeners to the GoogleMap
+            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClick());
+            mGoogleMap.setOnMarkerClickListener(new ShowInfoOnMarkerClick());
 
         }
 
@@ -251,7 +255,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         // get the value of the user string
         Location eventLocation = startingIntent.getParcelableExtra("location");
         if (eventLocation != null) {
-            mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
+            mMapZoomer.zoomOnLocation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
             eventLocation = null;
         }
 
@@ -379,7 +383,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         mSearchPanel.close();
         mSearchView.collapseActionView();
         // Focus on Friend
-        mMapZoomer.zoomOnLocation(friend.getLocation(), mGoogleMap);
+        mMapZoomer.zoomOnLocation(friend.getLatLng());
         this.setItemMenu(friend);
         // Add query to the searchEngine
         mSearchEngine.getHistory().addEntry(friend, new Date());
@@ -484,7 +488,12 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         this.closeInformationPanel();
     }
 
-    private class DefaultOnMapLongClickListener implements OnMapLongClickListener {
+    /**
+     * Listener that add an event to the map when long click
+     * 
+     * @author SpicyCH
+     */
+    private class AddEventOnMapLongClick implements OnMapLongClickListener {
         @Override
         public void onMapLongClick(LatLng latLng) {
             Intent result = new Intent(MainActivity.this.getContext(), AddEventActivity.class);
@@ -528,6 +537,34 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 MainActivity.this.startActivity(result);
                 MainActivity.this.finish();
             }
+        }
+
+    }
+
+    /**
+     * A listener that shows info in action bar when a marker is clicked on
+     * 
+     * @author hugo-S
+     */
+    private class ShowInfoOnMarkerClick implements OnMarkerClickListener {
+
+        @Override
+        public boolean onMarkerClick(Marker arg0) {
+
+            if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
+                Displayable friendClicked = mFriendMarkerManager.getItemForMarker(arg0);
+                // TODO See with Nicolas : PB with the zoom : getLatLng returns
+                // 0,0
+                // mMapZoomer.zoomOnLocation(friendClicked.getLatLng());
+                MainActivity.this.setItemMenu(friendClicked);
+                return true;
+            } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
+                Displayable eventClicked = mEventMarkerManager.getItemForMarker(arg0);
+                // mMapZoomer.zoomOnLocation(eventClicked.getLatLng());
+                MainActivity.this.setItemMenu(eventClicked);
+                return true;
+            }
+            return false;
         }
 
     }
