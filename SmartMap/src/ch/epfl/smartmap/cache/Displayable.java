@@ -3,6 +3,8 @@ package ch.epfl.smartmap.cache;
 import android.content.Context;
 import android.graphics.Bitmap;
 
+import com.google.android.gms.maps.model.MarkerOptions;
+
 /**
  * Objects that can be displayed on the bottom menu
  * 
@@ -27,4 +29,11 @@ public interface Displayable {
      *         etc.)
      */
     String getShortInfos();
+
+    /**
+     * @param context
+     *            , the application's context
+     * @return the options to display the marker
+     */
+    MarkerOptions getMarkerOptions(Context context);
 }

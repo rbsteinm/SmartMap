@@ -15,16 +15,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 /**
- * @author hugo
+ * A default implementation of {@link MarkerManager}
+ * 
+ * @param <T>
+ *            the type of the items for which the class displays markers
+ * @author hugo-S
  */
-public class DefaultMarkerManager<T extends Displayable> implements MarkerManager {
+public class DefaultMarkerManager<T extends Displayable> implements MarkerManager<T> {
 
     public static final String TAG = "MARKER MANAGER";
 
-    public static final float MARKER_ANCHOR_X = (float) 0.5;
-    public static final float MARKER_ANCHOR_Y = 1;
-    public static final int PICTURE_WIDTH = 50;
-    public static final int PICTURE_HEIGHT = 50;
     public static final long HANDLER_DELAY = 16;
 
     private final GoogleMap mGoogleMap;

@@ -13,7 +13,9 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import ch.epfl.smartmap.R;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * A class to represent the user's friends
@@ -38,6 +40,11 @@ public class Friend implements User, Searchable, Displayable {
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
+
+    public static final float MARKER_ANCHOR_X = (float) 0.5;
+    public static final float MARKER_ANCHOR_Y = 1;
+    public static final int PICTURE_WIDTH = 50;
+    public static final int PICTURE_HEIGHT = 50;
 
     private static final int LEFT_SHIFT_COUNT = 32;
 
@@ -262,5 +269,15 @@ public class Friend implements User, Searchable, Displayable {
     @Override
     public void setVisible(boolean isVisible) {
         mVisible = isVisible;
+    }
+
+    @Override
+    public MarkerOptions getMarkerOptions(Context context) {
+        Bitmap friendProfilePicture =
+            Bitmap.createScaledBitmap(this.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(this.getLatLng()).title(this.getName())
+            .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+        return markerOptions;
     }
 }
