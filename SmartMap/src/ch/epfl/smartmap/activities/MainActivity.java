@@ -146,6 +146,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
                 mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
             }
 
+            mGoogleMap.setOnMapLongClickListener(new DefaultOnMapLongClickListener());
+
         }
 
         // starting the background service
@@ -253,52 +255,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             eventLocation = null;
         }
 
-        mGoogleMap.setOnMapLongClickListener(new OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                Intent result = new Intent(MainActivity.this.getContext(), AddEventActivity.class);
-                Bundle extras = new Bundle();
-                Geocoder geocoder = new Geocoder(MainActivity.this.getContext(), Locale.getDefault());
-                String cityName = "";
-                List<Address> addresses;
-                try {
-                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                    if (addresses.size() > 0) {
-                        // Makes sure that an address is associated to the
-                        // coordinates, the user could have
-                        // long
-                        // clicked in the middle of the sea after all :)
-                        cityName = addresses.get(0).getLocality();
-                    }
-                } catch (IOException e) {
-                }
-                if (cityName == null) {
-                    // If google couldn't retrieve the city name, we use the
-                    // country name instead
-                    try {
-                        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                        if (addresses.size() > 0) {
-                            cityName = addresses.get(0).getCountryName();
-                        }
-                    } catch (IOException e) {
-                    }
-                }
-                extras.putString(CITY_NAME, cityName);
-                extras.putParcelable(LOCATION_SERVICE, latLng);
-                result.putExtras(extras);
-                if (MainActivity.this.getIntent().getBooleanExtra("pickLocationForEvent", false)) {
-                    // Return the result to the calling activity
-                    // (AddEventActivity)
-                    MainActivity.this.setResult(RESULT_OK, result);
-                    MainActivity.this.finish();
-                } else {
-                    // The user was in MainActivity and long clicked to create
-                    // an event
-                    MainActivity.this.startActivity(result);
-                    MainActivity.this.finish();
-                }
-            }
-        });
     }
 
     @Override
@@ -526,6 +482,54 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      */
     public void closeInformationPanel(MenuItem mi) {
         this.closeInformationPanel();
+    }
+
+    private class DefaultOnMapLongClickListener implements OnMapLongClickListener {
+        @Override
+        public void onMapLongClick(LatLng latLng) {
+            Intent result = new Intent(MainActivity.this.getContext(), AddEventActivity.class);
+            Bundle extras = new Bundle();
+            Geocoder geocoder = new Geocoder(MainActivity.this.getContext(), Locale.getDefault());
+            String cityName = "";
+            List<Address> addresses;
+            try {
+                addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                if (addresses.size() > 0) {
+                    // Makes sure that an address is associated to the
+                    // coordinates, the user could have
+                    // long
+                    // clicked in the middle of the sea after all :)
+                    cityName = addresses.get(0).getLocality();
+                }
+            } catch (IOException e) {
+            }
+            if (cityName == null) {
+                // If google couldn't retrieve the city name, we use the
+                // country name instead
+                try {
+                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                    if (addresses.size() > 0) {
+                        cityName = addresses.get(0).getCountryName();
+                    }
+                } catch (IOException e) {
+                }
+            }
+            extras.putString(CITY_NAME, cityName);
+            extras.putParcelable(LOCATION_SERVICE, latLng);
+            result.putExtras(extras);
+            if (MainActivity.this.getIntent().getBooleanExtra("pickLocationForEvent", false)) {
+                // Return the result to the calling activity
+                // (AddEventActivity)
+                MainActivity.this.setResult(RESULT_OK, result);
+                MainActivity.this.finish();
+            } else {
+                // The user was in MainActivity and long clicked to create
+                // an event
+                MainActivity.this.startActivity(result);
+                MainActivity.this.finish();
+            }
+        }
+
     }
 
 }
