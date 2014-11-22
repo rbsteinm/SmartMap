@@ -227,7 +227,8 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
      * @param hideMarker
      * @param map
      */
-    private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker, GoogleMap map) {
+    private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker,
+        GoogleMap map) {
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
         Projection proj = map.getProjection();

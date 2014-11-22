@@ -23,8 +23,8 @@ import android.util.Log;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider}
- * to communicate with a SmartMap server.
+ * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider} to communicate with a SmartMap
+ * server.
  * 
  * @author marion-S
  * @author Pamoi (code reviewed : 9.11.2014) : - I don't think user-agent and
@@ -586,7 +586,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      *             in case the response could not be retrieved for any reason
      *             external to the application (network failure etc.)
      */
-    private String sendViaPost(Map<String, String> params, HttpURLConnection connection) throws SmartMapClientException {
+    private String sendViaPost(Map<String, String> params, HttpURLConnection connection)
+        throws SmartMapClientException {
         StringBuffer response = null;
         Log.d("sendViaPost", "start");
 

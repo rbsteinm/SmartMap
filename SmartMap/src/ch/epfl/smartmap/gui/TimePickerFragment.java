@@ -11,8 +11,7 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 
 /**
- * A simple time picker. Used in
- * {@link ch.epfl.smartmap.activities.AddEventActivity}. When the time is set,
+ * A simple time picker. Used in {@link ch.epfl.smartmap.activities.AddEventActivity}. When the time is set,
  * the associated EditText is modified accordingly and a tag containing an int
  * array of hour, minute is linked to this EditText.
  * 
@@ -54,7 +53,8 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
 
         // Create a new instance of TimePickerDialog and return it
 
-        return new TimePickerDialog(getActivity(), this, hour, minute, DateFormat.is24HourFormat(getActivity()));
+        return new TimePickerDialog(getActivity(), this, hour, minute,
+            DateFormat.is24HourFormat(getActivity()));
     }
 
     @Override

@@ -13,8 +13,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 
 /**
- * A simple date picker. Used in
- * {@link ch.epfl.smartmap.activities.AddEventActivity}. When the date is set,
+ * A simple date picker. Used in {@link ch.epfl.smartmap.activities.AddEventActivity}. When the date is set,
  * the associated EditText is modified accordingly and a tag containing an int
  * array of year, month, day is linked to this EditText.
  * 
@@ -48,8 +47,8 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        mPickDate.setText(TimePickerFragment.formatForClock(day) + "/" + TimePickerFragment.formatForClock(month + 1)
-            + "/" + year);
+        mPickDate.setText(TimePickerFragment.formatForClock(day) + "/"
+            + TimePickerFragment.formatForClock(month + 1) + "/" + year);
         mPickDate.setTag(new int[]{year, month, day});
     }
 
