@@ -2,9 +2,12 @@ package ch.epfl.smartmap.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Displayable;
 
 /**
  * Activity that shows full informations about a Displayable Object.
@@ -13,10 +16,17 @@ import ch.epfl.smartmap.R;
  */
 public class InformationActivity extends Activity {
 
+    private static final String TAG = "INFORMATION_ACTIVITY";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_information);
+        Log.d(TAG, "onCreate");
+
+        Displayable displayable = this.getIntent().getParcelableExtra("CURRENT_DISPLAYABLE");
+        TextView name = (TextView) this.findViewById(R.id.info_name);
+        name.setText(displayable.getName());
     }
 
     @Override

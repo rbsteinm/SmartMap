@@ -21,6 +21,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -544,7 +545,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      */
     public void openInformationActivity(MenuItem mi) {
         Intent intent = new Intent(this, InformationActivity.class);
-        intent.putExtra("CURRENT_DISPLAYABLE", mCurrentItem);
+        intent.putExtra("CURRENT_DISPLAYABLE", (Parcelable) mCurrentItem);
         this.startActivity(intent);
+        this.finish();
     }
 }
