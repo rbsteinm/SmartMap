@@ -20,6 +20,7 @@ import java.util.Map;
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.util.Log;
+import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -82,6 +83,12 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void authServer(String name, long facebookId, String fbAccessToken) throws SmartMapClientException {
         Log.d("authServer", "begin");
         Map<String, String> params = new HashMap<String, String>();
+
+        // Stores connection info to re-log when app is killed
+        SettingsManager manager = SettingsManager.getInstance();
+        manager.setUserName(name);
+        manager.setFacebookID(facebookId);
+        manager.setToken(fbAccessToken);
 
         params.put("name", name);
         params.put("facebookId", Long.toString(facebookId));

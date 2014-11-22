@@ -102,8 +102,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
 
     // Table of invitations
-    private static final String CREATE_TABLE_PENDING = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING + "(" + KEY_USER_ID
-        + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
+    private static final String CREATE_TABLE_PENDING = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING + "("
+        + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
 
     private static DatabaseHelper mInstance;
     private static SQLiteDatabase mDatabase;
@@ -698,12 +698,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * 
      * @param user
      *            The user who made the request (only need name and ID)
+     * @return 1 if the invitation was added, 0 if it was already there
      */
-    public void addInvitation(User user) {
+    public int addInvitation(User user) {
         Cursor cursor =
             mDatabase.query(TABLE_INVITATIONS, INVITATION_COLUMNS, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(user.getID())}, null, null, null, null);
 
+        int result = 0;
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
             values.put(KEY_USER_ID, user.getID());
@@ -711,8 +713,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             mDatabase.insert(TABLE_INVITATIONS, null, values);
 
+            result = 1;
         }
         cursor.close();
+        return result;
     }
 
     /**

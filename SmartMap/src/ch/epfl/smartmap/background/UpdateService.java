@@ -2,11 +2,11 @@ package ch.epfl.smartmap.background;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.SettingsManager;
@@ -117,6 +118,23 @@ public class UpdateService extends Service {
     }
 
     /**
+     * AsyncTask to log in
+     * 
+     * @author ritterni
+     */
+    private class AsyncLogin extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            try {
+                mClient.authServer(mManager.getUserName(), mManager.getFacebookID(), mManager.getToken());
+            } catch (SmartMapClientException e) {
+                Log.e("UpdateService", "Couldn't log in!");
+            }
+            return null;
+        }
+    }
+
+    /**
      * AsyncTask to check if a friend request was received
      * 
      * @author ritterni
@@ -140,11 +158,9 @@ public class UpdateService extends Service {
                 for (User user : result) {
                     // TWEAK ! MUST BE REPLACED BY PROPER STORAGE IN THE
                     // DATABASE !
-                    if (!notifiedInvitations.contains(user.getID())) {
-                        notifiedInvitations.add(user.getID());
+                    if (mHelper.addInvitation(user) > 0) {
                         UpdateService.this.showFriendNotif(user);
                     }
-                    mHelper.addInvitation(user);
                 }
             }
         }
@@ -221,10 +237,6 @@ public class UpdateService extends Service {
 
     private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
 
-    // TWEAK FOR THE DEMO: MUST BE REMOVED AND REPLACED AFTERWARDS !!!
-    private final Set<Long> notifiedInvitations = new HashSet<Long>();
-    // TWEAK !!!
-
     private final Runnable friendsPosUpdate = new Runnable() {
         @Override
         public void run() {
@@ -256,7 +268,6 @@ public class UpdateService extends Service {
 
     @Override
     public IBinder onBind(Intent arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -286,6 +297,21 @@ public class UpdateService extends Service {
         Log.d("UpdateService", "Service started");
 
         return START_STICKY;
+    }
+
+    // Ugly workaround because of KitKat stopping services when app gets closed
+    // (Android issue #63618)
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        new AsyncLogin().execute();
+        Intent restartService = new Intent(getApplicationContext(), this.getClass());
+        restartService.setPackage(getPackageName());
+        PendingIntent restartServicePI =
+            PendingIntent.getService(getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        alarmService
+            .set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + HANDLER_DELAY, restartServicePI);
+
     }
 
     /**

@@ -60,7 +60,9 @@ public class SettingsManager {
      * @return The SettingsManager instance
      */
     public static SettingsManager initialize(Context context) {
-        mInstance = new SettingsManager(context);
+        if (mInstance == null) {
+            mInstance = new SettingsManager(context);
+        }
         return mInstance;
     }
 
