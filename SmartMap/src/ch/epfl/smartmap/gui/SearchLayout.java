@@ -74,7 +74,7 @@ public class SearchLayout extends LinearLayout {
         this.setSearchEngine(new MockSearchEngine());
 
         mTitleBar = new LinearLayout(context);
-        this.addSearchTypes(Type.ALL, Type.FRIENDS, Type.EVENTS, Type.TAGS);
+        this.addSearchTypes(Type.ALL, Type.FRIENDS, Type.EVENTS, Type.TAGS, Type.GROUPS);
         this.setSearchType(Type.ALL);
     }
 
@@ -87,6 +87,11 @@ public class SearchLayout extends LinearLayout {
         mSearchEngine = searchEngine;
     }
 
+    /**
+     * Change to a different search type and displays it
+     * 
+     * @param searchType
+     */
     public void setSearchType(Type searchType) {
         // Add new Views
         this.removeAllViews();
@@ -110,62 +115,37 @@ public class SearchLayout extends LinearLayout {
     }
 
     /**
-     * Go to next View
+     * @return Next Search Type in the Layout
      */
-    private void onSwipeLeft() {
+    private Type nextSearchType() {
         int nextSearchTypeIndex =
             (mSearchTypeIndexes.get(mCurrentSearchType).intValue() + 1) % mActiveSearchTypes.size();
         Type nextSearchType = mActiveSearchTypes.get(nextSearchTypeIndex);
-        this.setSearchType(nextSearchType);
+        return nextSearchType;
+    }
 
-        // ScrollView currentScrollView = mScrollViews.get(mCurrentSearchType);
-        // mCurrentSearchType =
-        // SearchType.values()[(mCurrentSearchType.ordinal() + 1) %
-        // SearchType.values().length];
-        // Log.d(TAG, mCurrentSearchType.mTitle);
-        // ScrollView nextScrollView = mScrollViews.get(mCurrentSearchType);
-        // nextScrollView.scrollTo(0, 0);
-        // if (mCurrentSearchType != SearchType.HISTORY) {
-        // SearchResultViewGroup<Friend> nextSearchResultViewGroup =
-        // mSearchResultViewGroups.get(mCurrentSearchType);
-        // nextSearchResultViewGroup.displayMinimized();
-        // nextSearchResultViewGroup.setResultList(mCurrentSearchResults);
-        // }
-        //
-        // this.addView(nextScrollView);
-        // nextScrollView.startAnimation(AnimationUtils.loadAnimation(this.getContext(),
-        // R.anim.swipe_left_in));
-        // currentScrollView.startAnimation(AnimationUtils.loadAnimation(this.getContext(),
-        // R.anim.swipe_left_out));
-        // this.removeViewAt(0);
+    private Type previousSearchType() {
+        // Need to add mActiveSearchTypes.size() to avoid negative numbers with
+        // % operator
+        int previousSearchTypeIndex =
+            ((mSearchTypeIndexes.get(mCurrentSearchType).intValue() - 1) + mActiveSearchTypes.size())
+                % mActiveSearchTypes.size();
+        Type previousSearchType = mActiveSearchTypes.get(previousSearchTypeIndex);
+        return previousSearchType;
+    }
+
+    /**
+     * Go to next View
+     */
+    private void onSwipeLeft() {
+        this.setSearchType(this.nextSearchType());
     }
 
     /**
      * Go to previous View
      */
     private void onSwipeRight() {
-        // // Get current and next ScrollViews (circularily)
-        // ScrollView currentScrollView = mScrollViews.get(mCurrentSearchType);
-        // mCurrentSearchType = SearchPanelType.values()[(2 * mCurrentSearchType
-        // .ordinal() - 1) % SearchPanelType.values().length];
-        // Log.d(TAG, mCurrentSearchType.title());
-        // ScrollView previousScrollView = mScrollViews.get(mCurrentSearchType);
-        // previousScrollView.scrollTo(0, 0);
-        // if (mCurrentSearchType != SearchPanelType.HISTORY) {
-        // SearchResultViewGroup nextSearchResultViewGroup =
-        // mSearchResultViewGroups
-        // .get(mCurrentSearchType);
-        //
-        // nextSearchResultViewGroup.displayMinimized();
-        // nextSearchResultViewGroup.setResultList(mCurrentSearchResults);
-        // }
-        //
-        // this.addView(previousScrollView, 0);
-        // previousScrollView.startAnimation(AnimationUtils.loadAnimation(
-        // getContext(), R.anim.swipe_right_in));
-        // currentScrollView.startAnimation(AnimationUtils.loadAnimation(
-        // getContext(), R.anim.swipe_right_out));
-        // this.removeViewAt(1);
+        this.setSearchType(this.previousSearchType());
     }
 
     /**
@@ -222,15 +202,23 @@ public class SearchLayout extends LinearLayout {
     private void addSearchTypes(Type... searchTypes) {
         // Add all titles into mTitleBar
         for (Type searchType : searchTypes) {
-            // create titleTextView
+            // Create titleTextView
             TextView titleTextView = new TextView(this.getContext());
             titleTextView.setText(searchType.getTitle());
             titleTextView.setTextSize(TITLE_TEXT_SIZE);
             titleTextView.setTextColor(this.getResources().getColor(R.color.bottomSliderBackground));
-            // Add it
+            // Create a spacer
+            TextView spacer = new TextView(this.getContext());
+            LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            params.weight = 1;
+            spacer.setLayoutParams(params);
+            // Add the titleTextView and the spacer
             mTitleTextViews.put(searchType, titleTextView);
             mTitleBar.addView(titleTextView);
+            mTitleBar.addView(spacer);
         }
+        // Remove last spacer
+        mTitleBar.removeViewAt(mTitleBar.getChildCount() - 1);
 
         for (Type searchType : searchTypes) {
             this.addSearchResultScrollView(searchType);
