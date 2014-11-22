@@ -9,6 +9,8 @@ import android.preference.PreferenceManager;
  * Used to get and set settings and local info using SharedPreferences
  * 
  * @author ritterni
+ * @author SpicyCH (add support for the user settings - we might want to change the design if my methods are
+ *         bottlenecks)
  */
 public class SettingsManager {
     public static final String PREFS_NAME = "settings";
@@ -43,11 +45,15 @@ public class SettingsManager {
     private final static String KEY_FRIENDSHIP_CONFIRMATIONS = "notifications_friendship_confirmations";
     private final static String KEY_EVENT_INVITATIONS = "notifications_event_invitations";
     private final static String KEY_EVENT_PROXIMITY = "notifications_event_proximity";
-    private final static String KEY_VIBRATE = "notifications_new_message_vibrate";
+    private final static String KEY_VIBRATE = "notifications_vibrate";
+    private static final String KEY_ALWAYS_SHARE = "general_always_share";
+    private static final String KEY_REFRESH_FREQUENCY = "refresh_frequency";
+    private static final String KEY_TIME_TO_WAIT_BEFORE_HIDING_FRIENDS = "last_seen_max";
+    private static final String KEY_PUBLIC_EVENTS = "events_show_public";
+    private static final String KEY_PRIVATE_EVENTS = "events_show_private";
 
     /**
-     * SettingsManager constructor. Will be made private, use initialize() or
-     * getInstance() instead.
+     * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
      * 
      * @param context
      *            The app's context, needed to access the shared preferences
@@ -60,8 +66,7 @@ public class SettingsManager {
     }
 
     /**
-     * Initializes the settings manager (should be called once when starting the
-     * app)
+     * Initializes the settings manager (should be called once when starting the app)
      * 
      * @param context
      *            The app's context, needed to access the shared preferences
@@ -89,9 +94,9 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for
-     *         friend requests and the user activated the notifications in
-     *         general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for friend requests and the user
+     *         activated the
+     *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
@@ -100,12 +105,11 @@ public class SettingsManager {
     }
 
     /**
-     * A friendship confirmation happens when another user accepts your friend
-     * request.
+     * A friendship confirmation happens when another user accepts your friend request.
      * 
-     * @return <code>true</code> if the user enabled the notifications for
-     *         friendship confirmations and the user activated the notifications
-     *         in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
+     *         user
+     *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
@@ -114,8 +118,14 @@ public class SettingsManager {
     }
 
     /**
+<<<<<<< HEAD
      * @return <code>true</code> if the user enabled the notifications for event
      *         invitations and the user activated the notifications in general, <code>false</code> otherwise.
+=======
+     * @return <code>true</code> if the user enabled the notifications for event invitations and the user
+     *         activated the
+     *         notifications in general, <code>false</code> otherwise.
+>>>>>>> dev
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
@@ -124,8 +134,14 @@ public class SettingsManager {
     }
 
     /**
+<<<<<<< HEAD
      * @return <code>true</code> if the user enabled the notifications for event
      *         proximity and the user activated the notifications in general, <code>false</code> otherwise.
+=======
+     * @return <code>true</code> if the user enabled the notifications for event proximity and the user
+     *         activated the
+     *         notifications in general, <code>false</code> otherwise.
+>>>>>>> dev
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
@@ -134,8 +150,13 @@ public class SettingsManager {
     }
 
     /**
+<<<<<<< HEAD
      * @return <code>true</code> if the user enabled the notifications
      *         vibrations and the user activated the notifications in general, <code>false</code> otherwise.
+=======
+     * @return <code>true</code> if the user enabled the notifications vibrations and the user activated the
+     *         notifications in general, <code>false</code> otherwise.
+>>>>>>> dev
      * @author SpicyCH
      */
     public boolean notificationsVibrate() {
@@ -144,8 +165,52 @@ public class SettingsManager {
     }
 
     /**
-     * @return The local user's name if it is found, DEFAULT_NAME value
-     *         otherwise
+     * @return <code>true</code> if the user agreed to share his position even when the app is closed,
+     *         <code>false</code> otherwise.
+     * @author SpicyCH
+     */
+    public boolean alwaysShare() {
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_ALWAYS_SHARE, true);
+    }
+
+    /**
+     * @return the frequence in seconds at which we fetch and upload the datas. Used by the service.
+     * @author SpicyCH
+     */
+    public int getRefreshFrequency() {
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
+            KEY_REFRESH_FREQUENCY, "10"));
+    }
+
+    /**
+     * @return the time to wait in minutes before hiding inactive friends from the map.
+     * @author SpicyCH
+     */
+    public int getTimeToWaitBeforeHidingFriends() {
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
+            KEY_TIME_TO_WAIT_BEFORE_HIDING_FRIENDS, "30"));
+    }
+
+    /**
+     * @return <code>true</code> if the user wants to see public events on his map, <code>false</code>
+     *         otherwise.
+     * @author SpicyCH
+     */
+    public boolean showPublicEvents() {
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_PUBLIC_EVENTS, true);
+    }
+
+    /**
+     * @return <code>true</code> if the user wants to see his private events on his map, <code>false</code>
+     *         otherwise.
+     * @author SpicyCH
+     */
+    public boolean showPrivateEvents() {
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_PRIVATE_EVENTS, true);
+    }
+
+    /**
+     * @return The local user's name if it is found, DEFAULT_NAME value otherwise
      */
     public String getUserName() {
         return mSharedPref.getString(USER_NAME, DEFAULT_NAME);
@@ -159,32 +224,28 @@ public class SettingsManager {
     }
 
     /**
-     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
-     *         otherwise
+     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value otherwise
      */
     public long getFacebookID() {
         return mSharedPref.getLong(FB_ID, DEFAULT_FB_ID);
     }
 
     /**
-     * @return The local user's phone number if it is found, DEFAULT_NUMBER
-     *         value otherwise
+     * @return The local user's phone number if it is found, DEFAULT_NUMBER value otherwise
      */
     public String getUPhoneNumber() {
         return mSharedPref.getString(PHONE_NUMBER, DEFAULT_NUMBER);
     }
 
     /**
-     * @return The local user's email if it is found, DEFAULT_EMAIL value
-     *         otherwise
+     * @return The local user's email if it is found, DEFAULT_EMAIL value otherwise
      */
     public String getEmail() {
         return mSharedPref.getString(EMAIL, DEFAULT_EMAIL);
     }
 
     /**
-     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN
-     *         value otherwise
+     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN value otherwise
      */
     public String getToken() {
         return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);

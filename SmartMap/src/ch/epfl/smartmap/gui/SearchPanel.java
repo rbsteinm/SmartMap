@@ -39,7 +39,7 @@ public class SearchPanel extends RelativeLayout {
     public void open() {
         if (this.getVisibility() != View.VISIBLE) {
             this.setVisibility(View.VISIBLE);
-            Animation bottomUp = AnimationUtils.loadAnimation(getContext(), R.anim.bottom_up);
+            Animation bottomUp = AnimationUtils.loadAnimation(this.getContext(), R.anim.bottom_up);
             this.startAnimation(bottomUp);
         }
     }
@@ -49,11 +49,11 @@ public class SearchPanel extends RelativeLayout {
      */
     public void close() {
         if (this.getVisibility() != View.GONE) {
-            Animation topDown = AnimationUtils.loadAnimation(getContext(), R.anim.top_down);
+            Animation topDown = AnimationUtils.loadAnimation(this.getContext(), R.anim.top_down);
 
             this.startAnimation(topDown);
             this.setVisibility(View.GONE);
-            clearFocus();
+            this.clearFocus();
         }
     }
 
@@ -65,7 +65,7 @@ public class SearchPanel extends RelativeLayout {
     public boolean onBackPressed() {
         if (this.getVisibility() == View.VISIBLE) {
             Log.d(TAG, "onBackPressed, true");
-            close();
+            this.close();
             return true;
         }
         Log.d(TAG, "onBackPressed, false");

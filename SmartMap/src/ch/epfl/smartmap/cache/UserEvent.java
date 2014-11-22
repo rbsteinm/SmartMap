@@ -27,7 +27,7 @@ public class UserEvent implements Event, Searchable, Displayable {
     private String mCreatorName;
     private String mDescription;
     public final static long DEFAULT_ID = -1;
-    public final static int EVENT_ICON = R.drawable.ic_launcher;
+    public final static int EVENT_ICON = R.drawable.default_event;
     private final static int RIGHT_SHIFT_COUNT = 32;
 
     /**
@@ -64,7 +64,7 @@ public class UserEvent implements Event, Searchable, Displayable {
         mLocation = new Location(p);
         mPositionName = "";
         mCreatorName = creatorName;
-        mDescription = "";
+        mDescription = "Tomorrow near Lausanne";
         mID = DEFAULT_ID;
     }
 

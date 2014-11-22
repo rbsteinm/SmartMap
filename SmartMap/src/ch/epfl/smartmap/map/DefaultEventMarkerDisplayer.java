@@ -30,7 +30,12 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /**
      * A map that contains the displayed markers' ids, associated with the event
+     * <<<<<<< HEAD
      * they represent
+     * =======
+     * they
+     * represent
+     * >>>>>>> gui-info
      */
     private final Map<String, Event> displayedMarkers = new HashMap<String, Event>();
 
@@ -54,7 +59,7 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
         for (Event event : eventsToDisplay) {
 
-            addMarker(event, context, googleMap);
+            this.addMarker(event, context, googleMap);
         }
 
     }
@@ -157,7 +162,7 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
      */
     @Override
     public Marker removeMarker(Event event) {
-        Marker marker = getMarkerForEvent(event);
+        Marker marker = this.getMarkerForEvent(event);
         displayedMarkers.remove(marker);
         marker.remove();
 
@@ -175,16 +180,16 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
     public void updateMarkers(Context context, GoogleMap googleMap, List<Event> eventsToDisplay) {
 
         for (Event event : eventsToDisplay) {
-            if (isDisplayedEvent(event)) {
-                getMarkerForEvent(event).setPosition(event.getLatLng());
+            if (this.isDisplayedEvent(event)) {
+                this.getMarkerForEvent(event).setPosition(event.getLatLng());
             } else {
-                addMarker(event, context, googleMap);
+                this.addMarker(event, context, googleMap);
             }
         }
 
-        for (Event event : getDisplayedEvents()) {
-            if ((!eventsToDisplay.contains(event)) && (!getMarkerForEvent(event).isInfoWindowShown())) {
-                removeMarker(event);
+        for (Event event : this.getDisplayedEvents()) {
+            if ((!eventsToDisplay.contains(event)) && (!this.getMarkerForEvent(event).isInfoWindowShown())) {
+                this.removeMarker(event);
             }
         }
 

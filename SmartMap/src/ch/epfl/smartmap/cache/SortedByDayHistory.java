@@ -17,24 +17,24 @@ public class SortedByDayHistory implements History {
     @SuppressWarnings("unused")
     private static final int MAX_HISTORY_ENTRY = 50;
 
-    private final List<Queue<Friend>> mHistoryEntries;
+    private final List<Queue<Displayable>> mHistoryEntries;
     private final List<Date> mDates;
     private int mSize;
 
     public SortedByDayHistory() {
-        mHistoryEntries = new ArrayList<Queue<Friend>>();
+        mHistoryEntries = new ArrayList<Queue<Displayable>>();
         mDates = new ArrayList<Date>();
         mSize = 0;
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public void addEntry(Friend friend, Date date) {
-        if (!mHistoryEntries.isEmpty() && date.getDate() == mDates.get(0).getDate()) {
+    public void addEntry(Displayable item, Date date) {
+        if (!mHistoryEntries.isEmpty() && (date.getDate() == mDates.get(0).getDate())) {
             // Same day as the first list of entries
-            mHistoryEntries.get(0).add(friend);
+            mHistoryEntries.get(0).add(item);
         } else {
-            mHistoryEntries.add(0, new LinkedList<Friend>(Arrays.asList(friend)));
+            mHistoryEntries.add(0, new LinkedList<Displayable>(Arrays.asList(item)));
             mDates.add(0, date);
         }
 
@@ -42,8 +42,8 @@ public class SortedByDayHistory implements History {
     }
 
     @Override
-    public ArrayList<Friend> getEntriesForIndex(int index) {
-        return new ArrayList<Friend>(mHistoryEntries.get(index));
+    public ArrayList<Displayable> getEntriesForIndex(int index) {
+        return new ArrayList<Displayable>(mHistoryEntries.get(index));
     }
 
     @Override
@@ -56,10 +56,10 @@ public class SortedByDayHistory implements History {
         return mSize == 0;
     }
 
-    public boolean contains(Friend friend) {
+    public boolean contains(Displayable item) {
         boolean contains = false;
-        for (Queue<Friend> e : mHistoryEntries) {
-            contains = contains || e.contains(friend);
+        for (Queue<Displayable> e : mHistoryEntries) {
+            contains = contains || e.contains(item);
         }
         return contains;
     }

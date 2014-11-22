@@ -7,12 +7,9 @@
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact based on your message history</string>
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-
+    <string name="pref_title_always_share">Always share my position</string>
+    <string name="pref_description_always_share">To save your battery, when you close SmartMap, we will only refresh your position every 30 minutes</string>
+    
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>
@@ -23,29 +20,51 @@
         <item>0</item>
         <item>-1</item>
     </string-array>
-
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-
-    <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
+    
+    <string name="pref_title_last_seen_max">Time to wait before hiding friends</string>
+    
+    <string-array name="pref_last_seen_max_titles">
+        <item>10 minutes</item>
+        <item>30 minutes (default)</item>
         <item>1 hour</item>
         <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
+        <item>12 hours</item>
+        <item>1 day</item>
     </string-array>
-    <string-array name="pref_sync_frequency_values">
-        <item>15</item>
+    
+    <string-array name="pref_last_seen_max_values">
+        <item>10</item>
         <item>30</item>
         <item>60</item>
         <item>180</item>
-        <item>360</item>
-        <item>-1</item>
+        <item>720</item>
+        <item>1440</item>
     </string-array>
 
-    <string name="pref_title_system_sync_settings">System sync settings</string>
+    <!-- Events -->
+    <string name="pref_header_events">Events</string>
+    <string name="pref_title_show_public_events">Show public events</string>
+    <string name="pref_title_show_private_events">Show private events</string>
+    
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string name="pref_title_refresh_frequency">Refresh data frequency</string>
+
+    <string-array name="pref_sync_frequency_titles">
+        <item>5 seconds</item>
+        <item>10 seconds (default)</item>
+        <item>30 seconds</item>
+        <item>1 minute</item>
+        <item>2 minutes</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>5</item>
+        <item>10</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+
 
     <!-- Notifications -->
     <string name="pref_header_notifications">Notifications</string>
@@ -54,8 +73,6 @@
     <string name="pref_title_friendship_confirmations">Friendship confirmations</string>
     <string name="pref_title_event_invitations">Event invitations</string>
     <string name="pref_title_event_proximity">Event proximity</string>
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
     <string name="pref_title_vibrate">Vibrate</string>
 
 </resources>

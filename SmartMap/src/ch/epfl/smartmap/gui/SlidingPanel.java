@@ -22,7 +22,8 @@ public class SlidingPanel extends FrameLayout {
 
     private static final String TAG = "INFORMATION_PANEL";
 
-    private static final int EXTEND_DURATION = 400;
+    private static final int EXTEND_DURATION = 600;
+    private static final int CLOSE_DURATION = 400;
     private static final int FADE_IN_DELAY = 400;
     private static final int FADE_IN_DURATION = 400;
     private static final int FADE_OUT_DELAY = 0;
@@ -57,14 +58,12 @@ public class SlidingPanel extends FrameLayout {
         private int mDuration;
 
         private Fade(float fromAlpha, float toAlpha, int delay, int duration) {
-            this.mFromAlpha = fromAlpha;
-            this.mToAlpha = toAlpha;
-            this.mDelay = delay;
-            this.mDuration = duration;
+            mFromAlpha = fromAlpha;
+            mToAlpha = toAlpha;
+            mDelay = delay;
+            mDuration = duration;
         }
     }
-
-    private final InformationViewExtended mExtendedView;
 
     private VisualState mVisualState;
 
@@ -74,11 +73,8 @@ public class SlidingPanel extends FrameLayout {
     public SlidingPanel(Context context, AttributeSet attrs) {
         super(context, attrs);
         // Create subviews
-        mExtendedView = new InformationViewExtended(context, this);
-        this.addView(mExtendedView);
 
         // Layout parameters
-
         this.setBackgroundResource(R.color.background_blue);
         this.setFocusable(true);
         this.setClickable(true);
@@ -94,12 +90,10 @@ public class SlidingPanel extends FrameLayout {
     public void initView() {
         // Initialize heights
         FrameLayout parent = (FrameLayout) this.getParent();
-
         this.measure(parent.getWidth(), parent.getHeight());
         VisualState.CLOSED.height = 0;
         // FIXME : Shouldn't be hardcoded
         VisualState.OPEN.height = OPEN_HEIGHT;
-        Log.d(TAG, "HEIGHT : " + this.getMeasuredHeight());
         // Initialize Position Animators
         this.initializeAnimators();
     }
@@ -107,7 +101,7 @@ public class SlidingPanel extends FrameLayout {
     /**
      * Show full screen view
      */
-    public void open() {
+    public boolean open() {
         if (mVisualState == VisualState.CLOSED) {
             if (VisualState.OPEN.height == -1) {
                 this.initView();
@@ -115,20 +109,35 @@ public class SlidingPanel extends FrameLayout {
             // Need to set Views to VISIBLE to avoid anim problems
             this.setVisibility(View.VISIBLE);
             // Start Animations
-            mExtendedView.clearAnimation();
-            mExtendedView.startAnimation(this.createAlphaAnimation(mExtendedView, Fade.IN));
+            for (int i = 0; i < this.getChildCount(); i++) {
+                Log.d(TAG, "View number " + i);
+                View v = this.getChildAt(i);
+                v.setVisibility(VISIBLE);
+                v.clearAnimation();
+                v.startAnimation(this.createAlphaAnimation(v, Fade.IN));
+            }
             mOpenAnim.start();
+
+            return true;
         }
+
+        return false;
     }
 
     /**
      * Hide panel
      */
-    public void close() {
+    public boolean close() {
         if (mVisualState == VisualState.OPEN) {
-            mExtendedView.startAnimation(this.createAlphaAnimation(mExtendedView, Fade.OUT));
+            for (int i = 0; i < this.getChildCount(); i++) {
+                View v = this.getChildAt(i);
+                v.startAnimation(this.createAlphaAnimation(v, Fade.OUT));
+            }
             mCloseAnim.start();
+            return true;
         }
+
+        return false;
     }
 
     public boolean isOpened() {
@@ -171,10 +180,11 @@ public class SlidingPanel extends FrameLayout {
 
     private ValueAnimator createTranslateAnimator(final VisualState start, final VisualState end) {
         ValueAnimator animator = ValueAnimator.ofInt(start.height, end.height);
-        if ((start == VisualState.OPEN) || (end == VisualState.OPEN)) {
+        if (start == VisualState.OPEN) {
+            animator.setDuration(CLOSE_DURATION);
+        } else if (start == VisualState.CLOSED) {
             animator.setDuration(EXTEND_DURATION);
         }
-
         final SlidingPanel thisPanel = this;
         Log.d(TAG, "new Animation  : " + start.height + " to " + end.height);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

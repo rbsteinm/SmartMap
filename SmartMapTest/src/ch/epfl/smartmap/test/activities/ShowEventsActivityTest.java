@@ -1,12 +1,11 @@
 package ch.epfl.smartmap.test.activities;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
+import static com.google.android.apps.common.testing.ui.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isEnabled;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
-import static com.google.android.apps.common.testing.ui.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
-
 import static org.hamcrest.Matchers.not;
 
 import java.util.GregorianCalendar;
@@ -47,6 +46,12 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
     protected void setUp() throws Exception {
         super.setUp();
 
+        mActivity = this.getActivity();
+
+        this.addMockEventsInDB();
+    }
+
+    private void addMockEventsInDB() {
         GregorianCalendar timeE0 = new GregorianCalendar();
         timeE0.add(GregorianCalendar.MINUTE, -5);
         GregorianCalendar timeEndE0 = new GregorianCalendar();
@@ -99,14 +104,13 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
                 + "is fun and liberating about sliding on snow in wintertime.";
         e3.setDescription(descrE3);
 
-        DatabaseHelper dbHelper = new DatabaseHelper(getActivity().getBaseContext());
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance();
         dbHelper.clearAll();
         dbHelper.addEvent(e0);
         dbHelper.addEvent(e1);
         dbHelper.addEvent(e2);
         dbHelper.addEvent(e3);
 
-        mActivity = getActivity();
     }
 
     public void testSeekBarDisabledByDefault() {
@@ -129,13 +133,13 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
         int initialSize = mActivity.getListView().getCount();
         onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(ViewActions.click());
         onView(withId(R.id.showEventSeekBar)).perform(setProgress(0));
-        mActivity = getActivity();
+        mActivity = this.getActivity();
         int finalSize = mActivity.getListView().getCount();
         assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
             finalSize < initialSize);
 
         onView(withId(R.id.showEventSeekBar)).perform(setProgress(100));
-        mActivity = getActivity();
+        mActivity = this.getActivity();
         int newFinalSize = mActivity.getListView().getCount();
         assertTrue("finalSize: " + finalSize + " wasn't smaller than newFinalSize: " + initialSize,
             finalSize < newFinalSize);
@@ -145,7 +149,7 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
         // FIXME this test fails sometimes for NO REASONS, wtf???
         int initialSize = mActivity.getListView().getCount();
         onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(ViewActions.click());
-        mActivity = getActivity();
+        mActivity = this.getActivity();
         int finalSize = mActivity.getListView().getCount();
         assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
             finalSize < initialSize);
@@ -154,7 +158,7 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
     public void testCheckingOnGoingChangesListSize() {
         int initialSize = mActivity.getListView().getCount();
         onView(withId(R.id.ShowEventscheckBoxStatus)).perform(ViewActions.click());
-        mActivity = getActivity();
+        mActivity = this.getActivity();
         int finalSize = mActivity.getListView().getCount();
         assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
             finalSize < initialSize);
@@ -163,14 +167,14 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
     public void testCheckingMyEventsChangesListSize() {
         int initialSize = mActivity.getListView().getCount();
         onView(withId(R.id.ShowEventsCheckBoxMyEv)).perform(ViewActions.click());
-        mActivity = getActivity();
+        mActivity = this.getActivity();
         int finalSize = mActivity.getListView().getCount();
         assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
             finalSize < initialSize);
     }
 
     public void testCanOpenAddEventActivity() {
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        openActionBarOverflowOrOptionsMenu(this.getInstrumentation().getTargetContext());
 
         onView(withText("Create a new event")).perform(ViewActions.click());
 

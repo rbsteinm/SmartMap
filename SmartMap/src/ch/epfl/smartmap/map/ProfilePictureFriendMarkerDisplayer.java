@@ -64,7 +64,7 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
         Log.d(TAG, "set markers to map");
         // Add marker with profile picture for each friend
         for (User friend : friendsToDisplay) {
-            addMarker(friend, context, googleMap);
+            this.addMarker(friend, context, googleMap);
         }
     }
 
@@ -171,7 +171,7 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
      */
     @Override
     public Marker removeMarker(User friend) {
-        Marker marker = getMarkerForFriend(friend);
+        Marker marker = this.getMarkerForFriend(friend);
         displayedMarkers.remove(marker.getId());
         dictionnaryMarkers.remove(marker.getId());
         marker.remove();
@@ -183,10 +183,17 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
      * (non-Javadoc)
      * @see
      * ch.epfl.smartmap.gui.FriendMarkerDisplayer#updateMarkers(android.content
+     * <<<<<<< HEAD
      * .Context, com.google.android.gms.maps.GoogleMap, java.util.List) This
      * method updates the markers on the map with the given list of friends. It
      * uses an auxiliary method animateMarkers to move the marker with an
      * animation instead of changing place roughly
+     * =======
+     * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
+     * This method updates the markers on the map with the given list of
+     * friends. It uses an auxiliary method animateMarkers to move the marker
+     * with an animation instead of changing place roughly
+     * >>>>>>> gui-info
      */
     @Override
     public void updateMarkers(Context context, GoogleMap googleMap, List<User> friendsToDisplay) {
@@ -199,21 +206,22 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
             Marker marker;
             // if the friend is already displayed, get the marker for this
             // friend, else add a new marker
-            if (isDisplayedFriend(friend)) {
-                marker = getMarkerForFriend(friend);
+            if (this.isDisplayedFriend(friend)) {
+                marker = this.getMarkerForFriend(friend);
                 Log.d(TAG, "found marker for friend " + friend.getName());
             } else {
-                marker = addMarker(friend, context, googleMap);
+                marker = this.addMarker(friend, context, googleMap);
                 Log.d(TAG, "friend was not displayed");
             }
-            animateMarker(marker, friend.getLatLng(), false, googleMap);
+            this.animateMarker(marker, friend.getLatLng(), false, googleMap);
         }
 
         // remove the markers that are not longer in the list to display
-        for (User friend : getDisplayedFriends()) {
-            if ((!friendsToDisplay.contains(friend)) && (!getMarkerForFriend(friend).isInfoWindowShown())) {
-                Marker marker = removeMarker(friend);
-                animateMarker(marker, friend.getLatLng(), true, googleMap);
+        for (User friend : this.getDisplayedFriends()) {
+            if ((!friendsToDisplay.contains(friend))
+                && (!this.getMarkerForFriend(friend).isInfoWindowShown())) {
+                Marker marker = this.removeMarker(friend);
+                this.animateMarker(marker, friend.getLatLng(), true, googleMap);
             }
         }
 
@@ -243,8 +251,8 @@ public class ProfilePictureFriendMarkerDisplayer implements FriendMarkerDisplaye
             public void run() {
                 long elapsed = SystemClock.uptimeMillis() - start;
                 float t = interpolator.getInterpolation((float) elapsed / duration);
-                double lng = t * toPosition.longitude + (1 - t) * startLatLng.longitude;
-                double lat = t * toPosition.latitude + (1 - t) * startLatLng.latitude;
+                double lng = (t * toPosition.longitude) + ((1 - t) * startLatLng.longitude);
+                double lat = (t * toPosition.latitude) + ((1 - t) * startLatLng.latitude);
                 marker.setPosition(new LatLng(lat, lng));
                 // Log.d(TAG, "Set marker position for friend "
                 // + getFriendForMarker(marker).getName() + " "

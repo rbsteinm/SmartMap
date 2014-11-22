@@ -159,7 +159,6 @@ public class FacebookFragment extends Fragment {
 
     protected void makeMeRequest() {
         Request request = Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
-
             @Override
             public void onCompleted(GraphUser user, Response response) {
 

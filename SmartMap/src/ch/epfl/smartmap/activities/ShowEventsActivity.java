@@ -66,8 +66,16 @@ public class ShowEventsActivity extends ListActivity {
         // Makes the logo clickable (clicking it returns to previous activity)
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mMyLocation = SettingsManager.getInstance().getLocation();
+        this.initializeGUI();
+    }
+
+    private void initializeGUI() {
+        // We need to intialize the two following Singletons to let espresso tests pass.
         mContext = this.getApplicationContext();
+        SettingsManager.initialize(mContext);
+        DatabaseHelper.initialize(mContext);
+
+        mMyLocation = SettingsManager.getInstance().getLocation();
 
         mMyEventsChecked = false;
         mOngoingChecked = false;
@@ -270,8 +278,14 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
+     * <<<<<<< HEAD
+     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired
+     * by
+     * =======
      * Computes the distance between two GPS locations (takes into consideration
-     * the earth radius), inspired by wikipedia
+     * the earth radius), inspired by
+     * >>>>>>> gui-info
+     * wikipedia
      * 
      * @param lat1
      * @param lon1
