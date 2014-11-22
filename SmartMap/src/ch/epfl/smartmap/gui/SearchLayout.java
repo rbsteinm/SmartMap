@@ -71,7 +71,8 @@ public class SearchLayout extends LinearLayout {
         super(context, attrs);
         // Layout relative informations
         this.setOrientation(HORIZONTAL);
-        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT));
         this.setBackgroundResource(R.color.background_blue);
         mCurrentSearchType = FIRST_SEARCH_PANEL_TYPE;
         mScrollViews = new HashMap<SearchPanelType, ScrollView>();
@@ -81,7 +82,7 @@ public class SearchLayout extends LinearLayout {
         // Create different Search Panels
         for (SearchPanelType type : SearchPanelType.values()) {
             Log.d(TAG, "Create SearchPanel : " + type.ordinal());
-            createSearchResultLayout(context, type);
+            this.createSearchResultLayout(context, type);
         }
 
         this.addView(mScrollViews.get(mCurrentSearchType));
@@ -115,8 +116,9 @@ public class SearchLayout extends LinearLayout {
         }
 
         this.addView(nextScrollView);
-        nextScrollView.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.swipe_left_in));
-        currentScrollView.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.swipe_left_out));
+        nextScrollView.startAnimation(AnimationUtils.loadAnimation(this.getContext(), R.anim.swipe_left_in));
+        currentScrollView.startAnimation(AnimationUtils.loadAnimation(this.getContext(),
+            R.anim.swipe_left_out));
         this.removeViewAt(0);
     }
 
@@ -156,27 +158,26 @@ public class SearchLayout extends LinearLayout {
         mCurrentSearchResults = mSearchEngine.sendQuery(query);
         Log.d(TAG, mCurrentSearchType.title());
         Log.d(TAG, "query : " + query);
-        if (mCurrentSearchType == SearchPanelType.HISTORY && query.equals("")) {
+        if ((mCurrentSearchType == SearchPanelType.HISTORY) && query.equals("")) {
             return;
         } else if (mCurrentSearchType == SearchPanelType.HISTORY) {
-            onSwipeLeft();
+            this.onSwipeLeft();
         }
         mSearchResultViewGroups.get(mCurrentSearchType).setResultList(mCurrentSearchResults);
     }
 
     /**
-     * Show the View that needs to be displayed when opening the
-     * {@code SearchPanel}, according to the query
+     * Show the View that needs to be displayed when opening the {@code SearchPanel}, according to the query
      * 
      * @param query
      */
     public void showMainPanel(String query) {
         if (mSearchEngine.getHistory().isEmpty() || !query.equals("")) {
-            showQuickPanel();
-            updateSearchResults(query);
+            this.showQuickPanel();
+            this.updateSearchResults(query);
         } else {
-            showHistoryPanel();
-            updateHistoryPanel();
+            this.showHistoryPanel();
+            this.updateHistoryPanel();
         }
     }
 
@@ -204,18 +205,19 @@ public class SearchLayout extends LinearLayout {
     private void updateHistoryPanel() {
         // History Panel
         History history = mSearchEngine.getHistory();
-        LinearLayout searchResultLayout = (LinearLayout) mScrollViews.get(SearchPanelType.HISTORY).getChildAt(0);
+        LinearLayout searchResultLayout =
+            (LinearLayout) mScrollViews.get(SearchPanelType.HISTORY).getChildAt(0);
         searchResultLayout.removeAllViews();
 
         for (int i = 0; i < history.nbOfDates(); i++) {
             // TextView displaying Date
-            TextView titleView = new TextView(getContext());
+            TextView titleView = new TextView(this.getContext());
             titleView.setTextSize(TITLE_TEXT_SIZE);
-            titleView.setTextColor(getResources().getColor(R.color.searchResultTitle));
+            titleView.setTextColor(this.getResources().getColor(R.color.searchResultTitle));
             titleView.setText(history.getDateForIndex(i).toString());
             // SearchResultViewGroup grouping all queries of this date
             SearchResultViewGroup searchResultViewGroup =
-                new SearchResultViewGroup(getContext(), history.getEntriesForIndex(i));
+                new SearchResultViewGroup(this.getContext(), history.getEntriesForIndex(i));
             // Put views together
             searchResultLayout.addView(titleView);
             searchResultLayout.addView(searchResultViewGroup);
@@ -232,7 +234,7 @@ public class SearchLayout extends LinearLayout {
 
         // ScrollView with TouchEvent passing handling
         ScrollView scrollView = new ScrollView(context) {
-            private final GestureDetector gestureDetector = new GestureDetector(getContext(),
+            private final GestureDetector gestureDetector = new GestureDetector(this.getContext(),
                 new HorizontalGestureListener());
 
             @Override
@@ -250,7 +252,7 @@ public class SearchLayout extends LinearLayout {
 
             @Override
             public boolean onInterceptTouchEvent(MotionEvent ev) {
-                if (!onTouchEvent(ev)) {
+                if (!this.onTouchEvent(ev)) {
                     return super.onInterceptTouchEvent(ev);
                 }
                 return false;
@@ -262,7 +264,8 @@ public class SearchLayout extends LinearLayout {
 
         // Layout contained in ScrollView
         LinearLayout searchResultLayout = new LinearLayout(context);
-        searchResultLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        searchResultLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT));
         searchResultLayout.setOrientation(VERTICAL);
         searchResultLayout.setPadding(0, SCROLLVIEW_LAYOUT_TOP_PADDING, 0, SCROLLVIEW_LAYOUT_BOTTOM_PADDING);
 
@@ -271,10 +274,11 @@ public class SearchLayout extends LinearLayout {
             // TextView displaying Name
             TextView titleView = new TextView(context);
             titleView.setTextSize(TITLE_TEXT_SIZE);
-            titleView.setTextColor(getResources().getColor(R.color.main_blue));
+            titleView.setTextColor(this.getResources().getColor(R.color.main_blue));
             titleView.setText(searchPanelType.title());
             // SearchResultViewGroup
-            SearchResultViewGroup searchResultViewGroup = new SearchResultViewGroup(context, MockDB.FRIENDS_LIST);
+            SearchResultViewGroup searchResultViewGroup =
+                new SearchResultViewGroup(context, MockDB.FRIENDS_LIST);
             // Put views together
             searchResultLayout.addView(titleView);
             searchResultLayout.addView(searchResultViewGroup);
@@ -305,11 +309,11 @@ public class SearchLayout extends LinearLayout {
             float diffY = e2.getY() - e1.getY();
             float diffX = e2.getX() - e1.getX();
             if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                if ((Math.abs(diffX) > SWIPE_THRESHOLD) && (Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD)) {
                     if (diffX > 0) {
-                        onSwipeRight();
+                        SearchLayout.this.onSwipeRight();
                     } else {
-                        onSwipeLeft();
+                        SearchLayout.this.onSwipeLeft();
                     }
                     result = true;
                 }

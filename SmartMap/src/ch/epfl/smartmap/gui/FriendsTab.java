@@ -30,7 +30,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * 
  * @author rbsteinm
  */
-public class FriendsTab extends ListFragment implements FriendsListener{
+public class FriendsTab extends ListFragment implements FriendsListener {
     private List<User> mFriendList;
     private final Context mContext;
     private DatabaseHelper mCacheDB;
@@ -52,7 +52,7 @@ public class FriendsTab extends ListFragment implements FriendsListener{
         FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
         this.setListAdapter(adapter);
 
-        //Initialize the listener
+        // Initialize the listener
         mCacheDB.addFriendsListener(this);
 
         return view;
@@ -144,7 +144,8 @@ public class FriendsTab extends ListFragment implements FriendsListener{
 
         @Override
         protected void onPostExecute(String confirmString) {
-            FriendsTab.this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+            FriendsTab.this
+                .setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
             Toast.makeText(mContext, confirmString, Toast.LENGTH_LONG).show();
         }
 

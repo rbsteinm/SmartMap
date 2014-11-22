@@ -159,32 +159,34 @@ public class ShowEventsActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         final Event event = (UserEvent) this.findViewById(position).getTag();
 
-        String message = EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "start")
-                + " - " + EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "end")
+        String message =
+            EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "start") + " - "
+                + EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "end")
                 + "\nCreated by " + event.getCreatorName() + "\n\n" + event.getDescription();
 
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(event.getName()
-                + " @ "
-                + event.getPositionName()
-                + "\n"
-                + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation().getLatitude(),
-                        event.getLocation().getLongitude()) + " km away");
+            + " @ "
+            + event.getPositionName()
+            + "\n"
+            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
+                .getLatitude(), event.getLocation().getLongitude()) + " km away");
         alertDialog.setMessage(message);
         final Activity activity = this;
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show on the map", new DialogInterface.OnClickListener() {
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show on the map",
+            new DialogInterface.OnClickListener() {
 
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
 
-                Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
 
-                Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                showEventIntent.putExtra("location", event.getLocation());
-                ShowEventsActivity.this.startActivity(showEventIntent);
+                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                    showEventIntent.putExtra("location", event.getLocation());
+                    ShowEventsActivity.this.startActivity(showEventIntent);
 
-            }
-        });
+                }
+            });
 
         alertDialog.show();
 
@@ -256,7 +258,8 @@ public class ShowEventsActivity extends ListActivity {
 
             if (mNearMeChecked) {
                 if (mMyLocation != null) {
-                    double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
+                    double distanceMeEvent =
+                        distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
                             mMyLocation.getLatitude(), mMyLocation.getLongitude());
                     String[] showKMContent = mShowKilometers.getText().toString().split(" ");
                     double distanceMax = Double.parseDouble(showKMContent[0]);
@@ -265,7 +268,8 @@ public class ShowEventsActivity extends ListActivity {
                     }
                 } else {
                     Toast.makeText(this.getApplicationContext(),
-                            "Your current location cannot be retrieved. Please try again", Toast.LENGTH_SHORT).show();
+                        "Your current location cannot be retrieved. Please try again", Toast.LENGTH_SHORT)
+                        .show();
                 }
             }
         }
@@ -275,7 +279,8 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired by
+     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired
+     * by
      * wikipedia
      * 
      * @param lat1

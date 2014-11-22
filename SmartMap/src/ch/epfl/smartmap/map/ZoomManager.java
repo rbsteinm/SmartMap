@@ -2,10 +2,10 @@ package ch.epfl.smartmap.map;
 
 import java.util.List;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
-
-import android.location.Location;
 
 /**
  * This interface offers different ways to zomm on the map

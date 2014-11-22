@@ -30,7 +30,7 @@ public class SortedByDayHistory implements History {
     @Override
     @SuppressWarnings("deprecation")
     public void addEntry(Friend friend, Date date) {
-        if (!mHistoryEntries.isEmpty() && date.getDate() == mDates.get(0).getDate()) {
+        if (!mHistoryEntries.isEmpty() && (date.getDate() == mDates.get(0).getDate())) {
             // Same day as the first list of entries
             mHistoryEntries.get(0).add(friend);
         } else {

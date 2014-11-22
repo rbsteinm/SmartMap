@@ -51,7 +51,7 @@ public class FriendSearchResultView extends SearchResultView {
         // Creates mLastConnectionView
         TextView lastConnectionView = new TextView(context);
         lastConnectionView.setText("last seen " + friend.getLastSeen().getTime().toString() + ".");
-        lastConnectionView.setTextColor(getResources().getColor(R.color.lastSeenConnectionTextColor));
+        lastConnectionView.setTextColor(this.getResources().getColor(R.color.lastSeenConnectionTextColor));
 
         // Create mInfoLayout and add everything
         mInfoLayout = new LinearLayout(context);
@@ -90,7 +90,8 @@ public class FriendSearchResultView extends SearchResultView {
                     Log.d(TAG, "Action DOWN");
                     startX = ev.getAxisValue(MotionEvent.AXIS_X);
                     startY = ev.getAxisValue(MotionEvent.AXIS_Y);
-                    v.setBackgroundColor(getResources().getColor(R.color.searchResultOnSelect));
+                    v.setBackgroundColor(FriendSearchResultView.this.getResources().getColor(
+                        R.color.searchResultOnSelect));
 
                 } else if (ev.getAction() == MotionEvent.ACTION_UP) {
                     Log.d(TAG, "Action UP");
@@ -98,12 +99,14 @@ public class FriendSearchResultView extends SearchResultView {
                     float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
 
                     if (Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)) < CLICK_DISTANCE_THRESHHOLD) {
-                        ((MainActivity) getContext()).performQuery(mFriend);
+                        ((MainActivity) FriendSearchResultView.this.getContext()).performQuery(mFriend);
                     }
-                    v.setBackgroundColor(getResources().getColor(R.color.searchResultBackground));
+                    v.setBackgroundColor(FriendSearchResultView.this.getResources().getColor(
+                        R.color.searchResultBackground));
                 } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
                     Log.d(TAG, "Action CANCEL");
-                    v.setBackgroundColor(getResources().getColor(R.color.searchResultBackground));
+                    v.setBackgroundColor(FriendSearchResultView.this.getResources().getColor(
+                        R.color.searchResultBackground));
                 }
                 return true;
             }
