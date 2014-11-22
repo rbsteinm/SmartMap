@@ -7,7 +7,6 @@ import java.util.List;
 
 import android.content.Context;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.cache.User;
 
 import com.google.android.gms.maps.model.Marker;
 
@@ -73,7 +72,7 @@ public interface MarkerManager<T extends Displayable> {
      * @param marker
      * @return the item that the marker represents
      */
-    User getItemForMarker(Marker marker);
+    T getItemForMarker(Marker marker);
 
     /**
      * @param event

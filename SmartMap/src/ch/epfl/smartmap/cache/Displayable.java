@@ -3,6 +3,7 @@ package ch.epfl.smartmap.cache;
 import android.content.Context;
 import android.graphics.Bitmap;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
@@ -36,4 +37,9 @@ public interface Displayable {
      * @return the options to display the marker
      */
     MarkerOptions getMarkerOptions(Context context);
+
+    /**
+     * @return the position of the item, encapsulated in LatLng object
+     */
+    LatLng getLatLng();
 }
