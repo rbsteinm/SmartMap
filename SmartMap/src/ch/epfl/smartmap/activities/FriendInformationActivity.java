@@ -49,8 +49,8 @@ public class FriendInformationActivity extends Activity {
         mContext = this;
         mFollowCheckBox = (CheckBox) this.findViewById(R.id.activity_friend_information_follow_checkbox);
 
-        //TODO need a method "isFollowing" from cache or DB to know how to set the checkbox
-        //when the Activity is launching
+        // TODO need a method "isFollowing" from cache or DB to know how to set the checkbox
+        // when the Activity is launching
     }
 
     @Override
