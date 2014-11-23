@@ -34,12 +34,12 @@ import com.facebook.widget.LoginButton;
 
 /**
  * <p>
- * The fragment for the "Login with Facebook" button, used by {@linkplain ch.epfl.smartmap.activities.StartActivity} for
- * screen 1.
+ * The fragment for the "Login with Facebook" button, used by
+ * {@linkplain ch.epfl.smartmap.activities.StartActivity} for screen 1.
  * </p>
  * <p>
- * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name, facebook id and
- * facebook token.
+ * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name,
+ * facebook id and facebook token.
  * </p>
  * 
  * @author SpicyCH
@@ -65,7 +65,6 @@ public class FacebookFragment extends Fragment {
 
         /*
          * (non-Javadoc)
-         * 
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
@@ -75,8 +74,8 @@ public class FacebookFragment extends Fragment {
 
             try {
                 networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
-                        Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
-                        mParams.get(FACEBOOK_TOKEN_POST_NAME));
+                    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
+                    mParams.get(FACEBOOK_TOKEN_POST_NAME));
             } catch (NumberFormatException e1) {
                 Log.e(TAG, "Couldn't parse to Long: " + e1.getMessage());
                 return false;
@@ -130,7 +129,8 @@ public class FacebookFragment extends Fragment {
                     params.put(FACEBOOK_NAME_POST_NAME, user.getName());
                     params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
 
-                    // Displays the name, facebookId and facebookToken. When we upload the app on google play, we might
+                    // Displays the name, facebookId and facebookToken. When we upload the app on google play,
+                    // we might
                     // want to remove these logcats messages.
                     Log.i(TAG, "user name: " + params.get(FACEBOOK_NAME_POST_NAME));
                     Log.i(TAG, "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
@@ -138,10 +138,10 @@ public class FacebookFragment extends Fragment {
 
                     if (!FacebookFragment.this.sendDataToServer(params)) {
                         Toast.makeText(
-                                FacebookFragment.this.getActivity(),
-                                FacebookFragment.this
-                                        .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
-                                Toast.LENGTH_LONG).show();
+                            FacebookFragment.this.getActivity(),
+                            FacebookFragment.this
+                                .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
+                            Toast.LENGTH_LONG).show();
                     } else {
                         // Create and start the next activity
                         FacebookFragment.this.startMainActivity();
@@ -184,7 +184,8 @@ public class FacebookFragment extends Fragment {
         view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 
         // Start animation and set login button
-        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(), R.anim.face_anim));
+        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(),
+            R.anim.face_anim));
         authButton.setFragment(this);
 
         // Not logged in Facebook or permission to use Facebook in SmartMap not
@@ -253,7 +254,8 @@ public class FacebookFragment extends Fragment {
      * 
      * @param params
      *            a map with values for the keys name, facebookId and facebookToken
-     * @return <code>true</code> if the internet connection is up and the data is beeing processed by an asynctask
+     * @return <code>true</code> if the internet connection is up and the data is beeing processed by an
+     *         asynctask
      * @author SpicyCH
      */
     private boolean sendDataToServer(Map<String, String> params) {
@@ -265,8 +267,8 @@ public class FacebookFragment extends Fragment {
         assert params.get(FACEBOOK_NAME_POST_NAME) != null : "Facebook name is null";
         assert !params.get(FACEBOOK_NAME_POST_NAME).equals("") : "Facebook name is empty";
 
-        ConnectivityManager connMgr = (ConnectivityManager) this.getActivity().getSystemService(
-                Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr =
+            (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if ((networkInfo != null) && networkInfo.isConnected()) {
             // Send data
@@ -276,8 +278,9 @@ public class FacebookFragment extends Fragment {
         } else {
             // An error occured
             Log.e(TAG, "Could not send user's data to server. Net down?");
-            Toast.makeText(this.getActivity(), this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet),
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getActivity(),
+                this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet), Toast.LENGTH_LONG)
+                .show();
             return false;
         }
 
