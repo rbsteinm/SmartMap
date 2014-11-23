@@ -6,8 +6,7 @@ import java.net.URL;
 
 /**
  * A default implementation of the {@link NetworkProvider} interface that uses
- * the mechanism available in the {@link URL} object to create
- * {@link HttpURLConnection} objects.
+ * the mechanism available in the {@link URL} object to create {@link HttpURLConnection} objects.
  * 
  * @author SpicyCH
  * @author Pamoi (code reviewed : 9.11.2014)

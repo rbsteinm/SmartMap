@@ -136,7 +136,8 @@ public class AddFriendActivity extends ListActivity {
         @Override
         protected void onPostExecute(List<User> refreshedList) {
             super.onPostExecute(refreshedList);
-            AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this, refreshedList));
+            AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
+                refreshedList));
         }
     }
 
@@ -165,7 +166,8 @@ public class AddFriendActivity extends ListActivity {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG).show();
+            Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG)
+                .show();
         }
     }
 }

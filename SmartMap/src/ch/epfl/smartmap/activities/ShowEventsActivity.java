@@ -160,23 +160,24 @@ public class ShowEventsActivity extends ListActivity {
             + " @ "
             + event.getPositionName()
             + "\n"
-            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation().getLatitude(), event
-                .getLocation().getLongitude()) + " km away");
+            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
+                .getLatitude(), event.getLocation().getLongitude()) + " km away");
         alertDialog.setMessage(message);
         final Activity activity = this;
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show on the map", new DialogInterface.OnClickListener() {
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show on the map",
+            new DialogInterface.OnClickListener() {
 
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
 
-                Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
 
-                Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                showEventIntent.putExtra("location", event.getLocation());
-                ShowEventsActivity.this.startActivity(showEventIntent);
+                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                    showEventIntent.putExtra("location", event.getLocation());
+                    ShowEventsActivity.this.startActivity(showEventIntent);
 
-            }
-        });
+                }
+            });
 
         alertDialog.show();
 
@@ -258,7 +259,8 @@ public class ShowEventsActivity extends ListActivity {
                     }
                 } else {
                     Toast.makeText(this.getApplicationContext(),
-                        "Your current location cannot be retrieved. Please try again", Toast.LENGTH_SHORT).show();
+                        "Your current location cannot be retrieved. Please try again", Toast.LENGTH_SHORT)
+                        .show();
                 }
             }
         }

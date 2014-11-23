@@ -1,0 +1,31 @@
+events:
+  -
+    id: 1
+    creator_id: 3
+    starting_date: "2014-11-18 10:30:00"
+    ending_date: "2014-11-18 12:00:00"
+    longitude: 6.56186974
+    latitude: 46.51895762
+    position_name: "UNIL"
+    name: "Seminar on usefulness of philosophy"
+    description: "Of course philosophy is useless !"
+  -
+    id: 2
+    creator_id: 1
+    starting_date: "2014-12-24 20:30:00"
+    ending_date: "2014-12-25 00:00:00"
+    longitude: 45.46734
+    latitude: 76.637524
+    position_name: "Somewhere"
+    name: "Christmas night"
+    description: "Gifts for everyone !"
+  -
+    id: 3
+    creator_id: 1
+    starting_date: "2014-12-30 20:30:00"
+    ending_date: "2014-12-30 20:00:00"
+    longitude: 45.46734
+    latitude: 76.637524
+    position_name: "Somewhere"
+    name: "Christmas night"
+    description: "Gifts for everyone !"

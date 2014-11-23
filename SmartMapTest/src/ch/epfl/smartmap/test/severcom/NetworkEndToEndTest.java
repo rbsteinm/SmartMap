@@ -2,18 +2,17 @@ package ch.epfl.smartmap.test.severcom;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-// import org.junit.FixMethodOrder;
+import junit.framework.TestCase;
+
 import org.junit.Test;
-// import org.junit.runners.MethodSorters;
 
 import android.location.Location;
-
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
-import junit.framework.TestCase;
+// import org.junit.FixMethodOrder;
+// import org.junit.runners.MethodSorters;
 
 /**
  * Tests whether we can interact with the real quiz server.
@@ -143,15 +142,13 @@ public class NetworkEndToEndTest extends TestCase {
     @Test
     public void testL_ListFriendPos() throws SmartMapClientException {
         NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        Map<Long, Location> positions = networkClient.listFriendsPos();
+        List<User> users = networkClient.listFriendsPos();
 
-        assertTrue("Null map", positions != null);
+        assertTrue("Null map", users != null);
 
-        for (long id : positions.keySet()) {
-            assertTrue("Unexpected id", id >= 0);
-        }
-
-        for (Location location : positions.values()) {
+        for (User user : users) {
+            Location location = user.getLocation();
+            assertTrue("Invalid id", user.getID() > 0);
             assertTrue("Unexpected latitude", -90 <= location.getLatitude() && location.getLatitude() <= 90);
             assertTrue("Unexpected longitude", -180 <= location.getLatitude() && location.getLatitude() <= 180);
         }

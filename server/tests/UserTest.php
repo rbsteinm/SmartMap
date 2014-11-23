@@ -74,7 +74,7 @@ class UserTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidLongName()
     {
-        $user = new User(1, 34, 'Toto Mirabeau de Kartein von Siebenlangental nach schmilblick über nordsee am stand', 
+        $user = new User(1, 34, 'Toto Mirabeau de Kartein von Siebenlangental nach schmilblick über nordsee am strand',
         		          'VISIBLE', 75.43, 22.88);
     }
     
@@ -149,41 +149,5 @@ class UserTest extends PHPUnit_Framework_TestCase
     public function testInvalidStringDate()
     {
         $user = new User(1, 1, 'Toto', 'VISIBLE', 75.43, 45.88, 'Toto lol');
-    }
-    
-    public function testGetIdFromRequest()
-    {
-    	$request = new Request();
-    	$session =  new Session(new MockArraySessionStorage());
-    	$session->set('userId', 14);
-    	$request->setSession($session);
-    	
-    	$id = User::getIdFromRequest($request);
-    	
-    	$this->assertEquals(14, $id);
-    }
-    
-    /**
-     * @expectedException SmartMap\Control\InvalidRequestException
-     * @expectedExceptionMessage Trying to access session but the session is not started.
-     */
-    public function testSessionNotStartedException()
-    {
-    	$request = new Request();
-    	
-    	User::getIdFromRequest($request);
-    }
-    
-    /**
-     * @expectedException SmartMap\Control\InvalidRequestException
-     * @expectedExceptionMessage The user is not authenticated.
-     */
-    public function testUserNotAuthenticatedException()
-    {
-    	$request = new Request();
-    	$session = new Session(new MockArraySessionStorage());
-    	$request->setSession($session);
-    	
-    	User::getIdFromRequest($request);
     }
 }

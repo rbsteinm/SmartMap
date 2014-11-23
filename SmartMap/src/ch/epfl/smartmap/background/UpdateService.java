@@ -10,6 +10,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
@@ -111,6 +112,7 @@ public class UpdateService extends Service {
             if (!result.isEmpty()) {
                 for (User user : result) {
                     mHelper.addUser(user);
+                    mHelper.deletePendingFriend(user.getID());
                     UpdateService.this.showAcceptedNotif(user);
                 }
             }
@@ -181,14 +183,15 @@ public class UpdateService extends Service {
             }
             // Sets the location name
             try {
-                String locName =
-                    mGeocoder.getFromLocation(locFromGps.getLatitude(), locFromGps.getLongitude(), 1).get(0)
-                        .getLocality();
-                if (locName == null) {
-                    mManager.setLocationName(SettingsManager.DEFAULT_LOC_NAME);
-                } else {
-                    mManager.setLocationName(locName);
+                List<Address> addresses =
+                    mGeocoder.getFromLocation(locFromGps.getLatitude(), locFromGps.getLongitude(), 1);
+
+                String locName = SettingsManager.DEFAULT_LOC_NAME;
+                if (!addresses.isEmpty()) {
+                    locName = addresses.get(0).getLocality();
                 }
+                mManager.setLocationName(locName);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -207,7 +210,8 @@ public class UpdateService extends Service {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             // stop sending position if provider isn't available
-            if (status == LocationProvider.OUT_OF_SERVICE || status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
+            if (status == LocationProvider.OUT_OF_SERVICE
+                || status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
                 mOwnPosEnabled = false;
             } else if (status == LocationProvider.AVAILABLE) {
                 mOwnPosEnabled = true;
@@ -222,6 +226,7 @@ public class UpdateService extends Service {
     private static final int INVITE_UPDATE_DELAY = 30000;
     private static final float MIN_DISTANCE = 5; // minimum distance to update
                                                  // position
+    private static final int RESTART_DELAY = 2000;
     private final Handler mHandler = new Handler();
     private Intent mFriendsPosIntent;
     private LocationManager mLocManager;
@@ -281,8 +286,8 @@ public class UpdateService extends Service {
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY, MIN_DISTANCE,
-            new MyLocationListener());
+        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
+            MIN_DISTANCE, new MyLocationListener());
         new AsyncFriendsInit().execute();
     }
 
@@ -294,6 +299,7 @@ public class UpdateService extends Service {
         mHandler.postDelayed(showFriendNotif, HANDLER_DELAY);
         mHandler.removeCallbacks(getReplies);
         mHandler.postDelayed(getReplies, HANDLER_DELAY);
+        new AsyncLogin().execute();
         Log.d("UpdateService", "Service started");
 
         return START_STICKY;
@@ -303,14 +309,14 @@ public class UpdateService extends Service {
     // (Android issue #63618)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        new AsyncLogin().execute();
         Intent restartService = new Intent(getApplicationContext(), this.getClass());
         restartService.setPackage(getPackageName());
-        PendingIntent restartServicePI =
+        PendingIntent restartServicePending =
             PendingIntent.getService(getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        alarmService
-            .set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + HANDLER_DELAY, restartServicePI);
+        AlarmManager alarmService =
+            (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
+            restartServicePending);
 
     }
 

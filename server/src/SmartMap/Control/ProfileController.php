@@ -18,9 +18,9 @@ class ProfileController
     public function getProfilePicture(Request $request, Application $app)
     {
         // We check that we are authenticated.
-        User::getIdFromRequest($request);
+        RequestUtils::getIdFromRequest($request);
         
-        $id = $this->getPostParam($request, 'user_id');
+        $id =RequestUtils::getPostParam($request, 'user_id');
         
         $imagePath = self::$PICTURES_PATH . $id . '.jpg';
         if (!file_exists($imagePath))
@@ -34,17 +34,5 @@ class ProfileController
         }
         
         return $app->sendFile($imagePath);
-    }
-    
-    private function getPostParam(Request $request, $param)
-    {
-        $value = $request->request->get($param);
-    
-        if ($value === null)
-        {
-            throw new InvalidRequestException('Post parameter ' . $param . ' is not set !');
-        }
-    
-        return $value;
     }
 }

@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -27,10 +27,11 @@ public class Friend implements User, Searchable, Displayable {
     private String mPhoneNumber;
     private String mEmail;
     private String mPositionName;
-    private final GregorianCalendar mLastSeen;
+    private GregorianCalendar mLastSeen;
     private final Location mLocation;
     private boolean mVisible;
 
+    public static final String NO_NAME = "";
     public static final String NO_NUMBER = "No phone number specified";
     public static final String NO_EMAIL = "No email address specified";
     public static final String POSITION_UNKNOWN = "Unknown position";
@@ -59,7 +60,7 @@ public class Friend implements User, Searchable, Displayable {
         if (userID < 0) {
             throw new IllegalArgumentException("Invalid user ID!");
         }
-        if (userName.isEmpty() || userName == null) {
+        if (userName == null) {
             throw new IllegalArgumentException("Invalid user name!");
         }
         mId = userID;
@@ -68,6 +69,7 @@ public class Friend implements User, Searchable, Displayable {
         mEmail = NO_EMAIL;
         mPositionName = POSITION_UNKNOWN;
         mLastSeen = new GregorianCalendar();
+        mLastSeen.setTimeInMillis(0);
         mLocation = new Location(PROVIDER_NAME);
         mVisible = true;
     }
@@ -127,7 +129,9 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public GregorianCalendar getLastSeen() {
-        return mLastSeen;
+        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
+        g.setTimeInMillis(mLastSeen.getTimeInMillis());
+        return g;
     }
 
     @Override
@@ -215,8 +219,9 @@ public class Friend implements User, Searchable, Displayable {
 
     @Override
     public void setLastSeen(GregorianCalendar date) {
-        mLastSeen.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE),
-            date.get(Calendar.HOUR), date.get(Calendar.MINUTE));
+        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
+        g.setTimeInMillis(date.getTimeInMillis());
+        mLastSeen = g;
     }
 
     @Override

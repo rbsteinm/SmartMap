@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.servercom;
 
 import java.util.List;
-import java.util.Map;
 
 import android.location.Location;
 import ch.epfl.smartmap.cache.User;
@@ -34,7 +33,7 @@ public interface SmartMapClient {
      * @return a map that maps each friend id to a position
      * @throws SmartMapClientException
      */
-    Map<Long, Location> listFriendsPos() throws SmartMapClientException;
+    List<User> listFriendsPos() throws SmartMapClientException;
 
     /**
      * Asks the server to follow the friend with id id
