@@ -66,10 +66,9 @@ import com.google.android.gms.maps.model.Marker;
 
 public class MainActivity extends FragmentActivity implements FriendsLocationListener {
 
+    @SuppressWarnings("unused")
     private static final String TAG = "MAIN_ACTIVITY";
-    private static final int LOCATION_UPDATE_TIMEOUT = 10000;
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-    private static final int LOCATION_UPDATE_DISTANCE = 10;
     private static final String CITY_NAME = "CITY_NAME";
 
     private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
@@ -528,8 +527,6 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
 
             if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
                 Displayable friendClicked = mFriendMarkerManager.getItemForMarker(arg0);
-                // TODO See with Nicolas : PB with the zoom : getLatLng returns
-                // 0,0
                 mMapZoomer.zoomOnLocation(arg0.getPosition());
                 MainActivity.this.setItemMenu(friendClicked);
                 return true;
