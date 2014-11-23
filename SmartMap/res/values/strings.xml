@@ -80,6 +80,9 @@
     <string name="ShowEventsCheckBoxNearMe">Near me</string>
     <string name="ShowEventsCheckBoxStatus">Ongoing</string>
     <string name="showEventsMenuNewEvent">Create a new event</string>
+    <string name="show_event_on_the_map_button">Show on the map</string>
+    <string name="show_event_on_the_map_loading">Opening event on the map...</string>
+    <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
 
     <!-- AddEventActivity -->
     <string name="title_activity_add_event">Create a new event</string>
@@ -94,14 +97,23 @@
     <string name="addEventPlaceName">Place (town, canton, etc...)</string>
     <string name="addEventDescription">Description (optional)</string>
     <string name="addEventButtonPickLocation">Set location</string>
-    
-    <!-- EventsListItemadapter -->
-    <string name="events_list_item_today">Today</string>
-    
-    <!--  InformationAvtivity -->
+    <string name="add_event_toast_event_cannot_end_before_starting">The event cannot end before it begins!</string>
+    <string name="add_event_toast_event_end_cannot_be_in_past">The event\'s end cannot be in the past!</string>
+    <string name="add_event_toast_not_all_fields_set">Cannot create event: please specify all fields!</string>
+    <string name="add_event_toast_event_created">Event created!</string>
+    <string name="add_event_toast_couldnt_retrieve_location">Sorry, couldn\'t get the location of your event. Please try again!</string>
+    <string name="add_event_toast_couldnt_retrieve_location_name">Sorry, couldn\'t retrieve the name of your event\'s place. Please specify it manually.</string>
+    <string name="add_event_toast_indication_long_click_map_to_create_event">Long click the map at the location of your event</string>
+
+    <!-- FacebookFragment -->
+    <string name="fb_fragment_toast_cannot_connect_to_smartmap_server">Failed to log in to the SmartMap server</string>
+    <string name="fb_fragment_toast_cannot_connect_to_internet">Your internet connection seems down. Please try again!</string>
+
+    <!-- InformationAvtivity -->
     <string name="title_activity_information">InformationActivity</string>
 
     <!-- FriendInformationActivity -->
     <string name="removeFriendDialogMessage">Remove from friends</string>
     <string name="follow_checkbox">Follow</string>
+
 </resources>
