@@ -1,4 +1,6 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu 
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <item
         android:id="@+id/action_search"
@@ -19,13 +21,11 @@
         android:id="@+id/action_hide_search"
         android:icon="@drawable/ic_down"
         android:showAsAction="always"
-        android:onClick="setMainMenu"
         android:title="Hide Search"
         android:visible="false"/>
     <item
         android:id="@+id/action_item_more"
-        android:icon="@drawable/ic_drawer"
-        android:onClick="openInformationActivity"
+        android:icon="@android:drawable/ic_menu_agenda"
         android:showAsAction="always"
         android:title="Open Infos"
         android:visible="false"/>
