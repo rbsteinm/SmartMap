@@ -412,12 +412,9 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
              ->method('removeInvitation')
              ->with($this->equalTo(1), $this->equalTo(14));
         
-        $this->mockRepo->expects($this->exactly(2))
+        $this->mockRepo->expects($this->once())
              ->method('addFriendshipLink')
-             ->withConsecutive(
-                array($this->equalTo(14), $this->equalTo(1)),
-                array($this->equalTo(1), $this->equalTo(14))
-             );
+             ->with($this->equalTo(14), $this->equalTo(1));
         
         $this->mockRepo
              ->method('getUser')
@@ -540,12 +537,13 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     
     public function testValidRemoveFriend()
     {
-        $this->mockRepo->expects($this->exactly(2))
+        $this->mockRepo
+            ->method('removeFriendshipLink')
+            ->willReturn(true);
+
+        $this->mockRepo->expects($this->once())
              ->method('removeFriendshipLink')
-             ->withConsecutive(
-                 array($this->equalTo(14), $this->equalTo(1)),
-                 array($this->equalTo(1), $this->equalTo(14))
-                 );
+             ->with($this->equalTo(14), $this->equalTo(1));
 
         $this->mockRepo->expects($this->once())
              ->method('addRemovedFriend')
@@ -564,6 +562,31 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $validResponse = array('status' => 'Ok', 'message' => 'Removed friend !');
         
         $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ServerFeedbackException
+     * @expectedExceptionMessage You are not friend with this user.
+     */
+    public function testRemoveNotFriendUser()
+    {
+        $this->mockRepo
+            ->method('removeFriendshipLink')
+            ->willReturn(false);
+
+        $this->mockRepo->expects($this->once())
+            ->method('removeFriendshipLink')
+            ->with($this->equalTo(14), $this->equalTo(1));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 1));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new DataController($this->mockRepo);
+
+        $controller->removeFriend($request);
     }
 
     public function testValidAckAcceptedFriend()

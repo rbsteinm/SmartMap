@@ -307,13 +307,13 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	
 	public function testAddFriendshipLink()
 	{
-	    $this->assertEquals(4, $this->getConnection()->getRowCount('friendships'), "Pre-Condition");
+	    $this->assertEquals(6, $this->getConnection()->getRowCount('friendships'), "Pre-Condition");
 	    
 	    $repo = new UserRepository(self::$doctrine);
 	    
 	    $repo->addFriendshipLink(1, 4);
 	    
-	    $this->assertEquals(5, $this->getConnection()->getRowCount('friendships'), "Post-Condition");
+	    $this->assertEquals(8, $this->getConnection()->getRowCount('friendships'), "Post-Condition");
 	}
 	
 	/**
@@ -326,28 +326,70 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    
 	    $repo->addFriendshipLink(1, 3);
 	}
+
+    /**
+     * @expectedException SmartMap\DBInterface\DatabaseException
+     * @expectedExceptionMessage Invalid state of database detected: there is an unidirectional friendship link between
+     * users with ids 2 and 4.
+     */
+    public function testInvalidStateAddFriendshipLink()
+    {
+        $repo = new UserRepository(self::$doctrine);
+
+        $repo->addFriendshipLink(2, 4);
+    }
 	
 	public function testRemoveFriendshipLink()
 	{
-	    $this->assertEquals(4, $this->getConnection()->getRowCount('friendships'), "Pre-Condition");
+	    $this->assertEquals(6, $this->getConnection()->getRowCount('friendships'), "Pre-Condition");
 	     
 	    $repo = new UserRepository(self::$doctrine);
 	     
-	    $repo->removeFriendshipLink(1, 3);
+	    $count = $repo->removeFriendshipLink(1, 3);
+
+        $this->assertEquals(1, $count);
 	     
-	    $this->assertEquals(3, $this->getConnection()->getRowCount('friendships'), "Post-Condition");
+	    $this->assertEquals(4, $this->getConnection()->getRowCount('friendships'), "Post-Condition");
 	}
 	
 	public function testRemoveUnexistingFriendshipLink()
 	{
-	    $this->assertEquals(4, $this->getConnection()->getRowCount('friendships'), "Pre-Condition");
+	    $this->assertEquals(6, $this->getConnection()->getRowCount('friendships'), "Pre-Condition");
 	    
 	    $repo = new UserRepository(self::$doctrine);
 	    
-	    $repo->removeFriendshipLink(1, 4);
+	    $count = $repo->removeFriendshipLink(1, 4);
+
+        $this->assertEquals(0, $count);
 	    
-	    $this->assertEquals(4, $this->getConnection()->getRowCount('friendships'), "Post-Condition");
+	    $this->assertEquals(6, $this->getConnection()->getRowCount('friendships'), "Post-Condition");
 	}
+
+    /**
+     * @expectedException SmartMap\DBInterface\DatabaseException
+     * @expectedExceptionMessage Invalid state of database detected: there was an unidirectional friendship link
+     * (now removed).
+     */
+    public function testInvalidStateRemoveFriendshipLink()
+    {
+        $this->assertEquals(6, $this->getConnection()->getRowCount('friendships'), "Pre-Condition");
+
+        $repo = new UserRepository(self::$doctrine);
+
+        $repo->removeFriendshipLink(2, 4);
+    }
+
+    /**
+     * @expectedException SmartMap\DBInterface\DatabaseException
+     * @expectedExceptionMessage Invalid state of database detected: a friendship link was declared more than once
+     * (now removed).
+     */
+    public function testDoubleFriendshipRemoveFriendshipLink()
+    {
+        $repo = new UserRepository(self::$doctrine);
+
+        $repo->removeFriendshipLink(1, 2);
+    }
 	
 	public function testSetFriendshipStatus()
 	{

@@ -213,7 +213,6 @@ class DataController
                 throw new ServerFeedbackException('There is already a pending invitation ' .
                     'or you are already friends.');
             }
-            
         }
         catch (DatabaseException $e)
         {
@@ -314,7 +313,6 @@ class DataController
             $this->mRepo->removeInvitation($friendId, $userId);
         
             $this->mRepo->addFriendshipLink($userId, $friendId);
-            $this->mRepo->addFriendshipLink($friendId, $userId);
             
             $this->mRepo->addAcceptedInvitation($userId, $friendId);
         
@@ -343,7 +341,7 @@ class DataController
      * 
      * @param Request $request
      * @throws ControlLogicException
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function declineInvitation(Request $request)
     {
@@ -392,13 +390,14 @@ class DataController
         
         return new JsonResponse($response);
     }
-    
+
     /**
      * Removes a friend.
-     * 
+     *
      * @param Request $request
+     * @return JsonResponse
      * @throws ControlLogicException
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @throws ServerFeedbackException
      */
     public function removeFriend(Request $request)
     {
@@ -408,16 +407,23 @@ class DataController
         
         try
         {
-            $this->mRepo->removeFriendshipLink($userId, $friendId);
-            $this->mRepo->removeFriendshipLink($friendId, $userId);
+            $removal = $this->mRepo->removeFriendshipLink($userId, $friendId);
 
-            $this->mRepo->addRemovedFriend($userId, $friendId);
+            // We add a friend removal notification to update client's cache only if there was a friend to remove.
+            if ($removal)
+            {
+                $this->mRepo->addRemovedFriend($userId, $friendId);
+            }
+            else
+            {
+                throw new ServerFeedbackException('You are not friend with this user.');
+            }
         }
         catch (DatabaseException $e)
         {
             throw new ControlLogicException('Error in removeFriend.', 2, $e);
         }
-        
+
         $response = array('status' => 'Ok', 'message' => 'Removed friend !');
         
         return new JsonResponse($response);

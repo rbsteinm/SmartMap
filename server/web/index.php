@@ -76,7 +76,7 @@ $app['event.controller'] = $app->share(function() use($app) {
 // Error management
 $app->error(function (SmartMap\Control\ControlException $e, $code) use ($app) {
     $app['logging']->addDebug('Deprecated ControlException thrown: ' . $e->__toString());
-    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occured.', 500,
+    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occurred.', 500,
         array('X-Status-Code' => 200)));
 });
 
