@@ -94,6 +94,8 @@
     <string name="addEventPlaceName">Place (town, canton, etc...)</string>
     <string name="addEventDescription">Description (optional)</string>
     <string name="addEventButtonPickLocation">Set location</string>
+    
+    <!--  InformationAvtivity -->
     <string name="title_activity_information">InformationActivity</string>
 
 </resources>

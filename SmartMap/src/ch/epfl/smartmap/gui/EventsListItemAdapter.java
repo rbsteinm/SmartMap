@@ -5,7 +5,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.view.LayoutInflater;
@@ -18,7 +17,14 @@ import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.cache.Event;
 
 /**
- * Adapter DP used to display the events in a list view
+ * <p>
+ * Adapter used to display the events in a list view.
+ * </p>
+ * <p>
+ * To make the scrolling smooth, we use the view adapter design pattern. See <a
+ * href="http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder">developer.android on
+ * ViewHolder</a>
+ * </p>
  * 
  * @author SpicyCH
  */
@@ -37,10 +43,13 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
     private final Location mMyLocation;
 
     /**
-     * An adapter for event's list
+     * 
+     * Constructor
      * 
      * @param context
      * @param itemsArrayList
+     * @param myLocation
+     *            the user's location
      */
     public EventsListItemAdapter(Context context, List<Event> itemsArrayList, Location myLocation) {
         super(context, R.layout.gui_event_list_item, itemsArrayList);
@@ -51,82 +60,90 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         mMyLocation = myLocation;
     }
 
-    @SuppressLint("ViewHolder")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         // Create inflater, get Friend View from the xml via Adapter
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.gui_event_list_item, parent, false);
-        // TODO use Holder pattern for smoother scrolling
 
-        // Get EventItem fields
-        TextView name = (TextView) convertView.findViewById(R.id.eventName);
-        TextView startDateText = (TextView) convertView.findViewById(R.id.eventStartDate);
-        TextView endDateText = (TextView) convertView.findViewById(R.id.eventEndDate);
+        EventViewHolder viewHolder;
+        Event event = this.getItem(position);
+
+        if (convertView == null) {
+
+            convertView = inflater.inflate(R.layout.gui_event_list_item, parent, false);
+
+            viewHolder = new EventViewHolder();
+
+            // Set the ViewHolder with the gui_event_list_item fields
+            viewHolder.setNameTextView((TextView) convertView.findViewById(R.id.eventName));
+            viewHolder.setStarTextView((TextView) convertView.findViewById(R.id.eventStartDate));
+            viewHolder.setEndTextView((TextView) convertView.findViewById(R.id.eventEndDate));
+
+            // Needed by the code that makes each item clickable
+            viewHolder.setEvent(event);
+
+            // Store the holder with the view
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (EventViewHolder) convertView.getTag();
+        }
 
         // Set fields with event's attributes
 
-        GregorianCalendar start = mItemsArrayList.get(position).getStartDate();
-        GregorianCalendar end = mItemsArrayList.get(position).getEndDate();
+        GregorianCalendar start = event.getStartDate();
+        GregorianCalendar end = event.getEndDate();
 
-        String startDateTextContent = "";
-        String endDateTextContent = "";
+        viewHolder.getStartTextView().setText(getTextFromDate(start, end, "start"));
+        viewHolder.getEndTextView().setText(getTextFromDate(start, end, "end"));
 
-        startDateTextContent = setTextFromDate(start, end, "start");
-        endDateTextContent = setTextFromDate(start, end, "end");
-
-        startDateText.setText(startDateTextContent);
-        endDateText.setText(endDateTextContent);
-
-        double distanceMeEvent =
-            ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
-                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position)
-                    .getLocation().getLongitude());
+        double distanceMeEvent = ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
+                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position).getLocation()
+                        .getLongitude());
         distanceMeEvent = Math.floor(distanceMeEvent * HUNDRED_PERCENT) / HUNDRED_PERCENT;
 
-        name.setText(mItemsArrayList.get(position).getName() + " @ "
-            + mItemsArrayList.get(position).getPositionName());
+        viewHolder.getNameTextView().setText(event.getName() + " @ " + event.getPositionName());
 
-        // Set the behavior when a list element is clicked
         convertView.setId(position);
-        convertView.setTag(mItemsArrayList.get(position));
-        // TODO
 
         return convertView;
     }
 
     /**
+     * <p>
+     * Gets a String to describe an event's date and time in a cool and human readable format.
+     * </p>
+     * <p>
+     * date1 must be before date2
+     * </p>
+     * 
      * @param date1
-     *            the date (start or end of the event)
+     * @param date2
      * @param s
-     *            "start" or "end"
-     * @return the time of the event, in a cool format
+     * @return a String of the form "Today at 04:01"
+     * 
      * @author SpicyCH
      */
-    public static String setTextFromDate(GregorianCalendar date1, GregorianCalendar date2, String s) {
+    public static String getTextFromDate(GregorianCalendar date1, GregorianCalendar date2, String s) {
         if (date1.after(date2)) {
-            // TODO assert
             throw new IllegalArgumentException("date1 must be before date2");
         }
 
         GregorianCalendar now = new GregorianCalendar();
 
-        GregorianCalendar midnight =
-            new GregorianCalendar(now.get(GregorianCalendar.YEAR), now.get(GregorianCalendar.MONTH),
-                now.get(GregorianCalendar.DAY_OF_MONTH), MIDNIGHT_HOUR, MIDNIGHT_MINUTES);
+        GregorianCalendar midnight = new GregorianCalendar(now.get(GregorianCalendar.YEAR),
+                now.get(GregorianCalendar.MONTH), now.get(GregorianCalendar.DAY_OF_MONTH), MIDNIGHT_HOUR,
+                MIDNIGHT_MINUTES);
 
-        GregorianCalendar tomorrowMidnight =
-            new GregorianCalendar(now.get(GregorianCalendar.YEAR), now.get(GregorianCalendar.MONTH),
-                now.get(GregorianCalendar.DAY_OF_MONTH), MIDNIGHT_HOUR, MIDNIGHT_MINUTES);
+        GregorianCalendar tomorrowMidnight = new GregorianCalendar(now.get(GregorianCalendar.YEAR),
+                now.get(GregorianCalendar.MONTH), now.get(GregorianCalendar.DAY_OF_MONTH), MIDNIGHT_HOUR,
+                MIDNIGHT_MINUTES);
         tomorrowMidnight.add(GregorianCalendar.DAY_OF_YEAR, 1);
 
-        String startHourOfDayString =
-            TimePickerFragment.formatForClock(date1.get(GregorianCalendar.HOUR_OF_DAY));
+        String startHourOfDayString = TimePickerFragment.formatForClock(date1.get(GregorianCalendar.HOUR_OF_DAY));
         String startMinuteString = TimePickerFragment.formatForClock(date1.get(GregorianCalendar.MINUTE));
 
-        String endHourOfDayString =
-            TimePickerFragment.formatForClock(date2.get(GregorianCalendar.HOUR_OF_DAY));
+        String endHourOfDayString = TimePickerFragment.formatForClock(date2.get(GregorianCalendar.HOUR_OF_DAY));
         String endMinuteString = TimePickerFragment.formatForClock(date2.get(GregorianCalendar.MINUTE));
         String dateTextContent = "";
 
@@ -135,18 +152,16 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
             if (s.equals("start")) {
                 dateTextContent = "Today";
             } else {
-                dateTextContent =
-                    "from " + startHourOfDayString + ":" + startMinuteString + " to " + endHourOfDayString
-                        + ":" + endMinuteString;
+                dateTextContent = "from " + startHourOfDayString + ":" + startMinuteString + " to "
+                        + endHourOfDayString + ":" + endMinuteString;
             }
         } else if (date1.before(tomorrowMidnight) && date2.before(tomorrowMidnight)) {
             // ends and starts the same day
             if (s.equals("start")) {
                 dateTextContent = "Tomorrow";
             } else {
-                dateTextContent =
-                    "from " + startHourOfDayString + ":" + startMinuteString + " to " + endHourOfDayString
-                        + ":" + endMinuteString;
+                dateTextContent = "from " + startHourOfDayString + ":" + startMinuteString + " to "
+                        + endHourOfDayString + ":" + endMinuteString;
             }
         } else {
             // Upcoming event
@@ -160,17 +175,13 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
                 dateTextContent = "Ends tomorrow at " + startHourOfDayString + ":" + startMinuteString;
             } else {
                 if (s.equals("start")) {
-                    dateTextContent =
-                        "Starts: " + date1.get(GregorianCalendar.DAY_OF_MONTH) + "/"
-                            + (date1.get(GregorianCalendar.MONTH) + 1) + "/"
-                            + date1.get(GregorianCalendar.YEAR) + " at " + startHourOfDayString + ":"
-                            + startMinuteString;
+                    dateTextContent = "Starts: " + date1.get(GregorianCalendar.DAY_OF_MONTH) + "/"
+                            + (date1.get(GregorianCalendar.MONTH) + 1) + "/" + date1.get(GregorianCalendar.YEAR)
+                            + " at " + startHourOfDayString + ":" + startMinuteString;
                 } else {
-                    dateTextContent =
-                        "Ends: " + date2.get(GregorianCalendar.DAY_OF_MONTH) + "/"
-                            + (date2.get(GregorianCalendar.MONTH) + 1) + "/"
-                            + date2.get(GregorianCalendar.YEAR) + " at " + endHourOfDayString + ":"
-                            + endMinuteString;
+                    dateTextContent = "Ends: " + date2.get(GregorianCalendar.DAY_OF_MONTH) + "/"
+                            + (date2.get(GregorianCalendar.MONTH) + 1) + "/" + date2.get(GregorianCalendar.YEAR)
+                            + " at " + endHourOfDayString + ":" + endMinuteString;
                 }
 
             }

@@ -25,7 +25,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.SettingsManager;
-import ch.epfl.smartmap.cache.UserEvent;
+import ch.epfl.smartmap.gui.EventViewHolder;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 
 /**
@@ -55,7 +55,7 @@ public class ShowEventsActivity extends ListActivity {
 
     private List<Event> mEventsList;
     private List<Event> mCurrentList;
-    private static String mMyName = "Robich";
+    private static String mMyName;
     private Location mMyLocation;
 
     @Override
@@ -67,6 +67,10 @@ public class ShowEventsActivity extends ListActivity {
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
 
         this.initializeGUI();
+
+        // Create custom Adapter and pass it to the Activity
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
+        this.setListAdapter(adapter);
     }
 
     private void initializeGUI() {
@@ -75,6 +79,8 @@ public class ShowEventsActivity extends ListActivity {
         SettingsManager.initialize(mContext);
         DatabaseHelper.initialize(mContext);
 
+        mMyName = SettingsManager.getInstance().getUserName();
+
         mMyLocation = SettingsManager.getInstance().getLocation();
 
         mMyEventsChecked = false;
@@ -82,6 +88,7 @@ public class ShowEventsActivity extends ListActivity {
         mNearMeChecked = false;
 
         mShowKilometers = (TextView) this.findViewById(R.id.showEventKilometers);
+
         // By default, the seek bar is disabled. This is done programmatically
         // as android:enabled="false" doesn't work
         // out in xml
@@ -112,9 +119,6 @@ public class ShowEventsActivity extends ListActivity {
 
         mEventsList = mDbHelper.getAllEvents();
 
-        // Create custom Adapter and pass it to the Activity
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
-        this.setListAdapter(adapter);
     }
 
     @Override
@@ -156,40 +160,39 @@ public class ShowEventsActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        final Event event = (UserEvent) this.findViewById(position).getTag();
+        super.onListItemClick(l, v, position, id);
 
-        String message =
-            EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "start") + " - "
-                + EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "end")
+        final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
+        final Event event = eventViewHolder.getEvent();
+
+        String message = EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "start")
+                + " - " + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
                 + "\nCreated by " + event.getCreatorName() + "\n\n" + event.getDescription();
 
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(event.getName()
-            + " @ "
-            + event.getPositionName()
-            + "\n"
-            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
-                .getLatitude(), event.getLocation().getLongitude()) + " km away");
+                + " @ "
+                + event.getPositionName()
+                + "\n"
+                + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation().getLatitude(),
+                        event.getLocation().getLongitude()) + " km away");
         alertDialog.setMessage(message);
         final Activity activity = this;
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show on the map",
-            new DialogInterface.OnClickListener() {
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show on the map", new DialogInterface.OnClickListener() {
 
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
 
-                    Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
 
-                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                    showEventIntent.putExtra("location", event.getLocation());
-                    ShowEventsActivity.this.startActivity(showEventIntent);
+                Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                showEventIntent.putExtra("location", event.getLocation());
+                ShowEventsActivity.this.startActivity(showEventIntent);
 
-                }
-            });
+            }
+        });
 
         alertDialog.show();
-
-        super.onListItemClick(l, v, position, id);
     }
 
     public void onCheckboxClicked(View v) {
@@ -257,8 +260,7 @@ public class ShowEventsActivity extends ListActivity {
 
             if (mNearMeChecked) {
                 if (mMyLocation != null) {
-                    double distanceMeEvent =
-                        distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
+                    double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
                             mMyLocation.getLatitude(), mMyLocation.getLongitude());
                     String[] showKMContent = mShowKilometers.getText().toString().split(" ");
                     double distanceMax = Double.parseDouble(showKMContent[0]);
@@ -267,8 +269,7 @@ public class ShowEventsActivity extends ListActivity {
                     }
                 } else {
                     Toast.makeText(this.getApplicationContext(),
-                        "Your current location cannot be retrieved. Please try again", Toast.LENGTH_SHORT)
-                        .show();
+                            "Your current location cannot be retrieved. Please try again", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -278,20 +279,18 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * <<<<<<< HEAD
-     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired
-     * by
-     * =======
-     * Computes the distance between two GPS locations (takes into consideration
-     * the earth radius), inspired by
-     * >>>>>>> gui-info
-     * wikipedia
+     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired by
+     * wikipedia. This is costly as there are several library calls to sin, cos, etc...
      * 
      * @param lat1
+     *            latitude of point 1
      * @param lon1
+     *            longitude of point 1
      * @param lat2
+     *            latitude of point 2
      * @param lon2
-     * @return the distance in km, rounded to 2 digits
+     *            longitude of point 2
+     * @return the distance between the two locations in km, rounded to 2 digits
      * @author SpicyCH
      */
     public static double distance(double lat1, double lon1, double lat2, double lon2) {
