@@ -42,21 +42,85 @@ public class ShowEventsActivity extends ListActivity {
     private final static int SEEK_BAR_MIN_VALUE = 2;
     private final static int ONE_HUNDRED = 100;
 
+    /**
+     * Computes the distance between two GPS locations (takes into consideration
+     * the earth radius), inspired by
+     * wikipedia
+     * 
+     * @param lat1
+     * @param lon1
+     * @param lat2
+     * @param lon2
+     * @return the distance in km, rounded to 2 digits
+     * @author SpicyCH
+     */
+    public static double distance(double lat1, double lon1, double lat2, double lon2) {
+        double radLat1 = Math.toRadians(lat1);
+        double radLong1 = Math.toRadians(lon1);
+        double radLat2 = Math.toRadians(lat2);
+        double radLong2 = Math.toRadians(lon2);
+
+        double sec1 = Math.sin(radLat1) * Math.sin(radLat2);
+        double dl = Math.abs(radLong1 - radLong2);
+        double sec2 = Math.cos(radLat1) * Math.cos(radLat2);
+        double centralAngle = Math.acos(sec1 + (sec2 * Math.cos(dl)));
+        double distance = centralAngle * EARTH_RADIUS_KM;
+
+        return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;
+    }
+
     private SeekBar mSeekBar;
+
     private TextView mShowKilometers;
 
     private Context mContext;
 
     private DatabaseHelper mDbHelper;
-
     private boolean mMyEventsChecked;
     private boolean mOngoingChecked;
-    private boolean mNearMeChecked;
 
+    private boolean mNearMeChecked;
     private List<Event> mEventsList;
     private List<Event> mCurrentList;
     private static String mMyName = "Robich";
+
     private Location mMyLocation;
+
+    public void onCheckboxClicked(View v) {
+        CheckBox checkBox = (CheckBox) v;
+
+        switch (v.getId()) {
+            case R.id.ShowEventsCheckBoxNearMe:
+                if (checkBox.isChecked()) {
+                    mNearMeChecked = true;
+                    // Show the seek bar
+                    mSeekBar.setEnabled(true);
+                } else {
+                    mNearMeChecked = false;
+                    // Hide the seek bar
+                    mSeekBar.setEnabled(false);
+                }
+                break;
+            case R.id.ShowEventsCheckBoxMyEv:
+                if (checkBox.isChecked()) {
+                    mMyEventsChecked = true;
+                } else {
+                    mMyEventsChecked = false;
+                }
+                break;
+            case R.id.ShowEventscheckBoxStatus:
+                if (checkBox.isChecked()) {
+                    mOngoingChecked = true;
+                } else {
+                    mOngoingChecked = false;
+                }
+                break;
+            default:
+                break;
+        }
+
+        this.updateCurrentList();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,40 +174,10 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        // This is needed to show an update of the events' list after having
-        // created an event
-        this.updateCurrentList();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.show_events, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                break;
-            case R.id.showEventsMenuNewEvent:
-                Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
-                this.startActivity(showEventIntent);
-            default:
-                // No other menu items!
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -184,39 +218,33 @@ public class ShowEventsActivity extends ListActivity {
         super.onListItemClick(l, v, position, id);
     }
 
-    public void onCheckboxClicked(View v) {
-        CheckBox checkBox = (CheckBox) v;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
 
-        switch (v.getId()) {
-            case R.id.ShowEventsCheckBoxNearMe:
-                if (checkBox.isChecked()) {
-                    mNearMeChecked = true;
-                    // Show the seek bar
-                    mSeekBar.setEnabled(true);
-                } else {
-                    mNearMeChecked = false;
-                    // Hide the seek bar
-                    mSeekBar.setEnabled(false);
-                }
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
                 break;
-            case R.id.ShowEventsCheckBoxMyEv:
-                if (checkBox.isChecked()) {
-                    mMyEventsChecked = true;
-                } else {
-                    mMyEventsChecked = false;
-                }
-                break;
-            case R.id.ShowEventscheckBoxStatus:
-                if (checkBox.isChecked()) {
-                    mOngoingChecked = true;
-                } else {
-                    mOngoingChecked = false;
-                }
-                break;
+            case R.id.showEventsMenuNewEvent:
+                Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
+                this.startActivity(showEventIntent);
             default:
+                // No other menu items!
                 break;
         }
 
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // This is needed to show an update of the events' list after having
+        // created an event
         this.updateCurrentList();
     }
 
@@ -267,32 +295,5 @@ public class ShowEventsActivity extends ListActivity {
 
         EventsListItemAdapter adapter = new EventsListItemAdapter(this, mCurrentList, mMyLocation);
         this.setListAdapter(adapter);
-    }
-
-    /**
-     * Computes the distance between two GPS locations (takes into consideration
-     * the earth radius), inspired by
-     * wikipedia
-     * 
-     * @param lat1
-     * @param lon1
-     * @param lat2
-     * @param lon2
-     * @return the distance in km, rounded to 2 digits
-     * @author SpicyCH
-     */
-    public static double distance(double lat1, double lon1, double lat2, double lon2) {
-        double radLat1 = Math.toRadians(lat1);
-        double radLong1 = Math.toRadians(lon1);
-        double radLat2 = Math.toRadians(lat2);
-        double radLong2 = Math.toRadians(lon2);
-
-        double sec1 = Math.sin(radLat1) * Math.sin(radLat2);
-        double dl = Math.abs(radLong1 - radLong2);
-        double sec2 = Math.cos(radLat1) * Math.cos(radLat2);
-        double centralAngle = Math.acos(sec1 + (sec2 * Math.cos(dl)));
-        double distance = centralAngle * EARTH_RADIUS_KM;
-
-        return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;
     }
 }

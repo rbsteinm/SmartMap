@@ -48,17 +48,10 @@ public class SettingsManager {
     private final static String KEY_VIBRATE = "notifications_new_message_vibrate";
 
     /**
-     * SettingsManager constructor. Will be made private, use initialize() or
-     * getInstance() instead.
-     * 
-     * @param context
-     *            The app's context, needed to access the shared preferences
+     * @return The SettingsManager instance
      */
-    @Deprecated
-    public SettingsManager(Context context) {
-        mContext = context;
-        mSharedPref = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        mEditor = mSharedPref.edit();
+    public static SettingsManager getInstance() {
+        return mInstance;
     }
 
     /**
@@ -77,10 +70,106 @@ public class SettingsManager {
     }
 
     /**
-     * @return The SettingsManager instance
+     * SettingsManager constructor. Will be made private, use initialize() or
+     * getInstance() instead.
+     * 
+     * @param context
+     *            The app's context, needed to access the shared preferences
      */
-    public static SettingsManager getInstance() {
-        return mInstance;
+    @Deprecated
+    public SettingsManager(Context context) {
+        mContext = context;
+        mSharedPref = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        mEditor = mSharedPref.edit();
+    }
+
+    /**
+     * Clears the settings
+     * 
+     * @return True if the settings were cleared successfully
+     */
+    public boolean clearAll() {
+        mEditor.clear();
+        return mEditor.commit();
+    }
+
+    /**
+     * @return The session cookie if it is found, DEFAULT_COOKIE value otherwise
+     */
+    public String getCookie() {
+        return mSharedPref.getString(COOKIE, DEFAULT_COOKIE);
+    }
+
+    /**
+     * @return The local user's email if it is found, DEFAULT_EMAIL value
+     *         otherwise
+     */
+    public String getEmail() {
+        return mSharedPref.getString(EMAIL, DEFAULT_EMAIL);
+    }
+
+    /**
+     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
+     *         otherwise
+     */
+    public long getFacebookID() {
+        return mSharedPref.getLong(FB_ID, DEFAULT_FB_ID);
+    }
+
+    /**
+     * @return The local user's current position as a Location object
+     */
+    public Location getLocation() {
+        Location loc = new Location("");
+        // Shared prefs can't store doubles
+        loc.setLongitude(Double.longBitsToDouble(mSharedPref.getLong(LONGITUDE, 0)));
+        loc.setLatitude(Double.longBitsToDouble(mSharedPref.getLong(LATITUDE, 0)));
+        return loc;
+    }
+
+    /**
+     * @return The location name (e.g. city)
+     */
+    public String getLocationName() {
+        return mSharedPref.getString(LOCATION_NAME, DEFAULT_LOC_NAME);
+    }
+
+    /**
+     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN
+     *         value otherwise
+     */
+    public String getToken() {
+        return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);
+    }
+
+    /**
+     * @return The local user's phone number if it is found, DEFAULT_NUMBER
+     *         value otherwise
+     */
+    public String getUPhoneNumber() {
+        return mSharedPref.getString(PHONE_NUMBER, DEFAULT_NUMBER);
+    }
+
+    /**
+     * @return The local user's ID if it is found, DEFAULT_ID value otherwise
+     */
+    public long getUserID() {
+        return mSharedPref.getLong(USER_ID, DEFAULT_ID);
+    }
+
+    /**
+     * @return The local user's name if it is found, DEFAULT_NAME value
+     *         otherwise
+     */
+    public String getUserName() {
+        return mSharedPref.getString(USER_NAME, DEFAULT_NAME);
+    }
+
+    /**
+     * @return True if hidden mode is enabled
+     */
+    public boolean isHidden() {
+        return mSharedPref.getBoolean(HIDDEN, false);
     }
 
     /**
@@ -90,6 +179,28 @@ public class SettingsManager {
     public boolean notificationsEnabled() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_NOTIFICATIONS_ENABLED,
             true);
+    }
+
+    /**
+     * @return <code>true</code> if the user enabled the notifications for event
+     *         invitations and the user activated the
+     *         notifications in general, <code>false</code> otherwise.
+     * @author SpicyCH
+     */
+    public boolean notificationsForEventInvitations() {
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(KEY_EVENT_INVITATIONS, true) : false;
+    }
+
+    /**
+     * @return <code>true</code> if the user enabled the notifications for event
+     *         proximity and the user activated the
+     *         notifications in general, <code>false</code> otherwise.
+     * @author SpicyCH
+     */
+    public boolean notificationsForEventProximity() {
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(KEY_EVENT_PROXIMITY, true) : false;
     }
 
     /**
@@ -118,28 +229,6 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event
-     *         invitations and the user activated the
-     *         notifications in general, <code>false</code> otherwise.
-     * @author SpicyCH
-     */
-    public boolean notificationsForEventInvitations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_EVENT_INVITATIONS, true) : false;
-    }
-
-    /**
-     * @return <code>true</code> if the user enabled the notifications for event
-     *         proximity and the user activated the
-     *         notifications in general, <code>false</code> otherwise.
-     * @author SpicyCH
-     */
-    public boolean notificationsForEventProximity() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_EVENT_PROXIMITY, true) : false;
-    }
-
-    /**
      * @return <code>true</code> if the user enabled the notifications
      *         vibrations and the user activated the
      *         notifications in general, <code>false</code> otherwise.
@@ -151,129 +240,14 @@ public class SettingsManager {
     }
 
     /**
-     * @return The local user's name if it is found, DEFAULT_NAME value
-     *         otherwise
-     */
-    public String getUserName() {
-        return mSharedPref.getString(USER_NAME, DEFAULT_NAME);
-    }
-
-    /**
-     * @return The local user's ID if it is found, DEFAULT_ID value otherwise
-     */
-    public long getUserID() {
-        return mSharedPref.getLong(USER_ID, DEFAULT_ID);
-    }
-
-    /**
-     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
-     *         otherwise
-     */
-    public long getFacebookID() {
-        return mSharedPref.getLong(FB_ID, DEFAULT_FB_ID);
-    }
-
-    /**
-     * @return The local user's phone number if it is found, DEFAULT_NUMBER
-     *         value otherwise
-     */
-    public String getUPhoneNumber() {
-        return mSharedPref.getString(PHONE_NUMBER, DEFAULT_NUMBER);
-    }
-
-    /**
-     * @return The local user's email if it is found, DEFAULT_EMAIL value
-     *         otherwise
-     */
-    public String getEmail() {
-        return mSharedPref.getString(EMAIL, DEFAULT_EMAIL);
-    }
-
-    /**
-     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN
-     *         value otherwise
-     */
-    public String getToken() {
-        return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);
-    }
-
-    /**
-     * @return The session cookie if it is found, DEFAULT_COOKIE value otherwise
-     */
-    public String getCookie() {
-        return mSharedPref.getString(COOKIE, DEFAULT_COOKIE);
-    }
-
-    /**
-     * @return The local user's current position as a Location object
-     */
-    public Location getLocation() {
-        Location loc = new Location("");
-        // Shared prefs can't store doubles
-        loc.setLongitude(Double.longBitsToDouble(mSharedPref.getLong(LONGITUDE, 0)));
-        loc.setLatitude(Double.longBitsToDouble(mSharedPref.getLong(LATITUDE, 0)));
-        return loc;
-    }
-
-    /**
-     * @return The location name (e.g. city)
-     */
-    public String getLocationName() {
-        return mSharedPref.getString(LOCATION_NAME, DEFAULT_LOC_NAME);
-    }
-
-    /**
-     * @return True if hidden mode is enabled
-     */
-    public boolean isHidden() {
-        return mSharedPref.getBoolean(HIDDEN, false);
-    }
-
-    /**
-     * Stores the local user's name
+     * Stores the session cookie
      * 
-     * @param newName
-     *            The user's new name
+     * @param newCookie
+     *            The new cookie
      * @return True if the new value was successfully saved
      */
-    public boolean setUserName(String newName) {
-        mEditor.putString(USER_NAME, newName);
-        return mEditor.commit();
-    }
-
-    /**
-     * Stores the user's ID
-     * 
-     * @param newID
-     *            The user's new ID
-     * @return True if the new value was successfully saved
-     */
-    public boolean setUserID(long newID) {
-        mEditor.putLong(USER_ID, newID);
-        return mEditor.commit();
-    }
-
-    /**
-     * Stores the user's Facebook ID
-     * 
-     * @param newID
-     *            The user's new Facebook ID
-     * @return True if the new value was successfully saved
-     */
-    public boolean setFacebookID(long newID) {
-        mEditor.putLong(FB_ID, newID);
-        return mEditor.commit();
-    }
-
-    /**
-     * Stores the user's phone number
-     * 
-     * @param newNumber
-     *            The user's new number
-     * @return True if the new value was successfully saved
-     */
-    public boolean setUPhoneNumber(String newNumber) {
-        mEditor.putString(PHONE_NUMBER, newNumber);
+    public boolean setCookie(String newCookie) {
+        mEditor.putString(COOKIE, newCookie);
         return mEditor.commit();
     }
 
@@ -290,26 +264,14 @@ public class SettingsManager {
     }
 
     /**
-     * Stores the Facebook token
+     * Stores the user's Facebook ID
      * 
-     * @param newToken
-     *            The new token
+     * @param newID
+     *            The user's new Facebook ID
      * @return True if the new value was successfully saved
      */
-    public boolean setToken(String newToken) {
-        mEditor.putString(TOKEN, newToken);
-        return mEditor.commit();
-    }
-
-    /**
-     * Stores the session cookie
-     * 
-     * @param newCookie
-     *            The new cookie
-     * @return True if the new value was successfully saved
-     */
-    public boolean setCookie(String newCookie) {
-        mEditor.putString(COOKIE, newCookie);
+    public boolean setFacebookID(long newID) {
+        mEditor.putLong(FB_ID, newID);
         return mEditor.commit();
     }
 
@@ -344,12 +306,50 @@ public class SettingsManager {
     }
 
     /**
-     * Clears the settings
+     * Stores the Facebook token
      * 
-     * @return True if the settings were cleared successfully
+     * @param newToken
+     *            The new token
+     * @return True if the new value was successfully saved
      */
-    public boolean clearAll() {
-        mEditor.clear();
+    public boolean setToken(String newToken) {
+        mEditor.putString(TOKEN, newToken);
+        return mEditor.commit();
+    }
+
+    /**
+     * Stores the user's phone number
+     * 
+     * @param newNumber
+     *            The user's new number
+     * @return True if the new value was successfully saved
+     */
+    public boolean setUPhoneNumber(String newNumber) {
+        mEditor.putString(PHONE_NUMBER, newNumber);
+        return mEditor.commit();
+    }
+
+    /**
+     * Stores the user's ID
+     * 
+     * @param newID
+     *            The user's new ID
+     * @return True if the new value was successfully saved
+     */
+    public boolean setUserID(long newID) {
+        mEditor.putLong(USER_ID, newID);
+        return mEditor.commit();
+    }
+
+    /**
+     * Stores the local user's name
+     * 
+     * @param newName
+     *            The user's new name
+     * @return True if the new value was successfully saved
+     */
+    public boolean setUserName(String newName) {
+        mEditor.putString(USER_NAME, newName);
         return mEditor.commit();
     }
 }

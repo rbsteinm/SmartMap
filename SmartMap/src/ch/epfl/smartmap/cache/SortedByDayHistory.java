@@ -30,7 +30,7 @@ public class SortedByDayHistory implements History {
     @Override
     @SuppressWarnings("deprecation")
     public void addEntry(Friend friend, Date date) {
-        if (!mHistoryEntries.isEmpty() && date.getDate() == mDates.get(0).getDate()) {
+        if (!mHistoryEntries.isEmpty() && (date.getDate() == mDates.get(0).getDate())) {
             // Same day as the first list of entries
             mHistoryEntries.get(0).add(friend);
         } else {
@@ -41,9 +41,12 @@ public class SortedByDayHistory implements History {
         mSize++;
     }
 
-    @Override
-    public ArrayList<Friend> getEntriesForIndex(int index) {
-        return new ArrayList<Friend>(mHistoryEntries.get(index));
+    public boolean contains(Friend friend) {
+        boolean contains = false;
+        for (Queue<Friend> e : mHistoryEntries) {
+            contains = contains || e.contains(friend);
+        }
+        return contains;
     }
 
     @Override
@@ -52,16 +55,13 @@ public class SortedByDayHistory implements History {
     }
 
     @Override
-    public boolean isEmpty() {
-        return mSize == 0;
+    public ArrayList<Friend> getEntriesForIndex(int index) {
+        return new ArrayList<Friend>(mHistoryEntries.get(index));
     }
 
-    public boolean contains(Friend friend) {
-        boolean contains = false;
-        for (Queue<Friend> e : mHistoryEntries) {
-            contains = contains || e.contains(friend);
-        }
-        return contains;
+    @Override
+    public boolean isEmpty() {
+        return mSize == 0;
     }
 
     /*

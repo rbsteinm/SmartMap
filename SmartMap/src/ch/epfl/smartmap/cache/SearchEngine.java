@@ -11,15 +11,15 @@ import java.util.List;
 public interface SearchEngine {
 
     /**
+     * @return History of searches of this SearchEngine
+     */
+    History getHistory();
+
+    /**
      * Sends a Query, computes it and return matched results
      * 
      * @param query
      * @return a List containing the result
      */
     List<Friend> sendQuery(String query);
-
-    /**
-     * @return History of searches of this SearchEngine
-     */
-    History getHistory();
 }

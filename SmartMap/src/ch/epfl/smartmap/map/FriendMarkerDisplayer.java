@@ -19,6 +19,56 @@ import com.google.android.gms.maps.model.Marker;
 public interface FriendMarkerDisplayer {
 
     /**
+     * Add a marker to the map
+     * 
+     * @param event
+     *            the friend for which we want to add a marker
+     */
+    Marker addMarker(User friend, Context context, GoogleMap googleMap);
+
+    /**
+     * @return the list of friends that are displayed
+     */
+    List<User> getDisplayedFriends();
+
+    /**
+     * @return the list of the markers that are displayed
+     */
+    List<Marker> getDisplayedMarkers();
+
+    /**
+     * @param marker
+     * @return the friend that the marker represents
+     */
+    User getFriendForMarker(Marker marker);
+
+    /**
+     * @param event
+     * @return the marker that represents the given friend
+     */
+    Marker getMarkerForFriend(User friend);
+
+    /**
+     * @param friend
+     * @return true if the friend is displayed
+     */
+    boolean isDisplayedFriend(User friend);
+
+    /**
+     * @param marker
+     * @return true if the marker is displayed
+     */
+    boolean isDisplayedMarker(Marker marker);
+
+    /**
+     * Remove a marker from the map
+     * 
+     * @param event
+     *            the friend for which we want to remove a marker
+     */
+    Marker removeMarker(User friend);
+
+    /**
      * Set markers on the map for the friends in the list listOfFriends
      * 
      * @param context
@@ -39,55 +89,5 @@ public interface FriendMarkerDisplayer {
      *            the updated friends
      */
     void updateMarkers(Context context, GoogleMap googleMap, List<User> friendsToDisplay);
-
-    /**
-     * @param friend
-     * @return true if the friend is displayed
-     */
-    boolean isDisplayedFriend(User friend);
-
-    /**
-     * @param marker
-     * @return true if the marker is displayed
-     */
-    boolean isDisplayedMarker(Marker marker);
-
-    /**
-     * @return the list of the markers that are displayed
-     */
-    List<Marker> getDisplayedMarkers();
-
-    /**
-     * @return the list of friends that are displayed
-     */
-    List<User> getDisplayedFriends();
-
-    /**
-     * Add a marker to the map
-     * 
-     * @param event
-     *            the friend for which we want to add a marker
-     */
-    Marker addMarker(User friend, Context context, GoogleMap googleMap);
-
-    /**
-     * Remove a marker from the map
-     * 
-     * @param event
-     *            the friend for which we want to remove a marker
-     */
-    Marker removeMarker(User friend);
-
-    /**
-     * @param marker
-     * @return the friend that the marker represents
-     */
-    User getFriendForMarker(Marker marker);
-
-    /**
-     * @param event
-     * @return the marker that represents the given friend
-     */
-    Marker getMarkerForFriend(User friend);
 
 }

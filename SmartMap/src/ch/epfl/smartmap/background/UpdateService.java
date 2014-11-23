@@ -73,6 +73,23 @@ public class UpdateService extends Service {
     }
 
     /**
+     * AsyncTask to log in
+     * 
+     * @author ritterni
+     */
+    private class AsyncLogin extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            try {
+                mClient.authServer(mManager.getUserName(), mManager.getFacebookID(), mManager.getToken());
+            } catch (SmartMapClientException e) {
+                Log.e("UpdateService", "Couldn't log in!");
+            }
+            return null;
+        }
+    }
+
+    /**
      * AsyncTask to send the user's own position to the server
      * 
      * @author ritterni
@@ -116,23 +133,6 @@ public class UpdateService extends Service {
                     UpdateService.this.showAcceptedNotif(user);
                 }
             }
-        }
-    }
-
-    /**
-     * AsyncTask to log in
-     * 
-     * @author ritterni
-     */
-    private class AsyncLogin extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            try {
-                mClient.authServer(mManager.getUserName(), mManager.getFacebookID(), mManager.getToken());
-            } catch (SmartMapClientException e) {
-                Log.e("UpdateService", "Couldn't log in!");
-            }
-            return null;
         }
     }
 
@@ -210,8 +210,8 @@ public class UpdateService extends Service {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             // stop sending position if provider isn't available
-            if (status == LocationProvider.OUT_OF_SERVICE
-                || status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
+            if ((status == LocationProvider.OUT_OF_SERVICE)
+                || (status == LocationProvider.TEMPORARILY_UNAVAILABLE)) {
                 mOwnPosEnabled = false;
             } else if (status == LocationProvider.AVAILABLE) {
                 mOwnPosEnabled = true;
@@ -281,7 +281,7 @@ public class UpdateService extends Service {
         super.onCreate();
         mManager = SettingsManager.initialize(this.getApplicationContext());
         mHelper = DatabaseHelper.initialize(this.getApplicationContext());
-        mGeocoder = new Geocoder(getBaseContext(), Locale.US);
+        mGeocoder = new Geocoder(this.getBaseContext(), Locale.US);
         mFriendsPosIntent = new Intent(BROADCAST_POS);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -309,12 +309,13 @@ public class UpdateService extends Service {
     // (Android issue #63618)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Intent restartService = new Intent(getApplicationContext(), this.getClass());
-        restartService.setPackage(getPackageName());
+        Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
+        restartService.setPackage(this.getPackageName());
         PendingIntent restartServicePending =
-            PendingIntent.getService(getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
+                PendingIntent.FLAG_ONE_SHOT);
         AlarmManager alarmService =
-            (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
 

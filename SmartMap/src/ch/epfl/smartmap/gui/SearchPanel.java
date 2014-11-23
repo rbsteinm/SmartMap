@@ -34,45 +34,6 @@ public class SearchPanel extends RelativeLayout {
     }
 
     /**
-     * Opens the panel and displays it full screen
-     */
-    public void open() {
-        if (this.getVisibility() != View.VISIBLE) {
-            this.setVisibility(View.VISIBLE);
-            Animation bottomUp = AnimationUtils.loadAnimation(getContext(), R.anim.bottom_up);
-            this.startAnimation(bottomUp);
-        }
-    }
-
-    /**
-     * Closes the panel and hides it.
-     */
-    public void close() {
-        if (this.getVisibility() != View.GONE) {
-            Animation topDown = AnimationUtils.loadAnimation(getContext(), R.anim.top_down);
-
-            this.startAnimation(topDown);
-            this.setVisibility(View.GONE);
-            clearFocus();
-        }
-    }
-
-    /**
-     * Handle the event of a back button press
-     * 
-     * @return true if the event should not go further
-     */
-    public boolean onBackPressed() {
-        if (this.getVisibility() == View.VISIBLE) {
-            Log.d(TAG, "onBackPressed, true");
-            close();
-            return true;
-        }
-        Log.d(TAG, "onBackPressed, false");
-        return false;
-    }
-
-    /**
      * Checks that the Representation Invariant is not violated.
      * 
      * @param depth
@@ -89,5 +50,44 @@ public class SearchPanel extends RelativeLayout {
         int auditErrors = 0;
 
         return auditErrors;
+    }
+
+    /**
+     * Closes the panel and hides it.
+     */
+    public void close() {
+        if (this.getVisibility() != View.GONE) {
+            Animation topDown = AnimationUtils.loadAnimation(this.getContext(), R.anim.top_down);
+
+            this.startAnimation(topDown);
+            this.setVisibility(View.GONE);
+            this.clearFocus();
+        }
+    }
+
+    /**
+     * Handle the event of a back button press
+     * 
+     * @return true if the event should not go further
+     */
+    public boolean onBackPressed() {
+        if (this.getVisibility() == View.VISIBLE) {
+            Log.d(TAG, "onBackPressed, true");
+            this.close();
+            return true;
+        }
+        Log.d(TAG, "onBackPressed, false");
+        return false;
+    }
+
+    /**
+     * Opens the panel and displays it full screen
+     */
+    public void open() {
+        if (this.getVisibility() != View.VISIBLE) {
+            this.setVisibility(View.VISIBLE);
+            Animation bottomUp = AnimationUtils.loadAnimation(this.getContext(), R.anim.bottom_up);
+            this.startAnimation(bottomUp);
+        }
     }
 }

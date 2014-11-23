@@ -93,7 +93,7 @@ public class StartActivity extends FragmentActivity {
 
         // Not logged in Facebook or permission to use Facebook in SmartMap not
         // given
-        if (Session.getActiveSession() == null || Session.getActiveSession().getPermissions().isEmpty()) {
+        if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
 
             // Start logo and text animation
             mLogoImage.startAnimation(AnimationUtils.loadAnimation(this, R.anim.logo_anim));

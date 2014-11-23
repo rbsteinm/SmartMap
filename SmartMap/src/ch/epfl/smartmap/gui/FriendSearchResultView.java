@@ -51,7 +51,7 @@ public class FriendSearchResultView extends SearchResultView {
         // Creates mLastConnectionView
         TextView lastConnectionView = new TextView(context);
         lastConnectionView.setText("last seen " + friend.getLastSeen().getTime().toString() + ".");
-        lastConnectionView.setTextColor(getResources().getColor(R.color.lastSeenConnectionTextColor));
+        lastConnectionView.setTextColor(this.getResources().getColor(R.color.lastSeenConnectionTextColor));
 
         // Create mInfoLayout and add everything
         mInfoLayout = new LinearLayout(context);
@@ -62,52 +62,6 @@ public class FriendSearchResultView extends SearchResultView {
 
         // Add view on the parent class
         this.initViews();
-    }
-
-    @Override
-    public ViewGroup getInfosLayout() {
-        return mInfoLayout;
-    }
-
-    @Override
-    public int getImageResource() {
-        return mImageResource;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.gui.SearchResultView#getOnClickListener()
-     */
-    @Override
-    public OnTouchListener getOnTouchListener(final SearchResultView v) {
-        return new OnTouchListener() {
-            private float startX;
-            private float startY;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent ev) {
-                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-                    Log.d(TAG, "Action DOWN");
-                    startX = ev.getAxisValue(MotionEvent.AXIS_X);
-                    startY = ev.getAxisValue(MotionEvent.AXIS_Y);
-                    v.setBackgroundColor(getResources().getColor(R.color.searchResultOnSelect));
-
-                } else if (ev.getAction() == MotionEvent.ACTION_UP) {
-                    Log.d(TAG, "Action UP");
-                    float endX = ev.getAxisValue(MotionEvent.AXIS_X);
-                    float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
-
-                    if (Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)) < CLICK_DISTANCE_THRESHHOLD) {
-                        ((MainActivity) getContext()).performQuery(mFriend);
-                    }
-                    v.setBackgroundColor(getResources().getColor(R.color.searchResultBackground));
-                } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
-                    Log.d(TAG, "Action CANCEL");
-                    v.setBackgroundColor(getResources().getColor(R.color.searchResultBackground));
-                }
-                return true;
-            }
-        };
     }
 
     /**
@@ -128,5 +82,54 @@ public class FriendSearchResultView extends SearchResultView {
         // auditErrors += mFriend.auditErrors(depth - 1);
 
         return auditErrors;
+    }
+
+    @Override
+    public int getImageResource() {
+        return mImageResource;
+    }
+
+    @Override
+    public ViewGroup getInfosLayout() {
+        return mInfoLayout;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.gui.SearchResultView#getOnClickListener()
+     */
+    @Override
+    public OnTouchListener getOnTouchListener(final SearchResultView v) {
+        return new OnTouchListener() {
+            private float startX;
+            private float startY;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
+                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Action DOWN");
+                    startX = ev.getAxisValue(MotionEvent.AXIS_X);
+                    startY = ev.getAxisValue(MotionEvent.AXIS_Y);
+                    v.setBackgroundColor(FriendSearchResultView.this.getResources().getColor(
+                        R.color.searchResultOnSelect));
+
+                } else if (ev.getAction() == MotionEvent.ACTION_UP) {
+                    Log.d(TAG, "Action UP");
+                    float endX = ev.getAxisValue(MotionEvent.AXIS_X);
+                    float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
+
+                    if (Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)) < CLICK_DISTANCE_THRESHHOLD) {
+                        ((MainActivity) FriendSearchResultView.this.getContext()).performQuery(mFriend);
+                    }
+                    v.setBackgroundColor(FriendSearchResultView.this.getResources().getColor(
+                        R.color.searchResultBackground));
+                } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
+                    Log.d(TAG, "Action CANCEL");
+                    v.setBackgroundColor(FriendSearchResultView.this.getResources().getColor(
+                        R.color.searchResultBackground));
+                }
+                return true;
+            }
+        };
     }
 }
