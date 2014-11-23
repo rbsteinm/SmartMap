@@ -17,21 +17,21 @@ public interface NotificationBag {
      * 
      * @return a list of the inviting users.
      */
-    public List<User> getInvitingUsers();
+    List<User> getInvitingUsers();
 
     /**
      * Get a list of the friends that accepted the user's friend requests.
      * 
      * @return a list of the new friends.
      */
-    public List<User> getNewFriends();
+    List<User> getNewFriends();
 
     /**
      * Get a list of the ids of friends that removed the user.
      * 
      * @return a list of ids.
      */
-    public List<Long> getRemovedFriendsIds();
+    List<Long> getRemovedFriendsIds();
 
     /**
      * Acknowledges a new friend so it will not be returned by the server
@@ -39,7 +39,7 @@ public interface NotificationBag {
      * 
      * @param id
      */
-    public void ackNewFriend(long id);
+    void ackNewFriend(long id);
 
     /**
      * Acknowledges a removed friend so it will not be returned by the server
@@ -47,5 +47,5 @@ public interface NotificationBag {
      * 
      * @param id
      */
-    public void ackRemovedFriend(long id);
+    void ackRemovedFriend(long id);
 }

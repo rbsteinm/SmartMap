@@ -25,6 +25,19 @@ public class NetworkNotificationBag implements NotificationBag {
 
     public NetworkNotificationBag(List<User> invitingUsers, List<User> newFriends,
         List<Long> removedFriendsIds, SmartMapClient client) {
+        if (invitingUsers == null) {
+            throw new IllegalArgumentException("invitingUsers list is null.");
+        }
+        if (newFriends == null) {
+            throw new IllegalArgumentException("newFriends list is null.");
+        }
+        if (removedFriendsIds == null) {
+            throw new IllegalArgumentException("removedFriendsIds list is null.");
+        }
+        if (client == null) {
+            throw new IllegalArgumentException("Smartmap client is null.");
+        }
+
         mInvitingUsers = new ArrayList<User>(invitingUsers);
         mNewFriends = new ArrayList<User>(newFriends);
         mRemovedFriends = new ArrayList<Long>(removedFriendsIds);
