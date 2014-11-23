@@ -18,76 +18,76 @@ import ch.epfl.smartmap.R;
  */
 public class SearchPanel extends RelativeLayout {
 
-    private final static String TAG = "SearchPanel";
-    @SuppressWarnings("unused")
-    private final static String AUDIT_TAG = "AuditError : " + TAG;
+	private final static String TAG = "SearchPanel";
+	@SuppressWarnings("unused")
+	private final static String AUDIT_TAG = "AuditError : " + TAG;
 
-    /**
-     * Constructor
-     * 
-     * @param context
-     *            The current context
-     */
-    public SearchPanel(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        this.setVisibility(View.GONE);
-    }
+	/**
+	 * Constructor
+	 * 
+	 * @param context
+	 *            The current context
+	 */
+	public SearchPanel(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		this.setVisibility(View.GONE);
+	}
 
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
-        }
+	/**
+	 * Checks that the Representation Invariant is not violated.
+	 * 
+	 * @param depth
+	 *            represents how deep the audit check is done (use 1 to check
+	 *            this object only)
+	 * @return The number of audit errors in this object
+	 */
+	public int auditErrors(int depth) {
+		// TODO : Decomment when auditErrors coded for other classes
+		if (depth == 0) {
+			return 0;
+		}
 
-        int auditErrors = 0;
+		int auditErrors = 0;
 
-        return auditErrors;
-    }
+		return auditErrors;
+	}
 
-    /**
-     * Closes the panel and hides it.
-     */
-    public void close() {
-        if (this.getVisibility() != View.GONE) {
-            Animation topDown = AnimationUtils.loadAnimation(this.getContext(), R.anim.top_down);
+	/**
+	 * Closes the panel and hides it.
+	 */
+	public void close() {
+		if (this.getVisibility() != View.GONE) {
+			Animation topDown = AnimationUtils.loadAnimation(this.getContext(), R.anim.top_down);
 
-            this.startAnimation(topDown);
-            this.setVisibility(View.GONE);
-            this.clearFocus();
-        }
-    }
+			this.startAnimation(topDown);
+			this.setVisibility(View.GONE);
+			this.clearFocus();
+		}
+	}
 
-    /**
-     * Handle the event of a back button press
-     * 
-     * @return true if the event should not go further
-     */
-    public boolean onBackPressed() {
-        if (this.getVisibility() == View.VISIBLE) {
-            Log.d(TAG, "onBackPressed, true");
-            this.close();
-            return true;
-        }
-        Log.d(TAG, "onBackPressed, false");
-        return false;
-    }
+	/**
+	 * Handle the event of a back button press
+	 * 
+	 * @return true if the event should not go further
+	 */
+	public boolean onBackPressed() {
+		if (this.getVisibility() == View.VISIBLE) {
+			Log.d(TAG, "onBackPressed, true");
+			this.close();
+			return true;
+		}
+		Log.d(TAG, "onBackPressed, false");
+		return false;
+	}
 
-    /**
-     * Opens the panel and displays it full screen
-     */
-    public void open() {
-        if (this.getVisibility() != View.VISIBLE) {
-            this.setVisibility(View.VISIBLE);
-            Animation bottomUp = AnimationUtils.loadAnimation(this.getContext(), R.anim.bottom_up);
-            this.startAnimation(bottomUp);
-        }
-    }
+	/**
+	 * Opens the panel and displays it full screen
+	 */
+	public void open() {
+		if (this.getVisibility() != View.VISIBLE) {
+			this.setVisibility(View.VISIBLE);
+			Animation bottomUp = AnimationUtils.loadAnimation(this.getContext(), R.anim.bottom_up);
+			this.startAnimation(bottomUp);
+		}
+	}
 }

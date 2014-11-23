@@ -15,53 +15,52 @@ import ch.epfl.smartmap.cache.User;
 
 public interface SmartMapParser {
 
-    /**
-     * Checks in the response returned by the server if the server returned
-     * Error, and if it is the case throws a SmartMapClientException with the
-     * server's message
-     * 
-     * @param s
-     *            the server's response
-     * @throws SmartMapClientException
-     *             if the server returned Error , SmartMapParseException if s
-     *             does not represent a valid server's response
-     *             <<<<<<< HEAD
-     *             =======
-     * @throws ServerFeedbackException
-     *             >>>>>>> service-2
-     */
-    void checkServerError(String s) throws SmartMapParseException, SmartMapClientException;
+	/**
+	 * Checks in the response returned by the server if the server returned
+	 * Error, and if it is the case throws a SmartMapClientException with the
+	 * server's message
+	 * 
+	 * @param s
+	 *            the server's response
+	 * @throws SmartMapClientException
+	 *             if the server returned Error , SmartMapParseException if s
+	 *             does not represent a valid server's response
+	 *             <<<<<<< HEAD
+	 *             =======
+	 * @throws ServerFeedbackException
+	 *             >>>>>>> service-2
+	 */
+	void checkServerError(String s) throws SmartMapParseException, SmartMapClientException;
 
-    User parseFriend(String s) throws SmartMapParseException;
+	User parseFriend(String s) throws SmartMapParseException;
 
-    /**
-     * Parses some text, and returns the list of friends
-     * 
-     * @param s
-     *            the list to parse
-     * @param key
-     *            the key word for the list to parse, if there is one, and null
-     *            if not
-     * @return the list of friends created from parsing s
-     * @throws SmartMapParseException
-     *             if s does not represent a valid list of friends (according to
-     *             the format that the parser supports)
-     */
-    List<User> parseFriends(String s, String key) throws SmartMapParseException;
+	/**
+	 * Parses some text, and returns the list of friends
+	 * 
+	 * @param s
+	 *            the list to parse
+	 * @param key
+	 *            the key word for the list to parse, if there is one, and null
+	 *            if not
+	 * @return the list of friends created from parsing s
+	 * @throws SmartMapParseException
+	 *             if s does not represent a valid list of friends (according to
+	 *             the format that the parser supports)
+	 */
+	List<User> parseFriends(String s, String key) throws SmartMapParseException;
 
-    /**
-     * Parses some text, and returns a map that maps id to positions
-     * 
-     * @param s
-     *            the text to parse
-     * @return the user's positions
-     * @throws SmartMapParseException
-     *             if s does not represent a valid list of positions (according
-     *             to the format that the parser supports)
-     */
+	/**
+	 * Parses some text, and returns a map that maps id to positions
+	 * 
+	 * @param s
+	 *            the text to parse
+	 * @return the user's positions
+	 * @throws SmartMapParseException
+	 *             if s does not represent a valid list of positions (according
+	 *             to the format that the parser supports)
+	 */
+	List<User> parsePositions(String s) throws SmartMapParseException;
 
-    List<User> parsePositions(String s) throws SmartMapParseException;
-
-    // TODO if necessary add a method to parse an event
+	// TODO if necessary add a method to parse an event
 
 }
