@@ -8,10 +8,8 @@ import java.util.Locale;
 
 import android.app.ActionBar;
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
@@ -132,6 +130,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         // TODO agpmilli : When click on actionbar icon button, open side menu
 
         mDbHelper = DatabaseHelper.getInstance();
+        mDbHelper.addFriendsLocationListener(this);
 
         mSearchEngine = new MockSearchEngine(this.sparseArrayToList(mDbHelper.getAllUsers()));
 
@@ -241,7 +240,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         super.onResume();
 
         // startService(mUpdateServiceIntent);
-        this.registerReceiver(mBroadcastReceiver, new IntentFilter(UpdateService.BROADCAST_POS));
+        // this.registerReceiver(mBroadcastReceiver, new IntentFilter(UpdateService.BROADCAST_POS));
 
         // get Intent that started this Activity
         Intent startingIntent = this.getIntent();
@@ -257,21 +256,21 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
     @Override
     public void onPause() {
         super.onPause();
-        this.unregisterReceiver(mBroadcastReceiver);
+        // this.unregisterReceiver(mBroadcastReceiver);
         // stopService(mUpdateServiceIntent);
     }
 
-    // will be removed
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
-                MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
-
-        }
-
-    };
+    // // will be removed
+    // private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+    // @Override
+    // public void onReceive(Context context, Intent intent) {
+    //
+    // mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
+    // MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
+    //
+    // }
+    //
+    // };
 
     /*
      * (non-Javadoc)
@@ -279,8 +278,14 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
      */
     @Override
     public void onChange() {
-        mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
-            MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
+
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
+                    MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
+            }
+        });
     }
 
     public Context getContext() {

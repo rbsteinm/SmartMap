@@ -23,7 +23,7 @@ import com.google.android.gms.maps.model.Marker;
  */
 public class DefaultZoomManager extends FragmentActivity implements ZoomManager {
     public static final String TAG = "ZOOM MANAGER";
-    private static final int GMAP_ZOOM_LEVEL = 17;
+    private static final int GMAP_ZOOM_LEVEL = 14;
     private static final int PADDING = 35; // offset from edges of the map in
                                            // pixels
     private final View mMapView;
