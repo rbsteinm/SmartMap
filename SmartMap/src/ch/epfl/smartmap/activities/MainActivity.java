@@ -228,7 +228,8 @@ public class MainActivity extends FragmentActivity {
 
         mDbHelper = DatabaseHelper.getInstance();
 
-        // mSearchEngine = new MockSearchEngine(this.getVisibleUsers(mDbHelper.getAllUsers()));
+        // mSearchEngine = new
+        // MockSearchEngine(this.getVisibleUsers(mDbHelper.getAllUsers()));
         mSearchEngine = new MockSearchEngine();
         mSearchLayout.setSearchEngine(mSearchEngine);
 
@@ -430,7 +431,8 @@ public class MainActivity extends FragmentActivity {
 
     /**
      * <<<<<<< HEAD
-     * Sets the view for Item Focus, this means - Write name / Display photo on ActionBar - Sets ActionMenu
+     * Sets the view for Item Focus, this means - Write name / Display photo on
+     * ActionBar - Sets ActionMenu
      * for Item
      * =======
      * Sets the view for Item Focus, this means - Write name / Display photo on

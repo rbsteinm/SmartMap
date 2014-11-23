@@ -20,7 +20,8 @@ import ch.epfl.smartmap.cache.SearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine.Type;
 
 /**
- * Layout that contains different SearchResult lists with different result types, change result type with
+ * Layout that contains different SearchResult lists with different result
+ * types, change result type with
  * horizontal swipe.
  * 
  * @author jfperren
@@ -73,7 +74,8 @@ public class SearchLayout extends LinearLayout {
 
                 @Override
                 public void onClick(View v) {
-                    // TODO : Implement the redirection towards corresponding activity.
+                    // TODO : Implement the redirection towards corresponding
+                    // activity.
                 }
             });
         }
@@ -96,7 +98,8 @@ public class SearchLayout extends LinearLayout {
             mLayout = new LinearLayout(context);
             mLayout.setOrientation(VERTICAL);
             this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-            // Remove scrollbar and shadow when the scrollview can't be scrolled.
+            // Remove scrollbar and shadow when the scrollview can't be
+            // scrolled.
             this.setVerticalScrollBarEnabled(false);
             super.addView(mLayout);
 
@@ -291,7 +294,8 @@ public class SearchLayout extends LinearLayout {
     }
 
     private Type previousSearchType() {
-        // Need to add mActiveSearchTypes.size() to avoid negative numbers with % operator
+        // Need to add mActiveSearchTypes.size() to avoid negative numbers with
+        // % operator
         int previousSearchTypeIndex =
             ((mSearchTypeIndexes.get(mCurrentSearchType).intValue() - 1) + mActiveSearchTypes.size())
                 % mActiveSearchTypes.size();
@@ -300,7 +304,8 @@ public class SearchLayout extends LinearLayout {
     }
 
     /**
-     * Show the {@code ScrollView} that needs to be displayed when opening the {@code SlidingPanel}, according
+     * Show the {@code ScrollView} that needs to be displayed when opening the
+     * {@code SlidingPanel}, according
      * to the query
      * 
      * @param query

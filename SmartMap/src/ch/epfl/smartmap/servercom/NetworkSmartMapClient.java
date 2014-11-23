@@ -24,7 +24,8 @@ import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider} to communicate with a SmartMap
+ * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider}
+ * to communicate with a SmartMap
  * server.
  * 
  * @author marion-S

@@ -9,7 +9,8 @@ import android.preference.PreferenceManager;
  * Used to get and set settings and local info using SharedPreferences
  * 
  * @author ritterni
- * @author SpicyCH (add support for the user settings - we might want to change the design if my methods are
+ * @author SpicyCH (add support for the user settings - we might want to change
+ *         the design if my methods are
  *         bottlenecks)
  */
 public class SettingsManager {
@@ -78,7 +79,8 @@ public class SettingsManager {
 
     /**
      * <<<<<<< HEAD
-     * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
+     * SettingsManager constructor. Will be made private, use initialize() or
+     * getInstance() instead.
      * =======
      * SettingsManager constructor. Will be made private, use initialize() or
      * getInstance() instead.
@@ -95,8 +97,8 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user agreed to share his position even when the app is closed,
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the user agreed to share his position even
+     *         when the app is closed, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean alwaysShare() {
@@ -121,14 +123,16 @@ public class SettingsManager {
     }
 
     /**
-     * @return The local user's email if it is found, DEFAULT_EMAIL value otherwise
+     * @return The local user's email if it is found, DEFAULT_EMAIL value
+     *         otherwise
      */
     public String getEmail() {
         return mSharedPref.getString(EMAIL, DEFAULT_EMAIL);
     }
 
     /**
-     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value otherwise
+     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
+     *         otherwise
      */
     public long getFacebookID() {
         return mSharedPref.getLong(FB_ID, DEFAULT_FB_ID);
@@ -146,7 +150,8 @@ public class SettingsManager {
     }
 
     /**
-     * @return the frequence in seconds at which we fetch and upload the datas. Used by the service.
+     * @return the frequence in seconds at which we fetch and upload the datas.
+     *         Used by the service.
      * @author SpicyCH
      */
     public int getRefreshFrequency() {
@@ -155,7 +160,8 @@ public class SettingsManager {
     }
 
     /**
-     * @return the time to wait in minutes before hiding inactive friends from the map.
+     * @return the time to wait in minutes before hiding inactive friends from
+     *         the map.
      * @author SpicyCH
      */
     public int getTimeToWaitBeforeHidingFriends() {
@@ -164,14 +170,16 @@ public class SettingsManager {
     }
 
     /**
-     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN value otherwise
+     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN
+     *         value otherwise
      */
     public String getToken() {
         return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);
     }
 
     /**
-     * @return The local user's phone number if it is found, DEFAULT_NUMBER value otherwise
+     * @return The local user's phone number if it is found, DEFAULT_NUMBER
+     *         value otherwise
      */
     public String getUPhoneNumber() {
         return mSharedPref.getString(PHONE_NUMBER, DEFAULT_NUMBER);
@@ -185,7 +193,8 @@ public class SettingsManager {
     }
 
     /**
-     * @return The local user's name if it is found, DEFAULT_NAME value otherwise
+     * @return The local user's name if it is found, DEFAULT_NAME value
+     *         otherwise
      */
     public String getUserName() {
         return mSharedPref.getString(USER_NAME, DEFAULT_NAME);
@@ -199,7 +208,8 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications,
+     *         <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsEnabled() {
@@ -208,8 +218,10 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event invitations and the user
-     *         activated the notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for event
+     *         invitations and the user
+     *         activated the notifications in general, <code>false</code>
+     *         otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
@@ -218,8 +230,10 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event proximity and the user
-     *         activated the notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for event
+     *         proximity and the user
+     *         activated the notifications in general, <code>false</code>
+     *         otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
@@ -228,8 +242,10 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for friend requests and the user
-     *         activated the notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for
+     *         friend requests and the user
+     *         activated the notifications in general, <code>false</code>
+     *         otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
@@ -238,10 +254,13 @@ public class SettingsManager {
     }
 
     /**
-     * A friendship confirmation happens when another user accepts your friend request.
+     * A friendship confirmation happens when another user accepts your friend
+     * request.
      * 
-     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
-     *         user activated the notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for
+     *         friendship confirmations and the
+     *         user activated the notifications in general, <code>false</code>
+     *         otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
@@ -250,7 +269,8 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications vibrations and the user activated the
+     * @return <code>true</code> if the user enabled the notifications
+     *         vibrations and the user activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
@@ -381,8 +401,8 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user wants to see his private events on his map, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> if the user wants to see his private events on
+     *         his map, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean showPrivateEvents() {
@@ -390,8 +410,8 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user wants to see public events on his map, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> if the user wants to see public events on his
+     *         map, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean showPublicEvents() {

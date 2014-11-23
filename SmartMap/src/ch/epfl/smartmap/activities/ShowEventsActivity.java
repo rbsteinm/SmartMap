@@ -43,8 +43,10 @@ public class ShowEventsActivity extends ListActivity {
     private final static int ONE_HUNDRED = 100;
 
     /**
-     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired
-     * by wikipedia. This is costly as there are several library calls to sin, cos, etc...
+     * Computes the distance between two GPS locations (takes into consideration
+     * the earth radius), inspired
+     * by wikipedia. This is costly as there are several library calls to sin,
+     * cos, etc...
      * 
      * @param lat1
      *            latitude of point 1
@@ -90,7 +92,8 @@ public class ShowEventsActivity extends ListActivity {
     private Location mMyLocation;
 
     private void initializeGUI() {
-        // We need to intialize the two following Singletons to let espresso tests pass.
+        // We need to intialize the two following Singletons to let espresso
+        // tests pass.
         mContext = this.getApplicationContext();
         SettingsManager.initialize(mContext);
         DatabaseHelper.initialize(mContext);

@@ -41,7 +41,8 @@ import com.facebook.widget.LoginButton;
 public class FacebookFragment extends Fragment {
 
     /**
-     * An AsyncTask to send the facebook user data to the SmartMap server asynchronously
+     * An AsyncTask to send the facebook user data to the SmartMap server
+     * asynchronously
      * 
      * @author SpicyCH
      */
@@ -248,8 +249,10 @@ public class FacebookFragment extends Fragment {
      * Sends the params to the SmartMap server.
      * 
      * @param params
-     *            a map with values for the keys name, facebookId and facebookToken
-     * @return <code>true</code> if the internet connection is up and the data is beeing processed by an
+     *            a map with values for the keys name, facebookId and
+     *            facebookToken
+     * @return <code>true</code> if the internet connection is up and the data
+     *         is beeing processed by an
      *         asynctask
      * @author SpicyCH
      */

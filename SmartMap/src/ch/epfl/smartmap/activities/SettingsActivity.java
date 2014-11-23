@@ -21,9 +21,11 @@ import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.SettingsManager;
 
 /**
- * A {@link PreferenceActivity} that presents a set of application settings. On handset devices, settings are
+ * A {@link PreferenceActivity} that presents a set of application settings. On
+ * handset devices, settings are
  * presented
- * as a single list. On tablets, settings are split by category, with category headers shown to the left of
+ * as a single list. On tablets, settings are split by category, with category
+ * headers shown to the left of
  * the list of
  * settings.
  * 
@@ -31,7 +33,8 @@ import ch.epfl.smartmap.cache.SettingsManager;
  */
 public class SettingsActivity extends PreferenceActivity {
     /**
-     * This fragment shows data and sync preferences only. It is used when the activity is showing a two-pane
+     * This fragment shows data and sync preferences only. It is used when the
+     * activity is showing a two-pane
      * settings
      * UI.
      */
@@ -45,7 +48,8 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * This fragment shows general preferences only. It is used when the activity is showing a two-pane
+     * This fragment shows general preferences only. It is used when the
+     * activity is showing a two-pane
      * settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -61,7 +65,8 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * This fragment shows notification preferences only. It is used when the activity is showing a two-pane
+     * This fragment shows notification preferences only. It is used when the
+     * activity is showing a two-pane
      * settings
      * UI.
      */
@@ -77,9 +82,11 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * Determines whether to always show the simplified settings UI, where settings are presented in a single
+     * Determines whether to always show the simplified settings UI, where
+     * settings are presented in a single
      * list. When
-     * false, settings are shown as a master/detail two-pane view on tablets. When true, a single pane is
+     * false, settings are shown as a master/detail two-pane view on tablets.
+     * When true, a single pane is
      * shown on
      * tablets.
      */
@@ -88,7 +95,8 @@ public class SettingsActivity extends PreferenceActivity {
     protected static final String TAG = SettingsActivity.class.getSimpleName();
 
     /**
-     * A preference value change listener that updates the preference's summary to reflect its new value.
+     * A preference value change listener that updates the preference's summary
+     * to reflect its new value.
      */
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
         new Preference.OnPreferenceChangeListener() {
@@ -97,7 +105,8 @@ public class SettingsActivity extends PreferenceActivity {
                 String stringValue = value.toString();
 
                 if (preference instanceof ListPreference) {
-                    // For list preferences, look up the correct display value in
+                    // For list preferences, look up the correct display value
+                    // in
                     // the preference's 'entries' list.
                     ListPreference listPreference = (ListPreference) preference;
                     int index = listPreference.findIndexOfValue(stringValue);
@@ -115,11 +124,14 @@ public class SettingsActivity extends PreferenceActivity {
         };
 
     /**
-     * Binds a preference's summary to its value. More specifically, when the preference's value is changed,
+     * Binds a preference's summary to its value. More specifically, when the
+     * preference's value is changed,
      * its summary
-     * (line of text below the preference title) is updated to reflect the value. The summary is also
+     * (line of text below the preference title) is updated to reflect the
+     * value. The summary is also
      * immediately
-     * updated upon calling this method. The exact display format is dependent on the type of preference.
+     * updated upon calling this method. The exact display format is dependent
+     * on the type of preference.
      * 
      * @see #sBindPreferenceSummaryToValueListener
      */
@@ -134,10 +146,12 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * Determines whether the simplified settings UI should be shown. This is true if this is forced via
-     * {@link #ALWAYS_SIMPLE_PREFS}, or the device doesn't have newer APIs like {@link PreferenceFragment}, or
+     * Determines whether the simplified settings UI should be shown. This is
+     * true if this is forced via {@link #ALWAYS_SIMPLE_PREFS}, or the device
+     * doesn't have newer APIs like {@link PreferenceFragment}, or
      * the
-     * device doesn't have an extra-large screen. In these cases, a single-pane "simplified" settings UI
+     * device doesn't have an extra-large screen. In these cases, a single-pane
+     * "simplified" settings UI
      * should be
      * shown.
      */
@@ -147,7 +161,8 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * Helper method to determine if the device has an extra-large screen. For example, 10" tablets are
+     * Helper method to determine if the device has an extra-large screen. For
+     * example, 10" tablets are
      * extra-large.
      */
     private static boolean isXLargeTablet(Context context) {
@@ -211,7 +226,8 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * Shows the simplified settings UI if the device configuration if the device configuration dictates that
+     * Shows the simplified settings UI if the device configuration if the
+     * device configuration dictates that
      * a simplified, single-pane UI should be shown.
      */
     @SuppressWarnings("deprecation")
@@ -243,6 +259,7 @@ public class SettingsActivity extends PreferenceActivity {
         // to reflect the new value, per the Android Design guidelines.
         bindPreferenceSummaryToValue(this.findPreference("refresh_frequency"));
         bindPreferenceSummaryToValue(this.findPreference("last_seen_max"));
-        // crash bindPreferenceSummaryToValue(this.findPreference("notifications_enabled"));
+        // crash
+        // bindPreferenceSummaryToValue(this.findPreference("notifications_enabled"));
     }
 }
