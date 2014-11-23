@@ -5,7 +5,6 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 
@@ -43,7 +42,7 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
      */
     @Override
     public void zoomOnLocation(LatLng latLng) {
-        Log.d(TAG, "zoomMap called");
+
         LatLng latLng1 = new LatLng(latLng.latitude, latLng.longitude);
         // Zoom in the Google Map
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
@@ -69,14 +68,14 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
     @Override
     public void zoomAccordingToMarkers(final List<Marker> markers) {
         if (!markers.isEmpty()) {
-            Log.i(TAG, "after mapview enter to zoom according");
+
             if (mMapView.getViewTreeObserver().isAlive()) {
                 mMapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
                     @SuppressWarnings("deprecation")
                     @SuppressLint("NewApi")
                     @Override
                     public void onGlobalLayout() {
-                        Log.d(TAG, "enter to zoom according on glpbal");
+
                         // LatLng centre = new LatLng(CENTER_LATTITUDE,
                         // CENTER_LONGITUDE);
                         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();

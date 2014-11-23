@@ -325,13 +325,13 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
             Criteria criteria = new Criteria();
             // Getting the name of the best provider
             String provider = locationManager.getBestProvider(criteria, true);
-            Log.d(TAG, "provider : " + provider);
+
             // Getting Current Location
             // Location location =
             // locationManager.getLastKnownLocation(provider);
             boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (isGPSEnabled) {
-                Log.d(TAG, "gps enabled");
+
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
                     LOCATION_UPDATE_DISTANCE, this);
             } else if (null != locationManager.getProvider(LocationManager.NETWORK_PROVIDER)) {
