@@ -3,7 +3,6 @@ package ch.epfl.smartmap.cache;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.preference.PreferenceManager;
 
 /**
  * Used to get and set settings and local info using SharedPreferences
@@ -22,6 +21,7 @@ public class SettingsManager {
     public static final String HIDDEN = "Hidden";
     public static final String LONGITUDE = "Longitude";
     public static final String LATITUDE = "Latitude";
+    public static final String LOCATION_NAME = "LocName";
 
     public static final long DEFAULT_ID = -1;
     public static final String DEFAULT_NAME = "No name";
@@ -30,20 +30,12 @@ public class SettingsManager {
     public static final String DEFAULT_TOKEN = "No token";
     public static final long DEFAULT_FB_ID = -1;
     public static final String DEFAULT_COOKIE = "No cookie";
+    public static final String DEFAULT_LOC_NAME = "";
 
     private final Context mContext;
     private final SharedPreferences mSharedPref;
     private final SharedPreferences.Editor mEditor;
     private static SettingsManager mInstance;
-
-    // The following constant Strings must match the keys defined in
-    // res/xml/pref_notifications.xml
-    private final static String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
-    private final static String KEY_FRIEND_REQUEST = "notifications_friend_requests";
-    private final static String KEY_FRIENDSHIP_CONFIRMATIONS = "notifications_friendship_confirmations";
-    private final static String KEY_EVENT_INVITATIONS = "notifications_event_invitations";
-    private final static String KEY_EVENT_PROXIMITY = "notifications_event_proximity";
-    private final static String KEY_VIBRATE = "notifications_new_message_vibrate";
 
     /**
      * SettingsManager constructor. Will be made private, use initialize() or
@@ -77,73 +69,6 @@ public class SettingsManager {
      */
     public static SettingsManager getInstance() {
         return mInstance;
-    }
-
-    /**
-     * @return <code>true</code> if the user enabled the notifications, <code>false</code> otherwise.
-     * @author SpicyCH
-     */
-    public boolean notificationsEnabled() {
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_NOTIFICATIONS_ENABLED,
-            true);
-    }
-
-    /**
-     * @return <code>true</code> if the user enabled the notifications for
-     *         friend requests and the user activated the
-     *         notifications in general, <code>false</code> otherwise.
-     * @author SpicyCH
-     */
-    public boolean notificationsForFriendRequests() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_FRIEND_REQUEST, true) : false;
-    }
-
-    /**
-     * A friendship confirmation happens when another user accepts your friend
-     * request.
-     * 
-     * @return <code>true</code> if the user enabled the notifications for
-     *         friendship confirmations and the user
-     *         activated the notifications in general, <code>false</code> otherwise.
-     * @author SpicyCH
-     */
-    public boolean notificationsForFriendshipConfirmations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_FRIENDSHIP_CONFIRMATIONS, true) : false;
-    }
-
-    /**
-     * @return <code>true</code> if the user enabled the notifications for event
-     *         invitations and the user activated the
-     *         notifications in general, <code>false</code> otherwise.
-     * @author SpicyCH
-     */
-    public boolean notificationsForEventInvitations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_EVENT_INVITATIONS, true) : false;
-    }
-
-    /**
-     * @return <code>true</code> if the user enabled the notifications for event
-     *         proximity and the user activated the
-     *         notifications in general, <code>false</code> otherwise.
-     * @author SpicyCH
-     */
-    public boolean notificationsForEventProximity() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_EVENT_PROXIMITY, true) : false;
-    }
-
-    /**
-     * @return <code>true</code> if the user enabled the notifications
-     *         vibrations and the user activated the
-     *         notifications in general, <code>false</code> otherwise.
-     * @author SpicyCH
-     */
-    public boolean notificationsVibrate() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_VIBRATE, true) : false;
     }
 
     /**
@@ -209,6 +134,13 @@ public class SettingsManager {
         loc.setLongitude(Double.longBitsToDouble(mSharedPref.getLong(LONGITUDE, 0)));
         loc.setLatitude(Double.longBitsToDouble(mSharedPref.getLong(LATITUDE, 0)));
         return loc;
+    }
+
+    /**
+     * @return The location name (e.g. city)
+     */
+    public String getLocationName() {
+        return mSharedPref.getString(LOCATION_NAME, DEFAULT_LOC_NAME);
     }
 
     /**
@@ -324,6 +256,11 @@ public class SettingsManager {
     public boolean setLocation(Location loc) {
         mEditor.putLong(LONGITUDE, Double.doubleToRawLongBits(loc.getLongitude()));
         mEditor.putLong(LATITUDE, Double.doubleToRawLongBits(loc.getLatitude()));
+        return mEditor.commit();
+    }
+
+    public boolean setLocationName(String locName) {
+        mEditor.putString(LOCATION_NAME, locName);
         return mEditor.commit();
     }
 

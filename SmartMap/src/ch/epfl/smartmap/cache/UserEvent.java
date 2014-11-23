@@ -227,6 +227,7 @@ public class UserEvent implements Event, Searchable, Displayable {
     public void setStartDate(GregorianCalendar newDate) {
         mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
             newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
+
     }
 
     /*
@@ -243,5 +244,6 @@ public class UserEvent implements Event, Searchable, Displayable {
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
             .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
         return markerOptions;
+
     }
 }

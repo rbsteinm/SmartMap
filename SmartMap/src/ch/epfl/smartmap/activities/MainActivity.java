@@ -15,11 +15,8 @@ import android.content.IntentFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
@@ -41,7 +38,6 @@ import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.FriendsLocationListener;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
-import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SearchPanel;
@@ -70,9 +66,7 @@ import com.google.android.gms.maps.model.Marker;
  * @author SpicyCH
  */
 
-// TODO MainActivity will no longer be a LocationListener when everything will
-// be ready in the service
-public class MainActivity extends FragmentActivity implements FriendsLocationListener, LocationListener {
+public class MainActivity extends FragmentActivity implements FriendsLocationListener {
 
     private static final String TAG = "MAIN_ACTIVITY";
     private static final int LOCATION_UPDATE_TIMEOUT = 10000;
@@ -117,6 +111,9 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
+        // starting the background service
+        this.startService(new Intent(this, UpdateService.class));
+
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
@@ -137,6 +134,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         mDbHelper = DatabaseHelper.getInstance();
 
         mSearchEngine = new MockSearchEngine(this.sparseArrayToList(mDbHelper.getAllUsers()));
+
         mSearchLayout.setSearchEngine(mSearchEngine);
 
         if (savedInstanceState == null) {
@@ -156,9 +154,6 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
             mGoogleMap.setOnMarkerClickListener(new ShowInfoOnMarkerClick());
 
         }
-
-        // starting the background service
-        this.startService(new Intent(this, UpdateService.class));
     }
 
     @Override
@@ -226,12 +221,6 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         return super.onOptionsItemSelected(item);
     }
 
-    // will be removed
-    @Override
-    public void onLocationChanged(Location location) {
-        SettingsManager.getInstance().setLocation(location);
-    }
-
     @Override
     public void onBackPressed() {
         switch (mMenuTheme) {
@@ -276,8 +265,10 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
             mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
                 MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
+
         }
 
     };
@@ -313,31 +304,9 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
+
             mGoogleMap.setMyLocationEnabled(true);
 
-            // the code below will be deleted
-
-            // Getting LocationManager object from System Service
-            // LOCATION_SERVICE
-            LocationManager locationManager =
-                (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            // Creating a criteria object to retrieve provider
-            Criteria criteria = new Criteria();
-            // Getting the name of the best provider
-            String provider = locationManager.getBestProvider(criteria, true);
-
-            // Getting Current Location
-            // Location location =
-            // locationManager.getLastKnownLocation(provider);
-            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            if (isGPSEnabled) {
-
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
-            } else if (null != locationManager.getProvider(LocationManager.NETWORK_PROVIDER)) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                    LOCATION_UPDATE_TIMEOUT, LOCATION_UPDATE_DISTANCE, this);
-            }
         }
     }
 
@@ -362,38 +331,6 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
 
         }
         return users;
-    }
-
-    // the 3 methods below will be removed
-
-    /*
-     * (non-Javadoc)
-     * @see android.location.LocationListener#onStatusChanged(java.lang.String,
-     * int, android.os.Bundle)
-     */
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // nothing
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * android.location.LocationListener#onProviderEnabled(java.lang.String)
-     */
-    @Override
-    public void onProviderEnabled(String provider) {
-        // nothing
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * android.location.LocationListener#onProviderDisabled(java.lang.String)
-     */
-    @Override
-    public void onProviderDisabled(String provider) {
-        // nothing
     }
 
     /**

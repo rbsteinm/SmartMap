@@ -1,13 +1,23 @@
 package ch.epfl.smartmap.background;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -134,7 +144,58 @@ public class UpdateService extends Service {
                         notifiedInvitations.add(user.getID());
                         UpdateService.this.showFriendNotif(user);
                     }
+                    mHelper.addInvitation(user);
                 }
+            }
+        }
+    }
+
+    /**
+     * A location listener
+     * 
+     * @author ritterni
+     */
+    private final class MyLocationListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location locFromGps) {
+            mManager.setLocation(locFromGps);
+            if (mOwnPosEnabled) {
+                new AsyncOwnPos().execute();
+            }
+            // Sets the location name
+            try {
+                String locName =
+                    mGeocoder.getFromLocation(locFromGps.getLatitude(), locFromGps.getLongitude(), 1).get(0)
+                        .getLocality();
+                if (locName == null) {
+                    mManager.setLocationName(SettingsManager.DEFAULT_LOC_NAME);
+                } else {
+                    mManager.setLocationName(locName);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            mOwnPosEnabled = false;
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            mOwnPosEnabled = true;
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            // stop sending position if provider isn't available
+            if ((status == LocationProvider.OUT_OF_SERVICE)
+                || (status == LocationProvider.TEMPORARILY_UNAVAILABLE)) {
+                mOwnPosEnabled = false;
+            } else if (status == LocationProvider.AVAILABLE) {
+                mOwnPosEnabled = true;
             }
         }
     }
@@ -143,18 +204,21 @@ public class UpdateService extends Service {
     public static final String UPDATED_ROWS = "UpdatedRows";
     private static final int HANDLER_DELAY = 1000;
     private static final int POS_UPDATE_DELAY = 10000;
-    private static final int INVITE_UPDATE_DELAY = 10000; // Fast updates for
-                                                          // demo purposes
+    private static final int INVITE_UPDATE_DELAY = 30000;
+    private static final float MIN_DISTANCE = 5; // minimum distance to update
+                                                 // position
     private final Handler mHandler = new Handler();
     private Intent mFriendsPosIntent;
+    private LocationManager mLocManager;
 
     private boolean mFriendsPosEnabled = true;
+    private boolean mOwnPosEnabled = true;
 
     private boolean mReady = false;
 
-    private final DatabaseHelper mHelper = DatabaseHelper.getInstance();
-
-    private final SettingsManager mManager = SettingsManager.getInstance();
+    private DatabaseHelper mHelper;
+    private SettingsManager mManager;
+    private Geocoder mGeocoder;
 
     private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
 
@@ -162,27 +226,16 @@ public class UpdateService extends Service {
     private final Set<Long> notifiedInvitations = new HashSet<Long>();
     // TWEAK !!!
 
-    private final Runnable sendFriendsPosUpdate = new Runnable() {
+    private final Runnable friendsPosUpdate = new Runnable() {
         @Override
         public void run() {
             if (mFriendsPosEnabled) {
                 if (mReady) {
                     new AsyncFriendsPos().execute();
                     UpdateService.this.sendBroadcast(mFriendsPosIntent);
-                    Log.d("UpdateService", "Broadcast sent");
                 }
                 mHandler.postDelayed(this, POS_UPDATE_DELAY);
-                Log.d("UpdateService", "Friends pos update");
             }
-        }
-    };
-
-    private final Runnable sendOwnPosUpdate = new Runnable() {
-        @Override
-        public void run() {
-            new AsyncOwnPos().execute();
-            mHandler.postDelayed(this, POS_UPDATE_DELAY);
-            Log.d("UpdateService", "Own pos update");
         }
     };
 
@@ -191,7 +244,6 @@ public class UpdateService extends Service {
         public void run() {
             new AsyncRequestCheck().execute();
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
-            Log.d("UpdateService", "Friend requests check");
         }
     };
 
@@ -200,7 +252,6 @@ public class UpdateService extends Service {
         public void run() {
             new AsyncReplyCheck().execute();
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
-            Log.d("UpdateService", "Friend replies check");
         }
     };
 
@@ -213,21 +264,29 @@ public class UpdateService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mManager = SettingsManager.initialize(this.getApplicationContext());
+        mHelper = DatabaseHelper.initialize(this.getApplicationContext());
+        mGeocoder = new Geocoder(this.getBaseContext(), Locale.US);
         mFriendsPosIntent = new Intent(BROADCAST_POS);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
+            MIN_DISTANCE, new MyLocationListener());
         new AsyncFriendsInit().execute();
     }
 
     @Override
-    public void onStart(Intent intent, int startId) {
-        mHandler.removeCallbacks(sendFriendsPosUpdate);
-        mHandler.postDelayed(sendFriendsPosUpdate, HANDLER_DELAY);
-        mHandler.removeCallbacks(sendOwnPosUpdate);
-        mHandler.postDelayed(sendOwnPosUpdate, HANDLER_DELAY);
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        mHandler.removeCallbacks(friendsPosUpdate);
+        mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
         mHandler.removeCallbacks(showFriendNotif);
         mHandler.postDelayed(showFriendNotif, HANDLER_DELAY);
         mHandler.removeCallbacks(getReplies);
         mHandler.postDelayed(getReplies, HANDLER_DELAY);
         Log.d("UpdateService", "Service started");
+
+        return START_STICKY;
     }
 
     /**
@@ -239,7 +298,7 @@ public class UpdateService extends Service {
     public void setFriendsPosUpdateEnabled(boolean isEnabled) {
         mFriendsPosEnabled = isEnabled;
         if (isEnabled) {
-            mHandler.postDelayed(sendFriendsPosUpdate, HANDLER_DELAY);
+            mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
         }
     }
 
