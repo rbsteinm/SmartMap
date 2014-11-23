@@ -10,13 +10,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import ch.epfl.smartmap.cache.Displayable;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
@@ -70,7 +72,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
             } else {
                 marker = this.addMarker(item, context);
             }
-            this.animateMarker(marker, item.getLatLng());
+            this.animateMarker(marker, item.getLatLng(), false);
         }
 
         // remove the markers that are not longer in the list to display
@@ -78,7 +80,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
             if (!itemsToDisplay.contains(item)) {
                 // && (!getMarkerForItem(item).isInfoWindowShown())) {
                 Marker marker = this.removeMarker(item);
-                this.animateMarker(marker, item.getLatLng());
+                this.animateMarker(marker, item.getLatLng(), true);
             }
         }
 
@@ -187,32 +189,37 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * @param hideMarker
      * @param map
      */
-    private void animateMarker(final Marker marker, final LatLng finalPosition) {
-        final LatLngInterpolator latLngInterpolator = new LatLngInterpolator.LinearFixed();
-        final LatLng startPosition = marker.getPosition();
+    private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker) {
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
-        final Interpolator interpolator = new AccelerateDecelerateInterpolator();
-        final float durationInMs = 3000;
+        Projection proj = mGoogleMap.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 500;
+
+        final Interpolator interpolator = new LinearInterpolator();
 
         handler.post(new Runnable() {
-            private long elapsed;
-            private float t;
-            private float v;
-
             @Override
             public void run() {
-                // Calculate progress using interpolator
-                elapsed = SystemClock.uptimeMillis() - start;
-                t = elapsed / durationInMs;
-                v = interpolator.getInterpolation(t);
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed / duration);
+                double lng = (t * toPosition.longitude) + ((1 - t) * startLatLng.longitude);
+                double lat = (t * toPosition.latitude) + ((1 - t) * startLatLng.latitude);
+                marker.setPosition(new LatLng(lat, lng));
+                // Log.d(TAG, "Set marker position for friend "
+                // + getFriendForMarker(marker).getName() + " "
+                // + marker.getPosition().toString());
 
-                marker.setPosition(latLngInterpolator.interpolate(v, startPosition, finalPosition));
-
-                // Repeat till progress is complete.
-                if (t < 1) {
+                if (t < 1.0) {
                     // Post again 16ms later.
                     handler.postDelayed(this, HANDLER_DELAY);
+                } else {
+                    if (hideMarker) {
+                        marker.setVisible(false);
+                    } else {
+                        marker.setVisible(true);
+                    }
                 }
             }
         });
