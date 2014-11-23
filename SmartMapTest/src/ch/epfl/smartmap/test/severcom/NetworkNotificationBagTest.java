@@ -3,14 +3,14 @@
  */
 package ch.epfl.smartmap.test.severcom;
 
-import static org.mockito.Mockito.mock;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
+
+import static org.mockito.Mockito.*;
 
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;

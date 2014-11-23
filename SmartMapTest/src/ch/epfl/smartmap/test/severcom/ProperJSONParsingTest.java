@@ -6,8 +6,6 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import android.annotation.SuppressLint;
