@@ -31,16 +31,6 @@ public class FriendList implements UserList {
     }
 
     @Override
-    public String getListName() {
-        return listName;
-    }
-
-    @Override
-    public void setListName(String newName) {
-        listName = newName;
-    }
-
-    @Override
     public void addUser(long id) {
         if (!idList.contains(id)) {
             idList.add(id);
@@ -48,13 +38,18 @@ public class FriendList implements UserList {
     }
 
     @Override
-    public void removeUser(long id) {
-        idList.remove(id);
+    public long getID() {
+        return databaseID;
     }
 
     @Override
     public List<Long> getList() {
         return new ArrayList<Long>(idList);
+    }
+
+    @Override
+    public String getListName() {
+        return listName;
     }
 
     @Override
@@ -70,12 +65,17 @@ public class FriendList implements UserList {
     }
 
     @Override
-    public long getID() {
-        return databaseID;
+    public void removeUser(long id) {
+        idList.remove(id);
     }
 
     @Override
     public void setID(long newID) {
         databaseID = newID;
+    }
+
+    @Override
+    public void setListName(String newName) {
+        listName = newName;
     }
 }

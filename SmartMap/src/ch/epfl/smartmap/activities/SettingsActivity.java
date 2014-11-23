@@ -30,6 +30,66 @@ import ch.epfl.smartmap.R;
  */
 public class SettingsActivity extends PreferenceActivity {
     /**
+     * This fragment shows data and sync preferences only. It is used when the activity is showing a two-pane
+     * settings
+     * UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class DataSyncPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            this.addPreferencesFromResource(R.xml.pref_data_sync);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            bindPreferenceSummaryToValue(this.findPreference("sync_frequency"));
+        }
+    }
+
+    /**
+     * This fragment shows general preferences only. It is used when the activity is showing a two-pane
+     * settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class GeneralPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            this.addPreferencesFromResource(R.xml.pref_general);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            bindPreferenceSummaryToValue(this.findPreference("example_text"));
+            bindPreferenceSummaryToValue(this.findPreference("example_list"));
+        }
+    }
+
+    /**
+     * This fragment shows notification preferences only. It is used when the activity is showing a two-pane
+     * settings
+     * UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class NotificationPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            this.addPreferencesFromResource(R.xml.pref_notification);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            bindPreferenceSummaryToValue(this.findPreference("notifications_enabled"));
+        }
+    }
+
+    /**
      * Determines whether to always show the simplified settings UI, where settings are presented in a single
      * list. When
      * false, settings are shown as a master/detail two-pane view on tablets. When true, a single pane is
@@ -39,113 +99,6 @@ public class SettingsActivity extends PreferenceActivity {
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
 
     protected static final String TAG = SettingsActivity.class.getSimpleName();
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setupActionBar();
-    }
-
-    /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void setupActionBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            // Show the Up button in the action bar.
-            this.getActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        this.setupSimplePreferencesScreen();
-    }
-
-    /**
-     * Shows the simplified settings UI if the device configuration if the device configuration dictates that
-     * a
-     * simplified, single-pane UI should be shown.
-     */
-    private void setupSimplePreferencesScreen() {
-        if (!isSimplePreferences(this)) {
-            return;
-        }
-
-        // In the simplified UI, fragments are not used at all and we instead
-        // use the older PreferenceActivity APIs.
-
-        // Add 'general' preferences.
-        this.addPreferencesFromResource(R.xml.pref_general);
-
-        // Add 'notifications' preferences, and a corresponding header.
-        PreferenceCategory fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_notifications);
-        this.getPreferenceScreen().addPreference(fakeHeader);
-        this.addPreferencesFromResource(R.xml.pref_notification);
-
-        // Add 'data and sync' preferences, and a corresponding header.
-        fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_data_sync);
-        this.getPreferenceScreen().addPreference(fakeHeader);
-        this.addPreferencesFromResource(R.xml.pref_data_sync);
-
-        // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
-        // their values. When their values change, their summaries are updated
-        // to reflect the new value, per the Android Design guidelines.
-        bindPreferenceSummaryToValue(this.findPreference("example_text"));
-        bindPreferenceSummaryToValue(this.findPreference("example_list"));
-        bindPreferenceSummaryToValue(this.findPreference("sync_frequency"));
-        // crash bindPreferenceSummaryToValue(this.findPreference("notifications_enabled"));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean onIsMultiPane() {
-        return isXLargeTablet(this) && !isSimplePreferences(this);
-    }
-
-    /**
-     * Helper method to determine if the device has an extra-large screen. For example, 10" tablets are
-     * extra-large.
-     */
-    private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
-
-    /**
-     * Determines whether the simplified settings UI should be shown. This is true if this is forced via
-     * {@link #ALWAYS_SIMPLE_PREFS}, or the device doesn't have newer APIs like {@link PreferenceFragment}, or
-     * the
-     * device doesn't have an extra-large screen. In these cases, a single-pane "simplified" settings UI
-     * should be
-     * shown.
-     */
-    private static boolean isSimplePreferences(Context context) {
-        return ALWAYS_SIMPLE_PREFS || (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-            || !isXLargeTablet(context);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void onBuildHeaders(List<Header> target) {
-        if (!isSimplePreferences(this)) {
-            this.loadHeadersFromResource(R.xml.pref_headers, target);
-        }
-    }
 
     /**
      * A preference value change listener that updates the preference's summary to reflect its new value.
@@ -194,62 +147,109 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * This fragment shows general preferences only. It is used when the activity is showing a two-pane
-     * settings UI.
+     * Determines whether the simplified settings UI should be shown. This is true if this is forced via
+     * {@link #ALWAYS_SIMPLE_PREFS}, or the device doesn't have newer APIs like {@link PreferenceFragment}, or
+     * the
+     * device doesn't have an extra-large screen. In these cases, a single-pane "simplified" settings UI
+     * should be
+     * shown.
+     */
+    private static boolean isSimplePreferences(Context context) {
+        return ALWAYS_SIMPLE_PREFS || (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+            || !isXLargeTablet(context);
+    }
+
+    /**
+     * Helper method to determine if the device has an extra-large screen. For example, 10" tablets are
+     * extra-large.
+     */
+    private static boolean isXLargeTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public void onBuildHeaders(List<Header> target) {
+        if (!isSimplePreferences(this)) {
+            this.loadHeadersFromResource(R.xml.pref_headers, target);
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setupActionBar();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean onIsMultiPane() {
+        return isXLargeTablet(this) && !isSimplePreferences(this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        this.setupSimplePreferencesScreen();
+    }
+
+    /**
+     * Set up the {@link android.app.ActionBar}, if the API is available.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            this.addPreferencesFromResource(R.xml.pref_general);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(this.findPreference("example_text"));
-            bindPreferenceSummaryToValue(this.findPreference("example_list"));
+    private void setupActionBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            // Show the Up button in the action bar.
+            this.getActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
 
     /**
-     * This fragment shows notification preferences only. It is used when the activity is showing a two-pane
-     * settings
-     * UI.
+     * Shows the simplified settings UI if the device configuration if the device configuration dictates that
+     * a
+     * simplified, single-pane UI should be shown.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class NotificationPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            this.addPreferencesFromResource(R.xml.pref_notification);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(this.findPreference("notifications_enabled"));
+    private void setupSimplePreferencesScreen() {
+        if (!isSimplePreferences(this)) {
+            return;
         }
-    }
 
-    /**
-     * This fragment shows data and sync preferences only. It is used when the activity is showing a two-pane
-     * settings
-     * UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class DataSyncPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            this.addPreferencesFromResource(R.xml.pref_data_sync);
+        // In the simplified UI, fragments are not used at all and we instead
+        // use the older PreferenceActivity APIs.
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(this.findPreference("sync_frequency"));
-        }
+        // Add 'general' preferences.
+        this.addPreferencesFromResource(R.xml.pref_general);
+
+        // Add 'notifications' preferences, and a corresponding header.
+        PreferenceCategory fakeHeader = new PreferenceCategory(this);
+        fakeHeader.setTitle(R.string.pref_header_notifications);
+        this.getPreferenceScreen().addPreference(fakeHeader);
+        this.addPreferencesFromResource(R.xml.pref_notification);
+
+        // Add 'data and sync' preferences, and a corresponding header.
+        fakeHeader = new PreferenceCategory(this);
+        fakeHeader.setTitle(R.string.pref_header_data_sync);
+        this.getPreferenceScreen().addPreference(fakeHeader);
+        this.addPreferencesFromResource(R.xml.pref_data_sync);
+
+        // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
+        // their values. When their values change, their summaries are updated
+        // to reflect the new value, per the Android Design guidelines.
+        bindPreferenceSummaryToValue(this.findPreference("example_text"));
+        bindPreferenceSummaryToValue(this.findPreference("example_list"));
+        bindPreferenceSummaryToValue(this.findPreference("sync_frequency"));
+        // crash bindPreferenceSummaryToValue(this.findPreference("notifications_enabled"));
     }
 }

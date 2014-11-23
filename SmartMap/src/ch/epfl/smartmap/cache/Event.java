@@ -14,52 +14,6 @@ import com.google.android.gms.maps.model.LatLng;
 public interface Event extends Displayable {
 
     /**
-     * @return The event's position
-     */
-    Location getLocation();
-
-    /**
-     * @return The event's latitude and longitude in the LatLng format
-     */
-    @Override
-    LatLng getLatLng();
-
-    /**
-     * Sets the event's position
-     * 
-     * @param p
-     *            The new position
-     */
-    void setLocation(Location p);
-
-    /**
-     * Sets the events's longitude
-     * 
-     * @param x
-     *            The longitude
-     */
-    void setLongitude(double x);
-
-    /**
-     * Sets the event's latitude
-     * 
-     * @param y
-     *            The latitude
-     */
-    void setLatitude(double y);
-
-    /**
-     * @return The event's name
-     */
-    @Override
-    String getName();
-
-    /**
-     * @return The event's description
-     */
-    String getDescription();
-
-    /**
      * @return The ID of the user who created the event
      */
     long getCreator();
@@ -70,9 +24,41 @@ public interface Event extends Displayable {
     String getCreatorName();
 
     /**
+     * @return The event's description
+     */
+    String getDescription();
+
+    /**
+     * @return The date (year, month, day, hour, minute) at which the event ends
+     */
+    GregorianCalendar getEndDate();
+
+    /**
      * @return The event's ID
      */
     long getID();
+
+    /**
+     * @return The event's latitude and longitude in the LatLng format
+     */
+    @Override
+    LatLng getLatLng();
+
+    /**
+     * @return The event's position
+     */
+    Location getLocation();
+
+    /**
+     * @return The event's name
+     */
+    @Override
+    String getName();
+
+    /**
+     * @return The event's position as a String (e.g. 'Lausanne')
+     */
+    String getPositionName();
 
     /**
      * @return The date (year, month, day, hour, minute) at which the event
@@ -81,22 +67,12 @@ public interface Event extends Displayable {
     GregorianCalendar getStartDate();
 
     /**
-     * @return The date (year, month, day, hour, minute) at which the event ends
-     */
-    GregorianCalendar getEndDate();
-
-    /**
-     * @return The event's position as a String (e.g. 'Lausanne')
-     */
-    String getPositionName();
-
-    /**
-     * Changes the event's name
+     * Sets the event creator's name
      * 
-     * @param newName
-     *            The new name
+     * @param name
+     *            The event creator's name
      */
-    void setName(String newName);
+    void setCreatorName(String name);
 
     /**
      * Sets the event's description
@@ -105,14 +81,6 @@ public interface Event extends Displayable {
      *            The new description
      */
     void setDescription(String desc);
-
-    /**
-     * Changes the event's start date
-     * 
-     * @param newDate
-     *            The new start date (year, month, day, hour, minute)
-     */
-    void setStartDate(GregorianCalendar newDate);
 
     /**
      * Changes the event's end date
@@ -131,6 +99,38 @@ public interface Event extends Displayable {
     void setID(long newID);
 
     /**
+     * Sets the event's latitude
+     * 
+     * @param y
+     *            The latitude
+     */
+    void setLatitude(double y);
+
+    /**
+     * Sets the event's position
+     * 
+     * @param p
+     *            The new position
+     */
+    void setLocation(Location p);
+
+    /**
+     * Sets the events's longitude
+     * 
+     * @param x
+     *            The longitude
+     */
+    void setLongitude(double x);
+
+    /**
+     * Changes the event's name
+     * 
+     * @param newName
+     *            The new name
+     */
+    void setName(String newName);
+
+    /**
      * Sets the user position's name
      * 
      * @param posName
@@ -139,10 +139,10 @@ public interface Event extends Displayable {
     void setPositionName(String posName);
 
     /**
-     * Sets the event creator's name
+     * Changes the event's start date
      * 
-     * @param name
-     *            The event creator's name
+     * @param newDate
+     *            The new start date (year, month, day, hour, minute)
      */
-    void setCreatorName(String name);
+    void setStartDate(GregorianCalendar newDate);
 }

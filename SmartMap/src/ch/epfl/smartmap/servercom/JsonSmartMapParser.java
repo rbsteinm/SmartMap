@@ -35,48 +35,89 @@ public class JsonSmartMapParser implements SmartMapParser {
 
     private static final String TAG = "JSON_PARSER";
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.servercom.SmartMapParser#parseFriend(java.lang.String)
+    /**
+     * Checks if the email address is valid
+     * 
+     * @param email
+     * @throws SmartMapParseException
+     *             if invalid email address
      */
-    @Override
-    public User parseFriend(String s) throws SmartMapParseException {
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(s);
-        } catch (JSONException e) {
-            throw new SmartMapParseException(e);
-        }
-        return this.parseFriendFromJSON(jsonObject);
+    private void checkEmail(String email) throws SmartMapParseException {
+        // TODO
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.servercom.SmartMapParser#parseFriends(java.lang.String)
+    /**
+     * Checks if the id is valid
+     * 
+     * @param id
+     * @throws SmartMapParseException
+     *             if invalid id
      */
-    @Override
-    public List<User> parseFriends(String s, String key) throws SmartMapParseException {
-
-        List<User> friends = new ArrayList<User>();
-
-        try {
-            JSONObject jsonObject = new JSONObject(s);
-
-            JSONArray usersArray = jsonObject.getJSONArray(key);
-
-            for (int i = 0; i < usersArray.length(); i++) {
-                JSONObject userJSON = usersArray.getJSONObject(i);
-                User friend = this.parseFriendFromJSON(userJSON);
-                friends.add(friend);
-            }
-        } catch (JSONException e) {
-            throw new SmartMapParseException(e);
+    private void checkId(long id) throws SmartMapParseException {
+        if (id <= 0) {
+            throw new SmartMapParseException("invalid id");
         }
+    }
 
-        Log.d(TAG, Integer.toString(friends.size()));
-        return friends;
+    /**
+     * Checks if the latitude is valid
+     * 
+     * @param latitude
+     * @throws SmartMapParseException
+     *             if invalid latitude
+     */
+    private void checkLatitude(double latitude) throws SmartMapParseException {
+        if (!((MIN_LATITUDE <= latitude) && (latitude <= MAX_LATITUDE))) {
+            throw new SmartMapParseException("invalid latitude");
+        }
+    }
+
+    /**
+     * Checks if the longitude is valid
+     * 
+     * @param longitude
+     * @throws SmartMapParseException
+     *             if invalid longitude
+     */
+    private void checkLongitude(double longitude) throws SmartMapParseException {
+        if (!((MIN_LONGITUDE <= longitude) && (longitude <= MAX_LONGITUDE))) {
+            throw new SmartMapParseException("invalid longitude");
+        }
+    }
+
+    /**
+     * Checks if the name is valid
+     * 
+     * @param name
+     * @throws SmartMapParseException
+     *             if invalid name
+     */
+    private void checkName(String name) throws SmartMapParseException {
+        if ((name.length() >= MAX_NAME_LENGTH) || (name.length() == 0)) {
+            throw new SmartMapParseException("invalid name");
+        }
+    }
+
+    /**
+     * Checks if the parameter "online" is valid
+     * 
+     * @param online
+     * @throws SmartMapParseException
+     *             if invalid parameter
+     */
+    private void checkOnLine(String online) throws SmartMapParseException {
+        // TODO
+    }
+
+    /**
+     * Checks if the phone number is valid
+     * 
+     * @param phoneNumber
+     * @throws SmartMapParseException
+     *             if invalid phone number
+     */
+    private void checkPhoneNumber(String phoneNumber) throws SmartMapParseException {
+        // TODO
     }
 
     /*
@@ -105,40 +146,20 @@ public class JsonSmartMapParser implements SmartMapParser {
 
     }
 
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.servercom.SmartMapParser#parseFriend(java.lang.String)
+     */
     @Override
-    public Map<Long, Location> parsePositions(String s) throws SmartMapParseException {
-        Map<Long, Location> positions = new HashMap<Long, Location>();
-
+    public User parseFriend(String s) throws SmartMapParseException {
+        JSONObject jsonObject = null;
         try {
-            JSONObject jsonObject = new JSONObject(s);
-
-            JSONArray usersArray = jsonObject.getJSONArray("positions");
-
-            for (int i = 0; i < usersArray.length(); i++) {
-                JSONObject position = usersArray.getJSONObject(i);
-                long userId = position.getLong("id");
-                double latitude = position.getDouble("latitude");
-                double longitude = position.getDouble("longitude");
-
-                this.checkId(userId);
-                this.checkLatitude(latitude);
-                this.checkLongitude(longitude);
-
-                Log.d(TAG, Long.toString(userId));
-                Log.d(TAG, Double.toString(latitude));
-                Log.d(TAG, Double.toString(longitude));
-
-                Location location = new Location("SmartMapServers");
-                location.setLatitude(latitude);
-                location.setLongitude(longitude);
-                positions.put(userId, location);
-            }
-            Log.d(TAG + "number of positions in the list", Integer.toString(positions.size()));
+            jsonObject = new JSONObject(s);
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
-
-        return positions;
+        return this.parseFriendFromJSON(jsonObject);
     }
 
     /**
@@ -205,89 +226,68 @@ public class JsonSmartMapParser implements SmartMapParser {
         return friend;
     }
 
-    /**
-     * Checks if the latitude is valid
-     * 
-     * @param latitude
-     * @throws SmartMapParseException
-     *             if invalid latitude
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.servercom.SmartMapParser#parseFriends(java.lang.String)
      */
-    private void checkLatitude(double latitude) throws SmartMapParseException {
-        if (!((MIN_LATITUDE <= latitude) && (latitude <= MAX_LATITUDE))) {
-            throw new SmartMapParseException("invalid latitude");
+    @Override
+    public List<User> parseFriends(String s, String key) throws SmartMapParseException {
+
+        List<User> friends = new ArrayList<User>();
+
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+
+            JSONArray usersArray = jsonObject.getJSONArray(key);
+
+            for (int i = 0; i < usersArray.length(); i++) {
+                JSONObject userJSON = usersArray.getJSONObject(i);
+                User friend = this.parseFriendFromJSON(userJSON);
+                friends.add(friend);
+            }
+        } catch (JSONException e) {
+            throw new SmartMapParseException(e);
         }
+
+        Log.d(TAG, Integer.toString(friends.size()));
+        return friends;
     }
 
-    /**
-     * Checks if the longitude is valid
-     * 
-     * @param longitude
-     * @throws SmartMapParseException
-     *             if invalid longitude
-     */
-    private void checkLongitude(double longitude) throws SmartMapParseException {
-        if (!((MIN_LONGITUDE <= longitude) && (longitude <= MAX_LONGITUDE))) {
-            throw new SmartMapParseException("invalid longitude");
+    @Override
+    public Map<Long, Location> parsePositions(String s) throws SmartMapParseException {
+        Map<Long, Location> positions = new HashMap<Long, Location>();
+
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+
+            JSONArray usersArray = jsonObject.getJSONArray("positions");
+
+            for (int i = 0; i < usersArray.length(); i++) {
+                JSONObject position = usersArray.getJSONObject(i);
+                long userId = position.getLong("id");
+                double latitude = position.getDouble("latitude");
+                double longitude = position.getDouble("longitude");
+
+                this.checkId(userId);
+                this.checkLatitude(latitude);
+                this.checkLongitude(longitude);
+
+                Log.d(TAG, Long.toString(userId));
+                Log.d(TAG, Double.toString(latitude));
+                Log.d(TAG, Double.toString(longitude));
+
+                Location location = new Location("SmartMapServers");
+                location.setLatitude(latitude);
+                location.setLongitude(longitude);
+                positions.put(userId, location);
+            }
+            Log.d(TAG + "number of positions in the list", Integer.toString(positions.size()));
+        } catch (JSONException e) {
+            throw new SmartMapParseException(e);
         }
-    }
 
-    /**
-     * Checks if the id is valid
-     * 
-     * @param id
-     * @throws SmartMapParseException
-     *             if invalid id
-     */
-    private void checkId(long id) throws SmartMapParseException {
-        if (id <= 0) {
-            throw new SmartMapParseException("invalid id");
-        }
-    }
-
-    /**
-     * Checks if the name is valid
-     * 
-     * @param name
-     * @throws SmartMapParseException
-     *             if invalid name
-     */
-    private void checkName(String name) throws SmartMapParseException {
-        if ((name.length() >= MAX_NAME_LENGTH) || (name.length() == 0)) {
-            throw new SmartMapParseException("invalid name");
-        }
-    }
-
-    /**
-     * Checks if the email address is valid
-     * 
-     * @param email
-     * @throws SmartMapParseException
-     *             if invalid email address
-     */
-    private void checkEmail(String email) throws SmartMapParseException {
-        // TODO
-    }
-
-    /**
-     * Checks if the phone number is valid
-     * 
-     * @param phoneNumber
-     * @throws SmartMapParseException
-     *             if invalid phone number
-     */
-    private void checkPhoneNumber(String phoneNumber) throws SmartMapParseException {
-        // TODO
-    }
-
-    /**
-     * Checks if the parameter "online" is valid
-     * 
-     * @param online
-     * @throws SmartMapParseException
-     *             if invalid parameter
-     */
-    private void checkOnLine(String online) throws SmartMapParseException {
-        // TODO
+        return positions;
     }
 
 }

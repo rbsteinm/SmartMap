@@ -64,14 +64,34 @@ public class FriendSearchResultView extends SearchResultView {
         this.initViews();
     }
 
-    @Override
-    public ViewGroup getInfosLayout() {
-        return mInfoLayout;
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        // TODO : Decomment when auditErrors coded for other classes
+        if (depth == 0) {
+            return 0;
+        }
+
+        int auditErrors = 0;
+        // auditErrors += mFriend.auditErrors(depth - 1);
+
+        return auditErrors;
     }
 
     @Override
     public int getImageResource() {
         return mImageResource;
+    }
+
+    @Override
+    public ViewGroup getInfosLayout() {
+        return mInfoLayout;
     }
 
     /*
@@ -111,25 +131,5 @@ public class FriendSearchResultView extends SearchResultView {
                 return true;
             }
         };
-    }
-
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
-        }
-
-        int auditErrors = 0;
-        // auditErrors += mFriend.auditErrors(depth - 1);
-
-        return auditErrors;
     }
 }

@@ -141,6 +141,24 @@ public class Friend implements User, Searchable, Displayable {
         return mLocation;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
+     * )
+     * @author hugo-S
+     */
+    @Override
+    public MarkerOptions getMarkerOptions(Context context) {
+        Bitmap friendProfilePicture =
+            Bitmap.createScaledBitmap(this.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(this.getLatLng()).title(this.getName())
+            .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
+            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+        return markerOptions;
+    }
+
     @Override
     public String getName() {
         return mName;
@@ -174,12 +192,12 @@ public class Friend implements User, Searchable, Displayable {
     @Override
     public String getShortInfos() {
         String info = "";
-        if (isOnline() && !getPositionName().equals("")) {
-            info = "Currently in " + getPositionName();
-        } else if (isOnline()) {
+        if (this.isOnline() && !this.getPositionName().equals("")) {
+            info = "Currently in " + this.getPositionName();
+        } else if (this.isOnline()) {
             info = "Online right now";
-        } else if (!getPositionName().equals("")) {
-            info = "Last seen near " + getPositionName();
+        } else if (!this.getPositionName().equals("")) {
+            info = "Last seen near " + this.getPositionName();
         } else {
             info = "Currently offline";
         }
@@ -194,14 +212,14 @@ public class Friend implements User, Searchable, Displayable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (int) (mId ^ mId >>> LEFT_SHIFT_COUNT);
-        result = prime * result + (mName == null ? 0 : mName.hashCode());
+        result = (prime * result) + (int) (mId ^ (mId >>> LEFT_SHIFT_COUNT));
+        result = (prime * result) + (mName == null ? 0 : mName.hashCode());
         return result;
     }
 
     @Override
     public boolean isOnline() {
-        return new GregorianCalendar().getTimeInMillis() - mLastSeen.getTimeInMillis() < ONLINE_TIMEOUT;
+        return (new GregorianCalendar().getTimeInMillis() - mLastSeen.getTimeInMillis()) < ONLINE_TIMEOUT;
     }
 
     @Override
@@ -281,23 +299,5 @@ public class Friend implements User, Searchable, Displayable {
     @Override
     public void setVisible(boolean isVisible) {
         mVisible = isVisible;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
-     * )
-     * @author hugo-S
-     */
-    @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        Bitmap friendProfilePicture =
-            Bitmap.createScaledBitmap(this.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(this.getLatLng()).title(this.getName())
-            .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
-            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
-        return markerOptions;
     }
 }

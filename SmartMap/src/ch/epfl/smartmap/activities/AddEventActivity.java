@@ -148,6 +148,28 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
+     * @param dayMonthYear
+     *            a String like "16/09/1993"
+     * @param hourMinute
+     *            a String like "17:03"
+     * @return a GregorianDate constructed from the given parameters
+     * @author SpicyCH
+     */
+    private GregorianCalendar getDateFromTextFormat(String dayMonthYear, String hourMinute) {
+        assert this.isValidDate(dayMonthYear) : "The string dayMonthYear isn't in the expected format";
+        assert this.isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
+
+        String[] s1 = dayMonthYear.split("/");
+        String[] s2 = hourMinute.split(":");
+        // Don't forget to substract 1 to the month in text format
+        GregorianCalendar date =
+            new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1,
+                Integer.parseInt(s1[0]), Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
+
+        return date;
+    }
+
+    /**
      * @author SpicyCH
      */
     private void initializeGUIComponents() {
@@ -242,6 +264,37 @@ public class AddEventActivity extends FragmentActivity {
         });
     }
 
+    private boolean isValidDate(String s) {
+        String[] sArray = s.split("/");
+        return sArray.length == ELEMENTS_JJ_DD_YYYY;
+    }
+
+    private boolean isValidTime(String s) {
+        String[] sArray = s.split(":");
+        return sArray.length == ELEMENTS_HH_MM;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case PICK_LOCATION_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    // All went smoothly, update location in this activity
+                    this.updateLocation(data);
+
+                } else {
+                    Toast.makeText(mContext, "Sorry, couldn't get the location of your event",
+                        Toast.LENGTH_LONG).show();
+                    mLatitude.setText("");
+                    mLongitude.setText("");
+                    mPlaceName.setText("");
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -292,25 +345,15 @@ public class AddEventActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case PICK_LOCATION_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    // All went smoothly, update location in this activity
-                    this.updateLocation(data);
+    public void pickLocation(View v) {
+        Toast.makeText(mContext, "Long click the map at the location of your event", Toast.LENGTH_LONG)
+            .show();
 
-                } else {
-                    Toast.makeText(mContext, "Sorry, couldn't get the location of your event",
-                        Toast.LENGTH_LONG).show();
-                    mLatitude.setText("");
-                    mLongitude.setText("");
-                    mPlaceName.setText("");
-                }
-                break;
-            default:
-                break;
-        }
+        Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
+        pickLocationIntent.putExtra("pickLocationForEvent", true);
+        pickLocationIntent.setType(Context.LOCATION_SERVICE);
+        this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
+
     }
 
     /**
@@ -332,48 +375,5 @@ public class AddEventActivity extends FragmentActivity {
                 Toast.LENGTH_LONG).show();
             mPlaceName.setText("");
         }
-    }
-
-    public void pickLocation(View v) {
-        Toast.makeText(mContext, "Long click the map at the location of your event", Toast.LENGTH_LONG)
-            .show();
-
-        Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
-        pickLocationIntent.putExtra("pickLocationForEvent", true);
-        pickLocationIntent.setType(Context.LOCATION_SERVICE);
-        this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
-
-    }
-
-    /**
-     * @param dayMonthYear
-     *            a String like "16/09/1993"
-     * @param hourMinute
-     *            a String like "17:03"
-     * @return a GregorianDate constructed from the given parameters
-     * @author SpicyCH
-     */
-    private GregorianCalendar getDateFromTextFormat(String dayMonthYear, String hourMinute) {
-        assert this.isValidDate(dayMonthYear) : "The string dayMonthYear isn't in the expected format";
-        assert this.isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
-
-        String[] s1 = dayMonthYear.split("/");
-        String[] s2 = hourMinute.split(":");
-        // Don't forget to substract 1 to the month in text format
-        GregorianCalendar date =
-            new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1,
-                Integer.parseInt(s1[0]), Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
-
-        return date;
-    }
-
-    private boolean isValidDate(String s) {
-        String[] sArray = s.split("/");
-        return sArray.length == ELEMENTS_JJ_DD_YYYY;
-    }
-
-    private boolean isValidTime(String s) {
-        String[] sArray = s.split(":");
-        return sArray.length == ELEMENTS_HH_MM;
     }
 }

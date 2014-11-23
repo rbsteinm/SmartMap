@@ -32,10 +32,31 @@ public class SettingsManager {
     public static final String DEFAULT_COOKIE = "No cookie";
     public static final String DEFAULT_LOC_NAME = "";
 
+    /**
+     * @return The SettingsManager instance
+     */
+    public static SettingsManager getInstance() {
+        return mInstance;
+    }
+
     private final Context mContext;
     private final SharedPreferences mSharedPref;
     private final SharedPreferences.Editor mEditor;
+
     private static SettingsManager mInstance;
+
+    /**
+     * Initializes the settings manager (should be called once when starting the
+     * app)
+     * 
+     * @param context
+     *            The app's context, needed to access the shared preferences
+     * @return The SettingsManager instance
+     */
+    public static SettingsManager initialize(Context context) {
+        mInstance = new SettingsManager(context);
+        return mInstance;
+    }
 
     /**
      * SettingsManager constructor. Will be made private, use initialize() or
@@ -52,54 +73,20 @@ public class SettingsManager {
     }
 
     /**
-     * Initializes the settings manager (should be called once when starting the
-     * app)
+     * Clears the settings
      * 
-     * @param context
-     *            The app's context, needed to access the shared preferences
-     * @return The SettingsManager instance
+     * @return True if the settings were cleared successfully
      */
-    public static SettingsManager initialize(Context context) {
-        mInstance = new SettingsManager(context);
-        return mInstance;
+    public boolean clearAll() {
+        mEditor.clear();
+        return mEditor.commit();
     }
 
     /**
-     * @return The SettingsManager instance
+     * @return The session cookie if it is found, DEFAULT_COOKIE value otherwise
      */
-    public static SettingsManager getInstance() {
-        return mInstance;
-    }
-
-    /**
-     * @return The local user's name if it is found, DEFAULT_NAME value
-     *         otherwise
-     */
-    public String getUserName() {
-        return mSharedPref.getString(USER_NAME, DEFAULT_NAME);
-    }
-
-    /**
-     * @return The local user's ID if it is found, DEFAULT_ID value otherwise
-     */
-    public long getUserID() {
-        return mSharedPref.getLong(USER_ID, DEFAULT_ID);
-    }
-
-    /**
-     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
-     *         otherwise
-     */
-    public long getFacebookID() {
-        return mSharedPref.getLong(FB_ID, DEFAULT_FB_ID);
-    }
-
-    /**
-     * @return The local user's phone number if it is found, DEFAULT_NUMBER
-     *         value otherwise
-     */
-    public String getUPhoneNumber() {
-        return mSharedPref.getString(PHONE_NUMBER, DEFAULT_NUMBER);
+    public String getCookie() {
+        return mSharedPref.getString(COOKIE, DEFAULT_COOKIE);
     }
 
     /**
@@ -111,18 +98,11 @@ public class SettingsManager {
     }
 
     /**
-     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN
-     *         value otherwise
+     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
+     *         otherwise
      */
-    public String getToken() {
-        return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);
-    }
-
-    /**
-     * @return The session cookie if it is found, DEFAULT_COOKIE value otherwise
-     */
-    public String getCookie() {
-        return mSharedPref.getString(COOKIE, DEFAULT_COOKIE);
+    public long getFacebookID() {
+        return mSharedPref.getLong(FB_ID, DEFAULT_FB_ID);
     }
 
     /**
@@ -144,6 +124,37 @@ public class SettingsManager {
     }
 
     /**
+     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN
+     *         value otherwise
+     */
+    public String getToken() {
+        return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);
+    }
+
+    /**
+     * @return The local user's phone number if it is found, DEFAULT_NUMBER
+     *         value otherwise
+     */
+    public String getUPhoneNumber() {
+        return mSharedPref.getString(PHONE_NUMBER, DEFAULT_NUMBER);
+    }
+
+    /**
+     * @return The local user's ID if it is found, DEFAULT_ID value otherwise
+     */
+    public long getUserID() {
+        return mSharedPref.getLong(USER_ID, DEFAULT_ID);
+    }
+
+    /**
+     * @return The local user's name if it is found, DEFAULT_NAME value
+     *         otherwise
+     */
+    public String getUserName() {
+        return mSharedPref.getString(USER_NAME, DEFAULT_NAME);
+    }
+
+    /**
      * @return True if hidden mode is enabled
      */
     public boolean isHidden() {
@@ -151,50 +162,14 @@ public class SettingsManager {
     }
 
     /**
-     * Stores the local user's name
+     * Stores the session cookie
      * 
-     * @param newName
-     *            The user's new name
+     * @param newCookie
+     *            The new cookie
      * @return True if the new value was successfully saved
      */
-    public boolean setUserName(String newName) {
-        mEditor.putString(USER_NAME, newName);
-        return mEditor.commit();
-    }
-
-    /**
-     * Stores the user's ID
-     * 
-     * @param newID
-     *            The user's new ID
-     * @return True if the new value was successfully saved
-     */
-    public boolean setUserID(long newID) {
-        mEditor.putLong(USER_ID, newID);
-        return mEditor.commit();
-    }
-
-    /**
-     * Stores the user's Facebook ID
-     * 
-     * @param newID
-     *            The user's new Facebook ID
-     * @return True if the new value was successfully saved
-     */
-    public boolean setFacebookID(long newID) {
-        mEditor.putLong(FB_ID, newID);
-        return mEditor.commit();
-    }
-
-    /**
-     * Stores the user's phone number
-     * 
-     * @param newNumber
-     *            The user's new number
-     * @return True if the new value was successfully saved
-     */
-    public boolean setUPhoneNumber(String newNumber) {
-        mEditor.putString(PHONE_NUMBER, newNumber);
+    public boolean setCookie(String newCookie) {
+        mEditor.putString(COOKIE, newCookie);
         return mEditor.commit();
     }
 
@@ -211,26 +186,14 @@ public class SettingsManager {
     }
 
     /**
-     * Stores the Facebook token
+     * Stores the user's Facebook ID
      * 
-     * @param newToken
-     *            The new token
+     * @param newID
+     *            The user's new Facebook ID
      * @return True if the new value was successfully saved
      */
-    public boolean setToken(String newToken) {
-        mEditor.putString(TOKEN, newToken);
-        return mEditor.commit();
-    }
-
-    /**
-     * Stores the session cookie
-     * 
-     * @param newCookie
-     *            The new cookie
-     * @return True if the new value was successfully saved
-     */
-    public boolean setCookie(String newCookie) {
-        mEditor.putString(COOKIE, newCookie);
+    public boolean setFacebookID(long newID) {
+        mEditor.putLong(FB_ID, newID);
         return mEditor.commit();
     }
 
@@ -265,12 +228,50 @@ public class SettingsManager {
     }
 
     /**
-     * Clears the settings
+     * Stores the Facebook token
      * 
-     * @return True if the settings were cleared successfully
+     * @param newToken
+     *            The new token
+     * @return True if the new value was successfully saved
      */
-    public boolean clearAll() {
-        mEditor.clear();
+    public boolean setToken(String newToken) {
+        mEditor.putString(TOKEN, newToken);
+        return mEditor.commit();
+    }
+
+    /**
+     * Stores the user's phone number
+     * 
+     * @param newNumber
+     *            The user's new number
+     * @return True if the new value was successfully saved
+     */
+    public boolean setUPhoneNumber(String newNumber) {
+        mEditor.putString(PHONE_NUMBER, newNumber);
+        return mEditor.commit();
+    }
+
+    /**
+     * Stores the user's ID
+     * 
+     * @param newID
+     *            The user's new ID
+     * @return True if the new value was successfully saved
+     */
+    public boolean setUserID(long newID) {
+        mEditor.putLong(USER_ID, newID);
+        return mEditor.commit();
+    }
+
+    /**
+     * Stores the local user's name
+     * 
+     * @param newName
+     *            The user's new name
+     * @return True if the new value was successfully saved
+     */
+    public boolean setUserName(String newName) {
+        mEditor.putString(USER_NAME, newName);
         return mEditor.commit();
     }
 }

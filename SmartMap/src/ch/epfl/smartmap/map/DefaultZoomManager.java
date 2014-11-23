@@ -34,26 +34,24 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
         mGoogleMap = fm.getMap();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.gui.ZoomManager#zoomOnLocation(android.location.Location
-     * , com.google.android.gms.maps.GoogleMap)
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
+     * @return The number of audit errors in this object
      */
-    @Override
-    public void zoomOnLocation(LatLng latLng) {
+    public int auditErrors(int depth) {
+        if (depth == 0) {
+            return 0;
+        }
 
-        LatLng latLng1 = new LatLng(latLng.latitude, latLng.longitude);
-        // Zoom in the Google Map
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
-        mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(GMAP_ZOOM_LEVEL)); // with
-        // animate
+        int auditErrors = 0;
 
-        /*
-         * Clarifications: for GMAP_ZOOM_LEVEL GMAP_ZOOM_LEVEL = 20 represents a
-         * exact address. = 11 represents a town = 6 represents a country We can
-         * make some functionality to define the asked precision.
-         */
+        // TODO
+
+        return auditErrors;
     }
 
     /*
@@ -100,23 +98,20 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
         }
     }
 
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.gui.ZoomManager#zoomOnLocation(android.location.Location
+     * , com.google.android.gms.maps.GoogleMap)
      */
-    public int auditErrors(int depth) {
-        if (depth == 0) {
-            return 0;
-        }
+    @Override
+    public void zoomOnLocation(LatLng latLng) {
 
-        int auditErrors = 0;
-
-        // TODO
-
-        return auditErrors;
+        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, GMAP_ZOOM_LEVEL));
+        /*
+         * Clarifications: for GMAP_ZOOM_LEVEL GMAP_ZOOM_LEVEL = 20 represents a
+         * exact address. = 11 represents a town = 6 represents a country We can
+         * make some functionality to define the asked precision.
+         */
     }
 }

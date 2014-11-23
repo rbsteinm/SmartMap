@@ -66,16 +66,58 @@ import com.google.android.gms.maps.model.Marker;
 
 public class MainActivity extends FragmentActivity implements FriendsLocationListener {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = "MAIN_ACTIVITY";
-    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-    private static final String CITY_NAME = "CITY_NAME";
+    /**
+     * Listener that add an event to the map when long click
+     * 
+     * @author SpicyCH
+     */
+    private class AddEventOnMapLongClick implements OnMapLongClickListener {
+        @Override
+        public void onMapLongClick(LatLng latLng) {
+            Intent result = new Intent(MainActivity.this.getContext(), AddEventActivity.class);
+            Bundle extras = new Bundle();
+            Geocoder geocoder = new Geocoder(MainActivity.this.getContext(), Locale.getDefault());
+            String cityName = "";
+            List<Address> addresses;
+            try {
+                addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                if (addresses.size() > 0) {
+                    // Makes sure that an address is associated to the
+                    // coordinates, the user could have
+                    // long
+                    // clicked in the middle of the sea after all :)
+                    cityName = addresses.get(0).getLocality();
+                }
+            } catch (IOException e) {
+            }
+            if (cityName == null) {
+                // If google couldn't retrieve the city name, we use the
+                // country name instead
+                try {
+                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                    if (addresses.size() > 0) {
+                        cityName = addresses.get(0).getCountryName();
+                    }
+                } catch (IOException e) {
+                }
+            }
+            extras.putString(CITY_NAME, cityName);
+            extras.putParcelable(LOCATION_SERVICE, latLng);
+            result.putExtras(extras);
+            if (MainActivity.this.getIntent().getBooleanExtra("pickLocationForEvent", false)) {
+                // Return the result to the calling activity
+                // (AddEventActivity)
+                MainActivity.this.setResult(RESULT_OK, result);
+                MainActivity.this.finish();
+            } else {
+                // The user was in MainActivity and long clicked to create
+                // an event
+                MainActivity.this.startActivity(result);
+                MainActivity.this.finish();
+            }
+        }
 
-    private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
-    private static final int MENU_ITEM_MYLOCATION_INDEX = 1;
-    private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
-    private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
-    private static final int MENU_ITEM_CLOSE_INFO_INDEX = 4;
+    }
 
     /**
      * Types of Menu that can be displayed on this activity
@@ -88,6 +130,43 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         ITEM;
     }
 
+    /**
+     * A listener that shows info in action bar when a marker is clicked on
+     * 
+     * @author hugo-S
+     */
+    private class ShowInfoOnMarkerClick implements OnMarkerClickListener {
+
+        @Override
+        public boolean onMarkerClick(Marker arg0) {
+
+            if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
+                Displayable friendClicked = mFriendMarkerManager.getItemForMarker(arg0);
+                mMapZoomer.zoomOnLocation(arg0.getPosition());
+                MainActivity.this.setItemMenu(friendClicked);
+                return true;
+            } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
+                Displayable eventClicked = mEventMarkerManager.getItemForMarker(arg0);
+                mMapZoomer.zoomOnLocation(arg0.getPosition());
+                MainActivity.this.setItemMenu(eventClicked);
+                return true;
+            }
+            return false;
+        }
+
+    }
+
+    @SuppressWarnings("unused")
+    private static final String TAG = "MAIN_ACTIVITY";
+    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+    private static final String CITY_NAME = "CITY_NAME";
+    private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
+    private static final int MENU_ITEM_MYLOCATION_INDEX = 1;
+
+    private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
+
+    private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
+    private static final int MENU_ITEM_CLOSE_INFO_INDEX = 4;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private DatabaseHelper mDbHelper;
@@ -99,9 +178,118 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
     private SupportMapFragment mFragmentMap;
     private SearchEngine mSearchEngine;
     private Menu mMenu;
+
     private MenuTheme mMenuTheme;
+
     @SuppressWarnings("unused")
     private Displayable mCurrentItem;
+
+    /**
+     * Close Information Panel if open
+     */
+    public void closeInformationPanel() {
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
+        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
+        final SlidingPanel mInformationPanel = (SlidingPanel) this.findViewById(R.id.information_panel);
+
+        mInformationPanel.close();
+    }
+
+    /**
+     * Close Information Panel if open
+     */
+    public void closeInformationPanel(MenuItem mi) {
+        this.closeInformationPanel();
+    }
+
+    /**
+     * Create a notification that appear in the notifications tab
+     */
+    public void createNotification(View view) {
+        // Notifications.createAddNotification(view, this);
+    }
+
+    /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+            // not available
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+            dialog.show();
+        } else {
+            // Google Play Services are available.
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = mFragmentMap.getMap();
+            // Enabling MyLocation Layer of Google Map
+
+            mGoogleMap.setMyLocationEnabled(true);
+
+        }
+    }
+
+    // // will be removed
+    // private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+    // @Override
+    // public void onReceive(Context context, Intent intent) {
+    //
+    // mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
+    // MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
+    //
+    // }
+    //
+    // };
+
+    public Context getContext() {
+        return this;
+    }
+
+    public void initializeMarkers() {
+        mEventMarkerManager.updateMarkers(this, mDbHelper.getAllEvents());
+        mFriendMarkerManager.updateMarkers(this, this.sparseArrayToList(mDbHelper.getAllUsers()));
+
+        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
+        allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
+        Intent startingIntent = this.getIntent();
+        if (startingIntent.getParcelableExtra("location") == null) {
+            mMapZoomer.zoomAccordingToMarkers(allMarkers);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        switch (mMenuTheme) {
+            case MAP:
+                super.onBackPressed();
+                break;
+            case SEARCH:
+            case ITEM:
+                this.setMainMenu(null);
+                break;
+            default:
+                assert false;
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FriendsLocationListener#onChange()
+     */
+    @Override
+    public void onChange() {
+
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
+                    MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
+            }
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,15 +356,15 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
 
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                mSearchView.clearFocus();
+            public boolean onQueryTextChange(String newText) {
+                // Give the query results to searchLayout
+                mSearchLayout.updateSearchResults(mSearchView.getQuery().toString());
                 return false;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                // Give the query results to searchLayout
-                mSearchLayout.updateSearchResults(mSearchView.getQuery().toString());
+            public boolean onQueryTextSubmit(String query) {
+                mSearchView.clearFocus();
                 return false;
             }
         });
@@ -220,18 +408,10 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
     }
 
     @Override
-    public void onBackPressed() {
-        switch (mMenuTheme) {
-            case MAP:
-                super.onBackPressed();
-                break;
-            case SEARCH:
-            case ITEM:
-                this.setMainMenu(null);
-                break;
-            default:
-                assert false;
-        }
+    public void onPause() {
+        super.onPause();
+        // this.unregisterReceiver(mBroadcastReceiver);
+        // stopService(mUpdateServiceIntent);
     }
 
     @Override
@@ -252,96 +432,23 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
 
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        // this.unregisterReceiver(mBroadcastReceiver);
-        // stopService(mUpdateServiceIntent);
-    }
-
-    // // will be removed
-    // private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-    // @Override
-    // public void onReceive(Context context, Intent intent) {
-    //
-    // mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
-    // MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
-    //
-    // }
-    //
-    // };
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.FriendsLocationListener#onChange()
+    /**
+     * Open Information Panel if closed
      */
-    @Override
-    public void onChange() {
+    public void openInformationPanel() {
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(true);
 
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
-                    MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
-            }
-        });
-    }
+        final SlidingPanel mInformationPanel = (SlidingPanel) this.findViewById(R.id.information_panel);
 
-    public Context getContext() {
-        return this;
+        mInformationPanel.open();
     }
 
     /**
-     * Display the map with the current location
+     * Open Information Panel if closed
      */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            // Enabling MyLocation Layer of Google Map
-
-            mGoogleMap.setMyLocationEnabled(true);
-
-        }
-    }
-
-    public void initializeMarkers() {
-        mEventMarkerManager.updateMarkers(this, mDbHelper.getAllEvents());
-        mFriendMarkerManager.updateMarkers(this, this.sparseArrayToList(mDbHelper.getAllUsers()));
-
-        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
-        allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
-        Intent startingIntent = this.getIntent();
-        if (startingIntent.getParcelableExtra("location") == null) {
-            mMapZoomer.zoomAccordingToMarkers(allMarkers);
-        }
-    }
-
-    private List<User> sparseArrayToList(LongSparseArray<User> usersSparseArray) {
-        List<User> users = new ArrayList<User>();
-        for (int i = 0; i < usersSparseArray.size(); i++) {
-            User user = usersSparseArray.valueAt(i);
-
-            users.add(user);
-
-        }
-        return users;
-    }
-
-    /**
-     * Create a notification that appear in the notifications tab
-     */
-    public void createNotification(View view) {
-        // Notifications.createAddNotification(view, this);
+    public void openInformationPanel(MenuItem mi) {
+        this.openInformationPanel();
     }
 
     /**
@@ -361,46 +468,6 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         this.setItemMenu(friend);
         // Add query to the searchEngine
         mSearchEngine.getHistory().addEntry(friend, new Date());
-    }
-
-    /**
-     * Sets the Menu that should be used when using Search Panel
-     */
-    public void setSearchMenu() {
-        final SearchPanel mSearchPanel = (SearchPanel) this.findViewById(R.id.search_panel);
-        mSearchPanel.open();
-        ActionBar mActionBar = this.getActionBar();
-        mActionBar.setTitle(R.string.app_name);
-        mActionBar.setSubtitle(null);
-        mActionBar.setIcon(R.drawable.ic_launcher);
-
-        mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(false);
-        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(true);
-        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
-        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
-        mMenuTheme = MenuTheme.SEARCH;
-    }
-
-    /**
-     * Sets the main Menu of the Activity
-     */
-    public void setMainMenu() {
-        final SearchPanel mSearchPanel = (SearchPanel) this.findViewById(R.id.search_panel);
-        mSearchPanel.close();
-        ActionBar mActionBar = this.getActionBar();
-        mActionBar.setTitle(R.string.app_name);
-        mActionBar.setSubtitle(null);
-        mActionBar.setIcon(R.drawable.ic_launcher);
-        mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).collapseActionView();
-        mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(true);
-        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
-        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
-        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
-        mMenuTheme = MenuTheme.MAP;
-    }
-
-    public void setMainMenu(MenuItem mi) {
-        this.setMainMenu();
     }
 
     /**
@@ -426,119 +493,54 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
     }
 
     /**
-     * Open Information Panel if closed
+     * Sets the main Menu of the Activity
      */
-    public void openInformationPanel() {
+    public void setMainMenu() {
+        final SearchPanel mSearchPanel = (SearchPanel) this.findViewById(R.id.search_panel);
+        mSearchPanel.close();
+        ActionBar mActionBar = this.getActionBar();
+        mActionBar.setTitle(R.string.app_name);
+        mActionBar.setSubtitle(null);
+        mActionBar.setIcon(R.drawable.ic_launcher);
+        mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).collapseActionView();
+        mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(true);
+        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
         mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
-        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(true);
-
-        final SlidingPanel mInformationPanel = (SlidingPanel) this.findViewById(R.id.information_panel);
-
-        mInformationPanel.open();
-    }
-
-    /**
-     * Open Information Panel if closed
-     */
-    public void openInformationPanel(MenuItem mi) {
-        this.openInformationPanel();
-    }
-
-    /**
-     * Close Information Panel if open
-     */
-    public void closeInformationPanel() {
-        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
         mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
-        final SlidingPanel mInformationPanel = (SlidingPanel) this.findViewById(R.id.information_panel);
+        mMenuTheme = MenuTheme.MAP;
+    }
 
-        mInformationPanel.close();
+    public void setMainMenu(MenuItem mi) {
+        this.setMainMenu();
     }
 
     /**
-     * Close Information Panel if open
+     * Sets the Menu that should be used when using Search Panel
      */
-    public void closeInformationPanel(MenuItem mi) {
-        this.closeInformationPanel();
+    public void setSearchMenu() {
+        final SearchPanel mSearchPanel = (SearchPanel) this.findViewById(R.id.search_panel);
+        mSearchPanel.open();
+        ActionBar mActionBar = this.getActionBar();
+        mActionBar.setTitle(R.string.app_name);
+        mActionBar.setSubtitle(null);
+        mActionBar.setIcon(R.drawable.ic_launcher);
+
+        mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(true);
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
+        mMenuTheme = MenuTheme.SEARCH;
     }
 
-    /**
-     * Listener that add an event to the map when long click
-     * 
-     * @author SpicyCH
-     */
-    private class AddEventOnMapLongClick implements OnMapLongClickListener {
-        @Override
-        public void onMapLongClick(LatLng latLng) {
-            Intent result = new Intent(MainActivity.this.getContext(), AddEventActivity.class);
-            Bundle extras = new Bundle();
-            Geocoder geocoder = new Geocoder(MainActivity.this.getContext(), Locale.getDefault());
-            String cityName = "";
-            List<Address> addresses;
-            try {
-                addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                if (addresses.size() > 0) {
-                    // Makes sure that an address is associated to the
-                    // coordinates, the user could have
-                    // long
-                    // clicked in the middle of the sea after all :)
-                    cityName = addresses.get(0).getLocality();
-                }
-            } catch (IOException e) {
-            }
-            if (cityName == null) {
-                // If google couldn't retrieve the city name, we use the
-                // country name instead
-                try {
-                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                    if (addresses.size() > 0) {
-                        cityName = addresses.get(0).getCountryName();
-                    }
-                } catch (IOException e) {
-                }
-            }
-            extras.putString(CITY_NAME, cityName);
-            extras.putParcelable(LOCATION_SERVICE, latLng);
-            result.putExtras(extras);
-            if (MainActivity.this.getIntent().getBooleanExtra("pickLocationForEvent", false)) {
-                // Return the result to the calling activity
-                // (AddEventActivity)
-                MainActivity.this.setResult(RESULT_OK, result);
-                MainActivity.this.finish();
-            } else {
-                // The user was in MainActivity and long clicked to create
-                // an event
-                MainActivity.this.startActivity(result);
-                MainActivity.this.finish();
-            }
+    private List<User> sparseArrayToList(LongSparseArray<User> usersSparseArray) {
+        List<User> users = new ArrayList<User>();
+        for (int i = 0; i < usersSparseArray.size(); i++) {
+            User user = usersSparseArray.valueAt(i);
+
+            users.add(user);
+
         }
-
-    }
-
-    /**
-     * A listener that shows info in action bar when a marker is clicked on
-     * 
-     * @author hugo-S
-     */
-    private class ShowInfoOnMarkerClick implements OnMarkerClickListener {
-
-        @Override
-        public boolean onMarkerClick(Marker arg0) {
-
-            if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
-                Displayable friendClicked = mFriendMarkerManager.getItemForMarker(arg0);
-                mMapZoomer.zoomOnLocation(arg0.getPosition());
-                MainActivity.this.setItemMenu(friendClicked);
-                return true;
-            } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
-                Displayable eventClicked = mEventMarkerManager.getItemForMarker(arg0);
-                mMapZoomer.zoomOnLocation(arg0.getPosition());
-                MainActivity.this.setItemMenu(eventClicked);
-                return true;
-            }
-            return false;
-        }
-
+        return users;
     }
 
 }

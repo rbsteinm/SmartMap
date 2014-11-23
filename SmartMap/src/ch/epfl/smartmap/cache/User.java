@@ -16,9 +16,35 @@ import com.google.android.gms.maps.model.LatLng;
 public interface User extends Displayable {
 
     /**
+     *
+     */
+    void deletePicture(Context context);
+
+    /**
+     * @return The user's email address
+     */
+    String getEmail();
+
+    /**
      * @return The user's ID
      */
     long getID();
+
+    /**
+     * @return The date/hour at which the user was last seen
+     */
+    GregorianCalendar getLastSeen();
+
+    /**
+     * @return The user's latitude and longitude
+     */
+    @Override
+    LatLng getLatLng();
+
+    /**
+     * @return The user's position
+     */
+    Location getLocation();
 
     /**
      * @return The user's name
@@ -32,36 +58,15 @@ public interface User extends Displayable {
     String getNumber();
 
     /**
-     * @return The user's email address
-     */
-    String getEmail();
-
-    /**
-     * @return The user's position
-     */
-    Location getLocation();
-
-    /**
-     * @return The user's latitude and longitude
-     */
-    @Override
-    LatLng getLatLng();
-
-    /**
-     * @return The user's position as a String (e.g. 'Lausanne')
-     */
-    String getPositionName();
-
-    /**
      * @return A user picture to display
      */
     @Override
     Bitmap getPicture(Context context);
 
     /**
-     * @return The date/hour at which the user was last seen
+     * @return The user's position as a String (e.g. 'Lausanne')
      */
-    GregorianCalendar getLastSeen();
+    String getPositionName();
 
     /**
      * Deprecated. Use getLastSeen() instead.
@@ -77,30 +82,6 @@ public interface User extends Displayable {
     boolean isVisible();
 
     /**
-     * Sets the user position's name
-     * 
-     * @param posName
-     *            The user's position
-     */
-    void setPositionName(String posName);
-
-    /**
-     * Sets the user's name
-     * 
-     * @param newName
-     *            The new name
-     */
-    void setName(String newName);
-
-    /**
-     * Sets the user's phone number
-     * 
-     * @param newNumber
-     *            The new phone number
-     */
-    void setNumber(String newNumber);
-
-    /**
      * Sets the user's email
      * 
      * @param newEmail
@@ -109,12 +90,10 @@ public interface User extends Displayable {
     void setEmail(String newEmail);
 
     /**
-     * Sets the user's longitude
-     * 
-     * @param x
-     *            The longitude
+     * @param date
+     *            The date/hour at which the user was last seen
      */
-    void setLongitude(double x);
+    void setLastSeen(GregorianCalendar date);
 
     /**
      * Sets the user's latitude
@@ -133,23 +112,28 @@ public interface User extends Displayable {
     void setLocation(Location p);
 
     /**
-     * Stores a new profile picture for the user
+     * Sets the user's longitude
      * 
-     * @param pic
-     *            The picture as a Bitmap object
+     * @param x
+     *            The longitude
      */
-    void setPicture(Bitmap pic, Context context);
+    void setLongitude(double x);
 
     /**
-     *
+     * Sets the user's name
+     * 
+     * @param newName
+     *            The new name
      */
-    void deletePicture(Context context);
+    void setName(String newName);
 
     /**
-     * @param date
-     *            The date/hour at which the user was last seen
+     * Sets the user's phone number
+     * 
+     * @param newNumber
+     *            The new phone number
      */
-    void setLastSeen(GregorianCalendar date);
+    void setNumber(String newNumber);
 
     /**
      * Sets whether or not the user is online. (Deprecated, use setLastSeen()
@@ -160,6 +144,22 @@ public interface User extends Displayable {
      */
     @Deprecated
     void setOnline(boolean isOnline);
+
+    /**
+     * Stores a new profile picture for the user
+     * 
+     * @param pic
+     *            The picture as a Bitmap object
+     */
+    void setPicture(Bitmap pic, Context context);
+
+    /**
+     * Sets the user position's name
+     * 
+     * @param posName
+     *            The user's position
+     */
+    void setPositionName(String posName);
 
     /**
      * @param isVisible

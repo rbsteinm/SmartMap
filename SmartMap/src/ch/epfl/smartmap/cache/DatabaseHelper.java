@@ -186,6 +186,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.notifyEventListeners();
     }
 
+    public void addEventsListener(EventsListener listener) {
+        mEventsListeners.add(listener);
+    }
+
     /**
      * Adds a filter/userlist/friendlist to the database, and gives an ID to the
      * filter
@@ -214,6 +218,62 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.notifyFilterListeners();
         return filterID;
+    }
+
+    public void addFiltersListener(FiltersListener listener) {
+        mFiltersListeners.add(listener);
+    }
+
+    public void addFriendsListener(FriendsListener listener) {
+        mFriendsListeners.add(listener);
+    }
+
+    public void addFriendsLocationListener(FriendsLocationListener listener) {
+        mLocationsListeners.add(listener);
+    }
+
+    /**
+     * Adds a pending friend request to the database
+     * 
+     * @param user
+     *            The user who made the request (only need name and ID)
+     */
+    public void addInvitation(User user) {
+        Cursor cursor =
+            mDatabase.query(TABLE_INVITATIONS, INVITATION_COLUMNS, KEY_USER_ID + " = ?",
+                new String[]{String.valueOf(user.getID())}, null, null, null, null);
+
+        if (!cursor.moveToFirst()) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_ID, user.getID());
+            values.put(KEY_NAME, user.getName());
+
+            mDatabase.insert(TABLE_INVITATIONS, null, values);
+
+        }
+        cursor.close();
+    }
+
+    /**
+     * Adds a pending sent friend request to the database
+     * 
+     * @param user
+     *            The user who was sent a request
+     */
+    public void addPendingFriend(User user) {
+        Cursor cursor =
+            mDatabase.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
+                new String[]{String.valueOf(user.getID())}, null, null, null, null);
+
+        if (!cursor.moveToFirst()) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_ID, user.getID());
+            values.put(KEY_NAME, user.getName());
+
+            mDatabase.insert(TABLE_PENDING, null, values);
+
+        }
+        cursor.close();
     }
 
     /**
@@ -298,6 +358,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         mDatabase.delete(TABLE_FILTER_USER, KEY_FILTER_ID + " = ?", new String[]{String.valueOf(id)});
 
         this.notifyFilterListeners();
+    }
+
+    /**
+     * Deletes an invitation from the database (call this when accepting or
+     * declining an invitation)
+     * 
+     * @param id
+     *            The inviter's id
+     */
+    public void deleteInvitation(long id) {
+
+        mDatabase.delete(TABLE_INVITATIONS, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
+    }
+
+    /**
+     * Deletes a pending friend request from the database
+     * 
+     * @param id
+     *            The invited user's id
+     */
+    public void deletePendingFriend(long id) {
+
+        mDatabase.delete(TABLE_PENDING, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
     /**
@@ -476,6 +559,60 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Returns a list of all pending received invitations
+     * 
+     * @return A list of users who sent requests
+     */
+    public List<User> getInvitations() {
+        List<User> invitations = new ArrayList<User>();
+
+        String query = "SELECT  * FROM " + TABLE_INVITATIONS;
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+
+        Friend friend = null;
+        if (cursor.moveToFirst()) {
+            do {
+                friend =
+                    new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
+                        .getColumnIndex(KEY_NAME)));
+
+                invitations.add(friend);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return invitations;
+    }
+
+    /**
+     * Returns a list of all pending friends
+     * 
+     * @return A list of users who were sent friend requests
+     */
+    public List<User> getPendingFriends() {
+        List<User> friends = new ArrayList<User>();
+
+        String query = "SELECT  * FROM " + TABLE_PENDING;
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+
+        Friend friend = null;
+        if (cursor.moveToFirst()) {
+            do {
+                friend =
+                    new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
+                        .getColumnIndex(KEY_NAME)));
+
+                friends.add(friend);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return friends;
+    }
+
+    /**
      * Gets a user from the database
      * 
      * @param id
@@ -529,6 +666,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.notifyFriendListeners();
         this.notifyLocationsListeners();
+    }
+
+    public void notifyEventListeners() {
+        for (EventsListener listener : mEventsListeners) {
+            listener.onChange();
+        }
+    }
+
+    public void notifyFilterListeners() {
+        for (FiltersListener listener : mFiltersListeners) {
+            listener.onChange();
+        }
+    }
+
+    public void notifyFriendListeners() {
+        for (FriendsListener listener : mFriendsListeners) {
+            listener.onChange();
+        }
+    }
+
+    public void notifyLocationsListeners() {
+        for (FriendsLocationListener listener : mLocationsListeners) {
+            listener.onChange();
+        }
     }
 
     @Override
@@ -696,166 +857,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.updateUser(friend);
 
         this.notifyLocationsListeners();
-    }
-
-    /**
-     * Adds a pending friend request to the database
-     * 
-     * @param user
-     *            The user who made the request (only need name and ID)
-     */
-    public void addInvitation(User user) {
-        Cursor cursor =
-            mDatabase.query(TABLE_INVITATIONS, INVITATION_COLUMNS, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getID())}, null, null, null, null);
-
-        if (!cursor.moveToFirst()) {
-            ContentValues values = new ContentValues();
-            values.put(KEY_USER_ID, user.getID());
-            values.put(KEY_NAME, user.getName());
-
-            mDatabase.insert(TABLE_INVITATIONS, null, values);
-
-        }
-        cursor.close();
-    }
-
-    /**
-     * Returns a list of all pending received invitations
-     * 
-     * @return A list of users who sent requests
-     */
-    public List<User> getInvitations() {
-        List<User> invitations = new ArrayList<User>();
-
-        String query = "SELECT  * FROM " + TABLE_INVITATIONS;
-
-        Cursor cursor = mDatabase.rawQuery(query, null);
-
-        Friend friend = null;
-        if (cursor.moveToFirst()) {
-            do {
-                friend =
-                    new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
-                        .getColumnIndex(KEY_NAME)));
-
-                invitations.add(friend);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return invitations;
-    }
-
-    /**
-     * Deletes an invitation from the database (call this when accepting or
-     * declining an invitation)
-     * 
-     * @param id
-     *            The inviter's id
-     */
-    public void deleteInvitation(long id) {
-
-        mDatabase.delete(TABLE_INVITATIONS, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
-    }
-
-    /**
-     * Adds a pending sent friend request to the database
-     * 
-     * @param user
-     *            The user who was sent a request
-     */
-    public void addPendingFriend(User user) {
-        Cursor cursor =
-            mDatabase.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getID())}, null, null, null, null);
-
-        if (!cursor.moveToFirst()) {
-            ContentValues values = new ContentValues();
-            values.put(KEY_USER_ID, user.getID());
-            values.put(KEY_NAME, user.getName());
-
-            mDatabase.insert(TABLE_PENDING, null, values);
-
-        }
-        cursor.close();
-    }
-
-    /**
-     * Returns a list of all pending friends
-     * 
-     * @return A list of users who were sent friend requests
-     */
-    public List<User> getPendingFriends() {
-        List<User> friends = new ArrayList<User>();
-
-        String query = "SELECT  * FROM " + TABLE_PENDING;
-
-        Cursor cursor = mDatabase.rawQuery(query, null);
-
-        Friend friend = null;
-        if (cursor.moveToFirst()) {
-            do {
-                friend =
-                    new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
-                        .getColumnIndex(KEY_NAME)));
-
-                friends.add(friend);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return friends;
-    }
-
-    /**
-     * Deletes a pending friend request from the database
-     * 
-     * @param id
-     *            The invited user's id
-     */
-    public void deletePendingFriend(long id) {
-
-        mDatabase.delete(TABLE_PENDING, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
-    }
-
-    public void addFriendsLocationListener(FriendsLocationListener listener) {
-        mLocationsListeners.add(listener);
-    }
-
-    public void addFriendsListener(FriendsListener listener) {
-        mFriendsListeners.add(listener);
-    }
-
-    public void addEventsListener(EventsListener listener) {
-        mEventsListeners.add(listener);
-    }
-
-    public void addFiltersListener(FiltersListener listener) {
-        mFiltersListeners.add(listener);
-    }
-
-    public void notifyLocationsListeners() {
-        for (FriendsLocationListener listener : mLocationsListeners) {
-            listener.onChange();
-        }
-    }
-
-    public void notifyFriendListeners() {
-        for (FriendsListener listener : mFriendsListeners) {
-            listener.onChange();
-        }
-    }
-
-    public void notifyEventListeners() {
-        for (EventsListener listener : mEventsListeners) {
-            listener.onChange();
-        }
-    }
-
-    public void notifyFilterListeners() {
-        for (FiltersListener listener : mFiltersListeners) {
-            listener.onChange();
-        }
     }
 }

@@ -14,17 +14,6 @@ import android.widget.LinearLayout;
  */
 public abstract class SearchResultView extends LinearLayout {
 
-    // FIXME : Should define
-    private static final int PADDING_BOTTOM = 20;
-    private static final int PADDING_RIGHT = 20;
-    private static final int PADDING_LEFT = 20;
-    private static final int PADDING_TOP = 20;
-    private static final float MAIN_LAYOUT_WEIGHTSUM = 10f;
-    private final static int PHOTO_RIGHT_MARGIN = 40;
-    private final static int PHOTO_SIZE = 150;
-
-    private final ImageView mImageView;
-
     /**
      * 
      */
@@ -32,6 +21,18 @@ public abstract class SearchResultView extends LinearLayout {
         EMPTY,
         ADDED
     }
+
+    // FIXME : Should define
+    private static final int PADDING_BOTTOM = 20;
+    private static final int PADDING_RIGHT = 20;
+    private static final int PADDING_LEFT = 20;
+    private static final int PADDING_TOP = 20;
+    private static final float MAIN_LAYOUT_WEIGHTSUM = 10f;
+    private final static int PHOTO_RIGHT_MARGIN = 40;
+
+    private final static int PHOTO_SIZE = 150;
+
+    private final ImageView mImageView;
 
     @SuppressWarnings("unused")
     private ChildrenState mChildrenState;
@@ -65,12 +66,9 @@ public abstract class SearchResultView extends LinearLayout {
         this.setOnTouchListener(this.getOnTouchListener(this));
     }
 
-    public void initViews() {
-        mImageView.setImageResource(this.getImageResource());
-        this.addView(mImageView);
-        this.addView(this.getInfosLayout());
-        mChildrenState = ChildrenState.ADDED;
-    }
+    public abstract int getImageResource();
+
+    public abstract ViewGroup getInfosLayout();
 
     /**
      * Define the OnClickListener that will be called when touching this View.
@@ -80,7 +78,10 @@ public abstract class SearchResultView extends LinearLayout {
      */
     public abstract OnTouchListener getOnTouchListener(final SearchResultView v);
 
-    public abstract int getImageResource();
-
-    public abstract ViewGroup getInfosLayout();
+    public void initViews() {
+        mImageView.setImageResource(this.getImageResource());
+        this.addView(mImageView);
+        this.addView(this.getInfosLayout());
+        mChildrenState = ChildrenState.ADDED;
+    }
 }

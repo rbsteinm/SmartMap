@@ -31,69 +31,13 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
     private final static int MIDNIGHT_HOUR = 23;
     private final static int MIDNIGHT_MINUTES = 59;
 
-    private final Context mContext;
-    private final List<Event> mItemsArrayList;
-
-    private final Location mMyLocation;
-
     /**
-     * An adapter for event's list
-     * 
-     * @param context
-     * @param itemsArrayList
+     * Might be useful later
      */
-    public EventsListItemAdapter(Context context, List<Event> itemsArrayList, Location myLocation) {
-        super(context, R.layout.gui_event_list_item, itemsArrayList);
-
-        mContext = context;
-        mItemsArrayList = itemsArrayList;
-
-        mMyLocation = myLocation;
-    }
-
-    @SuppressLint("ViewHolder")
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        // Create inflater, get Friend View from the xml via Adapter
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.gui_event_list_item, parent, false);
-        // TODO use Holder pattern for smoother scrolling
-
-        // Get EventItem fields
-        TextView name = (TextView) convertView.findViewById(R.id.eventName);
-        TextView startDateText = (TextView) convertView.findViewById(R.id.eventStartDate);
-        TextView endDateText = (TextView) convertView.findViewById(R.id.eventEndDate);
-
-        // Set fields with event's attributes
-
-        GregorianCalendar start = mItemsArrayList.get(position).getStartDate();
-        GregorianCalendar end = mItemsArrayList.get(position).getEndDate();
-
-        String startDateTextContent = "";
-        String endDateTextContent = "";
-
-        startDateTextContent = setTextFromDate(start, end, "start");
-        endDateTextContent = setTextFromDate(start, end, "end");
-
-        startDateText.setText(startDateTextContent);
-        endDateText.setText(endDateTextContent);
-
-        double distanceMeEvent =
-            ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
-                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position)
-                    .getLocation().getLongitude());
-        distanceMeEvent = Math.floor(distanceMeEvent * HUNDRED_PERCENT) / HUNDRED_PERCENT;
-
-        name.setText(mItemsArrayList.get(position).getName() + " @ "
-            + mItemsArrayList.get(position).getPositionName());
-
-        // Set the behavior when a list element is clicked
-        convertView.setId(position);
-        convertView.setTag(mItemsArrayList.get(position));
-        // TODO
-
-        return convertView;
+    @SuppressWarnings("unused")
+    private static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+        long diffInMillies = date2.getTime() - date1.getTime();
+        return Math.abs(timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS));
     }
 
     /**
@@ -186,12 +130,69 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         return dateTextContent;
     }
 
+    private final Context mContext;
+
+    private final List<Event> mItemsArrayList;
+
+    private final Location mMyLocation;
+
     /**
-     * Might be useful later
+     * An adapter for event's list
+     * 
+     * @param context
+     * @param itemsArrayList
      */
-    @SuppressWarnings("unused")
-    private static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
-        long diffInMillies = date2.getTime() - date1.getTime();
-        return Math.abs(timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS));
+    public EventsListItemAdapter(Context context, List<Event> itemsArrayList, Location myLocation) {
+        super(context, R.layout.gui_event_list_item, itemsArrayList);
+
+        mContext = context;
+        mItemsArrayList = itemsArrayList;
+
+        mMyLocation = myLocation;
+    }
+
+    @SuppressLint("ViewHolder")
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        // Create inflater, get Friend View from the xml via Adapter
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.gui_event_list_item, parent, false);
+        // TODO use Holder pattern for smoother scrolling
+
+        // Get EventItem fields
+        TextView name = (TextView) convertView.findViewById(R.id.eventName);
+        TextView startDateText = (TextView) convertView.findViewById(R.id.eventStartDate);
+        TextView endDateText = (TextView) convertView.findViewById(R.id.eventEndDate);
+
+        // Set fields with event's attributes
+
+        GregorianCalendar start = mItemsArrayList.get(position).getStartDate();
+        GregorianCalendar end = mItemsArrayList.get(position).getEndDate();
+
+        String startDateTextContent = "";
+        String endDateTextContent = "";
+
+        startDateTextContent = setTextFromDate(start, end, "start");
+        endDateTextContent = setTextFromDate(start, end, "end");
+
+        startDateText.setText(startDateTextContent);
+        endDateText.setText(endDateTextContent);
+
+        double distanceMeEvent =
+            ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
+                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position)
+                    .getLocation().getLongitude());
+        distanceMeEvent = Math.floor(distanceMeEvent * HUNDRED_PERCENT) / HUNDRED_PERCENT;
+
+        name.setText(mItemsArrayList.get(position).getName() + " @ "
+            + mItemsArrayList.get(position).getPositionName());
+
+        // Set the behavior when a list element is clicked
+        convertView.setId(position);
+        convertView.setTag(mItemsArrayList.get(position));
+        // TODO
+
+        return convertView;
     }
 }

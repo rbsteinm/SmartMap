@@ -137,6 +137,23 @@ public class UserEvent implements Event, Searchable, Displayable {
         return mLocation;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
+     * )
+     * @author hugo-S
+     */
+    @Override
+    public MarkerOptions getMarkerOptions(Context context) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(this.getLatLng()).title(this.getName())
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+        return markerOptions;
+
+    }
+
     @Override
     public String getName() {
         return mEvtName;
@@ -227,23 +244,6 @@ public class UserEvent implements Event, Searchable, Displayable {
     public void setStartDate(GregorianCalendar newDate) {
         mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
             newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
-     * )
-     * @author hugo-S
-     */
-    @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(this.getLatLng()).title(this.getName())
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
-        return markerOptions;
 
     }
 }

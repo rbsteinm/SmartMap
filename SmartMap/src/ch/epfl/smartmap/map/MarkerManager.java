@@ -20,15 +20,34 @@ import com.google.android.gms.maps.model.Marker;
 public interface MarkerManager<T extends Displayable> {
 
     /**
-     * This method updates the markers on the map with the given list of items
+     * Add a marker to the map
      * 
-     * @param context
-     * @param mGoogleMap
-     *            the map where we want to update markers
-     * @param friendsToDisplay
-     *            the updated friends
+     * @param event
+     *            the item for which we want to add a marker
      */
-    void updateMarkers(Context context, List<T> itemsToDisplay);
+    Marker addMarker(T item, Context context);
+
+    /**
+     * @return the list of items that are displayed
+     */
+    List<T> getDisplayedItems();
+
+    /**
+     * @return the list of the markers that are displayed
+     */
+    List<Marker> getDisplayedMarkers();
+
+    /**
+     * @param marker
+     * @return the item that the marker represents
+     */
+    T getItemForMarker(Marker marker);
+
+    /**
+     * @param event
+     * @return the marker that represents the given item
+     */
+    Marker getMarkerForItem(T item);
 
     /**
      * @param item
@@ -43,24 +62,6 @@ public interface MarkerManager<T extends Displayable> {
     boolean isDisplayedMarker(Marker marker);
 
     /**
-     * @return the list of the markers that are displayed
-     */
-    List<Marker> getDisplayedMarkers();
-
-    /**
-     * @return the list of items that are displayed
-     */
-    List<T> getDisplayedItems();
-
-    /**
-     * Add a marker to the map
-     * 
-     * @param event
-     *            the item for which we want to add a marker
-     */
-    Marker addMarker(T item, Context context);
-
-    /**
      * Remove a marker from the map
      * 
      * @param event
@@ -69,15 +70,14 @@ public interface MarkerManager<T extends Displayable> {
     Marker removeMarker(T item);
 
     /**
-     * @param marker
-     * @return the item that the marker represents
+     * This method updates the markers on the map with the given list of items
+     * 
+     * @param context
+     * @param mGoogleMap
+     *            the map where we want to update markers
+     * @param friendsToDisplay
+     *            the updated friends
      */
-    T getItemForMarker(Marker marker);
-
-    /**
-     * @param event
-     * @return the marker that represents the given item
-     */
-    Marker getMarkerForItem(T item);
+    void updateMarkers(Context context, List<T> itemsToDisplay);
 
 }

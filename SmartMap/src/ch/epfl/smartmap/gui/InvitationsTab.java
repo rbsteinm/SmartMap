@@ -29,92 +29,6 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class InvitationsTab extends ListFragment {
 
-    private final Context mContext;
-    private final NetworkSmartMapClient mNetworkClient;
-    private final DatabaseHelper mDataBaseHelper;
-
-    @SuppressWarnings("deprecation")
-    public InvitationsTab(Context context) {
-        mContext = context;
-        mNetworkClient = NetworkSmartMapClient.getInstance();
-        mDataBaseHelper = new DatabaseHelper(mContext);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater
-     * , android.view.ViewGroup, android.os.Bundle)
-     */
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.list_fragment_invitations_tab, container, false);
-        new RefreshInvitationsList().execute();
-        return view;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView
-     * , android.view.View, int, long)
-     * When a list item is clicked, display a dialog to ask whether to accept or
-     * decline the invitation
-     */
-    @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-        long userId = (Long) view.getTag();
-        RelativeLayout rl = (RelativeLayout) view;
-        TextView tv = (TextView) rl.getChildAt(1);
-        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
-        String name = tv.getText().toString();
-        this.displayAcceptFriendDialog(name, userId);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onResume()
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-        new RefreshInvitationsList().execute();
-    }
-
-    /**
-     * A dialog to ask whether to accept or decline the invitation of the given
-     * user
-     * 
-     * @param name
-     *            the user's name
-     * @param userId
-     *            the user's id
-     */
-    private void displayAcceptFriendDialog(String name, final long userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-        builder.setMessage("Accept " + name + " to become your friend?");
-
-        // Add positive button
-        builder.setPositiveButton("Yes, accept", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                new AcceptInvitation().execute(userId);
-            }
-        });
-
-        // Add negative button
-        builder.setNegativeButton("No, decline", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                new DeclineInvitation().execute(userId);
-            }
-        });
-
-        // display the AlertDialog
-        builder.create().show();
-    }
-
     /**
      * AsyncTask that notifies the server when the user accepts a friend request
      * also stores the new friend in the application cache
@@ -140,6 +54,25 @@ public class InvitationsTab extends ListFragment {
         protected void onPostExecute(String confirmString) {
             Toast.makeText(InvitationsTab.this.getActivity(), confirmString, Toast.LENGTH_LONG).show();
             new RefreshInvitationsList().execute();
+        }
+
+    }
+
+    /**
+     * AsyncTask that confirms the server that accepted invitations were
+     * received
+     * 
+     * @author marion-S
+     */
+    private class AckAcceptedInvitations extends AsyncTask<Long, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Long... params) {
+            try {
+                mNetworkClient.ackAcceptedInvitation(params[0]);
+            } catch (SmartMapClientException e) {
+            }
+            return null;
         }
 
     }
@@ -204,23 +137,92 @@ public class InvitationsTab extends ListFragment {
 
     }
 
+    private final Context mContext;
+
+    private final NetworkSmartMapClient mNetworkClient;
+
+    private final DatabaseHelper mDataBaseHelper;
+
+    @SuppressWarnings("deprecation")
+    public InvitationsTab(Context context) {
+        mContext = context;
+        mNetworkClient = NetworkSmartMapClient.getInstance();
+        mDataBaseHelper = new DatabaseHelper(mContext);
+    }
+
     /**
-     * AsyncTask that confirms the server that accepted invitations were
-     * received
+     * A dialog to ask whether to accept or decline the invitation of the given
+     * user
      * 
-     * @author marion-S
+     * @param name
+     *            the user's name
+     * @param userId
+     *            the user's id
      */
-    private class AckAcceptedInvitations extends AsyncTask<Long, Void, Void> {
+    private void displayAcceptFriendDialog(String name, final long userId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+        builder.setMessage("Accept " + name + " to become your friend?");
 
-        @Override
-        protected Void doInBackground(Long... params) {
-            try {
-                mNetworkClient.ackAcceptedInvitation(params[0]);
-            } catch (SmartMapClientException e) {
+        // Add positive button
+        builder.setPositiveButton("Yes, accept", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                new AcceptInvitation().execute(userId);
             }
-            return null;
-        }
+        });
 
+        // Add negative button
+        builder.setNegativeButton("No, decline", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                new DeclineInvitation().execute(userId);
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater
+     * , android.view.ViewGroup, android.os.Bundle)
+     */
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.list_fragment_invitations_tab, container, false);
+        new RefreshInvitationsList().execute();
+        return view;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView
+     * , android.view.View, int, long)
+     * When a list item is clicked, display a dialog to ask whether to accept or
+     * decline the invitation
+     */
+    @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        long userId = (Long) view.getTag();
+        RelativeLayout rl = (RelativeLayout) view;
+        TextView tv = (TextView) rl.getChildAt(1);
+        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
+        String name = tv.getText().toString();
+        this.displayAcceptFriendDialog(name, userId);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onResume()
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        new RefreshInvitationsList().execute();
     }
 
 }

@@ -19,19 +19,19 @@ public class PagerAdapter extends FragmentPagerAdapter {
         super(fm);
         mContext = context;
         mFragments = new ArrayList<Fragment>();
-        mFragments.add(new FriendsTab(this.mContext));
-        mFragments.add(new InvitationsTab(this.mContext));
+        mFragments.add(new FriendsTab(mContext));
+        mFragments.add(new InvitationsTab(mContext));
 
-    }
-
-    @Override
-    public Fragment getItem(int position) {
-        return mFragments.get(position);
     }
 
     @Override
     public int getCount() {
         return mFragments.size();
+    }
+
+    @Override
+    public Fragment getItem(int position) {
+        return mFragments.get(position);
     }
 
 }

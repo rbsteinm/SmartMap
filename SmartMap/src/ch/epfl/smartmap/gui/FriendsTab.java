@@ -31,13 +31,86 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * @author rbsteinm
  */
 public class FriendsTab extends ListFragment {
+    /**
+     * Asynchronous task that removes a friend from the users friendList
+     * both from the server and from the cache
+     * 
+     * @author rbsteinm
+     */
+    private class RemoveFriend extends AsyncTask<Long, Void, String> {
+
+        @Override
+        protected String doInBackground(Long... params) {
+            String confirmString = "";
+            try {
+                NetworkSmartMapClient.getInstance().removeFriend(params[0]);
+                confirmString =
+                    "You're no longer friend with "
+                        + NetworkSmartMapClient.getInstance().getUserInfo(params[0]).getName();
+
+                // remove friend from cache and update displayed list
+                // TODO should be done on the removeFriend method
+                mCacheDB.deleteUser(params[0]);
+            } catch (SmartMapClientException e) {
+                confirmString = "Network error, operation failed";
+            }
+            return confirmString;
+        }
+
+        @Override
+        protected void onPostExecute(String confirmString) {
+            FriendsTab.this
+                .setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+            Toast.makeText(mContext, confirmString, Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
+        if (sparseArray == null) {
+            return null;
+        }
+        List<C> arrayList = new ArrayList<C>(sparseArray.size());
+        for (int i = 0; i < sparseArray.size(); i++) {
+            arrayList.add(sparseArray.valueAt(i));
+        }
+        return arrayList;
+    }
+
     private List<User> mFriendList;
+
     private final Context mContext;
+
     private DatabaseHelper mCacheDB;
 
     public FriendsTab(Context context) {
         // TODO Auto-generated constructor stub
         mContext = context;
+    }
+
+    private void displayDeleteConfirmationDialog(String name, final long userId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+        builder.setMessage("remove " + name + " from your friends?");
+
+        // Add positive button
+        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                new RemoveFriend().execute(userId);
+                // TODO refresh the userList
+            }
+        });
+
+        // Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
     }
 
     @SuppressWarnings("deprecation")
@@ -88,77 +161,6 @@ public class FriendsTab extends ListFragment {
                 return 0;
             }
         });
-    }
-
-    public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
-        if (sparseArray == null) {
-            return null;
-        }
-        List<C> arrayList = new ArrayList<C>(sparseArray.size());
-        for (int i = 0; i < sparseArray.size(); i++) {
-            arrayList.add(sparseArray.valueAt(i));
-        }
-        return arrayList;
-    }
-
-    private void displayDeleteConfirmationDialog(String name, final long userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-        builder.setMessage("remove " + name + " from your friends?");
-
-        // Add positive button
-        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                new RemoveFriend().execute(userId);
-                // TODO refresh the userList
-            }
-        });
-
-        // Add negative button
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-
-        // display the AlertDialog
-        builder.create().show();
-    }
-
-    /**
-     * Asynchronous task that removes a friend from the users friendList
-     * both from the server and from the cache
-     * 
-     * @author rbsteinm
-     */
-    private class RemoveFriend extends AsyncTask<Long, Void, String> {
-
-        @Override
-        protected String doInBackground(Long... params) {
-            String confirmString = "";
-            try {
-                NetworkSmartMapClient.getInstance().removeFriend(params[0]);
-                confirmString =
-                    "You're no longer friend with "
-                        + NetworkSmartMapClient.getInstance().getUserInfo(params[0]).getName();
-
-                // remove friend from cache and update displayed list
-                // TODO should be done on the removeFriend method
-                mCacheDB.deleteUser(params[0]);
-            } catch (SmartMapClientException e) {
-                confirmString = "Network error, operation failed";
-            }
-            return confirmString;
-        }
-
-        @Override
-        protected void onPostExecute(String confirmString) {
-            FriendsTab.this
-                .setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
-            Toast.makeText(mContext, confirmString, Toast.LENGTH_LONG).show();
-        }
-
     }
 
 }

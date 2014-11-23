@@ -14,22 +14,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public interface Displayable {
 
     /**
-     * @param context
-     *            The application's context, needed to access the memory
-     * @return The object's picture
+     * @return the position of the item, encapsulated in LatLng object
      */
-    Bitmap getPicture(Context context);
-
-    /**
-     * @return A name for the panel (e.g. the username, event name, etc.)
-     */
-    String getName();
-
-    /**
-     * @return Text containing various information (description, last seen,
-     *         etc.)
-     */
-    String getShortInfos();
+    LatLng getLatLng();
 
     /**
      * @param context
@@ -39,7 +26,20 @@ public interface Displayable {
     MarkerOptions getMarkerOptions(Context context);
 
     /**
-     * @return the position of the item, encapsulated in LatLng object
+     * @return A name for the panel (e.g. the username, event name, etc.)
      */
-    LatLng getLatLng();
+    String getName();
+
+    /**
+     * @param context
+     *            The application's context, needed to access the memory
+     * @return The object's picture
+     */
+    Bitmap getPicture(Context context);
+
+    /**
+     * @return Text containing various information (description, last seen,
+     *         etc.)
+     */
+    String getShortInfos();
 }
