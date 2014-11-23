@@ -15,19 +15,19 @@ import ch.epfl.smartmap.cache.Displayable;
 
 /**
  * <<<<<<< HEAD
-<<<<<<< HEAD
+ * <<<<<<< HEAD
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
  * immutable.
  * =======
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}.
  * >>>>>>> service-2
-=======
+ * =======
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}.
  * =======
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
  * immutable.
  * >>>>>>> dev
->>>>>>> gui-raph2
+ * >>>>>>> gui-raph2
  * 
  * @author jfperren
  */

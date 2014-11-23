@@ -27,12 +27,29 @@ import ch.epfl.smartmap.cache.User;
  * @author rbsteinm
  */
 public class FriendsTab extends ListFragment implements FriendsListener {
+    public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
+        if (sparseArray == null) {
+            return null;
+        }
+        List<C> arrayList = new ArrayList<C>(sparseArray.size());
+        for (int i = 0; i < sparseArray.size(); i++) {
+            arrayList.add(sparseArray.valueAt(i));
+        }
+        return arrayList;
+    }
+
     private List<User> mFriendList;
     private final Context mContext;
+
     private DatabaseHelper mCacheDB;
 
     public FriendsTab(Context context) {
         mContext = context;
+    }
+
+    @Override
+    public void onChange() {
+        this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
     }
 
     @Override
@@ -65,24 +82,8 @@ public class FriendsTab extends ListFragment implements FriendsListener {
     }
 
     @Override
-    public void onChange() {
-        this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
-    }
-
-    public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
-        if (sparseArray == null) {
-            return null;
-        }
-        List<C> arrayList = new ArrayList<C>(sparseArray.size());
-        for (int i = 0; i < sparseArray.size(); i++) {
-            arrayList.add(sparseArray.valueAt(i));
-        }
-        return arrayList;
     }
 }

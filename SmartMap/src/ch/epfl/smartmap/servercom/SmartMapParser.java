@@ -17,6 +17,42 @@ import ch.epfl.smartmap.cache.User;
 public interface SmartMapParser {
 
     /**
+     * Checks in the response returned by the server if the server returned
+     * Error, and if it is the case throws a SmartMapClientException with the
+     * server's message
+     * 
+     * @param s
+     *            the server's response
+     * @throws SmartMapClientException
+     *             if the server returned Error
+     * @throws SmartMapParseException
+     *             if s
+     *             does not represent a valid server's response
+     * @throws ServerFeedbackException
+     */
+    void checkServerError(String s) throws SmartMapParseException, SmartMapClientException;
+
+    /**
+     * Parses some text, and returns an event
+     * 
+     * @param s
+     *            the text to parse, representing an event
+     * @return the event
+     * @throws SmartMapParseException
+     */
+    Event parseEvent(String s) throws SmartMapParseException;
+
+    /**
+     * Parses some text, and returns a list of events
+     * 
+     * @param s
+     *            the text to parse, representing a list of events
+     * @return the list of events
+     * @throws SmartMapParseException
+     */
+    List<Event> parseEventList(String s) throws SmartMapParseException;
+
+    /**
      * Parses some text, and returns a friend
      * 
      * @param s
@@ -42,35 +78,6 @@ public interface SmartMapParser {
     List<User> parseFriends(String s, String key) throws SmartMapParseException;
 
     /**
-     * Parses some text, and returns a map that maps id to positions
-     * 
-     * @param s
-     *            the text to parse, representing a list of positions
-     * @return the user's positions
-     * @throws SmartMapParseException
-     *             if s does not represent a valid list of positions (according
-     *             to the format that the parser supports)
-     */
-
-    List<User> parsePositions(String s) throws SmartMapParseException;
-
-    /**
-     * Checks in the response returned by the server if the server returned
-     * Error, and if it is the case throws a SmartMapClientException with the
-     * server's message
-     * 
-     * @param s
-     *            the server's response
-     * @throws SmartMapClientException
-     *             if the server returned Error
-     * @throws SmartMapParseException
-     *             if s
-     *             does not represent a valid server's response
-     * @throws ServerFeedbackException
-     */
-    void checkServerError(String s) throws SmartMapParseException, SmartMapClientException;
-
-    /**
      * Parses some text, and returns a list of ids
      * 
      * @param s
@@ -83,23 +90,16 @@ public interface SmartMapParser {
     List<Long> parseIds(String s, String key) throws SmartMapParseException;
 
     /**
-     * Parses some text, and returns an event
+     * Parses some text, and returns a map that maps id to positions
      * 
      * @param s
-     *            the text to parse, representing an event
-     * @return the event
+     *            the text to parse, representing a list of positions
+     * @return the user's positions
      * @throws SmartMapParseException
+     *             if s does not represent a valid list of positions (according
+     *             to the format that the parser supports)
      */
-    Event parseEvent(String s) throws SmartMapParseException;
 
-    /**
-     * Parses some text, and returns a list of events
-     * 
-     * @param s
-     *            the text to parse, representing a list of events
-     * @return the list of events
-     * @throws SmartMapParseException
-     */
-    List<Event> parseEventList(String s) throws SmartMapParseException;
+    List<User> parsePositions(String s) throws SmartMapParseException;
 
 }
