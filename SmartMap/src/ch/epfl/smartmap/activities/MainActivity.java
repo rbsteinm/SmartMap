@@ -120,6 +120,9 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         // TODO agpmilli : When click on actionbar icon button, open side menu
 
         mDbHelper = DatabaseHelper.getInstance();
+        if (mDbHelper == null) {
+            DatabaseHelper.initialize(this);
+        }
 
         if (savedInstanceState == null) {
             this.displayMap();
@@ -249,6 +252,20 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         if (eventLocation != null) {
             mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
             eventLocation = null;
+        }
+
+        // Set menu Style
+        switch (mMenuTheme) {
+            case SEARCH:
+                this.setSearchMenu();
+                break;
+            case ITEM:
+                this.setItemMenu(mCurrentItem);
+                break;
+            case MAP:
+                break;
+            default:
+                assert false;
         }
 
         mGoogleMap.setOnMapLongClickListener(new OnMapLongClickListener() {
@@ -465,7 +482,12 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     public void setMainMenu() {
         final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
         // Closes panel and change only if panel could close
-        if (mSearchPanel.close()) {
+        if (mSearchPanel.close() || mSearchPanel.isClosed()) {
+            // Collapse searchBar if needed
+            if ((mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).getActionView() != null)
+                && mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).isActionViewExpanded()) {
+                mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).collapseActionView();
+            }
             // Set visibility of MenuItems
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).setVisible(true);
             mMenu.getItem(MENU_ITEM_MY_LOCATION_INDEX).setVisible(true);
@@ -491,7 +513,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     public void setItemMenu(Displayable item) {
         final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
         // Closes panel and change only if panel could close
-        if (mSearchPanel.close()) {
+        if (mSearchPanel.close() || mSearchPanel.isClosed()) {
             // Set visibility of MenuItems
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).getActionView().clearFocus();
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).collapseActionView();

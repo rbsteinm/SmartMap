@@ -25,7 +25,7 @@
         android:visible="false"/>
     <item
         android:id="@+id/action_item_more"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
         android:showAsAction="always"
         android:title="Open Infos"
         android:visible="false"/>

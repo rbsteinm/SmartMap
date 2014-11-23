@@ -110,7 +110,7 @@
         <activity
             android:name=".activities.UserInformationActivity"
             android:label="@string/title_activity_user_information"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" >
             <meta-data

@@ -22,7 +22,6 @@ public class UserInformationActivity extends Activity {
     private ImageView mPictureView;
     private TextView mNameView;
     private TextView mInfosView;
-    private TextView mLoremIpsum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

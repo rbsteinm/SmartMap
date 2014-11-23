@@ -24,16 +24,23 @@ import com.google.android.apps.common.testing.ui.espresso.ViewAction;
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 
 public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
-    public MainActivityTest() {
-        super(MainActivity.class);
-    }
+    private static ViewAction actionCloseDrawer() {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isAssignableFrom(DrawerLayout.class);
+            }
 
-    // The standard JUnit 3 setUp method run for for every test
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        getActivity(); // prevent error
-                       // "No activities found. Did you forget to launch the activity by calling getActivity()"
+            @Override
+            public String getDescription() {
+                return "close drawer";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                ((DrawerLayout) view).closeDrawer(GravityCompat.START);
+            }
+        };
     }
 
     private static ViewAction actionOpenDrawer() {
@@ -55,28 +62,35 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         };
     }
 
-    private static ViewAction actionCloseDrawer() {
-        return new ViewAction() {
-            @Override
-            public Matcher<View> getConstraints() {
-                return isAssignableFrom(DrawerLayout.class);
-            }
-
-            @Override
-            public String getDescription() {
-                return "close drawer";
-            }
-
-            @Override
-            public void perform(UiController uiController, View view) {
-                ((DrawerLayout) view).closeDrawer(GravityCompat.START);
-            }
-        };
+    public MainActivityTest() {
+        super(MainActivity.class);
     }
 
-    public void testOpenSideMenu() throws Exception {
-        onView(withId(R.id.drawer_layout)).perform(actionOpenDrawer());
-        onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()));
+    // The standard JUnit 3 setUp method run for for every test
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        this.getActivity(); // prevent error
+        // "No activities found. Did you forget to launch the activity by calling getActivity()"
+    }
+
+    public void testCloseSearchViewWithBackButton() {
+        onView(withId(R.id.action_search)).perform(click());
+        pressBack();
+        pressBack();
+        onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
+    }
+
+    public void testCloseSearchViewWithMenuItem() {
+        onView(withId(R.id.action_search)).perform(click());
+        onView(withId(R.id.action_hide_search)).perform(click());
+        onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
+    }
+
+    public void testNormalSearchQuery() {
+        onView(withId(R.id.action_search)).perform(click());
+        onView(withId(R.id.action_search)).perform(ViewActions.typeText("Julien Perrenoud"));
+        // TODO : Check there is only one result
     }
 
     public void testOpenAndCloseSideMenu() throws Exception {
@@ -86,14 +100,20 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     public void testOpenFriendsActivity() throws Exception {
-        ListView lv = (ListView) getActivity().findViewById(R.id.left_drawer_listView);
+        ListView lv = (ListView) this.getActivity().findViewById(R.id.left_drawer_listView);
         View friendView = lv.getChildAt(1);
         onView(withId(friendView.getId())).perform(click());
         // TODO check that FriendsActivity is the current Activity
     }
 
-    public void testSideMenuViewExist() throws Exception {
-        // TODO check that all the views in the side menu exist
+    public void testOpenSearchView() {
+        onView(withId(R.id.action_search)).perform(click());
+        onView(withId(R.id.search_panel)).check(matches(isDisplayed()));
+    }
+
+    public void testOpenSideMenu() throws Exception {
+        onView(withId(R.id.drawer_layout)).perform(actionOpenDrawer());
+        onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()));
     }
 
     /**
@@ -104,35 +124,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.left_drawer_listView)).check(matches(isDisplayed()));
     }
 
-    public void testPanelsNotVisible() {
-        onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.information_panel)).check(matches(not(isDisplayed())));
-    }
-
-    public void testOpenSearchView() {
-        onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.search_panel)).check(matches(isDisplayed()));
-    }
-
-    public void testCloseSearchViewWithMenuItem() {
-        onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.action_hide_search)).perform(click());
-        onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
-    }
-
-    public void testCloseSearchViewWithBackButton() {
-        onView(withId(R.id.action_search)).perform(click());
-        // FIXME : This should require only 2 pressBack()
-        pressBack();
-        pressBack();
-        pressBack();
-        onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
-    }
-
-    public void testNormalSearchQuery() {
-        onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.action_search)).perform(ViewActions.typeText("Julien Perrenoud"));
-        // TODO : Check there is only one result
+    public void testSideMenuViewExist() throws Exception {
+        // TODO check that all the views in the side menu exist
     }
 
     public void testWrongSearchQuery() {

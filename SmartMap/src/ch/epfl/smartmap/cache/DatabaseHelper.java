@@ -131,13 +131,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Stores an event in the database. If there's already an event with the
-     * <<<<<<< HEAD
      * same ID, updates that event instead The event must have an ID (given by
      * the server)!
-     * =======
-     * same ID, updates that event instead
-     * The event must have an ID (given by the server)!
-     * >>>>>>> gui-info
      * 
      * @param event
      *            The event to store

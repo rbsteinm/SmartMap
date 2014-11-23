@@ -100,6 +100,8 @@ public class SlidingPanel extends FrameLayout {
 
     /**
      * Show full screen view
+     * 
+     * @return true is panel was closed and now opens
      */
     public boolean open() {
         if (mVisualState == VisualState.CLOSED) {
@@ -119,8 +121,6 @@ public class SlidingPanel extends FrameLayout {
             mOpenAnim.start();
 
             return true;
-        } else if (mVisualState == VisualState.OPEN) {
-            return true;
         }
 
         return false;
@@ -128,6 +128,8 @@ public class SlidingPanel extends FrameLayout {
 
     /**
      * Hide panel
+     * 
+     * @return true if panel was open and now closes
      */
     public boolean close() {
         if (mVisualState == VisualState.OPEN) {
@@ -136,8 +138,6 @@ public class SlidingPanel extends FrameLayout {
                 v.startAnimation(this.createAlphaAnimation(v, Fade.OUT));
             }
             mCloseAnim.start();
-            return true;
-        } else if (mVisualState == VisualState.CLOSED) {
             return true;
         }
 
