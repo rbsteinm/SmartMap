@@ -85,7 +85,8 @@ public class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsEnabled() {
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_NOTIFICATIONS_ENABLED, true);
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_NOTIFICATIONS_ENABLED,
+            true);
     }
 
     /**
@@ -95,8 +96,8 @@ public class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            KEY_FRIEND_REQUEST, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(KEY_FRIEND_REQUEST, true) : false;
     }
 
     /**
@@ -110,8 +111,8 @@ public class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            KEY_FRIENDSHIP_CONFIRMATIONS, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(KEY_FRIENDSHIP_CONFIRMATIONS, true) : false;
     }
 
     /**
@@ -121,8 +122,8 @@ public class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            KEY_EVENT_INVITATIONS, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(KEY_EVENT_INVITATIONS, true) : false;
     }
 
     /**
@@ -132,8 +133,8 @@ public class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            KEY_EVENT_PROXIMITY, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(KEY_EVENT_PROXIMITY, true) : false;
     }
 
     /**
@@ -143,8 +144,8 @@ public class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsVibrate() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            KEY_VIBRATE, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(KEY_VIBRATE, true) : false;
     }
 
     /**

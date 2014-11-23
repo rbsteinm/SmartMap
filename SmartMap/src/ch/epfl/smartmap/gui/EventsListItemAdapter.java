@@ -81,11 +81,12 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
         double distanceMeEvent =
             ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
-                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position).getLocation()
-                    .getLongitude());
+                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position)
+                    .getLocation().getLongitude());
         distanceMeEvent = Math.floor(distanceMeEvent * HUNDRED_PERCENT) / HUNDRED_PERCENT;
 
-        name.setText(mItemsArrayList.get(position).getName() + " @ " + mItemsArrayList.get(position).getPositionName());
+        name.setText(mItemsArrayList.get(position).getName() + " @ "
+            + mItemsArrayList.get(position).getPositionName());
 
         // Set the behavior when a list element is clicked
         convertView.setId(position);
@@ -120,10 +121,12 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
                 now.get(GregorianCalendar.DAY_OF_MONTH), MIDNIGHT_HOUR, MIDNIGHT_MINUTES);
         tomorrowMidnight.add(GregorianCalendar.DAY_OF_YEAR, 1);
 
-        String startHourOfDayString = TimePickerFragment.formatForClock(date1.get(GregorianCalendar.HOUR_OF_DAY));
+        String startHourOfDayString =
+            TimePickerFragment.formatForClock(date1.get(GregorianCalendar.HOUR_OF_DAY));
         String startMinuteString = TimePickerFragment.formatForClock(date1.get(GregorianCalendar.MINUTE));
 
-        String endHourOfDayString = TimePickerFragment.formatForClock(date2.get(GregorianCalendar.HOUR_OF_DAY));
+        String endHourOfDayString =
+            TimePickerFragment.formatForClock(date2.get(GregorianCalendar.HOUR_OF_DAY));
         String endMinuteString = TimePickerFragment.formatForClock(date2.get(GregorianCalendar.MINUTE));
         String dateTextContent = "";
 
@@ -133,8 +136,8 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
                 dateTextContent = "Today";
             } else {
                 dateTextContent =
-                    "from " + startHourOfDayString + ":" + startMinuteString + " to " + endHourOfDayString + ":"
-                        + endMinuteString;
+                    "from " + startHourOfDayString + ":" + startMinuteString + " to " + endHourOfDayString
+                        + ":" + endMinuteString;
             }
         } else if (date1.before(tomorrowMidnight) && date2.before(tomorrowMidnight)) {
             // ends and starts the same day
@@ -142,8 +145,8 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
                 dateTextContent = "Tomorrow";
             } else {
                 dateTextContent =
-                    "from " + startHourOfDayString + ":" + startMinuteString + " to " + endHourOfDayString + ":"
-                        + endMinuteString;
+                    "from " + startHourOfDayString + ":" + startMinuteString + " to " + endHourOfDayString
+                        + ":" + endMinuteString;
             }
         } else {
             // Upcoming event
@@ -159,13 +162,15 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
                 if (s.equals("start")) {
                     dateTextContent =
                         "Starts: " + date1.get(GregorianCalendar.DAY_OF_MONTH) + "/"
-                            + (date1.get(GregorianCalendar.MONTH) + 1) + "/" + date1.get(GregorianCalendar.YEAR)
-                            + " at " + startHourOfDayString + ":" + startMinuteString;
+                            + (date1.get(GregorianCalendar.MONTH) + 1) + "/"
+                            + date1.get(GregorianCalendar.YEAR) + " at " + startHourOfDayString + ":"
+                            + startMinuteString;
                 } else {
                     dateTextContent =
                         "Ends: " + date2.get(GregorianCalendar.DAY_OF_MONTH) + "/"
-                            + (date2.get(GregorianCalendar.MONTH) + 1) + "/" + date2.get(GregorianCalendar.YEAR)
-                            + " at " + endHourOfDayString + ":" + endMinuteString;
+                            + (date2.get(GregorianCalendar.MONTH) + 1) + "/"
+                            + date2.get(GregorianCalendar.YEAR) + " at " + endHourOfDayString + ":"
+                            + endMinuteString;
                 }
 
             }

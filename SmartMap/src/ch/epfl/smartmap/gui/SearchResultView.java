@@ -48,7 +48,8 @@ public abstract class SearchResultView extends LinearLayout {
         mChildrenState = ChildrenState.EMPTY;
 
         // Layout Parameters
-        this.setLayoutParams(new AbsListView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        this.setLayoutParams(new AbsListView.LayoutParams(LayoutParams.MATCH_PARENT,
+            LayoutParams.WRAP_CONTENT));
         this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
         this.setOrientation(LinearLayout.HORIZONTAL);
         this.setWeightSum(MAIN_LAYOUT_WEIGHTSUM);

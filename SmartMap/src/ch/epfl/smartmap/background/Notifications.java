@@ -164,11 +164,15 @@ public class Notifications {
         NotificationCompat.Builder noti =
             new NotificationCompat.Builder(context)
                 // Add all notification's specifications in the builder
-                .setStyle(inboxStyle).setAutoCancel(true).setContentIntent(pFriendIntent)
-                .setSmallIcon(R.drawable.ic_launcher).setTicker(user.getName() + " wants to be your friend")
+                .setStyle(inboxStyle)
+                .setAutoCancel(true)
+                .setContentIntent(pFriendIntent)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setTicker(user.getName() + " wants to be your friend")
 
                 .setContentTitle("SmartMap Friend Invitation")
-                .setContentText(user.getName() + " wants to be your friend \n Click here to open your list of friends");
+                .setContentText(
+                    user.getName() + " wants to be your friend \n Click here to open your list of friends");
 
         // TODO : determine if we need those buttons
         // noti.addAction(0, "Decline", pIntent);

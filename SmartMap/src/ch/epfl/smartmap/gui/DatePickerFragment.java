@@ -48,8 +48,8 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        mPickDate.setText(TimePickerFragment.formatForClock(day) + "/" + TimePickerFragment.formatForClock(month + 1)
-            + "/" + year);
+        mPickDate.setText(TimePickerFragment.formatForClock(day) + "/"
+            + TimePickerFragment.formatForClock(month + 1) + "/" + year);
         mPickDate.setTag(new int[]{year, month, day});
     }
 
