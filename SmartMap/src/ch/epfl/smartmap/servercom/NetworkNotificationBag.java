@@ -15,85 +15,6 @@ import ch.epfl.smartmap.cache.User;
  */
 public class NetworkNotificationBag implements NotificationBag {
 
-    private static final String TAG = "NetworkNotificationBag";
-
-    private List<User> mInvitingUsers;
-    private List<User> mNewFriends;
-    private List<Long> mRemovedFriends;
-
-    private SmartMapClient mClient;
-
-    public NetworkNotificationBag(List<User> invitingUsers, List<User> newFriends,
-        List<Long> removedFriendsIds, SmartMapClient client) {
-        if (invitingUsers == null) {
-            throw new IllegalArgumentException("invitingUsers list is null.");
-        }
-        if (newFriends == null) {
-            throw new IllegalArgumentException("newFriends list is null.");
-        }
-        if (removedFriendsIds == null) {
-            throw new IllegalArgumentException("removedFriendsIds list is null.");
-        }
-        if (client == null) {
-            throw new IllegalArgumentException("Smartmap client is null.");
-        }
-
-        mInvitingUsers = new ArrayList<User>(invitingUsers);
-        mNewFriends = new ArrayList<User>(newFriends);
-        mRemovedFriends = new ArrayList<Long>(removedFriendsIds);
-
-        // The client is a singleton, we cannot (and should not) create a
-        // defensive copy.
-        mClient = client;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.servercom.NotificationBag#getInvitingUsers()
-     */
-    @Override
-    public List<User> getInvitingUsers() {
-        return new ArrayList<User>(mInvitingUsers);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.servercom.NotificationBag#getNewFriends()
-     */
-    @Override
-    public List<User> getNewFriends() {
-        return new ArrayList<User>(mNewFriends);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.servercom.NotificationBag#getRemovedFriendsIds()
-     */
-    @Override
-    public List<Long> getRemovedFriendsIds() {
-        return new ArrayList<Long>(mRemovedFriends);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.servercom.NotificationBag#ackNewFriend(int)
-     */
-    @Override
-    public void ackNewFriend(long id) {
-        AsyncAckNewFriend task = new AsyncAckNewFriend();
-        task.execute(id);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.servercom.NotificationBag#ackRemovedFriend(int)
-     */
-    @Override
-    public void ackRemovedFriend(long id) {
-        AsyncAckRemovedFriend task = new AsyncAckRemovedFriend();
-        task.execute(id);
-    }
-
     /**
      * Sends an ackAcceptedInvitation request to the server asynchronously.
      * 
@@ -150,5 +71,85 @@ public class NetworkNotificationBag implements NotificationBag {
 
             return null;
         }
+    }
+
+    private static final String TAG = "NetworkNotificationBag";
+    private List<User> mInvitingUsers;
+
+    private List<User> mNewFriends;
+
+    private List<Long> mRemovedFriends;
+
+    private SmartMapClient mClient;
+
+    public NetworkNotificationBag(List<User> invitingUsers, List<User> newFriends,
+        List<Long> removedFriendsIds, SmartMapClient client) {
+        if (invitingUsers == null) {
+            throw new IllegalArgumentException("invitingUsers list is null.");
+        }
+        if (newFriends == null) {
+            throw new IllegalArgumentException("newFriends list is null.");
+        }
+        if (removedFriendsIds == null) {
+            throw new IllegalArgumentException("removedFriendsIds list is null.");
+        }
+        if (client == null) {
+            throw new IllegalArgumentException("Smartmap client is null.");
+        }
+
+        mInvitingUsers = new ArrayList<User>(invitingUsers);
+        mNewFriends = new ArrayList<User>(newFriends);
+        mRemovedFriends = new ArrayList<Long>(removedFriendsIds);
+
+        // The client is a singleton, we cannot (and should not) create a
+        // defensive copy.
+        mClient = client;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.NotificationBag#ackNewFriend(int)
+     */
+    @Override
+    public void ackNewFriend(long id) {
+        AsyncAckNewFriend task = new AsyncAckNewFriend();
+        task.execute(id);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.NotificationBag#ackRemovedFriend(int)
+     */
+    @Override
+    public void ackRemovedFriend(long id) {
+        AsyncAckRemovedFriend task = new AsyncAckRemovedFriend();
+        task.execute(id);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.NotificationBag#getInvitingUsers()
+     */
+    @Override
+    public List<User> getInvitingUsers() {
+        return new ArrayList<User>(mInvitingUsers);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.NotificationBag#getNewFriends()
+     */
+    @Override
+    public List<User> getNewFriends() {
+        return new ArrayList<User>(mNewFriends);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.NotificationBag#getRemovedFriendsIds()
+     */
+    @Override
+    public List<Long> getRemovedFriendsIds() {
+        return new ArrayList<Long>(mRemovedFriends);
     }
 }

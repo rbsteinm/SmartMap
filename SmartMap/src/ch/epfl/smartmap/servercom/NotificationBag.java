@@ -13,6 +13,22 @@ import ch.epfl.smartmap.cache.User;
 public interface NotificationBag {
 
     /**
+     * Acknowledges a new friend so it will not be returned by the server
+     * anymore.
+     * 
+     * @param id
+     */
+    void ackNewFriend(long id);
+
+    /**
+     * Acknowledges a removed friend so it will not be returned by the server
+     * anymore.
+     * 
+     * @param id
+     */
+    void ackRemovedFriend(long id);
+
+    /**
      * Get a list of the users that sent an invitation request.
      * 
      * @return a list of the inviting users.
@@ -32,20 +48,4 @@ public interface NotificationBag {
      * @return a list of ids.
      */
     List<Long> getRemovedFriendsIds();
-
-    /**
-     * Acknowledges a new friend so it will not be returned by the server
-     * anymore.
-     * 
-     * @param id
-     */
-    void ackNewFriend(long id);
-
-    /**
-     * Acknowledges a removed friend so it will not be returned by the server
-     * anymore.
-     * 
-     * @param id
-     */
-    void ackRemovedFriend(long id);
 }

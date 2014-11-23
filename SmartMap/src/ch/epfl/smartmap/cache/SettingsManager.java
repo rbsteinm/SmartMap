@@ -208,8 +208,7 @@ public class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications,
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsEnabled() {
@@ -220,8 +219,7 @@ public class SettingsManager {
     /**
      * @return <code>true</code> if the user enabled the notifications for event
      *         invitations and the user
-     *         activated the notifications in general, <code>false</code>
-     *         otherwise.
+     *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
@@ -232,8 +230,7 @@ public class SettingsManager {
     /**
      * @return <code>true</code> if the user enabled the notifications for event
      *         proximity and the user
-     *         activated the notifications in general, <code>false</code>
-     *         otherwise.
+     *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
@@ -244,8 +241,7 @@ public class SettingsManager {
     /**
      * @return <code>true</code> if the user enabled the notifications for
      *         friend requests and the user
-     *         activated the notifications in general, <code>false</code>
-     *         otherwise.
+     *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
@@ -259,8 +255,7 @@ public class SettingsManager {
      * 
      * @return <code>true</code> if the user enabled the notifications for
      *         friendship confirmations and the
-     *         user activated the notifications in general, <code>false</code>
-     *         otherwise.
+     *         user activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {

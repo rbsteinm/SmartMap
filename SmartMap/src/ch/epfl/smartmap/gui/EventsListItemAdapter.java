@@ -21,8 +21,7 @@ import ch.epfl.smartmap.cache.Event;
  * Adapter used to display the events in a list view.
  * </p>
  * <p>
- * To make the scrolling smooth, we use the view adapter design pattern. See <a
- * href=
+ * To make the scrolling smooth, we use the view adapter design pattern. See <a href=
  * "http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder"
  * >developer.android on ViewHolder</a>
  * </p>
@@ -49,8 +48,7 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
     /**
      * <p>
-     * Gets a String to describe an event's date and time in a cool and human
-     * readable format.
+     * Gets a String to describe an event's date and time in a cool and human readable format.
      * </p>
      * <p>
      * date1 must be before date2
