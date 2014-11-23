@@ -63,7 +63,6 @@ public class DatabaseHelperTest extends AndroidTestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
         dbh.clearAll();
-        dbh.close();
     }
 
     @Test
@@ -112,6 +111,16 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.deleteFilter(filter.getID());
         assertTrue(dbh.getAllFilters().isEmpty());
     }
+    
+    public void testUpdateUser() {
+        a.setEmail("test email");
+        dbh.addUser(a);
+        dbh.addUser(b);
+        int rows = dbh.updateUser(new Friend(a.getID(), c.getName()));
+        assertTrue(dbh.getUser(a.getID()).getName().equals(c.getName()) 
+            && dbh.getUser(a.getID()).getEmail().equals("test email") 
+            && rows == 1);
+    }
 
     @Test
     public void testDeleteUser() {
@@ -152,14 +161,5 @@ public class DatabaseHelperTest extends AndroidTestCase {
         event.setName(name);
         long rows = dbh.updateEvent(event);
         assertTrue(dbh.getEvent(event.getID()).getName().equals(name) && (rows == 1));
-    }
-
-    @Test
-    public void testUpdateUser() {
-        dbh.addUser(a);
-        dbh.addUser(b);
-        a.setName(name);
-        int rows = dbh.updateUser(a);
-        assertTrue(dbh.getUser(a.getID()).getName().equals(name) && (rows == 1));
     }
 }

@@ -14,8 +14,12 @@ import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.cache.Displayable;
 
 /**
+ * <<<<<<< HEAD
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
  * immutable.
+ * =======
+ * This class is a basic Layout that will be used to display search results in {@code SearchLayout}.
+ * >>>>>>> service-2
  * 
  * @author jfperren
  */
@@ -64,6 +68,7 @@ public class SearchResultView extends RelativeLayout {
         mImageView = new ImageView(context);
         mImageView.setId(R.id.search_result_image);
         mImageView.setAdjustViewBounds(true);
+
         mImageView.setImageBitmap(mImage);
         mImageView.setScaleType(ScaleType.FIT_XY);
         LayoutParams imageParams = new LayoutParams(IMAGE_SIZE, IMAGE_SIZE);

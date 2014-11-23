@@ -20,6 +20,7 @@ import java.util.Map;
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.util.Log;
+import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -190,6 +191,12 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void authServer(String name, long facebookId, String fbAccessToken) throws SmartMapClientException {
         Log.d("authServer", "begin");
         Map<String, String> params = new HashMap<String, String>();
+
+        // Stores connection info to re-log when app is killed
+        SettingsManager manager = SettingsManager.getInstance();
+        manager.setUserName(name);
+        manager.setFacebookID(facebookId);
+        manager.setToken(fbAccessToken);
 
         params.put("name", name);
         params.put("facebookId", Long.toString(facebookId));
@@ -471,11 +478,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      */
     @SuppressLint("UseSparseArrays")
     @Override
-    public Map<Long, Location> listFriendsPos() throws SmartMapClientException {
+    public List<User> listFriendsPos() throws SmartMapClientException {
 
         HttpURLConnection conn = this.getHttpURLConnection("/listFriendsPos");
         String response = this.sendViaPost(new HashMap<String, String>(), conn);
-        Map<Long, Location> positions = null;
 
         SmartMapParser parser = null;
         try {
@@ -490,14 +496,14 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-        positions = new HashMap<Long, Location>();
+        List<User> users = new ArrayList<User>();
         try {
-            positions = parser.parsePositions(response);
+            users = parser.parsePositions(response);
         } catch (SmartMapParseException e) {
             throw new SmartMapClientException(e);
         }
 
-        return positions;
+        return users;
     }
 
     private String longListToString(List<Long> list) {

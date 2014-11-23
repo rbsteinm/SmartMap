@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -29,17 +29,21 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
     private String mPhoneNumber;
     private String mEmail;
     private String mPositionName;
-    private final GregorianCalendar mLastSeen;
-    private boolean mOnline;
+    private GregorianCalendar mLastSeen;
     private final Location mLocation;
     private boolean mVisible;
 
+    public static final String NO_NAME = "";
     public static final String NO_NUMBER = "No phone number specified";
     public static final String NO_EMAIL = "No email address specified";
     public static final String POSITION_UNKNOWN = "Unknown position";
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
+    public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
+                                                             // until a user is
+                                                             // considered
+                                                             // offline
 
     private static final int LEFT_SHIFT_COUNT = 32;
 
@@ -67,15 +71,21 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
      * @author ritterni
      */
     public Friend(long userID, String userName) {
+        if (userID < 0) {
+            throw new IllegalArgumentException("Invalid user ID!");
+        }
+        if (userName == null) {
+            throw new IllegalArgumentException("Invalid user name!");
+        }
         mId = userID;
         mName = userName;
         mPhoneNumber = NO_NUMBER;
         mEmail = NO_EMAIL;
         mPositionName = POSITION_UNKNOWN;
         mLastSeen = new GregorianCalendar();
+        mLastSeen.setTimeInMillis(0);
         mLocation = new Location(PROVIDER_NAME);
         mVisible = true;
-        mOnline = false;
     }
 
     public Friend(long userID, String userName, double latitude, double longitude) {
@@ -96,7 +106,6 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
         boolean[] booleans = new boolean[2];
         in.readBooleanArray(booleans);
         mVisible = booleans[0];
-        mOnline = booleans[1];
     }
 
     @Override
@@ -157,7 +166,9 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
 
     @Override
     public GregorianCalendar getLastSeen() {
-        return mLastSeen;
+        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
+        g.setTimeInMillis(mLastSeen.getTimeInMillis());
+        return g;
     }
 
     @Override
@@ -202,8 +213,17 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
 
     @Override
     public String getShortInfos() {
-        // TODO
-        return "Seen 10 minutes ago near Lausanne";
+        String info = "";
+        if (this.isOnline() && !this.getPositionName().equals("")) {
+            info = "Currently in " + this.getPositionName();
+        } else if (this.isOnline()) {
+            info = "Online right now";
+        } else if (!this.getPositionName().equals("")) {
+            info = "Last seen near " + this.getPositionName();
+        } else {
+            info = "Currently offline";
+        }
+        return info;
     }
 
     /*
@@ -215,13 +235,13 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
         final int prime = 31;
         int result = 1;
         result = (prime * result) + (int) (mId ^ (mId >>> LEFT_SHIFT_COUNT));
-        result = (prime * result) + ((mName == null) ? 0 : mName.hashCode());
+        result = (prime * result) + (mName == null ? 0 : mName.hashCode());
         return result;
     }
 
     @Override
     public boolean isOnline() {
-        return mOnline;
+        return (new GregorianCalendar().getTimeInMillis() - mLastSeen.getTimeInMillis()) < ONLINE_TIMEOUT;
     }
 
     @Override
@@ -236,8 +256,9 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
 
     @Override
     public void setLastSeen(GregorianCalendar date) {
-        mLastSeen.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE),
-            date.get(Calendar.HOUR), date.get(Calendar.MINUTE));
+        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
+        g.setTimeInMillis(date.getTimeInMillis());
+        mLastSeen = g;
     }
 
     @Override
@@ -259,6 +280,9 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
 
     @Override
     public void setName(String newName) {
+        if (newName.isEmpty() || (newName == null)) {
+            throw new IllegalArgumentException("Invalid user name!");
+        }
         mName = newName;
     }
 
@@ -268,8 +292,9 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
     }
 
     @Override
+    @Deprecated
     public void setOnline(boolean status) {
-        mOnline = status;
+        // deprecated
     }
 
     @Override
@@ -315,7 +340,7 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
         dest.writeParcelable(mLocation, flags);
         dest.writeString(mPositionName);
         dest.writeLong(mLastSeen.getTimeInMillis());
-        boolean[] booleans = new boolean[]{mVisible, mOnline};
+        boolean[] booleans = new boolean[]{mVisible};
         dest.writeBooleanArray(booleans);
     }
 }

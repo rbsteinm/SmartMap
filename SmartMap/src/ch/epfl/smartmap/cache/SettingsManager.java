@@ -24,6 +24,7 @@ public class SettingsManager {
     public static final String HIDDEN = "Hidden";
     public static final String LONGITUDE = "Longitude";
     public static final String LATITUDE = "Latitude";
+    public static final String LOCATION_NAME = "LocName";
 
     public static final long DEFAULT_ID = -1;
     public static final String DEFAULT_NAME = "No name";
@@ -32,6 +33,7 @@ public class SettingsManager {
     public static final String DEFAULT_TOKEN = "No token";
     public static final long DEFAULT_FB_ID = -1;
     public static final String DEFAULT_COOKIE = "No cookie";
+    public static final String DEFAULT_LOC_NAME = "";
 
     private final Context mContext;
     private final SharedPreferences mSharedPref;
@@ -60,19 +62,27 @@ public class SettingsManager {
     }
 
     /**
-     * Initializes the settings manager (should be called once when starting the app)
+     * Initializes the settings manager (should be called once when starting the
+     * app)
      * 
      * @param context
      *            The app's context, needed to access the shared preferences
      * @return The SettingsManager instance
      */
     public static SettingsManager initialize(Context context) {
-        mInstance = new SettingsManager(context);
+        if (mInstance == null) {
+            mInstance = new SettingsManager(context);
+        }
         return mInstance;
     }
 
     /**
+     * <<<<<<< HEAD
      * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
+     * =======
+     * SettingsManager constructor. Will be made private, use initialize() or
+     * getInstance() instead.
+     * >>>>>>> service-2
      * 
      * @param context
      *            The app's context, needed to access the shared preferences
@@ -199,8 +209,7 @@ public class SettingsManager {
 
     /**
      * @return <code>true</code> if the user enabled the notifications for event invitations and the user
-     *         activated the
-     *         notifications in general, <code>false</code> otherwise.
+     *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
@@ -210,8 +219,7 @@ public class SettingsManager {
 
     /**
      * @return <code>true</code> if the user enabled the notifications for event proximity and the user
-     *         activated the
-     *         notifications in general, <code>false</code> otherwise.
+     *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
@@ -221,8 +229,7 @@ public class SettingsManager {
 
     /**
      * @return <code>true</code> if the user enabled the notifications for friend requests and the user
-     *         activated the
-     *         notifications in general, <code>false</code> otherwise.
+     *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
@@ -234,8 +241,7 @@ public class SettingsManager {
      * A friendship confirmation happens when another user accepts your friend request.
      * 
      * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
-     *         user
-     *         activated the notifications in general, <code>false</code> otherwise.
+     *         user activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
@@ -306,11 +312,23 @@ public class SettingsManager {
      * 
      * @param loc
      *            The location to be stored
-     * @return True if the location was stores successfully
+     * @return True if the location was stored successfully
      */
     public boolean setLocation(Location loc) {
         mEditor.putLong(LONGITUDE, Double.doubleToRawLongBits(loc.getLongitude()));
         mEditor.putLong(LATITUDE, Double.doubleToRawLongBits(loc.getLatitude()));
+        return mEditor.commit();
+    }
+
+    /**
+     * Change the location name of the local user
+     * 
+     * @param locName
+     *            The new location name (e.g. city)
+     * @return If the name was stored successfully
+     */
+    public boolean setLocationName(String locName) {
+        mEditor.putString(LOCATION_NAME, locName);
         return mEditor.commit();
     }
 

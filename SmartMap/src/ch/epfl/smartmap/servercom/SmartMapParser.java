@@ -1,9 +1,7 @@
 package ch.epfl.smartmap.servercom;
 
 import java.util.List;
-import java.util.Map;
 
-import android.location.Location;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -27,6 +25,10 @@ public interface SmartMapParser {
      * @throws SmartMapClientException
      *             if the server returned Error , SmartMapParseException if s
      *             does not represent a valid server's response
+     *             <<<<<<< HEAD
+     *             =======
+     * @throws ServerFeedbackException
+     *             >>>>>>> service-2
      */
     void checkServerError(String s) throws SmartMapParseException, SmartMapClientException;
 
@@ -57,7 +59,8 @@ public interface SmartMapParser {
      *             if s does not represent a valid list of positions (according
      *             to the format that the parser supports)
      */
-    Map<Long, Location> parsePositions(String s) throws SmartMapParseException;
+
+    List<User> parsePositions(String s) throws SmartMapParseException;
 
     // TODO if necessary add a method to parse an event
 

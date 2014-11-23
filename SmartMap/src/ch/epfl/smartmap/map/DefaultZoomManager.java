@@ -39,16 +39,9 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
      * (non-Javadoc)
      * @see
      * ch.epfl.smartmap.gui.ZoomManager#zoomAccordingToMarkers(com.google.android
-     * <<<<<<< HEAD
      * .gms.maps.GoogleMap, java.util.List) Almost all movement methods require
      * the Map object to have passed the layout process. We can wait for this to
      * happen using the addOnGlobalLayoutListener
-     * =======
-     * .gms.maps.GoogleMap, java.util.List)
-     * Almost all movement methods require the Map object to have passed the
-     * layout process. We can wait for this to happen using the
-     * addOnGlobalLayoutListener
-     * >>>>>>> gui-info
      */
     @Override
     public void zoomAccordingToMarkers(final GoogleMap map, final List<Marker> markers) {

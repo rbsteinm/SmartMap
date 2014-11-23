@@ -168,7 +168,7 @@ public class SearchLayout extends LinearLayout {
     private SearchEngine mSearchEngine;
 
     // Extra views
-    private LinearLayout mTitleBar;
+    private final LinearLayout mTitleBar;
 
     // Information about current state
     private Type mCurrentSearchType;
@@ -352,5 +352,6 @@ public class SearchLayout extends LinearLayout {
     private void updateCurrentPanel() {
         mSearchResultViewGroups.get(mCurrentSearchType).setResultList(
             mSearchEngine.sendQuery(mCurrentQuery, mCurrentSearchType));
+
     }
 }

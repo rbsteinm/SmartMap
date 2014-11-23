@@ -61,6 +61,7 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
      * @author SpicyCH
      */
     public static String getTextFromDate(GregorianCalendar date1, GregorianCalendar date2, String s) {
+
         if (date1.after(date2)) {
             throw new IllegalArgumentException("date1 must be before date2");
         }
@@ -148,12 +149,18 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
     private final Location mMyLocation;
 
     /**
+     * <<<<<<< HEAD
      * Constructor
      * 
      * @param context
      * @param itemsArrayList
      * @param myLocation
      *            the user's location
+     *            =======
+     *            An adapter for event's list
+     * @param context
+     * @param itemsArrayList
+     *            >>>>>>> service-2
      */
     public EventsListItemAdapter(Context context, List<Event> itemsArrayList, Location myLocation) {
         super(context, R.layout.gui_event_list_item, itemsArrayList);

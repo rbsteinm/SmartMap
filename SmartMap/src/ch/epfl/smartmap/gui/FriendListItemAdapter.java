@@ -52,6 +52,7 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         // Create inflater,get item to construct
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
+
         // Get FriendItem fields
         TextView name = (TextView) convertView.findViewById(R.id.activity_friends_name);
         TextView lastSeen = (TextView) convertView.findViewById(R.id.activity_friends_lastSeen);

@@ -14,11 +14,8 @@ import android.content.IntentFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
@@ -38,7 +35,6 @@ import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
-import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
@@ -58,12 +54,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 /**
- * This Activity displays the core features of the App. It displays the map and the whole menu.
+ * This Activity displays the core features of the App. It displays the map and
+ * the whole menu.
  * 
  * @author jfperren
  * @author SpicyCH
  */
-public class MainActivity extends FragmentActivity implements LocationListener {
+public class MainActivity extends FragmentActivity {
 
     /**
      * Types of Menu that can be displayed on this activity
@@ -154,28 +151,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
-            mGoogleMap.setMyLocationEnabled(true);
-            // Getting LocationManager object from System Service
-            // LOCATION_SERVICE
-            LocationManager locationManager =
-                (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            // Creating a criteria object to retrieve provider
-            Criteria criteria = new Criteria();
-            // Getting the name of the best provider
-            String provider = locationManager.getBestProvider(criteria, true);
-            Log.d(TAG, "provider : " + provider);
-            // Getting Current Location
-            // Location location =
-            // locationManager.getLastKnownLocation(provider);
-            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            if (isGPSEnabled) {
-                Log.d(TAG, "gps enabled");
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
-            } else if (null != locationManager.getProvider(LocationManager.NETWORK_PROVIDER)) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                    LOCATION_UPDATE_TIMEOUT, LOCATION_UPDATE_DISTANCE, this);
-            }
+            // mGoogleMap.setMyLocationEnabled(true);
         }
     }
 
@@ -230,6 +206,9 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
+        // starting the background service
+        this.startService(new Intent(this, UpdateService.class));
+
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
@@ -260,9 +239,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         if (mGoogleMap != null) {
             this.initializeMarkers();
         }
-
-        // starting the background service
-        this.startService(new Intent(this, UpdateService.class));
     }
 
     @Override
@@ -281,7 +257,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Give the query results to searchLayout
-
                 mSearchLayout.setSearchQuery(mSearchView.getQuery().toString());
                 return false;
             }
@@ -306,11 +281,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
         // Configure the search info and add any event listeners
         return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        SettingsManager.getInstance().setLocation(location);
     }
 
     @Override
@@ -341,24 +311,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         super.onPause();
         this.unregisterReceiver(mBroadcastReceiver);
         // stopService(mUpdateServiceIntent);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
-     */
-    @Override
-    public void onProviderDisabled(String provider) {
-        // nothing
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
-     */
-    @Override
-    public void onProviderEnabled(String provider) {
-        // nothing
     }
 
     @Override
@@ -426,15 +378,6 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         });
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
-     */
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // nothing
-    }
-
     /**
      * Opens Information Activity (called from MenuItem on Item view)
      * 
@@ -486,8 +429,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     }
 
     /**
+     * <<<<<<< HEAD
      * Sets the view for Item Focus, this means - Write name / Display photo on ActionBar - Sets ActionMenu
      * for Item
+     * =======
+     * Sets the view for Item Focus, this means - Write name / Display photo on
+     * ActionBar - Sets ActionMenu for Item
+     * >>>>>>> service-2
      * Focus
      * 
      * @param item

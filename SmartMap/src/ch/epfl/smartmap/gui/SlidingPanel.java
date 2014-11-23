@@ -97,7 +97,6 @@ public class SlidingPanel extends FrameLayout {
             mCloseAnim.start();
             return true;
         }
-
         return false;
     }
 

@@ -3,7 +3,6 @@ package ch.epfl.smartmap.cache;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,7 +22,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "SmartMapDB";
 
     private final List<FriendsLocationListener> mLocationsListeners =
@@ -36,6 +35,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_FILTER = "filters";
     public static final String TABLE_FILTER_USER = "filter_users";
     public static final String TABLE_EVENT = "events";
+    public static final String TABLE_INVITATIONS = "invitations";
+    public static final String TABLE_PENDING = "pending";
 
     private static final String KEY_USER_ID = "userID";
     private static final String KEY_NAME = "name";
@@ -70,6 +71,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String[] EVENT_COLUMNS = {KEY_ID, KEY_NAME, KEY_EVTDESC, KEY_USER_ID,
         KEY_CREATOR_NAME, KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_DATE, KEY_ENDDATE};
 
+    // Columns for the Invitations table
+    private static final String[] INVITATION_COLUMNS = {KEY_USER_ID, KEY_NAME};
+
+    // Columns for the Invitations table
+    private static final String[] PENDING_COLUMNS = {KEY_USER_ID, KEY_NAME};
+
     // Table of users
     private static final String CREATE_TABLE_USER = "CREATE TABLE IF NOT EXISTS " + TABLE_USER + "("
         + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_NUMBER + " TEXT," + KEY_EMAIL
@@ -90,6 +97,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_EVTDESC + " TEXT," + KEY_USER_ID
         + " INTEGER," + KEY_CREATOR_NAME + " TEXT," + KEY_LONGITUDE + " DOUBLE," + KEY_LATITUDE + " DOUBLE,"
         + KEY_POSNAME + " TEXT," + KEY_DATE + " INTEGER," + KEY_ENDDATE + " INTEGER" + ")";
+
+    // Table of invitations
+    private static final String CREATE_TABLE_INVITATIONS = "CREATE TABLE IF NOT EXISTS " + TABLE_INVITATIONS
+        + "(" + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
+
+    // Table of invitations
+    private static final String CREATE_TABLE_PENDING = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING + "("
+        + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
 
     private static DatabaseHelper mInstance;
     private static SQLiteDatabase mDatabase;
@@ -131,13 +146,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Stores an event in the database. If there's already an event with the
-     * <<<<<<< HEAD
-     * same ID, updates that event instead The event must have an ID (given by
-     * the server)!
-     * =======
      * same ID, updates that event instead
      * The event must have an ID (given by the server)!
-     * >>>>>>> gui-info
      * 
      * @param event
      *            The event to store
@@ -203,7 +213,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         filter.setID(filterID); // sets an ID so the filter can be easily
-        // accessed
+                                // accessed
 
         this.notifyFilterListeners();
         return filterID;
@@ -219,6 +229,54 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void addFriendsLocationListener(FriendsLocationListener listener) {
         mLocationsListeners.add(listener);
+    }
+
+    /**
+     * Adds a pending friend request to the database
+     * 
+     * @param user
+     *            The user who made the request (only need name and ID)
+     * @return 1 if the invitation was added, 0 if it was already there
+     */
+    public int addInvitation(User user) {
+        Cursor cursor =
+            mDatabase.query(TABLE_INVITATIONS, INVITATION_COLUMNS, KEY_USER_ID + " = ?",
+                new String[]{String.valueOf(user.getID())}, null, null, null, null);
+
+        int result = 0;
+        if (!cursor.moveToFirst()) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_ID, user.getID());
+            values.put(KEY_NAME, user.getName());
+
+            mDatabase.insert(TABLE_INVITATIONS, null, values);
+
+            result = 1;
+        }
+        cursor.close();
+        return result;
+    }
+
+    /**
+     * Adds a pending sent friend request to the database
+     * 
+     * @param user
+     *            The user who was sent a request
+     */
+    public void addPendingFriend(User user) {
+        Cursor cursor =
+            mDatabase.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
+                new String[]{String.valueOf(user.getID())}, null, null, null, null);
+
+        if (!cursor.moveToFirst()) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_ID, user.getID());
+            values.put(KEY_NAME, user.getName());
+
+            mDatabase.insert(TABLE_PENDING, null, values);
+
+        }
+        cursor.close();
     }
 
     /**
@@ -253,7 +311,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
 
-        Log.d("LISTENER", "addUser Called !");
         this.notifyFriendListeners();
     }
 
@@ -265,6 +322,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
+        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
 
         this.onCreate(mDatabase);
 
@@ -302,6 +361,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         mDatabase.delete(TABLE_FILTER_USER, KEY_FILTER_ID + " = ?", new String[]{String.valueOf(id)});
 
         this.notifyFilterListeners();
+    }
+
+    /**
+     * Deletes an invitation from the database (call this when accepting or
+     * declining an invitation)
+     * 
+     * @param id
+     *            The inviter's id
+     */
+    public void deleteInvitation(long id) {
+
+        mDatabase.delete(TABLE_INVITATIONS, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
+    }
+
+    /**
+     * Deletes a pending friend request from the database
+     * 
+     * @param id
+     *            The invited user's id
+     */
+    public void deletePendingFriend(long id) {
+
+        mDatabase.delete(TABLE_PENDING, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
     /**
@@ -389,8 +471,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
                 friend.setLastSeen(cal);
                 friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); // int
-                // to
-                // boolean
+                                                                                           // to
+                                                                                           // boolean
 
                 friends.put(friend.getID(), friend);
             } while (cursor.moveToNext());
@@ -480,6 +562,60 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Returns a list of all pending received invitations
+     * 
+     * @return A list of users who sent requests
+     */
+    public List<User> getInvitations() {
+        List<User> invitations = new ArrayList<User>();
+
+        String query = "SELECT  * FROM " + TABLE_INVITATIONS;
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+
+        Friend friend = null;
+        if (cursor.moveToFirst()) {
+            do {
+                friend =
+                    new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
+                        .getColumnIndex(KEY_NAME)));
+
+                invitations.add(friend);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return invitations;
+    }
+
+    /**
+     * Returns a list of all pending friends
+     * 
+     * @return A list of users who were sent friend requests
+     */
+    public List<User> getPendingFriends() {
+        List<User> friends = new ArrayList<User>();
+
+        String query = "SELECT  * FROM " + TABLE_PENDING;
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+
+        Friend friend = null;
+        if (cursor.moveToFirst()) {
+            do {
+                friend =
+                    new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
+                        .getColumnIndex(KEY_NAME)));
+
+                friends.add(friend);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return friends;
+    }
+
+    /**
      * Gets a user from the database
      * 
      * @param id
@@ -508,8 +644,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
         friend.setLastSeen(cal);
         friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); // int
-        // to
-        // boolean
+                                                                                   // to
+                                                                                   // boolean
 
         cursor.close();
 
@@ -522,10 +658,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void initializeAllFriends() {
         NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
         try {
-            Map<Long, Location> friends = client.listFriendsPos();
-            for (long i : friends.keySet()) {
-                this.addUser(client.getUserInfo(i));
-                Log.d("Database", i + " initialized");
+            List<User> friends = client.listFriendsPos();
+            for (User user : friends) {
+                this.addUser(client.getUserInfo(user.getID()));
             }
         } catch (SmartMapClientException e) {
             Log.e("UpdateService", e.getMessage());
@@ -565,6 +700,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_FILTER);
         db.execSQL(CREATE_TABLE_FILTER_USER);
         db.execSQL(CREATE_TABLE_EVENT);
+        db.execSQL(CREATE_TABLE_INVITATIONS);
+        db.execSQL(CREATE_TABLE_PENDING);
 
         this.notifyFriendListeners();
         this.notifyLocationsListeners();
@@ -578,6 +715,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
         this.onCreate(db);
 
         this.notifyFriendListeners();
@@ -612,18 +751,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int refreshFriendsPos() {
         int updatedRows = 0;
         try {
-            Map<Long, Location> locations = NetworkSmartMapClient.getInstance().listFriendsPos();
-            LongSparseArray<User> friends = this.getAllUsers();
-            long id;
-            for (int i = 0; i < friends.size(); i++) {
-                id = friends.keyAt(i);
-                if (locations.containsKey(id)) {
-                    updatedRows += this.updateUserPos(id, locations.get(id));
-                }
+            List<User> updatedUsers = NetworkSmartMapClient.getInstance().listFriendsPos();
+
+            for (User user : updatedUsers) {
+                this.updateUser(user);
+                updatedRows++;
             }
         } catch (SmartMapClientException e) {
             e.printStackTrace();
         }
+        this.notifyLocationsListeners();
         return updatedRows;
     }
 
@@ -682,23 +819,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return The number of rows that were updated
      */
     public int updateUser(User user) {
-
         ContentValues values = new ContentValues();
+        boolean updatedInfo = false;
+
+        // Check for default values
         values.put(KEY_USER_ID, user.getID());
-        values.put(KEY_NAME, user.getName());
-        values.put(KEY_NUMBER, user.getNumber());
-        values.put(KEY_EMAIL, user.getEmail());
-        values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
-        values.put(KEY_LATITUDE, user.getLocation().getLatitude());
-        values.put(KEY_POSNAME, user.getPositionName());
-        values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
+        if (user.getName() != Friend.NO_NAME) {
+            values.put(KEY_NAME, user.getName());
+            updatedInfo = true;
+        }
+        if (user.getNumber() != Friend.NO_NUMBER) {
+            values.put(KEY_NUMBER, user.getNumber());
+        }
+        if (user.getEmail() != Friend.NO_EMAIL) {
+            values.put(KEY_EMAIL, user.getEmail());
+        }
+        if ((user.getLocation().getLatitude() != 0.0) || (user.getLocation().getLongitude() != 0.0)) {
+            values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
+            values.put(KEY_LATITUDE, user.getLocation().getLatitude());
+        }
+        if (user.getPositionName() != Friend.POSITION_UNKNOWN) {
+            values.put(KEY_POSNAME, user.getPositionName());
+        }
+        if (user.getLastSeen().getTimeInMillis() != 0) {
+            values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
+        }
+
         values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); // boolean to int
 
         int rows =
             mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(user.getID())});
 
-        if (rows > 0) {
+        if ((rows > 0) && updatedInfo) {
             this.notifyFriendListeners();
         }
         return rows;
@@ -712,16 +865,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param location
      *            The user's new location
      */
-    public int updateUserPos(long id, Location location) {
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_LONGITUDE, location.getLongitude());
-        values.put(KEY_LATITUDE, location.getLatitude());
-
-        int rows =
-            mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
+    public void updateUserPos(long id, Location location) {
+        User friend = this.getUser(id);
+        friend.setLocation(location);
+        this.updateUser(friend);
 
         this.notifyLocationsListeners();
-        return rows;
     }
 }

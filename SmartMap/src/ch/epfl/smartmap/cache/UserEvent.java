@@ -48,6 +48,18 @@ public class UserEvent implements Event, Searchable, Displayable {
      */
     public UserEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
         GregorianCalendar endDate, Location p) {
+        if (name.isEmpty() || (name == null)) {
+            throw new IllegalArgumentException("Invalid event name!");
+        }
+        if (creatorName.isEmpty() || (creatorName == null)) {
+            throw new IllegalArgumentException("Invalid creator name!");
+        }
+        if (creator < 0) {
+            throw new IllegalArgumentException("Invalid creator ID!");
+        }
+        if (endDate.before(startDate)) {
+            throw new IllegalArgumentException("Invalid event dates!");
+        }
         mEvtName = name;
         mEvtCreator = creator;
         mStartDate =
@@ -166,13 +178,18 @@ public class UserEvent implements Event, Searchable, Displayable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((mEvtName == null) ? 0 : mEvtName.hashCode());
+
+        result = (prime * result) + (mEvtName == null ? 0 : mEvtName.hashCode());
         result = (prime * result) + (int) (mID ^ (mID >>> RIGHT_SHIFT_COUNT));
+
         return result;
     }
 
     @Override
     public void setCreatorName(String name) {
+        if (name.isEmpty() || (name == null)) {
+            throw new IllegalArgumentException("Invalid creator name!");
+        }
         mCreatorName = name;
     }
 
@@ -183,6 +200,9 @@ public class UserEvent implements Event, Searchable, Displayable {
 
     @Override
     public void setEndDate(GregorianCalendar newDate) {
+        if (newDate.before(mStartDate)) {
+            throw new IllegalArgumentException("Invalid event dates!");
+        }
         mEndDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
             newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
     }
@@ -210,6 +230,9 @@ public class UserEvent implements Event, Searchable, Displayable {
 
     @Override
     public void setName(String newName) {
+        if (newName.isEmpty() || (newName == null)) {
+            throw new IllegalArgumentException("Invalid event name!");
+        }
         mEvtName = newName;
     }
 
@@ -220,6 +243,9 @@ public class UserEvent implements Event, Searchable, Displayable {
 
     @Override
     public void setStartDate(GregorianCalendar newDate) {
+        if (mEndDate.before(newDate)) {
+            throw new IllegalArgumentException("Invalid event dates!");
+        }
         mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
             newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
     }

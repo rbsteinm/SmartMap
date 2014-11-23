@@ -1,9 +1,9 @@
 package ch.epfl.smartmap.servercom;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
+import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,10 +20,23 @@ import ch.epfl.smartmap.cache.User;
  * 
  * @author marion-S
  * @author SpicyCH (code reviewed 02.11.2014) : changed Error to error as the
- *         server uses a lowercase e.
+ *         server uses a lower case.
  */
 @SuppressLint("UseSparseArrays")
 public class JsonSmartMapParser implements SmartMapParser {
+
+    private static final String ERROR_STATUS = "error";
+    private static final String FEEDBACK_STATUS = "feedback";
+
+    private static final int DATETIME_FORMAT_PARTS = 2;
+    private static final int DATE_FORMAT_PARTS = 3;
+    private static final int TIME_FORMAT_PARTS = 3;
+
+    private static final int MAX_MONTHS_NUMBER = 11;
+    private static final int MAX_DAYS_NUMBER = 31;
+    private static final int MAX_HOURS_NUMBER = 23;
+    private static final int MAX_MINUTES_NUMBER = 59;
+    private static final int MAX_SECONDS_NUMBER = 59;
 
     private static final int UINITIALIZED_LATITUDE = -200;
     private static final int UNITIALIZED_LONGITUDE = -200;
@@ -56,6 +69,20 @@ public class JsonSmartMapParser implements SmartMapParser {
     private void checkId(long id) throws SmartMapParseException {
         if (id <= 0) {
             throw new SmartMapParseException("invalid id");
+        }
+    }
+
+    /**
+     * Checks if the parameter lastSeen is valid
+     * 
+     * @param lastSeen
+     * @throws SmartMapParseException
+     */
+    private void checkLastSeen(GregorianCalendar lastSeen) throws SmartMapParseException {
+        GregorianCalendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
+        if (now.compareTo(lastSeen) < 0) {
+            throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString()
+                + " compared to " + now.toString());
         }
     }
 
@@ -136,14 +163,83 @@ public class JsonSmartMapParser implements SmartMapParser {
             status = jsonObject.getString("status");
             message = jsonObject.getString("message");
             Log.d("serverMessage", message);
-            Log.d("serverAnswer", status);
+            Log.d("serverStatus", status);
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
-        if (status.equals("error")) {
+        if (status.equals(ERROR_STATUS)) {
             throw new SmartMapClientException(message);
         }
+        if (status.equals(FEEDBACK_STATUS)) {
+            throw new ServerFeedbackException(message);
+        }
+    }
 
+    /**
+     * Transforms a date in format YYYY:MM:DD hh-mm-ss into a GregorianCalendar
+     * instance.
+     * 
+     * @author Pamoi
+     * @param date
+     * @return
+     * @throws SmartMapClientException
+     */
+    private GregorianCalendar parseDate(String date) throws SmartMapParseException {
+
+        String[] dateTime = date.split(" ");
+
+        if (dateTime.length != DATETIME_FORMAT_PARTS) {
+            throw new SmartMapParseException("Invalid datetime format !");
+        }
+
+        String[] datePart = dateTime[0].split("-");
+
+        if (datePart.length != DATE_FORMAT_PARTS) {
+            throw new SmartMapParseException("Invalid date format !");
+        }
+
+        String[] timePart = dateTime[1].split(":");
+
+        if (timePart.length != TIME_FORMAT_PARTS) {
+            throw new SmartMapParseException("Invalid time format !");
+        }
+
+        int year = Integer.parseInt(datePart[0]);
+        // GregorianCalendar counts months from 0.
+        int month = Integer.parseInt(datePart[1]) - 1;
+        int day = Integer.parseInt(datePart[2]);
+
+        int hour = Integer.parseInt(timePart[0]);
+        int minutes = Integer.parseInt(timePart[1]);
+        int seconds = Integer.parseInt(timePart[2]);
+
+        // As GregorianCalendar does not check arguments, we need to to it.
+        if ((month > MAX_MONTHS_NUMBER) || (month < 0)) {
+            throw new SmartMapParseException("Invalid month number !");
+        }
+
+        if ((day > MAX_DAYS_NUMBER) || (day < 1)) {
+            throw new SmartMapParseException("Invalid day number !");
+        }
+
+        if ((hour > MAX_HOURS_NUMBER) || (hour < 0)) {
+            throw new SmartMapParseException("Invalid hour number !");
+        }
+
+        if ((minutes > MAX_MINUTES_NUMBER) || (hour < 0)) {
+            throw new SmartMapParseException("Invalid minute number !");
+        }
+
+        if ((seconds > MAX_SECONDS_NUMBER) || (seconds < 0)) {
+            throw new SmartMapParseException("Invalid second number !");
+        }
+
+        // Server time is in GMT+01:00
+        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
+
+        g.set(year, month, day, hour, minutes, seconds);
+
+        return g;
     }
 
     /*
@@ -177,6 +273,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         String online = null;
         double latitude = UINITIALIZED_LATITUDE;
         double longitude = UNITIALIZED_LONGITUDE;
+        String datetime = null;
 
         try {
             id = jsonObject.getLong("id");
@@ -186,6 +283,7 @@ public class JsonSmartMapParser implements SmartMapParser {
             phoneNumber = jsonObject.optString("phoneNumber", null);
             email = jsonObject.optString("email", null);
             online = jsonObject.optString("online", null);
+            datetime = jsonObject.optString("lastUpdate", null);
             // something else??
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
@@ -222,6 +320,11 @@ public class JsonSmartMapParser implements SmartMapParser {
             this.checkOnLine(online);
             // TODO see with Mathieu
         }
+        if (datetime != null) {
+            GregorianCalendar lastSeen = this.parseDate(datetime);
+            this.checkLastSeen(lastSeen);
+            friend.setLastSeen(lastSeen);
+        }
 
         return friend;
     }
@@ -255,8 +358,11 @@ public class JsonSmartMapParser implements SmartMapParser {
     }
 
     @Override
-    public Map<Long, Location> parsePositions(String s) throws SmartMapParseException {
-        Map<Long, Location> positions = new HashMap<Long, Location>();
+    public List<User> parsePositions(String s) throws SmartMapParseException {
+
+        Log.d(TAG, "Parsing positions.");
+
+        List<User> users = new ArrayList<User>();
 
         try {
             JSONObject jsonObject = new JSONObject(s);
@@ -268,26 +374,27 @@ public class JsonSmartMapParser implements SmartMapParser {
                 long userId = position.getLong("id");
                 double latitude = position.getDouble("latitude");
                 double longitude = position.getDouble("longitude");
+                GregorianCalendar lastSeen = this.parseDate(position.getString("lastUpdate"));
 
                 this.checkId(userId);
                 this.checkLatitude(latitude);
                 this.checkLongitude(longitude);
-
-                Log.d(TAG, Long.toString(userId));
-                Log.d(TAG, Double.toString(latitude));
-                Log.d(TAG, Double.toString(longitude));
+                this.checkLastSeen(lastSeen);
 
                 Location location = new Location("SmartMapServers");
                 location.setLatitude(latitude);
                 location.setLongitude(longitude);
-                positions.put(userId, location);
+
+                User user = new Friend(userId, Friend.NO_NAME);
+                user.setLocation(location);
+                user.setLastSeen(lastSeen);
+
+                users.add(user);
             }
-            Log.d(TAG + "number of positions in the list", Integer.toString(positions.size()));
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
-
-        return positions;
+        return users;
     }
 
 }

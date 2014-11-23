@@ -2,7 +2,6 @@ package ch.epfl.smartmap.test.severcom;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -136,17 +135,15 @@ public class NetworkEndToEndTest extends TestCase {
     @Test
     public void testL_ListFriendPos() throws SmartMapClientException {
         NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        Map<Long, Location> positions = networkClient.listFriendsPos();
+        List<User> users = networkClient.listFriendsPos();
 
-        assertTrue("Null map", positions != null);
+        assertTrue("Null map", users != null);
 
-        for (long id : positions.keySet()) {
-            assertTrue("Unexpected id", id >= 0);
-        }
-
-        for (Location location : positions.values()) {
-            assertTrue("Unexpected latitude", (-90 <= location.getLatitude()) && (location.getLatitude() <= 90));
-            assertTrue("Unexpected longitude", (-180 <= location.getLatitude()) && (location.getLatitude() <= 180));
+        for (User user : users) {
+            Location location = user.getLocation();
+            assertTrue("Invalid id", user.getID() > 0);
+            assertTrue("Unexpected latitude", -90 <= location.getLatitude() && location.getLatitude() <= 90);
+            assertTrue("Unexpected longitude", -180 <= location.getLatitude() && location.getLatitude() <= 180);
         }
     }
 

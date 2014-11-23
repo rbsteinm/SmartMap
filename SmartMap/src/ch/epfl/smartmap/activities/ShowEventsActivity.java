@@ -44,8 +44,7 @@ public class ShowEventsActivity extends ListActivity {
 
     /**
      * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired
-     * by
-     * wikipedia. This is costly as there are several library calls to sin, cos, etc...
+     * by wikipedia. This is costly as there are several library calls to sin, cos, etc...
      * 
      * @param lat1
      *            latitude of point 1
@@ -135,7 +134,6 @@ public class ShowEventsActivity extends ListActivity {
         mDbHelper = DatabaseHelper.getInstance();
 
         mEventsList = mDbHelper.getAllEvents();
-
     }
 
     public void onCheckboxClicked(View v) {
