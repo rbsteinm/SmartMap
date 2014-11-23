@@ -125,8 +125,11 @@ public class FacebookFragment extends Fragment {
                     params.put(FACEBOOK_NAME_POST_NAME, user.getName());
                     params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
 
-                    Log.i(TAG, "user name: " + params.get("name"));
+                    // Displays the name, facebookId and facebookToken. When we upload the app on google play, we might
+                    // want to remove these logcats messages.
+                    Log.i(TAG, "user name: " + params.get(FACEBOOK_NAME_POST_NAME));
                     Log.i(TAG, "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
+                    Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
 
                     if (!FacebookFragment.this.sendDataToServer(params)) {
                         Toast.makeText(FacebookFragment.this.getActivity(), "Failed to log in to the SmartMap server.",

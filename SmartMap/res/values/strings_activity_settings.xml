@@ -30,6 +30,7 @@
         <item>3 hours</item>
         <item>12 hours</item>
         <item>1 day</item>
+        <item>Never</item>
     </string-array>
     
     <string-array name="pref_last_seen_max_values">
@@ -39,6 +40,7 @@
         <item>180</item>
         <item>720</item>
         <item>1440</item>
+        <item>-1</item>
     </string-array>
 
     <!-- Events -->
