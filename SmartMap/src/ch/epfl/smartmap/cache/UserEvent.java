@@ -2,6 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -51,7 +52,7 @@ public class UserEvent implements Event, Searchable, Displayable {
         if (name.isEmpty() || (name == null)) {
             throw new IllegalArgumentException("Invalid event name!");
         }
-        if (creatorName.isEmpty() || (creatorName == null)) {
+        if (creatorName == null) {
             throw new IllegalArgumentException("Invalid creator name!");
         }
         if (creator < 0) {
@@ -67,12 +68,15 @@ public class UserEvent implements Event, Searchable, Displayable {
                 startDate.get(Calendar.DATE), startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
 
         mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
+        mStartDate.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+        mStartDate.setTimeInMillis(startDate.getTimeInMillis());
         mEndDate =
             new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH),
                 endDate.get(Calendar.DATE), endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
 
         mEndDate.set(GregorianCalendar.HOUR_OF_DAY, endDate.get(GregorianCalendar.HOUR_OF_DAY));
-
+        mEndDate.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+        mEndDate.setTimeInMillis(endDate.getTimeInMillis());
         mLocation = new Location(p);
         mPositionName = "";
         mCreatorName = creatorName;
