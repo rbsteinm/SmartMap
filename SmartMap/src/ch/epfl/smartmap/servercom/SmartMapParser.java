@@ -17,6 +17,19 @@ import ch.epfl.smartmap.cache.User;
 
 public interface SmartMapParser {
 
+    /**
+     * Checks in the response returned by the server if the server returned
+     * Error, and if it is the case throws a SmartMapClientException with the
+     * server's message
+     * 
+     * @param s
+     *            the server's response
+     * @throws SmartMapClientException
+     *             if the server returned Error , SmartMapParseException if s
+     *             does not represent a valid server's response
+     */
+    void checkServerError(String s) throws SmartMapParseException, SmartMapClientException;
+
     User parseFriend(String s) throws SmartMapParseException;
 
     /**
@@ -45,19 +58,6 @@ public interface SmartMapParser {
      *             to the format that the parser supports)
      */
     Map<Long, Location> parsePositions(String s) throws SmartMapParseException;
-
-    /**
-     * Checks in the response returned by the server if the server returned
-     * Error, and if it is the case throws a SmartMapClientException with the
-     * server's message
-     * 
-     * @param s
-     *            the server's response
-     * @throws SmartMapClientException
-     *             if the server returned Error , SmartMapParseException if s
-     *             does not represent a valid server's response
-     */
-    void checkServerError(String s) throws SmartMapParseException, SmartMapClientException;
 
     // TODO if necessary add a method to parse an event
 

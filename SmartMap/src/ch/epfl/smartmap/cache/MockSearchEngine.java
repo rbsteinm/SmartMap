@@ -30,6 +30,15 @@ public class MockSearchEngine implements SearchEngine {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.SearchEngine#getHistory()
+     */
+    @Override
+    public History getHistory() {
+        return mHistory;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.SearchEngine#sendQuery(java.lang.String)
      */
     @Override
@@ -76,14 +85,5 @@ public class MockSearchEngine implements SearchEngine {
         }
 
         return result;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.SearchEngine#getHistory()
-     */
-    @Override
-    public History getHistory() {
-        return mHistory;
     }
 }

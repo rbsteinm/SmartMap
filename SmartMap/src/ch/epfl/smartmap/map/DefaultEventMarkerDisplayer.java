@@ -51,41 +51,30 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
     /*
      * (non-Javadoc)
      * @see
-     * ch.epfl.smartmap.gui.EventMarkerDisplayer#setMarkersToMaps(android.content
-     * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
+     * ch.epfl.smartmap.gui.EventMarkerDisplayer#addMarker(ch.epfl.smartmap.
+     * cache.Event, android.content.Context,
+     * com.google.android.gms.maps.GoogleMap)
      */
     @Override
-    public void setMarkersToMaps(Context context, GoogleMap googleMap, List<Event> eventsToDisplay) {
+    public Marker addMarker(Event event, Context context, GoogleMap googleMap) {
+        Marker marker =
+            googleMap.addMarker(new MarkerOptions().position(event.getLatLng()).title(event.getName())
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
 
-        for (Event event : eventsToDisplay) {
-
-            this.addMarker(event, context, googleMap);
-        }
-
+        displayedMarkers.put(marker.getId(), event);
+        dictionnaryMarkers.put(marker.getId(), marker);
+        return marker;
     }
 
     /*
      * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.gui.EventMarkerDisplayer#isDisplayedEvent(ch.epfl.smartmap
-     * .cache.Event)
+     * @see ch.epfl.smartmap.gui.EventMarkerDisplayer#getDisplayedEvents()
      */
     @Override
-    public boolean isDisplayedEvent(Event event) {
+    public List<Event> getDisplayedEvents() {
 
-        return displayedMarkers.containsValue(event);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.gui.EventMarkerDisplayer#isDisplayedMarker(com.google
-     * .android.gms.maps.model.Marker)
-     */
-    @Override
-    public boolean isDisplayedMarker(Marker marker) {
-
-        return displayedMarkers.containsKey(marker.getId());
+        return new ArrayList<Event>(displayedMarkers.values());
     }
 
     /*
@@ -126,31 +115,26 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.gui.EventMarkerDisplayer#getDisplayedEvents()
+     * @see
+     * ch.epfl.smartmap.gui.EventMarkerDisplayer#isDisplayedEvent(ch.epfl.smartmap
+     * .cache.Event)
      */
     @Override
-    public List<Event> getDisplayedEvents() {
+    public boolean isDisplayedEvent(Event event) {
 
-        return new ArrayList<Event>(displayedMarkers.values());
+        return displayedMarkers.containsValue(event);
     }
 
     /*
      * (non-Javadoc)
      * @see
-     * ch.epfl.smartmap.gui.EventMarkerDisplayer#addMarker(ch.epfl.smartmap.
-     * cache.Event, android.content.Context,
-     * com.google.android.gms.maps.GoogleMap)
+     * ch.epfl.smartmap.gui.EventMarkerDisplayer#isDisplayedMarker(com.google
+     * .android.gms.maps.model.Marker)
      */
     @Override
-    public Marker addMarker(Event event, Context context, GoogleMap googleMap) {
-        Marker marker =
-            googleMap.addMarker(new MarkerOptions().position(event.getLatLng()).title(event.getName())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-                .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
+    public boolean isDisplayedMarker(Marker marker) {
 
-        displayedMarkers.put(marker.getId(), event);
-        dictionnaryMarkers.put(marker.getId(), marker);
-        return marker;
+        return displayedMarkers.containsKey(marker.getId());
     }
 
     /*
@@ -167,6 +151,22 @@ public class DefaultEventMarkerDisplayer implements EventMarkerDisplayer {
         marker.remove();
 
         return marker;
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.gui.EventMarkerDisplayer#setMarkersToMaps(android.content
+     * .Context, com.google.android.gms.maps.GoogleMap, java.util.List)
+     */
+    @Override
+    public void setMarkersToMaps(Context context, GoogleMap googleMap, List<Event> eventsToDisplay) {
+
+        for (Event event : eventsToDisplay) {
+
+            this.addMarker(event, context, googleMap);
+        }
 
     }
 

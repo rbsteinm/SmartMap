@@ -41,9 +41,12 @@ public class SortedByDayHistory implements History {
         mSize++;
     }
 
-    @Override
-    public ArrayList<Displayable> getEntriesForIndex(int index) {
-        return new ArrayList<Displayable>(mHistoryEntries.get(index));
+    public boolean contains(Displayable item) {
+        boolean contains = false;
+        for (Queue<Displayable> e : mHistoryEntries) {
+            contains = contains || e.contains(item);
+        }
+        return contains;
     }
 
     @Override
@@ -52,16 +55,13 @@ public class SortedByDayHistory implements History {
     }
 
     @Override
-    public boolean isEmpty() {
-        return mSize == 0;
+    public ArrayList<Displayable> getEntriesForIndex(int index) {
+        return new ArrayList<Displayable>(mHistoryEntries.get(index));
     }
 
-    public boolean contains(Displayable item) {
-        boolean contains = false;
-        for (Queue<Displayable> e : mHistoryEntries) {
-            contains = contains || e.contains(item);
-        }
-        return contains;
+    @Override
+    public boolean isEmpty() {
+        return mSize == 0;
     }
 
     /*

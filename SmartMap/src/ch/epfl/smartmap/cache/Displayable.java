@@ -12,11 +12,9 @@ import android.location.Location;
 public interface Displayable {
 
     /**
-     * @param context
-     *            The application's context, needed to access the memory
-     * @return The object's picture
+     * @return GoogleMap Location of the Displayable
      */
-    Bitmap getPicture(Context context);
+    Location getLocation();
 
     /**
      * @return A name for the panel (e.g. the username, event name, etc.)
@@ -24,13 +22,15 @@ public interface Displayable {
     String getName();
 
     /**
+     * @param context
+     *            The application's context, needed to access the memory
+     * @return The object's picture
+     */
+    Bitmap getPicture(Context context);
+
+    /**
      * @return Text containing various information (description, last seen,
      *         etc.)
      */
     String getShortInfos();
-
-    /**
-     * @return GoogleMap Location of the Displayable
-     */
-    Location getLocation();
 }

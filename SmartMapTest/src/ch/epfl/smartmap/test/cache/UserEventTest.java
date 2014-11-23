@@ -4,10 +4,9 @@ import java.util.GregorianCalendar;
 
 import org.junit.Test;
 
-import ch.epfl.smartmap.cache.UserEvent;
-
 import android.location.Location;
 import android.test.AndroidTestCase;
+import ch.epfl.smartmap.cache.UserEvent;
 
 public class UserEventTest extends AndroidTestCase {
 

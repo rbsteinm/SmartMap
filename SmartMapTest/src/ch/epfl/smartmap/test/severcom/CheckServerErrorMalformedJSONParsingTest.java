@@ -3,6 +3,8 @@ package ch.epfl.smartmap.test.severcom;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -11,7 +13,6 @@ import ch.epfl.smartmap.servercom.JsonSmartMapParser;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 import ch.epfl.smartmap.servercom.SmartMapParseException;
 import ch.epfl.smartmap.servercom.SmartMapParser;
-import junit.framework.TestCase;
 
 public class CheckServerErrorMalformedJSONParsingTest extends TestCase {
 
@@ -20,6 +21,7 @@ public class CheckServerErrorMalformedJSONParsingTest extends TestCase {
 
     private List<String> serverStatusJsonFields;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 

@@ -3,18 +3,17 @@ package ch.epfl.smartmap.test.severcom;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
 
 import android.annotation.SuppressLint;
 import android.location.Location;
-
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.JsonSmartMapParser;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 import ch.epfl.smartmap.servercom.SmartMapParseException;
 import ch.epfl.smartmap.servercom.SmartMapParser;
-
-import junit.framework.TestCase;
 
 /**
  * Tests whether the app correctly handles proper JSON
@@ -50,6 +49,7 @@ public class ProperJSONParsingTest extends TestCase {
     private Location location1 = new Location("SmartMapServers");
     private Location location2 = new Location("SmartMapServers");
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -59,26 +59,6 @@ public class ProperJSONParsingTest extends TestCase {
         location2.setLatitude(40.0);
         location2.setLongitude(3.0);
 
-    }
-
-    @Test
-    public void testParseFriend() throws SmartMapParseException {
-        SmartMapParser parser = new JsonSmartMapParser();
-        User friend = parser.parseFriend(PROPER_FRIEND_JSON);
-
-        assertEquals("Friend's id does not match", 13, friend.getID());
-        assertEquals("Friend's name does not match", "Georges", friend.getName());
-        assertEquals("Friend's email does not match", "georges@gmail.com", friend.getEmail());
-        assertEquals("Friend's phone number does not match", "0782678654", friend.getNumber());
-        // FIXME
-        // assertEquals("Friend's latitude or longitude does not match", new
-        // LatLng(20.03, 26.85), friend.getLatLng());
-    }
-
-    @Test
-    public void testCheckServerErrorWhenNoError() throws SmartMapParseException, SmartMapClientException {
-        SmartMapParser parser = new JsonSmartMapParser();
-        parser.checkServerError(PROPER_SUCCESS_STATUS_JSON);
     }
 
     @Test
@@ -96,6 +76,26 @@ public class ProperJSONParsingTest extends TestCase {
     }
 
     @Test
+    public void testCheckServerErrorWhenNoError() throws SmartMapParseException, SmartMapClientException {
+        SmartMapParser parser = new JsonSmartMapParser();
+        parser.checkServerError(PROPER_SUCCESS_STATUS_JSON);
+    }
+
+    @Test
+    public void testParseFriend() throws SmartMapParseException {
+        SmartMapParser parser = new JsonSmartMapParser();
+        User friend = parser.parseFriend(PROPER_FRIEND_JSON);
+
+        assertEquals("Friend's id does not match", 13, friend.getID());
+        assertEquals("Friend's name does not match", "Georges", friend.getName());
+        assertEquals("Friend's email does not match", "georges@gmail.com", friend.getEmail());
+        assertEquals("Friend's phone number does not match", "0782678654", friend.getNumber());
+        // FIXME
+        // assertEquals("Friend's latitude or longitude does not match", new
+        // LatLng(20.03, 26.85), friend.getLatLng());
+    }
+
+    @Test
     public void testParseFriends() throws SmartMapParseException {
         SmartMapParser parser = new JsonSmartMapParser();
         List<User> listFriends = parser.parseFriends(PROPER_FRIEND_LIST_JSON, "list");
@@ -103,6 +103,13 @@ public class ProperJSONParsingTest extends TestCase {
         assertEquals("First friend's name does not match", "Georges", listFriends.get(0).getName());
         assertEquals("Second friend's id does not match", 18, listFriends.get(1).getID());
         assertEquals("Second friend's name does not match", "Alice", listFriends.get(1).getName());
+    }
+
+    @Test
+    public void testParseFriendsWhenEmptyList() throws SmartMapParseException {
+        SmartMapParser parser = new JsonSmartMapParser();
+        List<User> friends = parser.parseFriends(PROPER_FRIEND_EMPTY_LIST_JSON, "list");
+        assertTrue("Did not parsed empty friends list correctly", friends.isEmpty());
     }
 
     @Test
@@ -120,13 +127,6 @@ public class ProperJSONParsingTest extends TestCase {
         assertEquals("Second location's longitude does not match", location2.getLongitude(), positions.get((long) 18)
             .getLongitude());
 
-    }
-
-    @Test
-    public void testParseFriendsWhenEmptyList() throws SmartMapParseException {
-        SmartMapParser parser = new JsonSmartMapParser();
-        List<User> friends = parser.parseFriends(PROPER_FRIEND_EMPTY_LIST_JSON, "list");
-        assertTrue("Did not parsed empty friends list correctly", friends.isEmpty());
     }
 
     @Test

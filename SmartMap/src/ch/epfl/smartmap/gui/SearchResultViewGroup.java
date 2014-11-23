@@ -21,6 +21,39 @@ import ch.epfl.smartmap.cache.Displayable;
 public class SearchResultViewGroup extends LinearLayout {
 
     /**
+     * Horizontal bar separating two different search results.
+     * 
+     * @author jfperren
+     */
+    private static class Divider extends LinearLayout {
+        public Divider(Context context) {
+            super(context);
+            this.setPadding(SEPARATOR_LEFT_PADDING, 0, SEPARATOR_RIGHT_PADDING, 0);
+            this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
+            this.setBackgroundResource(SEPARATOR_BACKGROUND_COLOR);
+        }
+    }
+
+    /**
+     * Button showing more Search results when clicked
+     * 
+     * @author jfperren
+     */
+    private static class MoreResultsButton extends Button {
+        public MoreResultsButton(Context context, final SearchResultViewGroup searchResultViewGroup) {
+            super(context);
+            this.setText(R.string.more_results);
+            this.setBackgroundResource(0);
+            this.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    searchResultViewGroup.showMoreResults();
+                }
+            });
+        }
+    }
+
+    /**
      * Visual state of a ViewGroup
      * 
      * @author jfperren
@@ -39,18 +72,30 @@ public class SearchResultViewGroup extends LinearLayout {
     private static final int SEPARATOR_RIGHT_PADDING = 10;
     // Colors
     private static final int SEPARATOR_BACKGROUND_COLOR = R.color.bottomSliderBackground;
+
     // Text Sizes
     private static final float NO_RESULT_VIEW_TEXT_SIZE = 25f;
     // Others
     private static final int ITEMS_PER_PAGE = 10;
-
     // Children Views
     private final Button mMoreResultsButton;
     private final TextView mEmptyListTextView;
     // Informations about current state
     private int mCurrentItemNb;
+
     private List<Displayable> mCurrentResultList;
+
     private VisualState mCurrentVisualState;
+
+    /**
+     * Constructor with empty list
+     * 
+     * @param context
+     *            Context this View lives in
+     */
+    public SearchResultViewGroup(Context context) {
+        this(context, new ArrayList<Displayable>());
+    }
 
     /**
      * Constructor
@@ -82,63 +127,6 @@ public class SearchResultViewGroup extends LinearLayout {
 
         // Create all SearchresultViews
         this.setResultList(results);
-    }
-
-    /**
-     * Constructor with empty list
-     * 
-     * @param context
-     *            Context this View lives in
-     */
-    public SearchResultViewGroup(Context context) {
-        this(context, new ArrayList<Displayable>());
-    }
-
-    /**
-     * Sets a new list of results
-     * 
-     * @param newResultList
-     *            New list of results
-     */
-    public void setResultList(List<Displayable> newResultList) {
-        mCurrentResultList = new ArrayList<Displayable>(newResultList);
-        this.displayMinimized();
-    }
-
-    /**
-     * @return True if there is no result to display
-     */
-    public boolean isEmpty() {
-        return mCurrentResultList.isEmpty();
-    }
-
-    /**
-     * Display the searchResultViewGroup in MINIMIZED mode
-     */
-    public void displayMinimized() {
-        mCurrentItemNb = 0;
-        this.removeAllViews();
-        if (mCurrentResultList.isEmpty()) {
-            this.setBackgroundResource(0);
-            this.addView(mEmptyListTextView);
-            mCurrentVisualState = VisualState.EMPTY;
-        } else {
-            this.setBackgroundResource(R.drawable.div_background);
-            this.addMoreViews();
-        }
-    }
-
-    /**
-     * Extend the searchResultViewGroup if there are more results to show
-     */
-    private void showMoreResults() {
-        if (mCurrentVisualState == VisualState.EMPTY) {
-            assert false : "Cannot expand an empty SearchResultViewGroup";
-        } else if (mCurrentVisualState == VisualState.MAX) {
-            assert false : "Cannot expand a SearchResultViewGroup that is already fully expanded";
-        } else {
-            this.addMoreViews();
-        }
     }
 
     /**
@@ -206,35 +194,49 @@ public class SearchResultViewGroup extends LinearLayout {
     }
 
     /**
-     * Button showing more Search results when clicked
-     * 
-     * @author jfperren
+     * Display the searchResultViewGroup in MINIMIZED mode
      */
-    private static class MoreResultsButton extends Button {
-        public MoreResultsButton(Context context, final SearchResultViewGroup searchResultViewGroup) {
-            super(context);
-            this.setText(R.string.more_results);
+    public void displayMinimized() {
+        mCurrentItemNb = 0;
+        this.removeAllViews();
+        if (mCurrentResultList.isEmpty()) {
             this.setBackgroundResource(0);
-            this.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    searchResultViewGroup.showMoreResults();
-                }
-            });
+            this.addView(mEmptyListTextView);
+            mCurrentVisualState = VisualState.EMPTY;
+        } else {
+            this.setBackgroundResource(R.drawable.div_background);
+            this.addMoreViews();
         }
     }
 
     /**
-     * Horizontal bar separating two different search results.
-     * 
-     * @author jfperren
+     * @return True if there is no result to display
      */
-    private static class Divider extends LinearLayout {
-        public Divider(Context context) {
-            super(context);
-            this.setPadding(SEPARATOR_LEFT_PADDING, 0, SEPARATOR_RIGHT_PADDING, 0);
-            this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
-            this.setBackgroundResource(SEPARATOR_BACKGROUND_COLOR);
+    public boolean isEmpty() {
+        return mCurrentResultList.isEmpty();
+    }
+
+    /**
+     * Sets a new list of results
+     * 
+     * @param newResultList
+     *            New list of results
+     */
+    public void setResultList(List<Displayable> newResultList) {
+        mCurrentResultList = new ArrayList<Displayable>(newResultList);
+        this.displayMinimized();
+    }
+
+    /**
+     * Extend the searchResultViewGroup if there are more results to show
+     */
+    private void showMoreResults() {
+        if (mCurrentVisualState == VisualState.EMPTY) {
+            assert false : "Cannot expand an empty SearchResultViewGroup";
+        } else if (mCurrentVisualState == VisualState.MAX) {
+            assert false : "Cannot expand a SearchResultViewGroup that is already fully expanded";
+        } else {
+            this.addMoreViews();
         }
     }
 }

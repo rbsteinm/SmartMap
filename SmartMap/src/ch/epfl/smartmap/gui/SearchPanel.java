@@ -34,14 +34,22 @@ public class SearchPanel extends RelativeLayout {
     }
 
     /**
-     * Opens the panel and displays it full screen
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
+     * @return The number of audit errors in this object
      */
-    public void open() {
-        if (this.getVisibility() != View.VISIBLE) {
-            this.setVisibility(View.VISIBLE);
-            Animation bottomUp = AnimationUtils.loadAnimation(this.getContext(), R.anim.bottom_up);
-            this.startAnimation(bottomUp);
+    public int auditErrors(int depth) {
+        // TODO : Decomment when auditErrors coded for other classes
+        if (depth == 0) {
+            return 0;
         }
+
+        int auditErrors = 0;
+
+        return auditErrors;
     }
 
     /**
@@ -73,21 +81,13 @@ public class SearchPanel extends RelativeLayout {
     }
 
     /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
+     * Opens the panel and displays it full screen
      */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
+    public void open() {
+        if (this.getVisibility() != View.VISIBLE) {
+            this.setVisibility(View.VISIBLE);
+            Animation bottomUp = AnimationUtils.loadAnimation(this.getContext(), R.anim.bottom_up);
+            this.startAnimation(bottomUp);
         }
-
-        int auditErrors = 0;
-
-        return auditErrors;
     }
 }

@@ -2,11 +2,10 @@ package ch.epfl.smartmap.test.cache;
 
 import org.junit.Test;
 
-import ch.epfl.smartmap.cache.SettingsManager;
-
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
+import ch.epfl.smartmap.cache.SettingsManager;
 
 public class SettingsManagerTest extends AndroidTestCase {
 
@@ -18,14 +17,8 @@ public class SettingsManagerTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mContext = new RenamingDelegatingContext(getContext(), "test_");
+        mContext = new RenamingDelegatingContext(this.getContext(), "test_");
         mManager = SettingsManager.initialize(mContext);
-    }
-
-    @Test
-    public void testGetUserID() {
-        mManager.setUserID(mID);
-        assertTrue(mManager.getUserID() == mID);
     }
 
     @Test
@@ -38,5 +31,11 @@ public class SettingsManagerTest extends AndroidTestCase {
     public void testGetFacebookID() {
         // Checking if default values are returned
         assertTrue(mManager.getFacebookID() == SettingsManager.DEFAULT_FB_ID);
+    }
+
+    @Test
+    public void testGetUserID() {
+        mManager.setUserID(mID);
+        assertTrue(mManager.getUserID() == mID);
     }
 }

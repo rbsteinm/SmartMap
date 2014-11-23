@@ -38,28 +38,6 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
     /*
      * (non-Javadoc)
      * @see
-     * ch.epfl.smartmap.gui.ZoomManager#zoomOnLocation(android.location.Location
-     * , com.google.android.gms.maps.GoogleMap)
-     */
-    @Override
-    public void zoomOnLocation(Location location, GoogleMap map) {
-        Log.d(TAG, "zoomMap called");
-        LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
-        // Zoom in the Google Map
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
-        map.animateCamera(CameraUpdateFactory.zoomTo(GMAP_ZOOM_LEVEL)); // with
-                                                                        // animate
-
-        /*
-         * Clarifications: for GMAP_ZOOM_LEVEL GMAP_ZOOM_LEVEL = 20 represents a
-         * exact address. = 11 represents a town = 6 represents a country We can
-         * make some functionality to define the asked precision.
-         */
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
      * ch.epfl.smartmap.gui.ZoomManager#zoomAccordingToMarkers(com.google.android
      * <<<<<<< HEAD
      * .gms.maps.GoogleMap, java.util.List) Almost all movement methods require
@@ -105,5 +83,27 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
             }
 
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.gui.ZoomManager#zoomOnLocation(android.location.Location
+     * , com.google.android.gms.maps.GoogleMap)
+     */
+    @Override
+    public void zoomOnLocation(Location location, GoogleMap map) {
+        Log.d(TAG, "zoomMap called");
+        LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
+        // Zoom in the Google Map
+        map.moveCamera(CameraUpdateFactory.newLatLng(latLng1));
+        map.animateCamera(CameraUpdateFactory.zoomTo(GMAP_ZOOM_LEVEL)); // with
+                                                                        // animate
+
+        /*
+         * Clarifications: for GMAP_ZOOM_LEVEL GMAP_ZOOM_LEVEL = 20 represents a
+         * exact address. = 11 represents a town = 6 represents a country We can
+         * make some functionality to define the asked precision.
+         */
     }
 }

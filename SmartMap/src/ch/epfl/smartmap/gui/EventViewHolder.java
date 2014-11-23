@@ -18,20 +18,12 @@ public class EventViewHolder {
     private TextView mStartTextView;
     private TextView mEndTextView;
 
-    public void setEvent(Event e) {
-        mEvent = e;
+    public TextView getEndTextView() {
+        return mEndTextView;
     }
 
-    public void setNameTextView(TextView v) {
-        mNameTextView = v;
-    }
-
-    public void setStarTextView(TextView v) {
-        mStartTextView = v;
-    }
-
-    public void setEndTextView(TextView v) {
-        mEndTextView = v;
+    public Event getEvent() {
+        return mEvent;
     }
 
     public TextView getNameTextView() {
@@ -42,11 +34,19 @@ public class EventViewHolder {
         return mStartTextView;
     }
 
-    public TextView getEndTextView() {
-        return mEndTextView;
+    public void setEndTextView(TextView v) {
+        mEndTextView = v;
     }
 
-    public Event getEvent() {
-        return mEvent;
+    public void setEvent(Event e) {
+        mEvent = e;
+    }
+
+    public void setNameTextView(TextView v) {
+        mNameTextView = v;
+    }
+
+    public void setStarTextView(TextView v) {
+        mStartTextView = v;
     }
 }

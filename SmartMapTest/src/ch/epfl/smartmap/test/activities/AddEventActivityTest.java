@@ -29,14 +29,6 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         this.getActivity();
     }
 
-    public void testCannotCreateEventWithoutFields() {
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
-        // If the description is displayed, we are still in AddEventActivity,
-        // hence the event couldn't be created.
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-
-    }
-
     public void testCannotCreateEventWith1Field() {
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("TEST_NAME"));
 
@@ -69,5 +61,13 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
 
         onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+    }
+
+    public void testCannotCreateEventWithoutFields() {
+        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+        // If the description is displayed, we are still in AddEventActivity,
+        // hence the event couldn't be created.
+        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
     }
 }

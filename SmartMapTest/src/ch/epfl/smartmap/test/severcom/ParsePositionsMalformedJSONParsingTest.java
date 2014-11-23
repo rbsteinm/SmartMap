@@ -1,5 +1,7 @@
 package ch.epfl.smartmap.test.severcom;
 
+import junit.framework.TestCase;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,8 +10,6 @@ import org.junit.Test;
 import ch.epfl.smartmap.servercom.JsonSmartMapParser;
 import ch.epfl.smartmap.servercom.SmartMapParseException;
 import ch.epfl.smartmap.servercom.SmartMapParser;
-
-import junit.framework.TestCase;
 
 /**
  * Tests whether the app correctly handles malformed JSON
@@ -22,6 +22,7 @@ public class ParsePositionsMalformedJSONParsingTest extends TestCase {
         + " \"latitude\" : \"20.03\", \n" + " \"longitude\" : \"26.85\" \n" + "},\n" + "{\n" + " \"id\" : \"18\", \n"
         + " \"latitude\" : \"40.0\", \n" + " \"longitude\" : \"3.0\" \n" + "}\n" + "  ]\n" + "}\n";
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 

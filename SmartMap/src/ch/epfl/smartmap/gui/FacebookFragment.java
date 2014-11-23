@@ -40,19 +40,121 @@ import com.facebook.widget.LoginButton;
  */
 public class FacebookFragment extends Fragment {
 
-    private static final String TAG = FacebookFragment.class.getSimpleName();
+    /**
+     * An AsyncTask to send the facebook user data to the SmartMap server asynchronously
+     * 
+     * @author SpicyCH
+     */
+    private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
 
+        private final static int FACEBOOK_ID_RADIX = 10;
+        private final Map<String, String> mParams;
+
+        /**
+         * @param params
+         */
+        public SendDataTask(Map<String, String> params) {
+            mParams = params;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
+            try {
+                networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
+                    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
+                    mParams.get(FACEBOOK_TOKEN_POST_NAME));
+            } catch (NumberFormatException e1) {
+                Log.e(TAG, "Couldn't parse to Long: " + e1.getMessage());
+                e1.printStackTrace();
+                return false;
+            } catch (SmartMapClientException e1) {
+                Log.e(TAG, "Couldn't authenticate : " + e1.getMessage());
+                e1.printStackTrace();
+                return false;
+            }
+
+            Log.i(TAG, "User' infos sent to SmartMap server");
+            return true;
+
+        }
+    }
+
+    private static final String TAG = FacebookFragment.class.getSimpleName();
     private static final String FACEBOOK_ID_POST_NAME = "facebookId";
     private static final String FACEBOOK_TOKEN_POST_NAME = "facebookToken";
+
     private static final String FACEBOOK_NAME_POST_NAME = "name";
 
     private UiLifecycleHelper mUiHelper;
 
     private final List<String> mPermissions;
 
+    private final Session.StatusCallback callback = new Session.StatusCallback() {
+        @Override
+        public void call(Session session, SessionState state, Exception exception) {
+            FacebookFragment.this.onSessionStateChange(session, state, exception);
+        }
+    };
+
     public FacebookFragment() {
         // We will need to access the user's friends list
         mPermissions = Arrays.asList("user_status", "user_friends");
+    }
+
+    protected void makeMeRequest() {
+        Request request = Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
+
+            @Override
+            public void onCompleted(GraphUser user, Response response) {
+
+                if (user != null) {
+
+                    // This portable token is used by the server
+                    String facebookToken = Session.getActiveSession().getAccessToken();
+
+                    // Send user's infos to SmartMap server
+                    Map<String, String> params = new LinkedHashMap<String, String>();
+                    params.put(FACEBOOK_ID_POST_NAME, user.getId());
+                    params.put(FACEBOOK_NAME_POST_NAME, user.getName());
+                    params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
+
+                    Log.i(TAG, "user name: " + params.get("name"));
+                    Log.i(TAG, "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
+
+                    SettingsManager.getInstance().setUserName(params.get("name"));
+                    SettingsManager.getInstance().setFacebookID(
+                        Long.parseLong(params.get(FACEBOOK_ID_POST_NAME)));
+                    SettingsManager.getInstance().setToken(params.get(FACEBOOK_TOKEN_POST_NAME));
+
+                    if (!FacebookFragment.this.sendDataToServer(params)) {
+                        Toast.makeText(FacebookFragment.this.getActivity(),
+                            "Failed to log in to the SmartMap server.", Toast.LENGTH_LONG).show();
+                    } else {
+                        // Create and start the next activity
+                        FacebookFragment.this.startMainActivity();
+                    }
+
+                } else if (response.getError() != null) {
+                    Log.e(TAG, "The user is null (authentication aborted?)");
+                }
+            }
+        });
+
+        request.executeAsync();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mUiHelper.onActivityResult(requestCode, resultCode, data);
+
     }
 
     @Override
@@ -76,7 +178,8 @@ public class FacebookFragment extends Fragment {
         view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 
         // Start animation and set login button
-        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(), R.anim.face_anim));
+        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(),
+            R.anim.face_anim));
         authButton.setFragment(this);
 
         // Not logged in Facebook or permission to use Facebook in SmartMap not
@@ -85,6 +188,18 @@ public class FacebookFragment extends Fragment {
             authButton.setReadPermissions(mPermissions);
         }
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mUiHelper.onDestroy();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mUiHelper.onPause();
     }
 
     @Override
@@ -100,25 +215,6 @@ public class FacebookFragment extends Fragment {
         }
 
         mUiHelper.onResume();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mUiHelper.onActivityResult(requestCode, resultCode, data);
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mUiHelper.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mUiHelper.onDestroy();
     }
 
     @Override
@@ -148,68 +244,13 @@ public class FacebookFragment extends Fragment {
         }
     }
 
-    private final Session.StatusCallback callback = new Session.StatusCallback() {
-        @Override
-        public void call(Session session, SessionState state, Exception exception) {
-            FacebookFragment.this.onSessionStateChange(session, state, exception);
-        }
-    };
-
-    protected void makeMeRequest() {
-        Request request = Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
-
-            @Override
-            public void onCompleted(GraphUser user, Response response) {
-
-                if (user != null) {
-
-                    // This portable token is used by the server
-                    String facebookToken = Session.getActiveSession().getAccessToken();
-
-                    // Send user's infos to SmartMap server
-                    Map<String, String> params = new LinkedHashMap<String, String>();
-                    params.put(FACEBOOK_ID_POST_NAME, user.getId());
-                    params.put(FACEBOOK_NAME_POST_NAME, user.getName());
-                    params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
-
-                    Log.i(TAG, "user name: " + params.get("name"));
-                    Log.i(TAG, "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
-
-                    SettingsManager.getInstance().setUserName(params.get("name"));
-                    SettingsManager.getInstance().setFacebookID(Long.parseLong(params.get(FACEBOOK_ID_POST_NAME)));
-                    SettingsManager.getInstance().setToken(params.get(FACEBOOK_TOKEN_POST_NAME));
-
-                    if (!FacebookFragment.this.sendDataToServer(params)) {
-                        Toast.makeText(FacebookFragment.this.getActivity(), "Failed to log in to the SmartMap server.",
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        // Create and start the next activity
-                        FacebookFragment.this.startMainActivity();
-                    }
-
-                } else if (response.getError() != null) {
-                    Log.e(TAG, "The user is null (authentication aborted?)");
-                }
-            }
-        });
-
-        request.executeAsync();
-    }
-
-    private void startMainActivity() {
-        Activity currentActivity = this.getActivity();
-        Intent intent = new Intent(this.getActivity(), MainActivity.class);
-        this.startActivity(intent);
-        currentActivity.finish();
-    }
-
     /**
      * Sends the params to the SmartMap server.
      * 
      * @param params
      *            a map with values for the keys name, facebookId and facebookToken
-     * @return <code>true</code> if the internet connection is up and the data is beeing processed by an asynctask
-     * 
+     * @return <code>true</code> if the internet connection is up and the data is beeing processed by an
+     *         asynctask
      * @author SpicyCH
      */
     private boolean sendDataToServer(Map<String, String> params) {
@@ -221,8 +262,8 @@ public class FacebookFragment extends Fragment {
         assert params.get(FACEBOOK_NAME_POST_NAME) != null : "Facebook name is null";
         assert !params.get(FACEBOOK_NAME_POST_NAME).equals("") : "Facebook name is empty";
 
-        ConnectivityManager connMgr = (ConnectivityManager) this.getActivity().getSystemService(
-                Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr =
+            (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if ((networkInfo != null) && networkInfo.isConnected()) {
             // Send data
@@ -233,56 +274,16 @@ public class FacebookFragment extends Fragment {
             // An error occured
             Log.e(TAG, "Could not send user's data to server. Net down?");
             Toast.makeText(this.getActivity(), "Your internet connection seems down. Please try again!",
-                    Toast.LENGTH_LONG).show();
+                Toast.LENGTH_LONG).show();
             return false;
         }
 
     }
 
-    /**
-     * An AsyncTask to send the facebook user data to the SmartMap server asynchronously
-     * 
-     * @author SpicyCH
-     */
-    private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final static int FACEBOOK_ID_RADIX = 10;
-        private final Map<String, String> mParams;
-
-        /**
-         * @param params
-         */
-        public SendDataTask(Map<String, String> params) {
-            mParams = params;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Boolean doInBackground(Void... params) {
-
-            NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-
-            try {
-                networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
-                        Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
-                        mParams.get(FACEBOOK_TOKEN_POST_NAME));
-            } catch (NumberFormatException e1) {
-                Log.e(TAG, "Couldn't parse to Long: " + e1.getMessage());
-                e1.printStackTrace();
-                return false;
-            } catch (SmartMapClientException e1) {
-                Log.e(TAG, "Couldn't authenticate : " + e1.getMessage());
-                e1.printStackTrace();
-                return false;
-            }
-
-            Log.i(TAG, "User' infos sent to SmartMap server");
-            return true;
-
-        }
+    private void startMainActivity() {
+        Activity currentActivity = this.getActivity();
+        Intent intent = new Intent(this.getActivity(), MainActivity.class);
+        this.startActivity(intent);
+        currentActivity.finish();
     }
 }

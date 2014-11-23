@@ -109,6 +109,15 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
 
     /*
      * (non-Javadoc)
+     * @see android.os.Parcelable#describeContents()
+     */
+    @Override
+    public int describeContents() {
+        return 1;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -291,15 +300,6 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
     @Override
     public void setVisible(boolean isVisible) {
         mVisible = isVisible;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.os.Parcelable#describeContents()
-     */
-    @Override
-    public int describeContents() {
-        return 1;
     }
 
     /*

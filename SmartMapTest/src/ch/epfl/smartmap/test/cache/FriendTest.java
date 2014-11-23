@@ -26,7 +26,22 @@ public class FriendTest extends AndroidTestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        friend.deletePicture(getContext());
+        friend.deletePicture(this.getContext());
+    }
+
+    @Test
+    public void testDeletePic() {
+        friend.setPicture(BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.ic_search),
+            this.getContext());
+        friend.deletePicture(this.getContext());
+        assertTrue(friend.getPicture(this.getContext()).sameAs(
+            BitmapFactory.decodeResource(this.getContext().getResources(), Friend.DEFAULT_PICTURE)));
+    }
+
+    @Test
+    public void testGetDefaultPic() {
+        assertTrue(friend.getPicture(this.getContext()).sameAs(
+            BitmapFactory.decodeResource(this.getContext().getResources(), Friend.DEFAULT_PICTURE)));
     }
 
     @Test
@@ -40,9 +55,29 @@ public class FriendTest extends AndroidTestCase {
     }
 
     @Test
+    public void testSetEmail() {
+        friend.setEmail(email);
+        assertTrue(friend.getEmail().equals(email));
+    }
+
+    @Test
+    public void testSetName() {
+        friend.setName(name2);
+        assertTrue(friend.getName().equals(name2));
+    }
+
+    @Test
     public void testSetNumber() {
         friend.setNumber(number);
         assertTrue(friend.getNumber().equals(number));
+    }
+
+    @Test
+    public void testSetPic() {
+        friend.setPicture(BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.ic_search),
+            this.getContext());
+        assertTrue(friend.getPicture(this.getContext()).sameAs(
+            BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.ic_search)));
     }
 
     @Test
@@ -55,40 +90,5 @@ public class FriendTest extends AndroidTestCase {
     public void testSetY() {
         friend.setLatitude(y);
         assertTrue(friend.getLocation().getLatitude() == y);
-    }
-
-    @Test
-    public void testSetName() {
-        friend.setName(name2);
-        assertTrue(friend.getName().equals(name2));
-    }
-
-    @Test
-    public void testSetEmail() {
-        friend.setEmail(email);
-        assertTrue(friend.getEmail().equals(email));
-    }
-
-    @Test
-    public void testGetDefaultPic() {
-        assertTrue(friend.getPicture(getContext()).sameAs(
-            BitmapFactory.decodeResource(getContext().getResources(), Friend.DEFAULT_PICTURE)));
-    }
-
-    @Test
-    public void testSetPic() {
-        friend
-            .setPicture(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.ic_search), getContext());
-        assertTrue(friend.getPicture(getContext()).sameAs(
-            BitmapFactory.decodeResource(getContext().getResources(), R.drawable.ic_search)));
-    }
-
-    @Test
-    public void testDeletePic() {
-        friend
-            .setPicture(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.ic_search), getContext());
-        friend.deletePicture(getContext());
-        assertTrue(friend.getPicture(getContext()).sameAs(
-            BitmapFactory.decodeResource(getContext().getResources(), Friend.DEFAULT_PICTURE)));
     }
 }

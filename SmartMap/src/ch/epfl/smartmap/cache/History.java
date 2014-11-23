@@ -9,16 +9,6 @@ import java.util.Date;
  * @author jfperren
  */
 public interface History {
-    void addEntry(Displayable item, Date date);
-
-    ArrayList<Displayable> getEntriesForIndex(int index);
-
-    Date getDateForIndex(int index);
-
-    int nbOfDates();
-
-    boolean isEmpty();
-
     /**
      * Represents an entry in the history of searches : Tuple of a searchResult
      * and a Date
@@ -40,12 +30,22 @@ public interface History {
             mDate = date;
         }
 
-        public Displayable getItem() {
-            return mItem;
-        }
-
         public Date getDate() {
             return mDate;
         }
+
+        public Displayable getItem() {
+            return mItem;
+        }
     }
+
+    void addEntry(Displayable item, Date date);
+
+    Date getDateForIndex(int index);
+
+    ArrayList<Displayable> getEntriesForIndex(int index);
+
+    boolean isEmpty();
+
+    int nbOfDates();
 }

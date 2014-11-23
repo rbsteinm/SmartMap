@@ -4,16 +4,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-// import org.junit.FixMethodOrder;
+import junit.framework.TestCase;
+
 import org.junit.Test;
-// import org.junit.runners.MethodSorters;
 
 import android.location.Location;
-
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
-import junit.framework.TestCase;
+// import org.junit.FixMethodOrder;
+// import org.junit.runners.MethodSorters;
 
 /**
  * Tests whether we can interact with the real quiz server.
@@ -35,6 +35,24 @@ public class NetworkEndToEndTest extends TestCase {
     private static final long VALID_ID_2 = 2;
     private static final long VALID_ID_3 = 3;
 
+    private void assertValidIdAndName(User user) {
+        assertTrue("Unexpected id", user.getID() >= 0);
+        assertTrue("Unexpected name", (0 < user.getName().length()) && (user.getName().length() <= 60));
+    }
+
+    @Test
+    public void ignoredtestF_AllowFriend() throws SmartMapClientException {
+        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+        networkClient.allowFriend(VALID_ID_3);
+    }
+
+    @Test
+    public void ignoredtestH_AllowFriendList() throws SmartMapClientException {
+        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+        networkClient.allowFriendList(Arrays.asList(VALID_ID_1, VALID_ID_2, VALID_ID_3));
+    }
+
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
     }
@@ -81,34 +99,22 @@ public class NetworkEndToEndTest extends TestCase {
     }
 
     @Test
-    public void ignoredtestF_AllowFriend() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.allowFriend(VALID_ID_3);
-    }
-
-    @Test
     public void testG_DisallowFriend() throws SmartMapClientException {
         NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
         networkClient.disallowFriend(VALID_ID_3);
     }
 
     @Test
-    public void ignoredtestH_AllowFriendList() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.allowFriendList(Arrays.asList((long) VALID_ID_1, (long) VALID_ID_2, (long) VALID_ID_3));
-    }
-
-    @Test
     public void testI_DisallowFriendList() throws SmartMapClientException {
         NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.disallowFriendList(Arrays.asList((long) VALID_ID_1, (long) VALID_ID_2, (long) VALID_ID_3));
+        networkClient.disallowFriendList(Arrays.asList(VALID_ID_1, VALID_ID_2, VALID_ID_3));
     }
 
     @Test
     public void testJ_GetUserInfo() throws SmartMapClientException {
         NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
         User friend = networkClient.getUserInfo(VALID_ID_1);
-        assertValidIdAndName(friend);
+        this.assertValidIdAndName(friend);
 
     }
 
@@ -121,21 +127,8 @@ public class NetworkEndToEndTest extends TestCase {
         for (List<User> list : resultList) {
             assertTrue("Null list", list != null);
             for (User user : list) {
-                assertValidIdAndName(user);
+                this.assertValidIdAndName(user);
             }
-        }
-
-    }
-
-    // FIXME should simulate an invitation on server side??
-    @Test
-    public void testQ_AcceptInvitation() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-
-        try {
-            networkClient.acceptInvitation(VALID_ID_1);
-        } catch (SmartMapClientException e) {
-            // ok because not invited by anyone
         }
 
     }
@@ -152,8 +145,8 @@ public class NetworkEndToEndTest extends TestCase {
         }
 
         for (Location location : positions.values()) {
-            assertTrue("Unexpected latitude", -90 <= location.getLatitude() && location.getLatitude() <= 90);
-            assertTrue("Unexpected longitude", -180 <= location.getLatitude() && location.getLatitude() <= 180);
+            assertTrue("Unexpected latitude", (-90 <= location.getLatitude()) && (location.getLatitude() <= 90));
+            assertTrue("Unexpected longitude", (-180 <= location.getLatitude()) && (location.getLatitude() <= 180));
         }
     }
 
@@ -164,7 +157,7 @@ public class NetworkEndToEndTest extends TestCase {
 
         assertTrue("Null list", friends != null);
         for (User user : friends) {
-            assertValidIdAndName(user);
+            this.assertValidIdAndName(user);
         }
     }
 
@@ -189,8 +182,16 @@ public class NetworkEndToEndTest extends TestCase {
         networkClient.ackAcceptedInvitation(VALID_ID_3);
     }
 
-    private void assertValidIdAndName(User user) {
-        assertTrue("Unexpected id", user.getID() >= 0);
-        assertTrue("Unexpected name", 0 < user.getName().length() && user.getName().length() <= 60);
+    // FIXME should simulate an invitation on server side??
+    @Test
+    public void testQ_AcceptInvitation() throws SmartMapClientException {
+        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
+        try {
+            networkClient.acceptInvitation(VALID_ID_1);
+        } catch (SmartMapClientException e) {
+            // ok because not invited by anyone
+        }
+
     }
 }

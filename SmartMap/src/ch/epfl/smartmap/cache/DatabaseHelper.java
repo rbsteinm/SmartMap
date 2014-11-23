@@ -175,6 +175,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.notifyEventListeners();
     }
 
+    public void addEventsListener(EventsListener listener) {
+        mEventsListeners.add(listener);
+    }
+
     /**
      * Adds a filter/userlist/friendlist to the database, and gives an ID to the
      * filter
@@ -203,6 +207,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.notifyFilterListeners();
         return filterID;
+    }
+
+    public void addFiltersListener(FiltersListener listener) {
+        mFiltersListeners.add(listener);
+    }
+
+    public void addFriendsListener(FriendsListener listener) {
+        mFriendsListeners.add(listener);
+    }
+
+    public void addFriendsLocationListener(FriendsLocationListener listener) {
+        mLocationsListeners.add(listener);
     }
 
     /**
@@ -519,6 +535,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.notifyLocationsListeners();
     }
 
+    public void notifyEventListeners() {
+        for (EventsListener listener : mEventsListeners) {
+            listener.onChange();
+        }
+    }
+
+    public void notifyFilterListeners() {
+        for (FiltersListener listener : mFiltersListeners) {
+            listener.onChange();
+        }
+    }
+
+    public void notifyFriendListeners() {
+        for (FriendsListener listener : mFriendsListeners) {
+            listener.onChange();
+        }
+    }
+
+    public void notifyLocationsListeners() {
+        for (FriendsLocationListener listener : mLocationsListeners) {
+            listener.onChange();
+        }
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_USER);
@@ -683,45 +723,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.notifyLocationsListeners();
         return rows;
-    }
-
-    public void addFriendsLocationListener(FriendsLocationListener listener) {
-        mLocationsListeners.add(listener);
-    }
-
-    public void addFriendsListener(FriendsListener listener) {
-        mFriendsListeners.add(listener);
-    }
-
-    public void addEventsListener(EventsListener listener) {
-        mEventsListeners.add(listener);
-    }
-
-    public void addFiltersListener(FiltersListener listener) {
-        mFiltersListeners.add(listener);
-    }
-
-    public void notifyLocationsListeners() {
-        for (FriendsLocationListener listener : mLocationsListeners) {
-            listener.onChange();
-        }
-    }
-
-    public void notifyFriendListeners() {
-        for (FriendsListener listener : mFriendsListeners) {
-            listener.onChange();
-        }
-    }
-
-    public void notifyEventListeners() {
-        for (EventsListener listener : mEventsListeners) {
-            listener.onChange();
-        }
-    }
-
-    public void notifyFilterListeners() {
-        for (FiltersListener listener : mFiltersListeners) {
-            listener.onChange();
-        }
     }
 }

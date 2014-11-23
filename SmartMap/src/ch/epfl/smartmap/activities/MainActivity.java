@@ -65,26 +65,29 @@ import com.google.android.gms.maps.model.Marker;
  */
 public class MainActivity extends FragmentActivity implements LocationListener {
 
-    private static final String TAG = "MAIN_ACTIVITY";
-    private static final int LOCATION_UPDATE_TIMEOUT = 10000;
-    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-    private static final int LOCATION_UPDATE_DISTANCE = 10;
-    private static final String CITY_NAME = "CITY_NAME";
-
-    private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
-    private static final int MENU_ITEM_MYLOCATION_INDEX = 1;
-    private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
-    private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
-    private static final int MENU_ITEM_CLOSE_INFO_INDEX = 4;
-
     /**
      * Types of Menu that can be displayed on this activity
      * 
      * @author jfperren
      */
     private enum MenuTheme {
-        MAP, SEARCH, ITEM;
+        MAP,
+        SEARCH,
+        ITEM;
     }
+
+    private static final String TAG = "MAIN_ACTIVITY";
+    private static final int LOCATION_UPDATE_TIMEOUT = 10000;
+    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+    private static final int LOCATION_UPDATE_DISTANCE = 10;
+
+    private static final String CITY_NAME = "CITY_NAME";
+    private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
+    private static final int MENU_ITEM_MYLOCATION_INDEX = 1;
+    private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
+    private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
+
+    private static final int MENU_ITEM_CLOSE_INFO_INDEX = 4;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -100,13 +103,136 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     private MenuTheme mMenuTheme;
     private Displayable mCurrentItem;
 
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mFriendMarkerDisplayer.updateMarkers(MainActivity.this.getContext(), mGoogleMap,
+                MainActivity.this.getVisibleUsers(mDbHelper.getAllUsers()));
+        }
+
+    };
+
+    /**
+     * Close Information Panel if open
+     */
+    public void closeInformationPanel() {
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
+        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
+        final SlidingPanel mInformationPanel = (SlidingPanel) this.findViewById(R.id.information_panel);
+
+        mInformationPanel.close();
+    }
+
+    /**
+     * Close Information Panel if open
+     */
+    public void closeInformationPanel(MenuItem mi) {
+        this.closeInformationPanel();
+    }
+
+    /**
+     * Create a notification that appear in the notifications tab
+     */
+    public void createNotification(View view) {
+        // Notifications.createAddNotification(view, this);
+    }
+
+    /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+            // not available
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+            dialog.show();
+        } else {
+            // Google Play Services are available.
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = mFragmentMap.getMap();
+            // Enabling MyLocation Layer of Google Map
+            mGoogleMap.setMyLocationEnabled(true);
+            // Getting LocationManager object from System Service
+            // LOCATION_SERVICE
+            LocationManager locationManager =
+                (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            // Creating a criteria object to retrieve provider
+            Criteria criteria = new Criteria();
+            // Getting the name of the best provider
+            String provider = locationManager.getBestProvider(criteria, true);
+            Log.d(TAG, "provider : " + provider);
+            // Getting Current Location
+            // Location location =
+            // locationManager.getLastKnownLocation(provider);
+            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if (isGPSEnabled) {
+                Log.d(TAG, "gps enabled");
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
+                    LOCATION_UPDATE_DISTANCE, this);
+            } else if (null != locationManager.getProvider(LocationManager.NETWORK_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    LOCATION_UPDATE_TIMEOUT, LOCATION_UPDATE_DISTANCE, this);
+            }
+        }
+    }
+
+    public Context getContext() {
+        return this;
+    }
+
+    private List<User> getVisibleUsers(LongSparseArray<User> usersSparseArray) {
+        List<User> visibleUsers = new ArrayList<User>();
+        for (int i = 0; i < usersSparseArray.size(); i++) {
+            User user = usersSparseArray.valueAt(i);
+            if (user.isVisible()) {
+                visibleUsers.add(user);
+            }
+        }
+        return visibleUsers;
+    }
+
+    public void initializeMarkers() {
+        mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
+        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, mDbHelper.getAllEvents());
+        mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
+        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
+            this.getVisibleUsers(mDbHelper.getAllUsers()));
+        mMapZoomer = new DefaultZoomManager(mFragmentMap);
+        Log.i(TAG, "before enter to zoom according");
+        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
+        allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
+        Intent startingIntent = this.getIntent();
+        if (startingIntent.getParcelableExtra("location") == null) {
+            mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        switch (mMenuTheme) {
+            case MAP:
+                super.onBackPressed();
+                break;
+            case SEARCH:
+            case ITEM:
+                this.setMainMenu(null);
+                break;
+            default:
+                assert false;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
         // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         this.getActionBar().setHomeButtonEnabled(true);
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setHomeAsUpIndicator(this.getResources().getDrawable(R.drawable.ic_drawer));
@@ -153,16 +279,16 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
         mSearchView.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                mSearchView.clearFocus();
-                return false;
-            }
-
-            @Override
             public boolean onQueryTextChange(String newText) {
                 // Give the query results to searchLayout
 
                 mSearchLayout.setSearchQuery(mSearchView.getQuery().toString());
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mSearchView.clearFocus();
                 return false;
             }
         });
@@ -180,6 +306,11 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
         // Configure the search info and add any event listeners
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        SettingsManager.getInstance().setLocation(location);
     }
 
     @Override
@@ -206,23 +337,28 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        SettingsManager.getInstance().setLocation(location);
+    public void onPause() {
+        super.onPause();
+        this.unregisterReceiver(mBroadcastReceiver);
+        // stopService(mUpdateServiceIntent);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
+     */
     @Override
-    public void onBackPressed() {
-        switch (mMenuTheme) {
-            case MAP:
-                super.onBackPressed();
-                break;
-            case SEARCH:
-            case ITEM:
-                this.setMainMenu(null);
-                break;
-            default:
-                assert false;
-        }
+    public void onProviderDisabled(String provider) {
+        // nothing
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
+     */
+    @Override
+    public void onProviderEnabled(String provider) {
+        // nothing
     }
 
     @Override
@@ -290,96 +426,8 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         });
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        this.unregisterReceiver(mBroadcastReceiver);
-        // stopService(mUpdateServiceIntent);
-    }
-
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            mFriendMarkerDisplayer.updateMarkers(MainActivity.this.getContext(), mGoogleMap,
-                    MainActivity.this.getVisibleUsers(mDbHelper.getAllUsers()));
-        }
-
-    };
-
-    public Context getContext() {
-        return this;
-    }
-
-    /**
-     * Display the map with the current location
-     */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            // Enabling MyLocation Layer of Google Map
-            mGoogleMap.setMyLocationEnabled(true);
-            // Getting LocationManager object from System Service
-            // LOCATION_SERVICE
-            LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            // Creating a criteria object to retrieve provider
-            Criteria criteria = new Criteria();
-            // Getting the name of the best provider
-            String provider = locationManager.getBestProvider(criteria, true);
-            Log.d(TAG, "provider : " + provider);
-            // Getting Current Location
-            // Location location =
-            // locationManager.getLastKnownLocation(provider);
-            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            if (isGPSEnabled) {
-                Log.d(TAG, "gps enabled");
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                        LOCATION_UPDATE_DISTANCE, this);
-            } else if (null != locationManager.getProvider(LocationManager.NETWORK_PROVIDER)) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                        LOCATION_UPDATE_DISTANCE, this);
-            }
-        }
-    }
-
-    public void initializeMarkers() {
-        mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
-        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, mDbHelper.getAllEvents());
-        mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, this.getVisibleUsers(mDbHelper.getAllUsers()));
-        mMapZoomer = new DefaultZoomManager(mFragmentMap);
-        Log.i(TAG, "before enter to zoom according");
-        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
-        allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
-        Intent startingIntent = this.getIntent();
-        if (startingIntent.getParcelableExtra("location") == null) {
-            mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
-        }
-    }
-
-    private List<User> getVisibleUsers(LongSparseArray<User> usersSparseArray) {
-        List<User> visibleUsers = new ArrayList<User>();
-        for (int i = 0; i < usersSparseArray.size(); i++) {
-            User user = usersSparseArray.valueAt(i);
-            if (user.isVisible()) {
-                visibleUsers.add(user);
-            }
-        }
-        return visibleUsers;
-    }
-
     /*
      * (non-Javadoc)
-     * 
      * @see android.location.LocationListener#onStatusChanged(java.lang.String, int, android.os.Bundle)
      */
     @Override
@@ -387,31 +435,35 @@ public class MainActivity extends FragmentActivity implements LocationListener {
         // nothing
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Opens Information Activity (called from MenuItem on Item view)
      * 
-     * @see android.location.LocationListener#onProviderEnabled(java.lang.String)
+     * @author jfperren
      */
-    @Override
-    public void onProviderEnabled(String provider) {
-        // nothing
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see android.location.LocationListener#onProviderDisabled(java.lang.String)
-     */
-    @Override
-    public void onProviderDisabled(String provider) {
-        // nothing
+    public void openInformationActivity(MenuItem mi) {
+        Intent intent = new Intent(this, InformationActivity.class);
+        intent.putExtra("CURRENT_DISPLAYABLE", (Parcelable) mCurrentItem);
+        this.startActivity(intent);
+        this.finish();
     }
 
     /**
-     * Create a notification that appear in the notifications tab
+     * Open Information Panel if closed
      */
-    public void createNotification(View view) {
-        // Notifications.createAddNotification(view, this);
+    public void openInformationPanel() {
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(true);
+
+        final SlidingPanel mInformationPanel = (SlidingPanel) this.findViewById(R.id.information_panel);
+
+        mInformationPanel.open();
+    }
+
+    /**
+     * Open Information Panel if closed
+     */
+    public void openInformationPanel(MenuItem mi) {
+        this.openInformationPanel();
     }
 
     /**
@@ -434,21 +486,25 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     }
 
     /**
-     * Sets the Menu that should be used when using Search Panel
+     * Sets the view for Item Focus, this means - Write name / Display photo on ActionBar - Sets ActionMenu
+     * for Item
+     * Focus
+     * 
+     * @param item
+     *            Item to be displayed
      */
-    public void setSearchMenu() {
-        final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
-        mSearchPanel.open();
-        ActionBar mActionBar = this.getActionBar();
-        mActionBar.setTitle(R.string.app_name);
-        mActionBar.setSubtitle(null);
-        mActionBar.setIcon(R.drawable.ic_launcher);
-
+    public void setItemMenu(Displayable item) {
         mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(false);
-        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(true);
-        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
         mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
-        mMenuTheme = MenuTheme.SEARCH;
+
+        ActionBar mActionBar = this.getActionBar();
+        mActionBar.setTitle(item.getName());
+        mActionBar.setSubtitle(item.getShortInfos());
+        mActionBar.setIcon(new BitmapDrawable(this.getResources(), item.getPicture(this)));
+        mCurrentItem = item;
+        mMenuTheme = MenuTheme.ITEM;
     }
 
     /**
@@ -474,72 +530,20 @@ public class MainActivity extends FragmentActivity implements LocationListener {
     }
 
     /**
-     * Sets the view for Item Focus, this means - Write name / Display photo on ActionBar - Sets ActionMenu for Item
-     * Focus
-     * 
-     * @param item
-     *            Item to be displayed
+     * Sets the Menu that should be used when using Search Panel
      */
-    public void setItemMenu(Displayable item) {
-        mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(false);
-        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
-        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
-        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
-
+    public void setSearchMenu() {
+        final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
+        mSearchPanel.open();
         ActionBar mActionBar = this.getActionBar();
-        mActionBar.setTitle(item.getName());
-        mActionBar.setSubtitle(item.getShortInfos());
-        mActionBar.setIcon(new BitmapDrawable(this.getResources(), item.getPicture(this)));
-        mCurrentItem = item;
-        mMenuTheme = MenuTheme.ITEM;
-    }
+        mActionBar.setTitle(R.string.app_name);
+        mActionBar.setSubtitle(null);
+        mActionBar.setIcon(R.drawable.ic_launcher);
 
-    /**
-     * Open Information Panel if closed
-     */
-    public void openInformationPanel() {
+        mMenu.getItem(MENU_ITEM_MYLOCATION_INDEX).setVisible(false);
+        mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(true);
         mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
-        mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(true);
-
-        final SlidingPanel mInformationPanel = (SlidingPanel) this.findViewById(R.id.information_panel);
-
-        mInformationPanel.open();
-    }
-
-    /**
-     * Open Information Panel if closed
-     */
-    public void openInformationPanel(MenuItem mi) {
-        this.openInformationPanel();
-    }
-
-    /**
-     * Close Information Panel if open
-     */
-    public void closeInformationPanel() {
-        mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
         mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
-        final SlidingPanel mInformationPanel = (SlidingPanel) this.findViewById(R.id.information_panel);
-
-        mInformationPanel.close();
-    }
-
-    /**
-     * Close Information Panel if open
-     */
-    public void closeInformationPanel(MenuItem mi) {
-        this.closeInformationPanel();
-    }
-
-    /**
-     * Opens Information Activity (called from MenuItem on Item view)
-     * 
-     * @author jfperren
-     */
-    public void openInformationActivity(MenuItem mi) {
-        Intent intent = new Intent(this, InformationActivity.class);
-        intent.putExtra("CURRENT_DISPLAYABLE", (Parcelable) mCurrentItem);
-        this.startActivity(intent);
-        this.finish();
+        mMenuTheme = MenuTheme.SEARCH;
     }
 }
