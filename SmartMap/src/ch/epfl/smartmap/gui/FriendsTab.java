@@ -27,62 +27,63 @@ import ch.epfl.smartmap.cache.User;
  * @author rbsteinm
  */
 public class FriendsTab extends ListFragment implements FriendsListener {
-	private List<User> mFriendList;
-	private final Context mContext;
-	private DatabaseHelper mCacheDB;
+    public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
+        if (sparseArray == null) {
+            return null;
+        }
+        List<C> arrayList = new ArrayList<C>(sparseArray.size());
+        for (int i = 0; i < sparseArray.size(); i++) {
+            arrayList.add(sparseArray.valueAt(i));
+        }
+        return arrayList;
+    }
 
-	public FriendsTab(Context context) {
-		mContext = context;
-	}
+    private List<User> mFriendList;
+    private final Context mContext;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    private DatabaseHelper mCacheDB;
 
-		View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-		mCacheDB = DatabaseHelper.getInstance();
-		mFriendList = new ArrayList<User>();
-		mFriendList = asList(mCacheDB.getAllUsers());
+    public FriendsTab(Context context) {
+        mContext = context;
+    }
 
-		// Create custom Adapter and pass it to the Activity
-		FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
-		this.setListAdapter(adapter);
+    @Override
+    public void onChange() {
+        this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+    }
 
-		// Initialize the listener
-		mCacheDB.addFriendsListener(this);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		return view;
-	}
+        View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
+        mCacheDB = DatabaseHelper.getInstance();
+        mFriendList = new ArrayList<User>();
+        mFriendList = asList(mCacheDB.getAllUsers());
 
-	@Override
-	public void onListItemClick(ListView listView, View view, int position, long id) {
-		User user = mFriendList.get(position);
-		RelativeLayout rl = (RelativeLayout) view;
-		TextView tv = (TextView) rl.getChildAt(1);
-		assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
-		Intent intent = new Intent(mContext, FriendInformationActivity.class);
-		intent.putExtra("CURRENT_DISPLAYABLE", (Parcelable) user);
-		this.startActivity(intent);
-	}
+        // Create custom Adapter and pass it to the Activity
+        FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
+        this.setListAdapter(adapter);
 
-	@Override
-	public void onChange() {
-		this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
-	}
+        // Initialize the listener
+        mCacheDB.addFriendsListener(this);
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
-	}
+        return view;
+    }
 
-	public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
-		if (sparseArray == null) {
-			return null;
-		}
-		List<C> arrayList = new ArrayList<C>(sparseArray.size());
-		for (int i = 0; i < sparseArray.size(); i++) {
-			arrayList.add(sparseArray.valueAt(i));
-		}
-		return arrayList;
-	}
+    @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        User user = mFriendList.get(position);
+        RelativeLayout rl = (RelativeLayout) view;
+        TextView tv = (TextView) rl.getChildAt(1);
+        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
+        Intent intent = new Intent(mContext, FriendInformationActivity.class);
+        intent.putExtra("CURRENT_DISPLAYABLE", (Parcelable) user);
+        this.startActivity(intent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+    }
 }

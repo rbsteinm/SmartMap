@@ -17,234 +17,236 @@ import com.google.android.gms.maps.model.LatLng;
  * @author ritterni
  */
 public class UserEvent implements Event, Searchable, Displayable {
-	private String mEvtName;
-	private final long mEvtCreator; // the user who created the event
-	private final GregorianCalendar mStartDate;
-	private final GregorianCalendar mEndDate;
-	private long mID;
-	private final Location mLocation;
-	private String mPositionName;
-	private String mCreatorName;
-	private String mDescription;
-	public final static long DEFAULT_ID = -1;
-	public final static int EVENT_ICON = R.drawable.default_event;
-	private final static int RIGHT_SHIFT_COUNT = 32;
+    private String mEvtName;
+    private final long mEvtCreator; // the user who created the event
+    private final GregorianCalendar mStartDate;
+    private final GregorianCalendar mEndDate;
+    private long mID;
+    private final Location mLocation;
+    private String mPositionName;
+    private String mCreatorName;
+    private String mDescription;
+    public final static long DEFAULT_ID = -1;
+    public final static int EVENT_ICON = R.drawable.default_event;
+    private final static int RIGHT_SHIFT_COUNT = 32;
 
-	/**
-	 * UserEvent constructor
-	 * 
-	 * @param name
-	 *            The name of the event
-	 * @param creator
-	 *            The id of the user who created the event
-	 * @param creatorName
-	 *            The name of the user who created the event
-	 * @param startDate
-	 *            The date at which the event starts
-	 * @param endDate
-	 *            The date at which the event ends
-	 * @param p
-	 *            The event's location on the map
-	 */
-	public UserEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
-	    GregorianCalendar endDate, Location p) {
-		if (name.isEmpty() || (name == null)) {
-			throw new IllegalArgumentException("Invalid event name!");
-		}
-		if (creatorName.isEmpty() || (creatorName == null)) {
-			throw new IllegalArgumentException("Invalid creator name!");
-		}
-		if (creator < 0) {
-			throw new IllegalArgumentException("Invalid creator ID!");
-		}
-		if (endDate.before(startDate)) {
-			throw new IllegalArgumentException("Invalid event dates!");
-		}
-		mEvtName = name;
-		mEvtCreator = creator;
-		mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
-		    startDate.get(Calendar.DATE), startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
+    /**
+     * UserEvent constructor
+     * 
+     * @param name
+     *            The name of the event
+     * @param creator
+     *            The id of the user who created the event
+     * @param creatorName
+     *            The name of the user who created the event
+     * @param startDate
+     *            The date at which the event starts
+     * @param endDate
+     *            The date at which the event ends
+     * @param p
+     *            The event's location on the map
+     */
+    public UserEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
+        GregorianCalendar endDate, Location p) {
+        if (name.isEmpty() || (name == null)) {
+            throw new IllegalArgumentException("Invalid event name!");
+        }
+        if (creatorName.isEmpty() || (creatorName == null)) {
+            throw new IllegalArgumentException("Invalid creator name!");
+        }
+        if (creator < 0) {
+            throw new IllegalArgumentException("Invalid creator ID!");
+        }
+        if (endDate.before(startDate)) {
+            throw new IllegalArgumentException("Invalid event dates!");
+        }
+        mEvtName = name;
+        mEvtCreator = creator;
+        mStartDate =
+            new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
+                startDate.get(Calendar.DATE), startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
 
-		mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
-		mEndDate = new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH),
-		    endDate.get(Calendar.DATE), endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
+        mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
+        mEndDate =
+            new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH),
+                endDate.get(Calendar.DATE), endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
 
-		mEndDate.set(GregorianCalendar.HOUR_OF_DAY, endDate.get(GregorianCalendar.HOUR_OF_DAY));
+        mEndDate.set(GregorianCalendar.HOUR_OF_DAY, endDate.get(GregorianCalendar.HOUR_OF_DAY));
 
-		mLocation = new Location(p);
-		mPositionName = "";
-		mCreatorName = creatorName;
-		mDescription = "Tomorrow near Lausanne";
-		mID = DEFAULT_ID;
-	}
+        mLocation = new Location(p);
+        mPositionName = "";
+        mCreatorName = creatorName;
+        mDescription = "Tomorrow near Lausanne";
+        mID = DEFAULT_ID;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
-		UserEvent other = (UserEvent) obj;
-		if (mEvtName == null) {
-			if (other.mEvtName != null) {
-				return false;
-			}
-		} else if (!mEvtName.equals(other.mEvtName)) {
-			return false;
-		}
-		if (mID != other.mID) {
-			return false;
-		}
-		return true;
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        UserEvent other = (UserEvent) obj;
+        if (mEvtName == null) {
+            if (other.mEvtName != null) {
+                return false;
+            }
+        } else if (!mEvtName.equals(other.mEvtName)) {
+            return false;
+        }
+        if (mID != other.mID) {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public long getCreator() {
-		return mEvtCreator;
-	}
+    @Override
+    public long getCreator() {
+        return mEvtCreator;
+    }
 
-	@Override
-	public String getCreatorName() {
-		return mCreatorName;
-	}
+    @Override
+    public String getCreatorName() {
+        return mCreatorName;
+    }
 
-	@Override
-	public String getDescription() {
-		return mDescription;
-	}
+    @Override
+    public String getDescription() {
+        return mDescription;
+    }
 
-	@Override
-	public GregorianCalendar getEndDate() {
-		return mEndDate;
-	}
+    @Override
+    public GregorianCalendar getEndDate() {
+        return mEndDate;
+    }
 
-	@Override
-	public long getID() {
-		return mID;
-	}
+    @Override
+    public long getID() {
+        return mID;
+    }
 
-	@Override
-	public LatLng getLatLng() {
-		return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-	}
+    @Override
+    public LatLng getLatLng() {
+        return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+    }
 
-	@Override
-	public Location getLocation() {
-		return mLocation;
-	}
+    @Override
+    public Location getLocation() {
+        return mLocation;
+    }
 
-	@Override
-	public String getName() {
-		return mEvtName;
-	}
+    @Override
+    public String getName() {
+        return mEvtName;
+    }
 
-	@Override
-	public Bitmap getPicture(Context context) {
-		// Returns a generic event picture
-		return BitmapFactory.decodeResource(context.getResources(), EVENT_ICON);
-	}
+    @Override
+    public Bitmap getPicture(Context context) {
+        // Returns a generic event picture
+        return BitmapFactory.decodeResource(context.getResources(), EVENT_ICON);
+    }
 
-	@Override
-	public String getPositionName() {
-		return mPositionName;
-	}
+    @Override
+    public String getPositionName() {
+        return mPositionName;
+    }
 
-	@Override
-	public String getShortInfos() {
-		return mDescription;
-	}
+    @Override
+    public String getShortInfos() {
+        return mDescription;
+    }
 
-	@Override
-	public GregorianCalendar getStartDate() {
-		return mStartDate;
-	}
+    @Override
+    public GregorianCalendar getStartDate() {
+        return mStartDate;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
 
-		result = (prime * result) + (mEvtName == null ? 0 : mEvtName.hashCode());
-		result = (prime * result) + (int) (mID ^ (mID >>> RIGHT_SHIFT_COUNT));
+        result = (prime * result) + (mEvtName == null ? 0 : mEvtName.hashCode());
+        result = (prime * result) + (int) (mID ^ (mID >>> RIGHT_SHIFT_COUNT));
 
-		return result;
-	}
+        return result;
+    }
 
-	@Override
-	public void setCreatorName(String name) {
-		if (name.isEmpty() || (name == null)) {
-			throw new IllegalArgumentException("Invalid creator name!");
-		}
-		mCreatorName = name;
-	}
+    @Override
+    public void setCreatorName(String name) {
+        if (name.isEmpty() || (name == null)) {
+            throw new IllegalArgumentException("Invalid creator name!");
+        }
+        mCreatorName = name;
+    }
 
-	@Override
-	public void setDescription(String desc) {
-		mDescription = desc;
-	}
+    @Override
+    public void setDescription(String desc) {
+        mDescription = desc;
+    }
 
-	@Override
-	public void setEndDate(GregorianCalendar newDate) {
-		if (newDate.before(mStartDate)) {
-			throw new IllegalArgumentException("Invalid event dates!");
-		}
-		mEndDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
-		    newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
-	}
+    @Override
+    public void setEndDate(GregorianCalendar newDate) {
+        if (newDate.before(mStartDate)) {
+            throw new IllegalArgumentException("Invalid event dates!");
+        }
+        mEndDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
+            newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
+    }
 
-	@Override
-	public void setID(long newID) {
-		mID = newID;
-	}
+    @Override
+    public void setID(long newID) {
+        mID = newID;
+    }
 
-	@Override
-	public void setLatitude(double y) {
-		mLocation.setLatitude(y);
-	}
+    @Override
+    public void setLatitude(double y) {
+        mLocation.setLatitude(y);
+    }
 
-	@Override
-	public void setLocation(Location p) {
-		mLocation.set(p);
-	}
+    @Override
+    public void setLocation(Location p) {
+        mLocation.set(p);
+    }
 
-	@Override
-	public void setLongitude(double x) {
-		mLocation.setLongitude(x);
+    @Override
+    public void setLongitude(double x) {
+        mLocation.setLongitude(x);
 
-	}
+    }
 
-	@Override
-	public void setName(String newName) {
-		if (newName.isEmpty() || (newName == null)) {
-			throw new IllegalArgumentException("Invalid event name!");
-		}
-		mEvtName = newName;
-	}
+    @Override
+    public void setName(String newName) {
+        if (newName.isEmpty() || (newName == null)) {
+            throw new IllegalArgumentException("Invalid event name!");
+        }
+        mEvtName = newName;
+    }
 
-	@Override
-	public void setPositionName(String posName) {
-		mPositionName = posName;
-	}
+    @Override
+    public void setPositionName(String posName) {
+        mPositionName = posName;
+    }
 
-	@Override
-	public void setStartDate(GregorianCalendar newDate) {
-		if (mEndDate.before(newDate)) {
-			throw new IllegalArgumentException("Invalid event dates!");
-		}
-		mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
-		    newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
-	}
+    @Override
+    public void setStartDate(GregorianCalendar newDate) {
+        if (mEndDate.before(newDate)) {
+            throw new IllegalArgumentException("Invalid event dates!");
+        }
+        mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
+            newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
+    }
 }
