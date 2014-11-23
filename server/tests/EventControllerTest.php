@@ -284,7 +284,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException SmartMap\Control\InvalidRequestException
+     * @expectedException SmartMap\Control\ServerFeedbackException
      * @expectedExceptionMessage You cannot edit this event.
      */
     public function testNotAllowedUpdateEvent()

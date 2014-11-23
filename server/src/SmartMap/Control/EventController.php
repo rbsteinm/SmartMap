@@ -2,6 +2,7 @@
 
 namespace SmartMap\Control;
 
+use Psr\Log\InvalidArgumentException;
 use SmartMap\DBInterface\DatabaseException;
 use SmartMap\DBInterface\EventRepository;
 use SmartMap\DBInterface\Event;
@@ -78,6 +79,7 @@ class EventController {
      * @param Request $request
      * @return JsonResponse
      * @throws ControlLogicException
+     * @throws ServerFeedbackException
      * @throws InvalidRequestException
      */
     public function updateEvent(Request $request)
@@ -103,7 +105,7 @@ class EventController {
 
             if ($userId != $event->getCreatorId())
             {
-                throw new InvalidRequestException('You cannot edit this event.');
+                throw new ServerFeedbackException('You cannot edit this event.');
             }
 
             // Update only the provided fields
