@@ -2,7 +2,9 @@ package ch.epfl.smartmap.servercom;
 
 import java.util.List;
 
+import android.graphics.Bitmap;
 import android.location.Location;
+import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -26,12 +28,20 @@ public interface SmartMapClient {
     User acceptInvitation(long id) throws SmartMapClientException;
 
     /**
-     * Confirm the server that the acception of the given friend was received
+     * Confirm the server that the acceptation of the given friend was received
      * 
      * @param id
      * @throws SmartMapClientException
      */
     void ackAcceptedInvitation(long id) throws SmartMapClientException;
+
+    /**
+     * Confirm the server that the removed friend was received
+     * 
+     * @param id
+     * @throws SmartMapClientException
+     */
+    void ackRemovedFriend(long id) throws SmartMapClientException;
 
     /**
      * Asks the server to allow the friend with id id to see the position
@@ -63,6 +73,15 @@ public interface SmartMapClient {
      * @throws SmartMapClientException
      */
     void authServer(String name, long facebookId, String fbAccessToken) throws SmartMapClientException;
+
+    /**
+     * Creates an event to be sent to the server
+     * 
+     * @param event
+     *            the event to create
+     * @throws SmartMapClientException
+     */
+    void createPublicEvent(Event event) throws SmartMapClientException;
 
     /**
      * Decline the invitation of the user with the given id
@@ -110,15 +129,37 @@ public interface SmartMapClient {
     void followFriend(long id) throws SmartMapClientException;
 
     /**
-     * Retrieve the invitations from the server, and also the list of users that
-     * accepted an invitation from us
-     * 
-     * @return a list of two lists of users: the first list is the list of the
-     *         inviters, the second list is the list of users that accepted our
-     *         invitation
+     * @return the list of the friends ids
      * @throws SmartMapClientException
      */
-    List<List<User>> getInvitations() throws SmartMapClientException;
+    List<Long> getFriendsIds() throws SmartMapClientException;
+
+    /**
+     * Retrieve the invitations from the server, and also the list of users that
+     * accepted an invitation from us, and the list of users that removed us from their friends
+     * 
+     * @return an object of type {@link NotificationBag} that encapsulates the 3 lists and offers methods
+     *         to ack the removed friends and the new friends. Must call this two methods to ack the server
+     *         that the new friends and the removed friends were retrieved
+     * @throws SmartMapClientException
+     */
+    NotificationBag getInvitations() throws SmartMapClientException;
+
+    /**
+     * @param id
+     * @return the profile picture of the friend with the given id
+     * @throws SmartMapClientException
+     */
+    Bitmap getProfilePicture(long id) throws SmartMapClientException;
+
+    /**
+     * @param latitude
+     * @param longitude
+     * @param radius
+     * @return the public events in the given radius centered at the given point
+     */
+    List<Event> getPublicEvents(double latitude, double longitude, double radius)
+        throws SmartMapClientException;
 
     /**
      * Asks to the server informations about the user with id id
@@ -166,9 +207,18 @@ public interface SmartMapClient {
     void unfollowFriend(long id) throws SmartMapClientException;
 
     /**
+     * Updates the given event in the server database
+     * 
+     * @param event
+     * @throws SmartMapClientException
+     */
+    void updateEvent(Event event) throws SmartMapClientException;
+
+    /**
      * Sends the latitude and longitude to the server
      * 
      * @throws SmartMapClientException
      */
     void updatePos(Location location) throws SmartMapClientException;
+
 }

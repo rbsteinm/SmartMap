@@ -12,8 +12,10 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.util.Log;
+import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserEvent;
 
 /**
  * A {@link SmartMapParser} implementation that parses objects from Json format
@@ -38,15 +40,16 @@ public class JsonSmartMapParser implements SmartMapParser {
     private static final int MAX_MINUTES_NUMBER = 59;
     private static final int MAX_SECONDS_NUMBER = 59;
 
-    private static final int UINITIALIZED_LATITUDE = -200;
+    private static final int UNITIALIZED_LATITUDE = -200;
     private static final int UNITIALIZED_LONGITUDE = -200;
     private static final int MIN_LATITUDE = -90;
     private static final int MAX_LATITUDE = 90;
     private static final int MIN_LONGITUDE = -180;
     private static final int MAX_LONGITUDE = 180;
     private static final int MAX_NAME_LENGTH = 60;
+    private static final int MAX_EVENT_DESCRIPTION_LENGTH = 255;
 
-    private static final String TAG = "JSON_PARSER";
+    // private static final String TAG = "JSON_PARSER";
 
     /**
      * Checks if the email address is valid
@@ -57,6 +60,12 @@ public class JsonSmartMapParser implements SmartMapParser {
      */
     private void checkEmail(String email) throws SmartMapParseException {
         // TODO
+    }
+
+    private void checkEventDescription(String description) throws SmartMapParseException {
+        if (description.length() > MAX_EVENT_DESCRIPTION_LENGTH) {
+            throw new SmartMapParseException("Description must not be longer than 255 characters");
+        }
     }
 
     /**
@@ -120,20 +129,9 @@ public class JsonSmartMapParser implements SmartMapParser {
      *             if invalid name
      */
     private void checkName(String name) throws SmartMapParseException {
-        if ((name.length() >= MAX_NAME_LENGTH) || (name.length() == 0)) {
-            throw new SmartMapParseException("invalid name");
+        if ((name.length() >= MAX_NAME_LENGTH) || (name.length() < 2)) {
+            throw new SmartMapParseException("invalid name : must be between 2 and 60 characters");
         }
-    }
-
-    /**
-     * Checks if the parameter "online" is valid
-     * 
-     * @param online
-     * @throws SmartMapParseException
-     *             if invalid parameter
-     */
-    private void checkOnLine(String online) throws SmartMapParseException {
-        // TODO
     }
 
     /**
@@ -162,8 +160,8 @@ public class JsonSmartMapParser implements SmartMapParser {
             JSONObject jsonObject = new JSONObject(s);
             status = jsonObject.getString("status");
             message = jsonObject.getString("message");
-            Log.d("serverMessage", message);
             Log.d("serverStatus", status);
+            Log.d("serverMessage", message);
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
@@ -175,8 +173,15 @@ public class JsonSmartMapParser implements SmartMapParser {
         }
     }
 
+    private void checkStartingAndEndDate(GregorianCalendar startingDate, GregorianCalendar endDate)
+        throws SmartMapParseException {
+        if (!startingDate.before(endDate)) {
+            throw new SmartMapParseException("Starting date must be before end date");
+        }
+    }
+
     /**
-     * Transforms a date in format YYYY:MM:DD hh-mm-ss into a GregorianCalendar
+     * Transforms a date in format YYYY-MM-DD hh:mm:ss into a GregorianCalendar
      * instance.
      * 
      * @author Pamoi
@@ -242,6 +247,84 @@ public class JsonSmartMapParser implements SmartMapParser {
         return g;
     }
 
+    @Override
+    public Event parseEvent(String s) throws SmartMapParseException {
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(s);
+        } catch (JSONException e) {
+            throw new SmartMapParseException(e);
+        }
+        return this.parseEventFromJSON(jsonObject);
+    }
+
+    private Event parseEventFromJSON(JSONObject jsonObject) throws SmartMapParseException {
+        long id = -1;
+        long creatorId = -1;
+        GregorianCalendar startingDate = null;
+        GregorianCalendar endDate = null;
+        double latitude = UNITIALIZED_LATITUDE;
+        double longitude = UNITIALIZED_LONGITUDE;
+        String positionName = null;
+        String name = null;
+        String description = "";
+
+        try {
+            id = jsonObject.getLong("id");
+            creatorId = jsonObject.getLong("creatorId");
+            startingDate = this.parseDate(jsonObject.getString("startingDate"));
+            endDate = this.parseDate(jsonObject.getString("endingDate"));
+            latitude = jsonObject.getDouble("latitude");
+            longitude = jsonObject.getDouble("longitude");
+            positionName = jsonObject.getString("positionName");
+            name = jsonObject.getString("name");
+            description = jsonObject.getString("description");
+        } catch (JSONException e) {
+            throw new SmartMapParseException(e);
+        }
+
+        this.checkId(id);
+        this.checkId(creatorId);
+        this.checkStartingAndEndDate(startingDate, endDate);
+        this.checkLatitude(latitude);
+        this.checkLongitude(longitude);
+        this.checkName(positionName);
+        this.checkName(name);
+        this.checkEventDescription(description);
+        Event event =
+            new UserEvent(name, creatorId, Friend.NO_NAME, startingDate, endDate, new Location(
+                "SmartMapServer"));
+        event.setID(id);
+        event.setPositionName(positionName);
+        event.setDescription(description);
+        event.getLocation().setLatitude(latitude);
+        event.getLocation().setLongitude(longitude);
+
+        return event;
+    }
+
+    @Override
+    public List<Event> parseEventList(String s) throws SmartMapParseException {
+        List<Event> events = new ArrayList<Event>();
+
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+
+            JSONArray eventsArray = jsonObject.getJSONArray("events");
+
+            for (int i = 0; i < eventsArray.length(); i++) {
+                JSONObject eventJSON = eventsArray.getJSONObject(i);
+                Event event = this.parseEventFromJSON(eventJSON);
+                events.add(event);
+                // Log.d("events", event.getName());
+            }
+        } catch (JSONException e) {
+            throw new SmartMapParseException(e);
+        }
+
+        return events;
+    }
+
     /*
      * (non-Javadoc)
      * @see
@@ -270,60 +353,41 @@ public class JsonSmartMapParser implements SmartMapParser {
         String name = null;
         String phoneNumber = null;
         String email = null;
-        String online = null;
-        double latitude = UINITIALIZED_LATITUDE;
+        double latitude = UNITIALIZED_LATITUDE;
         double longitude = UNITIALIZED_LONGITUDE;
-        String datetime = null;
 
         try {
             id = jsonObject.getLong("id");
             name = jsonObject.getString("name");
-            latitude = jsonObject.optDouble("latitude", UINITIALIZED_LATITUDE);
+            latitude = jsonObject.optDouble("latitude", UNITIALIZED_LATITUDE);
             longitude = jsonObject.optDouble("longitude", UNITIALIZED_LONGITUDE);
             phoneNumber = jsonObject.optString("phoneNumber", null);
             email = jsonObject.optString("email", null);
-            online = jsonObject.optString("online", null);
-            datetime = jsonObject.optString("lastUpdate", null);
-            // something else??
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
 
         this.checkId(id);
         this.checkName(name);
-        Log.d(TAG, Long.toString(id));
-        Log.d(TAG, name);
+
         Friend friend = new Friend(id, name);
 
-        if (latitude != UINITIALIZED_LATITUDE) {
+        if (latitude != UNITIALIZED_LATITUDE) {
             this.checkLatitude(latitude);
-            Log.d(TAG, Double.toString(latitude));
             friend.setLatitude(latitude);
         }
         if (longitude != UNITIALIZED_LONGITUDE) {
             this.checkLongitude(longitude);
-            Log.d(TAG, Double.toString(longitude));
             friend.setLongitude(longitude);
         }
 
         if (phoneNumber != null) {
             this.checkPhoneNumber(phoneNumber);
-            Log.d(TAG, phoneNumber);
             friend.setNumber(phoneNumber);
         }
         if (email != null) {
             this.checkEmail(email);
-            Log.d(TAG, email);
             friend.setEmail(email);
-        }
-        if (online != null) {
-            this.checkOnLine(online);
-            // TODO see with Mathieu
-        }
-        if (datetime != null) {
-            GregorianCalendar lastSeen = this.parseDate(datetime);
-            this.checkLastSeen(lastSeen);
-            friend.setLastSeen(lastSeen);
         }
 
         return friend;
@@ -353,14 +417,36 @@ public class JsonSmartMapParser implements SmartMapParser {
             throw new SmartMapParseException(e);
         }
 
-        Log.d(TAG, Integer.toString(friends.size()));
         return friends;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapParser#parseIds(java.lang.String)
+     */
+    @Override
+    public List<Long> parseIds(String s, String key) throws SmartMapParseException {
+        List<Long> ids = new ArrayList<Long>();
+
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+
+            JSONArray idsArray = jsonObject.getJSONArray(key);
+
+            for (int i = 0; i < idsArray.length(); i++) {
+                long id = idsArray.getLong(i);
+                this.checkId(id);
+                ids.add(id);
+            }
+
+        } catch (JSONException e) {
+            throw new SmartMapParseException(e);
+        }
+        return ids;
     }
 
     @Override
     public List<User> parsePositions(String s) throws SmartMapParseException {
-
-        Log.d(TAG, "Parsing positions.");
 
         List<User> users = new ArrayList<User>();
 
@@ -384,16 +470,21 @@ public class JsonSmartMapParser implements SmartMapParser {
                 Location location = new Location("SmartMapServers");
                 location.setLatitude(latitude);
                 location.setLongitude(longitude);
+                User user = null;
 
-                User user = new Friend(userId, Friend.NO_NAME);
+                user = new Friend(userId, Friend.NO_NAME);
+
                 user.setLocation(location);
                 user.setLastSeen(lastSeen);
 
                 users.add(user);
             }
+
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
+
         return users;
     }
+
 }

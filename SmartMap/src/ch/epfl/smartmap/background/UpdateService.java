@@ -117,7 +117,7 @@ public class UpdateService extends Service {
             List<User> list = new ArrayList<User>();
             try {
                 // Second list, the list of accepted invitations
-                list = mClient.getInvitations().get(1);
+                list = mClient.getInvitations().getNewFriends();
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't retrieve replies!");
             }
@@ -147,7 +147,7 @@ public class UpdateService extends Service {
             List<User> list = new ArrayList<User>();
             try {
                 // First list, the list of received invitations
-                list = mClient.getInvitations().get(0);
+                list = mClient.getInvitations().getInvitingUsers();
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't retrieve invites!");
             }

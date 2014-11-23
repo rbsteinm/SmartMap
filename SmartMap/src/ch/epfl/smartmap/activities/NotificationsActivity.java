@@ -1,8 +1,5 @@
 package ch.epfl.smartmap.activities;
 
-import java.util.Collections;
-import java.util.List;
-
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +12,9 @@ import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.gui.InvitationListItemAdapter;
+import ch.epfl.smartmap.gui.FriendListItemAdapter;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
@@ -52,24 +50,26 @@ public class NotificationsActivity extends ListActivity {
      * 
      * @author marion-S
      */
-    private class RefreshInvitationsList extends AsyncTask<String, Void, List<List<User>>> {
+    private class RefreshInvitationsList extends AsyncTask<String, Void, NotificationBag> {
 
         @Override
-        protected List<List<User>> doInBackground(String... params) {
+        protected NotificationBag doInBackground(String... params) {
             try {
 
                 return mNetworkClient.getInvitations();
 
             } catch (SmartMapClientException e) {
-                return Collections.emptyList();
+                // FIXME what to return??
+                return null;
             }
         }
 
         @Override
-        protected void onPostExecute(List<List<User>> list) {
-            super.onPostExecute(list);
-            NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, list.get(0)));
-            for (User newFriend : list.get(1)) {
+        protected void onPostExecute(NotificationBag notificationBag) {
+            super.onPostExecute(notificationBag);
+            NotificationsActivity.this.setListAdapter(new FriendListItemAdapter(mContext, notificationBag
+                .getInvitingUsers()));
+            for (User newFriend : notificationBag.getNewFriends()) {
                 mDbHelper.addUser(newFriend);
                 new AckAcceptedInvitations().execute(newFriend.getID());
             }

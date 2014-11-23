@@ -86,4 +86,5 @@ public class FriendsTab extends ListFragment implements FriendsListener {
         super.onResume();
         this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
     }
+
 }
