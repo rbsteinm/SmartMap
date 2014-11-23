@@ -13,7 +13,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public interface User {
+public interface User extends Displayable {
 
     /**
      * @return The user's ID
@@ -23,6 +23,7 @@ public interface User {
     /**
      * @return The user's name
      */
+    @Override
     String getName();
 
     /**
@@ -43,6 +44,7 @@ public interface User {
     /**
      * @return The user's latitude and longitude
      */
+    @Override
     LatLng getLatLng();
 
     /**
@@ -53,6 +55,7 @@ public interface User {
     /**
      * @return A user picture to display
      */
+    @Override
     Bitmap getPicture(Context context);
 
     /**

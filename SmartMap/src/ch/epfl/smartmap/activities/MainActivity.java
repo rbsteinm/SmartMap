@@ -36,13 +36,13 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.FriendsLocationListener;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.cache.UserEvent;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SearchPanel;
 import ch.epfl.smartmap.gui.SideMenu;
@@ -102,8 +102,8 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
     private DatabaseHelper mDbHelper;
     private SideMenu mSideMenu;
     private GoogleMap mGoogleMap;
-    private DefaultMarkerManager<Friend> mFriendMarkerManager;
-    private DefaultMarkerManager<UserEvent> mEventMarkerManager;
+    private DefaultMarkerManager<User> mFriendMarkerManager;
+    private DefaultMarkerManager<Event> mEventMarkerManager;
     private DefaultZoomManager mMapZoomer;
     private SupportMapFragment mFragmentMap;
     private SearchEngine mSearchEngine;
@@ -136,7 +136,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
 
         mDbHelper = DatabaseHelper.getInstance();
 
-        mSearchEngine = new MockSearchEngine(this.getVisibleUsers(mDbHelper.getAllUsers()));
+        mSearchEngine = new MockSearchEngine(this.sparseArrayToList(mDbHelper.getAllUsers()));
         mSearchLayout.setSearchEngine(mSearchEngine);
 
         if (savedInstanceState == null) {
@@ -145,17 +145,11 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
 
         if (mGoogleMap != null) {
             // Set different tools for the GoogleMap
-            mEventMarkerManager = new DefaultMarkerManager<UserEvent>(mGoogleMap);
-            mFriendMarkerManager = new DefaultMarkerManager<Friend>(mGoogleMap);
+            mEventMarkerManager = new DefaultMarkerManager<Event>(mGoogleMap);
+            mFriendMarkerManager = new DefaultMarkerManager<User>(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
 
-            // Zoom according to markers
-            List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
-            allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
-            Intent startingIntent = this.getIntent();
-            if (startingIntent.getParcelableExtra("location") == null) {
-                mMapZoomer.zoomAccordingToMarkers(allMarkers);
-            }
+            this.initializeMarkers();
 
             // Add listeners to the GoogleMap
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClick());
@@ -283,7 +277,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         @Override
         public void onReceive(Context context, Intent intent) {
             mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
-                MainActivity.this.getVisibleUsers(mDbHelper.getAllUsers()));
+                MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
         }
 
     };
@@ -295,7 +289,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
     @Override
     public void onChange() {
         mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
-            MainActivity.this.getVisibleUsers(mDbHelper.getAllUsers()));
+            MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
     }
 
     public Context getContext() {
@@ -347,15 +341,27 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         }
     }
 
-    private List<Friend> getVisibleUsers(LongSparseArray<User> usersSparseArray) {
-        List<Friend> visibleUsers = new ArrayList<Friend>();
+    public void initializeMarkers() {
+        mEventMarkerManager.updateMarkers(this, mDbHelper.getAllEvents());
+        mFriendMarkerManager.updateMarkers(this, this.sparseArrayToList(mDbHelper.getAllUsers()));
+
+        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
+        allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
+        Intent startingIntent = this.getIntent();
+        if (startingIntent.getParcelableExtra("location") == null) {
+            mMapZoomer.zoomAccordingToMarkers(allMarkers);
+        }
+    }
+
+    private List<User> sparseArrayToList(LongSparseArray<User> usersSparseArray) {
+        List<User> users = new ArrayList<User>();
         for (int i = 0; i < usersSparseArray.size(); i++) {
             User user = usersSparseArray.valueAt(i);
-            if (user.isVisible()) {
-                visibleUsers.add((Friend) user);
-            }
+
+            users.add(user);
+
         }
-        return visibleUsers;
+        return users;
     }
 
     // the 3 methods below will be removed
@@ -582,12 +588,12 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
                 Displayable friendClicked = mFriendMarkerManager.getItemForMarker(arg0);
                 // TODO See with Nicolas : PB with the zoom : getLatLng returns
                 // 0,0
-                // mMapZoomer.zoomOnLocation(friendClicked.getLatLng());
+                mMapZoomer.zoomOnLocation(arg0.getPosition());
                 MainActivity.this.setItemMenu(friendClicked);
                 return true;
             } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
                 Displayable eventClicked = mEventMarkerManager.getItemForMarker(arg0);
-                // mMapZoomer.zoomOnLocation(eventClicked.getLatLng());
+                mMapZoomer.zoomOnLocation(arg0.getPosition());
                 MainActivity.this.setItemMenu(eventClicked);
                 return true;
             }
