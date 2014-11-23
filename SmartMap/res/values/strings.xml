@@ -95,6 +95,9 @@
     <string name="addEventDescription">Description (optional)</string>
     <string name="addEventButtonPickLocation">Set location</string>
     
+    <!-- EventsListItemadapter -->
+    <string name="events_list_item_today">Today</string>
+    
     <!--  InformationAvtivity -->
     <string name="title_activity_information">InformationActivity</string>
 
