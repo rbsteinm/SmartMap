@@ -21,17 +21,4 @@
         android:textSize="20sp" >
     </TextView>
 
-    <TextView
-        android:id="@+id/side_menu_img_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="200dp"
-        android:gravity="center"
-        android:textSize="30sp"
-        android:scaleX="0.5"
-        android:scaleY="0.5"
-        android:textColor="#FFFFFF"
-        android:background="@drawable/red_circle_notification" >
-    </TextView>
-
 </FrameLayout>

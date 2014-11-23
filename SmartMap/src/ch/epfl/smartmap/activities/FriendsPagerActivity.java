@@ -19,8 +19,7 @@ import ch.epfl.smartmap.gui.PagerAdapter;
  * 
  * @author rbsteinm
  */
-public class FriendsPagerActivity extends FragmentActivity implements
-    ActionBar.TabListener {
+public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 
 	private ViewPager mPager;
 	private ActionBar mActionBar;
@@ -37,21 +36,18 @@ public class FriendsPagerActivity extends FragmentActivity implements
 		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		// Set action bar and tab color to main color
-		mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources()
-		    .getColor(R.color.main_blue)));
-		mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this
-		    .getResources().getColor(R.color.main_blue)));
+		mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+		mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this.getResources().getColor(
+		    R.color.main_blue)));
 
-		PagerAdapter pageAdapter = new PagerAdapter(this,
-		    this.getSupportFragmentManager());
+		PagerAdapter pageAdapter = new PagerAdapter(this, this.getSupportFragmentManager());
 		mPager.setAdapter(pageAdapter);
 		mActionBar.setHomeButtonEnabled(true);
 		mActionBar.setDisplayHomeAsUpEnabled(true);
 
 		// Adding Tabs
 		for (String tabName : mTabs) {
-			mActionBar.addTab(mActionBar.newTab().setText(tabName)
-			    .setTabListener(this));
+			mActionBar.addTab(mActionBar.newTab().setText(tabName).setTabListener(this));
 		}
 
 		/**

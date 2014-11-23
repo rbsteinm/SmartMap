@@ -45,8 +45,7 @@ public class SettingsManager {
 	@Deprecated
 	public SettingsManager(Context context) {
 		mContext = context;
-		mSharedPref = mContext.getSharedPreferences(PREFS_NAME,
-		    Context.MODE_PRIVATE);
+		mSharedPref = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 		mEditor = mSharedPref.edit();
 	}
 
@@ -130,10 +129,8 @@ public class SettingsManager {
 	public Location getLocation() {
 		Location loc = new Location("");
 		// Shared prefs can't store doubles
-		loc.setLongitude(Double.longBitsToDouble(mSharedPref.getLong(LONGITUDE,
-		    0)));
-		loc.setLatitude(Double.longBitsToDouble(mSharedPref
-		    .getLong(LATITUDE, 0)));
+		loc.setLongitude(Double.longBitsToDouble(mSharedPref.getLong(LONGITUDE, 0)));
+		loc.setLatitude(Double.longBitsToDouble(mSharedPref.getLong(LATITUDE, 0)));
 		return loc;
 	}
 
@@ -248,10 +245,8 @@ public class SettingsManager {
 	 * @return True if the location was stores successfully
 	 */
 	public boolean setLocation(Location loc) {
-		mEditor.putLong(LONGITUDE,
-		    Double.doubleToRawLongBits(loc.getLongitude()));
-		mEditor
-		    .putLong(LATITUDE, Double.doubleToRawLongBits(loc.getLatitude()));
+		mEditor.putLong(LONGITUDE, Double.doubleToRawLongBits(loc.getLongitude()));
+		mEditor.putLong(LATITUDE, Double.doubleToRawLongBits(loc.getLatitude()));
 		return mEditor.commit();
 	}
 

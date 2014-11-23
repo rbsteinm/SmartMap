@@ -46,22 +46,18 @@ public class UserEvent implements Event, Searchable, Displayable {
 	 * @param p
 	 *            The event's location on the map
 	 */
-	public UserEvent(String name, long creator, String creatorName,
-	    GregorianCalendar startDate, GregorianCalendar endDate, Location p) {
+	public UserEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
+	    GregorianCalendar endDate, Location p) {
 		mEvtName = name;
 		mEvtCreator = creator;
-		mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR),
-		    startDate.get(Calendar.MONTH), startDate.get(Calendar.DATE),
-		    startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
+		mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
+		    startDate.get(Calendar.DATE), startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
 
-		mStartDate.set(GregorianCalendar.HOUR_OF_DAY,
-		    startDate.get(GregorianCalendar.HOUR_OF_DAY));
-		mEndDate = new GregorianCalendar(endDate.get(Calendar.YEAR),
-		    endDate.get(Calendar.MONTH), endDate.get(Calendar.DATE),
-		    endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
+		mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
+		mEndDate = new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH),
+		    endDate.get(Calendar.DATE), endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
 
-		mEndDate.set(GregorianCalendar.HOUR_OF_DAY,
-		    endDate.get(GregorianCalendar.HOUR_OF_DAY));
+		mEndDate.set(GregorianCalendar.HOUR_OF_DAY, endDate.get(GregorianCalendar.HOUR_OF_DAY));
 
 		mLocation = new Location(p);
 		mPositionName = "";
@@ -168,8 +164,7 @@ public class UserEvent implements Event, Searchable, Displayable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result)
-		    + ((mEvtName == null) ? 0 : mEvtName.hashCode());
+		result = (prime * result) + ((mEvtName == null) ? 0 : mEvtName.hashCode());
 		result = (prime * result) + (int) (mID ^ (mID >>> RIGHT_SHIFT_COUNT));
 		return result;
 	}
@@ -186,9 +181,8 @@ public class UserEvent implements Event, Searchable, Displayable {
 
 	@Override
 	public void setEndDate(GregorianCalendar newDate) {
-		mEndDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH),
-		    newDate.get(Calendar.DATE), newDate.get(Calendar.HOUR),
-		    newDate.get(Calendar.MINUTE));
+		mEndDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
+		    newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
 	}
 
 	@Override
@@ -224,8 +218,7 @@ public class UserEvent implements Event, Searchable, Displayable {
 
 	@Override
 	public void setStartDate(GregorianCalendar newDate) {
-		mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH),
-		    newDate.get(Calendar.DATE), newDate.get(Calendar.HOUR),
-		    newDate.get(Calendar.MINUTE));
+		mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
+		    newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
 	}
 }

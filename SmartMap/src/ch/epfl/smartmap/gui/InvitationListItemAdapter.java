@@ -3,7 +3,6 @@ package ch.epfl.smartmap.gui;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +13,13 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * Customized adapter that displays a list of users in a target activity
- * This adapter dynamically creates a row in the activity for each user
- * It displays in each row: user name, user status, TODO user picture
+ * Customized adapter that displays a list of notification in a target activity
+ * This adapter dynamically creates a row in the activity for each notification
+ * It displays in each row: user name, user status
  * 
- * @author rbsteinm
+ * @author agpmilli
  */
-public class FriendListItemAdapter extends ArrayAdapter<User> {
+public class InvitationListItemAdapter extends ArrayAdapter<User> {
 
 	private final Context mContext;
 	private final List<User> mItemsArrayList;
@@ -31,9 +30,9 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
 	 * @param userList
 	 *            list of users to display
 	 */
-	public FriendListItemAdapter(Context context, List<User> itemsArrayList) {
+	public InvitationListItemAdapter(Context context, List<User> itemsArrayList) {
 
-		super(context, R.layout.gui_friend_list_item, itemsArrayList);
+		super(context, R.layout.gui_notification_list_item, itemsArrayList);
 
 		mContext = context;
 		mItemsArrayList = itemsArrayList;
@@ -45,33 +44,26 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
 	 * android.view.ViewGroup)
 	 * callback function automatically called one time for each user in the list
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		// Create inflater,get item to construct
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
+		convertView = inflater.inflate(R.layout.gui_notification_list_item, parent, false);
 
 		// Get FriendItem fields
-		TextView name = (TextView) convertView.findViewById(R.id.activity_friends_name);
-		TextView isOnline = (TextView) convertView.findViewById(R.id.activity_friends_isOnline);
-		ImageView picture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
+		TextView title = (TextView) convertView.findViewById(R.id.activity_notification_title);
+		TextView text = (TextView) convertView.findViewById(R.id.activity_notification_text);
+		ImageView picture = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
 
 		// Set the User's ID to the tag of its View
 		convertView.setTag(mItemsArrayList.get(position).getID());
 
 		// Set fields with friend attributes
-		name.setText(mItemsArrayList.get(position).getName());
+		title.setText(mContext.getString(R.string.notification_invitefriend_title));
 		picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
-		String status;
-		if (mItemsArrayList.get(position).isOnline()) {
-			status = "online";
-			isOnline.setTextColor(Color.GREEN);
-		} else {
-			status = "offline";
-		}
-		isOnline.setText(status);
+		text.setText(mItemsArrayList.get(position).getName() + " "
+		    + mContext.getString(R.string.notification_friend_invitation));
 
 		return convertView;
 	}

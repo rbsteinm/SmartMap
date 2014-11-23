@@ -156,8 +156,7 @@ public class UpdateService extends Service {
 
 	private final SettingsManager mManager = SettingsManager.getInstance();
 
-	private final NetworkSmartMapClient mClient = NetworkSmartMapClient
-	    .getInstance();
+	private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
 
 	// TWEAK FOR THE DEMO: MUST BE REMOVED AND REPLACED AFTERWARDS !!!
 	private final Set<Long> notifiedInvitations = new HashSet<Long>();

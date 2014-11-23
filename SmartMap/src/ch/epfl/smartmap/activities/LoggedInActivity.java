@@ -26,8 +26,7 @@ public class LoggedInActivity extends Activity {
 		// get the value of the user string
 		String userName = startingIntent.getExtras().getString("name");
 		// String userName = startingIntent.getStringExtra("name");
-		Toast.makeText(this, "You logged in successfully, " + userName,
-		    Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "You logged in successfully, " + userName, Toast.LENGTH_LONG).show();
 		this.finish();
 	}
 

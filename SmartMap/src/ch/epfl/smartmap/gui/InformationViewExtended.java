@@ -15,13 +15,12 @@ public class InformationViewExtended extends LinearLayout {
 	@SuppressWarnings("unused")
 	private static final String TAG = "INFORMATION VIEW EXTENDED";
 
-	public InformationViewExtended(Context context, Displayable item,
-	    SlidingPanel panel) {
+	public InformationViewExtended(Context context, Displayable item, SlidingPanel panel) {
 		super(context);
 		// Layout Settings
 		this.setOrientation(HORIZONTAL);
-		this.setLayoutParams(new LinearLayout.LayoutParams(
-		    LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+		    LayoutParams.MATCH_PARENT));
 		this.setBackgroundResource(R.color.light_blue);
 		this.addView(new TextView(context));
 	}

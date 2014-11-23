@@ -13,8 +13,7 @@ public abstract class SearchResultViewFactory {
 	@SuppressWarnings("unused")
 	private static final String TAG = "SEARCH_RESULT_VIEW_FACTORY";
 
-	public static SearchResultView getSearchResultView(Context context,
-	    Object item) {
+	public static SearchResultView getSearchResultView(Context context, Object item) {
 		if (item instanceof Friend) {
 			return new FriendSearchResultView(context, (Friend) item);
 		} else {

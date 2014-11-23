@@ -3,11 +3,8 @@ package ch.epfl.smartmap.activities;
 import java.util.Collections;
 import java.util.List;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,12 +12,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.gui.FriendListItemAdapter;
+import ch.epfl.smartmap.gui.InvitationListItemAdapter;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -31,12 +26,9 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class NotificationsActivity extends ListActivity {
 
-	private TextView mNotificationText;
-	private TextView mNotificationTitle;
 	private Context mContext;
 	private DatabaseHelper mDbHelper;
 	private NetworkSmartMapClient mNetworkClient;
-	private List<User> mInvitationList;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,18 +64,8 @@ public class NotificationsActivity extends ListActivity {
 		if (id == R.id.action_settings) {
 			return true;
 		}
-
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				this.finish();
-				break;
-			case R.id.showEventsMenuNewEvent:
-				Intent showEventIntent = new Intent(mContext,
-				    AddEventActivity.class);
-				this.startActivity(showEventIntent);
-			default:
-				// No other menu items!
-				break;
+		if (id == android.R.id.home) {
+			this.finish();
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -91,30 +73,8 @@ public class NotificationsActivity extends ListActivity {
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		final User user = (User) this.findViewById(position).getTag();
-
-		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-		alertDialog.setTitle(user.getName() + " "
-		    + mContext.getString(R.string.notification_invitation_accepted));
-		// alertDialog.setMessage(message);
-		final Activity activity = this;
-		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show invitation",
-		    new DialogInterface.OnClickListener() {
-
-			    @Override
-			    public void onClick(DialogInterface dialog, int id) {
-
-				    Toast.makeText(activity, "Opening event on the map...",
-				        Toast.LENGTH_SHORT).show();
-
-				    Intent showFriendIntent = new Intent(mContext,
-				        MainActivity.class);
-				    NotificationsActivity.this.startActivity(showFriendIntent);
-
-			    }
-		    });
-
-		alertDialog.show();
+		Intent showFriendIntent = new Intent(mContext, FriendsPagerActivity.class);
+		NotificationsActivity.this.startActivity(showFriendIntent);
 
 		super.onListItemClick(l, v, position, id);
 	}
@@ -126,8 +86,7 @@ public class NotificationsActivity extends ListActivity {
 	 * 
 	 * @author marion-S
 	 */
-	private class RefreshInvitationsList extends
-	    AsyncTask<String, Void, List<List<User>>> {
+	private class RefreshInvitationsList extends AsyncTask<String, Void, List<List<User>>> {
 
 		@Override
 		protected List<List<User>> doInBackground(String... params) {
@@ -143,8 +102,7 @@ public class NotificationsActivity extends ListActivity {
 		@Override
 		protected void onPostExecute(List<List<User>> list) {
 			super.onPostExecute(list);
-			NotificationsActivity.this
-			    .setListAdapter(new FriendListItemAdapter(mContext, list.get(0)));
+			NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, list.get(0)));
 			for (User newFriend : list.get(1)) {
 				mDbHelper.addUser(newFriend);
 				new AckAcceptedInvitations().execute(newFriend.getID());

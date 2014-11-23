@@ -47,8 +47,7 @@ public class AddFriendActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		this.getMenuInflater().inflate(R.menu.add_friend, menu);
-		mSearchBar = (SearchView) menu.findItem(
-		    R.id.add_friend_activity_searchBar).getActionView();
+		mSearchBar = (SearchView) menu.findItem(R.id.add_friend_activity_searchBar).getActionView();
 		this.setSearchBarListener();
 		return true;
 	}
@@ -66,13 +65,11 @@ public class AddFriendActivity extends ListActivity {
 	}
 
 	@Override
-	protected void onListItemClick(ListView listView, View view, int position,
-	    long id) {
+	protected void onListItemClick(ListView listView, View view, int position, long id) {
 		long userId = (Long) view.getTag();
 		RelativeLayout rl = (RelativeLayout) view;
 		TextView tv = (TextView) rl.getChildAt(1);
-		assert (tv instanceof TextView)
-		    && (tv.getId() == R.id.activity_friends_name);
+		assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
 		String name = tv.getText().toString();
 		this.displayConfirmationDialog(name, userId);
 	}
@@ -107,13 +104,12 @@ public class AddFriendActivity extends ListActivity {
 		});
 
 		// Add negative button
-		builder.setNegativeButton("Cancel",
-		    new DialogInterface.OnClickListener() {
-			    @Override
-			    public void onClick(DialogInterface dialog, int id) {
-				    dialog.cancel();
-			    }
-		    });
+		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+			}
+		});
 
 		// display the AlertDialog
 		builder.create().show();
@@ -134,8 +130,7 @@ public class AddFriendActivity extends ListActivity {
 				if (params[0].equals("")) {
 					return Collections.emptyList();
 				} else {
-					return NetworkSmartMapClient.getInstance().findUsers(
-					    params[0]);
+					return NetworkSmartMapClient.getInstance().findUsers(params[0]);
 				}
 			} catch (SmartMapClientException e) {
 				return Collections.emptyList();
@@ -145,8 +140,8 @@ public class AddFriendActivity extends ListActivity {
 		@Override
 		protected void onPostExecute(List<User> refreshedList) {
 			super.onPostExecute(refreshedList);
-			AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(
-			    AddFriendActivity.this, refreshedList));
+			AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
+			    refreshedList));
 		}
 	}
 
@@ -164,8 +159,7 @@ public class AddFriendActivity extends ListActivity {
 			try {
 				NetworkSmartMapClient.getInstance().inviteFriend(params[0]);
 				confirmString = "You sent a friend request to "
-				    + NetworkSmartMapClient.getInstance()
-				        .getUserInfo(params[0]).getName();
+				    + NetworkSmartMapClient.getInstance().getUserInfo(params[0]).getName();
 			} catch (SmartMapClientException e) {
 				// confirmString = "Error, friend request wasn't sent";
 				confirmString = e.getMessage();
@@ -175,8 +169,8 @@ public class AddFriendActivity extends ListActivity {
 
 		@Override
 		protected void onPostExecute(String confirmString) {
-			Toast.makeText(AddFriendActivity.this.getApplicationContext(),
-			    confirmString, Toast.LENGTH_LONG).show();
+			Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG)
+			    .show();
 		}
 	}
 }

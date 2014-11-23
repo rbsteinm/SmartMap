@@ -41,8 +41,8 @@ public class SearchResultViewGroup extends LinearLayout {
 	public SearchResultViewGroup(Context context, List<Friend> friendsList) {
 		super(context);
 
-		this.setLayoutParams(new LinearLayout.LayoutParams(
-		    LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+		    LayoutParams.MATCH_PARENT));
 		this.setOrientation(VERTICAL);
 		this.setBackgroundResource(R.drawable.view_group_background);
 		mContext = context;
@@ -62,8 +62,7 @@ public class SearchResultViewGroup extends LinearLayout {
 		mCurrentItemNb = Math.min(ITEMS_PER_PAGE, mList.size());
 
 		for (int i = 0; i < mCurrentItemNb; i++) {
-			this.addView(SearchResultViewFactory.getSearchResultView(mContext,
-			    mList.get(i)));
+			this.addView(SearchResultViewFactory.getSearchResultView(mContext, mList.get(i)));
 			this.addView(new Divider(mContext));
 		}
 
@@ -78,12 +77,10 @@ public class SearchResultViewGroup extends LinearLayout {
 	public void showMoreResults() {
 		if (mState != State.MAX) {
 			mState = State.EXPANDED;
-			int newItemsNb = Math.min(ITEMS_PER_PAGE, mList.size()
-			    - mCurrentItemNb);
+			int newItemsNb = Math.min(ITEMS_PER_PAGE, mList.size() - mCurrentItemNb);
 			this.removeViewAt(this.getChildCount() - 1);
 			for (int i = mCurrentItemNb; i < mCurrentItemNb + newItemsNb; i++) {
-				this.addView(SearchResultViewFactory.getSearchResultView(
-				    mContext, mList.get(i)));
+				this.addView(SearchResultViewFactory.getSearchResultView(mContext, mList.get(i)));
 				this.addView(new Divider(mContext));
 			}
 			mCurrentItemNb += newItemsNb;
@@ -109,8 +106,7 @@ public class SearchResultViewGroup extends LinearLayout {
 	 * @author jfperren
 	 */
 	private static class MoreResultsButton extends Button {
-		public MoreResultsButton(Context context,
-		    final SearchResultViewGroup searchResultViewGroup) {
+		public MoreResultsButton(Context context, final SearchResultViewGroup searchResultViewGroup) {
 			super(context);
 			this.setText("See more");
 			this.setBackgroundResource(0);

@@ -26,12 +26,9 @@ public class SideMenu extends DrawerLayout {
 	 */
 	public SideMenu(Context context) {
 		super(context);
-		mDrawerLayout = (DrawerLayout) ((Activity) context)
-		    .findViewById(R.id.drawer_layout);
-		mListItemsNames = this.getResources().getStringArray(
-		    R.array.sideMenuElements);
-		mDrawerListView = (ListView) ((Activity) context)
-		    .findViewById(R.id.left_drawer_listView);
+		mDrawerLayout = (DrawerLayout) ((Activity) context).findViewById(R.id.drawer_layout);
+		mListItemsNames = this.getResources().getStringArray(R.array.sideMenuElements);
+		mDrawerListView = (ListView) ((Activity) context).findViewById(R.id.left_drawer_listView);
 		mContext = context;
 	}
 
@@ -40,8 +37,7 @@ public class SideMenu extends DrawerLayout {
 	 */
 	public void initializeDrawerLayout() {
 		// Set the adapter for the listView
-		mDrawerListView.setAdapter(new SideMenuAdapter(mContext,
-		    mListItemsNames));
+		mDrawerListView.setAdapter(new SideMenuAdapter(mContext, mListItemsNames));
 		mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
 	}
 

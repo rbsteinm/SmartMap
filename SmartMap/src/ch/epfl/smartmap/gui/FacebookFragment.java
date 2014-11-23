@@ -64,13 +64,11 @@ public class FacebookFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	    Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.activity_start, container, false);
 
 		// Get the login button by id from the view
-		LoginButton authButton = (LoginButton) view
-		    .findViewById(R.id.loginButton);
+		LoginButton authButton = (LoginButton) view.findViewById(R.id.loginButton);
 
 		// Set other view's component to invisible
 		view.findViewById(R.id.loadingBar).setVisibility(View.INVISIBLE);
@@ -79,14 +77,13 @@ public class FacebookFragment extends Fragment {
 		view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 
 		// Start animation and set login button
-		authButton.startAnimation(AnimationUtils.loadAnimation(this
-		    .getActivity().getBaseContext(), R.anim.face_anim));
+		authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(),
+		    R.anim.face_anim));
 		authButton.setFragment(this);
 
 		// Not logged in Facebook or permission to use Facebook in SmartMap not
 		// given
-		if ((Session.getActiveSession() == null)
-		    || Session.getActiveSession().getPermissions().isEmpty()) {
+		if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
 			authButton.setReadPermissions(mPermissions);
 		}
 		return view;
@@ -132,17 +129,14 @@ public class FacebookFragment extends Fragment {
 		mUiHelper.onSaveInstanceState(outState);
 	}
 
-	private void onSessionStateChange(Session session, SessionState state,
-	    Exception exception) {
+	private void onSessionStateChange(Session session, SessionState state, Exception exception) {
 		Log.i(TAG, "Checking FB log in status...");
 		if (state.isOpened()) {
 			Log.i(TAG, "Logged in...");
 
 			// Display the loading Bar and Text
-			this.getView().findViewById(R.id.loadingBar)
-			    .setVisibility(View.VISIBLE);
-			this.getView().findViewById(R.id.loadingTextView)
-			    .setVisibility(View.VISIBLE);
+			this.getView().findViewById(R.id.loadingBar).setVisibility(View.VISIBLE);
+			this.getView().findViewById(R.id.loadingTextView).setVisibility(View.VISIBLE);
 
 			// Disable facebook log out button (CLOSE ISSUE #16)
 			this.getView().findViewById(R.id.loginButton).setAlpha(0f);
@@ -158,47 +152,36 @@ public class FacebookFragment extends Fragment {
 
 	private final Session.StatusCallback callback = new Session.StatusCallback() {
 		@Override
-		public void call(Session session, SessionState state,
-		    Exception exception) {
-			FacebookFragment.this.onSessionStateChange(session, state,
-			    exception);
+		public void call(Session session, SessionState state, Exception exception) {
+			FacebookFragment.this.onSessionStateChange(session, state, exception);
 		}
 	};
 
 	protected void makeMeRequest() {
-		Request request = Request.newMeRequest(Session.getActiveSession(),
-
-		new Request.GraphUserCallback() {
-
+		Request request = Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
 			@Override
 			public void onCompleted(GraphUser user, Response response) {
-
 				if (user != null) {
 
 					// This portable token is used by the server
-					String facebookToken = Session.getActiveSession()
-					    .getAccessToken();
+					String facebookToken = Session.getActiveSession().getAccessToken();
 
 					// Send user's infos to SmartMap server
 					Map<String, String> params = new LinkedHashMap<String, String>();
 					params.put(FACEBOOK_ID_POST_NAME, user.getId());
 					params.put(FACEBOOK_NAME_POST_NAME, user.getName());
 					params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
-					// TODO put user's friends?
 
 					// Debug
 					Log.i(TAG, "user name: " + params.get("name"));
-					Log.i(TAG,
-					    "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
+					Log.i(TAG, "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
 
-					SettingsManager settingsManager = SettingsManager
-					    .getInstance();
+					SettingsManager settingsManager = SettingsManager.getInstance();
 					settingsManager.setUserName(params.get("name"));
 
 					if (!FacebookFragment.this.sendDataToServer(params)) {
 						Toast.makeText(FacebookFragment.this.getActivity(),
-						    "Failed to log in to the SmartMap server.",
-						    Toast.LENGTH_LONG).show();
+						    "Failed to log in to the SmartMap server.", Toast.LENGTH_LONG).show();
 					} else {
 						// Create and start the next activity
 						FacebookFragment.this.startMainActivity();
@@ -209,7 +192,6 @@ public class FacebookFragment extends Fragment {
 				}
 			}
 		});
-
 		request.executeAsync();
 	}
 
@@ -222,8 +204,8 @@ public class FacebookFragment extends Fragment {
 
 	private boolean sendDataToServer(Map<String, String> params) {
 
-		ConnectivityManager connMgr = (ConnectivityManager) this.getActivity()
-		    .getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager connMgr = (ConnectivityManager) this.getActivity().getSystemService(
+		    Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 		if ((networkInfo != null) && networkInfo.isConnected()) {
 			// Send data
@@ -233,8 +215,7 @@ public class FacebookFragment extends Fragment {
 		} else {
 			// An error occured
 			Log.e(TAG, "Could not send user's data to server. Net down?");
-			Toast.makeText(this.getActivity(),
-			    "Your internet connection seems down. Please try again!",
+			Toast.makeText(this.getActivity(), "Your internet connection seems down. Please try again!",
 			    Toast.LENGTH_LONG).show();
 			return false;
 		}
@@ -266,14 +247,12 @@ public class FacebookFragment extends Fragment {
 		@Override
 		protected Boolean doInBackground(Void... params) {
 
-			NetworkSmartMapClient networkClient = NetworkSmartMapClient
-			    .getInstance();
+			NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
 
 			try {
 				networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
-				    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME),
-				        FACEBOOK_ID_RADIX), mParams
-				        .get(FACEBOOK_TOKEN_POST_NAME));
+				    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
+				    mParams.get(FACEBOOK_TOKEN_POST_NAME));
 			} catch (NumberFormatException e1) {
 				Log.e(TAG, "Couldn't parse to Long: " + e1.getMessage());
 				e1.printStackTrace();

@@ -12,8 +12,7 @@ import ch.epfl.smartmap.R;
  */
 public class Utils {
 
-	public static void setBadgeCount(Context context, LayerDrawable icon,
-	    int count) {
+	public static void setBadgeCount(Context context, LayerDrawable icon, int count) {
 
 		BadgeDrawable badge;
 

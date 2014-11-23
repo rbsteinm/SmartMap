@@ -25,8 +25,8 @@ public class Notifications {
 
 	private static final int VIBRATE_NOTIFICATION_TIME = 500;
 	private static final int SILENT_NOTIFICATION_TIME = 100;
-	private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME,
-	    SILENT_NOTIFICATION_TIME, VIBRATE_NOTIFICATION_TIME};
+	private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME, SILENT_NOTIFICATION_TIME,
+	    VIBRATE_NOTIFICATION_TIME};
 	private static long notificationID = 0;
 	private static int numberOfEventNotification = 0;
 	private static int numberOfFriendNotification = 0;
@@ -48,9 +48,8 @@ public class Notifications {
 		notificationID++;
 
 		// Prepare intent that redirects the user to FriendActivity
-		PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0,
-		    new Intent(context, FriendsPagerActivity.class),
-		    PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0, new Intent(context,
+		    FriendsPagerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// Add Big View Specific Configuration
 		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -61,34 +60,23 @@ public class Notifications {
 		events[1] = context.getString(R.string.notification_open_friend_list);
 
 		// Sets a title for the Inbox style big view
-		inboxStyle.setBigContentTitle(context
-		    .getString(R.string.notification_acceptedfriend_title));
+		inboxStyle.setBigContentTitle(context.getString(R.string.notification_acceptedfriend_title));
 		// Moves events into the big view
 		for (int i = 0; i < events.length; i++) {
 			inboxStyle.addLine(events[i]);
 		}
 
 		// Build notification
-		NotificationCompat.Builder noti = new NotificationCompat.Builder(
-		    context)
+		NotificationCompat.Builder noti = new NotificationCompat.Builder(context)
 		    // Sets all notification's specifications in the builder
 		    .setStyle(inboxStyle)
 		    .setAutoCancel(true)
-		    .setContentTitle(
-		        context.getString(R.string.notification_acceptedfriend_title))
+		    .setContentTitle(context.getString(R.string.notification_acceptedfriend_title))
 		    .setContentText(
-		        user.getName()
-		            + " "
-		            + context
-		                .getString(R.string.notification_invitation_accepted)
-		            + "\n"
+		        user.getName() + " " + context.getString(R.string.notification_invitation_accepted) + "\n"
 		            + context.getString(R.string.notification_open_friend_list))
 		    .setSmallIcon(R.drawable.ic_launcher)
-		    .setTicker(
-		        user.getName()
-		            + " "
-		            + context
-		                .getString(R.string.notification_invitation_accepted))
+		    .setTicker(user.getName() + " " + context.getString(R.string.notification_invitation_accepted))
 		    .setVibrate(PATTERN).setContentIntent(pFriendIntent);
 
 		displayNotification(context, noti.build(), notificationID);
@@ -106,8 +94,7 @@ public class Notifications {
 	 * @param notificationId
 	 *            id of current notification
 	 */
-	private static void displayNotification(Context context,
-	    Notification notification, long notificationId) {
+	private static void displayNotification(Context context, Notification notification, long notificationId) {
 		NotificationManager notificationManager = (NotificationManager) context
 		    .getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify((int) notificationId, notification);
@@ -130,46 +117,37 @@ public class Notifications {
 		setNumberOfUnreadEventNotification(getNumberOfEventNotification() + 1);
 
 		// Prepare intent that redirect the user to EventActivity
-		PendingIntent pEventIntent = PendingIntent.getActivity(context, 0,
-		    new Intent(context, ShowEventsActivity.class),
-		    PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pEventIntent = PendingIntent.getActivity(context, 0, new Intent(context,
+		    ShowEventsActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// Add Big View Specific Configuration
 		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
 		String[] events = new String[2];
 		events[0] = new String(event.getCreatorName() + " "
-		    + context.getString(R.string.notification_event_invitation) + " "
-		    + event.getName());
+		    + context.getString(R.string.notification_event_invitation) + " " + event.getName());
 		events[1] = context.getString(R.string.notification_open_event_list);
 
 		// Sets a title for the Inbox style big view
-		inboxStyle.setBigContentTitle(context
-		    .getString(R.string.notification_inviteevent_title));
+		inboxStyle.setBigContentTitle(context.getString(R.string.notification_inviteevent_title));
 		// Moves events into the big view
 		for (int i = 0; i < events.length; i++) {
 			inboxStyle.addLine(events[i]);
 		}
 
 		// Build notification
-		NotificationCompat.Builder noti = new NotificationCompat.Builder(
-		    context)
+		NotificationCompat.Builder noti = new NotificationCompat.Builder(context)
 		    // Sets all notification's specifications in the builder
 		    .setStyle(inboxStyle)
 		    .setAutoCancel(true)
-		    .setContentTitle(
-		        context.getString(R.string.notification_inviteevent_title))
+		    .setContentTitle(context.getString(R.string.notification_inviteevent_title))
 		    .setContentText(
-		        event.getCreatorName() + " "
-		            + context.getString(R.string.notification_event_invitation)
-		            + event.getName() + "\n"
-		            + context.getString(R.string.notification_open_event_list))
+		        event.getCreatorName() + " " + context.getString(R.string.notification_event_invitation)
+		            + event.getName() + "\n" + context.getString(R.string.notification_open_event_list))
 		    .setSmallIcon(R.drawable.ic_launcher)
 		    .setTicker(
-		        event.getCreatorName() + " "
-		            + context.getString(R.string.notification_event_invitation)
-		            + event.getName()).setVibrate(PATTERN)
-		    .setContentIntent(pEventIntent);
+		        event.getCreatorName() + " " + context.getString(R.string.notification_event_invitation)
+		            + event.getName()).setVibrate(PATTERN).setContentIntent(pEventIntent);
 
 		displayNotification(context, noti.build(), notificationID);
 
@@ -194,48 +172,35 @@ public class Notifications {
 		Log.d("BABOUIN", "" + getNumberOfFriendNotification());
 
 		// Prepare intent that redirects the user to FriendActivity
-		PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0,
-		    new Intent(context, FriendsPagerActivity.class),
-		    PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0, new Intent(context,
+		    FriendsPagerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// Add Big View Specific Configuration
 		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
 		String[] events = new String[2];
-		events[0] = user.getName() + " "
-		    + context.getString(R.string.notification_friend_invitation);
+		events[0] = user.getName() + " " + context.getString(R.string.notification_friend_invitation);
 		events[1] = context.getString(R.string.notification_open_friend_list);
 
 		// Sets a title for the Inbox style big view
-		inboxStyle.setBigContentTitle(context
-		    .getString(R.string.notification_invitefriend_title));
+		inboxStyle.setBigContentTitle(context.getString(R.string.notification_invitefriend_title));
 		// Moves events into the big view
 		for (int i = 0; i < events.length; i++) {
 			inboxStyle.addLine(events[i]);
 		}
 
 		// Build notification
-		NotificationCompat.Builder noti = new NotificationCompat.Builder(
-		    context)
+		NotificationCompat.Builder noti = new NotificationCompat.Builder(context)
 		    // Add all notification's specifications in the builder
 		    .setStyle(inboxStyle)
 		    .setAutoCancel(true)
 		    .setContentIntent(pFriendIntent)
 		    .setSmallIcon(R.drawable.ic_launcher)
-		    .setTicker(
-		        user.getName()
-		            + " "
-		            + context
-		                .getString(R.string.notification_friend_invitation))
-		    .setContentTitle(
-		        context.getString(R.string.notification_invitefriend_title))
+		    .setTicker(user.getName() + " " + context.getString(R.string.notification_friend_invitation))
+		    .setContentTitle(context.getString(R.string.notification_invitefriend_title))
 		    .setVibrate(PATTERN)
 		    .setContentText(
-		        user.getName()
-		            + " "
-		            + context
-		                .getString(R.string.notification_friend_invitation)
-		            + "\n"
+		        user.getName() + " " + context.getString(R.string.notification_friend_invitation) + "\n"
 		            + context.getString(R.string.notification_open_friend_list));
 		displayNotification(context, noti.build(), notificationID);
 

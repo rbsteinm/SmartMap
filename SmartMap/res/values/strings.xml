@@ -109,6 +109,7 @@
     <string name="notification_open_event_list">Click here to open your list of events.</string>
     
     <!-- Notification Activity -->
-    <string name="title_activity_notifications">Notifications</string>
+    <string name="notification_img_content_description">Image of notification</string>
+    <string name="title_activity_notifications">Invitations</string>
 
 </resources>

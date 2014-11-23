@@ -111,4 +111,19 @@ public class MainActivityTest extends
 				ViewActions.typeText("flksdhéfjkslkfshdfljkshfd"));
 		// TODO : Check no result is displayed
 	}
+
+	// public void testOpenNotificationActivity() {
+	// onView(withId(R.id.action_notifications)).perform(click());
+	// onView(withId(R.id.notification_activity))
+	// .check(matches(isDisplayed()));
+	// }
+
+	// public void testOpenAndCloseNotificationActivityUsingHome() {
+	// onView(withId(R.id.action_notifications)).perform(click());
+	// onView(withId(R.id.notification_activity))
+	// .check(matches(isDisplayed()));
+	// pressBack();
+	// onView(withId(R.id.notification_activity)).check(
+	// matches(not(hasFocus())));
+	// }
 }

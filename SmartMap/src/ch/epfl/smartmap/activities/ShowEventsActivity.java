@@ -77,8 +77,7 @@ public class ShowEventsActivity extends ListActivity {
 		mOngoingChecked = false;
 		mNearMeChecked = false;
 
-		mShowKilometers = (TextView) this
-		    .findViewById(R.id.showEventKilometers);
+		mShowKilometers = (TextView) this.findViewById(R.id.showEventKilometers);
 		// By default, the seek bar is disabled. This is done programmatically
 		// as android:enabled="false" doesn't work
 		// out in xml
@@ -87,8 +86,7 @@ public class ShowEventsActivity extends ListActivity {
 		mSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
 			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,
-			    boolean fromUser) {
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
 					seekBar.setProgress(SEEK_BAR_MIN_VALUE);
 				}
@@ -111,8 +109,7 @@ public class ShowEventsActivity extends ListActivity {
 		mEventsList = mDbHelper.getAllEvents();
 
 		// Create custom Adapter and pass it to the Activity
-		EventsListItemAdapter adapter = new EventsListItemAdapter(this,
-		    mEventsList, mMyLocation);
+		EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
 		this.setListAdapter(adapter);
 	}
 
@@ -143,8 +140,7 @@ public class ShowEventsActivity extends ListActivity {
 				this.finish();
 				break;
 			case R.id.showEventsMenuNewEvent:
-				Intent showEventIntent = new Intent(mContext,
-				    AddEventActivity.class);
+				Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
 				this.startActivity(showEventIntent);
 			default:
 				// No other menu items!
@@ -158,22 +154,19 @@ public class ShowEventsActivity extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		final Event event = (UserEvent) this.findViewById(position).getTag();
 
-		String message = EventsListItemAdapter.setTextFromDate(
-		    event.getStartDate(), event.getEndDate(), "start")
+		String message = EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(),
+		    "start")
 		    + " - "
-		    + EventsListItemAdapter.setTextFromDate(event.getStartDate(),
-		        event.getEndDate(), "end")
-		    + "\nCreated by "
-		    + event.getCreatorName() + "\n\n" + event.getDescription();
+		    + EventsListItemAdapter.setTextFromDate(event.getStartDate(), event.getEndDate(), "end")
+		    + "\nCreated by " + event.getCreatorName() + "\n\n" + event.getDescription();
 
 		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 		alertDialog.setTitle(event.getName()
 		    + " @ "
 		    + event.getPositionName()
 		    + "\n"
-		    + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
-		        event.getLocation().getLatitude(), event.getLocation()
-		            .getLongitude()) + " km away");
+		    + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
+		        .getLatitude(), event.getLocation().getLongitude()) + " km away");
 		alertDialog.setMessage(message);
 		final Activity activity = this;
 		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Show on the map",
@@ -182,11 +175,9 @@ public class ShowEventsActivity extends ListActivity {
 			    @Override
 			    public void onClick(DialogInterface dialog, int id) {
 
-				    Toast.makeText(activity, "Opening event on the map...",
-				        Toast.LENGTH_SHORT).show();
+				    Toast.makeText(activity, "Opening event on the map...", Toast.LENGTH_SHORT).show();
 
-				    Intent showEventIntent = new Intent(mContext,
-				        MainActivity.class);
+				    Intent showEventIntent = new Intent(mContext, MainActivity.class);
 				    showEventIntent.putExtra("location", event.getLocation());
 				    ShowEventsActivity.this.startActivity(showEventIntent);
 
@@ -263,27 +254,22 @@ public class ShowEventsActivity extends ListActivity {
 
 			if (mNearMeChecked) {
 				if (mMyLocation != null) {
-					double distanceMeEvent = distance(e.getLocation()
-					    .getLatitude(), e.getLocation().getLongitude(),
-					    mMyLocation.getLatitude(), mMyLocation.getLongitude());
-					String[] showKMContent = mShowKilometers.getText()
-					    .toString().split(" ");
+					double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation()
+					    .getLongitude(), mMyLocation.getLatitude(), mMyLocation.getLongitude());
+					String[] showKMContent = mShowKilometers.getText().toString().split(" ");
 					double distanceMax = Double.parseDouble(showKMContent[0]);
 					if (!(distanceMeEvent < distanceMax)) {
 						mCurrentList.remove(e);
 					}
 				} else {
-					Toast
-					    .makeText(
-					        this.getApplicationContext(),
-					        "Your current location cannot be retrieved. Please try again",
-					        Toast.LENGTH_SHORT).show();
+					Toast.makeText(this.getApplicationContext(),
+					    "Your current location cannot be retrieved. Please try again", Toast.LENGTH_SHORT)
+					    .show();
 				}
 			}
 		}
 
-		EventsListItemAdapter adapter = new EventsListItemAdapter(this,
-		    mCurrentList, mMyLocation);
+		EventsListItemAdapter adapter = new EventsListItemAdapter(this, mCurrentList, mMyLocation);
 		this.setListAdapter(adapter);
 	}
 
@@ -299,8 +285,7 @@ public class ShowEventsActivity extends ListActivity {
 	 * @return the distance in km, rounded to 2 digits
 	 * @author SpicyCH
 	 */
-	public static double distance(double lat1, double lon1, double lat2,
-	    double lon2) {
+	public static double distance(double lat1, double lon1, double lat2, double lon2) {
 		double radLat1 = Math.toRadians(lat1);
 		double radLong1 = Math.toRadians(lon1);
 		double radLat2 = Math.toRadians(lat2);
