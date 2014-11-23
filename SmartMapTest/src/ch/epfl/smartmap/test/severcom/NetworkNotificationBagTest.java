@@ -10,8 +10,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import static org.mockito.Mockito.*;
-
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkNotificationBag;
@@ -25,9 +23,10 @@ import ch.epfl.smartmap.servercom.SmartMapClient;
  */
 public class NetworkNotificationBagTest extends TestCase {
     
+    @SuppressWarnings("unused")
     @Test
-    void testContructor() {
-        SmartMapClient client = mock(NetworkSmartMapClient.class);
+    public void testContructor() {
+        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         try {
             NotificationBag nb = new NetworkNotificationBag(null, new ArrayList<User>(), new ArrayList<Long>(),
@@ -63,9 +62,9 @@ public class NetworkNotificationBagTest extends TestCase {
     }
     
     @Test
-    void testGetInvitingUsers()
+    public void testGetInvitingUsers()
     {
-        SmartMapClient client = mock(NetworkSmartMapClient.class);
+        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<User> invitersList = new ArrayList<User>();
         invitersList.add(new Friend(1, "Toto"));
@@ -80,8 +79,8 @@ public class NetworkNotificationBagTest extends TestCase {
     }
     
     @Test
-    void testGetNewFriends() {
-        SmartMapClient client = mock(NetworkSmartMapClient.class);
+    public void testGetNewFriends() {
+        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<User> newFriends = new ArrayList<User>();
         newFriends.add(new Friend(1, "Toto"));
@@ -96,8 +95,8 @@ public class NetworkNotificationBagTest extends TestCase {
     }
     
     @Test
-    void testGetRemovedFriendsIds() {
-        SmartMapClient client = mock(NetworkSmartMapClient.class);
+    public void testGetRemovedFriendsIds() {
+        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<Long> removedIds = new ArrayList<Long>();
         removedIds.add((long) 4);
@@ -112,8 +111,8 @@ public class NetworkNotificationBagTest extends TestCase {
     }
     
     @Test
-    void testInvitingFriendsDefensiveCopy() {
-        SmartMapClient client = mock(NetworkSmartMapClient.class);
+    public void testInvitingFriendsDefensiveCopy() {
+        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<User> invitersList = new ArrayList<User>();
         invitersList.add(new Friend(1, "Toto"));
@@ -135,8 +134,8 @@ public class NetworkNotificationBagTest extends TestCase {
     }
     
     @Test
-    void testNewFriendsDefensiveCopy() {
-        SmartMapClient client = mock(NetworkSmartMapClient.class);
+    public void testNewFriendsDefensiveCopy() {
+        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<User> friendsList = new ArrayList<User>();
         friendsList.add(new Friend(1, "Toto"));
@@ -158,8 +157,8 @@ public class NetworkNotificationBagTest extends TestCase {
     }
     
     @Test
-    void testIRemovedFriendsDefensiveCopy() {
-        SmartMapClient client = mock(NetworkSmartMapClient.class);
+    public void testIRemovedFriendsDefensiveCopy() {
+        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<Long> removedIds = new ArrayList<Long>();
         removedIds.add((long) 4);
