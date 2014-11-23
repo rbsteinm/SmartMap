@@ -141,13 +141,13 @@ public class SearchLayout extends LinearLayout {
     }
 
     /**
-<<<<<<< HEAD
+     * <<<<<<< HEAD
      * Show the View that needs to be displayed when opening the {@code SearchPanel}, according to the query
      * 
      * @param query
-=======
+     *            =======
      * @return Next Search Type in the Layout
->>>>>>> dev
+     *         >>>>>>> dev
      */
     private Type nextSearchType() {
         int nextSearchTypeIndex =
@@ -160,7 +160,7 @@ public class SearchLayout extends LinearLayout {
         // Need to add mActiveSearchTypes.size() to avoid negative numbers with % operator
         int previousSearchTypeIndex =
             ((mSearchTypeIndexes.get(mCurrentSearchType).intValue() - 1) + mActiveSearchTypes.size())
-            % mActiveSearchTypes.size();
+                % mActiveSearchTypes.size();
         Type previousSearchType = mActiveSearchTypes.get(previousSearchTypeIndex);
         return previousSearchType;
     }

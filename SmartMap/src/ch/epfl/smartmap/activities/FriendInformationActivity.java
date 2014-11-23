@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
@@ -31,6 +32,7 @@ public class FriendInformationActivity extends Activity {
     private static long mUserId;
     private DatabaseHelper mCacheDB;
     private static Context mContext;
+    private static CheckBox mFollowCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,10 @@ public class FriendInformationActivity extends Activity {
         mUserId = mUser.getID();
         mCacheDB = DatabaseHelper.getInstance();
         mContext = this;
+        mFollowCheckBox = (CheckBox) this.findViewById(R.id.activity_friend_information_follow_checkbox);
+
+        //TODO need a method "isFollowing" from cache or DB to know how to set the checkbox
+        //when the Activity is launching
     }
 
     @Override
@@ -66,6 +72,10 @@ public class FriendInformationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void followUnfollow(View view) {
+        new FollowFriend().execute(mUserId);
+    }
+
     public void displayDeleteConfirmationDialog(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setMessage("remove " + mUser.getName() + " from your friends?");
@@ -75,7 +85,6 @@ public class FriendInformationActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 new RemoveFriend().execute(mUserId);
-                // TODO refresh the userList
             }
         });
 
@@ -91,20 +100,6 @@ public class FriendInformationActivity extends Activity {
         builder.create().show();
     }
 
-    /*private void setUpRemoveFriendButton(){
-        Button button = (Button) this.findViewById(R.id.remove_displayable_button);
-        button.setText("Remove from friendList");
-        button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                FriendInformationActivity.this.displayDeleteConfirmationDialog(mUser.getName(), mUserId);
-            }
-        });
-    }*/
-
-
-
     /**
      * Asynchronous task that removes a friend from the users friendList both
      * from the server and from the cache
@@ -114,6 +109,7 @@ public class FriendInformationActivity extends Activity {
     private class RemoveFriend extends AsyncTask<Long, Void, String> {
 
         private final Handler mHandler = new Handler();
+
         @Override
         protected String doInBackground(Long... params) {
             String confirmString = "";
@@ -131,9 +127,39 @@ public class FriendInformationActivity extends Activity {
                     }
                 });
 
-
             } catch (SmartMapClientException e) {
                 confirmString = "Network error, operation failed";
+            }
+            return confirmString;
+        }
+
+        @Override
+        protected void onPostExecute(String confirmString) {
+            Toast.makeText(mContext, confirmString, Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    /**
+     * @author rbsteinm
+     *         AsyncTask that follows/unfollows a friend when the user checks/unchecks
+     *         the checkBox
+     */
+    private class FollowFriend extends AsyncTask<Long, Void, String> {
+
+        @Override
+        protected String doInBackground(Long... params) {
+            String confirmString = "";
+            try {
+                if (mFollowCheckBox.isChecked()) {
+                    NetworkSmartMapClient.getInstance().followFriend(mUserId);
+                    confirmString = "You're now following " + mUser.getName();
+                } else {
+                    NetworkSmartMapClient.getInstance().unfollowFriend(mUserId);
+                    confirmString = "You're not following " + mUser.getName() + " anymore";
+                }
+            } catch (SmartMapClientException e) {
+                confirmString = e.getMessage();
             }
             return confirmString;
         }

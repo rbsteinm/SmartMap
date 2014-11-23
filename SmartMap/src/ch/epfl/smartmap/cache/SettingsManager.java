@@ -118,14 +118,15 @@ public class SettingsManager {
     }
 
     /**
-<<<<<<< HEAD
+     * <<<<<<< HEAD
+     * 
      * @return <code>true</code> if the user enabled the notifications for event
      *         invitations and the user activated the notifications in general, <code>false</code> otherwise.
-=======
+     *         =======
      * @return <code>true</code> if the user enabled the notifications for event invitations and the user
      *         activated the
      *         notifications in general, <code>false</code> otherwise.
->>>>>>> dev
+     *         >>>>>>> dev
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
@@ -134,14 +135,15 @@ public class SettingsManager {
     }
 
     /**
-<<<<<<< HEAD
+     * <<<<<<< HEAD
+     * 
      * @return <code>true</code> if the user enabled the notifications for event
      *         proximity and the user activated the notifications in general, <code>false</code> otherwise.
-=======
+     *         =======
      * @return <code>true</code> if the user enabled the notifications for event proximity and the user
      *         activated the
      *         notifications in general, <code>false</code> otherwise.
->>>>>>> dev
+     *         >>>>>>> dev
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
@@ -150,13 +152,14 @@ public class SettingsManager {
     }
 
     /**
-<<<<<<< HEAD
+     * <<<<<<< HEAD
+     * 
      * @return <code>true</code> if the user enabled the notifications
      *         vibrations and the user activated the notifications in general, <code>false</code> otherwise.
-=======
+     *         =======
      * @return <code>true</code> if the user enabled the notifications vibrations and the user activated the
      *         notifications in general, <code>false</code> otherwise.
->>>>>>> dev
+     *         >>>>>>> dev
      * @author SpicyCH
      */
     public boolean notificationsVibrate() {
