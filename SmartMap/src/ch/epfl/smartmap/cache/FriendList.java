@@ -4,7 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.R;
 
 /**
  * Describes a clientside, custom friend list (e.g. friends, family, etc.)
@@ -77,5 +82,44 @@ public class FriendList implements UserList {
     @Override
     public void setID(long newID) {
         databaseID = newID;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getPicture(android.content.Context)
+     */
+    @Override
+    public Bitmap getPicture(Context context) {
+
+        Bitmap pic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_default_user);
+
+        return pic;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getName()
+     */
+    @Override
+    public String getName() {
+        return listName;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getShortInfos()
+     */
+    @Override
+    public String getShortInfos() {
+        return "This is a Family Filter";
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getLocation()
+     */
+    @Override
+    public Location getLocation() {
+        return new Location("Lausanne");
     }
 }

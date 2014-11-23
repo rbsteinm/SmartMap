@@ -65,7 +65,7 @@
         <activity
             android:name=".activities.FriendsPagerActivity"
             android:label="@string/title_activity_pager"
-            android:parentActivityName="ch.epfl.smartmap.activities.MainActivity"
+            android:parentActivityName=".activities.MainActivity"
             android:screenOrientation="portrait" >
         </activity>
 
@@ -94,26 +94,29 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.AddFriendActivity"
+            android:name=".activities.AddFriendActivity"
             android:label="@string/title_activity_add_friend"
-            android:parentActivityName="ch.epfl.smartmap.activities.FriendsPagerActivity" >
+            android:parentActivityName=".activities.FriendsPagerActivity" >
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="ch.epfl.smartmap.activities.MainActivity"
+            android:parentActivityName=".activities.MainActivity"
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.smartmap.activities.MainActivity" />
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.InformationActivity"
-            android:label="@string/title_activity_information"
-            android:parentActivityName=".MainActivity" >
+            android:name=".activities.UserInformationActivity"
+            android:label="@string/title_activity_user_information"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />
         </activity>
     </application>
+
 </manifest>

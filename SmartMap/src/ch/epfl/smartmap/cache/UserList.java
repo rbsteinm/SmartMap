@@ -9,7 +9,7 @@ import android.util.LongSparseArray;
  * 
  * @author ritterni
  */
-public interface UserList {
+public interface UserList extends Displayable {
 
     /**
      * @return The name of the list

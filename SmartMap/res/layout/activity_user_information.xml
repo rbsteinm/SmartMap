@@ -1,0 +1,49 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_blue"
+    android:paddingBottom="@dimen/activity_user_information_bottom_margin"
+    android:paddingLeft="@dimen/activity_user_information_side_margin"
+    android:paddingRight="@dimen/activity_user_information_side_margin"
+    android:paddingTop="@dimen/activity_user_information_top_margin"
+    tools:context="ch.epfl.smartmap.activities.UserInformationActivity" >
+
+    <RelativeLayout
+        android:id="@+id/user_info_header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/div_background" >
+
+        <ImageView
+            android:id="@+id/user_info_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@string/user_information_picture_description"
+            android:src="@drawable/ic_default_user" />
+
+        <TextView
+            android:id="@+id/user_info_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/user_info_picture" />
+
+        <TextView
+            android:id="@+id/user_info_infos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/user_info_name"
+            android:layout_toRightOf="@id/user_info_picture" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/user_info_lorem_ipsum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/user_info_header"
+        android:background="@drawable/div_background" />
+
+</RelativeLayout>

@@ -384,6 +384,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return friends;
     }
 
+    public ArrayList<Friend> getAllFriends() {
+        ArrayList<Friend> friends = new ArrayList<Friend>();
+        LongSparseArray<User> sparseArray = this.getAllUsers();
+
+        for (int i = 0; i < sparseArray.size(); i++) {
+            friends.add((Friend) sparseArray.valueAt(i));
+        }
+        return friends;
+    }
+
     /**
      * @param id
      *            The event's ID

@@ -11,11 +11,12 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public interface Event {
+public interface Event extends Displayable {
 
     /**
      * @return The event's position
      */
+    @Override
     Location getLocation();
 
     /**
@@ -50,6 +51,7 @@ public interface Event {
     /**
      * @return The event's name
      */
+    @Override
     String getName();
 
     /**

@@ -119,6 +119,8 @@ public class SlidingPanel extends FrameLayout {
             mOpenAnim.start();
 
             return true;
+        } else if (mVisualState == VisualState.OPEN) {
+            return true;
         }
 
         return false;
@@ -134,6 +136,8 @@ public class SlidingPanel extends FrameLayout {
                 v.startAnimation(this.createAlphaAnimation(v, Fade.OUT));
             }
             mCloseAnim.start();
+            return true;
+        } else if (mVisualState == VisualState.CLOSED) {
             return true;
         }
 

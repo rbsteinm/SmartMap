@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -13,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public interface User {
+public interface User extends Parcelable, Displayable {
 
     /**
      * @return The user's ID
@@ -23,6 +24,7 @@ public interface User {
     /**
      * @return The user's name
      */
+    @Override
     String getName();
 
     /**
@@ -38,6 +40,7 @@ public interface User {
     /**
      * @return The user's position
      */
+    @Override
     Location getLocation();
 
     /**
@@ -53,6 +56,7 @@ public interface User {
     /**
      * @return A user picture to display
      */
+    @Override
     Bitmap getPicture(Context context);
 
     /**

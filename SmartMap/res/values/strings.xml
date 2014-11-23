@@ -94,6 +94,10 @@
     <string name="addEventPlaceName">Place (town, canton, etc...)</string>
     <string name="addEventDescription">Description (optional)</string>
     <string name="addEventButtonPickLocation">Set location</string>
-    <string name="title_activity_information">InformationActivity</string>
+
+    <!-- UserInformationActivity -->
+    <string name="title_activity_user_information">Friend Informations</string>
+    <string name="user_information_picture_description">Profile Picture</string>
+    <string name="title_activity_search">SearchActivity</string>
 
 </resources>
