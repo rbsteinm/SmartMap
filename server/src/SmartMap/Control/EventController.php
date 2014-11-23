@@ -194,3 +194,4 @@ class EventController {
         return new JsonResponse($response);
     }
 }
+
