@@ -3,13 +3,11 @@ package ch.epfl.smartmap.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +15,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.activities.FriendInformationActivity;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.FriendsListener;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
  * Fragment displaying your friends in FriendsActivity
@@ -60,18 +56,21 @@ public class FriendsTab extends ListFragment implements FriendsListener {
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
+        User user = mFriendList.get(position);
         long userId = (Long) view.getTag();
         RelativeLayout rl = (RelativeLayout) view;
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         String name = tv.getText().toString();
-        this.displayDeleteConfirmationDialog(name, userId);
+        //this.displayDeleteConfirmationDialog(name, userId);
+        Intent intent = new Intent(mContext, FriendInformationActivity.class);
+        intent.putExtra("CURRENT_DISPLAYABLE", (Parcelable) user);
+        this.startActivity(intent);
     }
 
     @Override
     public void onChange() {
         this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
-        Log.d("ONCHANGE IS CALLED", "ONCHANGE");
     }
 
     @Override
@@ -91,7 +90,7 @@ public class FriendsTab extends ListFragment implements FriendsListener {
         return arrayList;
     }
 
-    private void displayDeleteConfirmationDialog(String name, final long userId) {
+    /*private void displayDeleteConfirmationDialog(String name, final long userId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
         builder.setMessage("remove " + name + " from your friends?");
 
@@ -114,7 +113,7 @@ public class FriendsTab extends ListFragment implements FriendsListener {
 
         // display the AlertDialog
         builder.create().show();
-    }
+    }*/
 
     /**
      * Asynchronous task that removes a friend from the users friendList both
@@ -122,7 +121,7 @@ public class FriendsTab extends ListFragment implements FriendsListener {
      * 
      * @author rbsteinm
      */
-    private class RemoveFriend extends AsyncTask<Long, Void, String> {
+    /*private class RemoveFriend extends AsyncTask<Long, Void, String> {
 
         @Override
         protected String doInBackground(Long... params) {
@@ -145,9 +144,9 @@ public class FriendsTab extends ListFragment implements FriendsListener {
         @Override
         protected void onPostExecute(String confirmString) {
             FriendsTab.this
-                .setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+            .setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
             Toast.makeText(mContext, confirmString, Toast.LENGTH_LONG).show();
         }
 
-    }
+    }*/
 }

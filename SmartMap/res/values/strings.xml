@@ -96,4 +96,6 @@
     <string name="addEventButtonPickLocation">Set location</string>
     <string name="title_activity_information">InformationActivity</string>
 
+    <!-- FirnedInformationActivity -->
+    <string name="removeFriendDialogMessage">Remove from friends</string>
 </resources>

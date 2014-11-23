@@ -547,7 +547,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
      * @author jfperren
      */
     public void openInformationActivity(MenuItem mi) {
-        Intent intent = new Intent(this, InformationActivity.class);
+        Intent intent = new Intent(this, FriendInformationActivity.class);
         intent.putExtra("CURRENT_DISPLAYABLE", (Parcelable) mCurrentItem);
         this.startActivity(intent);
         this.finish();

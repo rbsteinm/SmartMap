@@ -33,4 +33,9 @@ public interface Displayable {
      * @return GoogleMap Location of the Displayable
      */
     Location getLocation();
+
+    /**
+     * @return The user's ID
+     */
+    long getID();
 }
