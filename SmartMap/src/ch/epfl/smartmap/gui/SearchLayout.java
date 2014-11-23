@@ -304,8 +304,7 @@ public class SearchLayout extends LinearLayout {
     }
 
     /**
-     * Show the {@code ScrollView} that needs to be displayed when opening the
-     * {@code SlidingPanel}, according
+     * Show the {@code ScrollView} that needs to be displayed when opening the {@code SlidingPanel}, according
      * to the query
      * 
      * @param query

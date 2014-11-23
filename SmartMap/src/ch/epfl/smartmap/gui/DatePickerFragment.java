@@ -13,8 +13,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 
 /**
- * A simple date picker. Used in
- * {@link ch.epfl.smartmap.activities.AddEventActivity}. When the date is set,
+ * A simple date picker. Used in {@link ch.epfl.smartmap.activities.AddEventActivity}. When the date is set,
  * the associated EditText is modified accordingly and a tag containing an int
  * array of year, month, day is linked to this EditText.
  * 
