@@ -107,6 +107,7 @@ public class SearchResultViewGroup extends LinearLayout {
      */
     public SearchResultViewGroup(Context context, List<Displayable> results) {
         super(context);
+
         // Layout parameters
         this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
             LayoutParams.MATCH_PARENT));

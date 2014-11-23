@@ -6,12 +6,33 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="ch.epfl.smartmap.activities.InformationActivity" >
+    tools:context="ch.epfl.smartmap.activities.FriendInformationActivity" >
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/info_name"
-        android:text="@string/hello_world" />
+        android:paddingBottom="50dp"
+        />
+    
+    <CheckBox
+        android:id="@+id/activity_friend_information_follow_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/info_name"
+        android:layout_alignLeft="@+id/info_name"
+        android:onClick="followUnfollow"
+        android:text="@string/follow_checkbox" />
+    
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/remove_displayable_button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:text="@string/removeFriendDialogMessage"
+        android:onClick="displayDeleteConfirmationDialog"/>
+
+    
 
 </RelativeLayout>

@@ -107,7 +107,7 @@
                 android:value="ch.epfl.smartmap.activities.MainActivity" />
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.InformationActivity"
+            android:name="ch.epfl.smartmap.activities.FriendInformationActivity"
             android:label="@string/title_activity_information"
             android:parentActivityName=".MainActivity" >
             <meta-data

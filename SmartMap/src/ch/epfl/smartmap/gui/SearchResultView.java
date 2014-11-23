@@ -15,11 +15,19 @@ import ch.epfl.smartmap.cache.Displayable;
 
 /**
  * <<<<<<< HEAD
+<<<<<<< HEAD
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
  * immutable.
  * =======
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}.
  * >>>>>>> service-2
+=======
+ * This class is a basic Layout that will be used to display search results in {@code SearchLayout}.
+ * =======
+ * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
+ * immutable.
+ * >>>>>>> dev
+>>>>>>> gui-raph2
  * 
  * @author jfperren
  */
@@ -61,6 +69,7 @@ public class SearchResultView extends RelativeLayout {
         mImage = item.getPicture(context);
 
         // Layout Parameters
+
         this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
 

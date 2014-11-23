@@ -298,7 +298,7 @@ public class SearchLayout extends LinearLayout {
         // % operator
         int previousSearchTypeIndex =
             ((mSearchTypeIndexes.get(mCurrentSearchType).intValue() - 1) + mActiveSearchTypes.size())
-                % mActiveSearchTypes.size();
+            % mActiveSearchTypes.size();
         Type previousSearchType = mActiveSearchTypes.get(previousSearchTypeIndex);
         return previousSearchType;
     }

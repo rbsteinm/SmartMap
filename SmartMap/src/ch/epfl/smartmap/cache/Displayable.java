@@ -33,4 +33,9 @@ public interface Displayable {
      *         etc.)
      */
     String getShortInfos();
+
+    /**
+     * @return The user's ID
+     */
+    long getID();
 }

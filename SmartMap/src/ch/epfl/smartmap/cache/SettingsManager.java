@@ -116,23 +116,61 @@ public class SettingsManager {
     }
 
     /**
+<<<<<<< HEAD
      * @return The session cookie if it is found, DEFAULT_COOKIE value otherwise
+=======
+     * <<<<<<< HEAD
+     * 
+     * @return <code>true</code> if the user enabled the notifications for event
+     *         invitations and the user activated the notifications in general, <code>false</code> otherwise.
+     *         =======
+     * @return <code>true</code> if the user enabled the notifications for event invitations and the user
+     *         activated the
+     *         notifications in general, <code>false</code> otherwise.
+     *         >>>>>>> dev
+     * @author SpicyCH
+>>>>>>> gui-raph2
      */
     public String getCookie() {
         return mSharedPref.getString(COOKIE, DEFAULT_COOKIE);
     }
 
     /**
+<<<<<<< HEAD
      * @return The local user's email if it is found, DEFAULT_EMAIL value
      *         otherwise
+=======
+     * <<<<<<< HEAD
+     * 
+     * @return <code>true</code> if the user enabled the notifications for event
+     *         proximity and the user activated the notifications in general, <code>false</code> otherwise.
+     *         =======
+     * @return <code>true</code> if the user enabled the notifications for event proximity and the user
+     *         activated the
+     *         notifications in general, <code>false</code> otherwise.
+     *         >>>>>>> dev
+     * @author SpicyCH
+>>>>>>> gui-raph2
      */
     public String getEmail() {
         return mSharedPref.getString(EMAIL, DEFAULT_EMAIL);
     }
 
     /**
+<<<<<<< HEAD
      * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
      *         otherwise
+=======
+     * <<<<<<< HEAD
+     * 
+     * @return <code>true</code> if the user enabled the notifications
+     *         vibrations and the user activated the notifications in general, <code>false</code> otherwise.
+     *         =======
+     * @return <code>true</code> if the user enabled the notifications vibrations and the user activated the
+     *         notifications in general, <code>false</code> otherwise.
+     *         >>>>>>> dev
+     * @author SpicyCH
+>>>>>>> gui-raph2
      */
     public long getFacebookID() {
         return mSharedPref.getLong(FB_ID, DEFAULT_FB_ID);

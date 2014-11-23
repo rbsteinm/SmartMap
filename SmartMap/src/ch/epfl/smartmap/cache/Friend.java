@@ -41,9 +41,9 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
     public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
-                                                             // until a user is
-                                                             // considered
-                                                             // offline
+    // until a user is
+    // considered
+    // offline
 
     private static final int LEFT_SHIFT_COUNT = 32;
 
