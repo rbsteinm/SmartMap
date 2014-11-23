@@ -14,6 +14,7 @@ import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserEvent;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.ServerFeedbackException;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -145,15 +146,24 @@ public class NetworkEndToEndTest extends TestCase {
 	public void testK_GetInvitations() throws SmartMapClientException {
 		NetworkSmartMapClient networkClient = NetworkSmartMapClient
 				.getInstance();
-		List<List<User>> resultList = networkClient.getInvitations();
-		assertTrue("Null list", resultList != null);
+		NotificationBag notificationBag = networkClient.getInvitations();
+		List<User> inviters = notificationBag.getInvitingUsers();
+		assertTrue("Null inviter list", inviters != null);
+		List<User> newFriends = notificationBag.getNewFriends();
+		assertTrue("Null new friends list", newFriends != null);
+		List<Long> removedFriends = notificationBag.getRemovedFriendsIds();
+		assertTrue("Null removed friends list", removedFriends != null);
 
-		for (List<User> list : resultList) {
-			assertTrue("Null list", list != null);
-			for (User user : list) {
-				this.assertValidIdAndName(user);
-			}
+		for (User user : inviters) {
+			this.assertValidIdAndName(user);
 		}
+		for (User user : newFriends) {
+			this.assertValidIdAndName(user);
+		}
+		for(long id : removedFriends){
+			assertTrue("Unexpected id", id >= 0);
+		}
+
 
 	}
 
@@ -210,7 +220,6 @@ public class NetworkEndToEndTest extends TestCase {
 				.getInstance();
 		networkClient.declineInvitation(MY_ID);
 	}
-
 
 	@Test
 	public void testO_removeFriend() throws SmartMapClientException {
@@ -287,9 +296,8 @@ public class NetworkEndToEndTest extends TestCase {
 			assertTrue("Unexpected event name",
 					((2 < event.getName().length()) && (event.getName()
 							.length() <= 60)));
-			assertTrue("Unexpected creator name", ((2 < event
-					.getCreatorName().length()) && (event.getCreatorName()
-							.length() <= 60)));
+			assertTrue("Unexpected creator name", ((2 < event.getCreatorName()
+					.length()) && (event.getCreatorName().length() <= 60)));
 			assertTrue("Unexpected event description", (event.getName()
 					.length() <= 255));
 

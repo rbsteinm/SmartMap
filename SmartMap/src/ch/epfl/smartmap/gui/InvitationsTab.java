@@ -1,8 +1,5 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.Collections;
-import java.util.List;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,10 +17,14 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
- * Frangment diplaying your invitations in FriendsActivity
+ * FIXME What to do with this class? Remove it? If not, should implement FriendsListener instead of sending
+ * its
+ * own requests?
+ * Fragment diplaying your invitations in FriendsActivity
  * 
  * @author marion-S
  */
@@ -112,24 +113,26 @@ public class InvitationsTab extends ListFragment {
      * 
      * @author marion-S
      */
-    private class RefreshInvitationsList extends AsyncTask<String, Void, List<List<User>>> {
+    private class RefreshInvitationsList extends AsyncTask<String, Void, NotificationBag> {
 
         @Override
-        protected List<List<User>> doInBackground(String... params) {
+        protected NotificationBag doInBackground(String... params) {
             try {
 
                 return mNetworkClient.getInvitations();
 
             } catch (SmartMapClientException e) {
-                return Collections.emptyList();
+                // FIXME what to return??
+                return null;
             }
         }
 
         @Override
-        protected void onPostExecute(List<List<User>> list) {
-            super.onPostExecute(list);
-            InvitationsTab.this.setListAdapter(new FriendListItemAdapter(mContext, list.get(0)));
-            for (User newFriend : list.get(1)) {
+        protected void onPostExecute(NotificationBag notificationBag) {
+            super.onPostExecute(notificationBag);
+            InvitationsTab.this.setListAdapter(new FriendListItemAdapter(mContext, notificationBag
+                .getInvitingUsers()));
+            for (User newFriend : notificationBag.getNewFriends()) {
                 mDataBaseHelper.addUser(newFriend);
                 new AckAcceptedInvitations().execute(newFriend.getID());
             }

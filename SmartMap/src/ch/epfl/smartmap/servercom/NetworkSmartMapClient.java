@@ -413,7 +413,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getInvitations()
      */
     @Override
-    public List<List<User>> getInvitations() throws SmartMapClientException {
+    public NotificationBag getInvitations() throws SmartMapClientException {
 
         HttpURLConnection conn = this.getHttpURLConnection("/getInvitations");
         String response = this.sendViaPost(new HashMap<String, String>(), conn);
@@ -421,23 +421,22 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         SmartMapParser parser = null;
         List<User> inviters = null;
         List<User> newFriends = null;
+        List<Long> removedFriends = null;
 
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
             inviters = parser.parseFriends(response, "invitations");
             newFriends = parser.parseFriends(response, "newFriends");
+            removedFriends = parser.parseIds(response, "removedFriends");
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
         } catch (SmartMapParseException e) {
             throw new SmartMapClientException(e);
         }
 
-        List<List<User>> list = new ArrayList<List<User>>();
-        list.add(inviters);
-        list.add(newFriends);
-
-        return list;
+        return new NetworkNotificationBag(inviters, newFriends, removedFriends,
+            NetworkSmartMapClient.getInstance());
 
     }
 
