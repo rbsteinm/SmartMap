@@ -1,8 +1,5 @@
 package ch.epfl.smartmap.activities;
 
-import java.util.Collections;
-import java.util.List;
-
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +12,9 @@ import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.gui.InvitationListItemAdapter;
+import ch.epfl.smartmap.gui.FriendListItemAdapter;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
@@ -26,107 +24,111 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class NotificationsActivity extends ListActivity {
 
-	private Context mContext;
-	private DatabaseHelper mDbHelper;
-	private NetworkSmartMapClient mNetworkClient;
+    /**
+     * AsyncTask that confirms the server that accepted invitations were
+     * received
+     * 
+     * @author marion-S
+     */
+    private class AckAcceptedInvitations extends AsyncTask<Long, Void, Void> {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.activity_notifications);
+        @Override
+        protected Void doInBackground(Long... params) {
+            try {
+                mNetworkClient.ackAcceptedInvitation(params[0]);
+            } catch (SmartMapClientException e) {
+            }
+            return null;
+        }
 
-		mContext = this.getBaseContext();
-		mDbHelper = DatabaseHelper.getInstance();
-		mNetworkClient = NetworkSmartMapClient.getInstance();
+    }
 
-		// mInvitationList = mDbHelper.getInvitations();
-		new RefreshInvitationsList().execute();
-	}
+    /**
+     * AsyncTask that refreshes the invitations list after the user answered to
+     * an invitation and each time the activity is resumed. It also retrieves
+     * accepted invitations and store them in the application cache.
+     * 
+     * @author marion-S
+     */
+    private class RefreshInvitationsList extends AsyncTask<String, Void, NotificationBag> {
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		// This is needed to show an update of the events' list after having
-		// created an event
-		new RefreshInvitationsList().execute();
-	}
+        @Override
+        protected NotificationBag doInBackground(String... params) {
+            try {
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		this.getMenuInflater().inflate(R.menu.show_events, menu);
-		return true;
-	}
+                return mNetworkClient.getInvitations();
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		if (id == android.R.id.home) {
-			this.finish();
-		}
+            } catch (SmartMapClientException e) {
+                // FIXME what to return??
+                return null;
+            }
+        }
 
-		return super.onOptionsItemSelected(item);
-	}
+        @Override
+        protected void onPostExecute(NotificationBag notificationBag) {
+            super.onPostExecute(notificationBag);
+            NotificationsActivity.this.setListAdapter(new FriendListItemAdapter(mContext, notificationBag
+                .getInvitingUsers()));
+            for (User newFriend : notificationBag.getNewFriends()) {
+                mDbHelper.addUser(newFriend);
+                new AckAcceptedInvitations().execute(newFriend.getID());
+            }
+        }
 
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Intent showFriendIntent = new Intent(mContext, FriendsPagerActivity.class);
-		NotificationsActivity.this.startActivity(showFriendIntent);
+    }
 
-		super.onListItemClick(l, v, position, id);
-	}
+    private Context mContext;
 
-	/**
-	 * AsyncTask that refreshes the invitations list after the user answered to
-	 * an invitation and each time the activity is resumed. It also retrieves
-	 * accepted invitations and store them in the application cache.
-	 * 
-	 * @author marion-S
-	 */
-	private class RefreshInvitationsList extends AsyncTask<String, Void, List<List<User>>> {
+    private DatabaseHelper mDbHelper;
 
-		@Override
-		protected List<List<User>> doInBackground(String... params) {
-			try {
+    private NetworkSmartMapClient mNetworkClient;
 
-				return mNetworkClient.getInvitations();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_notifications);
 
-			} catch (SmartMapClientException e) {
-				return Collections.emptyList();
-			}
-		}
+        mContext = this.getBaseContext();
+        mDbHelper = DatabaseHelper.getInstance();
+        mNetworkClient = NetworkSmartMapClient.getInstance();
 
-		@Override
-		protected void onPostExecute(List<List<User>> list) {
-			super.onPostExecute(list);
-			NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, list.get(0)));
-			for (User newFriend : list.get(1)) {
-				mDbHelper.addUser(newFriend);
-				new AckAcceptedInvitations().execute(newFriend.getID());
-			}
-		}
+        // mInvitationList = mDbHelper.getInvitations();
+        new RefreshInvitationsList().execute();
+    }
 
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.show_events, menu);
+        return true;
+    }
 
-	/**
-	 * AsyncTask that confirms the server that accepted invitations were
-	 * received
-	 * 
-	 * @author marion-S
-	 */
-	private class AckAcceptedInvitations extends AsyncTask<Long, Void, Void> {
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Intent showFriendIntent = new Intent(mContext, FriendsPagerActivity.class);
+        NotificationsActivity.this.startActivity(showFriendIntent);
 
-		@Override
-		protected Void doInBackground(Long... params) {
-			try {
-				mNetworkClient.ackAcceptedInvitation(params[0]);
-			} catch (SmartMapClientException e) {
-			}
-			return null;
-		}
+        super.onListItemClick(l, v, position, id);
+    }
 
-	}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == android.R.id.home) {
+            this.finish();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // This is needed to show an update of the events' list after having
+        // created an event
+        new RefreshInvitationsList().execute();
+    }
 }

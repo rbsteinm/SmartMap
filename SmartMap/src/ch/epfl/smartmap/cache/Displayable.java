@@ -12,6 +12,11 @@ import android.location.Location;
 public interface Displayable {
 
     /**
+     * @return The user's ID
+     */
+    long getID();
+
+    /**
      * @return GoogleMap Location of the Displayable
      */
     Location getLocation();
@@ -33,9 +38,4 @@ public interface Displayable {
      *         etc.)
      */
     String getShortInfos();
-
-    /**
-     * @return The user's ID
-     */
-    long getID();
 }
