@@ -314,7 +314,7 @@ class UserRepository
     }
     
     /**
-     * Add a friendship link between two users, with status set to ALLOWED
+     * Add a bidirectional friendship link between two users, with status set to ALLOWED
      * and follow to FOLLOWED.
      * 
      * @param long $idUser
@@ -325,11 +325,22 @@ class UserRepository
     {
         // We first check that there is not already a friendship link.
         $req = "SELECT * FROM " . self::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND id2 = ?";
-        $data = $this->mDb->fetchAssoc($req, array((int) $idUser, (int) $idFriend));
-        
-        if ($data)
+        $link1 = $this->mDb->fetchAssoc($req, array((int) $idUser, (int) $idFriend));
+
+        $req = "SELECT * FROM " . self::$TABLE_FRIENDSHIP . " WHERE id1 = ? AND id2 = ?";
+        $link2 = $this->mDb->fetchAssoc($req, array((int) $idFriend, (int) $idUser));
+
+        // The return value of fetchAssoc is false if no row was found.
+        if ($link1 AND $link2)
         {
             throw new DatabaseException('This friendship link already exists !');
+        }
+
+        // If there wasn't already a friendship link, $link1 and $link2 should be false.
+        if ($link1 OR $link2)
+        {
+            throw new DatabaseException('Invalid state of database detected: there is an unidirectional ' .
+                'friendship link between users with ids ' . $idUser . ' and ' . $idFriend . '.');
         }
         
         try
@@ -341,26 +352,63 @@ class UserRepository
                     'status' => 'ALLOWED',
                     'follow' => 'FOLLOWED'
                 ));
+
+            $this->mDb->insert(self::$TABLE_FRIENDSHIP,
+                array(
+                    'id1' => (int) $idFriend,
+                    'id2' => (int) $idUser,
+                    'status' => 'ALLOWED',
+                    'follow' => 'FOLLOWED'
+                ));
         }
         catch (\Exception $e)
         {
-            throw new DatabaseException('Error adding a firendship link in addFriendshipLink.', 1, $e);
+            throw new DatabaseException('Error adding a friendship link in addFriendshipLink.', 1, $e);
         }
     }
-    
+
+    /**
+     * Removes a bidirectional friendship link. Returns true if the friendship link existed, false
+     * otherwise.
+     *
+     * @param $idUser
+     * @param $idFriend
+     * @return int
+     * @throws DatabaseException
+     */
     public function removeFriendshipLink($idUser, $idFriend)
     {
         try
         {
-            $this->mDb->delete(self::$TABLE_FRIENDSHIP, array(
+            $affectedRowsCount1 = $this->mDb->delete(self::$TABLE_FRIENDSHIP, array(
                 'id1' => (int) $idUser,
                 'id2' => (int) $idFriend
+            ));
+
+            $affectedRowsCount2 = $this->mDb->delete(self::$TABLE_FRIENDSHIP, array(
+                'id1' => (int) $idFriend,
+                'id2' => (int) $idUser
             ));
         }
         catch (\Exception $e)
         {
-            throw new DatabaseException('Error removing a firendship link in removeFriendshipLink.', 1, $e);
+            throw new DatabaseException('Error removing a friendship link in removeFriendshipLink.', 1, $e);
         }
+
+        // Database state sanity checks
+        if ($affectedRowsCount1 > 1 OR $affectedRowsCount2 > 1)
+        {
+            throw new DatabaseException('Invalid state of database detected: a friendship link was declared more ' .
+                'than once (now removed).');
+        }
+
+        if ($affectedRowsCount1 != $affectedRowsCount2)
+        {
+            throw new DatabaseException('Invalid state of database detected: there was an unidirectional ' .
+                'friendship link (now removed).');
+        }
+
+        return $affectedRowsCount1 > 0;
     }
     
     /**

@@ -354,7 +354,6 @@ public class AddEventActivity extends FragmentActivity {
         pickLocationIntent.putExtra("pickLocationForEvent", true);
         pickLocationIntent.setType(Context.LOCATION_SERVICE);
         this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
-
     }
 
     /**
