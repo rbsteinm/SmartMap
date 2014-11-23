@@ -126,7 +126,8 @@ public class StartActivity extends FragmentActivity {
             mLogoImage.setVisibility(View.INVISIBLE);
 
             mFacebookFragment = new FacebookFragment();
-            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment).commit();
+            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment)
+                .commit();
         }
 
         SettingsManager.initialize(this.getApplicationContext());

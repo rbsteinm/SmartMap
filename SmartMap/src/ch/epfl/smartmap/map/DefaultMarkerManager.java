@@ -40,17 +40,17 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * A map that contains the displayed markers' ids, associated with the
      * item they represent
      */
-    private final Map<String, T> displayedItems;
+    private final Map<String, T> mDisplayedItems;
 
     /**
      * A map that maps each marker with its id
      */
-    private final Map<String, Marker> dictionnaryMarkers;
+    private final Map<String, Marker> mDictionnaryMarkers;
 
     public DefaultMarkerManager(GoogleMap googleMap) {
         mGoogleMap = googleMap;
-        displayedItems = new HashMap<String, T>();
-        dictionnaryMarkers = new HashMap<String, Marker>();
+        mDisplayedItems = new HashMap<String, T>();
+        mDictionnaryMarkers = new HashMap<String, Marker>();
     }
 
     /*
@@ -77,7 +77,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
 
         // remove the markers that are not longer in the list to display
         for (T item : this.getDisplayedItems()) {
-            if ((!itemsToDisplay.contains(item))) {
+            if (!itemsToDisplay.contains(item)) {
                 // && (!getMarkerForItem(item).isInfoWindowShown())) {
                 Marker marker = this.removeMarker(item);
                 this.animateMarker(marker, item.getLatLng(), true);
@@ -94,7 +94,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      */
     @Override
     public boolean isDisplayedItem(T item) {
-        return displayedItems.containsValue(item);
+        return mDisplayedItems.containsValue(item);
     }
 
     /*
@@ -105,7 +105,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      */
     @Override
     public boolean isDisplayedMarker(Marker marker) {
-        return displayedItems.containsKey(marker.getId());
+        return mDisplayedItems.containsKey(marker.getId());
     }
 
     /*
@@ -114,7 +114,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      */
     @Override
     public List<Marker> getDisplayedMarkers() {
-        return new ArrayList<Marker>(dictionnaryMarkers.values());
+        return new ArrayList<Marker>(mDictionnaryMarkers.values());
     }
 
     /*
@@ -123,7 +123,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      */
     @Override
     public List<T> getDisplayedItems() {
-        return new ArrayList<T>(displayedItems.values());
+        return new ArrayList<T>(mDisplayedItems.values());
     }
 
     /*
@@ -134,8 +134,8 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
     @Override
     public Marker addMarker(T item, Context context) {
         Marker marker = mGoogleMap.addMarker(item.getMarkerOptions(context));
-        displayedItems.put(marker.getId(), item);
-        dictionnaryMarkers.put(marker.getId(), marker);
+        mDisplayedItems.put(marker.getId(), item);
+        mDictionnaryMarkers.put(marker.getId(), marker);
         return marker;
     }
 
@@ -148,8 +148,8 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
     @Override
     public Marker removeMarker(T item) {
         Marker marker = this.getMarkerForItem(item);
-        displayedItems.remove(marker.getId());
-        dictionnaryMarkers.remove(marker.getId());
+        mDisplayedItems.remove(marker.getId());
+        mDictionnaryMarkers.remove(marker.getId());
         marker.remove();
         return marker;
     }
@@ -162,7 +162,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      */
     @Override
     public T getItemForMarker(Marker marker) {
-        return displayedItems.get(marker.getId());
+        return mDisplayedItems.get(marker.getId());
     }
 
     /*
@@ -173,9 +173,9 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      */
     @Override
     public Marker getMarkerForItem(T item) {
-        for (Entry<String, T> entry : displayedItems.entrySet()) {
+        for (Entry<String, T> entry : mDisplayedItems.entrySet()) {
             if (entry.getValue().equals(item)) {
-                return dictionnaryMarkers.get(entry.getKey());
+                return mDictionnaryMarkers.get(entry.getKey());
             }
         }
         return null;
@@ -223,6 +223,36 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
                 }
             }
         });
+    }
+
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        if (depth == 0) {
+            return 0;
+        }
+
+        int auditErrors = 0;
+
+        if (mGoogleMap == null) {
+            auditErrors++;
+        }
+
+        if (mDictionnaryMarkers == null) {
+            auditErrors++;
+        }
+
+        if (mDisplayedItems == null) {
+            auditErrors++;
+        }
+
+        return auditErrors;
     }
 
 }

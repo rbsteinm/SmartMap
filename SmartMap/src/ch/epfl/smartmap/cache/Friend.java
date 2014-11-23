@@ -284,7 +284,8 @@ public class Friend implements User, Searchable, Displayable {
             Bitmap.createScaledBitmap(this.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(this.getLatLng()).title(this.getName())
-            .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+            .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
+            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
         return markerOptions;
     }
 }

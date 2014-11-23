@@ -154,7 +154,8 @@ public class FriendsTab extends ListFragment {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            FriendsTab.this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+            FriendsTab.this
+                .setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
             Toast.makeText(mContext, confirmString, Toast.LENGTH_LONG).show();
         }
 

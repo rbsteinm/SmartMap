@@ -118,7 +118,8 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         this.setContentView(R.layout.activity_main);
 
         // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         this.getActionBar().setHomeButtonEnabled(true);
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setHomeAsUpIndicator(this.getResources().getDrawable(R.drawable.ic_drawer));
@@ -324,7 +325,8 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
 
             // Getting LocationManager object from System Service
             // LOCATION_SERVICE
-            LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            LocationManager locationManager =
+                (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
             // Creating a criteria object to retrieve provider
             Criteria criteria = new Criteria();
             // Getting the name of the best provider
@@ -339,8 +341,8 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATE_TIMEOUT,
                     LOCATION_UPDATE_DISTANCE, this);
             } else if (null != locationManager.getProvider(LocationManager.NETWORK_PROVIDER)) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_UPDATE_TIMEOUT,
-                    LOCATION_UPDATE_DISTANCE, this);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    LOCATION_UPDATE_TIMEOUT, LOCATION_UPDATE_DISTANCE, this);
             }
         }
     }

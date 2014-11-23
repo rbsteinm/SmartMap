@@ -43,7 +43,8 @@ public class SearchResultViewGroup extends LinearLayout {
     public SearchResultViewGroup(Context context, List<Friend> friendsList) {
         super(context);
 
-        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT));
         this.setOrientation(VERTICAL);
         this.setBackgroundResource(R.drawable.view_group_background);
         mContext = context;

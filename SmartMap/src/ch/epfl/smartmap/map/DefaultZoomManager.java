@@ -27,11 +27,11 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
     private static final int GMAP_ZOOM_LEVEL = 17;
     private static final int PADDING = 35; // offset from edges of the map in
                                            // pixels
-    private final View mapView;
+    private final View mMapView;
     private final GoogleMap mGoogleMap;
 
     public DefaultZoomManager(SupportMapFragment fm) {
-        mapView = fm.getView();
+        mMapView = fm.getView();
         mGoogleMap = fm.getMap();
     }
 
@@ -70,8 +70,8 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
     public void zoomAccordingToMarkers(final List<Marker> markers) {
         if (!markers.isEmpty()) {
             Log.i(TAG, "after mapview enter to zoom according");
-            if (mapView.getViewTreeObserver().isAlive()) {
-                mapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+            if (mMapView.getViewTreeObserver().isAlive()) {
+                mMapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
                     @SuppressWarnings("deprecation")
                     @SuppressLint("NewApi")
                     @Override
@@ -85,9 +85,9 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
                         }
                         LatLngBounds bounds = boundsBuilder.build();
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                            mapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                            mMapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                         } else {
-                            mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            mMapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                         }
 
                         CameraUpdate camUpdate = CameraUpdateFactory.newLatLngBounds(bounds, PADDING);
@@ -99,5 +99,25 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
             }
 
         }
+    }
+
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        if (depth == 0) {
+            return 0;
+        }
+
+        int auditErrors = 0;
+
+        // TODO
+
+        return auditErrors;
     }
 }
