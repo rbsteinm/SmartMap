@@ -2,7 +2,6 @@
 
 namespace SmartMap\Control;
 
-use Psr\Log\InvalidArgumentException;
 use SmartMap\DBInterface\DatabaseException;
 use SmartMap\DBInterface\EventRepository;
 use SmartMap\DBInterface\Event;
@@ -55,7 +54,7 @@ class EventController {
                 $description
             );
 
-            $this->mRepo->createEvent($event);
+            $event = $this->mRepo->createEvent($event);
         }
         catch (DatabaseException $e)
         {
@@ -66,7 +65,7 @@ class EventController {
             throw new InvalidRequestException($e->getMessage());
         }
 
-        $response = array('status' => 'Ok', 'message' => 'Created event.');
+        $response = array('status' => 'Ok', 'message' => 'Created event.', 'id' => $event->getId());
 
         return new JsonResponse($response);
     }

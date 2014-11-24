@@ -118,6 +118,9 @@ class AuthenticationController
             $user = new User(1 , $facebookId, $name, 'VISIBLE', 0.0, 0.0);
             $user = $this->mRepo->createUser($user);
             $session->set('userId', $user->getId());
+
+            // We set the variable used for the response
+            $userId = $user->getId();
             
             // Getting the user facebook profile image to set it as default.
             $pic = file_get_contents(self::$GRAPH_API_URL . $user->getFbId() . self::$PICTURE_REQUEST);
@@ -129,7 +132,7 @@ class AuthenticationController
             $session->set('userId', $userId);
         }
         
-        $response = array('status' => 'Ok', 'message' => 'Successfully authenticated !');
+        $response = array('status' => 'Ok', 'message' => 'Successfully authenticated !', 'id' => $userId);
         
         return new JsonResponse($response);
     }
