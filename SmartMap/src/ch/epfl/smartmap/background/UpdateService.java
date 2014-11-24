@@ -233,7 +233,6 @@ public class UpdateService extends Service {
         protected NotificationBag doInBackground(Void... arg0) {
             NotificationBag nb = null;
             try {
-                // Second list, the list of accepted invitations
                 nb = mClient.getInvitations();
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't retrieve replies!");
@@ -244,22 +243,20 @@ public class UpdateService extends Service {
         @Override
         protected void onPostExecute(NotificationBag result) {
 
-            List<User> newFriends = result.getNewFriends();
-            if (!newFriends.isEmpty()) {
-                for (User user : newFriends) {
-                    mHelper.addUser(user);
-                    mHelper.deletePendingFriend(user.getID());
-                    UpdateService.this.showAcceptedNotif(user);
+            for (User user : result.getNewFriends()) {
+                mHelper.addUser(user);
+                mHelper.deletePendingFriend(user.getID());
+                UpdateService.this.showAcceptedNotif(user);
+            }
+
+            for (User user : result.getInvitingUsers()) {
+                if (mHelper.addInvitation(user) > 0) {
+                    UpdateService.this.showFriendNotif(user);
                 }
             }
 
-            List<User> invitingUsers = result.getInvitingUsers();
-            if (!invitingUsers.isEmpty()) {
-                for (User user : invitingUsers) {
-                    if (mHelper.addInvitation(user) > 0) {
-                        UpdateService.this.showFriendNotif(user);
-                    }
-                }
+            for (Long id : result.getRemovedFriendsIds()) {
+                mHelper.deleteUser(id);
             }
         }
     }
