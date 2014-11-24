@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -205,6 +206,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
+            long id = parser.parseId(response);
+            SettingsManager.getInstance().setUserID(id);
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
         } catch (SmartMapParseException e) {
@@ -230,6 +233,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
+            long id = parser.parseId(response);
+            event.setID(id);
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
 

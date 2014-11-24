@@ -78,6 +78,15 @@ public interface SmartMapParser {
     List<User> parseFriends(String s, String key) throws SmartMapParseException;
 
     /**
+     * Parses some text, and returns the id
+     * 
+     * @param s
+     * @return the id
+     * @throws SmartMapParseException
+     */
+    Long parseId(String s) throws SmartMapParseException;
+
+    /**
      * Parses some text, and returns a list of ids
      * 
      * @param s
