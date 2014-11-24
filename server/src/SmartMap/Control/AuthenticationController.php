@@ -129,7 +129,7 @@ class AuthenticationController
             $session->set('userId', $userId);
         }
         
-        $response = array('status' => 'Ok', 'message' => 'Successfully authenticated !');
+        $response = array('status' => 'Ok', 'message' => 'Successfully authenticated !', 'id' => $userId);
         
         return new JsonResponse($response);
     }

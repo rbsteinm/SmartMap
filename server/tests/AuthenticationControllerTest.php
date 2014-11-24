@@ -86,7 +86,7 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
 
         $response = $this->authController->authenticate($request);
 
-        $validResponse = array('status' => 'Ok', 'message' => 'Successfully authenticated !');
+        $validResponse = array('status' => 'Ok', 'message' => 'Successfully authenticated !', 'id' => 1);
         
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     
