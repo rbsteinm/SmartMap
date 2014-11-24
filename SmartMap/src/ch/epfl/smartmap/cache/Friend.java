@@ -15,7 +15,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import ch.epfl.smartmap.R;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * A class to represent the user's friends
@@ -45,6 +47,11 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
     // until a user is
     // considered
     // offline
+
+    public static final float MARKER_ANCHOR_X = (float) 0.5;
+    public static final float MARKER_ANCHOR_Y = 1;
+    public static final int PICTURE_WIDTH = 50;
+    public static final int PICTURE_HEIGHT = 50;
 
     private static final int LEFT_SHIFT_COUNT = 32;
 
@@ -180,6 +187,24 @@ public class Friend implements User, Searchable, Displayable, Parcelable {
     @Override
     public Location getLocation() {
         return mLocation;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
+     * )
+     * @author hugo-S
+     */
+    @Override
+    public MarkerOptions getMarkerOptions(Context context) {
+        Bitmap friendProfilePicture =
+            Bitmap.createScaledBitmap(this.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(this.getLatLng()).title(this.getName())
+            .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
+            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+        return markerOptions;
     }
 
     @Override

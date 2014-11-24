@@ -10,7 +10,9 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import ch.epfl.smartmap.R;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * An event that can be seen on the map
@@ -30,6 +32,9 @@ public class UserEvent implements Event, Searchable, Displayable {
     public final static long DEFAULT_ID = -1;
     public final static int EVENT_ICON = R.drawable.default_event;
     private final static int RIGHT_SHIFT_COUNT = 32;
+
+    public static final float MARKER_ANCHOR_X = (float) 0.5;
+    public static final float MARKER_ANCHOR_Y = 1;
 
     /**
      * UserEvent constructor
@@ -148,6 +153,23 @@ public class UserEvent implements Event, Searchable, Displayable {
         return mLocation;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
+     * )
+     * @author hugo-S
+     */
+    @Override
+    public MarkerOptions getMarkerOptions(Context context) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(this.getLatLng()).title(this.getName())
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+        return markerOptions;
+
+    }
+
     @Override
     public String getName() {
         return mEvtName;
@@ -252,5 +274,6 @@ public class UserEvent implements Event, Searchable, Displayable {
         }
         mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
             newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
+
     }
 }

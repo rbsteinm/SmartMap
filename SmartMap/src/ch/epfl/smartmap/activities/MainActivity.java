@@ -7,10 +7,8 @@ import java.util.Locale;
 
 import android.app.ActionBar;
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -36,6 +34,8 @@ import ch.epfl.smartmap.background.Notifications.NotificationListener;
 import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.FriendsLocationListener;
 import ch.epfl.smartmap.cache.MockSearchEngine;
 import ch.epfl.smartmap.cache.SearchEngine;
 import ch.epfl.smartmap.cache.User;
@@ -43,16 +43,14 @@ import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
 import ch.epfl.smartmap.gui.Utils;
-import ch.epfl.smartmap.map.DefaultEventMarkerDisplayer;
+import ch.epfl.smartmap.map.DefaultMarkerManager;
 import ch.epfl.smartmap.map.DefaultZoomManager;
-import ch.epfl.smartmap.map.EventMarkerDisplayer;
-import ch.epfl.smartmap.map.FriendMarkerDisplayer;
-import ch.epfl.smartmap.map.ProfilePictureFriendMarkerDisplayer;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -60,13 +58,69 @@ import com.google.android.gms.maps.model.Marker;
 /**
  * This Activity displays the core features of the App. It displays the map and
  * the whole menu.
+ * It is a FriendsLocationListener to update the markers on the map when friends positions
+ * change
  * 
  * @author jfperren
+ * @author hugo-S
  * @author SpicyCH
  * @author agpmilli
  */
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements FriendsLocationListener {
+
+    /**
+     * Listener that add an event to the map when long click
+     * 
+     * @author SpicyCH
+     */
+    private class AddEventOnMapLongClick implements OnMapLongClickListener {
+        @Override
+        public void onMapLongClick(LatLng latLng) {
+            Intent result = new Intent(MainActivity.this.getContext(), AddEventActivity.class);
+            Bundle extras = new Bundle();
+            Geocoder geocoder = new Geocoder(MainActivity.this.getContext(), Locale.getDefault());
+            String cityName = "";
+            List<Address> addresses;
+            try {
+                addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                if (addresses.size() > 0) {
+                    // Makes sure that an address is associated to the
+                    // coordinates, the user could have
+                    // long
+                    // clicked in the middle of the sea after all :)
+                    cityName = addresses.get(0).getLocality();
+                }
+            } catch (IOException e) {
+            }
+            if (cityName == null) {
+                // If google couldn't retrieve the city name, we use the
+                // country name instead
+                try {
+                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                    if (addresses.size() > 0) {
+                        cityName = addresses.get(0).getCountryName();
+                    }
+                } catch (IOException e) {
+                }
+            }
+            extras.putString(CITY_NAME, cityName);
+            extras.putParcelable(LOCATION_SERVICE, latLng);
+            result.putExtras(extras);
+            if (MainActivity.this.getIntent().getBooleanExtra("pickLocationForEvent", false)) {
+                // Return the result to the calling activity
+                // (AddEventActivity)
+                MainActivity.this.setResult(RESULT_OK, result);
+                MainActivity.this.finish();
+            } else {
+                // The user was in MainActivity and long clicked to create
+                // an event
+                MainActivity.this.startActivity(result);
+                MainActivity.this.finish();
+            }
+        }
+
+    }
 
     /**
      * Types of Menu that can be displayed on this activity
@@ -79,44 +133,59 @@ public class MainActivity extends FragmentActivity {
         ITEM;
     }
 
-    private static final String TAG = "MAIN_ACTIVITY";
-    private static final int LOCATION_UPDATE_TIMEOUT = 10000;
-    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-    private static final int LOCATION_UPDATE_DISTANCE = 10;
+    /**
+     * A listener that shows info in action bar when a marker is clicked on
+     * 
+     * @author hugo-S
+     */
+    private class ShowInfoOnMarkerClick implements OnMarkerClickListener {
 
+        @Override
+        public boolean onMarkerClick(Marker arg0) {
+
+            if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
+                Displayable friendClicked = mFriendMarkerManager.getItemForMarker(arg0);
+                mMapZoomer.zoomOnLocation(arg0.getPosition());
+                MainActivity.this.setItemMenu(friendClicked);
+                return true;
+            } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
+                Displayable eventClicked = mEventMarkerManager.getItemForMarker(arg0);
+                mMapZoomer.zoomOnLocation(arg0.getPosition());
+                MainActivity.this.setItemMenu(eventClicked);
+                return true;
+            }
+            return false;
+        }
+
+    }
+
+    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
     private static final String CITY_NAME = "CITY_NAME";
     private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
     private static final int MENU_ITEM_MYLOCATION_INDEX = 1;
+
     private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
+
     private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
-
     private static final int MENU_ITEM_CLOSE_INFO_INDEX = 4;
-
     private ActionBar mActionBar;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private DatabaseHelper mDbHelper;
     private SideMenu mSideMenu;
     private GoogleMap mGoogleMap;
-    private FriendMarkerDisplayer mFriendMarkerDisplayer;
-    private EventMarkerDisplayer mEventMarkerDisplayer;
+    private DefaultMarkerManager<User> mFriendMarkerManager;
+    private DefaultMarkerManager<Event> mEventMarkerManager;
     private DefaultZoomManager mMapZoomer;
     private SupportMapFragment mFragmentMap;
     private SearchEngine mSearchEngine;
     private Menu mMenu;
     private MenuTheme mMenuTheme;
     private Displayable mCurrentItem;
+
     private Context mContext;
+
     private LayerDrawable mIcon;
-
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            mFriendMarkerDisplayer.updateMarkers(MainActivity.this.getContext(), mGoogleMap,
-                MainActivity.this.getVisibleUsers(mDbHelper.getAllUsers()));
-        }
-
-    };
 
     /**
      * Close Information Panel if open
@@ -160,7 +229,7 @@ public class MainActivity extends FragmentActivity {
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
-            // mGoogleMap.setMyLocationEnabled(true);
+            mGoogleMap.setMyLocationEnabled(true);
         }
     }
 
@@ -168,30 +237,15 @@ public class MainActivity extends FragmentActivity {
         return this;
     }
 
-    private List<User> getVisibleUsers(LongSparseArray<User> usersSparseArray) {
-        List<User> visibleUsers = new ArrayList<User>();
-        for (int i = 0; i < usersSparseArray.size(); i++) {
-            User user = usersSparseArray.valueAt(i);
-            if (user.isVisible()) {
-                visibleUsers.add(user);
-            }
-        }
-        return visibleUsers;
-    }
+    private void initializeMarkers() {
+        mEventMarkerManager.updateMarkers(this, mDbHelper.getAllEvents());
+        mFriendMarkerManager.updateMarkers(this, this.sparseArrayToList(mDbHelper.getAllUsers()));
 
-    public void initializeMarkers() {
-        mEventMarkerDisplayer = new DefaultEventMarkerDisplayer();
-        mEventMarkerDisplayer.setMarkersToMaps(this, mGoogleMap, mDbHelper.getAllEvents());
-        mFriendMarkerDisplayer = new ProfilePictureFriendMarkerDisplayer();
-        mFriendMarkerDisplayer.setMarkersToMaps(this, mGoogleMap,
-            this.getVisibleUsers(mDbHelper.getAllUsers()));
-        mMapZoomer = new DefaultZoomManager(mFragmentMap);
-        Log.i(TAG, "before enter to zoom according");
-        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerDisplayer.getDisplayedMarkers());
-        allMarkers.addAll(mEventMarkerDisplayer.getDisplayedMarkers());
+        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
+        allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
         Intent startingIntent = this.getIntent();
         if (startingIntent.getParcelableExtra("location") == null) {
-            mMapZoomer.zoomAccordingToMarkers(mGoogleMap, allMarkers);
+            mMapZoomer.zoomAccordingToMarkers(allMarkers);
         }
     }
 
@@ -210,6 +264,22 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FriendsLocationListener#onChange()
+     */
+    @Override
+    public void onChange() {
+
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(),
+                    MainActivity.this.sparseArrayToList(mDbHelper.getAllUsers()));
+            }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -220,6 +290,7 @@ public class MainActivity extends FragmentActivity {
 
         // TODO resolve main activity test ?
         mDbHelper = DatabaseHelper.initialize(this.getApplicationContext());
+        mDbHelper.addFriendsLocationListener(this);
 
         mActionBar = this.getActionBar();
 
@@ -252,7 +323,17 @@ public class MainActivity extends FragmentActivity {
         }
 
         if (mGoogleMap != null) {
+            // Set different tools for the GoogleMap
+            mEventMarkerManager = new DefaultMarkerManager<Event>(mGoogleMap);
+            mFriendMarkerManager = new DefaultMarkerManager<User>(mGoogleMap);
+            mMapZoomer = new DefaultZoomManager(mFragmentMap);
+
             this.initializeMarkers();
+
+            // Add listeners to the GoogleMap
+            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClick());
+            mGoogleMap.setOnMarkerClickListener(new ShowInfoOnMarkerClick());
+
         }
     }
 
@@ -349,7 +430,8 @@ public class MainActivity extends FragmentActivity {
     @Override
     public void onPause() {
         super.onPause();
-        this.unregisterReceiver(mBroadcastReceiver);
+        // TODO A method to unregister to the service when the map is not opened?
+        // this.unregisterReceiver(mBroadcastReceiver);
         // stopService(mUpdateServiceIntent);
     }
 
@@ -358,64 +440,17 @@ public class MainActivity extends FragmentActivity {
         super.onResume();
 
         // startService(mUpdateServiceIntent);
-        this.registerReceiver(mBroadcastReceiver, new IntentFilter(UpdateService.BROADCAST_POS));
+        // this.registerReceiver(mBroadcastReceiver, new IntentFilter(UpdateService.BROADCAST_POS));
 
         // get Intent that started this Activity
         Intent startingIntent = this.getIntent();
         // get the value of the user string
         Location eventLocation = startingIntent.getParcelableExtra("location");
         if (eventLocation != null) {
-            mMapZoomer.zoomOnLocation(eventLocation, mGoogleMap);
+            mMapZoomer.zoomOnLocation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
             eventLocation = null;
         }
 
-        // @author SpicyCH
-        mGoogleMap.setOnMapLongClickListener(new OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                Intent result = new Intent(MainActivity.this.getContext(), AddEventActivity.class);
-                Bundle extras = new Bundle();
-                Geocoder geocoder = new Geocoder(MainActivity.this.getContext(), Locale.getDefault());
-                String cityName = "";
-                List<Address> addresses;
-                try {
-                    addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                    if (addresses.size() > 0) {
-                        // Makes sure that an address is associated to the
-                        // coordinates, the user could have
-                        // long
-                        // clicked in the middle of the sea after all :)
-                        cityName = addresses.get(0).getLocality();
-                    }
-                } catch (IOException e) {
-                }
-                if (cityName == null) {
-                    // If google couldn't retrieve the city name, we use the
-                    // country name instead
-                    try {
-                        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                        if (addresses.size() > 0) {
-                            cityName = addresses.get(0).getCountryName();
-                        }
-                    } catch (IOException e) {
-                    }
-                }
-                extras.putString(CITY_NAME, cityName);
-                extras.putParcelable(LOCATION_SERVICE, latLng);
-                result.putExtras(extras);
-                if (MainActivity.this.getIntent().getBooleanExtra("pickLocationForEvent", false)) {
-                    // Return the result to the calling activity
-                    // (AddEventActivity)
-                    MainActivity.this.setResult(RESULT_OK, result);
-                    MainActivity.this.finish();
-                } else {
-                    // The user was in MainActivity and long clicked to create
-                    // an event
-                    MainActivity.this.startActivity(result);
-                    MainActivity.this.finish();
-                }
-            }
-        });
     }
 
     /**
@@ -462,21 +497,18 @@ public class MainActivity extends FragmentActivity {
         mSearchPanel.close();
         mSearchView.collapseActionView();
         // Focus on Friend
-        mMapZoomer.zoomOnLocation(item.getLocation(), mGoogleMap);
+        mMapZoomer.zoomOnLocation(item.getLatLng());
         this.setItemMenu(item);
         // Add query to the searchEngine
         // mSearchEngine.getHistory().addEntryy(item, new Date());
     }
 
     /**
-     * <<<<<<< HEAD
      * Sets the view for Item Focus, this means - Write name / Display photo on
      * ActionBar - Sets ActionMenu
      * for Item
-     * =======
      * Sets the view for Item Focus, this means - Write name / Display photo on
      * ActionBar - Sets ActionMenu for Item
-     * >>>>>>> service-2
      * Focus
      * 
      * @param item
@@ -534,6 +566,17 @@ public class MainActivity extends FragmentActivity {
         mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
         mMenu.getItem(MENU_ITEM_CLOSE_INFO_INDEX).setVisible(false);
         mMenuTheme = MenuTheme.SEARCH;
+    }
+
+    private List<User> sparseArrayToList(LongSparseArray<User> usersSparseArray) {
+        List<User> users = new ArrayList<User>();
+        for (int i = 0; i < usersSparseArray.size(); i++) {
+            User user = usersSparseArray.valueAt(i);
+
+            users.add(user);
+
+        }
+        return users;
     }
 
 }

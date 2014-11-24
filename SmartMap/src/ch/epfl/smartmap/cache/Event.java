@@ -11,7 +11,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public interface Event {
+public interface Event extends Displayable {
 
     /**
      * @return The ID of the user who created the event
@@ -36,21 +36,27 @@ public interface Event {
     /**
      * @return The event's ID
      */
+    @Override
     long getID();
 
     /**
      * @return The event's latitude and longitude in the LatLng format
      */
+
+    @Override
     LatLng getLatLng();
 
     /**
      * @return The event's position
      */
+    @Override
     Location getLocation();
 
     /**
      * @return The event's name
      */
+
+    @Override
     String getName();
 
     /**

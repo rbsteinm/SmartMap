@@ -6,6 +6,9 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 /**
  * A class to represent the user's friends
  * 
@@ -98,6 +101,26 @@ public class FriendInvitation implements Invitation, Displayable {
     @Override
     public void setUser(User user) {
         mUser = user;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getLatLng()
+     */
+    @Override
+    public LatLng getLatLng() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
+     */
+    @Override
+    public MarkerOptions getMarkerOptions(Context context) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
