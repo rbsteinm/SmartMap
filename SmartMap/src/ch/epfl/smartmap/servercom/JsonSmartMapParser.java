@@ -157,6 +157,25 @@ public class JsonSmartMapParser implements SmartMapParser {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapParser#parseId(java.lang.String)
+     */
+    @Override
+    public Long parseId(String s) throws SmartMapParseException {
+        long id = -1;
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+            id = jsonObject.getLong("id");
+
+        } catch (JSONException e) {
+            throw new SmartMapParseException(e);
+        }
+        this.checkId(id);
+
+        return id;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.servercom.SmartMapParser#parseIds(java.lang.String)
      */
     @Override

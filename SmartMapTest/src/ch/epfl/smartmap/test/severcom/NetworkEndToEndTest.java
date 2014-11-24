@@ -11,8 +11,8 @@ import org.junit.Test;
 import android.location.Location;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.cache.UserEvent;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.ServerFeedbackException;
@@ -40,7 +40,7 @@ public class NetworkEndToEndTest extends TestCase {
 	private static final long VALID_ID_2 = 2;
 	private static final long MY_ID = 3;
 	private static final User VALID_PEOPLE = new Friend(MY_ID, VALID_NAME);
-	private static final Event FOOTBALL_TOURNAMENT = new UserEvent(
+	private static final Event FOOTBALL_TOURNAMENT = new PublicEvent(
 			"Football Tournament", VALID_PEOPLE.getID(),
 			VALID_PEOPLE.getName(), new GregorianCalendar(2014, 11, 23),
 			new GregorianCalendar(2014, 11, 27), LOCATION);

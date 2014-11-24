@@ -13,9 +13,7 @@ import org.junit.Test;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkNotificationBag;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
-import ch.epfl.smartmap.servercom.SmartMapClient;
 
 /**
  * @author Pamoi
@@ -26,27 +24,16 @@ public class NetworkNotificationBagTest extends TestCase {
     @SuppressWarnings("unused")
     @Test
     public void testContructor() {
-        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         try {
-            NotificationBag nb = new NetworkNotificationBag(null, new ArrayList<User>(), new ArrayList<Long>(),
-                client);
+            NotificationBag nb = new NetworkNotificationBag(null, new ArrayList<User>(), new ArrayList<Long>());
             fail("Exception was not raised by constructor !");
         } catch (IllegalArgumentException e) {
             // Success
         }
         
         try {
-            NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), null, new ArrayList<Long>(),
-                client);
-            fail("Exception was not raised by constructor !");
-        } catch (IllegalArgumentException e) {
-            // Success
-        }
-        
-        try {
-            NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(),
-                null, client);
+            NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), null, new ArrayList<Long>());
             fail("Exception was not raised by constructor !");
         } catch (IllegalArgumentException e) {
             // Success
@@ -54,7 +41,7 @@ public class NetworkNotificationBagTest extends TestCase {
         
         try {
             NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(),
-                new ArrayList<Long>(), null);
+                null);
             fail("Exception was not raised by constructor !");
         } catch (IllegalArgumentException e) {
             // Success
@@ -62,16 +49,13 @@ public class NetworkNotificationBagTest extends TestCase {
     }
     
     @Test
-    public void testGetInvitingUsers()
-    {
-        SmartMapClient client = NetworkSmartMapClient.getInstance();
+    public void testGetInvitingUsers() {
         
         List<User> invitersList = new ArrayList<User>();
         invitersList.add(new Friend(1, "Toto"));
         invitersList.add(new Friend(2, "Titi"));
         
-        NotificationBag nb = new NetworkNotificationBag(invitersList, new ArrayList<User>(), new ArrayList<Long>(),
-            client);
+        NotificationBag nb = new NetworkNotificationBag(invitersList, new ArrayList<User>(), new ArrayList<Long>());
         
         // Test for structural equality (with method equals), not reference equality !
         assertTrue("The IntitingUsers list is not equal to the one given to the constructor",
@@ -80,14 +64,12 @@ public class NetworkNotificationBagTest extends TestCase {
     
     @Test
     public void testGetNewFriends() {
-        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<User> newFriends = new ArrayList<User>();
         newFriends.add(new Friend(1, "Toto"));
         newFriends.add(new Friend(2, "Titi"));
         
-        NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), newFriends, new ArrayList<Long>(),
-            client);
+        NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), newFriends, new ArrayList<Long>());
         
         // Test for structural equality (with method equals), not reference equality !
         assertTrue("The newFriends list is not equal to the one given to the constructor",
@@ -96,14 +78,12 @@ public class NetworkNotificationBagTest extends TestCase {
     
     @Test
     public void testGetRemovedFriendsIds() {
-        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<Long> removedIds = new ArrayList<Long>();
         removedIds.add((long) 4);
         removedIds.add((long) 54);
         
-        NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(), removedIds,
-            client);
+        NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(), removedIds);
         
         // Test for structural equality (with method equals), not reference equality !
         assertTrue("The newFriends list is not equal to the one given to the constructor",
@@ -112,14 +92,12 @@ public class NetworkNotificationBagTest extends TestCase {
     
     @Test
     public void testInvitingFriendsDefensiveCopy() {
-        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<User> invitersList = new ArrayList<User>();
         invitersList.add(new Friend(1, "Toto"));
         invitersList.add(new Friend(2, "Titi"));
         
-        NotificationBag nb = new NetworkNotificationBag(invitersList, new ArrayList<User>(), new ArrayList<Long>(),
-            client);
+        NotificationBag nb = new NetworkNotificationBag(invitersList, new ArrayList<User>(), new ArrayList<Long>());
         
         invitersList.add(new Friend(3, "Tata"));
         
@@ -135,14 +113,12 @@ public class NetworkNotificationBagTest extends TestCase {
     
     @Test
     public void testNewFriendsDefensiveCopy() {
-        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<User> friendsList = new ArrayList<User>();
         friendsList.add(new Friend(1, "Toto"));
         friendsList.add(new Friend(2, "Titi"));
         
-        NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), friendsList, new ArrayList<Long>(),
-            client);
+        NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), friendsList, new ArrayList<Long>());
         
         friendsList.add(new Friend(3, "Tata"));
         
@@ -158,14 +134,12 @@ public class NetworkNotificationBagTest extends TestCase {
     
     @Test
     public void testIRemovedFriendsDefensiveCopy() {
-        SmartMapClient client = NetworkSmartMapClient.getInstance();
         
         List<Long> removedIds = new ArrayList<Long>();
         removedIds.add((long) 4);
         removedIds.add((long) 54);
         
-        NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(), removedIds,
-            client);
+        NotificationBag nb = new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(), removedIds);
         
         removedIds.add((long) 5);
         

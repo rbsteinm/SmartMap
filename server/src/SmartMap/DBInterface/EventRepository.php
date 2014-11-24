@@ -50,13 +50,13 @@ class EventRepository
                     'name' => $event->getName(),
                     'description' => $event->getDescription()
                 ));
+
+            $event->setId($this->mDb->fetchColumn('SELECT LAST_INSERT_ID()', array(), 0));
         }
         catch (\Exception $e)
         {
             throw new DatabaseException('Error in createEvent.', 1, $e);
         }
-        
-        $event->setId($this->mDb->fetchColumn('SELECT LAST_INSERT_ID()', array(), 0));
         
         return $event;
     }
