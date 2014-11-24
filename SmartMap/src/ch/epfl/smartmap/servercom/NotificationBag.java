@@ -8,29 +8,15 @@ import java.util.List;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * An interface to encapsulate the informations given by the request getInvitations of {@link SmartMapClient}.
- * It also offers a method to acknowledge the server that the list of new friends was retrieved and one to
+ * An interface to encapsulate the informations given by the request
+ * getInvitations of {@link SmartMapClient}.
+ * It also offers a method to acknowledge the server that the list of new
+ * friends was retrieved and one to
  * acknowledge that the list of removed friends was retrieved.
  * 
  * @author Pamoi
  */
 public interface NotificationBag {
-
-    /**
-     * Acknowledges a new friend so it will not be returned by the server
-     * anymore.
-     * 
-     * @param id
-     */
-    void ackNewFriend(long id);
-
-    /**
-     * Acknowledges a removed friend so it will not be returned by the server
-     * anymore.
-     * 
-     * @param id
-     */
-    void ackRemovedFriend(long id);
 
     /**
      * Get a list of the users that sent an invitation request.

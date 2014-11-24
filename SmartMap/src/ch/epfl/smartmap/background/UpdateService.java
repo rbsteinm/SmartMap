@@ -284,8 +284,6 @@ public class UpdateService extends Service {
         protected void onPostExecute(List<User> result) {
             if (!result.isEmpty()) {
                 for (User user : result) {
-                    // TWEAK ! MUST BE REPLACED BY PROPER STORAGE IN THE
-                    // DATABASE !
                     if (mHelper.addInvitation(user) > 0) {
                         UpdateService.this.showFriendNotif(user);
                     }

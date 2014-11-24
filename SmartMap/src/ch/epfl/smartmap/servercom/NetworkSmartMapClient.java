@@ -26,7 +26,8 @@ import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider} to communicate with a SmartMap
+ * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider}
+ * to communicate with a SmartMap
  * server.
  * 
  * @author marion-S
@@ -404,8 +405,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-        return new NetworkNotificationBag(inviters, newFriends, removedFriends,
-            NetworkSmartMapClient.getInstance());
+        return new NetworkNotificationBag(inviters, newFriends, removedFriends);
 
     }
 
