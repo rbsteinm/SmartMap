@@ -3,6 +3,7 @@ package ch.epfl.smartmap.test.activities;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.AddEventActivity;
 
@@ -18,6 +19,9 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  * @author SpicyCH
  */
 public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
+
+    private AddEventActivity mAddEventActivity;
+
     public AddEventActivityTest() {
         super(AddEventActivity.class);
     }
@@ -27,6 +31,7 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
     protected void setUp() throws Exception {
         super.setUp();
         this.getActivity();
+        mAddEventActivity = this.getActivity();
     }
 
     public void testCannotCreateEventWith1Field() {
@@ -37,7 +42,6 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
-    @SuppressWarnings("unchecked")
     public void testCannotCreateEventWith2Field() {
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("TEST_NAME"));
 
@@ -61,6 +65,27 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
 
         onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+    }
+
+    public void testCannotCreateWithEmptyNameAndGoodOtherFields() {
+        // Regression test for bug #40
+
+        TextView latitude = (TextView) mAddEventActivity.findViewById(R.id.addEventLatitude);
+        TextView longitude = (TextView) mAddEventActivity.findViewById(R.id.addEventLongitude);
+
+        latitude.setText("1");
+        longitude.setText("2");
+
+        onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
+        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+
+        onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
+        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+
+        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+
+        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
     }
 
     public void testCannotCreateEventWithoutFields() {
