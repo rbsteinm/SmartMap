@@ -28,6 +28,7 @@ import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
@@ -35,7 +36,8 @@ import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.AddEventOnMapLongClickListener;
-import ch.epfl.smartmap.listeners.FriendsLocationListener;
+import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
+import ch.epfl.smartmap.listeners.OnFriendsLocationUpdateListener;
 import ch.epfl.smartmap.map.DefaultMarkerManager;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 
@@ -59,7 +61,7 @@ import com.google.android.gms.maps.model.Marker;
  * @author agpmilli
  */
 
-public class MainActivity extends FragmentActivity implements FriendsLocationListener {
+public class MainActivity extends FragmentActivity implements OnFriendsLocationUpdateListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -97,7 +99,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
 
         // TODO resolve main activity test ?
         mDbHelper = DatabaseHelper.initialize(this.getApplicationContext());
-        mDbHelper.addFriendsLocationListener(this);
+        mDbHelper.addOnFriendsLocationUpdateListener(this);
 
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
@@ -227,21 +229,6 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.FriendsLocationListener#onChange()
-     */
-    @Override
-    public void onChange() {
-
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(), mDbHelper.getAllFriends());
-            }
-        });
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -304,6 +291,21 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         });
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FriendsLocationListener#onChange()
+     */
+    @Override
+    public void onFriendsLocationChange() {
+
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(), mDbHelper.getAllFriends());
+            }
+        });
     }
 
     public void onLocationChanged(Location location) {
@@ -384,7 +386,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
      * @param item
      *            Item to be displayed
      */
-    public void setItemMenu(Displayable item) {
+    public void setItemMenu(final Displayable item) {
         final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
         // Closes panel and change only if panel could close
         if (mSearchPanel.close() || mSearchPanel.isClosed()) {
@@ -405,6 +407,22 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
 
             mCurrentItem = item;
             mMenuTheme = MenuTheme.ITEM;
+
+            mDbHelper.addOnDisplayableInformationsChangeListener(item,
+                new OnDisplayableInformationsChangeListener() {
+
+                    @Override
+                    public void onDisplayableInformationsChange() {
+                        if (item instanceof Friend) {
+                            MainActivity.this.mCurrentItem = mDbHelper.getUser(item.getID());
+                            ActionBar actionBar = MainActivity.this.getActionBar();
+                            actionBar.setTitle(item.getName());
+                            actionBar.setSubtitle(item.getShortInfos());
+                            actionBar.setIcon(new BitmapDrawable(MainActivity.this.getResources(), item
+                                .getPicture(MainActivity.this)));
+                        }
+                    }
+                });
         }
     }
 
