@@ -19,6 +19,9 @@ import ch.epfl.smartmap.gui.FriendListItemAdapter;
  */
 public class NotificationsActivity extends ListActivity {
 
+    @SuppressWarnings("unused")
+    private static final String TAG = NotificationsActivity.class.getSimpleName();
+
     private Context mContext;
 
     private DatabaseHelper mDbHelper;

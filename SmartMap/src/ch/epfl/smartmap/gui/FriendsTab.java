@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +36,7 @@ public class FriendsTab extends ListFragment implements FriendsListener {
 
     @Override
     public void onChange() {
-        this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+        this.setListAdapter(new FriendListItemAdapter(mContext, mCacheDB.getAllFriends()));
     }
 
     @Override
@@ -46,7 +45,7 @@ public class FriendsTab extends ListFragment implements FriendsListener {
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
         mCacheDB = DatabaseHelper.getInstance();
         mFriendList = new ArrayList<User>();
-        mFriendList = asList(mCacheDB.getAllUsers());
+        mFriendList = mCacheDB.getAllFriends();
 
         // Create custom Adapter and pass it to the Activity
         FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
@@ -65,25 +64,14 @@ public class FriendsTab extends ListFragment implements FriendsListener {
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         Intent intent = new Intent(mContext, UserInformationActivity.class);
-        intent.putExtra("CURRENT_DISPLAYABLE", user);
+        intent.putExtra("USER", user);
         this.startActivity(intent);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
-    }
-
-    public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
-        if (sparseArray == null) {
-            return null;
-        }
-        List<C> arrayList = new ArrayList<C>(sparseArray.size());
-        for (int i = 0; i < sparseArray.size(); i++) {
-            arrayList.add(sparseArray.valueAt(i));
-        }
-        return arrayList;
+        this.setListAdapter(new FriendListItemAdapter(mContext, mCacheDB.getAllFriends()));
     }
 
 }

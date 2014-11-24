@@ -1,18 +1,18 @@
 package ch.epfl.smartmap.test.cache;
 
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.junit.Test;
 
 import android.location.Location;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
-import android.util.LongSparseArray;
 import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.DefaultFilter;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.PublicEvent;
+import ch.epfl.smartmap.cache.User;
 
 /**
  * Tests for the DatabaseHelper class
@@ -25,10 +25,10 @@ public class DatabaseHelperTest extends AndroidTestCase {
     private Friend a = new Friend(1234, "qwertz uiop");
     private Friend b = new Friend(0, "hcjkehfkl");
     private Friend c = new Friend(9909, "Abc Def");
-    private final PublicEvent event = new PublicEvent("A new event", 1234, "qwertz uiop", new GregorianCalendar(),
-        new GregorianCalendar(), new Location("SmartMapProvider"));
-    private final PublicEvent event2 = new PublicEvent("Another new event", 4523, "abababab", new GregorianCalendar(),
-        new GregorianCalendar(), new Location("SmartMapProvider"));
+    private final PublicEvent event = new PublicEvent("A new event", 1234, "qwertz uiop",
+        new GregorianCalendar(), new GregorianCalendar(), new Location("SmartMapProvider"));
+    private final PublicEvent event2 = new PublicEvent("Another new event", 4523, "abababab",
+        new GregorianCalendar(), new GregorianCalendar(), new Location("SmartMapProvider"));
     private DatabaseHelper dbh;
     private DefaultFilter filter;
     private DefaultFilter filter2;
@@ -69,8 +69,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
     public void testAddEvent() {
         dbh.addEvent(event);
         assertTrue(dbh.getEvent(event.getID()).getCreatorName().equals(event.getCreatorName())
-            && (dbh.getEvent(event.getID()).getStartDate().get(GregorianCalendar.MINUTE) == event.getStartDate().get(
-                GregorianCalendar.MINUTE))
+            && (dbh.getEvent(event.getID()).getStartDate().get(GregorianCalendar.MINUTE) == event
+                .getStartDate().get(GregorianCalendar.MINUTE))
             && (dbh.getEvent(event.getID()).getLocation().getLatitude() == event.getLocation().getLatitude()));
     }
 
@@ -94,7 +94,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
             && dbh.getUser(a.getID()).getPositionName().equals(a.getPositionName())
             && (dbh.getUser(a.getID()).getLocation().getLongitude() == a.getLocation().getLongitude())
             && (dbh.getUser(a.getID()).getLocation().getLatitude() == a.getLocation().getLatitude())
-            && (dbh.getAllUsers().size() == 1));
+            && (dbh.getAllFriends().size() == 1));
     }
 
     @Test
@@ -111,16 +111,6 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.deleteFilter(filter.getID());
         assertTrue(dbh.getAllFilters().isEmpty());
     }
-    
-    public void testUpdateUser() {
-        a.setEmail("test email");
-        dbh.addUser(a);
-        dbh.addUser(b);
-        int rows = dbh.updateUser(new Friend(a.getID(), c.getName()));
-        assertTrue(dbh.getUser(a.getID()).getName().equals(c.getName()) 
-            && dbh.getUser(a.getID()).getEmail().equals("test email") 
-            && rows == 1);
-    }
 
     @Test
     public void testDeleteUser() {
@@ -128,8 +118,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(b);
         dbh.addUser(c);
         dbh.deleteUser(b.getID());
-        LongSparseArray<User> list = dbh.getAllUsers();
-        assertTrue((list.size() == 2) && (list.get(c.getID()).getID() == c.getID()));
+        List<User> list = dbh.getAllFriends();
+        assertTrue((list.size() == 2));
     }
 
     @Test
@@ -147,12 +137,12 @@ public class DatabaseHelperTest extends AndroidTestCase {
     }
 
     @Test
-    public void testGetAllUsers() {
+    public void testgetAllFriends() {
         dbh.addUser(a);
         dbh.addUser(b);
         dbh.addUser(c);
-        LongSparseArray<User> list = dbh.getAllUsers();
-        assertTrue(list.get(c.getID()).getID() == c.getID());
+        List<User> list = dbh.getAllFriends();
+        assertTrue((list.size() == 3) && (dbh.getUser(c.getID()).getID() == c.getID()));
     }
 
     @Test
@@ -161,5 +151,14 @@ public class DatabaseHelperTest extends AndroidTestCase {
         event.setName(name);
         long rows = dbh.updateEvent(event);
         assertTrue(dbh.getEvent(event.getID()).getName().equals(name) && (rows == 1));
+    }
+
+    public void testUpdateUser() {
+        a.setEmail("test email");
+        dbh.addUser(a);
+        dbh.addUser(b);
+        int rows = dbh.updateUser(new Friend(a.getID(), c.getName()));
+        assertTrue(dbh.getUser(a.getID()).getName().equals(c.getName())
+            && dbh.getUser(a.getID()).getEmail().equals("test email") && (rows == 1));
     }
 }

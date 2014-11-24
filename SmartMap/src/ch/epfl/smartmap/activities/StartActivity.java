@@ -33,6 +33,7 @@ import com.facebook.Session;
  * @author SpicyCH
  */
 public class StartActivity extends FragmentActivity {
+
     private static final String TAG = StartActivity.class.getSimpleName();
 
     private FacebookFragment mFacebookFragment;

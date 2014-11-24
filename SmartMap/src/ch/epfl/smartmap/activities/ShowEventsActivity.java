@@ -66,7 +66,7 @@ public class ShowEventsActivity extends ListActivity {
 
         // Makes the logo clickable (clicking it returns to previous activity)
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
-
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
         this.initializeGUI();
 
         // Create custom Adapter and pass it to the Activity

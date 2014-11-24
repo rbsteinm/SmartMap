@@ -21,6 +21,9 @@ import ch.epfl.smartmap.gui.PagerAdapter;
  */
 public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 
+    @SuppressWarnings("unused")
+    private static final String TAG = FriendsPagerActivity.class.getSimpleName();
+
     private ViewPager mPager;
     private ActionBar mActionBar;
     private final String[] mTabs = {"Friends", "Invitations"};

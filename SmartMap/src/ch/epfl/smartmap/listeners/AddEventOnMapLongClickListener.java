@@ -40,9 +40,7 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
         try {
             addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
             if (addresses.size() > 0) {
-                // Makes sure that an address is associated to the
-                // coordinates, the user could have
-                // long
+                // Makes sure that an address is associated to the coordinates, the user could have long
                 // clicked in the middle of the sea after all :)
                 cityName = addresses.get(0).getLocality();
             }
@@ -63,12 +61,10 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
         extras.putParcelable(Activity.LOCATION_SERVICE, latLng);
         result.putExtras(extras);
         if (mActivity.getIntent().getBooleanExtra("pickLocationForEvent", false)) {
-            // Return the result to the calling activity
-            // (AddEventActivity)
+            // Return the result to the calling activity (AddEventActivity)
             mActivity.setResult(Activity.RESULT_OK, result);
         } else {
-            // The user was in MainActivity and long clicked to create
-            // an event
+            // The user was in MainActivity and long clicked to create an event
             mActivity.startActivity(result);
         }
     }

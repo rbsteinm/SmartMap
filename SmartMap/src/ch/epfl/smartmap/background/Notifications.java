@@ -22,6 +22,7 @@ import ch.epfl.smartmap.cache.User;
  * @author agpmilli
  */
 public class Notifications {
+
     private static final int VIBRATE_NOTIFICATION_TIME = 500;
 
     private static final int SILENT_NOTIFICATION_TIME = 100;

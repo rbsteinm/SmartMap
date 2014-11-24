@@ -35,6 +35,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * @author ritterni
  */
 public class UpdateService extends Service {
+
     public static final String BROADCAST_POS = "ch.epfl.smartmap.background.broadcastPos";
 
     public static final String UPDATED_ROWS = "UpdatedRows";

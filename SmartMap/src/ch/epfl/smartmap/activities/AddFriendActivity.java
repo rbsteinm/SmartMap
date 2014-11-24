@@ -32,6 +32,9 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class AddFriendActivity extends ListActivity {
 
+    @SuppressWarnings("unused")
+    private static final String TAG = AddFriendActivity.class.getSimpleName();
+
     private SearchView mSearchBar;
 
     @Override

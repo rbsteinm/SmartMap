@@ -30,6 +30,10 @@ import ch.epfl.smartmap.cache.SettingsManager;
  * @author SpicyCH
  */
 public class SettingsActivity extends PreferenceActivity {
+
+    @SuppressWarnings("unused")
+    private static final String TAG = SettingsActivity.class.getSimpleName();
+
     /**
      * Determines whether to always show the simplified settings UI, where settings are presented in a single
      * list. When
@@ -38,8 +42,6 @@ public class SettingsActivity extends PreferenceActivity {
      * tablets.
      */
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
-
-    public static final String TAG = SettingsActivity.class.getSimpleName();
 
     /**
      * A preference value change listener that updates the preference's summary to reflect its new value.
@@ -198,7 +200,9 @@ public class SettingsActivity extends PreferenceActivity {
      * extra-large.
      */
     private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+        int screenSize =
+            context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+        return screenSize >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     /**

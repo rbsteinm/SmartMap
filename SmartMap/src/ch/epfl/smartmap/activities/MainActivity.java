@@ -5,7 +5,6 @@ import java.util.List;
 
 import android.app.ActionBar;
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
@@ -15,7 +14,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
@@ -63,7 +61,8 @@ import com.google.android.gms.maps.model.Marker;
 
 public class MainActivity extends FragmentActivity implements FriendsLocationListener {
 
-    private static final String TAG = "MAIN ACTIVITY";
+    @SuppressWarnings("unused")
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
 
@@ -72,7 +71,6 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
     private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
     private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
 
-    private ActionBar mActionBar;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private DatabaseHelper mDbHelper;
@@ -88,14 +86,6 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
     private Displayable mCurrentItem;
 
     private LayerDrawable mIcon;
-
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            mFriendMarkerManager.updateMarkers(MainActivity.this.getContext(), mDbHelper.getAllFriends());
-        }
-
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -406,12 +396,12 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
             mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
             mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
             // Change ActionBar title and icon
-            ActionBar mActionBar = this.getActionBar();
-            mActionBar.setTitle(item.getName());
-            mActionBar.setSubtitle(item.getShortInfos());
-            mActionBar.setIcon(new BitmapDrawable(this.getResources(), item.getPicture(this)));
+            ActionBar actionBar = this.getActionBar();
+            actionBar.setTitle(item.getName());
+            actionBar.setSubtitle(item.getShortInfos());
+            actionBar.setIcon(new BitmapDrawable(this.getResources(), item.getPicture(this)));
             // ActionBar HomeIndicator
-            mActionBar.setHomeAsUpIndicator(null);
+            actionBar.setHomeAsUpIndicator(null);
 
             mCurrentItem = item;
             mMenuTheme = MenuTheme.ITEM;
@@ -436,11 +426,11 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
             mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
             mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
             // Change ActionBar title and icon
-            ActionBar mActionBar = this.getActionBar();
-            mActionBar.setTitle(R.string.app_name);
-            mActionBar.setSubtitle(null);
-            mActionBar.setIcon(R.drawable.ic_launcher);
-            mActionBar.setHomeAsUpIndicator(this.getResources().getDrawable(R.drawable.ic_drawer));
+            ActionBar actionBar = this.getActionBar();
+            actionBar.setTitle(R.string.app_name);
+            actionBar.setSubtitle(null);
+            actionBar.setIcon(R.drawable.ic_launcher);
+            actionBar.setHomeAsUpIndicator(this.getResources().getDrawable(R.drawable.ic_drawer));
             mMenuTheme = MenuTheme.MAP;
         }
     }
@@ -455,17 +445,17 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
             mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(true);
             mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
             // Change ActionBar title and icon
-            ActionBar mActionBar = this.getActionBar();
-            mActionBar.setTitle(R.string.app_name);
-            mActionBar.setSubtitle(null);
-            mActionBar.setIcon(R.drawable.ic_launcher);
+            ActionBar actionBar = this.getActionBar();
+            actionBar.setTitle(R.string.app_name);
+            actionBar.setSubtitle(null);
+            actionBar.setIcon(R.drawable.ic_launcher);
             mMenuTheme = MenuTheme.SEARCH;
         }
     }
 
     private void initializeMarkers() {
         mEventMarkerManager.updateMarkers(this, mDbHelper.getAllEvents());
-        mFriendMarkerManager.updateMarkers(this, this.sparseArrayToList(mDbHelper.getAllUsers()));
+        mFriendMarkerManager.updateMarkers(this, mDbHelper.getAllFriends());
 
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
         allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
@@ -473,17 +463,6 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         if (startingIntent.getParcelableExtra("location") == null) {
             mMapZoomer.zoomAccordingToMarkers(allMarkers);
         }
-    }
-
-    private List<User> sparseArrayToList(LongSparseArray<User> usersSparseArray) {
-        List<User> users = new ArrayList<User>();
-        for (int i = 0; i < usersSparseArray.size(); i++) {
-            User user = usersSparseArray.valueAt(i);
-
-            users.add(user);
-
-        }
-        return users;
     }
 
     /**

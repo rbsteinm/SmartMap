@@ -11,7 +11,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.util.Log;
-import android.util.LongSparseArray;
 import ch.epfl.smartmap.listeners.EventsListener;
 import ch.epfl.smartmap.listeners.FiltersListener;
 import ch.epfl.smartmap.listeners.FriendsListener;
@@ -127,13 +126,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Stores an event in the database. If there's already an event with the
-     * <<<<<<< HEAD
      * same ID, updates that event instead
      * The event must have an ID (given by the server)!
-     * =======
-     * same ID, updates that event instead The event must have an ID (given by
-     * the server)!
-     * >>>>>>> gui-user-info
      * 
      * @param event
      *            The event to store
@@ -387,7 +381,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * @return The list of all events
+     * @return the {@code List} of all events
      */
     public List<Event> getAllEvents() {
         ArrayList<Event> events = new ArrayList<Event>();
@@ -406,9 +400,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Gets all the filters from the database
-     * 
-     * @return A list of FriendLists
+     * @return the {@code List} of all Filters
      */
     public List<Filter> getAllFilters() {
 
@@ -429,24 +421,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return filters;
     }
 
-    public ArrayList<User> getAllFriends() {
-        ArrayList<User> friends = new ArrayList<User>();
-        LongSparseArray<User> sparseArray = this.getAllUsers();
-
-        for (int i = 0; i < sparseArray.size(); i++) {
-            friends.add(sparseArray.valueAt(i));
-        }
-        return friends;
-    }
-
     /**
-     * Creates a LongSparseArray containing all users in the database, mapped to
-     * their ID
-     * 
-     * @return A LongSparseArray of all users
+     * @return the {@code List} of all friends
      */
-    public LongSparseArray<User> getAllUsers() {
-        LongSparseArray<User> friends = new LongSparseArray<User>();
+    public List<User> getAllFriends() {
+        ArrayList<User> friends = new ArrayList<User>();
 
         String query = "SELECT  * FROM " + TABLE_USER;
 
@@ -466,11 +445,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 GregorianCalendar cal = new GregorianCalendar();
                 cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
                 friend.setLastSeen(cal);
-                friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); // int
-                                                                                           // to
-                                                                                           // boolean
-
-                friends.put(friend.getID(), friend);
+                friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); // int to boolean
+                friends.add(friend);
             } while (cursor.moveToNext());
         }
 
@@ -725,13 +701,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Fully updates the friends database (not only positions)
      */
     public void refreshFriendsInfo() {
-        LongSparseArray<User> friends = this.getAllUsers();
+        List<User> friends = this.getAllFriends();
         NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-        for (int i = 0; i < friends.size(); i++) {
+        for (User f : friends) {
             try {
-                // The keys are IDs, so we call getUserInfo for each key and
-                // update the db with the result
-                this.updateUser(client.getUserInfo(friends.keyAt(i)));
+                // Update Server Database with local changes
+                this.updateUser(client.getUserInfo(f.getID()));
             } catch (SmartMapClientException e) {
                 e.printStackTrace();
             }

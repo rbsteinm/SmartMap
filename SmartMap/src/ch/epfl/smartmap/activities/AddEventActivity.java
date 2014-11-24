@@ -33,16 +33,13 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class AddEventActivity extends FragmentActivity {
 
-    static final int PICK_LOCATION_REQUEST = 1;
-
-    private static final String CITY_NAME = "CITY_NAME";
-
-    private static final int ELEMENTS_HH_MM = 2;
-
-    private static final int ELEMENTS_JJ_DD_YYYY = 3;
-
     @SuppressWarnings("unused")
     private static final String TAG = AddEventActivity.class.getSimpleName();
+
+    static final int PICK_LOCATION_REQUEST = 1;
+    private static final String CITY_NAME = "CITY_NAME";
+    private static final int ELEMENTS_HH_MM = 2;
+    private static final int ELEMENTS_JJ_DD_YYYY = 3;
 
     private Context mContext;
     private EditText mDescription;
@@ -65,6 +62,7 @@ public class AddEventActivity extends FragmentActivity {
 
         // Makes the logo clickable (clicking it returns to previous activity)
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
         this.initializeGUIComponents();
 
