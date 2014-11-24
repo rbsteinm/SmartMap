@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.background;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -27,6 +26,7 @@ import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
@@ -74,18 +74,11 @@ public class UpdateService extends Service {
             }
         }
     };
-    private final Runnable showFriendNotif = new Runnable() {
-        @Override
-        public void run() {
-            new AsyncRequestCheck().execute();
-            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
-        }
-    };
 
-    private final Runnable getReplies = new Runnable() {
+    private final Runnable getInvitations = new Runnable() {
         @Override
         public void run() {
-            new AsyncReplyCheck().execute();
+            new AsyncGetInvitations().execute();
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
         }
     };
@@ -114,10 +107,8 @@ public class UpdateService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         mHandler.removeCallbacks(friendsPosUpdate);
         mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
-        mHandler.removeCallbacks(showFriendNotif);
-        mHandler.postDelayed(showFriendNotif, HANDLER_DELAY);
-        mHandler.removeCallbacks(getReplies);
-        mHandler.postDelayed(getReplies, HANDLER_DELAY);
+        mHandler.removeCallbacks(getInvitations);
+        mHandler.postDelayed(getInvitations, HANDLER_DELAY);
         new AsyncLogin().execute();
         Log.d("UpdateService", "Service started");
 
@@ -233,59 +224,38 @@ public class UpdateService extends Service {
     }
 
     /**
-     * AsyncTask to check if a friend request was received
+     * AsyncTask to get invitations.
      * 
      * @author ritterni
      */
-    private class AsyncReplyCheck extends AsyncTask<Void, Void, List<User>> {
+    private class AsyncGetInvitations extends AsyncTask<Void, Void, NotificationBag> {
         @Override
-        protected List<User> doInBackground(Void... arg0) {
-            List<User> list = new ArrayList<User>();
+        protected NotificationBag doInBackground(Void... arg0) {
+            NotificationBag nb = null;
             try {
                 // Second list, the list of accepted invitations
-                list = mClient.getInvitations().getNewFriends();
+                nb = mClient.getInvitations();
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't retrieve replies!");
             }
-            return list;
+            return nb;
         }
 
         @Override
-        protected void onPostExecute(List<User> result) {
-            if (!result.isEmpty()) {
-                for (User user : result) {
+        protected void onPostExecute(NotificationBag result) {
+
+            List<User> newFriends = result.getNewFriends();
+            if (!newFriends.isEmpty()) {
+                for (User user : newFriends) {
                     mHelper.addUser(user);
                     mHelper.deletePendingFriend(user.getID());
                     UpdateService.this.showAcceptedNotif(user);
                 }
             }
-        }
-    }
 
-    /**
-     * AsyncTask to check if a friend request was received
-     * 
-     * @author ritterni
-     */
-    private class AsyncRequestCheck extends AsyncTask<Void, Void, List<User>> {
-        @Override
-        protected List<User> doInBackground(Void... arg0) {
-            List<User> list = new ArrayList<User>();
-            try {
-                // First list, the list of received invitations
-                list = mClient.getInvitations().getInvitingUsers();
-            } catch (SmartMapClientException e) {
-                Log.e("UpdateService", "Couldn't retrieve invites!");
-            }
-            return list;
-        }
-
-        @Override
-        protected void onPostExecute(List<User> result) {
-            if (!result.isEmpty()) {
-                for (User user : result) {
-                    // TWEAK ! MUST BE REPLACED BY PROPER STORAGE IN THE
-                    // DATABASE !
+            List<User> invitingUsers = result.getInvitingUsers();
+            if (!invitingUsers.isEmpty()) {
+                for (User user : invitingUsers) {
                     if (mHelper.addInvitation(user) > 0) {
                         UpdateService.this.showFriendNotif(user);
                     }
