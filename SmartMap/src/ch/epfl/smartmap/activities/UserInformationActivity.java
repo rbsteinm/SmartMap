@@ -7,7 +7,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +42,6 @@ public class UserInformationActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
         this.setContentView(R.layout.activity_user_information);
         // Get views
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);

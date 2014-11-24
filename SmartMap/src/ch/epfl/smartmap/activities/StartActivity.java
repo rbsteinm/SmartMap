@@ -9,7 +9,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,7 +52,6 @@ public class StartActivity extends FragmentActivity {
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
-                Log.d(TAG, "SHA1 hash of the app : " + Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
         } catch (NameNotFoundException e) {
             Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");

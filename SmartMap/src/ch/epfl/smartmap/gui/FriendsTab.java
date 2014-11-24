@@ -17,14 +17,14 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.listeners.FriendsListener;
+import ch.epfl.smartmap.listeners.OnFriendListUpdateListener;
 
 /**
  * Fragment displaying your friends in FriendsActivity
  * 
  * @author rbsteinm
  */
-public class FriendsTab extends ListFragment implements FriendsListener {
+public class FriendsTab extends ListFragment implements OnFriendListUpdateListener {
     private List<User> mFriendList;
 
     private final Context mContext;
@@ -32,11 +32,6 @@ public class FriendsTab extends ListFragment implements FriendsListener {
 
     public FriendsTab(Context context) {
         mContext = context;
-    }
-
-    @Override
-    public void onChange() {
-        this.setListAdapter(new FriendListItemAdapter(mContext, mCacheDB.getAllFriends()));
     }
 
     @Override
@@ -52,9 +47,14 @@ public class FriendsTab extends ListFragment implements FriendsListener {
         this.setListAdapter(adapter);
 
         // Initialize the listener
-        mCacheDB.addFriendsListener(this);
+        mCacheDB.addOnFriendListUpdateListener(this);
 
         return view;
+    }
+
+    @Override
+    public void onFriendListUpdate() {
+        this.setListAdapter(new FriendListItemAdapter(mContext, mCacheDB.getAllFriends()));
     }
 
     @Override

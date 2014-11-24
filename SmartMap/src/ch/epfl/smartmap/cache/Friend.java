@@ -138,28 +138,8 @@ public class Friend implements User, Displayable, Parcelable {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (this.getClass() != obj.getClass()) {
-            return false;
-        }
-        Friend other = (Friend) obj;
-        if (mId != other.mId) {
-            return false;
-        }
-        if (mName == null) {
-            if (other.mName != null) {
-                return false;
-            }
-        } else if (!mName.equals(other.mName)) {
-            return false;
-        }
-        return true;
+    public boolean equals(Object that) {
+        return (that != null) && (that instanceof Friend) && (this.mId == ((Friend) that).mId);
     }
 
     @Override
@@ -249,6 +229,7 @@ public class Friend implements User, Displayable, Parcelable {
         } else {
             info = "Currently offline";
         }
+
         return info;
     }
 
@@ -259,10 +240,8 @@ public class Friend implements User, Displayable, Parcelable {
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
-        result = (prime * result) + (int) (mId ^ (mId >>> LEFT_SHIFT_COUNT));
-        result = (prime * result) + (mName == null ? 0 : mName.hashCode());
-        return result;
+
+        return ((int) mId) * prime;
     }
 
     @Override

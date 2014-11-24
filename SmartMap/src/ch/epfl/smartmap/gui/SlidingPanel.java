@@ -5,7 +5,6 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -100,14 +99,11 @@ public class SlidingPanel extends FrameLayout {
     public boolean onBackPressed() {
         switch (mVisualState) {
             case ANIM_PERFORMED:
-                Log.d(TAG, "onBackPressed, true anim");
                 return true;
             case OPEN:
-                Log.d(TAG, "onBackPressed, true ext");
                 this.close();
                 return true;
             case CLOSED:
-                Log.d(TAG, "onBackPressed, false");
                 return false;
             default:
                 assert false;
@@ -130,7 +126,6 @@ public class SlidingPanel extends FrameLayout {
             this.setVisibility(View.VISIBLE);
             // Start Animations
             for (int i = 0; i < this.getChildCount(); i++) {
-                Log.d(TAG, "View number " + i);
                 View v = this.getChildAt(i);
                 v.setVisibility(VISIBLE);
                 v.clearAnimation();
@@ -175,7 +170,7 @@ public class SlidingPanel extends FrameLayout {
 
             @Override
             public void onAnimationStart(Animation animation) {
-                Log.d(TAG, "Fade Animation Started with duration" + anim.getDuration());
+                // Nothing
             }
         });
 
@@ -190,13 +185,11 @@ public class SlidingPanel extends FrameLayout {
             animator.setDuration(EXTEND_DURATION);
         }
         final SlidingPanel thisPanel = this;
-        Log.d(TAG, "new Animation  : " + start.height + " to " + end.height);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 Integer value = (Integer) animation.getAnimatedValue();
                 thisPanel.getLayoutParams().height = value.intValue();
-                Log.d(TAG, "int value : " + value.intValue());
                 thisPanel.requestLayout();
             }
         });

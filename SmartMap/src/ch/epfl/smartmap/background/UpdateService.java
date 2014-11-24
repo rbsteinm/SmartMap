@@ -110,7 +110,6 @@ public class UpdateService extends Service {
         mHandler.removeCallbacks(getInvitations);
         mHandler.postDelayed(getInvitations, HANDLER_DELAY);
         new AsyncLogin().execute();
-        Log.d("UpdateService", "Service started");
 
         return START_STICKY;
     }
@@ -190,40 +189,6 @@ public class UpdateService extends Service {
     }
 
     /**
-     * AsyncTask to log in
-     * 
-     * @author ritterni
-     */
-    private class AsyncLogin extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            try {
-                mClient.authServer(mManager.getUserName(), mManager.getFacebookID(), mManager.getToken());
-            } catch (SmartMapClientException e) {
-                Log.e("UpdateService", "Couldn't log in!");
-            }
-            return null;
-        }
-    }
-
-    /**
-     * AsyncTask to send the user's own position to the server
-     * 
-     * @author ritterni
-     */
-    private class AsyncOwnPos extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            try {
-                mClient.updatePos(mManager.getLocation());
-            } catch (SmartMapClientException e) {
-                Log.e("UpdateService", "Position update failed!");
-            }
-            return null;
-        }
-    }
-
-    /**
      * AsyncTask to get invitations.
      * 
      * @author ritterni
@@ -292,6 +257,40 @@ public class UpdateService extends Service {
     }
 
     /**
+     * AsyncTask to log in
+     * 
+     * @author ritterni
+     */
+    private class AsyncLogin extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            try {
+                mClient.authServer(mManager.getUserName(), mManager.getFacebookID(), mManager.getToken());
+            } catch (SmartMapClientException e) {
+                Log.e("UpdateService", "Couldn't log in!");
+            }
+            return null;
+        }
+    }
+
+    /**
+     * AsyncTask to send the user's own position to the server
+     * 
+     * @author ritterni
+     */
+    private class AsyncOwnPos extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            try {
+                mClient.updatePos(mManager.getLocation());
+            } catch (SmartMapClientException e) {
+                Log.e("UpdateService", "Position update failed!");
+            }
+            return null;
+        }
+    }
+
+    /**
      * AsyncTask to ack friend removals
      * 
      * @author ritterni
@@ -352,8 +351,8 @@ public class UpdateService extends Service {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             // stop sending position if provider isn't available
-            if (status == LocationProvider.OUT_OF_SERVICE
-                || status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
+            if ((status == LocationProvider.OUT_OF_SERVICE)
+                || (status == LocationProvider.TEMPORARILY_UNAVAILABLE)) {
                 mOwnPosEnabled = false;
             } else if (status == LocationProvider.AVAILABLE) {
                 mOwnPosEnabled = true;
