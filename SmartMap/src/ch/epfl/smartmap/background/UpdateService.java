@@ -243,7 +243,10 @@ public class UpdateService extends Service {
         @Override
         protected void onPostExecute(NotificationBag result) {
 
-            for (User user : result.getNewFriends()) {
+            List<User> newFriends = result.getNewFriends();
+            List<Long> removedFriends = result.getRemovedFriendsIds();
+
+            for (User user : newFriends) {
                 mHelper.addUser(user);
                 mHelper.deletePendingFriend(user.getID());
                 UpdateService.this.showAcceptedNotif(user);
@@ -258,6 +261,52 @@ public class UpdateService extends Service {
             for (Long id : result.getRemovedFriendsIds()) {
                 mHelper.deleteUser(id);
             }
+
+            if (!newFriends.isEmpty()) {
+                new AsyncInvitationAck().execute(newFriends.toArray(new User[newFriends.size()]));
+            }
+
+            if (!removedFriends.isEmpty()) {
+                new AsyncRemovalAck().execute(removedFriends.toArray(new Long[removedFriends.size()]));
+            }
+        }
+    }
+
+    /**
+     * AsyncTask to ack accepted invitations
+     * 
+     * @author ritterni
+     */
+    private class AsyncInvitationAck extends AsyncTask<User, Void, Void> {
+        @Override
+        protected Void doInBackground(User... users) {
+            try {
+                for (User user : users) {
+                    mClient.ackAcceptedInvitation(user.getID());
+                }
+            } catch (SmartMapClientException e) {
+                Log.e("UpdateService", "Couldn't send acks!");
+            }
+            return null;
+        }
+    }
+
+    /**
+     * AsyncTask to ack friend removals
+     * 
+     * @author ritterni
+     */
+    private class AsyncRemovalAck extends AsyncTask<Long, Void, Void> {
+        @Override
+        protected Void doInBackground(Long... ids) {
+            try {
+                for (long id : ids) {
+                    mClient.ackRemovedFriend(id);
+                }
+            } catch (SmartMapClientException e) {
+                Log.e("UpdateService", "Couldn't send acks!");
+            }
+            return null;
         }
     }
 
@@ -303,8 +352,8 @@ public class UpdateService extends Service {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             // stop sending position if provider isn't available
-            if ((status == LocationProvider.OUT_OF_SERVICE)
-                || (status == LocationProvider.TEMPORARILY_UNAVAILABLE)) {
+            if (status == LocationProvider.OUT_OF_SERVICE
+                || status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
                 mOwnPosEnabled = false;
             } else if (status == LocationProvider.AVAILABLE) {
                 mOwnPosEnabled = true;
