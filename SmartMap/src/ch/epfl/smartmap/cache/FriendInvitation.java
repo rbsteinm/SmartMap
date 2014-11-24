@@ -35,9 +35,29 @@ public class FriendInvitation implements Invitation, Displayable {
         return mIntent;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getLatLng()
+     */
+    @Override
+    public LatLng getLatLng() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     @Override
     public Location getLocation() {
         return mUser.getLocation();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
+     */
+    @Override
+    public MarkerOptions getMarkerOptions(Context context) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
@@ -101,26 +121,6 @@ public class FriendInvitation implements Invitation, Displayable {
     @Override
     public void setUser(User user) {
         mUser = user;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getLatLng()
-     */
-    @Override
-    public LatLng getLatLng() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
-     */
-    @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

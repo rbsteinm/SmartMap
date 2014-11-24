@@ -15,69 +15,11 @@ import ch.epfl.smartmap.cache.User;
  */
 public class NetworkNotificationBag implements NotificationBag {
 
-    /**
-     * Sends an ackAcceptedInvitation request to the server asynchronously.
-     * 
-     * @author Pamoi
-     */
-    private class AsyncAckNewFriend extends AsyncTask<Long, Void, Void> {
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Void doInBackground(Long... params) {
-            // This private class is only used in this class, so we assume the
-            // number of parameters to be correct
-            try {
-                mClient.ackAcceptedInvitation(params[0]);
-            } catch (SmartMapClientException e) {
-                Log.e(TAG,
-                    "An error occured during communication with the server while executing ackNewFriend("
-                        + params[0] + ").");
-            }
-
-            return null;
-        }
-    }
-
-    /**
-     * Sends an ackRemovedFriend request to the server asynchronously.
-     * 
-     * @author Pamoi
-     */
-    private class AsyncAckRemovedFriend extends AsyncTask<Long, Void, Void> {
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Void doInBackground(Long... params) {
-            // This private class is only used in this class, so we assume the
-            // number of parameters to be correct
-
-            // method is ackRemovedFriend is not yet implemented.
-            /*
-             * try {
-             * mClient.ackRemovedFriend(params[0]);
-             * } catch (SmartMapClientException e) {
-             * Log.e(TAG,
-             * "An error occured during communication with the server while executing ackNewFriend("
-             * + params[0] + ").");
-             * }
-             */
-
-            return null;
-        }
-    }
-
     private static final String TAG = "NetworkNotificationBag";
+
     private List<User> mInvitingUsers;
 
     private List<User> mNewFriends;
-
     private List<Long> mRemovedFriends;
 
     private SmartMapClient mClient;
@@ -151,5 +93,63 @@ public class NetworkNotificationBag implements NotificationBag {
     @Override
     public List<Long> getRemovedFriendsIds() {
         return new ArrayList<Long>(mRemovedFriends);
+    }
+
+    /**
+     * Sends an ackAcceptedInvitation request to the server asynchronously.
+     * 
+     * @author Pamoi
+     */
+    private class AsyncAckNewFriend extends AsyncTask<Long, Void, Void> {
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Void doInBackground(Long... params) {
+            // This private class is only used in this class, so we assume the
+            // number of parameters to be correct
+            try {
+                mClient.ackAcceptedInvitation(params[0]);
+            } catch (SmartMapClientException e) {
+                Log.e(TAG,
+                    "An error occured during communication with the server while executing ackNewFriend("
+                        + params[0] + ").");
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     * Sends an ackRemovedFriend request to the server asynchronously.
+     * 
+     * @author Pamoi
+     */
+    private class AsyncAckRemovedFriend extends AsyncTask<Long, Void, Void> {
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Void doInBackground(Long... params) {
+            // This private class is only used in this class, so we assume the
+            // number of parameters to be correct
+
+            // method is ackRemovedFriend is not yet implemented.
+            /*
+             * try {
+             * mClient.ackRemovedFriend(params[0]);
+             * } catch (SmartMapClientException e) {
+             * Log.e(TAG,
+             * "An error occured during communication with the server while executing ackNewFriend("
+             * + params[0] + ").");
+             * }
+             */
+
+            return null;
+        }
     }
 }

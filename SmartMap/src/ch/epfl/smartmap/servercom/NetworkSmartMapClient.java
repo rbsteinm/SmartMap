@@ -59,11 +59,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     private static final NetworkSmartMapClient ONE_INSTANCE = new NetworkSmartMapClient();
 
-    public static NetworkSmartMapClient getInstance() {
-
-        return ONE_INSTANCE;
-    }
-
     private NetworkSmartMapClient() {
 
         CookieHandler.setDefault(mCookieManager);
@@ -216,17 +211,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-    }
-
-    private void checkResponseCode(HttpURLConnection connection) throws SmartMapClientException {
-        try {
-            if (connection.getResponseCode() != SERVER_RESPONSE_OK) {
-                throw new SmartMapClientException("HTTP error with code " + connection.getResponseCode()
-                    + " during communication with client.");
-            }
-        } catch (IOException e) {
-            throw new SmartMapClientException(e);
-        }
     }
 
     /*
@@ -393,21 +377,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         return ids;
     }
 
-    private HttpURLConnection getHttpURLConnection(String uri) throws SmartMapClientException {
-        URL serverURL = null;
-        HttpURLConnection connection = null;
-        try {
-            serverURL = new URL(SERVER_URL + uri);
-            connection = NETWORK_PROVIDER.getConnection(serverURL);
-        } catch (MalformedURLException e1) {
-            e1.printStackTrace();
-            throw new IllegalArgumentException();
-        } catch (IOException e) {
-            throw new SmartMapClientException(e);
-        }
-        return connection;
-    }
-
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getInvitations()
@@ -437,25 +406,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
         return new NetworkNotificationBag(inviters, newFriends, removedFriends,
             NetworkSmartMapClient.getInstance());
-
-    }
-
-    private Map<String, String> getParamsForEvent(Event event) {
-        Map<String, String> params = new HashMap<String, String>();
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        String startingDate = dateFormat.format(event.getStartDate().getTime());
-        String endDate = dateFormat.format(event.getEndDate().getTime());
-
-        params.put("starting", startingDate);
-        params.put("ending", endDate);
-        params.put("longitude", Double.toString(event.getLocation().getLongitude()));
-        params.put("latitude", Double.toString(event.getLocation().getLatitude()));
-        params.put("positionName", event.getPositionName());
-        params.put("name", event.getName());
-        params.put("description", event.getDescription());
-
-        return params;
 
     }
 
@@ -515,27 +465,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         }
 
         return publicEvents;
-    }
-
-    private String getRequestResponse(HttpURLConnection connection) throws SmartMapClientException {
-        StringBuffer response = null;
-        try {
-            // Get response
-            String inputLine;
-            response = new StringBuffer();
-            BufferedReader in;
-
-            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-
-            in.close();
-        } catch (IOException e) {
-            throw new SmartMapClientException(e);
-        }
-        return response.toString();
     }
 
     /*
@@ -613,16 +542,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         return users;
     }
 
-    private String longListToString(List<Long> list) {
-        String listString = "";
-
-        for (long n : list) {
-            listString += n + ",";
-        }
-
-        return listString;
-    }
-
     @Override
     public void removeFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
@@ -640,72 +559,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-    }
-
-    private void sendRequestWithParams(Map<String, String> params, HttpURLConnection connection)
-        throws SmartMapClientException {
-        try {
-            // Build the request
-            StringBuilder postData = new StringBuilder();
-            for (Map.Entry<String, String> param : params.entrySet()) {
-                if (postData.length() != 0) {
-                    postData.append('&');
-                }
-
-                postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
-                postData.append('=');
-                postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
-
-            }
-
-            connection.setDoOutput(true); // To be able to send data
-
-            // Send post request
-
-            DataOutputStream wr;
-
-            wr = new DataOutputStream(connection.getOutputStream());
-            wr.writeBytes(postData.toString());
-            wr.flush();
-            wr.close();
-        } catch (IOException e) {
-            throw new SmartMapClientException(e);
-        }
-    }
-
-    /**
-     * Sends a POST request to the server and returns the server's response
-     * 
-     * @param params
-     *            the parameters to send to the server
-     * @param uri
-     *            to append to the base url of the SmartMap server
-     * @return the server's response in String format
-     * @throws SmartMapClientException
-     *             in case the response could not be retrieved for any reason
-     *             external to the application (network failure etc.)
-     */
-    private String sendViaPost(Map<String, String> params, HttpURLConnection connection)
-        throws SmartMapClientException {
-        String response = null;
-        try {
-            connection.setRequestMethod("POST");
-
-            if (params.size() != 0) {
-                this.sendRequestWithParams(params, connection);
-            }
-
-            this.checkResponseCode(connection);
-
-            response = this.getRequestResponse(connection);
-
-        } catch (ProtocolException e) {
-            throw new SmartMapClientException(e);
-
-        } finally {
-            connection.disconnect();
-        }
-        return response;
     }
 
     /*
@@ -779,5 +632,152 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
+    }
+
+    private void checkResponseCode(HttpURLConnection connection) throws SmartMapClientException {
+        try {
+            if (connection.getResponseCode() != SERVER_RESPONSE_OK) {
+                throw new SmartMapClientException("HTTP error with code " + connection.getResponseCode()
+                    + " during communication with client.");
+            }
+        } catch (IOException e) {
+            throw new SmartMapClientException(e);
+        }
+    }
+
+    private HttpURLConnection getHttpURLConnection(String uri) throws SmartMapClientException {
+        URL serverURL = null;
+        HttpURLConnection connection = null;
+        try {
+            serverURL = new URL(SERVER_URL + uri);
+            connection = NETWORK_PROVIDER.getConnection(serverURL);
+        } catch (MalformedURLException e1) {
+            e1.printStackTrace();
+            throw new IllegalArgumentException();
+        } catch (IOException e) {
+            throw new SmartMapClientException(e);
+        }
+        return connection;
+    }
+
+    private Map<String, String> getParamsForEvent(Event event) {
+        Map<String, String> params = new HashMap<String, String>();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String startingDate = dateFormat.format(event.getStartDate().getTime());
+        String endDate = dateFormat.format(event.getEndDate().getTime());
+
+        params.put("starting", startingDate);
+        params.put("ending", endDate);
+        params.put("longitude", Double.toString(event.getLocation().getLongitude()));
+        params.put("latitude", Double.toString(event.getLocation().getLatitude()));
+        params.put("positionName", event.getPositionName());
+        params.put("name", event.getName());
+        params.put("description", event.getDescription());
+
+        return params;
+
+    }
+
+    private String getRequestResponse(HttpURLConnection connection) throws SmartMapClientException {
+        StringBuffer response = null;
+        try {
+            // Get response
+            String inputLine;
+            response = new StringBuffer();
+            BufferedReader in;
+
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+
+            in.close();
+        } catch (IOException e) {
+            throw new SmartMapClientException(e);
+        }
+        return response.toString();
+    }
+
+    private String longListToString(List<Long> list) {
+        String listString = "";
+
+        for (long n : list) {
+            listString += n + ",";
+        }
+
+        return listString;
+    }
+
+    private void sendRequestWithParams(Map<String, String> params, HttpURLConnection connection)
+        throws SmartMapClientException {
+        try {
+            // Build the request
+            StringBuilder postData = new StringBuilder();
+            for (Map.Entry<String, String> param : params.entrySet()) {
+                if (postData.length() != 0) {
+                    postData.append('&');
+                }
+
+                postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+                postData.append('=');
+                postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+
+            }
+
+            connection.setDoOutput(true); // To be able to send data
+
+            // Send post request
+
+            DataOutputStream wr;
+
+            wr = new DataOutputStream(connection.getOutputStream());
+            wr.writeBytes(postData.toString());
+            wr.flush();
+            wr.close();
+        } catch (IOException e) {
+            throw new SmartMapClientException(e);
+        }
+    }
+
+    /**
+     * Sends a POST request to the server and returns the server's response
+     * 
+     * @param params
+     *            the parameters to send to the server
+     * @param uri
+     *            to append to the base url of the SmartMap server
+     * @return the server's response in String format
+     * @throws SmartMapClientException
+     *             in case the response could not be retrieved for any reason
+     *             external to the application (network failure etc.)
+     */
+    private String sendViaPost(Map<String, String> params, HttpURLConnection connection)
+        throws SmartMapClientException {
+        String response = null;
+        try {
+            connection.setRequestMethod("POST");
+
+            if (params.size() != 0) {
+                this.sendRequestWithParams(params, connection);
+            }
+
+            this.checkResponseCode(connection);
+
+            response = this.getRequestResponse(connection);
+
+        } catch (ProtocolException e) {
+            throw new SmartMapClientException(e);
+
+        } finally {
+            connection.disconnect();
+        }
+        return response;
+    }
+
+    public static NetworkSmartMapClient getInstance() {
+
+        return ONE_INSTANCE;
     }
 }

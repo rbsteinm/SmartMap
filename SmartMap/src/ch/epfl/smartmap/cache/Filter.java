@@ -9,7 +9,7 @@ import android.util.LongSparseArray;
  * 
  * @author ritterni
  */
-public interface UserList {
+public interface Filter extends Displayable {
 
     /**
      * Adds a user to the list
@@ -25,6 +25,7 @@ public interface UserList {
      * 
      * @return The ID
      */
+    @Override
     long getID();
 
     /**

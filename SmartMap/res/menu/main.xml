@@ -1,4 +1,5 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <item
         android:id="@+id/action_search"
@@ -9,36 +10,22 @@
         android:singleLine="true"
         android:textSize="25sp"
         android:title="Search"/>
-    
-    <group 
-        android:id="@+id/search_menu_group"
-        android:visible="false" >
-        <item
-            android:id="@+id/action_hide_search"
-            android:icon="@drawable/ic_down"
-            android:showAsAction="always"
-            android:onClick="setMainMenu"
-            android:title="Hide Search" />
-    </group>
-
+    <item
+        android:id="@+id/action_notifications"
+        android:icon="@drawable/ic_menu_notifications"
+        android:showAsAction="always"
+        android:title="Notifications"/>
+    <item
+        android:id="@+id/action_hide_search"
+        android:icon="@drawable/ic_down"
+        android:showAsAction="always"
+        android:title="Hide Search"
+        android:visible="false"/>
     <item
         android:id="@+id/action_item_more"
-        android:icon="@drawable/ic_drawer"
-        android:onClick="openInformationActivity"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
         android:showAsAction="always"
         android:title="Open Infos"
         android:visible="false"/>
-    <item
-        android:id="@+id/action_item_less"
-        android:icon="@drawable/ic_down"
-        android:onClick="closeInformationPanel"
-        android:showAsAction="always"
-        android:title="Hide Infos"
-        android:visible="false"/>
-    
-    <item android:id="@+id/action_notifications"
-        android:title="Notifications"
-        android:icon="@drawable/ic_menu_notifications"
-        android:showAsAction="always"/>
 
 </menu>

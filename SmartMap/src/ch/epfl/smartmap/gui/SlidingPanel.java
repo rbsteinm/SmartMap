@@ -20,48 +20,14 @@ import ch.epfl.smartmap.R;
  */
 public class SlidingPanel extends FrameLayout {
 
-    /**
-     * Type of FadeAnimation
-     * 
-     * @author jfperren
-     */
-    private enum Fade {
-        IN(0, 1, FADE_IN_DELAY, FADE_IN_DURATION),
-        OUT(1, 0, FADE_OUT_DELAY, FADE_OUT_DURATION);
-
-        private float mFromAlpha;
-        private float mToAlpha;
-        private int mDelay;
-        private int mDuration;
-
-        private Fade(float fromAlpha, float toAlpha, int delay, int duration) {
-            mFromAlpha = fromAlpha;
-            mToAlpha = toAlpha;
-            mDelay = delay;
-            mDuration = duration;
-        }
-    }
-
-    /**
-     * Visual State of a SlidingPanel
-     * 
-     * @author jfperren
-     */
-    private enum VisualState {
-        CLOSED,
-        OPEN,
-        ANIM_PERFORMED;
-        private int height;
-    }
-
     private static final String TAG = "INFORMATION_PANEL";
+
     private static final int EXTEND_DURATION = 600;
+
     private static final int CLOSE_DURATION = 400;
     private static final int FADE_IN_DELAY = 400;
     private static final int FADE_IN_DURATION = 400;
-
     private static final int FADE_OUT_DELAY = 0;
-
     private static final int FADE_OUT_DURATION = 400;
 
     private static final int OPEN_HEIGHT = 1800;
@@ -69,6 +35,7 @@ public class SlidingPanel extends FrameLayout {
     private VisualState mVisualState;
 
     private ValueAnimator mCloseAnim;
+
     private ValueAnimator mOpenAnim;
 
     public SlidingPanel(Context context, AttributeSet attrs) {
@@ -87,6 +54,8 @@ public class SlidingPanel extends FrameLayout {
 
     /**
      * Hide panel
+     * 
+     * @return true if panel was open and now closes
      */
     public boolean close() {
         if (mVisualState == VisualState.OPEN) {
@@ -97,6 +66,81 @@ public class SlidingPanel extends FrameLayout {
             mCloseAnim.start();
             return true;
         }
+
+        return false;
+    }
+
+    /**
+     * Initialize Position Animations
+     */
+    public void initView() {
+        // Initialize heights
+        FrameLayout parent = (FrameLayout) this.getParent();
+        this.measure(parent.getWidth(), parent.getHeight());
+        VisualState.CLOSED.height = 0;
+        // FIXME : Shouldn't be hardcoded
+        VisualState.OPEN.height = OPEN_HEIGHT;
+        // Initialize Position Animators
+        this.initializeAnimators();
+    }
+
+    public boolean isClosed() {
+        return mVisualState == VisualState.CLOSED;
+    }
+
+    public boolean isOpened() {
+        return mVisualState == VisualState.OPEN;
+    }
+
+    /**
+     * Handle the event onBackPressed
+     * 
+     * @return true if the event is handled and should not go further
+     */
+    public boolean onBackPressed() {
+        switch (mVisualState) {
+            case ANIM_PERFORMED:
+                Log.d(TAG, "onBackPressed, true anim");
+                return true;
+            case OPEN:
+                Log.d(TAG, "onBackPressed, true ext");
+                this.close();
+                return true;
+            case CLOSED:
+                Log.d(TAG, "onBackPressed, false");
+                return false;
+            default:
+                assert false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Show full screen view
+     * 
+     * @return true is panel was closed and now opens
+     */
+    public boolean open() {
+        if (mVisualState == VisualState.CLOSED) {
+            if (VisualState.OPEN.height == -1) {
+                this.initView();
+            }
+            // Need to set Views to VISIBLE to avoid anim problems
+            this.setVisibility(View.VISIBLE);
+            // Start Animations
+            for (int i = 0; i < this.getChildCount(); i++) {
+                Log.d(TAG, "View number " + i);
+                View v = this.getChildAt(i);
+                v.setVisibility(VISIBLE);
+                v.clearAnimation();
+                v.startAnimation(this.createAlphaAnimation(v, Fade.IN));
+            }
+            mOpenAnim.start();
+
+            return true;
+        }
+
         return false;
     }
 
@@ -195,74 +239,36 @@ public class SlidingPanel extends FrameLayout {
     }
 
     /**
-     * Initialize Position Animations
-     */
-    public void initView() {
-        // Initialize heights
-        FrameLayout parent = (FrameLayout) this.getParent();
-        this.measure(parent.getWidth(), parent.getHeight());
-        VisualState.CLOSED.height = 0;
-        // FIXME : Shouldn't be hardcoded
-        VisualState.OPEN.height = OPEN_HEIGHT;
-        // Initialize Position Animators
-        this.initializeAnimators();
-    }
-
-    public boolean isClosed() {
-        return mVisualState == VisualState.CLOSED;
-    }
-
-    public boolean isOpened() {
-        return mVisualState == VisualState.OPEN;
-    }
-
-    /**
-     * Handle the event onBackPressed
+     * Type of FadeAnimation
      * 
-     * @return true if the event is handled and should not go further
+     * @author jfperren
      */
-    public boolean onBackPressed() {
-        switch (mVisualState) {
-            case ANIM_PERFORMED:
-                Log.d(TAG, "onBackPressed, true anim");
-                return true;
-            case OPEN:
-                Log.d(TAG, "onBackPressed, true ext");
-                this.close();
-                return true;
-            case CLOSED:
-                Log.d(TAG, "onBackPressed, false");
-                return false;
-            default:
-                assert false;
-        }
+    private enum Fade {
+        IN(0, 1, FADE_IN_DELAY, FADE_IN_DURATION),
+        OUT(1, 0, FADE_OUT_DELAY, FADE_OUT_DURATION);
 
-        return false;
+        private float mFromAlpha;
+        private float mToAlpha;
+        private int mDelay;
+        private int mDuration;
+
+        private Fade(float fromAlpha, float toAlpha, int delay, int duration) {
+            mFromAlpha = fromAlpha;
+            mToAlpha = toAlpha;
+            mDelay = delay;
+            mDuration = duration;
+        }
     }
 
     /**
-     * Show full screen view
+     * Visual State of a SlidingPanel
+     * 
+     * @author jfperren
      */
-    public boolean open() {
-        if (mVisualState == VisualState.CLOSED) {
-            if (VisualState.OPEN.height == -1) {
-                this.initView();
-            }
-            // Need to set Views to VISIBLE to avoid anim problems
-            this.setVisibility(View.VISIBLE);
-            // Start Animations
-            for (int i = 0; i < this.getChildCount(); i++) {
-                Log.d(TAG, "View number " + i);
-                View v = this.getChildAt(i);
-                v.setVisibility(VISIBLE);
-                v.clearAnimation();
-                v.startAnimation(this.createAlphaAnimation(v, Fade.IN));
-            }
-            mOpenAnim.start();
-
-            return true;
-        }
-
-        return false;
+    private enum VisualState {
+        CLOSED,
+        OPEN,
+        ANIM_PERFORMED;
+        private int height;
     }
 }

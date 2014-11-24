@@ -10,9 +10,9 @@ import android.test.RenamingDelegatingContext;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.FriendList;
+import ch.epfl.smartmap.cache.DefaultFilter;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.cache.UserEvent;
+import ch.epfl.smartmap.cache.PublicEvent;
 
 /**
  * Tests for the DatabaseHelper class
@@ -25,13 +25,13 @@ public class DatabaseHelperTest extends AndroidTestCase {
     private Friend a = new Friend(1234, "qwertz uiop");
     private Friend b = new Friend(0, "hcjkehfkl");
     private Friend c = new Friend(9909, "Abc Def");
-    private final UserEvent event = new UserEvent("A new event", 1234, "qwertz uiop", new GregorianCalendar(),
+    private final PublicEvent event = new PublicEvent("A new event", 1234, "qwertz uiop", new GregorianCalendar(),
         new GregorianCalendar(), new Location("SmartMapProvider"));
-    private final UserEvent event2 = new UserEvent("Another new event", 4523, "abababab", new GregorianCalendar(),
+    private final PublicEvent event2 = new PublicEvent("Another new event", 4523, "abababab", new GregorianCalendar(),
         new GregorianCalendar(), new Location("SmartMapProvider"));
     private DatabaseHelper dbh;
-    private FriendList filter;
-    private FriendList filter2;
+    private DefaultFilter filter;
+    private DefaultFilter filter2;
     private Location loc = new Location("");
 
     @Override
@@ -40,12 +40,12 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh = DatabaseHelper.initialize(new RenamingDelegatingContext(this.getContext(), "test_"));
         // to avoid erasing the actual database
 
-        filter = new FriendList(name);
+        filter = new DefaultFilter(name);
         filter.addUser(a.getID());
         filter.addUser(b.getID());
         filter.addUser(c.getID());
 
-        filter2 = new FriendList(name);
+        filter2 = new DefaultFilter(name);
         filter.addUser(b.getID());
         filter.addUser(c.getID());
 

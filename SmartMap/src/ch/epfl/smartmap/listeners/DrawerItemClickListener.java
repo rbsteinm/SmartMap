@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.gui;
+package ch.epfl.smartmap.listeners;
 
 import android.content.Intent;
 import android.view.View;

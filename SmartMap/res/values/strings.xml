@@ -112,8 +112,10 @@
     <string name="fb_fragment_toast_cannot_connect_to_smartmap_server">Failed to log in to the SmartMap server</string>
     <string name="fb_fragment_toast_cannot_connect_to_internet">Your internet connection seems down. Please try again!</string>
 
-    <!-- InformationAvtivity -->
-    <string name="title_activity_information">InformationActivity</string>
+    <!-- UserInformationActivity -->
+    <string name="title_activity_user_information">Friend Informations</string>
+    <string name="user_information_picture_description">Profile Picture</string>
+    <string name="title_activity_search">SearchActivity</string>
 
     <!-- Notification texts -->
     <string name="notification_acceptedfriend_title">Friend invitation accepted</string>

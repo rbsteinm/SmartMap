@@ -42,27 +42,6 @@ public class StartActivity extends FragmentActivity {
     private TextView mProgressText;
     private com.facebook.widget.LoginButton mLoginButton;
 
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
-        }
-
-        int auditErrors = 0;
-        // auditErrors += mSearchEngine.auditErrors(depth - 1);
-        // What are the rep invariants?
-
-        return auditErrors;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Displays the facebook app hash in LOG.d
@@ -135,6 +114,27 @@ public class StartActivity extends FragmentActivity {
 
         SettingsManager.initialize(this.getApplicationContext());
         DatabaseHelper.initialize(this.getApplicationContext());
+    }
+
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        // TODO : Decomment when auditErrors coded for other classes
+        if (depth == 0) {
+            return 0;
+        }
+
+        int auditErrors = 0;
+        // auditErrors += mSearchEngine.auditErrors(depth - 1);
+        // What are the rep invariants?
+
+        return auditErrors;
     }
 
     @Override

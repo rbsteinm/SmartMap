@@ -28,13 +28,13 @@ public class MockDB {
     public static final Friend MARIE = new Friend(12, "Marie Wermeille", 45.2547877, 45.004577);
     public static final Friend HUGO = new Friend(13, "Hugo Sbai", 47.5547877, 4.4255457);
 
-    public static final UserEvent FOOTBALL_TOURNAMENT = new UserEvent("Football Tournament", HUGO.getID(),
-        HUGO.getName(), new GregorianCalendar(2014, 11, 23), new GregorianCalendar(2014, 11, 27),
-        new Location("SmartMapServers"));
-    public static final UserEvent CONFERENCE = new UserEvent("Conference on cellular networks", HUGO.getID(),
-        HUGO.getName(), new GregorianCalendar(2014, 11, 26), new GregorianCalendar(2014, 11, 26),
-        new Location("Lausanne"));
-    public static final UserEvent MARION_BIRTHDAY = new UserEvent("Marion's birthday", MARION.getID(),
+    public static final PublicEvent FOOTBALL_TOURNAMENT = new PublicEvent("Football Tournament",
+        HUGO.getID(), HUGO.getName(), new GregorianCalendar(2014, 11, 23),
+        new GregorianCalendar(2014, 11, 27), new Location("SmartMapServers"));
+    public static final PublicEvent CONFERENCE = new PublicEvent("Conference on cellular networks",
+        HUGO.getID(), HUGO.getName(), new GregorianCalendar(2014, 11, 26),
+        new GregorianCalendar(2014, 11, 26), new Location("Lausanne"));
+    public static final PublicEvent MARION_BIRTHDAY = new PublicEvent("Marion's birthday", MARION.getID(),
         MARION.getName(), new GregorianCalendar(2014, 11, 20), new GregorianCalendar(2014, 11, 20),
         new Location("Marion's"));
 
@@ -56,14 +56,14 @@ public class MockDB {
         locationBirthday.setLatitude(45.8333);
         locationBirthday.setLongitude(7.38677);
         Event footballTournament =
-            new UserEvent("Football Tournament", HUGO.getID(), HUGO.getName(), new GregorianCalendar(2014,
+            new PublicEvent("Football Tournament", HUGO.getID(), HUGO.getName(), new GregorianCalendar(2014,
                 11, 23), new GregorianCalendar(2014, 11, 27), locationFootball);
         Event conference =
-            new UserEvent("Conference on cellular networks", HUGO.getID(), HUGO.getName(),
+            new PublicEvent("Conference on cellular networks", HUGO.getID(), HUGO.getName(),
                 new GregorianCalendar(2014, 11, 26), new GregorianCalendar(2014, 11, 26), locationConference);
         Event birthday =
-            new UserEvent("Marion's birthday", MARION.getID(), MARION.getName(), new GregorianCalendar(2014,
-                11, 20), new GregorianCalendar(2014, 11, 20), locationBirthday);
+            new PublicEvent("Marion's birthday", MARION.getID(), MARION.getName(), new GregorianCalendar(
+                2014, 11, 20), new GregorianCalendar(2014, 11, 20), locationBirthday);
         return Arrays.asList(conference, footballTournament, birthday);
     }
 }

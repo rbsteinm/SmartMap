@@ -12,6 +12,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.util.Log;
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.listeners.EventsListener;
+import ch.epfl.smartmap.listeners.FiltersListener;
+import ch.epfl.smartmap.listeners.FriendsListener;
+import ch.epfl.smartmap.listeners.FriendsLocationListener;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -110,29 +114,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static SQLiteDatabase mDatabase;
 
     /**
-     * @return The instance of DatabaseHelper
-     */
-    public static DatabaseHelper getInstance() {
-        return mInstance;
-    }
-
-    /**
-     * Initializes the database helper (should be called once when starting the
-     * app)
-     * 
-     * @param context
-     *            The app's context, needed to access the files
-     * @return The DatabaseHelper instance
-     */
-    public static DatabaseHelper initialize(Context context) {
-        if (mInstance == null) {
-            mInstance = new DatabaseHelper(context);
-            mDatabase = mInstance.getWritableDatabase();
-        }
-        return mInstance;
-    }
-
-    /**
      * DatabaseHelper constructor. Will be made private, so use initialize() or
      * getInstance() instead.
      * 
@@ -146,8 +127,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Stores an event in the database. If there's already an event with the
+     * <<<<<<< HEAD
      * same ID, updates that event instead
      * The event must have an ID (given by the server)!
+     * =======
+     * same ID, updates that event instead The event must have an ID (given by
+     * the server)!
+     * >>>>>>> gui-user-info
      * 
      * @param event
      *            The event to store
@@ -197,7 +183,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *            The filter/list to add
      * @return The ID of the newly added filter in the filter database
      */
-    public long addFilter(UserList filter) {
+    public long addFilter(Filter filter) {
         // First we insert the filter in the table of lists
         ContentValues filterValues = new ContentValues();
         filterValues.put(KEY_NAME, filter.getListName());
@@ -424,9 +410,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * 
      * @return A list of FriendLists
      */
-    public List<UserList> getAllFilters() {
+    public List<Filter> getAllFilters() {
 
-        ArrayList<UserList> filters = new ArrayList<UserList>();
+        ArrayList<Filter> filters = new ArrayList<Filter>();
 
         String query = "SELECT  * FROM " + TABLE_FILTER;
 
@@ -441,6 +427,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return filters;
+    }
+
+    public ArrayList<User> getAllFriends() {
+        ArrayList<User> friends = new ArrayList<User>();
+        LongSparseArray<User> sparseArray = this.getAllUsers();
+
+        for (int i = 0; i < sparseArray.size(); i++) {
+            friends.add(sparseArray.valueAt(i));
+        }
+        return friends;
     }
 
     /**
@@ -509,8 +505,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         loc.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
         loc.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
 
-        UserEvent event =
-            new UserEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)), cursor.getLong(cursor
+        PublicEvent event =
+            new PublicEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)), cursor.getLong(cursor
                 .getColumnIndex(KEY_USER_ID)), cursor.getString(cursor.getColumnIndex(KEY_CREATOR_NAME)),
                 startDate, endDate, loc);
 
@@ -530,7 +526,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *            The filter's id
      * @return The filter as a FriendList object
      */
-    public UserList getFilter(long id) {
+    public Filter getFilter(long id) {
 
         // SQLiteDatabase db = this.getWritableDatabase();
 
@@ -543,7 +539,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
         }
 
-        FriendList filter = new FriendList(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+        DefaultFilter filter = new DefaultFilter(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
         filter.setID(id);
 
         // Second query to get the associated list of IDs
@@ -802,7 +798,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param filter
      *            The updated filter
      */
-    public void updateFilter(UserList filter) {
+    public void updateFilter(Filter filter) {
 
         this.deleteFilter(filter.getID());
         this.addFilter(filter);
@@ -871,5 +867,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.updateUser(friend);
 
         this.notifyLocationsListeners();
+    }
+
+    /**
+     * @return The instance of DatabaseHelper
+     */
+    public static DatabaseHelper getInstance() {
+        return mInstance;
+    }
+
+    /**
+     * Initializes the database helper (should be called once when starting the
+     * app)
+     * 
+     * @param context
+     *            The app's context, needed to access the files
+     * @return The DatabaseHelper instance
+     */
+    public static DatabaseHelper initialize(Context context) {
+        if (mInstance == null) {
+            mInstance = new DatabaseHelper(context);
+            mDatabase = mInstance.getWritableDatabase();
+        }
+        return mInstance;
     }
 }

@@ -24,6 +24,61 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class NotificationsActivity extends ListActivity {
 
+    private Context mContext;
+
+    private DatabaseHelper mDbHelper;
+
+    private NetworkSmartMapClient mNetworkClient;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_notifications);
+
+        mContext = this.getBaseContext();
+        mDbHelper = DatabaseHelper.getInstance();
+        mNetworkClient = NetworkSmartMapClient.getInstance();
+
+        // mInvitationList = mDbHelper.getInvitations();
+        new RefreshInvitationsList().execute();
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Intent showFriendIntent = new Intent(mContext, FriendsPagerActivity.class);
+        NotificationsActivity.this.startActivity(showFriendIntent);
+
+        super.onListItemClick(l, v, position, id);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // This is needed to show an update of the events' list after having
+        // created an event
+        new RefreshInvitationsList().execute();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.show_events, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == android.R.id.home) {
+            this.finish();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
      * AsyncTask that confirms the server that accepted invitations were
      * received
@@ -75,60 +130,5 @@ public class NotificationsActivity extends ListActivity {
             }
         }
 
-    }
-
-    private Context mContext;
-
-    private DatabaseHelper mDbHelper;
-
-    private NetworkSmartMapClient mNetworkClient;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_notifications);
-
-        mContext = this.getBaseContext();
-        mDbHelper = DatabaseHelper.getInstance();
-        mNetworkClient = NetworkSmartMapClient.getInstance();
-
-        // mInvitationList = mDbHelper.getInvitations();
-        new RefreshInvitationsList().execute();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.show_events, menu);
-        return true;
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        Intent showFriendIntent = new Intent(mContext, FriendsPagerActivity.class);
-        NotificationsActivity.this.startActivity(showFriendIntent);
-
-        super.onListItemClick(l, v, position, id);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        if (id == android.R.id.home) {
-            this.finish();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // This is needed to show an update of the events' list after having
-        // created an event
-        new RefreshInvitationsList().execute();
     }
 }

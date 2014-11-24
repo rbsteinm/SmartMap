@@ -4,8 +4,6 @@ import java.util.GregorianCalendar;
 
 import android.location.Location;
 
-import com.google.android.gms.maps.model.LatLng;
-
 /**
  * Describes an event
  * 
@@ -32,32 +30,6 @@ public interface Event extends Displayable {
      * @return The date (year, month, day, hour, minute) at which the event ends
      */
     GregorianCalendar getEndDate();
-
-    /**
-     * @return The event's ID
-     */
-    @Override
-    long getID();
-
-    /**
-     * @return The event's latitude and longitude in the LatLng format
-     */
-
-    @Override
-    LatLng getLatLng();
-
-    /**
-     * @return The event's position
-     */
-    @Override
-    Location getLocation();
-
-    /**
-     * @return The event's name
-     */
-
-    @Override
-    String getName();
 
     /**
      * @return The event's position as a String (e.g. 'Lausanne')

@@ -67,50 +67,6 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
     }
 
     /**
-     * Animate the given marker from it's position to the given one
-     * 
-     * @param marker
-     * @param toPosition
-     * @param hideMarker
-     * @param map
-     */
-    private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker) {
-        final Handler handler = new Handler();
-        final long start = SystemClock.uptimeMillis();
-        Projection proj = mGoogleMap.getProjection();
-        Point startPoint = proj.toScreenLocation(marker.getPosition());
-        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
-        final long duration = 500;
-
-        final Interpolator interpolator = new LinearInterpolator();
-
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                long elapsed = SystemClock.uptimeMillis() - start;
-                float t = interpolator.getInterpolation((float) elapsed / duration);
-                double lng = (t * toPosition.longitude) + ((1 - t) * startLatLng.longitude);
-                double lat = (t * toPosition.latitude) + ((1 - t) * startLatLng.latitude);
-                marker.setPosition(new LatLng(lat, lng));
-                // Log.d(TAG, "Set marker position for friend "
-                // + getFriendForMarker(marker).getName() + " "
-                // + marker.getPosition().toString());
-
-                if (t < 1.0) {
-                    // Post again 16ms later.
-                    handler.postDelayed(this, HANDLER_DELAY);
-                } else {
-                    if (hideMarker) {
-                        marker.setVisible(false);
-                    } else {
-                        marker.setVisible(true);
-                    }
-                }
-            }
-        });
-    }
-
-    /**
      * Checks that the Representation Invariant is not violated.
      * 
      * @param depth
@@ -253,6 +209,50 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
             }
         }
 
+    }
+
+    /**
+     * Animate the given marker from it's position to the given one
+     * 
+     * @param marker
+     * @param toPosition
+     * @param hideMarker
+     * @param map
+     */
+    private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker) {
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = mGoogleMap.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 500;
+
+        final Interpolator interpolator = new LinearInterpolator();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed / duration);
+                double lng = (t * toPosition.longitude) + ((1 - t) * startLatLng.longitude);
+                double lat = (t * toPosition.latitude) + ((1 - t) * startLatLng.latitude);
+                marker.setPosition(new LatLng(lat, lng));
+                // Log.d(TAG, "Set marker position for friend "
+                // + getFriendForMarker(marker).getName() + " "
+                // + marker.getPosition().toString());
+
+                if (t < 1.0) {
+                    // Post again 16ms later.
+                    handler.postDelayed(this, HANDLER_DELAY);
+                } else {
+                    if (hideMarker) {
+                        marker.setVisible(false);
+                    } else {
+                        marker.setVisible(true);
+                    }
+                }
+            }
+        });
     }
 
 }

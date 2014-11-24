@@ -10,6 +10,26 @@ import ch.epfl.smartmap.cache.User;
  * @author marion-S
  */
 public class EventCreatorNameRetriever {
+    private final Event mEvent;
+
+    public EventCreatorNameRetriever(Event event) {
+        // TODO Constructeur de copie pour Event?
+        mEvent = event;
+    }
+
+    /**
+     * Executes the AsyncTask
+     * 
+     * @throws SmartMapClientException
+     *             if the retrieved name is null, meaning that the server request failed n the AsynTask
+     */
+    public void setEventCreatorName() throws SmartMapClientException {
+        new SetEventCreatorName().execute(mEvent.getCreator());
+        if (mEvent.getCreatorName() == null) {
+            throw new SmartMapClientException("Network error");
+        }
+    }
+
     /**
      * AsyncTask to retrieve the event creator name by executing the request getUserInfo. doInBackGround
      * returns null if there was an error while executing getUserInfo
@@ -35,26 +55,6 @@ public class EventCreatorNameRetriever {
             mEvent.setCreatorName(name);
         }
 
-    }
-
-    private final Event mEvent;
-
-    public EventCreatorNameRetriever(Event event) {
-        // TODO Constructeur de copie pour Event?
-        mEvent = event;
-    }
-
-    /**
-     * Executes the AsyncTask
-     * 
-     * @throws SmartMapClientException
-     *             if the retrieved name is null, meaning that the server request failed n the AsynTask
-     */
-    public void setEventCreatorName() throws SmartMapClientException {
-        new SetEventCreatorName().execute(mEvent.getCreator());
-        if (mEvent.getCreatorName() == null) {
-            throw new SmartMapClientException("Network error");
-        }
     }
 
 }

@@ -21,23 +21,6 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
 
     private final static int FIRST_2DIGITS_NUMBER = 10;
 
-    /**
-     * @param time
-     *            a second, minute, hour, day or month
-     * @return the time prefixed with 0 if it was < 10
-     * @author SpicyCH
-     */
-    public static String formatForClock(int time) {
-        String hourOfDayString = "";
-        if (time < FIRST_2DIGITS_NUMBER) {
-            hourOfDayString += "0" + time;
-        } else {
-            hourOfDayString += time;
-        }
-
-        return hourOfDayString;
-    }
-
     private final EditText mPickTimeEditText;
 
     public TimePickerFragment(EditText e) {
@@ -60,6 +43,23 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         mPickTimeEditText.setText(formatForClock(hourOfDay) + ":" + formatForClock(minute));
         mPickTimeEditText.setTag(new int[]{hourOfDay, minute});
+    }
+
+    /**
+     * @param time
+     *            a second, minute, hour, day or month
+     * @return the time prefixed with 0 if it was < 10
+     * @author SpicyCH
+     */
+    public static String formatForClock(int time) {
+        String hourOfDayString = "";
+        if (time < FIRST_2DIGITS_NUMBER) {
+            hourOfDayString += "0" + time;
+        } else {
+            hourOfDayString += time;
+        }
+
+        return hourOfDayString;
     }
 
 }

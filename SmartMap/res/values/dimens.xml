@@ -7,4 +7,9 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="badge_text_size">16dp</dimen>
 
+    
+    <!-- UserInformationActivity -->
+    <dimen name="activity_user_information_side_margin">20px</dimen>
+    <dimen name="activity_user_information_top_margin">20px</dimen>
+    <dimen name="activity_user_information_bottom_margin">20px</dimen>
 </resources>

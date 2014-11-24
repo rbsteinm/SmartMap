@@ -19,7 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * 
  * @author ritterni
  */
-public class UserEvent implements Event, Searchable, Displayable {
+public class PublicEvent implements Event, Displayable {
     private String mEvtName;
     private final long mEvtCreator; // the user who created the event
     private final GregorianCalendar mStartDate;
@@ -52,7 +52,7 @@ public class UserEvent implements Event, Searchable, Displayable {
      * @param p
      *            The event's location on the map
      */
-    public UserEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
+    public PublicEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
         GregorianCalendar endDate, Location p) {
         if (name.isEmpty() || (name == null)) {
             throw new IllegalArgumentException("Invalid event name!");
@@ -104,7 +104,7 @@ public class UserEvent implements Event, Searchable, Displayable {
         if (this.getClass() != obj.getClass()) {
             return false;
         }
-        UserEvent other = (UserEvent) obj;
+        PublicEvent other = (PublicEvent) obj;
         if (mEvtName == null) {
             if (other.mEvtName != null) {
                 return false;

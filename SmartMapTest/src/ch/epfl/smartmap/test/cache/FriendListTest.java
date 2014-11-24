@@ -5,7 +5,7 @@ import org.junit.Test;
 import android.test.AndroidTestCase;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.FriendList;
+import ch.epfl.smartmap.cache.DefaultFilter;
 import ch.epfl.smartmap.cache.User;
 
 public class FriendListTest extends AndroidTestCase {
@@ -19,7 +19,7 @@ public class FriendListTest extends AndroidTestCase {
 
     @Test
     public void testAddUser() {
-        FriendList fl = new FriendList(listName);
+        DefaultFilter fl = new DefaultFilter(listName);
         fl.addUser(a.getID());
         assertTrue(fl.getList().get(0) == a.getID());
     }
@@ -29,7 +29,7 @@ public class FriendListTest extends AndroidTestCase {
         array.put(1234, a);
         array.put(0, b);
         array.put(9909, c);
-        FriendList fl = new FriendList(listName);
+        DefaultFilter fl = new DefaultFilter(listName);
         fl.addUser(a.getID());
         fl.addUser(b.getID());
         fl.addUser(c.getID());
@@ -38,7 +38,7 @@ public class FriendListTest extends AndroidTestCase {
 
     @Test
     public void testRemoveUser() {
-        FriendList fl = new FriendList(listName);
+        DefaultFilter fl = new DefaultFilter(listName);
         fl.addUser(b.getID());
         fl.addUser(a.getID());
         fl.removeUser(b.getID());
@@ -47,7 +47,7 @@ public class FriendListTest extends AndroidTestCase {
 
     @Test
     public void testSetListName() {
-        FriendList fl = new FriendList(listName);
+        DefaultFilter fl = new DefaultFilter(listName);
         fl.setListName(newListName);
         assertTrue(fl.getListName().equals(newListName));
     }

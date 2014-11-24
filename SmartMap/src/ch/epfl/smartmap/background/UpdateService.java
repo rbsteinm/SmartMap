@@ -35,6 +35,131 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * @author ritterni
  */
 public class UpdateService extends Service {
+    public static final String BROADCAST_POS = "ch.epfl.smartmap.background.broadcastPos";
+
+    public static final String UPDATED_ROWS = "UpdatedRows";
+
+    private static final int HANDLER_DELAY = 1000;
+
+    private static final int POS_UPDATE_DELAY = 10000;
+
+    private static final int INVITE_UPDATE_DELAY = 30000;
+
+    private static final float MIN_DISTANCE = 5; // minimum distance to update
+
+    // position
+    private static final int RESTART_DELAY = 2000;
+
+    private final Handler mHandler = new Handler();
+    private Intent mFriendsPosIntent;
+    private LocationManager mLocManager;
+    private boolean mFriendsPosEnabled = true;
+    private boolean mOwnPosEnabled = true;
+    private boolean mReady = false;
+    private DatabaseHelper mHelper;
+    private SettingsManager mManager;
+    private Geocoder mGeocoder;
+    private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
+
+    private final Runnable friendsPosUpdate = new Runnable() {
+        @Override
+        public void run() {
+            if (mFriendsPosEnabled) {
+                if (mReady) {
+                    new AsyncFriendsPos().execute();
+                    UpdateService.this.sendBroadcast(mFriendsPosIntent);
+                }
+                mHandler.postDelayed(this, POS_UPDATE_DELAY);
+            }
+        }
+    };
+    private final Runnable showFriendNotif = new Runnable() {
+        @Override
+        public void run() {
+            new AsyncRequestCheck().execute();
+            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
+        }
+    };
+
+    private final Runnable getReplies = new Runnable() {
+        @Override
+        public void run() {
+            new AsyncReplyCheck().execute();
+            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
+        }
+    };
+
+    @Override
+    public IBinder onBind(Intent arg0) {
+        return null;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mManager = SettingsManager.initialize(this.getApplicationContext());
+        mHelper = DatabaseHelper.initialize(this.getApplicationContext());
+        mGeocoder = new Geocoder(this.getBaseContext(), Locale.US);
+        mFriendsPosIntent = new Intent(BROADCAST_POS);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
+            MIN_DISTANCE, new MyLocationListener());
+        new AsyncFriendsInit().execute();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        mHandler.removeCallbacks(friendsPosUpdate);
+        mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
+        mHandler.removeCallbacks(showFriendNotif);
+        mHandler.postDelayed(showFriendNotif, HANDLER_DELAY);
+        mHandler.removeCallbacks(getReplies);
+        mHandler.postDelayed(getReplies, HANDLER_DELAY);
+        new AsyncLogin().execute();
+        Log.d("UpdateService", "Service started");
+
+        return START_STICKY;
+    }
+
+    // Ugly workaround because of KitKat stopping services when app gets closed
+    // (Android issue #63618)
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
+        restartService.setPackage(this.getPackageName());
+        PendingIntent restartServicePending =
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
+                PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService =
+            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
+            restartServicePending);
+
+    }
+
+    /**
+     * Enables/disables friends position updates
+     * 
+     * @param isEnabled
+     *            True if updates should be enabled
+     */
+    public void setFriendsPosUpdateEnabled(boolean isEnabled) {
+        mFriendsPosEnabled = isEnabled;
+        if (isEnabled) {
+            mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
+        }
+    }
+
+    private void showAcceptedNotif(User user) {
+        Notifications.acceptedFriendNotification(this, user);
+    }
+
+    private void showFriendNotif(User user) {
+        Notifications.newFriendNotification(this, user);
+    }
+
     /**
      * AsyncTask to send the user's own position to the server
      * 
@@ -217,128 +342,5 @@ public class UpdateService extends Service {
                 mOwnPosEnabled = true;
             }
         }
-    }
-
-    public static final String BROADCAST_POS = "ch.epfl.smartmap.background.broadcastPos";
-    public static final String UPDATED_ROWS = "UpdatedRows";
-    private static final int HANDLER_DELAY = 1000;
-    private static final int POS_UPDATE_DELAY = 10000;
-    private static final int INVITE_UPDATE_DELAY = 30000;
-    private static final float MIN_DISTANCE = 5; // minimum distance to update
-                                                 // position
-    private static final int RESTART_DELAY = 2000;
-    private final Handler mHandler = new Handler();
-    private Intent mFriendsPosIntent;
-    private LocationManager mLocManager;
-
-    private boolean mFriendsPosEnabled = true;
-    private boolean mOwnPosEnabled = true;
-
-    private boolean mReady = false;
-
-    private DatabaseHelper mHelper;
-    private SettingsManager mManager;
-    private Geocoder mGeocoder;
-
-    private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
-
-    private final Runnable friendsPosUpdate = new Runnable() {
-        @Override
-        public void run() {
-            if (mFriendsPosEnabled) {
-                if (mReady) {
-                    new AsyncFriendsPos().execute();
-                    UpdateService.this.sendBroadcast(mFriendsPosIntent);
-                }
-                mHandler.postDelayed(this, POS_UPDATE_DELAY);
-            }
-        }
-    };
-
-    private final Runnable showFriendNotif = new Runnable() {
-        @Override
-        public void run() {
-            new AsyncRequestCheck().execute();
-            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
-        }
-    };
-
-    private final Runnable getReplies = new Runnable() {
-        @Override
-        public void run() {
-            new AsyncReplyCheck().execute();
-            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
-        }
-    };
-
-    @Override
-    public IBinder onBind(Intent arg0) {
-        return null;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mManager = SettingsManager.initialize(this.getApplicationContext());
-        mHelper = DatabaseHelper.initialize(this.getApplicationContext());
-        mGeocoder = new Geocoder(this.getBaseContext(), Locale.US);
-        mFriendsPosIntent = new Intent(BROADCAST_POS);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
-            MIN_DISTANCE, new MyLocationListener());
-        new AsyncFriendsInit().execute();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        mHandler.removeCallbacks(friendsPosUpdate);
-        mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
-        mHandler.removeCallbacks(showFriendNotif);
-        mHandler.postDelayed(showFriendNotif, HANDLER_DELAY);
-        mHandler.removeCallbacks(getReplies);
-        mHandler.postDelayed(getReplies, HANDLER_DELAY);
-        new AsyncLogin().execute();
-        Log.d("UpdateService", "Service started");
-
-        return START_STICKY;
-    }
-
-    // Ugly workaround because of KitKat stopping services when app gets closed
-    // (Android issue #63618)
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
-        restartService.setPackage(this.getPackageName());
-        PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
-                PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService =
-            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
-            restartServicePending);
-
-    }
-
-    /**
-     * Enables/disables friends position updates
-     * 
-     * @param isEnabled
-     *            True if updates should be enabled
-     */
-    public void setFriendsPosUpdateEnabled(boolean isEnabled) {
-        mFriendsPosEnabled = isEnabled;
-        if (isEnabled) {
-            mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
-        }
-    }
-
-    private void showAcceptedNotif(User user) {
-        Notifications.acceptedFriendNotification(this, user);
-    }
-
-    private void showFriendNotif(User user) {
-        Notifications.newFriendNotification(this, user);
     }
 }

@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -13,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public interface User extends Displayable {
+public interface User extends Parcelable, Displayable {
 
     /**
      *

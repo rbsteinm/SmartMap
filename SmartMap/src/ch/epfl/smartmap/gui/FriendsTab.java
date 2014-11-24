@@ -6,7 +6,6 @@ import java.util.List;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
@@ -16,10 +15,10 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.activities.FriendInformationActivity;
+import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.FriendsListener;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.listeners.FriendsListener;
 
 /**
  * Fragment displaying your friends in FriendsActivity
@@ -27,20 +26,9 @@ import ch.epfl.smartmap.cache.User;
  * @author rbsteinm
  */
 public class FriendsTab extends ListFragment implements FriendsListener {
-    public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
-        if (sparseArray == null) {
-            return null;
-        }
-        List<C> arrayList = new ArrayList<C>(sparseArray.size());
-        for (int i = 0; i < sparseArray.size(); i++) {
-            arrayList.add(sparseArray.valueAt(i));
-        }
-        return arrayList;
-    }
-
     private List<User> mFriendList;
-    private final Context mContext;
 
+    private final Context mContext;
     private DatabaseHelper mCacheDB;
 
     public FriendsTab(Context context) {
@@ -76,8 +64,8 @@ public class FriendsTab extends ListFragment implements FriendsListener {
         RelativeLayout rl = (RelativeLayout) view;
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
-        Intent intent = new Intent(mContext, FriendInformationActivity.class);
-        intent.putExtra("CURRENT_DISPLAYABLE", (Parcelable) user);
+        Intent intent = new Intent(mContext, UserInformationActivity.class);
+        intent.putExtra("CURRENT_DISPLAYABLE", user);
         this.startActivity(intent);
     }
 
@@ -85,6 +73,17 @@ public class FriendsTab extends ListFragment implements FriendsListener {
     public void onResume() {
         super.onResume();
         this.setListAdapter(new FriendListItemAdapter(mContext, asList(mCacheDB.getAllUsers())));
+    }
+
+    public static <C> List<C> asList(LongSparseArray<C> sparseArray) {
+        if (sparseArray == null) {
+            return null;
+        }
+        List<C> arrayList = new ArrayList<C>(sparseArray.size());
+        for (int i = 0; i < sparseArray.size(); i++) {
+            arrayList.add(sparseArray.valueAt(i));
+        }
+        return arrayList;
     }
 
 }

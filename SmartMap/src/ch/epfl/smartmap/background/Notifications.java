@@ -22,25 +22,14 @@ import ch.epfl.smartmap.cache.User;
  * @author agpmilli
  */
 public class Notifications {
-    /**
-     * Listener use to listen when notifications arrive
-     * 
-     * @author agpmilli
-     */
-    public static class NotificationListener {
-        public void onNewNotification() {
-
-        }
-    }
-
     private static final int VIBRATE_NOTIFICATION_TIME = 500;
+
     private static final int SILENT_NOTIFICATION_TIME = 100;
     private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME, SILENT_NOTIFICATION_TIME,
         VIBRATE_NOTIFICATION_TIME};
     private static long notificationID = 0;
     private static int numberOfEventNotification = 0;
     private static int numberOfFriendNotification = 0;
-
     private static List<NotificationListener> listeners = new ArrayList<NotificationListener>();
 
     /**
@@ -100,22 +89,6 @@ public class Notifications {
 
     public static void addNotificationListener(NotificationListener listener) {
         listeners.add(listener);
-    }
-
-    /**
-     * Build the notification and notify it with notification manager.
-     * 
-     * @param activity
-     *            current activity
-     * @param notification
-     *            notification to notify
-     * @param notificationId
-     *            id of current notification
-     */
-    private static void displayNotification(Context context, Notification notification, long notificationId) {
-        NotificationManager notificationManager =
-            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify((int) notificationId, notification);
     }
 
     public static int getNumberOfEventNotification() {
@@ -238,17 +211,44 @@ public class Notifications {
         notifyListeners();
     }
 
-    private static void notifyListeners() {
-        for (NotificationListener l : listeners) {
-            l.onNewNotification();
-        }
-    }
-
     public static void setNumberOfUnreadEventNotification(int numberOfEvent) {
         Notifications.numberOfEventNotification = numberOfEvent;
     }
 
     public static void setNumberOfUnreadFriendNotification(int numberOfFriend) {
         Notifications.numberOfFriendNotification = numberOfFriend;
+    }
+
+    /**
+     * Build the notification and notify it with notification manager.
+     * 
+     * @param activity
+     *            current activity
+     * @param notification
+     *            notification to notify
+     * @param notificationId
+     *            id of current notification
+     */
+    private static void displayNotification(Context context, Notification notification, long notificationId) {
+        NotificationManager notificationManager =
+            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify((int) notificationId, notification);
+    }
+
+    private static void notifyListeners() {
+        for (NotificationListener l : listeners) {
+            l.onNewNotification();
+        }
+    }
+
+    /**
+     * Listener use to listen when notifications arrive
+     * 
+     * @author agpmilli
+     */
+    public static class NotificationListener {
+        public void onNewNotification() {
+
+        }
     }
 }

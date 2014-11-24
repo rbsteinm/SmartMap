@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.listeners.DrawerItemClickListener;
 
 /**
  * represents the side menu drawer

@@ -55,27 +55,6 @@ public class SettingsManager {
     private static final String KEY_PRIVATE_EVENTS = "events_show_private";
 
     /**
-     * @return The SettingsManager instance
-     */
-    public static SettingsManager getInstance() {
-        return mInstance;
-    }
-
-    /**
-     * Initializes the settings manager (should be called once when starting the app)
-     * 
-     * @param context
-     *            The app's context, needed to access the shared preferences
-     * @return The SettingsManager instance
-     */
-    public static SettingsManager initialize(Context context) {
-        if (mInstance == null) {
-            mInstance = new SettingsManager(context);
-        }
-        return mInstance;
-    }
-
-    /**
      * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
      * 
      * @param context
@@ -178,7 +157,8 @@ public class SettingsManager {
      * @return The local user's ID if it is found, DEFAULT_ID value otherwise
      */
     public long getUserID() {
-        return mSharedPref.getLong(USER_ID, DEFAULT_ID);
+        return 1;
+        // return mSharedPref.getLong(USER_ID, DEFAULT_ID);
     }
 
     /**
@@ -397,5 +377,26 @@ public class SettingsManager {
      */
     public boolean showPublicEvents() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_PUBLIC_EVENTS, true);
+    }
+
+    /**
+     * @return The SettingsManager instance
+     */
+    public static SettingsManager getInstance() {
+        return mInstance;
+    }
+
+    /**
+     * Initializes the settings manager (should be called once when starting the app)
+     * 
+     * @param context
+     *            The app's context, needed to access the shared preferences
+     * @return The SettingsManager instance
+     */
+    public static SettingsManager initialize(Context context) {
+        if (mInstance == null) {
+            mInstance = new SettingsManager(context);
+        }
+        return mInstance;
     }
 }

@@ -37,13 +37,76 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
     private final static int MIDNIGHT_HOUR = 23;
     private final static int MIDNIGHT_MINUTES = 59;
 
+    private final Context mContext;
+
+    private final List<Event> mItemsArrayList;
+
+    private final Location mMyLocation;
+
     /**
-     * Might be useful later
+     * Constructor
+     * 
+     * @param context
+     * @param itemsArrayList
+     * @param myLocation
      */
-    @SuppressWarnings("unused")
-    private static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
-        long diffInMillies = date2.getTime() - date1.getTime();
-        return Math.abs(timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS));
+    public EventsListItemAdapter(Context context, List<Event> itemsArrayList, Location myLocation) {
+        super(context, R.layout.gui_event_list_item, itemsArrayList);
+
+        mContext = context;
+        mItemsArrayList = itemsArrayList;
+
+        mMyLocation = myLocation;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        // Create inflater, get Friend View from the xml via Adapter
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        EventViewHolder viewHolder;
+        Event event = this.getItem(position);
+
+        if (convertView == null) {
+
+            convertView = inflater.inflate(R.layout.gui_event_list_item, parent, false);
+
+            viewHolder = new EventViewHolder();
+
+            // Set the ViewHolder with the gui_event_list_item fields
+            viewHolder.setNameTextView((TextView) convertView.findViewById(R.id.eventName));
+            viewHolder.setStarTextView((TextView) convertView.findViewById(R.id.eventStartDate));
+            viewHolder.setEndTextView((TextView) convertView.findViewById(R.id.eventEndDate));
+
+            // Needed by the code that makes each item clickable
+            viewHolder.setEvent(event);
+
+            // Store the holder with the view
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (EventViewHolder) convertView.getTag();
+        }
+
+        // Set fields with event's attributes
+
+        GregorianCalendar start = event.getStartDate();
+        GregorianCalendar end = event.getEndDate();
+
+        viewHolder.getStartTextView().setText(getTextFromDate(start, end, "start"));
+        viewHolder.getEndTextView().setText(getTextFromDate(start, end, "end"));
+
+        double distanceMeEvent =
+            ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
+                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position)
+                    .getLocation().getLongitude());
+        distanceMeEvent = Math.floor(distanceMeEvent * HUNDRED_PERCENT) / HUNDRED_PERCENT;
+
+        viewHolder.getNameTextView().setText(event.getName() + " @ " + event.getPositionName());
+
+        convertView.setId(position);
+
+        return convertView;
     }
 
     /**
@@ -142,75 +205,12 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         return dateTextContent;
     }
 
-    private final Context mContext;
-
-    private final List<Event> mItemsArrayList;
-
-    private final Location mMyLocation;
-
     /**
-     * Constructor
-     * 
-     * @param context
-     * @param itemsArrayList
-     * @param myLocation
+     * Might be useful later
      */
-    public EventsListItemAdapter(Context context, List<Event> itemsArrayList, Location myLocation) {
-        super(context, R.layout.gui_event_list_item, itemsArrayList);
-
-        mContext = context;
-        mItemsArrayList = itemsArrayList;
-
-        mMyLocation = myLocation;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        // Create inflater, get Friend View from the xml via Adapter
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        EventViewHolder viewHolder;
-        Event event = this.getItem(position);
-
-        if (convertView == null) {
-
-            convertView = inflater.inflate(R.layout.gui_event_list_item, parent, false);
-
-            viewHolder = new EventViewHolder();
-
-            // Set the ViewHolder with the gui_event_list_item fields
-            viewHolder.setNameTextView((TextView) convertView.findViewById(R.id.eventName));
-            viewHolder.setStarTextView((TextView) convertView.findViewById(R.id.eventStartDate));
-            viewHolder.setEndTextView((TextView) convertView.findViewById(R.id.eventEndDate));
-
-            // Needed by the code that makes each item clickable
-            viewHolder.setEvent(event);
-
-            // Store the holder with the view
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (EventViewHolder) convertView.getTag();
-        }
-
-        // Set fields with event's attributes
-
-        GregorianCalendar start = event.getStartDate();
-        GregorianCalendar end = event.getEndDate();
-
-        viewHolder.getStartTextView().setText(getTextFromDate(start, end, "start"));
-        viewHolder.getEndTextView().setText(getTextFromDate(start, end, "end"));
-
-        double distanceMeEvent =
-            ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
-                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position)
-                    .getLocation().getLongitude());
-        distanceMeEvent = Math.floor(distanceMeEvent * HUNDRED_PERCENT) / HUNDRED_PERCENT;
-
-        viewHolder.getNameTextView().setText(event.getName() + " @ " + event.getPositionName());
-
-        convertView.setId(position);
-
-        return convertView;
+    @SuppressWarnings("unused")
+    private static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+        long diffInMillies = date2.getTime() - date1.getTime();
+        return Math.abs(timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS));
     }
 }

@@ -20,71 +20,27 @@ import ch.epfl.smartmap.cache.Displayable;
  */
 public class SearchResultViewGroup extends LinearLayout {
 
-    /**
-     * Horizontal bar separating two different search results.
-     * 
-     * @author jfperren
-     */
-    private static class Divider extends LinearLayout {
-        public Divider(Context context) {
-            super(context);
-            this.setPadding(SEPARATOR_LEFT_PADDING, 0, SEPARATOR_RIGHT_PADDING, 0);
-            this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
-            this.setBackgroundResource(SEPARATOR_BACKGROUND_COLOR);
-        }
-    }
-
-    /**
-     * Button showing more Search results when clicked
-     * 
-     * @author jfperren
-     */
-    private static class MoreResultsButton extends Button {
-        public MoreResultsButton(Context context, final SearchResultViewGroup searchResultViewGroup) {
-            super(context);
-            this.setText(R.string.more_results);
-            this.setBackgroundResource(0);
-            this.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    searchResultViewGroup.showMoreResults();
-                }
-            });
-        }
-    }
-
-    /**
-     * Visual state of a ViewGroup
-     * 
-     * @author jfperren
-     */
-    private enum VisualState {
-        MINIMIZED,
-        EXPANDED,
-        MAX,
-        EMPTY;
-    }
-
     private static final String TAG = "SEARCH_RESULT_VIEW_GROUP";
+
     // Margins & Paddings
     private static final int NO_RESULT_VIEW_VERTICAL_PADDING = 150;
+
     private static final int SEPARATOR_LEFT_PADDING = 10;
+
     private static final int SEPARATOR_RIGHT_PADDING = 10;
     // Colors
     private static final int SEPARATOR_BACKGROUND_COLOR = R.color.bottomSliderBackground;
-
     // Text Sizes
     private static final float NO_RESULT_VIEW_TEXT_SIZE = 25f;
     // Others
     private static final int ITEMS_PER_PAGE = 10;
     // Children Views
     private final Button mMoreResultsButton;
+
     private final TextView mEmptyListTextView;
     // Informations about current state
     private int mCurrentItemNb;
-
     private List<Displayable> mCurrentResultList;
-
     private VisualState mCurrentVisualState;
 
     /**
@@ -128,30 +84,6 @@ public class SearchResultViewGroup extends LinearLayout {
 
         // Create all SearchresultViews
         this.setResultList(results);
-    }
-
-    /**
-     * If possible, add {@code ITEMS_PER_PAGE} more {@code SearchResultView}s
-     */
-    private void addMoreViews() {
-        this.removeView(mMoreResultsButton);
-        // Computes the number of items to add
-        int newItemsNb = Math.min(ITEMS_PER_PAGE, mCurrentResultList.size() - mCurrentItemNb);
-        // Add SearchResultViews
-        for (int i = mCurrentItemNb; i < (mCurrentItemNb + newItemsNb); i++) {
-            Log.d(TAG, "add" + mCurrentResultList.get(i).getName());
-            this.addView(new SearchResultView(this.getContext(), mCurrentResultList.get(i)));
-            this.addView(new Divider(this.getContext()));
-        }
-
-        mCurrentItemNb += newItemsNb;
-        // Sets the new visual state
-        if (mCurrentItemNb == mCurrentResultList.size()) {
-            mCurrentVisualState = VisualState.MAX;
-        } else {
-            this.addView(mMoreResultsButton);
-            mCurrentVisualState = VisualState.EXPANDED;
-        }
     }
 
     /**
@@ -229,6 +161,30 @@ public class SearchResultViewGroup extends LinearLayout {
     }
 
     /**
+     * If possible, add {@code ITEMS_PER_PAGE} more {@code SearchResultView}s
+     */
+    private void addMoreViews() {
+        this.removeView(mMoreResultsButton);
+        // Computes the number of items to add
+        int newItemsNb = Math.min(ITEMS_PER_PAGE, mCurrentResultList.size() - mCurrentItemNb);
+        // Add SearchResultViews
+        for (int i = mCurrentItemNb; i < (mCurrentItemNb + newItemsNb); i++) {
+            Log.d(TAG, "add" + mCurrentResultList.get(i).getName());
+            this.addView(new SearchResultView(this.getContext(), mCurrentResultList.get(i)));
+            this.addView(new Divider(this.getContext()));
+        }
+
+        mCurrentItemNb += newItemsNb;
+        // Sets the new visual state
+        if (mCurrentItemNb == mCurrentResultList.size()) {
+            mCurrentVisualState = VisualState.MAX;
+        } else {
+            this.addView(mMoreResultsButton);
+            mCurrentVisualState = VisualState.EXPANDED;
+        }
+    }
+
+    /**
      * Extend the searchResultViewGroup if there are more results to show
      */
     private void showMoreResults() {
@@ -239,5 +195,50 @@ public class SearchResultViewGroup extends LinearLayout {
         } else {
             this.addMoreViews();
         }
+    }
+
+    /**
+     * Horizontal bar separating two different search results.
+     * 
+     * @author jfperren
+     */
+    private static class Divider extends LinearLayout {
+        public Divider(Context context) {
+            super(context);
+            this.setPadding(SEPARATOR_LEFT_PADDING, 0, SEPARATOR_RIGHT_PADDING, 0);
+            this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
+            this.setBackgroundResource(SEPARATOR_BACKGROUND_COLOR);
+        }
+    }
+
+    /**
+     * Button showing more Search results when clicked
+     * 
+     * @author jfperren
+     */
+    private static class MoreResultsButton extends Button {
+        public MoreResultsButton(Context context, final SearchResultViewGroup searchResultViewGroup) {
+            super(context);
+            this.setText(R.string.more_results);
+            this.setBackgroundResource(0);
+            this.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    searchResultViewGroup.showMoreResults();
+                }
+            });
+        }
+    }
+
+    /**
+     * Visual state of a ViewGroup
+     * 
+     * @author jfperren
+     */
+    private enum VisualState {
+        MINIMIZED,
+        EXPANDED,
+        MAX,
+        EMPTY;
     }
 }

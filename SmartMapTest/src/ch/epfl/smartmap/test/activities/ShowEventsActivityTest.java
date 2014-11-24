@@ -18,7 +18,7 @@ import android.widget.SeekBar;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.UserEvent;
+import ch.epfl.smartmap.cache.PublicEvent;
 
 import com.google.android.apps.common.testing.ui.espresso.UiController;
 import com.google.android.apps.common.testing.ui.espresso.ViewAction;
@@ -70,7 +70,7 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
         lutry.setLatitude(46.506038);
         lutry.setLongitude(6.685314);
 
-        UserEvent e0 = new UserEvent("Now Event", 2, "Robich", timeE0, timeEndE0, lutry);
+        PublicEvent e0 = new PublicEvent("Now Event", 2, "Robich", timeE0, timeEndE0, lutry);
         e0.setID(0);
         e0.setPositionName("Lutry");
 
@@ -82,7 +82,7 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
         lausanne.setLatitude(46.519962);
         lausanne.setLongitude(6.633597);
 
-        UserEvent e1 = new UserEvent("Swag party", 2, "Robich", timeE1, timeEndE1, lausanne);
+        PublicEvent e1 = new PublicEvent("Swag party", 2, "Robich", timeE1, timeEndE1, lausanne);
         e1.setID(1);
         e1.setPositionName("Lausanne");
 
@@ -94,7 +94,7 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
         epfl.setLatitude(46.526120);
         epfl.setLongitude(6.563778);
 
-        UserEvent e2 = new UserEvent("LOL Tournament", 1, "Alain", timeE2, timeEndE2, epfl);
+        PublicEvent e2 = new PublicEvent("LOL Tournament", 1, "Alain", timeE2, timeEndE2, epfl);
         e2.setID(2);
         e2.setPositionName("EPFL");
 
@@ -106,7 +106,7 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
         verbier.setLatitude(46.096076);
         verbier.setLongitude(7.228875);
 
-        UserEvent e3 = new UserEvent("Freeride World Tour", 1, "Julien", timeE3, timeEndE3, verbier);
+        PublicEvent e3 = new PublicEvent("Freeride World Tour", 1, "Julien", timeE3, timeEndE3, verbier);
         e3.setID(3);
         e3.setPositionName("Verbier");
         String descrE3 =

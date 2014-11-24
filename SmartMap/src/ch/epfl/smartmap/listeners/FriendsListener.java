@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.cache;
+package ch.epfl.smartmap.listeners;
 
 /**
  * @author ritterni
