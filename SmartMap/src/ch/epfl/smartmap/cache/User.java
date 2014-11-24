@@ -71,7 +71,7 @@ public interface User extends Parcelable, Displayable {
     /**
      * @return The user's position as a String (e.g. 'Lausanne')
      */
-    String getPositionName();
+    String getLocationString();
 
     /**
      * Deprecated. Use getLastSeen() instead.

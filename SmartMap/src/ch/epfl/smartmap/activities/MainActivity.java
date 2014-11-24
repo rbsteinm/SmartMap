@@ -93,6 +93,8 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Utils.Context = this;
+
         this.setContentView(R.layout.activity_main);
 
         // starting the background service

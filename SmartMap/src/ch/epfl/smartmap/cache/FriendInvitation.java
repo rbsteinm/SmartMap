@@ -72,7 +72,7 @@ public class FriendInvitation implements Invitation, Displayable {
 
     @Override
     public String getShortInfos() {
-        return new String("Position : " + mUser.getPositionName() + "\n" + "Last seen : "
+        return new String("Position : " + mUser.getLocationString() + "\n" + "Last seen : "
             + mUser.getLastSeen());
     }
 

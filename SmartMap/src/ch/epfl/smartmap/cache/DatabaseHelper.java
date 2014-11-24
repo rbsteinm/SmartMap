@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.util.Log;
+import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
 import ch.epfl.smartmap.listeners.OnEventListUpdateListener;
 import ch.epfl.smartmap.listeners.OnFilterListUpdateListener;
@@ -303,7 +304,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_EMAIL, user.getEmail());
             values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
             values.put(KEY_LATITUDE, user.getLocation().getLatitude());
-            values.put(KEY_POSNAME, user.getPositionName());
+            values.put(KEY_POSNAME, user.getLocationString());
             values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
             values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); // boolean to int
 
@@ -807,8 +808,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
             values.put(KEY_LATITUDE, user.getLocation().getLatitude());
         }
-        if (user.getPositionName() != Friend.POSITION_UNKNOWN) {
-            values.put(KEY_POSNAME, user.getPositionName());
+        if (user.getLocationString() != Utils.UNKNOWN_LOCATION) {
+            values.put(KEY_POSNAME, user.getLocationString());
         }
         if (user.getLastSeen().getTimeInMillis() != 0) {
             values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());

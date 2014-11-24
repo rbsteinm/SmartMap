@@ -30,6 +30,8 @@ public class JsonSmartMapParser implements SmartMapParser {
     private static final String ERROR_STATUS = "error";
     private static final String FEEDBACK_STATUS = "feedback";
 
+    private static final int SERVER_TIME_DIFFERENCE_THRESHHOLD = -15000;
+
     private static final int DATETIME_FORMAT_PARTS = 2;
     private static final int DATE_FORMAT_PARTS = 3;
     private static final int TIME_FORMAT_PARTS = 3;
@@ -279,7 +281,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      */
     private void checkLastSeen(GregorianCalendar lastSeen) throws SmartMapParseException {
         GregorianCalendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        if (now.compareTo(lastSeen) < 0) {
+        if ((now.getTimeInMillis() - lastSeen.getTimeInMillis()) < SERVER_TIME_DIFFERENCE_THRESHHOLD) {
             throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString()
                 + " compared to " + now.toString());
         }

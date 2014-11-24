@@ -14,6 +14,7 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.gui.Utils;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -24,14 +25,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * 
  * @author ritterni
  */
-
 public class Friend implements User, Displayable, Parcelable {
 
     private final long mId; // the user's unique ID
     private String mName; // the user's name as it will be displayed
     private String mPhoneNumber;
     private String mEmail;
-    private String mPositionName;
+    private String mLocationString;
     private GregorianCalendar mLastSeen;
     private final Location mLocation;
     private boolean mVisible;
@@ -39,7 +39,6 @@ public class Friend implements User, Displayable, Parcelable {
     public static final String NO_NAME = "";
     public static final String NO_NUMBER = "No phone number specified";
     public static final String NO_EMAIL = "No email address specified";
-    public static final String POSITION_UNKNOWN = "Unknown position";
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
@@ -52,7 +51,6 @@ public class Friend implements User, Displayable, Parcelable {
     public static final float MARKER_ANCHOR_Y = 1;
     public static final int PICTURE_WIDTH = 50;
     public static final int PICTURE_HEIGHT = 50;
-
     private static final int LEFT_SHIFT_COUNT = 32;
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
@@ -89,15 +87,16 @@ public class Friend implements User, Displayable, Parcelable {
         mName = userName;
         mPhoneNumber = NO_NUMBER;
         mEmail = NO_EMAIL;
-        mPositionName = POSITION_UNKNOWN;
+        mLocationString = Utils.UNKNOWN_LOCATION;
         mLastSeen = new GregorianCalendar();
         mLastSeen.setTimeInMillis(0);
         mLocation = new Location(PROVIDER_NAME);
         mVisible = true;
     }
 
-    public Friend(long userID, String userName, double latitude, double longitude) {
+    public Friend(long userID, String userName, double longitude, double latitude) {
         this(userID, userName);
+
         this.setLatitude(latitude);
         this.setLongitude(longitude);
     }
@@ -108,7 +107,7 @@ public class Friend implements User, Displayable, Parcelable {
         mPhoneNumber = in.readString();
         mEmail = in.readString();
         mLocation = in.readParcelable(Location.class.getClassLoader());
-        mPositionName = in.readString();
+        mLocationString = in.readString();
         mLastSeen = new GregorianCalendar();
         mLastSeen.setTimeInMillis(in.readLong());
         boolean[] booleans = new boolean[1];
@@ -169,6 +168,11 @@ public class Friend implements User, Displayable, Parcelable {
         return mLocation;
     }
 
+    @Override
+    public String getLocationString() {
+        return mLocationString;
+    }
+
     /*
      * (non-Javadoc)
      * @see
@@ -213,24 +217,13 @@ public class Friend implements User, Displayable, Parcelable {
     }
 
     @Override
-    public String getPositionName() {
-        return mPositionName;
-    }
-
-    @Override
     public String getShortInfos() {
-        String info = "";
-        if (this.isOnline() && !this.getPositionName().equals("")) {
-            info = "Currently in " + this.getPositionName();
-        } else if (this.isOnline()) {
-            info = "Online right now";
-        } else if (!this.getPositionName().equals("")) {
-            info = "Last seen near " + this.getPositionName();
-        } else {
-            info = "Currently offline";
-        }
+        String infos = "";
+        infos += Utils.getLastSeenStringFromCalendar(this.getLastSeen());
+        infos += " near ";
+        infos += mLocationString;
 
-        return info;
+        return infos;
     }
 
     /*
@@ -269,7 +262,6 @@ public class Friend implements User, Displayable, Parcelable {
     @Override
     public void setLatitude(double latitude) {
         mLocation.setLatitude(latitude);
-
     }
 
     @Override
@@ -324,7 +316,7 @@ public class Friend implements User, Displayable, Parcelable {
 
     @Override
     public void setPositionName(String posName) {
-        mPositionName = posName;
+        mLocationString = posName;
     }
 
     @Override
@@ -343,9 +335,13 @@ public class Friend implements User, Displayable, Parcelable {
         dest.writeString(mPhoneNumber);
         dest.writeString(mEmail);
         dest.writeParcelable(mLocation, flags);
-        dest.writeString(mPositionName);
+        dest.writeString(mLocationString);
         dest.writeLong(mLastSeen.getTimeInMillis());
         boolean[] booleans = new boolean[]{mVisible};
         dest.writeBooleanArray(booleans);
+    }
+
+    private void updateLocationString() {
+        mLocationString = Utils.getCityFromLocation(this.getLocation());
     }
 }

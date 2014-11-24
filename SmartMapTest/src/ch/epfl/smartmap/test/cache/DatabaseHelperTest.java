@@ -91,7 +91,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
             && dbh.getUser(a.getID()).getName().equals(a.getName())
             && dbh.getUser(a.getID()).getNumber().equals(a.getNumber())
             && dbh.getUser(a.getID()).getEmail().equals(a.getEmail())
-            && dbh.getUser(a.getID()).getPositionName().equals(a.getPositionName())
+            && dbh.getUser(a.getID()).getLocationString().equals(a.getLocationString())
             && (dbh.getUser(a.getID()).getLocation().getLongitude() == a.getLocation().getLongitude())
             && (dbh.getUser(a.getID()).getLocation().getLatitude() == a.getLocation().getLatitude())
             && (dbh.getAllFriends().size() == 1));

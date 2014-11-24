@@ -207,32 +207,33 @@ public class UpdateService extends Service {
 
         @Override
         protected void onPostExecute(NotificationBag result) {
+            if (result != null) {
+                List<User> newFriends = result.getNewFriends();
+                List<Long> removedFriends = result.getRemovedFriendsIds();
 
-            List<User> newFriends = result.getNewFriends();
-            List<Long> removedFriends = result.getRemovedFriendsIds();
-
-            for (User user : newFriends) {
-                mHelper.addUser(user);
-                mHelper.deletePendingFriend(user.getID());
-                UpdateService.this.showAcceptedNotif(user);
-            }
-
-            for (User user : result.getInvitingUsers()) {
-                if (mHelper.addInvitation(user) > 0) {
-                    UpdateService.this.showFriendNotif(user);
+                for (User user : newFriends) {
+                    mHelper.addUser(user);
+                    mHelper.deletePendingFriend(user.getID());
+                    UpdateService.this.showAcceptedNotif(user);
                 }
-            }
 
-            for (Long id : result.getRemovedFriendsIds()) {
-                mHelper.deleteUser(id);
-            }
+                for (User user : result.getInvitingUsers()) {
+                    if (mHelper.addInvitation(user) > 0) {
+                        UpdateService.this.showFriendNotif(user);
+                    }
+                }
 
-            if (!newFriends.isEmpty()) {
-                new AsyncInvitationAck().execute(newFriends.toArray(new User[newFriends.size()]));
-            }
+                for (Long id : result.getRemovedFriendsIds()) {
+                    mHelper.deleteUser(id);
+                }
 
-            if (!removedFriends.isEmpty()) {
-                new AsyncRemovalAck().execute(removedFriends.toArray(new Long[removedFriends.size()]));
+                if (!newFriends.isEmpty()) {
+                    new AsyncInvitationAck().execute(newFriends.toArray(new User[newFriends.size()]));
+                }
+
+                if (!removedFriends.isEmpty()) {
+                    new AsyncRemovalAck().execute(removedFriends.toArray(new Long[removedFriends.size()]));
+                }
             }
         }
     }
