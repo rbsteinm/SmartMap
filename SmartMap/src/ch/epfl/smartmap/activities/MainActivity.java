@@ -68,9 +68,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
 
     private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
-
-    private static final int MENU_ITEM_MY_LOCATION_INDEX = 1;
-
+    private static final int MENU_ITEM_NOTIFICATION_INDEX = 1;
     private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
     private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
 
@@ -404,7 +402,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).getActionView().clearFocus();
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).collapseActionView();
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).setVisible(false);
-            mMenu.getItem(MENU_ITEM_MY_LOCATION_INDEX).setVisible(false);
+            mMenu.getItem(MENU_ITEM_NOTIFICATION_INDEX).setVisible(false);
             mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
             mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
             // Change ActionBar title and icon
@@ -434,7 +432,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
             }
             // Set visibility of MenuItems
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).setVisible(true);
-            mMenu.getItem(MENU_ITEM_MY_LOCATION_INDEX).setVisible(true);
+            mMenu.getItem(MENU_ITEM_NOTIFICATION_INDEX).setVisible(true);
             mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
             mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
             // Change ActionBar title and icon
@@ -453,7 +451,7 @@ public class MainActivity extends FragmentActivity implements FriendsLocationLis
         if (mSearchPanel.open()) {
             // Set visibility of MenuItems
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).setVisible(true);
-            mMenu.getItem(MENU_ITEM_MY_LOCATION_INDEX).setVisible(false);
+            mMenu.getItem(MENU_ITEM_NOTIFICATION_INDEX).setVisible(false);
             mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(true);
             mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(false);
             // Change ActionBar title and icon

@@ -654,9 +654,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void initializeAllFriends() {
         NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
         try {
-            List<User> friends = client.listFriendsPos();
-            for (User user : friends) {
-                this.addUser(client.getUserInfo(user.getID()));
+            List<Long> friends = client.getFriendsIds();
+            for (long userID : friends) {
+                this.addUser(client.getUserInfo(userID));
             }
         } catch (SmartMapClientException e) {
             Log.e("UpdateService", e.getMessage());
