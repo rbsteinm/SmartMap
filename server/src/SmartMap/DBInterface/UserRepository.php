@@ -223,13 +223,13 @@ class UserRepository
                     'latitude' => $user->getLatitude(),
                     'last_update' => date(User::$DATE_FORMAT)
                 ));
+
+            $user->setId($this->mDb->fetchColumn('SELECT LAST_INSERT_ID()', array(), 0));
         }
         catch (\Exception $e)
         {
             throw new DatabaseException('Error creating user in createUser.', 1, $e);
         }
-        
-        $user->setId($this->mDb->fetchColumn('SELECT LAST_INSERT_ID()', array(), 0));
         
         return $user;
     }

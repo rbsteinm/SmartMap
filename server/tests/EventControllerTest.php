@@ -43,6 +43,22 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
     public function testCreateEvent()
     {
+        $returnEvent = new Event(
+            14,
+            123,
+            '2014-11-18 23:05:22',
+            '2014-11-23 10:34:34',
+            46.05647,
+            6.84657,
+            'EPFL',
+            'Fondue au soleil',
+            ''
+        );
+
+        $this->mockRepo
+             ->method('createEvent')
+             ->willReturn($returnEvent);
+
         $this->mockRepo->expects($this->once())
              ->method('createEvent')
              ->with($this->equalTo($this->mValidEvent));
@@ -65,7 +81,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
         $response = $controller->createEvent($request);
 
-        $validResponse = array('status' => 'Ok', 'message' => 'Created event.');
+        $validResponse = array('status' => 'Ok', 'message' => 'Created event.', 'id' => 14);
 
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
