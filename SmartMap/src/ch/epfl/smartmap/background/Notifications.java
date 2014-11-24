@@ -9,7 +9,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
@@ -172,7 +171,6 @@ public class Notifications {
         // Get ID and the number of ongoing Friend notifications
         notificationID++;
         setNumberOfUnreadFriendNotification(getNumberOfFriendNotification() + 1);
-        Log.d("BABOUIN", "" + getNumberOfFriendNotification());
 
         // Prepare intent that redirects the user to FriendActivity
         PendingIntent pFriendIntent =
