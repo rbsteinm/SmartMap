@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.background;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,6 +26,7 @@ import android.util.Log;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.servercom.NetworkNotificationBag;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -200,7 +202,13 @@ public class UpdateService extends Service {
             try {
                 nb = mClient.getInvitations();
             } catch (SmartMapClientException e) {
-                Log.e("UpdateService", "Couldn't retrieve replies!");
+                Log.e("UpdateService",
+                    "Couldn't retrieve invitations due to a server error: " + e.getMessage());
+                // We set an empty notification bag as we couldn't retrieve data
+                // from the server.
+                nb =
+                    new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(),
+                        new ArrayList<Long>());
             }
             return nb;
         }
