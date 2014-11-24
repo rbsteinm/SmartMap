@@ -11,7 +11,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
+import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
 
 /**
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
@@ -40,9 +42,12 @@ public class SearchResultView extends RelativeLayout {
     private static final int CLICK_DISTANCE_THRESHHOLD = 10;
 
     // Children Views
-    private final Displayable mItem;
-    private final Bitmap mImage;
     private final ImageView mImageView;
+    private final TextView mTitleView;
+    private final TextView mShortInfoView;
+
+    private Displayable mItem;
+    private final Bitmap mImage;
 
     /**
      * Constructor
@@ -50,7 +55,7 @@ public class SearchResultView extends RelativeLayout {
      * @param context
      *            Context of the Application
      */
-    public SearchResultView(Context context, Displayable item) {
+    public SearchResultView(final Context context, Displayable item) {
         super(context);
 
         mItem = item;
@@ -74,7 +79,7 @@ public class SearchResultView extends RelativeLayout {
         mImageView.setLayoutParams(imageParams);
 
         // Create mTitleView
-        TextView mTitleView = new TextView(context);
+        mTitleView = new TextView(context);
         mTitleView.setId(R.id.search_result_title);
         mTitleView.setText(mItem.getName());
         mTitleView.setTextSize(TITLE_TEXT_SIZE);
@@ -86,7 +91,7 @@ public class SearchResultView extends RelativeLayout {
         mTitleView.setLayoutParams(titleParams);
 
         // Create mShortInfoView
-        TextView mShortInfoView = new TextView(context);
+        mShortInfoView = new TextView(context);
         mShortInfoView.setId(R.id.search_result_short_info);
         mShortInfoView.setText(item.getShortInfos());
         mShortInfoView.setTextColor(this.getResources().getColor(R.color.lastSeenConnectionTextColor));
@@ -128,6 +133,18 @@ public class SearchResultView extends RelativeLayout {
                 return true;
             }
         });
+
+        DatabaseHelper.getInstance().addOnDisplayableInformationsChangeListener(mItem,
+            new OnDisplayableInformationsChangeListener() {
+
+                @Override
+                public void onDisplayableInformationsChange() {
+                    SearchResultView.this.mItem = DatabaseHelper.getInstance().getUser(mItem.getID());
+                    mTitleView.setText(mItem.getName());
+                    mShortInfoView.setText(mItem.getShortInfos());
+                    mImageView.setImageBitmap(mItem.getPicture(context));
+                }
+            });
     }
 
     /**

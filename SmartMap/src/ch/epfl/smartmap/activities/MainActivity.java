@@ -27,6 +27,7 @@ import ch.epfl.smartmap.background.Notifications;
 import ch.epfl.smartmap.background.Notifications.NotificationListener;
 import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.DatabaseSearchEngine;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
@@ -122,6 +123,9 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
         if (mDbHelper == null) {
             DatabaseHelper.initialize(this);
         }
+
+        final SearchLayout mSearchLayout = (SearchLayout) this.findViewById(R.id.search_layout);
+        mSearchLayout.setSearchEngine(new DatabaseSearchEngine(mDbHelper));
 
         if (savedInstanceState == null) {
             this.displayMap();
