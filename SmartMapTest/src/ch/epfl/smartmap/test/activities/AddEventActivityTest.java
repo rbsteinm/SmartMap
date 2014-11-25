@@ -35,6 +35,11 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         mAddEventActivity = this.getActivity();
     }
 
+    @Override
+    protected void tearDown() {
+        this.getActivity().finish();
+    }
+
     public void testCannotCreateEventWith1Field() {
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("TEST_NAME"));
 

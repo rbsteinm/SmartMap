@@ -27,6 +27,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class UserInformationActivity extends Activity {
 
+    @SuppressWarnings("unused")
     private static final String TAG = UserInformationActivity.class.getSimpleName();
 
     private DatabaseHelper mCacheDB;

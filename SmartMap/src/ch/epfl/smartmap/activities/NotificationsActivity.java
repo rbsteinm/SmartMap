@@ -19,56 +19,56 @@ import ch.epfl.smartmap.gui.InvitationListItemAdapter;
  */
 public class NotificationsActivity extends ListActivity {
 
-	@SuppressWarnings("unused")
-	private static final String TAG = NotificationsActivity.class.getSimpleName();
+    @SuppressWarnings("unused")
+    private static final String TAG = NotificationsActivity.class.getSimpleName();
 
-	private Context mContext;
+    private Context mContext;
 
-	private DatabaseHelper mDbHelper;
+    private DatabaseHelper mDbHelper;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.activity_notifications);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_notifications);
 
-		mContext = this.getBaseContext();
-		mDbHelper = DatabaseHelper.getInstance();
-	}
+        mContext = this.getBaseContext();
+        mDbHelper = DatabaseHelper.getInstance();
+    }
 
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Intent showFriendIntent = new Intent(mContext, FriendsPagerActivity.class);
-		NotificationsActivity.this.startActivity(showFriendIntent);
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Intent showFriendIntent = new Intent(mContext, FriendsPagerActivity.class);
+        NotificationsActivity.this.startActivity(showFriendIntent);
 
-		super.onListItemClick(l, v, position, id);
-	}
+        super.onListItemClick(l, v, position, id);
+    }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		// This is needed to show an update of the events' list after having
-		// created an event
-		NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, mDbHelper
-		    .getInvitations()));
-	}
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // This is needed to show an update of the events' list after having
+        // created an event
+        NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, mDbHelper
+            .getInvitations()));
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		this.getMenuInflater().inflate(R.menu.show_events, menu);
-		return true;
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.show_events, menu);
+        return true;
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		if (id == android.R.id.home) {
-			this.finish();
-		}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == android.R.id.home) {
+            this.finish();
+        }
 
-		return super.onOptionsItemSelected(item);
-	}
+        return super.onOptionsItemSelected(item);
+    }
 }
