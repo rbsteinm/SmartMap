@@ -139,7 +139,7 @@ public class SearchResultView extends RelativeLayout {
             new OnDisplayableInformationsChangeListener() {
                 @Override
                 public void onDisplayableInformationsChange() {
-                    SearchResultView.this.mItem = DatabaseHelper.getInstance().getUser(mItem.getID());
+                    mItem = DatabaseHelper.getInstance().getUser(mItem.getID());
                     ((Activity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
