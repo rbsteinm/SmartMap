@@ -1,126 +1,85 @@
 package ch.epfl.smartmap.cache;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.location.Location;
 import ch.epfl.smartmap.R;
-
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import ch.epfl.smartmap.activities.UserInformationActivity;
+import ch.epfl.smartmap.gui.Utils;
 
 /**
- * A class to represent the user's friends
+ * A class to represent the user's invitations
  * 
- * @author ritterni
+ * @author agpmilli
  */
-public class FriendInvitation implements Invitation, Displayable {
-    private long mId;
-    private Intent mIntent;
-    private String mTitle;
-    private String mText;
-    private User mUser;
-    private boolean mIsRead;
-    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
-    public static final int IMAGE_QUALITY = 100;
-    public static final String PROVIDER_NAME = "SmartMapServers";
+public class FriendInvitation implements Invitation {
+	private final long mInvitationId;
+	private long mUserId;
+	private String mUserName;
+	private int mStatus;
 
-    @Override
-    public long getID() {
-        return mId;
-    }
+	public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
+	public static final int IMAGE_QUALITY = 100;
+	public static final String PROVIDER_NAME = "SmartMapServers";
 
-    @Override
-    public Intent getIntent() {
-        return mIntent;
-    }
+	public FriendInvitation(long invitationId, long userId, String userName, int status) {
+		mInvitationId = invitationId;
+		mUserId = userId;
+		mUserName = userName;
+		mStatus = status;
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getLatLng()
-     */
-    @Override
-    public LatLng getLatLng() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	}
 
-    @Override
-    public Location getLocation() {
-        return mUser.getLocation();
-    }
+	@Override
+	public int getStatus() {
+		return mStatus;
+	}
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
-     */
-    @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public Intent getIntent() {
+		if (mStatus == READ) {
+			return new Intent(Utils.Context, UserInformationActivity.class);
+		} else {
+			return new Intent();
+		}
+	}
 
-    @Override
-    public String getName() {
-        return mUser.getName();
-    }
+	@Override
+	public long getID() {
+		return mInvitationId;
+	}
 
-    @Override
-    public Bitmap getPicture(Context context) {
-        return mUser.getPicture(context);
-    }
+	@Override
+	public String getText() {
+		return "Click here to open the invitation";
+	}
 
-    @Override
-    public String getShortInfos() {
-        return new String("Position : " + mUser.getLocationString() + "\n" + "Last seen : "
-            + mUser.getLastSeen());
-    }
+	@Override
+	public String getTitle() {
+		return "Friend request from " + mUserName;
+	}
 
-    @Override
-    public String getText() {
-        return mText;
-    }
+	@Override
+	public String getUserName() {
+		return mUserName;
+	}
 
-    @Override
-    public String getTitle() {
-        return mTitle;
-    }
+	@Override
+	public long getUserId() {
+		return mUserId;
+	}
 
-    @Override
-    public User getUser() {
-        return mUser;
-    }
+	@Override
+	public void setUserName(String name) {
+		mUserName = name;
+	}
 
-    @Override
-    public boolean isRead() {
-        return mIsRead;
-    }
+	@Override
+	public void setUserId(long id) {
+		mUserId = id;
+	}
 
-    @Override
-    public void setIntent(Intent intent) {
-        mIntent = intent;
-
-    }
-
-    @Override
-    public void setRead(boolean isRead) {
-        mIsRead = isRead;
-
-    }
-
-    @Override
-    public void setText(String text) {
-        mText = text;
-    }
-
-    @Override
-    public void setTitle(String title) {
-        mTitle = title;
-    }
-
-    @Override
-    public void setUser(User user) {
-        mUser = user;
-    }
+	@Override
+	public void setStatus(int status) {
+		mStatus = status;
+	}
 
 }
