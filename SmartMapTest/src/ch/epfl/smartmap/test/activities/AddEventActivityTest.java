@@ -2,6 +2,7 @@ package ch.epfl.smartmap.test.activities;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import android.os.Handler;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
@@ -67,14 +68,33 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
+    public void testCannotCreateEventWithoutFields() {
+        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+        // If the description is displayed, we are still in AddEventActivity,
+        // hence the event couldn't be created.
+        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+    }
+
     public void testCannotCreateWithEmptyNameAndGoodOtherFields() {
         // Regression test for bug #40
 
-        TextView latitude = (TextView) mAddEventActivity.findViewById(R.id.addEventLatitude);
-        TextView longitude = (TextView) mAddEventActivity.findViewById(R.id.addEventLongitude);
+        Handler myHandler = new Handler();
 
-        latitude.setText("1");
-        longitude.setText("2");
+        Runnable updateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // call the activity method that updates the UI
+
+                TextView latitude = (TextView) mAddEventActivity.findViewById(R.id.addEventLatitude);
+                TextView longitude = (TextView) mAddEventActivity.findViewById(R.id.addEventLongitude);
+
+                latitude.setText("1");
+                longitude.setText("2");
+            }
+        };
+
+        myHandler.post(updateRunnable);
 
         onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
         onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
@@ -84,14 +104,6 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
 
         onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
 
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-
-    }
-
-    public void testCannotCreateEventWithoutFields() {
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
-        // If the description is displayed, we are still in AddEventActivity,
-        // hence the event couldn't be created.
         onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
     }
