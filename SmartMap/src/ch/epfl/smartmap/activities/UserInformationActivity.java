@@ -24,6 +24,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * Activity that shows full informations about a Displayable Object.
  * 
  * @author jfperren
+ * @author rbsteinm
  */
 public class UserInformationActivity extends Activity {
 
@@ -48,6 +49,7 @@ public class UserInformationActivity extends Activity {
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
         mNameView = (TextView) this.findViewById(R.id.user_info_name);
         mInfosView = (TextView) this.findViewById(R.id.user_info_infos);
+        mFollowCheckBox = (CheckBox) this.findViewById(R.id.user_info_checkbox);
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
