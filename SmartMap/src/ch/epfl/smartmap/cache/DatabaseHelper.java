@@ -233,14 +233,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void addOnDisplayableInformationsChangeListener(Displayable displayable,
         OnDisplayableInformationsChangeListener listener) {
-        Log.d("DATABASE", "add Listener");
         List<OnDisplayableInformationsChangeListener> listenerList =
             mOnDisplayableInformationsChangeListeners.get(displayable);
         if (listenerList != null) {
-            Log.d("DATABASE", "was not null");
             listenerList.add(listener);
         } else {
-            Log.d("DATABASE", "was null");
             mOnDisplayableInformationsChangeListeners.put(displayable,
                 new ArrayList<OnDisplayableInformationsChangeListener>(Arrays.asList(listener)));
         }
@@ -790,13 +787,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public int updateUser(User user) {
         ContentValues values = new ContentValues();
-        boolean updatedInfo = false;
 
         // Check for default values
         values.put(KEY_USER_ID, user.getID());
         if (user.getName() != Friend.NO_NAME) {
             values.put(KEY_NAME, user.getName());
-            updatedInfo = true;
         }
         if (user.getNumber() != Friend.NO_NUMBER) {
             values.put(KEY_NUMBER, user.getNumber());
@@ -820,17 +815,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int rows =
             mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(user.getID())});
-        Log.d("DATABASE", "update user");
         if (rows > 0) {
-            Log.d("DATABASE", "notify");
-            if (mOnDisplayableInformationsChangeListeners.get(user) == null) {
-                Log.d("DATABASE", "null");
-            }
-            if (mOnDisplayableInformationsChangeListeners.get(user) != null) {
-                Log.d("DATABASE", "size " + mOnDisplayableInformationsChangeListeners.get(user).size());
-            }
-
-            Log.d("DATABASE", "MAP : " + mOnDisplayableInformationsChangeListeners.keySet().size());
             this.notifyOnDisplayableInformationListeners(user);
         }
         return rows;

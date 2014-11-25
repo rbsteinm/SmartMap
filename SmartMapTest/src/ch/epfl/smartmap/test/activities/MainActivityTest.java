@@ -7,7 +7,6 @@ import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewA
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
-
 import static org.hamcrest.Matchers.not;
 
 import org.hamcrest.Matcher;
@@ -15,10 +14,8 @@ import org.hamcrest.Matcher;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.test.ActivityInstrumentationTestCase2;
-
 import android.view.View;
 import android.widget.ListView;
-
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
 
@@ -27,43 +24,6 @@ import com.google.android.apps.common.testing.ui.espresso.ViewAction;
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 
 public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
-    private static ViewAction actionCloseDrawer() {
-        return new ViewAction() {
-            @Override
-            public Matcher<View> getConstraints() {
-                return isAssignableFrom(DrawerLayout.class);
-            }
-
-            @Override
-            public String getDescription() {
-                return "close drawer";
-            }
-
-            @Override
-            public void perform(UiController uiController, View view) {
-                ((DrawerLayout) view).closeDrawer(GravityCompat.START);
-            }
-        };
-    }
-
-    private static ViewAction actionOpenDrawer() {
-        return new ViewAction() {
-            @Override
-            public Matcher<View> getConstraints() {
-                return isAssignableFrom(DrawerLayout.class);
-            }
-
-            @Override
-            public String getDescription() {
-                return "open drawer";
-            }
-
-            @Override
-            public void perform(UiController uiController, View view) {
-                ((DrawerLayout) view).openDrawer(GravityCompat.START);
-            }
-        };
-    }
 
     public MainActivityTest() {
         super(MainActivity.class);
@@ -75,6 +35,11 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         super.setUp();
         this.getActivity(); // prevent error
         // "No activities found. Did you forget to launch the activity by calling getActivity()"
+    }
+
+    @Override
+    protected void tearDown() {
+        this.getActivity().finish();
     }
 
     public void testCloseSearchViewWithBackButton() {
@@ -135,5 +100,43 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.action_search)).perform(click());
         onView(withId(R.id.action_search)).perform(ViewActions.typeText("flksdh�fjkslkfshdfljkshfd"));
         // TODO : Check no result is displayed
+    }
+
+    private static ViewAction actionCloseDrawer() {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isAssignableFrom(DrawerLayout.class);
+            }
+
+            @Override
+            public String getDescription() {
+                return "close drawer";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                ((DrawerLayout) view).closeDrawer(GravityCompat.START);
+            }
+        };
+    }
+
+    private static ViewAction actionOpenDrawer() {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isAssignableFrom(DrawerLayout.class);
+            }
+
+            @Override
+            public String getDescription() {
+                return "open drawer";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                ((DrawerLayout) view).openDrawer(GravityCompat.START);
+            }
+        };
     }
 }

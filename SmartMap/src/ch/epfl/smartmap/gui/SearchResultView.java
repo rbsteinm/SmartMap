@@ -135,7 +135,7 @@ public class SearchResultView extends RelativeLayout {
             }
         });
 
-        DatabaseHelper.getInstance().addOnDisplayableInformationsChangeListener(mItem,
+        DatabaseHelper.initialize(context).addOnDisplayableInformationsChangeListener(mItem,
             new OnDisplayableInformationsChangeListener() {
                 @Override
                 public void onDisplayableInformationsChange() {

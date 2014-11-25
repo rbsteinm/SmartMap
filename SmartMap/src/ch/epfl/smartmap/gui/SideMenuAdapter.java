@@ -38,23 +38,12 @@ public class SideMenuAdapter extends ArrayAdapter<String> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Log.d("sideMenuView is null", "NULLVIEW");
-
         // Create inflater,get item to construct
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.drawer_list_item, parent, false);
 
         // Get item field
         TextView sideMenuView = (TextView) convertView.findViewById(R.id.side_menu_text_view);
-        /*
-         * <<<<<<< HEAD
-         * if(sideMenuView == null){ Log.d("sideMenuView is null", "NULLVIEW");
-         * =======
-         * if(sideMenuView == null){
-         * Log.d("sideMenuView is null", "NULLVIEW");
-         * >>>>>>> gui-info
-         * }
-         */
         // Set item field + id
         sideMenuView.setText(mListItems[position]);
         // set tag to each View
