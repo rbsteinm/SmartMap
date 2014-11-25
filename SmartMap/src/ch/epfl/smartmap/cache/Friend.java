@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
@@ -13,7 +14,6 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
-import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.Utils;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -35,22 +35,6 @@ public class Friend implements User, Displayable, Parcelable {
     private GregorianCalendar mLastSeen;
     private final Location mLocation;
     private boolean mVisible;
-
-    public static final String NO_NAME = "";
-    public static final String NO_NUMBER = "No phone number specified";
-    public static final String NO_EMAIL = "No email address specified";
-    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
-    public static final int IMAGE_QUALITY = 100;
-    public static final String PROVIDER_NAME = "SmartMapServers";
-    public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
-    // until a user is
-    // considered
-    // offline
-
-    public static final float MARKER_ANCHOR_X = (float) 0.5;
-    public static final float MARKER_ANCHOR_Y = 1;
-    public static final int PICTURE_WIDTH = 50;
-    public static final int PICTURE_HEIGHT = 50;
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
         @Override
@@ -236,13 +220,12 @@ public class Friend implements User, Displayable, Parcelable {
         return ((int) mId) * prime;
     }
 
-    @Override
     public boolean isOnline() {
         return (new GregorianCalendar().getTimeInMillis() - mLastSeen.getTimeInMillis()) < ONLINE_TIMEOUT;
     }
 
     @Override
-    public boolean isVisible() {
+    public boolean isVisibleOnMap() {
         return mVisible;
     }
 
@@ -252,10 +235,8 @@ public class Friend implements User, Displayable, Parcelable {
     }
 
     @Override
-    public void setLastSeen(GregorianCalendar date) {
-        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        g.setTimeInMillis(date.getTimeInMillis());
-        mLastSeen = g;
+    public void setLastSeen(Date date) {
+        mLastSeen.setTime(date);
     }
 
     @Override
@@ -276,7 +257,7 @@ public class Friend implements User, Displayable, Parcelable {
 
     @Override
     public void setName(String newName) {
-        if (newName.isEmpty() || (newName == null)) {
+        if ((newName == null) || newName.isEmpty()) {
             throw new IllegalArgumentException("Invalid user name!");
         }
         mName = newName;
@@ -287,14 +268,13 @@ public class Friend implements User, Displayable, Parcelable {
         mPhoneNumber = newNumber;
     }
 
-    @Override
     @Deprecated
     public void setOnline(boolean status) {
         // deprecated
     }
 
     @Override
-    public void setPicture(Bitmap pic, Context context) {
+    public void setPicture(Bitmap pic, Context context) throws FileNotFoundException, IOException {
 
         File file = new File(context.getFilesDir(), mId + ".png");
 
@@ -302,23 +282,16 @@ public class Friend implements User, Displayable, Parcelable {
             file.delete();
         }
 
-        try {
-            FileOutputStream out = context.openFileOutput(mId + ".png", Context.MODE_PRIVATE);
-            pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        FileOutputStream out = context.openFileOutput(mId + ".png", Context.MODE_PRIVATE);
+        pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
+        out.close();
+
     }
 
-    @Override
     public void setPositionName(String posName) {
         mLocationString = posName;
     }
 
-    @Override
     public void setVisible(boolean isVisible) {
         mVisible = isVisible;
     }

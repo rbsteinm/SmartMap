@@ -303,7 +303,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_LATITUDE, user.getLocation().getLatitude());
             values.put(KEY_POSNAME, user.getLocationString());
             values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
-            values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); // boolean to int
+            values.put(KEY_VISIBLE, user.isVisibleOnMap() ? 1 : 0); // boolean to int
 
             mDatabase.insert(TABLE_USER, null, values);
 
@@ -467,7 +467,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
                 GregorianCalendar cal = new GregorianCalendar();
                 cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
-                friend.setLastSeen(cal);
+                friend.setLastSeen(cal.getTime());
                 friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); // int to boolean
                 friends.add(friend);
             } while (cursor.moveToNext());
@@ -637,7 +637,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
-        friend.setLastSeen(cal);
+        friend.setLastSeen(cal.getTime());
         friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1);
 
         cursor.close();
@@ -810,7 +810,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
         }
 
-        values.put(KEY_VISIBLE, user.isVisible() ? 1 : 0); // boolean to int
+        values.put(KEY_VISIBLE, user.isVisibleOnMap() ? 1 : 0); // boolean to int
 
         int rows =
             mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",

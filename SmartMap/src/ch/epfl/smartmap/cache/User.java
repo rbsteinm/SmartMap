@@ -1,11 +1,15 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.GregorianCalendar;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Parcelable;
+import ch.epfl.smartmap.R;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -15,6 +19,20 @@ import com.google.android.gms.maps.model.LatLng;
  * @author ritterni
  */
 public interface User extends Parcelable, Displayable {
+
+    public static final String NO_NAME = "NO_NAME";
+    public static final String NO_NUMBER = "NO_NUMBER";
+    public static final String NO_EMAIL = "NO_EMAIL";
+    public static final String NO_LOCATION = "NO_LOCATION";
+    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
+    public static final int IMAGE_QUALITY = 100;
+    public static final String PROVIDER_NAME = "SmartMapServers";
+    public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
+
+    public static final float MARKER_ANCHOR_X = (float) 0.5;
+    public static final float MARKER_ANCHOR_Y = 1;
+    public static final int PICTURE_WIDTH = 50;
+    public static final int PICTURE_HEIGHT = 50;
 
     /**
      *
@@ -35,7 +53,7 @@ public interface User extends Parcelable, Displayable {
     /**
      * @return The date/hour at which the user was last seen
      */
-    GregorianCalendar getLastSeen();
+    Calendar getLastSeen();
 
     /**
      * @return The user's latitude and longitude
@@ -74,17 +92,9 @@ public interface User extends Parcelable, Displayable {
     Bitmap getPicture(Context context);
 
     /**
-     * Deprecated. Use getLastSeen() instead.
-     * 
-     * @return True if the user is online
-     */
-    @Deprecated
-    boolean isOnline();
-
-    /**
      * @return True if the user's location is visible
      */
-    boolean isVisible();
+    boolean isVisibleOnMap();
 
     /**
      * Sets the user's email
@@ -98,7 +108,7 @@ public interface User extends Parcelable, Displayable {
      * @param date
      *            The date/hour at which the user was last seen
      */
-    void setLastSeen(GregorianCalendar date);
+    void setLastSeen(Date date);
 
     /**
      * Sets the user's latitude
@@ -141,34 +151,10 @@ public interface User extends Parcelable, Displayable {
     void setNumber(String newNumber);
 
     /**
-     * Sets whether or not the user is online. (Deprecated, use setLastSeen()
-     * instead)
-     * 
-     * @param isOnline
-     *            True if the user is online
-     */
-    @Deprecated
-    void setOnline(boolean isOnline);
-
-    /**
      * Stores a new profile picture for the user
      * 
      * @param pic
      *            The picture as a Bitmap object
      */
-    void setPicture(Bitmap pic, Context context);
-
-    /**
-     * Sets the user position's name
-     * 
-     * @param posName
-     *            The user's position
-     */
-    void setPositionName(String posName);
-
-    /**
-     * @param isVisible
-     *            True if the user is visible
-     */
-    void setVisible(boolean isVisible);
+    void setPicture(Bitmap pic, Context context) throws FileNotFoundException, IOException;
 }

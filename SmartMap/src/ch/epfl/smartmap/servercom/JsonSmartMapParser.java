@@ -228,7 +228,7 @@ public class JsonSmartMapParser implements SmartMapParser {
                 user = new Friend(userId, Friend.NO_NAME);
 
                 user.setLocation(location);
-                user.setLastSeen(lastSeen);
+                user.setLastSeen(lastSeen.getTime());
 
                 users.add(user);
             }
