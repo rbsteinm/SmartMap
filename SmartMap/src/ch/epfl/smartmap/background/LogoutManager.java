@@ -100,10 +100,18 @@ public final class LogoutManager {
      * 
      * @author SpicyCH
      */
-    public static LogoutManager getInstance(Context context) {
+    public static LogoutManager getInstance() {
+        if (mContext == null) {
+            throw new UnsupportedOperationException(
+                    "You must initialize the LogoutManager before you can get an instance");
+        }
         if (mInstance == null) {
-            mInstance = new LogoutManager(context);
+            mInstance = new LogoutManager(mContext);
         }
         return mInstance;
+    }
+
+    public static void initialize(Context context) {
+        mInstance = new LogoutManager(context);
     }
 }
