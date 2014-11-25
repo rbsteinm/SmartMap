@@ -28,6 +28,11 @@ public class StartActivityTest extends
 		// "No activities found. Did you forget to launch the activity by calling getActivity()"
 	}
 
+	@Override
+	protected void tearDown() throws Exception {
+		this.getActivity().finish();
+	}
+
 	/**
 	 * Click on startActivity shouldn't do anything
 	 * 
