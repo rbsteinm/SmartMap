@@ -154,7 +154,7 @@ class EventController {
 
     public function getPublicEvents(Request $request)
     {
-        $userId = RequestUtils::getIdFromRequest($request);
+        RequestUtils::getIdFromRequest($request);
 
         $longitude = RequestUtils::getPostParam($request, 'longitude');
 
@@ -175,6 +175,15 @@ class EventController {
 
         foreach ($events as $event)
         {
+            try
+            {
+                $participants = $this->mRepo->getEventParticipants($event->getId());
+            }
+            catch (DatabaseException $e)
+            {
+                throw new ControlLogicException('Error in getPublicEvents', 2, $e);
+            }
+
             $eventsArray[] = array(
                 'id' => $event->getId(),
                 'creatorId' => $event->getCreatorId(),
@@ -184,11 +193,62 @@ class EventController {
                 'latitude' => $event->getLatitude(),
                 'positionName' => $event->getPositionName(),
                 'name' => $event->getName(),
-                'description' => $event->getDescription()
+                'description' => $event->getDescription(),
+                'participants' => $participants
             );
         }
 
         $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventsArray);
+
+        return new JsonResponse($response);
+    }
+
+    /**
+     * Adds the user to the event with id in post parameter event_id.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
+    public function joinEvent(Request $request)
+    {
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        $eventId = RequestUtils::getPostParam($request, 'event_id');
+
+        try
+        {
+            $this->mRepo->addUserToEvent($eventId, $userId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in joinEvent.', 2, $e);
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Joined event.');
+
+        return new JsonResponse($response);
+    }
+
+    public function inviteUsersToEvent(Request $request)
+    {
+        RequestUtils::getIdFromRequest($request);
+
+        $eventId = RequestUtils::getPostParam($request, 'event_id');
+
+        $userIds = RequestUtils::getIntArrayFromString(RequestUtils::getPostParam($request, 'users_ids'));
+
+        try
+        {
+            $this->mRepo->addEventInvitations($eventId, $userIds);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in inviteUsersToEvent.', 2, $e);
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Invited users.');
 
         return new JsonResponse($response);
     }
