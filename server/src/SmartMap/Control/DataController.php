@@ -198,7 +198,7 @@ class DataController
         {
             // Check if the user is already friend or already invited or already inviting
             $friendsIds = $this->mRepo->getFriendsIds($userId,
-                                                      array('BLOCKED', 'ALLOWED', 'DISALLOWED'));
+                array('BLOCKED', 'ALLOWED', 'DISALLOWED'));
             
             $userInvitingIds = $this->mRepo->getInvitationIds($userId);
             $friendInvitingIds = $this->mRepo->getInvitationIds($friendId);
