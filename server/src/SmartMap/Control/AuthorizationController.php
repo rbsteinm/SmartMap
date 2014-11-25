@@ -96,7 +96,7 @@ class AuthorizationController
         
         $friendsIds = RequestUtils::getPostParam($request, 'friend_ids');
         
-        $friendsIds = $this->getIntArrayFromString($friendsIds);
+        $friendsIds = RequestUtils::getIntArrayFromString($friendsIds);
         
         try
         {
@@ -127,7 +127,7 @@ class AuthorizationController
         
         $friendsIds = RequestUtils::getPostParam($request, 'friend_ids');
         
-        $friendsIds = $this->getIntArrayFromString($friendsIds);
+        $friendsIds = RequestUtils::getIntArrayFromString($friendsIds);
         
         try
         {
@@ -197,24 +197,5 @@ class AuthorizationController
         $response = array('status' => 'Ok', 'message' => 'Unfollowed friend !');
         
         return new JsonResponse($response);
-    }
-    
-    /** 
-     * Utility function transforming a list of numbers separated by commas
-     * in an array of integers.
-     * 
-     * @param string $string
-     * @return array
-     */
-    private function getIntArrayFromString($string)
-    {
-        $array = explode(',', $string);
-        
-        for ($i = 0; $i < count($array); $i++)
-        {
-            $array[$i] = (int) $array[$i];
-        }
-        
-        return $array;
     }
 }
