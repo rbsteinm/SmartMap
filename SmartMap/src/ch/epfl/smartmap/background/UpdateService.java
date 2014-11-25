@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -24,8 +25,11 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.FriendInvitation;
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
 import ch.epfl.smartmap.servercom.NetworkNotificationBag;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
@@ -36,7 +40,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * 
  * @author ritterni
  */
-public class UpdateService extends Service {
+public class UpdateService extends Service implements OnInvitationListUpdateListener {
 
     public static final String BROADCAST_POS = "ch.epfl.smartmap.background.broadcastPos";
 
@@ -49,8 +53,8 @@ public class UpdateService extends Service {
     private static final int INVITE_UPDATE_DELAY = 30000;
 
     private static final float MIN_DISTANCE = 5; // minimum distance to update
+                                                 // position
 
-    // position
     private static final int RESTART_DELAY = 2000;
 
     private final Handler mHandler = new Handler();
@@ -63,6 +67,7 @@ public class UpdateService extends Service {
     private SettingsManager mManager;
     private Geocoder mGeocoder;
     private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
+    private Set<Long> mInviterIds;
 
     private final Runnable friendsPosUpdate = new Runnable() {
         @Override
@@ -100,9 +105,17 @@ public class UpdateService extends Service {
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
-            MIN_DISTANCE, new MyLocationListener());
+        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY, MIN_DISTANCE,
+            new MyLocationListener());
+
+        updateInvitationSet();
+
         new AsyncFriendsInit().execute();
+    }
+
+    @Override
+    public void onInvitationListUpdate() {
+        updateInvitationSet();
     }
 
     @Override
@@ -123,10 +136,8 @@ public class UpdateService extends Service {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
         restartService.setPackage(this.getPackageName());
         PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
-                PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService =
-            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
 
@@ -151,6 +162,14 @@ public class UpdateService extends Service {
 
     private void showFriendNotif(User user) {
         Notifications.newFriendNotification(this, user);
+    }
+
+    public void updateInvitationSet() {
+        for (FriendInvitation invitation : mHelper.getFriendInvitations()) {
+            if (invitation.getStatus() != Invitation.ACCEPTED || invitation.getStatus() != Invitation.REFUSED) {
+                mInviterIds.add(invitation.getUserId());
+            }
+        }
     }
 
     /**
@@ -202,13 +221,10 @@ public class UpdateService extends Service {
             try {
                 nb = mClient.getInvitations();
             } catch (SmartMapClientException e) {
-                Log.e("UpdateService",
-                    "Couldn't retrieve invitations due to a server error: " + e.getMessage());
+                Log.e("UpdateService", "Couldn't retrieve invitations due to a server error: " + e.getMessage());
                 // We set an empty notification bag as we couldn't retrieve data
                 // from the server.
-                nb =
-                    new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(),
-                        new ArrayList<Long>());
+                nb = new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(), new ArrayList<Long>());
             }
             return nb;
         }
@@ -226,7 +242,9 @@ public class UpdateService extends Service {
                 }
 
                 for (User user : result.getInvitingUsers()) {
-                    if (mHelper.addInvitation(user) > 0) {
+                    if (!mInviterIds.contains(user.getID())) {
+                        mHelper.addFriendInvitation(new FriendInvitation(0, user.getID(), user.getName(),
+                            Invitation.UNREAD));
                         UpdateService.this.showFriendNotif(user);
                     }
                 }
@@ -360,8 +378,7 @@ public class UpdateService extends Service {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             // stop sending position if provider isn't available
-            if ((status == LocationProvider.OUT_OF_SERVICE)
-                || (status == LocationProvider.TEMPORARILY_UNAVAILABLE)) {
+            if ((status == LocationProvider.OUT_OF_SERVICE) || (status == LocationProvider.TEMPORARILY_UNAVAILABLE)) {
                 mOwnPosEnabled = false;
             } else if (status == LocationProvider.AVAILABLE) {
                 mOwnPosEnabled = true;
