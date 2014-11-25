@@ -67,6 +67,9 @@
             android:label="@string/title_activity_pager"
             android:parentActivityName=".activities.MainActivity"
             android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.smartmap.activities.MainActivity" />
         </activity>
 
         <meta-data
