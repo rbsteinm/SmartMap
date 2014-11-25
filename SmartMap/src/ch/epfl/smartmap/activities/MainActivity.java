@@ -423,12 +423,17 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
                         Log.d(TAG, "listener notified");
                         if (item instanceof Friend) {
                             Log.d(TAG, "instanceof friend");
-                            MainActivity.this.mCurrentItem = mDbHelper.getUser(item.getID());
-                            ActionBar actionBar = MainActivity.this.getActionBar();
-                            actionBar.setTitle(item.getName());
-                            actionBar.setSubtitle(item.getShortInfos());
-                            actionBar.setIcon(new BitmapDrawable(MainActivity.this.getResources(), item
-                                .getPicture(MainActivity.this)));
+                            MainActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MainActivity.this.mCurrentItem = mDbHelper.getUser(item.getID());
+                                    ActionBar actionBar = MainActivity.this.getActionBar();
+                                    actionBar.setTitle(item.getName());
+                                    actionBar.setSubtitle(item.getShortInfos());
+                                    actionBar.setIcon(new BitmapDrawable(MainActivity.this.getResources(),
+                                        item.getPicture(MainActivity.this)));
+                                }
+                            });
                         }
                     }
                 });

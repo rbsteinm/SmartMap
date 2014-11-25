@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.gui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -136,13 +137,18 @@ public class SearchResultView extends RelativeLayout {
 
         DatabaseHelper.getInstance().addOnDisplayableInformationsChangeListener(mItem,
             new OnDisplayableInformationsChangeListener() {
-
                 @Override
                 public void onDisplayableInformationsChange() {
                     SearchResultView.this.mItem = DatabaseHelper.getInstance().getUser(mItem.getID());
-                    mTitleView.setText(mItem.getName());
-                    mShortInfoView.setText(mItem.getShortInfos());
-                    mImageView.setImageBitmap(mItem.getPicture(context));
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTitleView.setText(mItem.getName());
+                            mShortInfoView.setText(mItem.getShortInfos());
+                            mImageView.setImageBitmap(mItem.getPicture(context));
+                        }
+
+                    });
                 }
             });
     }
@@ -166,4 +172,5 @@ public class SearchResultView extends RelativeLayout {
 
         return auditErrors;
     }
+
 }
