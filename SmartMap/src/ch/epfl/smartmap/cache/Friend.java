@@ -138,7 +138,7 @@ public class Friend implements User, Displayable, Parcelable {
      */
     @Override
     public boolean equals(Object that) {
-        return (that != null) && (that instanceof Friend) && (this.mId == ((Friend) that).mId);
+        return (that != null) && (that instanceof Friend) && (mId == ((Friend) that).mId);
     }
 
     @Override

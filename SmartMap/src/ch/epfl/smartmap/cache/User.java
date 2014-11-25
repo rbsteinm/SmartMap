@@ -51,6 +51,11 @@ public interface User extends Parcelable, Displayable {
     Location getLocation();
 
     /**
+     * @return The user's position as a String (e.g. 'Lausanne')
+     */
+    String getLocationString();
+
+    /**
      * @return The user's name
      */
 
@@ -67,11 +72,6 @@ public interface User extends Parcelable, Displayable {
      */
     @Override
     Bitmap getPicture(Context context);
-
-    /**
-     * @return The user's position as a String (e.g. 'Lausanne')
-     */
-    String getLocationString();
 
     /**
      * Deprecated. Use getLastSeen() instead.
