@@ -14,8 +14,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.PagerAdapter;
 
 /**
- * This activity displays your friends in one tab, and your friend request (both
- * sent and received) in another tab
+ * This activity displays your friends in one tab, and your friend request (both sent and received) in another tab
  * 
  * @author rbsteinm
  */
@@ -26,13 +25,13 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
     private ViewPager mPager;
     private ActionBar mActionBar;
-    private final String[] mTabs = {"Friends", "Invitations"};
+    private final String[] mTabs = { "Friends", "Invitations" };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         // Makes the logo clickable (clicking it returns to previous activity)
-        // getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
 
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_friends_pager);
@@ -44,8 +43,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
         // Set action bar and tab color to main color
         mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-        mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this.getResources().getColor(
-            R.color.main_blue)));
+        mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
 
         mPager.setAdapter(pageAdapter);
         mActionBar.setHomeButtonEnabled(false);
@@ -88,17 +86,17 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
         int id = item.getItemId();
-        switch (id) {
-            case R.id.activity_friends_add_button:
-                this.startAddFriendActivity(null);
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        switch (item.getItemId()) {
             case android.R.id.home:
                 this.finish();
+                break;
             default:
+                // No other menu items!
                 break;
         }
 
