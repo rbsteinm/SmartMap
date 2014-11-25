@@ -93,7 +93,7 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.context = this;
+        Utils.sContext = this;
 
         this.setContentView(R.layout.activity_main);
 

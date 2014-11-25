@@ -119,7 +119,7 @@ public class SearchLayout extends LinearLayout {
     /**
      * Creates a new ScrollView containing the results of a certain Type
      * 
-     * @param context
+     * @param sContext
      *            Context of the Application
      * @param searchType
      *            Type of Search Results the ScrollView should display
@@ -151,7 +151,7 @@ public class SearchLayout extends LinearLayout {
     /**
      * Create all Views to handle multiple Search Types
      * 
-     * @param context
+     * @param sContext
      *            Context of the Application
      * @param searchType
      *            Search Types that need to be implemented

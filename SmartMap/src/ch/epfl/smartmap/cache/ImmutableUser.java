@@ -35,7 +35,7 @@ public class ImmutableUser implements User {
     private ImmutableUser(long id, String name, String phoneNumber, String email, String locationString,
         GregorianCalendar lastSeen, Location location) {
         if (id < 0) {
-            throw new IllegalArgumentException("Cannot create Friend with negative ID !");
+            throw new IllegalArgumentException("Cannot create User with negative ID !");
         } else {
             this.mID = id;
         }
@@ -43,7 +43,7 @@ public class ImmutableUser implements User {
         if (name == null) {
             this.mName = User.NO_NAME;
         } else if (name.equals("")) {
-            throw new IllegalArgumentException("Cannot create Friend with empty name !");
+            throw new IllegalArgumentException("Cannot create User with empty name !");
         } else {
             this.mName = name;
         }

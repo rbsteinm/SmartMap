@@ -21,7 +21,7 @@ import ch.epfl.smartmap.R;
  * @author agpmilli
  */
 public class Utils {
-    public static Context context;
+    public static Context sContext;
 
     public static final long ONE_SECOND = 1000;
     public static final long ONE_MINUTE = 60 * ONE_SECOND;
@@ -36,7 +36,7 @@ public class Utils {
             return UNKNOWN_LOCATION;
         }
 
-        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
 
         try {
             List<Address> addresses =

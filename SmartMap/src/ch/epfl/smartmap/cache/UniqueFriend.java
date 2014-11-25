@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TimeZone;
 
 import android.content.Context;
@@ -16,7 +16,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Parcel;
+import android.util.LongSparseArray;
 import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.listeners.OnDisplayableInformationsUpdateListener;
+import ch.epfl.smartmap.listeners.OnFriendLocationChangedListener;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -31,7 +34,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public final class UniqueFriend implements User {
 
     // Class Map containing all unique instances of Friend
-    private static final Map<Integer, Friend> sFriendInstances = new HashMap<Integer, Friend>();
+    private static final LongSparseArray<UniqueFriend> sFriendInstances = new LongSparseArray<UniqueFriend>();
+
+    // Listeners
+    private final List<OnFriendLocationChangedListener> mOnFriendLocationChangedListeners;
+    private final List<OnDisplayableInformationsUpdateListener> mOnDisplayableInformationsUpdateListeners;
 
     // Friend informations
     private final long mID;
@@ -43,7 +50,7 @@ public final class UniqueFriend implements User {
     private final Location mLocation;
 
     private UniqueFriend(long id, String name, String phoneNumber, String email, String locationString,
-        GregorianCalendar lastSeen, Location location) {
+        Calendar lastSeen, Location location) {
         if (id < 0) {
             throw new IllegalArgumentException("Cannot create Friend with negative ID !");
         } else {
@@ -88,6 +95,17 @@ public final class UniqueFriend implements User {
         } else {
             this.mLastSeen = (Calendar) lastSeen.clone();
         }
+
+        mOnDisplayableInformationsUpdateListeners = new LinkedList<OnDisplayableInformationsUpdateListener>();
+        mOnFriendLocationChangedListeners = new LinkedList<OnFriendLocationChangedListener>();
+    }
+
+    public void addOnDisplayableInformationUpdateListener(OnDisplayableInformationsUpdateListener listener) {
+        mOnDisplayableInformationsUpdateListeners.add(listener);
+    }
+
+    public void addOnFriendLocationChangedListener(OnFriendLocationChangedListener listener) {
+        mOnFriendLocationChangedListeners.add(listener);
     }
 
     /*
@@ -261,6 +279,15 @@ public final class UniqueFriend implements User {
             .get(Calendar.MINUTE)) < SettingsManager.getInstance().getTimeToWaitBeforeHidingFriends();
     }
 
+    public void
+        removeOnDisplayableInformationUpdateListener(OnDisplayableInformationsUpdateListener listener) {
+        mOnDisplayableInformationsUpdateListeners.remove(listener);
+    }
+
+    public void removeOnFriendLocationChangedListener(OnFriendLocationChangedListener listener) {
+        mOnFriendLocationChangedListeners.remove(listener);
+    }
+
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.User#setEmail(java.lang.String)
@@ -357,5 +384,82 @@ public final class UniqueFriend implements User {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.mID);
+    }
+
+    private void onEmailChanged() {
+
+        // TODO : Update database
+    }
+
+    private void onImageChanged() {
+
+        // TODO : Update database
+
+        for (OnDisplayableInformationsUpdateListener l : mOnDisplayableInformationsUpdateListeners) {
+            l.onImageChanged();
+        }
+    }
+
+    private void onLastSeenChanged() {
+
+        // TODO : Update database
+
+    }
+
+    private void onLocationChanged() {
+
+        // TODO : Update database
+
+        for (OnFriendLocationChangedListener l : mOnFriendLocationChangedListeners) {
+            l.onFriendLocationChanged();
+        }
+    }
+
+    private void onLocationStringChanged() {
+
+        // TODO : Update database
+
+        for (OnDisplayableInformationsUpdateListener l : mOnDisplayableInformationsUpdateListeners) {
+            l.onShortInfoChanged();
+        }
+    }
+
+    private void onNameChanged() {
+
+        // TODO : Update database
+
+        for (OnDisplayableInformationsUpdateListener l : mOnDisplayableInformationsUpdateListeners) {
+            l.onNameChanged();
+        }
+    }
+
+    private void onPhoneNumberChange() {
+
+        // TODO : Update database
+
+    }
+
+    public static UniqueFriend getFriendFromId(long id) {
+        // Try to get friend from cache
+        UniqueFriend friend = sFriendInstances.get(Long.valueOf(id));
+
+        if (friend == null) {
+            // Try to get friend from local database
+            User user = DatabaseHelper.getInstance().getUser(id);
+
+            if (user != null) {
+                friend =
+                    new UniqueFriend(user.getID(), user.getName(), user.getNumber(), user.getEmail(),
+                        user.getLocationString(), user.getLastSeen(), user.getLocation());
+
+                // TODO : Add database listeners
+
+                sFriendInstances.put(Long.valueOf(id), friend);
+            } else {
+                // TODO : Get online
+            }
+        }
+
+        return friend;
     }
 }
