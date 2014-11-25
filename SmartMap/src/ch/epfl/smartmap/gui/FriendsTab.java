@@ -54,7 +54,8 @@ public class FriendsTab extends ListFragment implements OnFriendListUpdateListen
 
     @Override
     public void onFriendListUpdate() {
-        this.setListAdapter(new FriendListItemAdapter(mContext, mCacheDB.getAllFriends()));
+        mFriendList = mCacheDB.getAllFriends();
+        this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
     }
 
     @Override
