@@ -38,14 +38,14 @@
             android:layout_below="@id/user_info_name"
             android:layout_toRightOf="@id/user_info_picture" />
 
-        <CheckBox
-            android:id="@+id/user_info_checkbox"
+        <Switch
+            android:id="@+id/user_info_follow_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/user_info_picture"
             android:onClick="followUnfollow"
-            android:text="@string/follow_checkbox" />
+            android:text="@string/follow_switch" />
 
     </RelativeLayout>
     

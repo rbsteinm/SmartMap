@@ -10,8 +10,8 @@ import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
@@ -33,7 +33,7 @@ public class UserInformationActivity extends Activity {
 
     private DatabaseHelper mCacheDB;
 
-    private CheckBox mFollowCheckBox;
+    private Switch mFollowSwitch;
     private TextView mInfosView;
     private TextView mNameView;
 
@@ -49,7 +49,7 @@ public class UserInformationActivity extends Activity {
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
         mNameView = (TextView) this.findViewById(R.id.user_info_name);
         mInfosView = (TextView) this.findViewById(R.id.user_info_infos);
-        mFollowCheckBox = (CheckBox) this.findViewById(R.id.user_info_checkbox);
+        mFollowSwitch = (Switch) this.findViewById(R.id.user_info_follow_switch);
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
@@ -121,7 +121,7 @@ public class UserInformationActivity extends Activity {
         protected String doInBackground(Long... params) {
             String confirmString = "";
             try {
-                if (mFollowCheckBox.isChecked()) {
+                if (mFollowSwitch.isChecked()) {
                     NetworkSmartMapClient.getInstance().followFriend(mUser.getID());
                     confirmString = "You're now following " + mUser.getName();
                 } else {
@@ -136,7 +136,7 @@ public class UserInformationActivity extends Activity {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            Toast.makeText(UserInformationActivity.this, confirmString, Toast.LENGTH_LONG).show();
+            Toast.makeText(UserInformationActivity.this, confirmString, Toast.LENGTH_SHORT).show();
         }
 
     }
