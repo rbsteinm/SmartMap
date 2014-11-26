@@ -37,15 +37,17 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/user_info_name"
             android:layout_toRightOf="@id/user_info_picture" />
-    </RelativeLayout>
-    
+
         <CheckBox
-        android:id="@+id/activity_friend_information_follow_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/user_info_header"
-        android:onClick="followUnfollow"
-        android:text="@string/follow_checkbox" />
+            android:id="@+id/user_info_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/user_info_picture"
+            android:onClick="followUnfollow"
+            android:text="@string/follow_checkbox" />
+
+    </RelativeLayout>
     
     <Button
         android:layout_width="fill_parent"

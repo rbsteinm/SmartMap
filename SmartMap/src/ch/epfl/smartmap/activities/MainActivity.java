@@ -14,7 +14,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
@@ -95,7 +94,7 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.Context = this;
+        Utils.context = this;
 
         this.setContentView(R.layout.activity_main);
 
@@ -412,9 +411,7 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 
                     @Override
                     public void onDisplayableInformationsChange() {
-                        Log.d(TAG, "listener notified");
                         if (item instanceof Friend) {
-                            Log.d(TAG, "instanceof friend");
                             if (item == mCurrentItem) {
                                 MainActivity.this.runOnUiThread(new Runnable() {
                                     @Override

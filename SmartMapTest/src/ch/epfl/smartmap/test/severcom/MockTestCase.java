@@ -9,7 +9,8 @@ public class MockTestCase extends InstrumentationTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         // XXX: Hack required to make Mockito work on Android
-        System.setProperty("dexmaker.dexcache", this.getInstrumentation().getTargetContext().getCacheDir().getPath());
+        System.setProperty("dexmaker.dexcache", this.getInstrumentation().getTargetContext().getCacheDir()
+            .getPath());
     }
 
 }

@@ -229,14 +229,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void addOnDisplayableInformationsChangeListener(Displayable displayable,
         OnDisplayableInformationsChangeListener listener) {
-        Log.d("DATABASE", "add Listener");
         List<OnDisplayableInformationsChangeListener> listenerList =
             mOnDisplayableInformationsChangeListeners.get(displayable);
         if (listenerList != null) {
-            Log.d("DATABASE", "was not null");
             listenerList.add(listener);
         } else {
-            Log.d("DATABASE", "was null");
             mOnDisplayableInformationsChangeListeners.put(displayable,
                 new ArrayList<OnDisplayableInformationsChangeListener>(Arrays.asList(listener)));
         }
