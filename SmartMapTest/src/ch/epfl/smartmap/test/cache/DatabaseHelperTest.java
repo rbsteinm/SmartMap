@@ -11,6 +11,8 @@ import android.test.RenamingDelegatingContext;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.DefaultFilter;
 import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.FriendInvitation;
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.cache.User;
 
@@ -31,6 +33,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
 	private final PublicEvent event2 = new PublicEvent("Another new event",
 			4523, "abababab", new GregorianCalendar(), new GregorianCalendar(),
 			new Location("SmartMapProvider"));
+	private final FriendInvitation invitA = new FriendInvitation(0, 8, "Otto Ritter", Invitation.UNREAD);
+	private final FriendInvitation invitB = new FriendInvitation(0, 2, "Robiche", Invitation.REFUSED);
 	private DatabaseHelper dbh;
 	private DefaultFilter filter;
 	private DefaultFilter filter2;
@@ -165,6 +169,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
 				&& (rows == 1));
 	}
 
+	@Test
 	public void testUpdateUser() {
 		a.setEmail("test email");
 		dbh.addUser(a);
@@ -173,5 +178,13 @@ public class DatabaseHelperTest extends AndroidTestCase {
 		assertTrue(dbh.getUser(a.getID()).getName().equals(c.getName())
 				&& dbh.getUser(a.getID()).getEmail().equals("test email")
 				&& (rows == 1));
+	}
+	
+	@Test
+	public void testGetUnansweredFriendInvitations(){
+	    dbh.addFriendInvitation(invitA);
+	    dbh.addFriendInvitation(invitB);
+	    List<FriendInvitation> list = dbh.getUnansweredFriendInvitations();
+	    assertTrue(list.size() == 1 && list.get(0).getUserId() == 8);
 	}
 }
