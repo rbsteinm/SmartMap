@@ -130,7 +130,8 @@
         <activity
             android:name="ch.epfl.smartmap.activities.ShowEventInformationActivity"
             android:label="@string/title_activity_show_event_information"
-            android:parentActivityName=".activities.ShowEventsActivity" >
+            android:parentActivityName=".activities.ShowEventsActivity"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.smartmap.activities.ShowEventsActivity" />

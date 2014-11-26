@@ -2,15 +2,59 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="ch.epfl.smartmap.activities.ShowEventInformationActivity" >
+    android:background="@color/background_blue"
+    android:paddingBottom="@dimen/activity_user_information_bottom_margin"
+    android:paddingLeft="@dimen/activity_user_information_side_margin"
+    android:paddingRight="@dimen/activity_user_information_side_margin"
+    android:paddingTop="@dimen/activity_user_information_top_margin"
+    tools:context="ch.epfl.smartmap.activities.UserInformationActivity" >
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/user_info_header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/div_background" >
+
+        <TextView
+            android:id="@+id/show_event_info_event_name"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="17dp"
+            android:layout_marginTop="17dp"
+            android:text="event name" />
+
+        <TextView
+            android:id="@+id/show_event_info_creator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/show_event_info_event_name"
+            android:layout_below="@+id/show_event_info_event_name"
+            android:text="By creator" />
+
+        <Button
+            android:id="@+id/show_event_info_invite_friends_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="42dp"
+            android:onClick="inviteFriendsToEvent"
+            android:text="@string/show_event_info_invite_friends_button" />
+        
+        <Button
+        android:id="@+id/show_event_info_show_on_map_button"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:onClick="openMapAtEventLocation"
+        android:text="@string/show_event_on_the_map_button" />
+
+    </RelativeLayout>
+    
 
 </RelativeLayout>

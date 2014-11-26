@@ -88,8 +88,9 @@
     <string name="show_event_details_button">See details</string>
     
     <!-- ShowEventInformationActivity -->
-    <string name="title_activity_show_event_information">ShowEventInformationActivity</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_show_event_information">Show event</string>
+    <string name="show_event_info_invite_friends_button">Invite friends</string>
+    <string name="show_event_by">By</string>
 
     <!-- AddEventActivity -->
     <string name="title_activity_add_event">Create a new event</string>
