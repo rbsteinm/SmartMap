@@ -1,8 +1,5 @@
 package ch.epfl.smartmap.background;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -28,7 +25,6 @@ public class Notifications {
 	private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME, SILENT_NOTIFICATION_TIME,
 	    VIBRATE_NOTIFICATION_TIME};
 	private static long notificationID = 0;
-	private static List<NotificationListener> listeners = new ArrayList<NotificationListener>();
 
 	/**
 	 * Create an accepted friend invitation notification and notify it
@@ -79,11 +75,6 @@ public class Notifications {
 
 		displayNotification(context, noti.build(), notificationID);
 
-		notifyListeners();
-	}
-
-	public static void addNotificationListener(NotificationListener listener) {
-		listeners.add(listener);
 	}
 
 	/**
@@ -135,8 +126,6 @@ public class Notifications {
 		            + event.getName()).setVibrate(PATTERN).setContentIntent(pEventIntent);
 
 		displayNotification(context, noti.build(), notificationID);
-
-		notifyListeners();
 	}
 
 	/**
@@ -189,7 +178,6 @@ public class Notifications {
 		            + context.getString(R.string.notification_open_friend_list));
 		displayNotification(context, noti.build(), notificationID);
 
-		notifyListeners();
 	}
 
 	/**
@@ -206,22 +194,5 @@ public class Notifications {
 		NotificationManager notificationManager = (NotificationManager) context
 		    .getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify((int) notificationId, notification);
-	}
-
-	private static void notifyListeners() {
-		for (NotificationListener l : listeners) {
-			l.onNewNotification();
-		}
-	}
-
-	/**
-	 * Listener use to listen when notifications arrive
-	 * 
-	 * @author agpmilli
-	 */
-	public static class NotificationListener {
-		public void onNewNotification() {
-
-		}
 	}
 }

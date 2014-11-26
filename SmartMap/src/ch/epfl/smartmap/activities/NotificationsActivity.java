@@ -73,7 +73,8 @@ public class NotificationsActivity extends ListActivity {
 
 		for (int i = 0; i < mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size(); i++) {
 			mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).get(i).setStatus(Invitation.READ);
-			mDbHelper.updateFriendInvitation(mDbHelper.getUnansweredFriendInvitations().get(i));
+			mDbHelper
+			    .updateFriendInvitation(mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).get(i));
 		}
 
 	}

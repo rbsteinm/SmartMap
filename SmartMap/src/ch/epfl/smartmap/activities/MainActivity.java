@@ -23,8 +23,6 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.Notifications;
-import ch.epfl.smartmap.background.Notifications.NotificationListener;
 import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.DatabaseSearchEngine;
@@ -41,6 +39,7 @@ import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.AddEventOnMapLongClickListener;
 import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
 import ch.epfl.smartmap.listeners.OnFriendsLocationUpdateListener;
+import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
 import ch.epfl.smartmap.map.DefaultMarkerManager;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 
@@ -64,7 +63,8 @@ import com.google.android.gms.maps.model.Marker;
  * @author agpmilli
  */
 
-public class MainActivity extends FragmentActivity implements OnFriendsLocationUpdateListener {
+public class MainActivity extends FragmentActivity implements OnFriendsLocationUpdateListener,
+    OnInvitationListUpdateListener {
 
 	@SuppressWarnings("unused")
 	private static final String TAG = MainActivity.class.getSimpleName();
@@ -242,24 +242,16 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 		// Inflate the menu; this adds items to the action bar if it is present.
 		this.getMenuInflater().inflate(R.menu.main, menu);
 
+		// Get menu
+		mMenu = menu;
 		// Get the notifications MenuItem and
 		// its LayerDrawable (layer-list)
-		MenuItem item = menu.findItem(R.id.action_notifications);
+		MenuItem item = mMenu.findItem(R.id.action_notifications);
 		mIcon = (LayerDrawable) item.getIcon();
 
-		// Update LayerDrawable's BadgeDrawable
-		Utils.setBadgeCount(this, mIcon, mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
+		Utils.setBadgeCount(MainActivity.this, mIcon,
+		    mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
 
-		Notifications.addNotificationListener(new NotificationListener() {
-			@Override
-			public void onNewNotification() {
-				// Update LayerDrawable's BadgeDrawable
-				Utils.setBadgeCount(MainActivity.this, mIcon,
-				    mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
-			}
-		});
-
-		mMenu = menu;
 		// Get Views
 		MenuItem searchItem = menu.findItem(R.id.action_search);
 		final SearchView mSearchView = (SearchView) searchItem.getActionView();
@@ -534,4 +526,13 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 		}
 
 	}
+
+	@Override
+	public void onInvitationListUpdate() {
+		// Update LayerDrawable's BadgeDrawable
+		Utils.setBadgeCount(MainActivity.this, mIcon,
+		    mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
+
+	}
+
 }
