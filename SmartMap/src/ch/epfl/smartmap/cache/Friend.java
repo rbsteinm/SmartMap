@@ -14,7 +14,9 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
+import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -35,6 +37,19 @@ public class Friend implements User, Displayable, Parcelable {
     private GregorianCalendar mLastSeen;
     private final Location mLocation;
     private boolean mVisible;
+
+    public static final String NO_NAME = "";
+    public static final String NO_NUMBER = "No phone number specified";
+    public static final String NO_EMAIL = "No email address specified";
+    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
+    public static final int IMAGE_QUALITY = 100;
+    public static final String PROVIDER_NAME = "SmartMapServers";
+    public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
+
+    public static final float MARKER_ANCHOR_X = (float) 0.5;
+    public static final float MARKER_ANCHOR_Y = 1;
+    public static final int PICTURE_WIDTH = 50;
+    public static final int PICTURE_HEIGHT = 50;
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
         @Override
@@ -98,6 +113,17 @@ public class Friend implements User, Displayable, Parcelable {
         mVisible = booleans[0];
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#addOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
+     * OnDisplayableUpdateListener)
+     */
+    @Override
+    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        // TODO Auto-generated method stub
+
+    }
+
     @Override
     public void deletePicture(Context context) {
         File file = new File(context.getFilesDir(), mId + ".png");
@@ -132,6 +158,21 @@ public class Friend implements User, Displayable, Parcelable {
     @Override
     public long getID() {
         return mId;
+    }
+
+    @Override
+    public Bitmap getImage(Context context) {
+
+        File file = new File(context.getFilesDir(), mId + ".png");
+
+        Bitmap pic = null;
+
+        if (file.exists()) {
+            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
+        } else {
+            pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE);
+        }
+        return pic;
     }
 
     @Override
@@ -185,21 +226,6 @@ public class Friend implements User, Displayable, Parcelable {
     }
 
     @Override
-    public Bitmap getImage(Context context) {
-
-        File file = new File(context.getFilesDir(), mId + ".png");
-
-        Bitmap pic = null;
-
-        if (file.exists()) {
-            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
-        } else {
-            pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE);
-        }
-        return pic;
-    }
-
-    @Override
     public String getShortInfos() {
         String infos = "";
         infos += Utils.getLastSeenStringFromCalendar(this.getLastSeen());
@@ -224,9 +250,29 @@ public class Friend implements User, Displayable, Parcelable {
         return (new GregorianCalendar().getTimeInMillis() - mLastSeen.getTimeInMillis()) < ONLINE_TIMEOUT;
     }
 
+    public boolean isVisible() {
+        return mVisible;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#isVisibleOnMap()
+     */
     @Override
     public boolean isVisibleOnMap() {
-        return mVisible;
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#removeOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
+     * OnDisplayableUpdateListener)
+     */
+    @Override
+    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
@@ -235,8 +281,39 @@ public class Friend implements User, Displayable, Parcelable {
     }
 
     @Override
-    public void setLastSeen(Date date) {
-        mLastSeen.setTime(date);
+    public void setImage(Bitmap pic, Context context) {
+
+        File file = new File(context.getFilesDir(), mId + ".png");
+
+        if (file.exists()) {
+            file.delete();
+        }
+
+        try {
+            FileOutputStream out = context.openFileOutput(mId + ".png", Context.MODE_PRIVATE);
+            pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#setLastSeen(java.util.Date)
+     */
+    @Override
+    public void setLastSeen(Date newDate) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void setLastSeen(GregorianCalendar date) {
+        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
+        g.setTimeInMillis(date.getTimeInMillis());
+        mLastSeen = g;
     }
 
     @Override
@@ -257,7 +334,7 @@ public class Friend implements User, Displayable, Parcelable {
 
     @Override
     public void setName(String newName) {
-        if ((newName == null) || newName.isEmpty()) {
+        if (newName.isEmpty() || (newName == null)) {
             throw new IllegalArgumentException("Invalid user name!");
         }
         mName = newName;
@@ -269,23 +346,8 @@ public class Friend implements User, Displayable, Parcelable {
     }
 
     @Override
-    public void setPhoneNumber(String newNumber) {
-        mPhoneNumber = newNumber;
-    }
-
-    @Override
-    public void setImage(Bitmap pic, Context context) throws FileNotFoundException, IOException {
-
-        File file = new File(context.getFilesDir(), mId + ".png");
-
-        if (file.exists()) {
-            file.delete();
-        }
-
-        FileOutputStream out = context.openFileOutput(mId + ".png", Context.MODE_PRIVATE);
-        pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
-        out.close();
-
+    public void setPhoneNumber(String newPhoneNumber) {
+        mPhoneNumber = newPhoneNumber;
     }
 
     public void setPositionName(String posName) {

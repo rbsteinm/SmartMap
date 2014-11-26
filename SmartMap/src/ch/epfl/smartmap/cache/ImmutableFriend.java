@@ -4,12 +4,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -20,7 +20,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * 
  * @author jfperren
  */
-public class ImmutableUser implements User {
+public final class ImmutableFriend implements User {
+
+    // Instance saying that the
+    public static final ImmutableFriend NOT_FOUND = new ImmutableFriend(NO_ID, NO_NAME, NO_NUMBER, NO_EMAIL,
+        NO_LOCATION_STRING, NO_LASTSEEN, NO_LATITUDE, NO_LONGITUDE);
 
     // User informations
     private final long mID;
@@ -31,8 +35,8 @@ public class ImmutableUser implements User {
     private Calendar mLastSeen;
     private final Location mLocation;
 
-    private ImmutableUser(long id, String name, String phoneNumber, String email, String locationString,
-        GregorianCalendar lastSeen, Location location) {
+    public ImmutableFriend(long id, String name, String phoneNumber, String email, String locationString,
+        Calendar lastSeen, double latitude, double longitude) {
         if (id < 0) {
             throw new IllegalArgumentException("Cannot create User with negative ID !");
         } else {
@@ -47,36 +51,44 @@ public class ImmutableUser implements User {
             this.mName = name;
         }
 
-        if (phoneNumber == null) {
-            this.mPhoneNumber = User.NO_NUMBER;
-        } else {
+        if (phoneNumber != null) {
             mPhoneNumber = phoneNumber;
+        } else {
+            this.mPhoneNumber = User.NO_NUMBER;
         }
 
-        if (email == null) {
-            this.mEmail = User.NO_EMAIL;
-        } else {
+        if (email != null) {
             this.mEmail = email;
+        } else {
+            this.mEmail = User.NO_EMAIL;
         }
 
-        if (location == null) {
-            this.mLocation = new Location(User.PROVIDER_NAME);
-        } else {
-            this.mLocation = location;
-        }
-
-        if (mLocationString == null) {
-            this.mLocationString = User.NO_LOCATION;
-        } else {
+        if (locationString != null) {
             this.mLocationString = locationString;
+        } else {
+            this.mLocationString = NO_LOCATION_STRING;
         }
 
-        if (lastSeen == null) {
-            this.mLastSeen = GregorianCalendar.getInstance();
-            mLastSeen.setTimeInMillis(0);
-        } else {
+        if (lastSeen != null) {
             this.mLastSeen = (Calendar) lastSeen.clone();
+        } else {
+            this.mLastSeen = NO_LASTSEEN;
         }
+
+        this.mLocation = new Location(User.PROVIDER_NAME);
+        mLocation.setLatitude(latitude);
+        mLocation.setLongitude(longitude);
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#addOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
+     * OnDisplayableUpdateListener)
+     */
+    @Override
+    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        throw new UnsupportedOperationException();
     }
 
     /*
@@ -219,6 +231,16 @@ public class ImmutableUser implements User {
      */
     @Override
     public boolean isVisibleOnMap() {
+        throw new UnsupportedOperationException();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#removeOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
+     * OnDisplayableUpdateListener)
+     */
+    @Override
+    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
         throw new UnsupportedOperationException();
     }
 

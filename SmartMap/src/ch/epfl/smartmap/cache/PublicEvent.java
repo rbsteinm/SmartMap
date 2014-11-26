@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -91,6 +92,17 @@ public class PublicEvent implements Event, Displayable {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#addOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
+     * OnDisplayableUpdateListener)
+     */
+    @Override
+    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /*
+     * (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -144,6 +156,12 @@ public class PublicEvent implements Event, Displayable {
     }
 
     @Override
+    public Bitmap getImage(Context context) {
+        // Returns a generic event picture
+        return BitmapFactory.decodeResource(context.getResources(), EVENT_ICON);
+    }
+
+    @Override
     public LatLng getLatLng() {
         return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
     }
@@ -176,12 +194,6 @@ public class PublicEvent implements Event, Displayable {
     }
 
     @Override
-    public Bitmap getImage(Context context) {
-        // Returns a generic event picture
-        return BitmapFactory.decodeResource(context.getResources(), EVENT_ICON);
-    }
-
-    @Override
     public String getPositionName() {
         return mPositionName;
     }
@@ -209,6 +221,17 @@ public class PublicEvent implements Event, Displayable {
         result = (prime * result) + (int) (mID ^ (mID >>> RIGHT_SHIFT_COUNT));
 
         return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#removeOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
+     * OnDisplayableUpdateListener)
+     */
+    @Override
+    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

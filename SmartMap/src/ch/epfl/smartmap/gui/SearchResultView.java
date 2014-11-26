@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.gui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -12,9 +11,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
-import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
+import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
 
 /**
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
@@ -22,7 +20,7 @@ import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
  * 
  * @author jfperren
  */
-public class SearchResultView extends RelativeLayout {
+public class SearchResultView extends RelativeLayout implements OnDisplayableUpdateListener {
 
     private static final String TAG = "SEARCH RESULT VIEW";
     @SuppressWarnings("unused")
@@ -63,7 +61,6 @@ public class SearchResultView extends RelativeLayout {
         mImage = item.getImage(context);
 
         // Layout Parameters
-
         this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
 
@@ -134,23 +131,6 @@ public class SearchResultView extends RelativeLayout {
                 return true;
             }
         });
-
-        DatabaseHelper.initialize(context).addOnDisplayableInformationsChangeListener(mItem,
-            new OnDisplayableInformationsChangeListener() {
-                @Override
-                public void onDisplayableInformationsChange() {
-                    mItem = DatabaseHelper.getInstance().getUser(mItem.getID());
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mTitleView.setText(mItem.getName());
-                            mShortInfoView.setText(mItem.getShortInfos());
-                            mImageView.setImageBitmap(mItem.getImage(context));
-                        }
-
-                    });
-                }
-            });
     }
 
     /**
@@ -171,6 +151,42 @@ public class SearchResultView extends RelativeLayout {
         // auditErrors += mFriend.auditErrors(depth - 1);
 
         return auditErrors;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.OnDisplayableUpdateListener#onImageChanged()
+     */
+    @Override
+    public void onImageChanged() {
+        this.mImageView.setImageBitmap(mItem.getImage(this.getContext()));
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.OnDisplayableUpdateListener#onLocationChanged()
+     */
+    @Override
+    public void onLocationChanged() {
+        // Nothing to do
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.OnDisplayableUpdateListener#onNameChanged()
+     */
+    @Override
+    public void onNameChanged() {
+        this.mTitleView.setText(mItem.getName());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.OnDisplayableUpdateListener#onShortInfoChanged()
+     */
+    @Override
+    public void onShortInfoChanged() {
+        this.mShortInfoView.setText(mItem.getName());
     }
 
 }

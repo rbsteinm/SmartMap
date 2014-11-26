@@ -29,8 +29,6 @@ public class Utils {
     public static final long ONE_DAY = 24 * ONE_HOUR;
     public static final long TEN_DAYS = 10 * ONE_DAY;
 
-    public static final String UNKNOWN_LOCATION = "Unknown Location";
-
     public static String getCityFromLocation(Location location) {
         if (location == null) {
             return UNKNOWN_LOCATION;

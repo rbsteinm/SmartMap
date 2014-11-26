@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -25,9 +26,25 @@ public class FriendInvitation implements Invitation, Displayable {
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#addOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
+     * OnDisplayableUpdateListener)
+     */
+    @Override
+    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        // TODO Auto-generated method stub
+
+    }
+
     @Override
     public long getID() {
         return mId;
+    }
+
+    @Override
+    public Bitmap getImage(Context context) {
+        return mUser.getImage(context);
     }
 
     @Override
@@ -66,11 +83,6 @@ public class FriendInvitation implements Invitation, Displayable {
     }
 
     @Override
-    public Bitmap getImage(Context context) {
-        return mUser.getImage(context);
-    }
-
-    @Override
     public String getShortInfos() {
         return new String("Position : " + mUser.getLocationString() + "\n" + "Last seen : "
             + mUser.getLastSeen());
@@ -94,6 +106,17 @@ public class FriendInvitation implements Invitation, Displayable {
     @Override
     public boolean isRead() {
         return mIsRead;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#removeOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
+     * OnDisplayableUpdateListener)
+     */
+    @Override
+    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

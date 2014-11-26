@@ -4,20 +4,23 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.util.LongSparseArray;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
+import ch.epfl.smartmap.listeners.OnListUpdateListener;
 import ch.epfl.smartmap.listeners.OnUserUpdateListener;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -33,15 +36,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public final class UniqueFriend implements User {
 
     // Class Map containing all unique instances of Friend
-    private static final LongSparseArray<UniqueFriend> INSTANCES = new LongSparseArray<UniqueFriend>();
+    private static final Map<Long, UniqueFriend> INSTANCES = new HashMap<Long, UniqueFriend>();
 
-    // Listeners
+    private static final List<OnListUpdateListener> FRIENDLIST_LISTENERS =
+        new LinkedList<OnListUpdateListener>();
+
+    // Instance Listeners
     private final List<OnDisplayableUpdateListener> mOnDisplayableUpdateListeners;
-
     private final List<OnUserUpdateListener> mOnUserUpdateListeners;
+
     // Friend informations
     private final long mID;
-
     private String mName;
     private String mPhoneNumber;
     private String mEmail;
@@ -84,7 +89,7 @@ public final class UniqueFriend implements User {
         }
 
         if (mLocationString == null) {
-            this.mLocationString = User.NO_LOCATION;
+            this.mLocationString = User.NO_LOCATION_STRING;
         } else {
             this.mLocationString = locationString;
         }
@@ -100,6 +105,7 @@ public final class UniqueFriend implements User {
         mOnUserUpdateListeners = new LinkedList<OnUserUpdateListener>();
     }
 
+    @Override
     public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
         mOnDisplayableUpdateListeners.add(listener);
     }
@@ -163,6 +169,11 @@ public final class UniqueFriend implements User {
             pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE);
         }
         return pic;
+    }
+
+    public ImmutableFriend getImmutableCopy() {
+        return new ImmutableFriend(mID, mName, mPhoneNumber, mEmail, mLocationString, mLastSeen,
+            mLocation.getLatitude(), mLocation.getLongitude());
     }
 
     /*
@@ -270,6 +281,7 @@ public final class UniqueFriend implements User {
             .get(Calendar.MINUTE)) < SettingsManager.getInstance().getTimeToWaitBeforeHidingFriends();
     }
 
+    @Override
     public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
         mOnDisplayableUpdateListeners.remove(listener);
     }
@@ -456,13 +468,34 @@ public final class UniqueFriend implements User {
         }
     }
 
+    public static void addFriend(ImmutableFriend user) {
+        // Create new Friend and puts it in the cache
+        UniqueFriend newFriend =
+            new UniqueFriend(user.getID(), user.getName(), user.getNumber(), User.NO_LOCATION_STRING,
+                user.getEmail(), user.getLastSeen(), user.getLocation());
+        UniqueFriend.INSTANCES.put(user.getID(), newFriend);
+
+        // Call listeners
+        for (OnListUpdateListener listener : UniqueFriend.FRIENDLIST_LISTENERS) {
+            listener.onElementAdded(user.getID());
+        }
+    }
+
+    public static void addOnListUpdateListener(OnListUpdateListener listener) {
+        FRIENDLIST_LISTENERS.add(listener);
+    }
+
+    public static List<User> getAllFriends() {
+        return Arrays.asList((User[]) INSTANCES.values().toArray());
+    }
+
     public static UniqueFriend getFriendFromId(long id) {
         // Try to get friend from cache
         UniqueFriend friend = INSTANCES.get(Long.valueOf(id));
 
         if (friend == null) {
             // Try to get friend from local database
-            User user = DatabaseHelper.getInstance().getUser(id);
+            User user = DatabaseHelper.getInstance().getFriend(id);
 
             if (user != null) {
                 friend =
@@ -473,10 +506,24 @@ public final class UniqueFriend implements User {
 
                 INSTANCES.put(Long.valueOf(id), friend);
             } else {
-                // TODO : Get online
+                // TODO : Get online (this happens on first
             }
         }
 
         return friend;
+    }
+
+    public static void removeFriend(long id) {
+        // Remove from cache
+        UniqueFriend.INSTANCES.remove(id);
+
+        // Call listeners
+        for (OnListUpdateListener listener : UniqueFriend.FRIENDLIST_LISTENERS) {
+            listener.onElementRemoved(id);
+        }
+    }
+
+    public static void removeOnListUpdateListener(OnListUpdateListener listener) {
+        FRIENDLIST_LISTENERS.remove(listener);
     }
 }

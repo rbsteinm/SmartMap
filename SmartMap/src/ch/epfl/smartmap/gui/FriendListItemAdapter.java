@@ -24,7 +24,7 @@ import ch.epfl.smartmap.cache.User;
 public class FriendListItemAdapter extends ArrayAdapter<User> {
 
     private final Context mContext;
-    private final List<User> mItemsArrayList;
+    private final List<? extends User> mItemsArrayList;
 
     /**
      * @param context

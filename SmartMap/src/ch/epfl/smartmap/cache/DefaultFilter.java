@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -38,6 +39,17 @@ public class DefaultFilter implements Filter {
         idList = new ArrayList<Long>();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#addOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
+     * OnDisplayableUpdateListener)
+     */
+    @Override
+    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        // TODO Auto-generated method stub
+
+    }
+
     @Override
     public void addUser(long id) {
         if (!idList.contains(id)) {
@@ -48,6 +60,18 @@ public class DefaultFilter implements Filter {
     @Override
     public long getID() {
         return databaseID;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getPicture(android.content.Context)
+     */
+    @Override
+    public Bitmap getImage(Context context) {
+
+        Bitmap pic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_default_user);
+
+        return pic;
     }
 
     /*
@@ -100,18 +124,6 @@ public class DefaultFilter implements Filter {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getPicture(android.content.Context)
-     */
-    @Override
-    public Bitmap getImage(Context context) {
-
-        Bitmap pic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_default_user);
-
-        return pic;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Displayable#getShortInfos()
      */
     @Override
@@ -129,6 +141,17 @@ public class DefaultFilter implements Filter {
         Collections.sort(uList, new UserComparator());
 
         return uList;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#removeOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
+     * OnDisplayableUpdateListener)
+     */
+    @Override
+    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

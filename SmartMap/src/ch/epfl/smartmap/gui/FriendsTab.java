@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -16,15 +15,16 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.UniqueFriend;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.listeners.OnFriendListUpdateListener;
+import ch.epfl.smartmap.listeners.OnListUpdateListener;
 
 /**
  * Fragment displaying your friends in FriendsActivity
  * 
  * @author rbsteinm
  */
-public class FriendsTab extends ListFragment implements OnFriendListUpdateListener {
+public class FriendsTab extends ListFragment implements OnListUpdateListener {
     private List<User> mFriendList;
 
     private final Context mContext;
@@ -38,23 +38,35 @@ public class FriendsTab extends ListFragment implements OnFriendListUpdateListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mCacheDB = DatabaseHelper.getInstance();
-        mFriendList = new ArrayList<User>();
-        mFriendList = mCacheDB.getAllFriends();
+        mFriendList = UniqueFriend.getAllFriends();
 
         // Create custom Adapter and pass it to the Activity
-        FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
+        FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, UniqueFriend.getAllFriends());
         this.setListAdapter(adapter);
 
         // Initialize the listener
-        mCacheDB.addOnFriendListUpdateListener(this);
+        UniqueFriend.addOnListUpdateListener(this);
 
         return view;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.OnListUpdateListener#onElementAdded(long)
+     */
     @Override
-    public void onFriendListUpdate() {
-        mFriendList = mCacheDB.getAllFriends();
+    public void onElementAdded(long id) {
+        mFriendList = UniqueFriend.getAllFriends();
+        this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.OnListUpdateListener#onElementRemoved(long)
+     */
+    @Override
+    public void onElementRemoved(long id) {
+        mFriendList = UniqueFriend.getAllFriends();
         this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
     }
 
@@ -65,14 +77,14 @@ public class FriendsTab extends ListFragment implements OnFriendListUpdateListen
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         Intent intent = new Intent(mContext, UserInformationActivity.class);
-        intent.putExtra("USER", user);
+        intent.putExtra("USER", user.getID());
         this.startActivity(intent);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        this.setListAdapter(new FriendListItemAdapter(mContext, mCacheDB.getAllFriends()));
+        this.setListAdapter(new FriendListItemAdapter(mContext, UniqueFriend.getAllFriends()));
     }
 
 }

@@ -87,13 +87,13 @@ public class DatabaseHelperTest extends AndroidTestCase {
         a.setName(name);
         // testing that adding a user with the same id erases the first one
         dbh.addUser(a);
-        assertTrue((dbh.getUser(a.getID()).getID() == a.getID())
-            && dbh.getUser(a.getID()).getName().equals(a.getName())
-            && dbh.getUser(a.getID()).getNumber().equals(a.getNumber())
-            && dbh.getUser(a.getID()).getEmail().equals(a.getEmail())
-            && dbh.getUser(a.getID()).getLocationString().equals(a.getLocationString())
-            && (dbh.getUser(a.getID()).getLocation().getLongitude() == a.getLocation().getLongitude())
-            && (dbh.getUser(a.getID()).getLocation().getLatitude() == a.getLocation().getLatitude())
+        assertTrue((dbh.getFriend(a.getID()).getID() == a.getID())
+            && dbh.getFriend(a.getID()).getName().equals(a.getName())
+            && dbh.getFriend(a.getID()).getNumber().equals(a.getNumber())
+            && dbh.getFriend(a.getID()).getEmail().equals(a.getEmail())
+            && dbh.getFriend(a.getID()).getLocationString().equals(a.getLocationString())
+            && (dbh.getFriend(a.getID()).getLocation().getLongitude() == a.getLocation().getLongitude())
+            && (dbh.getFriend(a.getID()).getLocation().getLatitude() == a.getLocation().getLatitude())
             && (dbh.getAllFriends().size() == 1));
     }
 
@@ -142,7 +142,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(b);
         dbh.addUser(c);
         List<User> list = dbh.getAllFriends();
-        assertTrue((list.size() == 3) && (dbh.getUser(c.getID()).getID() == c.getID()));
+        assertTrue((list.size() == 3) && (dbh.getFriend(c.getID()).getID() == c.getID()));
     }
 
     @Test
@@ -157,8 +157,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
         a.setEmail("test email");
         dbh.addUser(a);
         dbh.addUser(b);
-        int rows = dbh.updateUser(new Friend(a.getID(), c.getName()));
-        assertTrue(dbh.getUser(a.getID()).getName().equals(c.getName())
-            && dbh.getUser(a.getID()).getEmail().equals("test email") && (rows == 1));
+        int rows = dbh.updateFriend(new Friend(a.getID(), c.getName()));
+        assertTrue(dbh.getFriend(a.getID()).getName().equals(c.getName())
+            && dbh.getFriend(a.getID()).getEmail().equals("test email") && (rows == 1));
     }
 }

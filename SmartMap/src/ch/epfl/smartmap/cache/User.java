@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -19,10 +21,13 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public interface User extends Displayable {
 
+    int NO_ID = -1;
     String NO_NAME = "NO_NAME";
     String NO_NUMBER = "NO_NUMBER";
     String NO_EMAIL = "NO_EMAIL";
-    String NO_LOCATION = "NO_LOCATION";
+    String NO_LOCATION_STRING = "Unknown Location";
+    Calendar NO_LASTSEEN = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+
     int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     int IMAGE_QUALITY = 100;
     String PROVIDER_NAME = "SmartMapServers";

@@ -6,7 +6,7 @@ package ch.epfl.smartmap.listeners;
  * 
  * @author jfperren
  */
-public interface OnUserUpdateListener {
+public interface OnUserUpdateListener extends OnDisplayableUpdateListener {
 
     /**
      * Called when e-mail changes.
@@ -14,29 +14,14 @@ public interface OnUserUpdateListener {
     void onEmailChanged();
 
     /**
-     * Called when the image of the Displayable changes
-     */
-    void onImageChanged();
-
-    /**
      * Called when timestamp is refreshed.
      */
     void onLastSeenChanged();
 
     /**
-     * Called when the location changes
-     */
-    void onLocationChanged();
-
-    /**
      * Called when location changes
      */
     void onLocationStringChanged();
-
-    /**
-     * Called when name changes
-     */
-    void onNameChanged();
 
     /**
      * Called when phone number changes.

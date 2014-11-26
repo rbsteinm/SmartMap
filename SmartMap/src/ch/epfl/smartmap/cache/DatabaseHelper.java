@@ -1,11 +1,10 @@
 package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.TimeZone;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,15 +12,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
-import android.util.Log;
-import ch.epfl.smartmap.gui.Utils;
-import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
-import ch.epfl.smartmap.listeners.OnEventListUpdateListener;
-import ch.epfl.smartmap.listeners.OnFilterListUpdateListener;
-import ch.epfl.smartmap.listeners.OnFriendListUpdateListener;
-import ch.epfl.smartmap.listeners.OnFriendsLocationUpdateListener;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
  * SQLite helper
@@ -32,17 +22,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "SmartMapDB";
-
-    private final List<OnFriendsLocationUpdateListener> mOnFriendsLocationUpdateListeners =
-        new ArrayList<OnFriendsLocationUpdateListener>();
-    private final List<OnFriendListUpdateListener> mOnFriendListUpdateListeners =
-        new ArrayList<OnFriendListUpdateListener>();
-    private final List<OnEventListUpdateListener> mOnEventListUpdateListeners =
-        new ArrayList<OnEventListUpdateListener>();
-    private final List<OnFilterListUpdateListener> mOnFilterListUpdateListeners =
-        new ArrayList<OnFilterListUpdateListener>();
-    private final Map<Displayable, List<OnDisplayableInformationsChangeListener>> mOnDisplayableInformationsChangeListeners =
-        new HashMap<Displayable, List<OnDisplayableInformationsChangeListener>>();
 
     public static final String TABLE_USER = "users";
     public static final String TABLE_FILTER = "filters";
@@ -120,7 +99,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
 
     private static DatabaseHelper mInstance;
-    private static SQLiteDatabase mDatabase;
+    private static SQLiteDatabase DATABASE;
 
     /**
      * DatabaseHelper constructor. Will be made private, so use initialize() or
@@ -148,7 +127,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         Cursor cursor =
-            mDatabase.query(TABLE_EVENT, EVENT_COLUMNS, KEY_ID + " = ?",
+            DATABASE.query(TABLE_EVENT, EVENT_COLUMNS, KEY_ID + " = ?",
                 new String[]{String.valueOf(event.getID())}, null, null, null, null);
 
         // We check if the event is already there
@@ -165,14 +144,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
             values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
 
-            mDatabase.insert(TABLE_EVENT, null, values);
+            DATABASE.insert(TABLE_EVENT, null, values);
         } else {
             this.updateEvent(event);
         }
 
         cursor.close();
 
-        this.notifyOnEventListUpdateListeners();
     }
 
     /**
@@ -187,7 +165,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // First we insert the filter in the table of lists
         ContentValues filterValues = new ContentValues();
         filterValues.put(KEY_NAME, filter.getListName());
-        long filterID = mDatabase.insert(TABLE_FILTER, null, filterValues);
+        long filterID = DATABASE.insert(TABLE_FILTER, null, filterValues);
 
         // Then we add the filter-user pairs to another table
         ContentValues pairValues = null;
@@ -195,13 +173,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             pairValues = new ContentValues();
             pairValues.put(KEY_FILTER_ID, filterID);
             pairValues.put(KEY_USER_ID, id);
-            mDatabase.insert(TABLE_FILTER_USER, null, pairValues);
+            DATABASE.insert(TABLE_FILTER_USER, null, pairValues);
         }
 
         filter.setID(filterID); // sets an ID so the filter can be easily
                                 // accessed
 
-        this.notifyOnFilterListUpdateListeners();
         return filterID;
     }
 
@@ -214,7 +191,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public int addInvitation(User user) {
         Cursor cursor =
-            mDatabase.query(TABLE_INVITATIONS, INVITATION_COLUMNS, KEY_USER_ID + " = ?",
+            DATABASE.query(TABLE_INVITATIONS, INVITATION_COLUMNS, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(user.getID())}, null, null, null, null);
 
         int result = 0;
@@ -223,40 +200,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_USER_ID, user.getID());
             values.put(KEY_NAME, user.getName());
 
-            mDatabase.insert(TABLE_INVITATIONS, null, values);
+            DATABASE.insert(TABLE_INVITATIONS, null, values);
 
             result = 1;
         }
         cursor.close();
         return result;
-    }
-
-    public void addOnDisplayableInformationsChangeListener(Displayable displayable,
-        OnDisplayableInformationsChangeListener listener) {
-        List<OnDisplayableInformationsChangeListener> listenerList =
-            mOnDisplayableInformationsChangeListeners.get(displayable);
-        if (listenerList != null) {
-            listenerList.add(listener);
-        } else {
-            mOnDisplayableInformationsChangeListeners.put(displayable,
-                new ArrayList<OnDisplayableInformationsChangeListener>(Arrays.asList(listener)));
-        }
-    }
-
-    public void addOnEventListUpdateListener(OnEventListUpdateListener listener) {
-        mOnEventListUpdateListeners.add(listener);
-    }
-
-    public void addOnFilterListUpdateListener(OnFilterListUpdateListener listener) {
-        mOnFilterListUpdateListeners.add(listener);
-    }
-
-    public void addOnFriendListUpdateListener(OnFriendListUpdateListener listener) {
-        mOnFriendListUpdateListeners.add(listener);
-    }
-
-    public void addOnFriendsLocationUpdateListener(OnFriendsLocationUpdateListener listener) {
-        mOnFriendsLocationUpdateListeners.add(listener);
     }
 
     /**
@@ -267,7 +216,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void addPendingFriend(User user) {
         Cursor cursor =
-            mDatabase.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
+            DATABASE.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(user.getID())}, null, null, null, null);
 
         if (!cursor.moveToFirst()) {
@@ -275,7 +224,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_USER_ID, user.getID());
             values.put(KEY_NAME, user.getName());
 
-            mDatabase.insert(TABLE_PENDING, null, values);
+            DATABASE.insert(TABLE_PENDING, null, values);
 
         }
         cursor.close();
@@ -288,9 +237,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param user
      *            The user to add to the database
      */
-    public void addUser(User user) {
+    public void addUser(ImmutableFriend user) {
         Cursor cursor =
-            mDatabase.query(TABLE_USER, USER_COLUMNS, KEY_USER_ID + " = ?",
+            DATABASE.query(TABLE_USER, USER_COLUMNS, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(user.getID())}, null, null, null, null);
 
         if (!cursor.moveToFirst()) {
@@ -303,36 +252,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_LATITUDE, user.getLocation().getLatitude());
             values.put(KEY_POSNAME, user.getLocationString());
             values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
-            values.put(KEY_VISIBLE, user.isVisibleOnMap() ? 1 : 0); // boolean to int
 
-            mDatabase.insert(TABLE_USER, null, values);
-
+            DATABASE.insert(TABLE_USER, null, values);
         } else {
-            this.updateUser(user);
+            this.updateFriend(user);
         }
 
         cursor.close();
-
-        this.notifyOnFriendListUpdateListeners();
     }
 
     /**
      * Clears the database. Mainly for testing purposes.
      */
     public void clearAll() {
-        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
-        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
-        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
-        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
-        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
+        DATABASE.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        DATABASE.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
+        DATABASE.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
+        DATABASE.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        DATABASE.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
+        DATABASE.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
 
-        this.onCreate(mDatabase);
-
-        this.notifyOnFriendListUpdateListeners();
-        this.notifyOnFriendsLocationUpdateListeners();
-        this.notifyOnEventListUpdateListeners();
-        this.notifyOnFilterListUpdateListeners();
+        this.onCreate(DATABASE);
     }
 
     /**
@@ -343,9 +283,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteEvent(long id) {
 
-        mDatabase.delete(TABLE_EVENT, KEY_ID + " = ?", new String[]{String.valueOf(id)});
+        DATABASE.delete(TABLE_EVENT, KEY_ID + " = ?", new String[]{String.valueOf(id)});
 
-        this.notifyOnEventListUpdateListeners();
     }
 
     /**
@@ -356,13 +295,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteFilter(long id) {
         // delete the filter from the table of filters
-        mDatabase.delete(TABLE_FILTER, KEY_ID + " = ?", new String[]{String.valueOf(id)});
+        DATABASE.delete(TABLE_FILTER, KEY_ID + " = ?", new String[]{String.valueOf(id)});
 
         // then delete all the rows that reference this filter in the
         // filter-user table
-        mDatabase.delete(TABLE_FILTER_USER, KEY_FILTER_ID + " = ?", new String[]{String.valueOf(id)});
+        DATABASE.delete(TABLE_FILTER_USER, KEY_FILTER_ID + " = ?", new String[]{String.valueOf(id)});
 
-        this.notifyOnFilterListUpdateListeners();
     }
 
     /**
@@ -374,7 +312,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteInvitation(long id) {
 
-        mDatabase.delete(TABLE_INVITATIONS, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
+        DATABASE.delete(TABLE_INVITATIONS, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
     /**
@@ -385,7 +323,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deletePendingFriend(long id) {
 
-        mDatabase.delete(TABLE_PENDING, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
+        DATABASE.delete(TABLE_PENDING, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
     /**
@@ -396,11 +334,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteUser(long id) {
 
-        mDatabase.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
-
-        // TODO : There should be no need to notify LocationListeners
-        this.notifyOnFriendListUpdateListeners();
-        this.notifyOnFriendsLocationUpdateListeners();
+        DATABASE.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
     /**
@@ -411,7 +345,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT  * FROM " + TABLE_EVENT;
 
-        Cursor cursor = mDatabase.rawQuery(query, null);
+        Cursor cursor = DATABASE.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {
@@ -431,7 +365,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT  * FROM " + TABLE_FILTER;
 
-        Cursor cursor = mDatabase.rawQuery(query, null);
+        Cursor cursor = DATABASE.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {
@@ -447,35 +381,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * @return the {@code List} of all friends
      */
-    public List<User> getAllFriends() {
-        ArrayList<User> friends = new ArrayList<User>();
-
-        String query = "SELECT  * FROM " + TABLE_USER;
-
-        Cursor cursor = mDatabase.rawQuery(query, null);
-
-        Friend friend = null;
-        if (cursor.moveToFirst()) {
-            do {
-                friend =
-                    new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
-                        .getColumnIndex(KEY_NAME)));
-                friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
-                friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
-                friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
-                friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
-                friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
-                GregorianCalendar cal = new GregorianCalendar();
-                cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
-                friend.setLastSeen(cal.getTime());
-                friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); // int to boolean
-                friends.add(friend);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return friends;
-    }
+    // public List<User> getAllFriends() {
+    // ArrayList<User> friends = new ArrayList<User>();
+    //
+    // String query = "SELECT  * FROM " + TABLE_USER;
+    //
+    // Cursor cursor = mDatabase.rawQuery(query, null);
+    //
+    // Friend friend = null;
+    // if (cursor.moveToFirst()) {
+    // do {
+    // friend =
+    // new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
+    // .getColumnIndex(KEY_NAME)));
+    // friend.setPhoneNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
+    // friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
+    // friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
+    // friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
+    // friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
+    // GregorianCalendar cal = new GregorianCalendar();
+    // cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
+    // friend.setLastSeen(cal.getTime());
+    // friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); // int to boolean
+    // friends.add(friend);
+    // } while (cursor.moveToNext());
+    // }
+    //
+    // cursor.close();
+    // return friends;
+    // }
 
     /**
      * @param id
@@ -487,7 +421,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor =
-            mDatabase.query(TABLE_EVENT, EVENT_COLUMNS, KEY_ID + " = ?", new String[]{String.valueOf(id)},
+            DATABASE.query(TABLE_EVENT, EVENT_COLUMNS, KEY_ID + " = ?", new String[]{String.valueOf(id)},
                 null, null, null, null);
 
         if (cursor != null) {
@@ -531,7 +465,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // First query to get the filter's name
         Cursor cursor =
-            mDatabase.query(TABLE_FILTER, FILTER_COLUMNS, KEY_ID + " = ?", new String[]{String.valueOf(id)},
+            DATABASE.query(TABLE_FILTER, FILTER_COLUMNS, KEY_ID + " = ?", new String[]{String.valueOf(id)},
                 null, null, null, null);
 
         if (cursor != null) {
@@ -543,7 +477,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Second query to get the associated list of IDs
         cursor =
-            mDatabase.query(TABLE_FILTER_USER, FILTER_USER_COLUMNS, KEY_FILTER_ID + " = ?",
+            DATABASE.query(TABLE_FILTER_USER, FILTER_USER_COLUMNS, KEY_FILTER_ID + " = ?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
 
         if (cursor.moveToFirst()) {
@@ -557,6 +491,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Gets a user from the database
+     * 
+     * @param id
+     *            The user's unique ID
+     * @return The user as a Friend object
+     */
+    public ImmutableFriend getFriend(long id) {
+
+        Cursor cursor =
+            DATABASE.query(TABLE_USER, USER_COLUMNS, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)},
+                null, null, null, null);
+
+        if (cursor != null) {
+            cursor.moveToFirst();
+
+            String name = cursor.getString(cursor.getColumnIndex(KEY_NAME));
+            String phoneNumber = cursor.getString(cursor.getColumnIndex(KEY_NUMBER));
+            String email = cursor.getString(cursor.getColumnIndex(KEY_EMAIL));
+            double longitude = cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE));
+            double latitude = cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE));
+            String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
+            Calendar lastSeen = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+            lastSeen.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
+
+            cursor.close();
+
+            return new ImmutableFriend(id, name, phoneNumber, email, locationString, lastSeen, longitude,
+                latitude);
+        }
+
+        return ImmutableFriend.NOT_FOUND;
+    }
+
+    /**
      * Returns a list of all pending received invitations
      * 
      * @return A list of users who sent requests
@@ -566,7 +534,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT  * FROM " + TABLE_INVITATIONS;
 
-        Cursor cursor = mDatabase.rawQuery(query, null);
+        Cursor cursor = DATABASE.rawQuery(query, null);
 
         Friend friend = null;
         if (cursor.moveToFirst()) {
@@ -593,7 +561,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT  * FROM " + TABLE_PENDING;
 
-        Cursor cursor = mDatabase.rawQuery(query, null);
+        Cursor cursor = DATABASE.rawQuery(query, null);
 
         Friend friend = null;
         if (cursor.moveToFirst()) {
@@ -611,57 +579,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Gets a user from the database
-     * 
-     * @param id
-     *            The user's unique ID
-     * @return The user as a Friend object
-     */
-    public User getUser(long id) {
-
-        Cursor cursor =
-            mDatabase.query(TABLE_USER, USER_COLUMNS, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)},
-                null, null, null, null);
-
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-
-        Friend friend =
-            new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
-                .getColumnIndex(KEY_NAME)));
-        friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
-        friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
-        friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
-        friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
-        friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
-        friend.setLastSeen(cal.getTime());
-        friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1);
-
-        cursor.close();
-
-        return friend;
-    }
-
-    /**
      * Fills the friend database with server data
      */
-    public void initializeAllFriends() {
-        NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-        try {
-            List<Long> friends = client.getFriendsIds();
-            for (long userID : friends) {
-                this.addUser(client.getUserInfo(userID));
-            }
-        } catch (SmartMapClientException e) {
-            Log.e("UpdateService", e.getMessage());
-        }
-
-        this.notifyOnFriendListUpdateListeners();
-        this.notifyOnFriendsLocationUpdateListeners();
-    }
+    // public void initializeAllFriends() {
+    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+    // try {
+    // List<Long> friends = client.getFriendsIds();
+    // for (long userID : friends) {
+    // this.addUser(client.getUserInfo(userID));
+    // }
+    // } catch (SmartMapClientException e) {
+    // Log.e("UpdateService", e.getMessage());
+    // }
+    // }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -671,11 +601,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_EVENT);
         db.execSQL(CREATE_TABLE_INVITATIONS);
         db.execSQL(CREATE_TABLE_PENDING);
-
-        this.notifyOnFriendListUpdateListeners();
-        this.notifyOnFriendsLocationUpdateListeners();
-        this.notifyOnEventListUpdateListeners();
-        this.notifyOnFilterListUpdateListeners();
     }
 
     @Override
@@ -687,27 +612,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
         this.onCreate(db);
-
-        this.notifyOnFriendListUpdateListeners();
-        this.notifyOnFriendsLocationUpdateListeners();
-        this.notifyOnEventListUpdateListeners();
-        this.notifyOnFilterListUpdateListeners();
     }
 
-    /**
-     * Fully updates the friends database (not only positions)
-     */
-    public void refreshFriendsInfo() {
-        List<User> friends = this.getAllFriends();
-        NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-        for (User f : friends) {
-            try {
-                this.updateUser(client.getUserInfo(f.getID()));
-            } catch (SmartMapClientException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    // /**
+    // * Fully updates the friends database (not only positions)
+    // */
+    // public void refreshFriendsInfo() {
+    // List<User> friends = this.getAllFriends();
+    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+    // for (User f : friends) {
+    // try {
+    // this.updateUser(client.getUserInfo(f.getID()));
+    // } catch (SmartMapClientException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // }
 
     /**
      * Uses listFriendsPos() to update the entire friends database with updated
@@ -715,21 +635,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * 
      * @return The number of rows (i.e. friends) that were updated
      */
-    public int refreshFriendsPos() {
-        int updatedRows = 0;
-        try {
-            List<User> updatedUsers = NetworkSmartMapClient.getInstance().listFriendsPos();
-
-            for (User user : updatedUsers) {
-                this.updateUser(user);
-                updatedRows++;
-            }
-        } catch (SmartMapClientException e) {
-            e.printStackTrace();
-        }
-        this.notifyOnFriendsLocationUpdateListeners();
-        return updatedRows;
-    }
+    // public int refreshFriendsPos() {
+    // int updatedRows = 0;
+    // try {
+    // List<User> updatedUsers = NetworkSmartMapClient.getInstance().listFriendsPos();
+    //
+    // for (User user : updatedUsers) {
+    // this.updateUser(user);
+    // updatedRows++;
+    // }
+    // } catch (SmartMapClientException e) {
+    // e.printStackTrace();
+    // }
+    // return updatedRows;
+    // }
 
     /**
      * Updates an event
@@ -753,12 +672,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
 
         int rows =
-            mDatabase.update(TABLE_EVENT, values, KEY_ID + " = ?",
-                new String[]{String.valueOf(event.getID())});
-
-        if (rows > 0) {
-            this.notifyOnDisplayableInformationListeners(event);
-        }
+            DATABASE
+                .update(TABLE_EVENT, values, KEY_ID + " = ?", new String[]{String.valueOf(event.getID())});
 
         return rows;
     }
@@ -773,102 +688,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.deleteFilter(filter.getID());
         this.addFilter(filter);
-        // not sure if there's a more efficient way
-
-        this.notifyOnFilterListUpdateListeners();
     }
 
     /**
      * Updates a user's values
      * 
-     * @param user
+     * @param friend
      *            The user to update
      * @return The number of rows that were updated
      */
-    public int updateUser(User user) {
+    public int updateFriend(ImmutableFriend friend) {
         ContentValues values = new ContentValues();
 
-        // Check for default values
-        values.put(KEY_USER_ID, user.getID());
-        if (user.getName() != Friend.NO_NAME) {
-            values.put(KEY_NAME, user.getName());
+        if (friend.getID() != User.NO_ID) {
+            values.put(KEY_USER_ID, friend.getID());
         }
-        if (user.getNumber() != Friend.NO_NUMBER) {
-            values.put(KEY_NUMBER, user.getNumber());
+        if (friend.getName() != Friend.NO_NAME) {
+            values.put(KEY_NAME, friend.getName());
         }
-        if (user.getEmail() != Friend.NO_EMAIL) {
-            values.put(KEY_EMAIL, user.getEmail());
+        if (friend.getNumber() != Friend.NO_NUMBER) {
+            values.put(KEY_NUMBER, friend.getNumber());
         }
-        if ((user.getLocation().getLatitude() != 0.0) || (user.getLocation().getLongitude() != 0.0)) {
-            values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
-            values.put(KEY_LATITUDE, user.getLocation().getLatitude());
+        if (friend.getEmail() != Friend.NO_EMAIL) {
+            values.put(KEY_EMAIL, friend.getEmail());
         }
-        if (user.getLocationString() != Utils.UNKNOWN_LOCATION) {
-            values.put(KEY_POSNAME, user.getLocationString());
+        if ((friend.getLocation().getLatitude() != Friend.NO_LATITUDE)
+            || (friend.getLocation().getLongitude() != Friend.NO_LONGITUDE)) {
+            values.put(KEY_LONGITUDE, friend.getLocation().getLongitude());
+            values.put(KEY_LATITUDE, friend.getLocation().getLatitude());
         }
-        if (user.getLastSeen().getTimeInMillis() != 0) {
-            values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
+        if (friend.getLocationString() != Friend.NO_LOCATION_STRING) {
+            values.put(KEY_POSNAME, friend.getLocationString());
         }
-
-        values.put(KEY_VISIBLE, user.isVisibleOnMap() ? 1 : 0); // boolean to int
+        if (friend.getLastSeen().getTimeInMillis() != 0) {
+            values.put(KEY_LASTSEEN, friend.getLastSeen().getTimeInMillis());
+        }
 
         int rows =
-            mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getID())});
-        if (rows > 0) {
-            this.notifyOnDisplayableInformationListeners(user);
-        }
+            DATABASE.update(TABLE_USER, values, KEY_USER_ID + " = ?",
+                new String[]{String.valueOf(friend.getID())});
+
         return rows;
-    }
-
-    /**
-     * Updates a user's location
-     * 
-     * @param id
-     *            The user's id
-     * @param location
-     *            The user's new location
-     */
-    public void updateUserPos(long id, Location location) {
-        User friend = this.getUser(id);
-        friend.setLocation(location);
-        this.updateUser(friend);
-
-        this.notifyOnFriendsLocationUpdateListeners();
-        this.notifyOnDisplayableInformationListeners(friend);
-    }
-
-    private void notifyOnDisplayableInformationListeners(Displayable d) {
-        if (mOnDisplayableInformationsChangeListeners.get(d) != null) {
-            for (OnDisplayableInformationsChangeListener listener : mOnDisplayableInformationsChangeListeners
-                .get(d)) {
-                listener.onDisplayableInformationsChange();
-            }
-        }
-    }
-
-    private void notifyOnEventListUpdateListeners() {
-        for (OnEventListUpdateListener listener : mOnEventListUpdateListeners) {
-            listener.onEventListUpdate();
-        }
-    }
-
-    private void notifyOnFilterListUpdateListeners() {
-        for (OnFilterListUpdateListener listener : mOnFilterListUpdateListeners) {
-            listener.onFilterListUpdate();
-        }
-    }
-
-    private void notifyOnFriendListUpdateListeners() {
-        for (OnFriendListUpdateListener listener : mOnFriendListUpdateListeners) {
-            listener.onFriendListUpdate();
-        }
-    }
-
-    private void notifyOnFriendsLocationUpdateListeners() {
-        for (OnFriendsLocationUpdateListener listener : mOnFriendsLocationUpdateListeners) {
-            listener.onFriendsLocationChange();
-        }
     }
 
     /**
@@ -889,7 +749,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static DatabaseHelper initialize(Context context) {
         if (mInstance == null) {
             mInstance = new DatabaseHelper(context);
-            mDatabase = mInstance.getWritableDatabase();
+            DATABASE = mInstance.getWritableDatabase();
         }
         return mInstance;
     }
