@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.gui.InvitationListItemAdapter;
 
 /**
@@ -38,6 +39,7 @@ public class NotificationsActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Intent showFriendIntent = new Intent(mContext, FriendsPagerActivity.class);
+        showFriendIntent.putExtra("invitation", true);
         NotificationsActivity.this.startActivity(showFriendIntent);
 
         super.onListItemClick(l, v, position, id);
@@ -46,10 +48,15 @@ public class NotificationsActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // This is needed to show an update of the events' list after having
-        // created an event
         NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, mDbHelper
-            .getInvitations()));
+            .getFriendInvitations()));
+
+        for (int i = 0; i < mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size(); i++) {
+            mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).get(i).setStatus(Invitation.READ);
+            mDbHelper
+                .updateFriendInvitation(mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).get(i));
+        }
+
     }
 
     @Override

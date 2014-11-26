@@ -1,126 +1,85 @@
 package ch.epfl.smartmap.cache;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.location.Location;
 import ch.epfl.smartmap.R;
-
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import ch.epfl.smartmap.activities.UserInformationActivity;
+import ch.epfl.smartmap.gui.Utils;
 
 /**
- * A class to represent the user's friends
+ * A class to represent the user's invitations
  * 
- * @author ritterni
+ * @author agpmilli
  */
-public class FriendInvitation implements Invitation, Displayable {
-    private long mId;
-    private Intent mIntent;
-    private String mTitle;
-    private String mText;
-    private User mUser;
-    private boolean mIsRead;
+public class FriendInvitation implements Invitation {
+    private final long mInvitationId;
+    private long mUserId;
+    private String mUserName;
+    private int mStatus;
+
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
 
+    public FriendInvitation(long invitationId, long userId, String userName, int status) {
+        mInvitationId = invitationId;
+        mUserId = userId;
+        mUserName = userName;
+        mStatus = status;
+
+    }
+
     @Override
     public long getID() {
-        return mId;
+        return mInvitationId;
     }
 
     @Override
     public Intent getIntent() {
-        return mIntent;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getLatLng()
-     */
-    @Override
-    public LatLng getLatLng() {
-        // TODO Auto-generated method stub
-        return null;
+        if (mStatus == READ) {
+            return new Intent(Utils.context, UserInformationActivity.class);
+        } else {
+            return new Intent();
+        }
     }
 
     @Override
-    public Location getLocation() {
-        return mUser.getLocation();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
-     */
-    @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getName() {
-        return mUser.getName();
-    }
-
-    @Override
-    public Bitmap getPicture(Context context) {
-        return mUser.getPicture(context);
-    }
-
-    @Override
-    public String getShortInfos() {
-        return new String("Position : " + mUser.getLocationString() + "\n" + "Last seen : "
-            + mUser.getLastSeen());
+    public int getStatus() {
+        return mStatus;
     }
 
     @Override
     public String getText() {
-        return mText;
+        return "Click here to open the invitation";
     }
 
     @Override
     public String getTitle() {
-        return mTitle;
+        return "Friend request from " + mUserName;
     }
 
     @Override
-    public User getUser() {
-        return mUser;
+    public long getUserId() {
+        return mUserId;
     }
 
     @Override
-    public boolean isRead() {
-        return mIsRead;
+    public String getUserName() {
+        return mUserName;
     }
 
     @Override
-    public void setIntent(Intent intent) {
-        mIntent = intent;
-
+    public void setStatus(int status) {
+        mStatus = status;
     }
 
     @Override
-    public void setRead(boolean isRead) {
-        mIsRead = isRead;
-
+    public void setUserId(long id) {
+        mUserId = id;
     }
 
     @Override
-    public void setText(String text) {
-        mText = text;
-    }
-
-    @Override
-    public void setTitle(String title) {
-        mTitle = title;
-    }
-
-    @Override
-    public void setUser(User user) {
-        mUser = user;
+    public void setUserName(String name) {
+        mUserName = name;
     }
 
 }
