@@ -621,6 +621,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Returns a list of all friend invitations with the specified status
+     * 
+     * @param status
+     *            The invitations status
+     * @return A list of {@code FriendInvitation}
+     */
+    public List<FriendInvitation> getFriendInvitationsByStatus(int status) {
+        List<FriendInvitation> invitations = new ArrayList<FriendInvitation>();
+
+        String query = "SELECT  * FROM " + TABLE_INVITATIONS;
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+
+        FriendInvitation invitation = null;
+        if (cursor.moveToFirst()) {
+            do {
+                int currentStatus = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
+                if (currentStatus == status) {
+                    invitation =
+                        new FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)),
+                            cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
+                                .getColumnIndex(KEY_NAME)), currentStatus);
+
+                    invitations.add(invitation);
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return invitations;
+    }
+
+    /**
      * Returns a list of all pending friends
      * 
      * @return A list of users who were sent friend requests
