@@ -36,7 +36,7 @@
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.StartActivity"
+            android:name=".activities.StartActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" >
@@ -122,10 +122,18 @@
                 android:value="MainActivity" />
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.NotificationsActivity"
+            android:name=".activities.NotificationsActivity"
             android:label="@string/title_activity_notifications"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Dialog" >
+        </activity>
+        <activity
+            android:name="ch.epfl.smartmap.activities.ShowEventInformationActivity"
+            android:label="@string/title_activity_show_event_information"
+            android:parentActivityName=".activities.ShowEventsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.smartmap.activities.ShowEventsActivity" />
         </activity>
     </application>
 
