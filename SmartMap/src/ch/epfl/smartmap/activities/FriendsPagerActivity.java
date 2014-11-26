@@ -27,6 +27,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 	private ViewPager mPager;
 	private ActionBar mActionBar;
 	private final String[] mTabs = {"Friends", "Invitations"};
+	private static final int INVITATION_INDEX = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +84,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 	protected void onResume() {
 		super.onResume();
 		if (this.getIntent().getBooleanExtra("invitation", false) == true) {
-			mPager.setCurrentItem(1);
+			mPager.setCurrentItem(INVITATION_INDEX);
 		}
 	}
 

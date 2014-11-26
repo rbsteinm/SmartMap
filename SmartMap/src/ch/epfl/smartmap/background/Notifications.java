@@ -28,8 +28,6 @@ public class Notifications {
 	private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME, SILENT_NOTIFICATION_TIME,
 	    VIBRATE_NOTIFICATION_TIME};
 	private static long notificationID = 0;
-	private static int numberOfEventNotification = 0;
-	private static int numberOfFriendNotification = 0;
 	private static List<NotificationListener> listeners = new ArrayList<NotificationListener>();
 
 	/**
@@ -88,14 +86,6 @@ public class Notifications {
 		listeners.add(listener);
 	}
 
-	public static int getNumberOfEventNotification() {
-		return numberOfEventNotification;
-	}
-
-	public static int getNumberOfFriendNotification() {
-		return numberOfFriendNotification;
-	}
-
 	/**
 	 * Create an event invitation notification and notify it
 	 * 
@@ -110,7 +100,6 @@ public class Notifications {
 
 		// Get ID and the number of ongoing Event notifications
 		notificationID++;
-		setNumberOfUnreadEventNotification(getNumberOfEventNotification() + 1);
 
 		// Prepare intent that redirect the user to EventActivity
 		PendingIntent pEventIntent = PendingIntent.getActivity(context, 0, new Intent(context,
@@ -164,7 +153,6 @@ public class Notifications {
 
 		// Get ID and the number of ongoing Friend notifications
 		notificationID++;
-		setNumberOfUnreadFriendNotification(getNumberOfFriendNotification() + 1);
 
 		// Prepare intent that redirects the user to FriendActivity
 		Intent showFriendIntent = new Intent(context, FriendsPagerActivity.class);
@@ -202,14 +190,6 @@ public class Notifications {
 		displayNotification(context, noti.build(), notificationID);
 
 		notifyListeners();
-	}
-
-	public static void setNumberOfUnreadEventNotification(int numberOfEvent) {
-		Notifications.numberOfEventNotification = numberOfEvent;
-	}
-
-	public static void setNumberOfUnreadFriendNotification(int numberOfFriend) {
-		Notifications.numberOfFriendNotification = numberOfFriend;
 	}
 
 	/**

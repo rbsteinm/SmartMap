@@ -247,15 +247,14 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 		mIcon = (LayerDrawable) item.getIcon();
 
 		// Update LayerDrawable's BadgeDrawable
-		Utils.setBadgeCount(this, mIcon,
-		    Notifications.getNumberOfEventNotification() + Notifications.getNumberOfFriendNotification());
+		// Utils.setBadgeCount(this, mIcon, mDbHelper.getUnansweredFriendInvitations().size());
 
 		Notifications.addNotificationListener(new NotificationListener() {
 			@Override
 			public void onNewNotification() {
 				// Update LayerDrawable's BadgeDrawable
-				Utils.setBadgeCount(MainActivity.this, mIcon, Notifications.getNumberOfEventNotification()
-				    + Notifications.getNumberOfFriendNotification());
+				Utils.setBadgeCount(MainActivity.this, mIcon, mDbHelper.getUnansweredFriendInvitations()
+				    .size());
 			}
 		});
 
@@ -345,8 +344,6 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 				}
 				break;
 			case R.id.action_notifications:
-				Notifications.setNumberOfUnreadEventNotification(0);
-				Notifications.setNumberOfUnreadFriendNotification(0);
 				Intent pNotifIntent = new Intent(this, NotificationsActivity.class);
 				this.startActivity(pNotifIntent);
 				return true;

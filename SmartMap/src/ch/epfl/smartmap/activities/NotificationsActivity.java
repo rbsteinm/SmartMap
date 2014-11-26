@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.gui.InvitationListItemAdapter;
 
 /**
@@ -69,6 +70,10 @@ public class NotificationsActivity extends ListActivity {
 		super.onResume();
 		NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, mDbHelper
 		    .getFriendInvitations()));
+		for (int i = 0; i < mDbHelper.getUnansweredFriendInvitations().size(); i++) {
+			mDbHelper.getUnansweredFriendInvitations().get(i).setStatus(Invitation.READ);
+			mDbHelper.updateFriendInvitation(mDbHelper.getUnansweredFriendInvitations().get(i));
+		}
 
 	}
 }
