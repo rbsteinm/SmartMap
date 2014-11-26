@@ -93,6 +93,24 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
             finalSize < initialSize);
     }
 
+    public void testDistance() {
+        double latPully = 46.509300;
+        double longPully = 6.661600;
+
+        double latVerbier = 46.096076;
+        double longVerbier = 7.228875;
+
+        double latNY = 40.712784;
+        double longNY = -74.005941;
+
+        double distPullyVerbier = ShowEventsActivity.distance(latPully, longPully, latVerbier, longVerbier);
+        double distPullyNY = ShowEventsActivity.distance(latPully, longPully, latNY, longNY);
+
+        assertTrue("The distance Pully-Verbier is not correct", (distPullyVerbier > 20)
+            && (distPullyVerbier < 100));
+        assertTrue("The distance Pully-NY is not correct", (distPullyNY > 6000) && (distPullyNY < 10000));
+    }
+
     public void testSeekBarCannotGoToZero() {
         onView(withId(R.id.showEventSeekBar)).perform(setProgress(0));
         onView(withId(R.id.showEventKilometers)).check(matches(not(ViewMatchers.withText("0 km"))));
