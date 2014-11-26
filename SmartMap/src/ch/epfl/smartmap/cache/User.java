@@ -8,7 +8,6 @@ import java.util.Date;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.os.Parcelable;
 import ch.epfl.smartmap.R;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -18,21 +17,21 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author ritterni
  */
-public interface User extends Parcelable, Displayable {
+public interface User extends Displayable {
 
-    public static final String NO_NAME = "NO_NAME";
-    public static final String NO_NUMBER = "NO_NUMBER";
-    public static final String NO_EMAIL = "NO_EMAIL";
-    public static final String NO_LOCATION = "NO_LOCATION";
-    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
-    public static final int IMAGE_QUALITY = 100;
-    public static final String PROVIDER_NAME = "SmartMapServers";
-    public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
+    String NO_NAME = "NO_NAME";
+    String NO_NUMBER = "NO_NUMBER";
+    String NO_EMAIL = "NO_EMAIL";
+    String NO_LOCATION = "NO_LOCATION";
+    int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
+    int IMAGE_QUALITY = 100;
+    String PROVIDER_NAME = "SmartMapServers";
+    long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
 
-    public static final float MARKER_ANCHOR_X = (float) 0.5;
-    public static final float MARKER_ANCHOR_Y = 1;
-    public static final int PICTURE_WIDTH = 50;
-    public static final int PICTURE_HEIGHT = 50;
+    float MARKER_ANCHOR_X = (float) 0.5;
+    float MARKER_ANCHOR_Y = 1;
+    int PICTURE_WIDTH = 50;
+    int PICTURE_HEIGHT = 50;
 
     /**
      *
@@ -49,6 +48,12 @@ public interface User extends Parcelable, Displayable {
      */
     @Override
     long getID();
+
+    /**
+     * @return A user picture to display
+     */
+    @Override
+    Bitmap getImage(Context context);
 
     /**
      * @return The date/hour at which the user was last seen
@@ -86,12 +91,6 @@ public interface User extends Parcelable, Displayable {
     String getNumber();
 
     /**
-     * @return A user picture to display
-     */
-    @Override
-    Bitmap getPicture(Context context);
-
-    /**
      * @return True if the user's location is visible
      */
     boolean isVisibleOnMap();
@@ -105,34 +104,42 @@ public interface User extends Parcelable, Displayable {
     void setEmail(String newEmail);
 
     /**
-     * @param date
+     * Stores a new profile picture for the user
+     * 
+     * @param newImage
+     *            The picture as a Bitmap object
+     */
+    void setImage(Bitmap newImage, Context context) throws FileNotFoundException, IOException;
+
+    /**
+     * @param newDate
      *            The date/hour at which the user was last seen
      */
-    void setLastSeen(Date date);
+    void setLastSeen(Date newDate);
 
     /**
      * Sets the user's latitude
      * 
-     * @param y
+     * @param newLatitude
      *            The latitude
      */
-    void setLatitude(double y);
+    void setLatitude(double newLatitude);
 
     /**
      * Sets the user's position (x and y)
      * 
-     * @param p
+     * @param newLocation
      *            The new position
      */
-    void setLocation(Location p);
+    void setLocation(Location newLocation);
 
     /**
      * Sets the user's longitude
      * 
-     * @param x
+     * @param newLongitude
      *            The longitude
      */
-    void setLongitude(double x);
+    void setLongitude(double newLongitude);
 
     /**
      * Sets the user's name
@@ -148,13 +155,5 @@ public interface User extends Parcelable, Displayable {
      * @param newNumber
      *            The new phone number
      */
-    void setNumber(String newNumber);
-
-    /**
-     * Stores a new profile picture for the user
-     * 
-     * @param pic
-     *            The picture as a Bitmap object
-     */
-    void setPicture(Bitmap pic, Context context) throws FileNotFoundException, IOException;
+    void setPhoneNumber(String newNumber);
 }

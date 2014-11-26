@@ -60,7 +60,7 @@ public class SearchResultView extends RelativeLayout {
         super(context);
 
         mItem = item;
-        mImage = item.getPicture(context);
+        mImage = item.getImage(context);
 
         // Layout Parameters
 
@@ -145,7 +145,7 @@ public class SearchResultView extends RelativeLayout {
                         public void run() {
                             mTitleView.setText(mItem.getName());
                             mShortInfoView.setText(mItem.getShortInfos());
-                            mImageView.setImageBitmap(mItem.getPicture(context));
+                            mImageView.setImageBitmap(mItem.getImage(context));
                         }
 
                     });

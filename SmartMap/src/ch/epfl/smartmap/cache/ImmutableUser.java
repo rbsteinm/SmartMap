@@ -9,7 +9,6 @@ import java.util.GregorianCalendar;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.os.Parcel;
 import ch.epfl.smartmap.gui.Utils;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -91,15 +90,6 @@ public class ImmutableUser implements User {
 
     /*
      * (non-Javadoc)
-     * @see android.os.Parcelable#describeContents()
-     */
-    @Override
-    public int describeContents() {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-     * (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -123,6 +113,15 @@ public class ImmutableUser implements User {
     @Override
     public long getID() {
         return mID;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
+     */
+    @Override
+    public Bitmap getImage(Context context) {
+        throw new UnsupportedOperationException();
     }
 
     /*
@@ -193,15 +192,6 @@ public class ImmutableUser implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
-     */
-    @Override
-    public Bitmap getPicture(Context context) {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Displayable#getShortInfos()
      */
     @Override
@@ -243,10 +233,19 @@ public class ImmutableUser implements User {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#setPicture(android.graphics.Bitmap, android.content.Context)
+     */
+    @Override
+    public void setImage(Bitmap newImage, Context context) throws FileNotFoundException, IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.User#setLastSeen(java.util.Date)
      */
     @Override
-    public void setLastSeen(Date date) {
+    public void setLastSeen(Date newDate) {
         throw new UnsupportedOperationException();
     }
 
@@ -291,25 +290,7 @@ public class ImmutableUser implements User {
      * @see ch.epfl.smartmap.cache.User#setNumber(java.lang.String)
      */
     @Override
-    public void setNumber(String newNumber) {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setPicture(android.graphics.Bitmap, android.content.Context)
-     */
-    @Override
-    public void setPicture(Bitmap pic, Context context) throws FileNotFoundException, IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
-     */
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void setPhoneNumber(String newNumber) {
         throw new UnsupportedOperationException();
     }
 }

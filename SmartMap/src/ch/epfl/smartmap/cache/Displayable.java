@@ -46,7 +46,7 @@ public interface Displayable {
      *            The application's context, needed to access the memory
      * @return The object's picture
      */
-    Bitmap getPicture(Context context);
+    Bitmap getImage(Context context);
 
     /**
      * @return Text containing various information (description, last seen,

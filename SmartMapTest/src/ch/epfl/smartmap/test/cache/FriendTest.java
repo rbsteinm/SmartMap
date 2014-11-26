@@ -31,17 +31,17 @@ public class FriendTest extends AndroidTestCase {
 
     @Test
     public void testDeletePic() {
-        friend.setPicture(
+        friend.setImage(
             BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.ic_search),
             this.getContext());
         friend.deletePicture(this.getContext());
-        assertTrue(friend.getPicture(this.getContext()).sameAs(
+        assertTrue(friend.getImage(this.getContext()).sameAs(
             BitmapFactory.decodeResource(this.getContext().getResources(), Friend.DEFAULT_PICTURE)));
     }
 
     @Test
     public void testGetDefaultPic() {
-        assertTrue(friend.getPicture(this.getContext()).sameAs(
+        assertTrue(friend.getImage(this.getContext()).sameAs(
             BitmapFactory.decodeResource(this.getContext().getResources(), Friend.DEFAULT_PICTURE)));
     }
 
@@ -75,10 +75,10 @@ public class FriendTest extends AndroidTestCase {
 
     @Test
     public void testSetPic() {
-        friend.setPicture(
+        friend.setImage(
             BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.ic_search),
             this.getContext());
-        assertTrue(friend.getPicture(this.getContext()).sameAs(
+        assertTrue(friend.getImage(this.getContext()).sameAs(
             BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.ic_search)));
     }
 

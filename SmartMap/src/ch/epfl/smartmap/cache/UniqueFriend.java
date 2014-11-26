@@ -15,11 +15,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.os.Parcel;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.gui.Utils;
-import ch.epfl.smartmap.listeners.OnDisplayableInformationsUpdateListener;
-import ch.epfl.smartmap.listeners.OnFriendLocationChangedListener;
+import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
+import ch.epfl.smartmap.listeners.OnUserUpdateListener;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -34,14 +33,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public final class UniqueFriend implements User {
 
     // Class Map containing all unique instances of Friend
-    private static final LongSparseArray<UniqueFriend> sFriendInstances = new LongSparseArray<UniqueFriend>();
+    private static final LongSparseArray<UniqueFriend> INSTANCES = new LongSparseArray<UniqueFriend>();
 
     // Listeners
-    private final List<OnFriendLocationChangedListener> mOnFriendLocationChangedListeners;
-    private final List<OnDisplayableInformationsUpdateListener> mOnDisplayableInformationsUpdateListeners;
+    private final List<OnDisplayableUpdateListener> mOnDisplayableUpdateListeners;
 
+    private final List<OnUserUpdateListener> mOnUserUpdateListeners;
     // Friend informations
     private final long mID;
+
     private String mName;
     private String mPhoneNumber;
     private String mEmail;
@@ -96,16 +96,16 @@ public final class UniqueFriend implements User {
             this.mLastSeen = (Calendar) lastSeen.clone();
         }
 
-        mOnDisplayableInformationsUpdateListeners = new LinkedList<OnDisplayableInformationsUpdateListener>();
-        mOnFriendLocationChangedListeners = new LinkedList<OnFriendLocationChangedListener>();
+        mOnDisplayableUpdateListeners = new LinkedList<OnDisplayableUpdateListener>();
+        mOnUserUpdateListeners = new LinkedList<OnUserUpdateListener>();
     }
 
-    public void addOnDisplayableInformationUpdateListener(OnDisplayableInformationsUpdateListener listener) {
-        mOnDisplayableInformationsUpdateListeners.add(listener);
+    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        mOnDisplayableUpdateListeners.add(listener);
     }
 
-    public void addOnFriendLocationChangedListener(OnFriendLocationChangedListener listener) {
-        mOnFriendLocationChangedListeners.add(listener);
+    public void addOnUserUpdateListener(OnUserUpdateListener listener) {
+        mOnUserUpdateListeners.add(listener);
     }
 
     /*
@@ -118,15 +118,6 @@ public final class UniqueFriend implements User {
         if (file.exists()) {
             file.delete();
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.os.Parcelable#describeContents()
-     */
-    @Override
-    public int describeContents() {
-        return 0;
     }
 
     /*
@@ -154,6 +145,24 @@ public final class UniqueFriend implements User {
     @Override
     public long getID() {
         return mID;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
+     */
+    @Override
+    public Bitmap getImage(Context context) {
+        File file = new File(context.getFilesDir(), mID + ".png");
+
+        Bitmap pic = null;
+
+        if (file.exists()) {
+            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
+        } else {
+            pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE);
+        }
+        return pic;
     }
 
     /*
@@ -202,7 +211,7 @@ public final class UniqueFriend implements User {
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
         Bitmap friendProfilePicture =
-            Bitmap.createScaledBitmap(this.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+            Bitmap.createScaledBitmap(this.getImage(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(this.getLatLng()).title(this.getName())
             .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
@@ -226,24 +235,6 @@ public final class UniqueFriend implements User {
     @Override
     public String getNumber() {
         return mPhoneNumber;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
-     */
-    @Override
-    public Bitmap getPicture(Context context) {
-        File file = new File(context.getFilesDir(), mID + ".png");
-
-        Bitmap pic = null;
-
-        if (file.exists()) {
-            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
-        } else {
-            pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE);
-        }
-        return pic;
     }
 
     /*
@@ -279,13 +270,12 @@ public final class UniqueFriend implements User {
             .get(Calendar.MINUTE)) < SettingsManager.getInstance().getTimeToWaitBeforeHidingFriends();
     }
 
-    public void
-        removeOnDisplayableInformationUpdateListener(OnDisplayableInformationsUpdateListener listener) {
-        mOnDisplayableInformationsUpdateListeners.remove(listener);
+    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        mOnDisplayableUpdateListeners.remove(listener);
     }
 
-    public void removeOnFriendLocationChangedListener(OnFriendLocationChangedListener listener) {
-        mOnFriendLocationChangedListeners.remove(listener);
+    public void removeOnUserUpdateListener(OnUserUpdateListener listener) {
+        mOnUserUpdateListeners.remove(listener);
     }
 
     /*
@@ -296,6 +286,28 @@ public final class UniqueFriend implements User {
     public void setEmail(String newEmail) {
         if (newEmail != null) {
             mEmail = newEmail;
+            this.onEmailChanged();
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#setPicture(android.graphics.Bitmap, android.content.Context)
+     */
+    @Override
+    public void setImage(Bitmap newImage, Context context) throws FileNotFoundException, IOException {
+        if (newImage != null) {
+            File file = new File(context.getFilesDir(), mID + ".png");
+
+            if (file.exists()) {
+                file.delete();
+            }
+
+            FileOutputStream out = context.openFileOutput(mID + ".png", Context.MODE_PRIVATE);
+            newImage.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
+            out.close();
+
+            this.onImageChanged();
         }
     }
 
@@ -307,6 +319,7 @@ public final class UniqueFriend implements User {
     public void setLastSeen(Date date) {
         if (date != null) {
             this.mLastSeen.setTime(date);
+            this.onLastSeenChanged();
         }
     }
 
@@ -317,6 +330,7 @@ public final class UniqueFriend implements User {
     @Override
     public void setLatitude(double newLatitude) {
         this.mLocation.setLatitude(newLatitude);
+        this.onLocationChanged();
     }
 
     /*
@@ -327,6 +341,7 @@ public final class UniqueFriend implements User {
     public void setLocation(Location newLocation) {
         this.setLatitude(newLocation.getLatitude());
         this.setLongitude(newLocation.getLongitude());
+        this.onLocationChanged();
     }
 
     /*
@@ -336,6 +351,7 @@ public final class UniqueFriend implements User {
     @Override
     public void setLongitude(double newLongitude) {
         this.mLocation.setLongitude(newLongitude);
+        this.onLocationChanged();
     }
 
     /*
@@ -346,6 +362,7 @@ public final class UniqueFriend implements User {
     public void setName(String newName) {
         if ((newName != null) && !newName.equals("")) {
             this.mName = newName;
+            this.onNameChanged();
         }
     }
 
@@ -354,94 +371,94 @@ public final class UniqueFriend implements User {
      * @see ch.epfl.smartmap.cache.User#setNumber(java.lang.String)
      */
     @Override
-    public void setNumber(String newNumber) {
-        if ((newNumber != null) && !newNumber.equals("")) {
-            this.mPhoneNumber = newNumber;
+    public void setPhoneNumber(String newPhoneNumber) {
+        if ((newPhoneNumber != null) && !newPhoneNumber.equals("")) {
+            this.mPhoneNumber = newPhoneNumber;
+            this.onPhoneNumberChange();
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setPicture(android.graphics.Bitmap, android.content.Context)
+    /**
+     * Calls listeners on email field
      */
-    @Override
-    public void setPicture(Bitmap pic, Context context) throws FileNotFoundException, IOException {
-        File file = new File(context.getFilesDir(), mID + ".png");
-
-        if (file.exists()) {
-            file.delete();
-        }
-
-        FileOutputStream out = context.openFileOutput(mID + ".png", Context.MODE_PRIVATE);
-        pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
-        out.close();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
-     */
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.mID);
-    }
-
     private void onEmailChanged() {
-
-        // TODO : Update database
+        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
+            listener.onEmailChanged();
+        }
     }
 
+    /**
+     * Calls listeners on image field
+     */
     private void onImageChanged() {
-
-        // TODO : Update database
-
-        for (OnDisplayableInformationsUpdateListener l : mOnDisplayableInformationsUpdateListeners) {
-            l.onImageChanged();
+        for (OnDisplayableUpdateListener listener : mOnDisplayableUpdateListeners) {
+            listener.onImageChanged();
+        }
+        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
+            listener.onImageChanged();
         }
     }
 
+    /**
+     * Calls listeners on lastSeen field
+     */
     private void onLastSeenChanged() {
-
-        // TODO : Update database
-
+        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
+            listener.onLastSeenChanged();
+        }
+        for (OnDisplayableUpdateListener listener : mOnDisplayableUpdateListeners) {
+            listener.onShortInfoChanged();
+        }
     }
 
+    /**
+     * Calls listeners on location field
+     */
     private void onLocationChanged() {
-
-        // TODO : Update database
-
-        for (OnFriendLocationChangedListener l : mOnFriendLocationChangedListeners) {
-            l.onFriendLocationChanged();
+        for (OnDisplayableUpdateListener listener : mOnDisplayableUpdateListeners) {
+            listener.onLocationChanged();
+        }
+        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
+            listener.onLocationChanged();
         }
     }
 
+    /**
+     * Calls listeners on locationString field
+     */
     private void onLocationStringChanged() {
-
-        // TODO : Update database
-
-        for (OnDisplayableInformationsUpdateListener l : mOnDisplayableInformationsUpdateListeners) {
-            l.onShortInfoChanged();
+        for (OnDisplayableUpdateListener listener : mOnDisplayableUpdateListeners) {
+            listener.onShortInfoChanged();
+        }
+        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
+            listener.onLocationStringChanged();
         }
     }
 
+    /**
+     * Calls listeners on name field
+     */
     private void onNameChanged() {
-
-        // TODO : Update database
-
-        for (OnDisplayableInformationsUpdateListener l : mOnDisplayableInformationsUpdateListeners) {
-            l.onNameChanged();
+        for (OnDisplayableUpdateListener listener : mOnDisplayableUpdateListeners) {
+            listener.onNameChanged();
+        }
+        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
+            listener.onNameChanged();
         }
     }
 
+    /**
+     * Calls listeners on phone number field
+     */
     private void onPhoneNumberChange() {
-
-        // TODO : Update database
-
+        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
+            listener.onPhoneNumberChanged();
+        }
     }
 
     public static UniqueFriend getFriendFromId(long id) {
         // Try to get friend from cache
-        UniqueFriend friend = sFriendInstances.get(Long.valueOf(id));
+        UniqueFriend friend = INSTANCES.get(Long.valueOf(id));
 
         if (friend == null) {
             // Try to get friend from local database
@@ -454,7 +471,7 @@ public final class UniqueFriend implements User {
 
                 // TODO : Add database listeners
 
-                sFriendInstances.put(Long.valueOf(id), friend);
+                INSTANCES.put(Long.valueOf(id), friend);
             } else {
                 // TODO : Get online
             }

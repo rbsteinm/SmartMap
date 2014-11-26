@@ -166,7 +166,7 @@ public class Friend implements User, Displayable, Parcelable {
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
         Bitmap friendProfilePicture =
-            Bitmap.createScaledBitmap(this.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+            Bitmap.createScaledBitmap(this.getImage(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(this.getLatLng()).title(this.getName())
             .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
@@ -185,7 +185,7 @@ public class Friend implements User, Displayable, Parcelable {
     }
 
     @Override
-    public Bitmap getPicture(Context context) {
+    public Bitmap getImage(Context context) {
 
         File file = new File(context.getFilesDir(), mId + ".png");
 
@@ -263,18 +263,18 @@ public class Friend implements User, Displayable, Parcelable {
         mName = newName;
     }
 
-    @Override
-    public void setNumber(String newNumber) {
-        mPhoneNumber = newNumber;
-    }
-
     @Deprecated
     public void setOnline(boolean status) {
         // deprecated
     }
 
     @Override
-    public void setPicture(Bitmap pic, Context context) throws FileNotFoundException, IOException {
+    public void setPhoneNumber(String newNumber) {
+        mPhoneNumber = newNumber;
+    }
+
+    @Override
+    public void setImage(Bitmap pic, Context context) throws FileNotFoundException, IOException {
 
         File file = new File(context.getFilesDir(), mId + ".png");
 

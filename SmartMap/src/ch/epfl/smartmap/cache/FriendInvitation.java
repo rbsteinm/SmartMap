@@ -66,8 +66,8 @@ public class FriendInvitation implements Invitation, Displayable {
     }
 
     @Override
-    public Bitmap getPicture(Context context) {
-        return mUser.getPicture(context);
+    public Bitmap getImage(Context context) {
+        return mUser.getImage(context);
     }
 
     @Override

@@ -64,7 +64,7 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         // Set fields with friend attributes
         User user = mItemsArrayList.get(position);
         name.setText(user.getName());
-        picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
+        picture.setImageBitmap(mItemsArrayList.get(position).getImage(mContext));
 
         // build String "Last seen d/m/y at hour/min"
         String lastSeenString =

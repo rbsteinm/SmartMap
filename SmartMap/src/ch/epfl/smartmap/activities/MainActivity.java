@@ -407,7 +407,7 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
             ActionBar actionBar = this.getActionBar();
             actionBar.setTitle(item.getName());
             actionBar.setSubtitle(item.getShortInfos());
-            actionBar.setIcon(new BitmapDrawable(this.getResources(), item.getPicture(this)));
+            actionBar.setIcon(new BitmapDrawable(this.getResources(), item.getImage(this)));
             // ActionBar HomeIndicator
             actionBar.setHomeAsUpIndicator(null);
 
@@ -430,7 +430,7 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
                                         actionBar.setSubtitle(item.getShortInfos());
                                         actionBar.setIcon(new BitmapDrawable(
                                             MainActivity.this.getResources(), item
-                                                .getPicture(MainActivity.this)));
+                                                .getImage(MainActivity.this)));
                                     }
                                 });
                             }

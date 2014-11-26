@@ -103,7 +103,7 @@ public class DefaultFilter implements Filter {
      * @see ch.epfl.smartmap.cache.Displayable#getPicture(android.content.Context)
      */
     @Override
-    public Bitmap getPicture(Context context) {
+    public Bitmap getImage(Context context) {
 
         Bitmap pic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_default_user);
 

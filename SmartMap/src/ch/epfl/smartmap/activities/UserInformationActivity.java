@@ -64,7 +64,7 @@ public class UserInformationActivity extends Activity {
         // Set Informations
         mNameView.setText(mUser.getName());
         mInfosView.setText(mUser.getShortInfos());
-        mPictureView.setImageBitmap(mUser.getPicture(this));
+        mPictureView.setImageBitmap(mUser.getImage(this));
     }
 
     public void displayDeleteConfirmationDialog(View view) {

@@ -176,7 +176,7 @@ public class PublicEvent implements Event, Displayable {
     }
 
     @Override
-    public Bitmap getPicture(Context context) {
+    public Bitmap getImage(Context context) {
         // Returns a generic event picture
         return BitmapFactory.decodeResource(context.getResources(), EVENT_ICON);
     }
