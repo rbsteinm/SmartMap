@@ -31,6 +31,7 @@ import ch.epfl.smartmap.cache.DatabaseSearchEngine;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
@@ -247,14 +248,14 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 		mIcon = (LayerDrawable) item.getIcon();
 
 		// Update LayerDrawable's BadgeDrawable
-		// Utils.setBadgeCount(this, mIcon, mDbHelper.getUnansweredFriendInvitations().size());
+		Utils.setBadgeCount(this, mIcon, mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
 
 		Notifications.addNotificationListener(new NotificationListener() {
 			@Override
 			public void onNewNotification() {
 				// Update LayerDrawable's BadgeDrawable
-				Utils.setBadgeCount(MainActivity.this, mIcon, mDbHelper.getUnansweredFriendInvitations()
-				    .size());
+				Utils.setBadgeCount(MainActivity.this, mIcon,
+				    mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
 			}
 		});
 
@@ -344,8 +345,10 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 				}
 				break;
 			case R.id.action_notifications:
+				Utils.setBadgeCount(MainActivity.this, mIcon, 0);
 				Intent pNotifIntent = new Intent(this, NotificationsActivity.class);
 				this.startActivity(pNotifIntent);
+
 				return true;
 			case R.id.action_hide_search:
 				this.setMainMenu();

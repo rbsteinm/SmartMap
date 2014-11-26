@@ -70,8 +70,9 @@ public class NotificationsActivity extends ListActivity {
 		super.onResume();
 		NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, mDbHelper
 		    .getFriendInvitations()));
-		for (int i = 0; i < mDbHelper.getUnansweredFriendInvitations().size(); i++) {
-			mDbHelper.getUnansweredFriendInvitations().get(i).setStatus(Invitation.READ);
+
+		for (int i = 0; i < mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size(); i++) {
+			mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).get(i).setStatus(Invitation.READ);
 			mDbHelper.updateFriendInvitation(mDbHelper.getUnansweredFriendInvitations().get(i));
 		}
 
