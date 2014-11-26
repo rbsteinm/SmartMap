@@ -53,7 +53,7 @@ public class InvitationsTab extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_invitations_tab, container, false);
-        new RefreshInvitationsList().execute();
+        // new RefreshInvitationsList().execute();
         return view;
     }
 
@@ -81,7 +81,8 @@ public class InvitationsTab extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        new RefreshInvitationsList().execute();
+        // new RefreshInvitationsList().execute();
+        this.setListAdapter(new InvitationListItemAdapter(mContext, mDataBaseHelper.getFriendInvitations()));
     }
 
     /**
