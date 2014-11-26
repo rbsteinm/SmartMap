@@ -1,5 +1,11 @@
 package ch.epfl.smartmap.test.activities;
 
+import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
+import static com.google.android.apps.common.testing.ui.espresso.Espresso.pressBack;
+import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
+import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import android.support.v4.view.ViewPager;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.ListView;
@@ -35,21 +41,21 @@ public class FriendsPagerActivityTest extends ActivityInstrumentationTestCase2<F
 	}
 
 
-	public void testClickViewLeadsToFriendsInfo() {
-		// TODO
+	//	public void testClickViewLeadsToFriendsInfo() {
+	//		// TODO
+	//	}
+	public void testOpenAddFriendActivity() {
+		onView(withId(R.id.activity_friends_add_button)).perform(click());
+		onView(withId(R.id.add_friend_activity_searchBar)).check(matches(isDisplayed()));
+		pressBack();
 	}
-	//	public void testOpenAddFriendActivity() {
-	//		onView(withId(R.id.activity_friends_add_button)).perform(click());
-	//		onView(withId(R.id.add_friend_activity_searchBar)).check(matches(isDisplayed()));
-	//		pressBack();
+
+	//	public void testPressBackButton() {
+	//		// TODO
 	//	}
 
-	public void testPressBackButton() {
-		// TODO
-	}
-
-	public void testPressTopLeftIcon() {
-		// TODO
-	}
+	//	public void testPressTopLeftIcon() {
+	//		// TODO
+	//	}
 
 }

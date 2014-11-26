@@ -36,11 +36,10 @@ public class InvitationsTab extends ListFragment {
 
     private final DatabaseHelper mDataBaseHelper;
 
-    @SuppressWarnings("deprecation")
     public InvitationsTab(Context context) {
         mContext = context;
         mNetworkClient = NetworkSmartMapClient.getInstance();
-        mDataBaseHelper = new DatabaseHelper(mContext);
+        mDataBaseHelper = DatabaseHelper.initialize(mContext);
     }
 
     /*

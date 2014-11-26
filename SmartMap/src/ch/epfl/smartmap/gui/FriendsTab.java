@@ -38,7 +38,8 @@ public class FriendsTab extends ListFragment implements OnFriendListUpdateListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mCacheDB = DatabaseHelper.getInstance();
+        // mCacheDB = DatabaseHelper.getInstance();
+        mCacheDB = DatabaseHelper.initialize(mContext);
         mFriendList = new ArrayList<User>();
         mFriendList = mCacheDB.getAllFriends();
 
