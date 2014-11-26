@@ -8,6 +8,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
 import ch.epfl.smartmap.R;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -18,8 +20,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * An event that can be seen on the map
  * 
  * @author ritterni
+ * @author SpicyCH (PublicEvents are now Parcelable)
  */
-public class PublicEvent implements Event, Displayable {
+public class PublicEvent implements Event, Displayable, Parcelable {
     private String mEvtName;
     private final long mEvtCreator; // the user who created the event
     private final GregorianCalendar mStartDate;
@@ -29,12 +32,46 @@ public class PublicEvent implements Event, Displayable {
     private String mPositionName;
     private String mCreatorName;
     private String mDescription;
+
     public final static long DEFAULT_ID = -1;
     public final static int EVENT_ICON = R.drawable.default_event;
     private final static int RIGHT_SHIFT_COUNT = 32;
 
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
+
+    public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
+        @Override
+        public PublicEvent createFromParcel(Parcel source) {
+            return new PublicEvent(source);
+        }
+
+        @Override
+        public PublicEvent[] newArray(int size) {
+            return new PublicEvent[size];
+        }
+    };
+
+    /**
+     * 
+     * Constructor
+     * 
+     * @param in
+     * @author SpicyCH
+     */
+    public PublicEvent(Parcel in) {
+        mEvtName = in.readString();
+        mEvtCreator = in.readLong();
+        mStartDate = new GregorianCalendar();
+        mStartDate.setTimeInMillis(in.readLong());
+        mEndDate = new GregorianCalendar();
+        mEndDate.setTimeInMillis(in.readLong());
+        mID = in.readLong();
+        mLocation = in.readParcelable(Location.class.getClassLoader());
+        mPositionName = in.readString();
+        mCreatorName = in.readString();
+        mDescription = in.readString();
+    }
 
     /**
      * UserEvent constructor
@@ -53,7 +90,7 @@ public class PublicEvent implements Event, Displayable {
      *            The event's location on the map
      */
     public PublicEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
-        GregorianCalendar endDate, Location p) {
+            GregorianCalendar endDate, Location p) {
         if (name.isEmpty() || (name == null)) {
             throw new IllegalArgumentException("Invalid event name!");
         }
@@ -68,15 +105,13 @@ public class PublicEvent implements Event, Displayable {
         }
         mEvtName = name;
         mEvtCreator = creator;
-        mStartDate =
-            new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
+        mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
                 startDate.get(Calendar.DATE), startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
 
         mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
         mStartDate.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
         mStartDate.setTimeInMillis(startDate.getTimeInMillis());
-        mEndDate =
-            new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH),
+        mEndDate = new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH),
                 endDate.get(Calendar.DATE), endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
 
         mEndDate.set(GregorianCalendar.HOUR_OF_DAY, endDate.get(GregorianCalendar.HOUR_OF_DAY));
@@ -91,6 +126,17 @@ public class PublicEvent implements Event, Displayable {
 
     /*
      * (non-Javadoc)
+     * 
+     * @see android.os.Parcelable#describeContents()
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -155,17 +201,17 @@ public class PublicEvent implements Event, Displayable {
 
     /*
      * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
-     * )
+     * 
+     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context )
+     * 
      * @author hugo-S
      */
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(this.getLatLng()).title(this.getName())
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
         return markerOptions;
 
     }
@@ -198,6 +244,7 @@ public class PublicEvent implements Event, Displayable {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -230,7 +277,7 @@ public class PublicEvent implements Event, Displayable {
             throw new IllegalArgumentException("Invalid event dates!");
         }
         mEndDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
-            newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
+                newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
     }
 
     @Override
@@ -273,7 +320,25 @@ public class PublicEvent implements Event, Displayable {
             throw new IllegalArgumentException("Invalid event dates!");
         }
         mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
-            newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
+                newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
 
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mEvtName);
+        dest.writeLong(mEvtCreator);
+        dest.writeLong(mStartDate.getTimeInMillis());
+        dest.writeLong(mEndDate.getTimeInMillis());
+        dest.writeLong(mID);
+        dest.writeParcelable(mLocation, flags);
+        dest.writeString(mPositionName);
+        dest.writeString(mCreatorName);
+        dest.writeString(mDescription);
     }
 }

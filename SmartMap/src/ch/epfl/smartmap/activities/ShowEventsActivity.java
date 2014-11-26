@@ -118,7 +118,7 @@ public class ShowEventsActivity extends ListActivity {
                     public void onClick(DialogInterface dialog, int id) {
 
                         Intent showEventIntent = new Intent(mContext, ShowEventInformationActivity.class);
-                        // showEventIntent.putExtra("event", );
+                        showEventIntent.putExtra("event", event);
                         ShowEventsActivity.this.startActivity(showEventIntent);
 
                     }
