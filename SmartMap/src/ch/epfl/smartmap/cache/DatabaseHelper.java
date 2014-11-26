@@ -21,6 +21,7 @@ import ch.epfl.smartmap.listeners.OnFilterListUpdateListener;
 import ch.epfl.smartmap.listeners.OnFriendListUpdateListener;
 import ch.epfl.smartmap.listeners.OnFriendsLocationUpdateListener;
 import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
+import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -44,6 +45,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         new ArrayList<OnFilterListUpdateListener>();
     private final List<OnInvitationListUpdateListener> mOnInvitationListUpdateListeners =
         new ArrayList<OnInvitationListUpdateListener>();
+    private final List<OnInvitationStatusUpdateListener> mOnInvitationStatusUpdateListeners =
+        new ArrayList<OnInvitationStatusUpdateListener>();
     private final Map<Displayable, List<OnDisplayableInformationsChangeListener>> mOnDisplayableInformationsChangeListeners =
         new HashMap<Displayable, List<OnDisplayableInformationsChangeListener>>();
 
@@ -257,6 +260,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void addOnInvitationListUpdateListener(OnInvitationListUpdateListener listener) {
         mOnInvitationListUpdateListeners.add(listener);
+    }
+
+    public void addOnInvitationStatusUpdateListener(OnInvitationStatusUpdateListener listener) {
+        mOnInvitationStatusUpdateListeners.add(listener);
     }
 
     /**
@@ -587,37 +594,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Returns a list of all unanswered received invitations
-     * 
-     * @return A list of {@code FriendInvitation}
-     */
-    public List<FriendInvitation> getUnansweredFriendInvitations() {
-        List<FriendInvitation> invitations = new ArrayList<FriendInvitation>();
-
-        String query = "SELECT  * FROM " + TABLE_INVITATIONS;
-
-        Cursor cursor = mDatabase.rawQuery(query, null);
-
-        FriendInvitation invitation = null;
-        if (cursor.moveToFirst()) {
-            do {
-                int status = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
-                if (status == Invitation.READ || status == Invitation.UNREAD) {
-                    invitation =
-                        new FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)),
-                            cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
-                                .getColumnIndex(KEY_NAME)), status);
-
-                    invitations.add(invitation);
-                }
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return invitations;
-    }
-
-    /**
      * Returns a list of all friend invitations with the specified status
      * 
      * @param status
@@ -675,6 +651,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return friends;
+    }
+
+    /**
+     * Returns a list of all unanswered received invitations
+     * 
+     * @return A list of {@code FriendInvitation}
+     */
+    public List<FriendInvitation> getUnansweredFriendInvitations() {
+        List<FriendInvitation> invitations = new ArrayList<FriendInvitation>();
+
+        String query = "SELECT  * FROM " + TABLE_INVITATIONS;
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+
+        FriendInvitation invitation = null;
+        if (cursor.moveToFirst()) {
+            do {
+                int status = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
+                if (status == Invitation.READ || status == Invitation.UNREAD) {
+                    invitation =
+                        new FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)),
+                            cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
+                                .getColumnIndex(KEY_NAME)), status);
+
+                    invitations.add(invitation);
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return invitations;
     }
 
     /**
@@ -766,6 +773,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void notifyOnInvitationListUpdateListeners() {
         for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
             listener.onInvitationListUpdate();
+        }
+    }
+
+    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
+        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
+            listener.onInvitationStatusUpdate(id, status);
         }
     }
 
@@ -905,6 +918,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (rows > 0) {
             this.notifyOnInvitationListUpdateListeners();
+        }
+        if (invitation.getStatus() == Invitation.ACCEPTED || invitation.getStatus() == Invitation.REFUSED) {
+            notifyOnInvitationStatusUpdateListeners(invitation.getUserId(), invitation.getStatus());
         }
 
         return rows;
