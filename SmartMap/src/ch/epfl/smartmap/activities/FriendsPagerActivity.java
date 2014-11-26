@@ -84,6 +84,10 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
     }
 
+    public ViewPager getViewPager() {
+        return mPager;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -132,10 +136,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     public void startAddFriendActivity(MenuItem menu) {
         Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
         this.startActivity(displayActivityIntent);
-    }
-
-    public ViewPager getViewPager() {
-        return mPager;
     }
 
 }
