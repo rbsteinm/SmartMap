@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -275,6 +276,7 @@ public class ShowEventsActivity extends ListActivity {
     private void updateCurrentList() {
 
         mMyLocation = SettingsManager.getInstance().getLocation();
+        Log.d(TAG, "My position: " + mMyLocation.getLatitude() + "/" + mMyLocation.getLongitude());
         mEventsList = mDbHelper.getAllEvents();
         mCurrentList = new ArrayList<Event>();
 
