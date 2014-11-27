@@ -16,7 +16,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Listener that add an event to the map when long click
+ * Listener that loads AddEventActivity with the location, city name and country name when the map is long clicked.
  * 
  * @author SpicyCH
  */
@@ -26,7 +26,7 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
 
     private static final String COUNTRY_NAME = "COUNTRY_NAME";
 
-    private static final String TAG = OnMapLongClickListener.class.getSimpleName();
+    private static final String TAG = AddEventOnMapLongClickListener.class.getSimpleName();
 
     private final Activity mActivity;
 
@@ -49,6 +49,7 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
                 // Makes sure that an address is associated to the coordinates, the user could have long
                 // clicked in the middle of the sea after all :)
                 cityName = addresses.get(0).getLocality();
+                Log.d(TAG, "City name: " + cityName);
                 if (cityName == null) {
                     cityName = "";
                 }

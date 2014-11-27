@@ -230,10 +230,17 @@ public class AddEventActivity extends FragmentActivity {
             event.setPositionName(mPlaceName.getText().toString());
             event.setPositionCountryName(mCountryName);
 
+            Log.d(TAG, "City name: " + event.getPositionName());
+            Log.d(TAG, "Country name: " + event.getPositionCountryName());
+
             DatabaseHelper dbHelper = DatabaseHelper.getInstance();
             dbHelper.addEvent(event);
 
             Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_created), Toast.LENGTH_SHORT).show();
+
+            Intent loadEventIntent = new Intent(this, ShowEventInformationActivity.class);
+            loadEventIntent.putExtra("event", event);
+            this.startActivity(loadEventIntent);
             this.finish();
 
         }

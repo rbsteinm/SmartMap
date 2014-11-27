@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import ch.epfl.smartmap.gui.EventsListItemAdapter;
  */
 public class ShowEventInformationActivity extends Activity {
 
+    private static final String TAG = ShowEventInformationActivity.class.getSimpleName();
     private Context mContext;
     private Event mEvent;
     private TextView mEventTitle;
@@ -37,6 +39,8 @@ public class ShowEventInformationActivity extends Activity {
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
         mEvent = this.getIntent().getParcelableExtra("event");
+        Log.d(TAG, "City name: " + mEvent.getPositionName());
+        Log.d(TAG, "Country name: " + mEvent.getPositionCountryName());
 
         if (mEvent == null) {
             // This activity needs an event to function properly
