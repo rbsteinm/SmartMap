@@ -38,10 +38,10 @@ public class FriendInvitation implements Invitation {
 	public Intent getIntent() {
 		Intent intent = null;
 		if (mStatus == READ) {
-			intent = new Intent(Utils.Context, FriendsPagerActivity.class);
+			intent = new Intent(Utils.context, FriendsPagerActivity.class);
 			intent.putExtra("invitation", true);
 		} else if (mStatus == ACCEPTED) {
-			intent = new Intent(Utils.Context, UserInformationActivity.class);
+			intent = new Intent(Utils.context, UserInformationActivity.class);
 		}
 		return intent;
 	}

@@ -11,7 +11,6 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.location.Location;
-import android.util.Log;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.PublicEvent;
@@ -68,8 +67,6 @@ public class JsonSmartMapParser implements SmartMapParser {
 			JSONObject jsonObject = new JSONObject(s);
 			status = jsonObject.getString("status");
 			message = jsonObject.getString("message");
-			Log.d("serverStatus", status);
-			Log.d("serverMessage", message);
 		} catch (JSONException e) {
 			throw new SmartMapParseException(e);
 		}

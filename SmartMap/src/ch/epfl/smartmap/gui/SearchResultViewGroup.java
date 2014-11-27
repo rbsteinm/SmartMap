@@ -169,7 +169,6 @@ public class SearchResultViewGroup extends LinearLayout {
 		int newItemsNb = Math.min(ITEMS_PER_PAGE, mCurrentResultList.size() - mCurrentItemNb);
 		// Add SearchResultViews
 		for (int i = mCurrentItemNb; i < (mCurrentItemNb + newItemsNb); i++) {
-			Log.d(TAG, "add" + mCurrentResultList.get(i).getName());
 			this.addView(new SearchResultView(this.getContext(), mCurrentResultList.get(i)));
 			this.addView(new Divider(this.getContext()));
 		}

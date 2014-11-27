@@ -41,7 +41,7 @@ public class EventInvitation implements Invitation {
 	public Intent getIntent() {
 		Intent intent = null;
 		if (mStatus == READ) {
-			intent = new Intent(Utils.Context, ShowEventsActivity.class);
+			intent = new Intent(Utils.context, ShowEventsActivity.class);
 			intent.putExtra("invitation", true);
 		} else if (mStatus == ACCEPTED) {
 			// intent = new Intent(Utils.Context, ShowEventInformationActivity.class);

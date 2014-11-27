@@ -3,14 +3,14 @@ package ch.epfl.smartmap.cache;
 import java.util.GregorianCalendar;
 
 import android.location.Location;
+import android.os.Parcelable;
 
 /**
  * Describes an event
  * 
  * @author ritterni
  */
-public interface Event extends Displayable {
-
+public interface Event extends Displayable, Parcelable {
 	/**
 	 * @return The ID of the user who created the event
 	 */
@@ -37,8 +37,7 @@ public interface Event extends Displayable {
 	String getPositionName();
 
 	/**
-	 * @return The date (year, month, day, hour, minute) at which the event
-	 *         starts
+	 * @return The date (year, month, day, hour, minute) at which the event starts
 	 */
 	GregorianCalendar getStartDate();
 

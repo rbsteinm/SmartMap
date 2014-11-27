@@ -11,6 +11,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +33,6 @@ import com.google.android.gms.maps.model.LatLng;
  * @author SpicyCH
  */
 public class AddEventActivity extends FragmentActivity {
-
 	@SuppressWarnings("unused")
 	private static final String TAG = AddEventActivity.class.getSimpleName();
 
@@ -203,6 +203,11 @@ public class AddEventActivity extends FragmentActivity {
 		    || ((mPlaceName.getText().toString() == null) || mEventName.getText().toString().isEmpty())) {
 			Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set),
 			    Toast.LENGTH_SHORT).show();
+			Log.d(TAG, "Couldn't create a new event because not all fields have been set.\n" + "end date: "
+			    + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
+			    + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
+			    + mPlaceName.getText().toString() + "\n" + "event lat/long: "
+			    + mLatitude.getText().toString() + "/" + mLongitude.getText().toString());
 		} else {
 			GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
 			    mPickStartTime.getText().toString());
@@ -267,13 +272,11 @@ public class AddEventActivity extends FragmentActivity {
 		mPickStartTime = (EditText) this.findViewById(R.id.addEventEventTime);
 		mPickEndTime = (EditText) this.findViewById(R.id.addEventEndTime);
 		mPickEndDate = (EditText) this.findViewById(R.id.addEventEndDate);
-		mLatitude = (EditText) this.findViewById(R.id.addEventLatitude);
-		mLongitude = (EditText) this.findViewById(R.id.addEventLongitude);
 		mDescription = (EditText) this.findViewById(R.id.addEventDescription);
 		mPlaceName = (EditText) this.findViewById(R.id.addEventPlaceName);
 
-		mLongitude.setEnabled(false);
-		mLatitude.setEnabled(false);
+		// mLongitude.setEnabled(false);
+		// mLatitude.setEnabled(false);
 
 		mTextChangedListener = new TextWatcher() {
 

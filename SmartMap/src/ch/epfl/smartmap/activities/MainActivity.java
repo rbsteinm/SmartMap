@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
@@ -94,7 +93,7 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Utils.Context = this;
+		Utils.context = this;
 
 		this.setContentView(R.layout.activity_main);
 
@@ -187,13 +186,6 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 
 		}
 
-	}
-
-	/**
-	 * Create a notification that appear in the notifications tab
-	 */
-	public void createNotification(View view) {
-		// Notifications.createAddNotification(view, this);
 	}
 
 	/**
@@ -534,5 +526,4 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 		}
 
 	}
-
 }

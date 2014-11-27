@@ -26,7 +26,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * @author ritterni
  */
 public class Friend implements User, Displayable, Parcelable {
-
 	private final long mId; // the user's unique ID
 	private String mName; // the user's name as it will be displayed
 	private String mPhoneNumber;
@@ -51,7 +50,6 @@ public class Friend implements User, Displayable, Parcelable {
 	public static final float MARKER_ANCHOR_Y = 1;
 	public static final int PICTURE_WIDTH = 50;
 	public static final int PICTURE_HEIGHT = 50;
-	private static final int LEFT_SHIFT_COUNT = 32;
 
 	public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
 		@Override

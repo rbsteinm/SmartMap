@@ -8,6 +8,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
 import ch.epfl.smartmap.R;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -18,8 +20,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * An event that can be seen on the map
  * 
  * @author ritterni
+ * @author SpicyCH (PublicEvents are now Parcelable)
  */
-public class PublicEvent implements Event, Displayable {
+
+public class PublicEvent implements Event, Displayable, Parcelable {
 	private String mEvtName;
 	private final long mEvtCreator; // the user who created the event
 	private final GregorianCalendar mStartDate;
@@ -29,12 +33,45 @@ public class PublicEvent implements Event, Displayable {
 	private String mPositionName;
 	private String mCreatorName;
 	private String mDescription;
+
 	public final static long DEFAULT_ID = -1;
 	public final static int EVENT_ICON = R.drawable.default_event;
 	private final static int RIGHT_SHIFT_COUNT = 32;
 
 	public static final float MARKER_ANCHOR_X = (float) 0.5;
 	public static final float MARKER_ANCHOR_Y = 1;
+
+	public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
+		@Override
+		public PublicEvent createFromParcel(Parcel source) {
+			return new PublicEvent(source);
+		}
+
+		@Override
+		public PublicEvent[] newArray(int size) {
+			return new PublicEvent[size];
+		}
+	};
+
+	/**
+	 * Constructor
+	 * 
+	 * @param in
+	 * @author SpicyCH
+	 */
+	public PublicEvent(Parcel in) {
+		mEvtName = in.readString();
+		mEvtCreator = in.readLong();
+		mStartDate = new GregorianCalendar();
+		mStartDate.setTimeInMillis(in.readLong());
+		mEndDate = new GregorianCalendar();
+		mEndDate.setTimeInMillis(in.readLong());
+		mID = in.readLong();
+		mLocation = in.readParcelable(Location.class.getClassLoader());
+		mPositionName = in.readString();
+		mCreatorName = in.readString();
+		mDescription = in.readString();
+	}
 
 	/**
 	 * UserEvent constructor
@@ -85,6 +122,15 @@ public class PublicEvent implements Event, Displayable {
 		mCreatorName = creatorName;
 		mDescription = "Tomorrow near Lausanne";
 		mID = DEFAULT_ID;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see android.os.Parcelable#describeContents()
+	 */
+	@Override
+	public int describeContents() {
+		return 0;
 	}
 
 	/*
@@ -153,9 +199,7 @@ public class PublicEvent implements Event, Displayable {
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
-	 * )
+	 * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context )
 	 * @author hugo-S
 	 */
 	@Override
@@ -273,5 +317,22 @@ public class PublicEvent implements Event, Displayable {
 		mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
 		    newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
+	 */
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(mEvtName);
+		dest.writeLong(mEvtCreator);
+		dest.writeLong(mStartDate.getTimeInMillis());
+		dest.writeLong(mEndDate.getTimeInMillis());
+		dest.writeLong(mID);
+		dest.writeParcelable(mLocation, flags);
+		dest.writeString(mPositionName);
+		dest.writeString(mCreatorName);
+		dest.writeString(mDescription);
 	}
 }

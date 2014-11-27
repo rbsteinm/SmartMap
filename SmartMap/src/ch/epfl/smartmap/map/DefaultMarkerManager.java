@@ -237,9 +237,6 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
 				double lng = (t * toPosition.longitude) + ((1 - t) * startLatLng.longitude);
 				double lat = (t * toPosition.latitude) + ((1 - t) * startLatLng.latitude);
 				marker.setPosition(new LatLng(lat, lng));
-				// Log.d(TAG, "Set marker position for friend "
-				// + getFriendForMarker(marker).getName() + " "
-				// + marker.getPosition().toString());
 
 				if (t < 1.0) {
 					// Post again 16ms later.
