@@ -679,9 +679,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (file.exists()) {
             pic = BitmapFactory.decodeFile(file.getAbsolutePath());
-        } else {
+        }
+        if (pic == null) {
             pic = BitmapFactory.decodeResource(mContext.getResources(), Friend.DEFAULT_PICTURE);
         }
+
         return pic;
     }
 

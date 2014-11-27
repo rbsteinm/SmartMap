@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.background;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -115,14 +116,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         this.updateInvitationSet();
-
-        new AsyncFriendsInit().execute();
-        List<User> friends = mHelper.getAllFriends();
-        HashSet<Long> ids = new HashSet<Long>();
-        for (User user : friends) {
-            ids.add(user.getID());
-        }
-        new AsyncGetPictures().execute(ids.toArray(new Long[ids.size()]));
     }
 
     @Override
@@ -149,6 +142,15 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         mHandler.removeCallbacks(getInvitations);
         mHandler.postDelayed(getInvitations, HANDLER_DELAY);
         new AsyncLogin().execute();
+
+        new AsyncFriendsInit().execute();
+        List<User> friends = mHelper.getAllFriends();
+        for (User user : friends) {
+            File file = new File(getFilesDir(), user.getID() + ".png");
+            if (!file.exists()) {
+                new AsyncGetPictures().execute(user.getID());
+            }
+        }
 
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
