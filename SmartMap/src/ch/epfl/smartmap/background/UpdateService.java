@@ -46,19 +46,16 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     OnInvitationStatusUpdateListener {
 
     public static final String BROADCAST_POS = "ch.epfl.smartmap.background.broadcastPos";
-
     public static final String UPDATED_ROWS = "UpdatedRows";
-
     private static final int HANDLER_DELAY = 1000;
-
     private static final int POS_UPDATE_DELAY = 10000;
-
     private static final int INVITE_UPDATE_DELAY = 30000;
 
     private static final float MIN_DISTANCE = 5; // minimum distance to update
                                                  // position
 
     private static final int RESTART_DELAY = 2000;
+    public static final int IMAGE_QUALITY = 100;
 
     private final Handler mHandler = new Handler();
     private Intent mFriendsPosIntent;
@@ -93,6 +90,14 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         }
     };
 
+    public void downloadUserPicture(long id) {
+        try {
+            mHelper.setUserPicture(mClient.getProfilePicture(id), id);
+        } catch (SmartMapClientException e) {
+            Log.e("UpdateService", "Couldn't download picture #" + id + "!");
+        }
+    }
+
     @Override
     public IBinder onBind(Intent arg0) {
         return null;
@@ -107,15 +112,17 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         mHelper.addOnInvitationStatusUpdateListener(this);
         mGeocoder = new Geocoder(this.getBaseContext(), Locale.US);
         mFriendsPosIntent = new Intent(BROADCAST_POS);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
         mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
-            MIN_DISTANCE, new MyLocationListener());
 
         this.updateInvitationSet();
 
         new AsyncFriendsInit().execute();
+        List<User> friends = mHelper.getAllFriends();
+        HashSet<Long> ids = new HashSet<Long>();
+        for (User user : friends) {
+            ids.add(user.getID());
+        }
+        new AsyncGetPictures().execute(ids.toArray(new Long[ids.size()]));
     }
 
     @Override
@@ -142,6 +149,11 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         mHandler.removeCallbacks(getInvitations);
         mHandler.postDelayed(getInvitations, HANDLER_DELAY);
         new AsyncLogin().execute();
+
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
+            MIN_DISTANCE, new MyLocationListener());
 
         return START_STICKY;
     }
@@ -306,6 +318,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                     if (!mInviterIds.contains(user.getID())) {
                         mHelper.addFriendInvitation(new FriendInvitation(0, user.getID(), user.getName(),
                             Invitation.UNREAD));
+                        new AsyncGetPictures().execute(user.getID());
                         UpdateService.this.showFriendNotif(user);
                     }
                 }
@@ -322,6 +335,21 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                     new AsyncRemovalAck().execute(removedFriends.toArray(new Long[removedFriends.size()]));
                 }
             }
+        }
+    }
+
+    /**
+     * AsyncTask to download a user's picture
+     * 
+     * @author ritterni
+     */
+    private class AsyncGetPictures extends AsyncTask<Long, Void, Void> {
+        @Override
+        protected Void doInBackground(Long... ids) {
+            for (long id : ids) {
+                downloadUserPicture(id);
+            }
+            return null;
         }
     }
 
