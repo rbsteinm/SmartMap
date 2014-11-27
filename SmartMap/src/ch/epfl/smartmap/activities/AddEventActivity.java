@@ -34,13 +34,15 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class AddEventActivity extends FragmentActivity {
 
-    @SuppressWarnings("unused")
     private static final String TAG = AddEventActivity.class.getSimpleName();
 
     static final int PICK_LOCATION_REQUEST = 1;
     private static final String CITY_NAME = "CITY_NAME";
+    private static final String COUNTRY_NAME = "COUNTRY_NAME";
     private static final int ELEMENTS_HH_MM = 2;
     private static final int ELEMENTS_JJ_DD_YYYY = 3;
+
+    private String mCountryName;
 
     private Context mContext;
     private EditText mDescription;
@@ -88,9 +90,7 @@ public class AddEventActivity extends FragmentActivity {
 
                 } else {
                     // Google wasn't able to retrieve the location name associated to the coordinates
-                    Toast
-                        .makeText(mContext,
-                            this.getString(R.string.add_event_toast_couldnt_retrieve_location),
+                    Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location),
                             Toast.LENGTH_LONG).show();
                     mLatitude.setText("");
                     mLongitude.setText("");
@@ -132,9 +132,8 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     public void pickLocation(View v) {
-        Toast.makeText(mContext,
-            this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
-            Toast.LENGTH_LONG).show();
+        Toast.makeText(mContext, this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
+                Toast.LENGTH_LONG).show();
 
         Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
         pickLocationIntent.putExtra("pickLocationForEvent", true);
@@ -143,8 +142,7 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * Ensures the end of the event is after its start and end of the event is not in the past. Displays a
-     * toast and
+     * Ensures the end of the event is after its start and end of the event is not in the past. Displays a toast and
      * reset the bad field set by the user if necessary.
      * 
      * @param startDate
@@ -153,17 +151,16 @@ public class AddEventActivity extends FragmentActivity {
      * @param endTime
      * @author SpicyCH
      */
-    private void
-        checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
+    private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
 
         if (this.isValidDate(endDate.getText().toString()) && this.isValidTime(endTime.getText().toString())) {
             // The end of the event has been set by the user
 
-            GregorianCalendar start =
-                this.getDateFromTextFormat(startDate.getText().toString(), startTime.getText().toString());
+            GregorianCalendar start = this.getDateFromTextFormat(startDate.getText().toString(), startTime.getText()
+                    .toString());
 
-            GregorianCalendar end =
-                this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText().toString());
+            GregorianCalendar end = this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText()
+                    .toString());
 
             GregorianCalendar now = new GregorianCalendar();
 
@@ -177,18 +174,16 @@ public class AddEventActivity extends FragmentActivity {
                 endDate.setText("");
                 endTime.setText("");
 
-                Toast.makeText(mContext,
-                    this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
-                    Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
+                        Toast.LENGTH_LONG).show();
             } else if (end.before(now)) {
                 // The user is trying to create an event in the past
 
                 endDate.setText("");
                 endTime.setText("");
 
-                Toast.makeText(mContext,
-                    this.getString(R.string.add_event_toast_event_end_cannot_be_in_past), Toast.LENGTH_LONG)
-                    .show();
+                Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_end_cannot_be_in_past),
+                        Toast.LENGTH_LONG).show();
             }
         }
 
@@ -200,23 +195,22 @@ public class AddEventActivity extends FragmentActivity {
     private void createEvent() {
 
         if (!this.isValidDate(mPickEndDate.getText().toString())
-            || !this.isValidTime(mPickEndTime.getText().toString())
-            || mLatitude.getText().toString().equals("") || mLongitude.getText().toString().equals("")
-            || ((mPlaceName.getText().toString() == null) || mEventName.getText().toString().isEmpty())) {
-            Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set),
-                Toast.LENGTH_SHORT).show();
+                || !this.isValidTime(mPickEndTime.getText().toString()) || mLatitude.getText().toString().equals("")
+                || mLongitude.getText().toString().equals("")
+                || ((mPlaceName.getText().toString() == null) || mEventName.getText().toString().isEmpty())
+                || mCountryName.isEmpty()) {
+            Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set), Toast.LENGTH_SHORT)
+                    .show();
             Log.d(TAG, "Couldn't create a new event because not all fields have been set.\n" + "end date: "
-                + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
-                + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
-                + mPlaceName.getText().toString() + "\n" + "event lat/long: "
-                + mLatitude.getText().toString() + "/" + mLongitude.getText().toString());
+                    + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
+                    + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
+                    + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mLatitude.getText().toString()
+                    + "/" + mLongitude.getText().toString());
         } else {
-            GregorianCalendar startDate =
-                this.getDateFromTextFormat(mPickStartDate.getText().toString(), mPickStartTime.getText()
-                    .toString());
-            GregorianCalendar endDate =
-                this.getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime.getText()
-                    .toString());
+            GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
+                    mPickStartTime.getText().toString());
+            GregorianCalendar endDate = this.getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime
+                    .getText().toString());
 
             double latitude = Double.parseDouble(mLatitude.getText().toString());
             double longitude = Double.parseDouble(mLongitude.getText().toString());
@@ -225,9 +219,8 @@ public class AddEventActivity extends FragmentActivity {
             location.setLongitude(longitude);
 
             SettingsManager setMng = SettingsManager.getInstance();
-            PublicEvent event =
-                new PublicEvent(mEventName.getText().toString(), setMng.getUserID(), setMng.getUserName(),
-                    startDate, endDate, location);
+            PublicEvent event = new PublicEvent(mEventName.getText().toString(), setMng.getUserID(),
+                    setMng.getUserName(), startDate, endDate, location);
 
             // TODO send event to server (server-side code not written yet :( ),
             // and use the returned event id
@@ -235,12 +228,12 @@ public class AddEventActivity extends FragmentActivity {
             event.setID(mNewEventId++);
             event.setDescription(mDescription.getText().toString());
             event.setPositionName(mPlaceName.getText().toString());
+            event.setPositionCountryName(mCountryName);
 
             DatabaseHelper dbHelper = DatabaseHelper.getInstance();
             dbHelper.addEvent(event);
 
-            Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_created),
-                Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_created), Toast.LENGTH_SHORT).show();
             this.finish();
 
         }
@@ -261,8 +254,7 @@ public class AddEventActivity extends FragmentActivity {
         String[] s1 = dayMonthYear.split("/");
         String[] s2 = hourMinute.split(":");
         // Don't forget to substract 1 to the month in text format
-        GregorianCalendar date =
-            new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1,
+        GregorianCalendar date = new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1,
                 Integer.parseInt(s1[0]), Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
 
         return date;
@@ -295,8 +287,7 @@ public class AddEventActivity extends FragmentActivity {
                 mPickEndDate.removeTextChangedListener(mTextChangedListener);
                 mPickStartDate.removeTextChangedListener(mTextChangedListener);
 
-                AddEventActivity.this.checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate,
-                    mPickEndTime);
+                AddEventActivity.this.checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
 
                 // Reset the TextChangedListener
                 mPickEndDate.addTextChangedListener(mTextChangedListener);
@@ -320,7 +311,7 @@ public class AddEventActivity extends FragmentActivity {
         GregorianCalendar now = new GregorianCalendar();
 
         mPickStartTime.setText(TimePickerFragment.formatForClock(now.get(Calendar.HOUR_OF_DAY)) + ":"
-            + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));
+                + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));
 
         mPickStartTime.setOnClickListener(new OnClickListener() {
 
@@ -333,7 +324,7 @@ public class AddEventActivity extends FragmentActivity {
         });
 
         mPickStartDate.setText(now.get(Calendar.DAY_OF_MONTH) + "/" + (now.get(Calendar.MONTH) + 1) + "/"
-            + now.get(Calendar.YEAR));
+                + now.get(Calendar.YEAR));
 
         mPickStartDate.setOnClickListener(new OnClickListener() {
 
@@ -388,8 +379,15 @@ public class AddEventActivity extends FragmentActivity {
             mPlaceName.setText(cityName);
         } else {
             Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location_name),
-                Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_LONG).show();
             mPlaceName.setText("");
+        }
+
+        String countryName = extras.getString(COUNTRY_NAME);
+        if ((countryName != null) && !countryName.isEmpty()) {
+            mCountryName = countryName;
+        } else {
+            mCountryName = this.getString(R.string.unknown_country);
         }
     }
 }

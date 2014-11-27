@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * An event that can be seen on the map
  * 
  * @author ritterni
- * @author SpicyCH (PublicEvents are now Parcelable)
+ * @author SpicyCH (Events are now Parcelable, add support for event's country name)
  */
 public class PublicEvent implements Event, Displayable, Parcelable {
     private String mEvtName;
