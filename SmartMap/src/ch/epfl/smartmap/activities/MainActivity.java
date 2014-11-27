@@ -63,8 +63,7 @@ import com.google.android.gms.maps.model.Marker;
  * @author agpmilli
  */
 
-public class MainActivity extends FragmentActivity implements OnFriendsLocationUpdateListener,
-    OnInvitationListUpdateListener {
+public class MainActivity extends FragmentActivity implements OnFriendsLocationUpdateListener {
 
 	@SuppressWarnings("unused")
 	private static final String TAG = MainActivity.class.getSimpleName();
@@ -248,9 +247,18 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 		// its LayerDrawable (layer-list)
 		MenuItem item = mMenu.findItem(R.id.action_notifications);
 		mIcon = (LayerDrawable) item.getIcon();
-
+		// Initialize the number of unread notifications
 		Utils.setBadgeCount(MainActivity.this, mIcon,
 		    mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
+		// And set a Listener on InvitationList
+		mDbHelper.addOnInvitationListUpdateListener(new OnInvitationListUpdateListener() {
+			@Override
+			public void onInvitationListUpdate() {
+				// Update LayerDrawable's BadgeDrawable
+				Utils.setBadgeCount(MainActivity.this, mIcon,
+				    mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
+			}
+		});
 
 		// Get Views
 		MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -524,14 +532,6 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
 			}
 			return false;
 		}
-
-	}
-
-	@Override
-	public void onInvitationListUpdate() {
-		// Update LayerDrawable's BadgeDrawable
-		Utils.setBadgeCount(MainActivity.this, mIcon,
-		    mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
 
 	}
 

@@ -10,18 +10,18 @@ package ch.epfl.smartmap.servercom;
  *         reporting ?
  */
 public class NoSuchFormatException extends Exception {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public NoSuchFormatException() {
-        super();
-    }
+	public NoSuchFormatException() {
+		super();
+	}
 
-    public NoSuchFormatException(String message) {
-        super(message);
-    }
+	public NoSuchFormatException(String message) {
+		super(message);
+	}
 
-    public NoSuchFormatException(Throwable throwable) {
-        super(throwable);
-    }
+	public NoSuchFormatException(Throwable throwable) {
+		super(throwable);
+	}
 
 }

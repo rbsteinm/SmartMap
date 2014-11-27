@@ -12,9 +12,9 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.FriendInvitation;
 
 /**
- * Customized adapter that displays a list of notification in a target activity
- * This adapter dynamically creates a row in the activity for each notification
- * It displays in each row: user name, user status
+ * Customized adapter that displays a list of invitation in a target activity
+ * This adapter dynamically creates a row in the activity for each invitation
+ * It displays in each row: a title, a picture and a text
  * 
  * @author agpmilli
  */
@@ -37,12 +37,6 @@ public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
 		mItemsArrayList = itemsArrayList;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-	 * android.view.ViewGroup)
-	 * callback function automatically called one time for each user in the list
-	 */
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -62,6 +56,8 @@ public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
 		title.setText(mContext.getString(R.string.notification_invitefriend_title));
 		text.setText(mItemsArrayList.get(position).getUserName() + " "
 		    + mContext.getString(R.string.notification_friend_invitation));
+
+		// convertView.setBackgroundColor(Utils.Context.getResources().getColor(R.color.main_blue));
 
 		return convertView;
 	}

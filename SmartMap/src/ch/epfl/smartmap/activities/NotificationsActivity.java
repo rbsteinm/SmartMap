@@ -1,5 +1,7 @@
 package ch.epfl.smartmap.activities;
 
+import java.util.List;
+
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.gui.InvitationListItemAdapter;
 
@@ -45,9 +48,14 @@ public class NotificationsActivity extends ListActivity {
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Intent showFriendIntent = new Intent(mContext, FriendsPagerActivity.class);
-		showFriendIntent.putExtra("invitation", true);
-		NotificationsActivity.this.startActivity(showFriendIntent);
+		Intent invitationIntent = null;
+		if (this.getListView().getItemAtPosition(position).getClass() == FriendInvitation.class) {
+			invitationIntent = ((FriendInvitation) l.getItemAtPosition(position)).getIntent();
+		} else {
+			// invitationIntent = ((EventInvitation) l.getItemAtPosition(position)).getIntent();
+			// invitationIntent.putExtra("invitation", true);
+		}
+		NotificationsActivity.this.startActivity(invitationIntent);
 
 		super.onListItemClick(l, v, position, id);
 	}
@@ -71,10 +79,10 @@ public class NotificationsActivity extends ListActivity {
 		NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, mDbHelper
 		    .getFriendInvitations()));
 
-		for (int i = 0; i < mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size(); i++) {
-			mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).get(i).setStatus(Invitation.READ);
-			mDbHelper
-			    .updateFriendInvitation(mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).get(i));
+		List<FriendInvitation> unreadInvitations = mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD);
+		for (int i = 0; i < unreadInvitations.size(); i++) {
+			unreadInvitations.get(i).setStatus(Invitation.READ);
+			mDbHelper.updateFriendInvitation(unreadInvitations.get(i));
 		}
 
 	}

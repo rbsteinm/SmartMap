@@ -9,43 +9,43 @@ import java.util.Date;
  * @author jfperren
  */
 public interface History {
-    void addEntry(Displayable item, Date date);
+	void addEntry(Displayable item, Date date);
 
-    Date getDateForIndex(int index);
+	Date getDateForIndex(int index);
 
-    ArrayList<Displayable> getEntriesForIndex(int index);
+	ArrayList<Displayable> getEntriesForIndex(int index);
 
-    boolean isEmpty();
+	boolean isEmpty();
 
-    int nbOfDates();
+	int nbOfDates();
 
-    /**
-     * Represents an entry in the history of searches : Tuple of a searchResult
-     * and a Date
-     * 
-     * @author jfperren
-     */
-    public static class HistoryEntry {
-        private final Displayable mItem;
-        private final Date mDate;
+	/**
+	 * Represents an entry in the history of searches : Tuple of a searchResult
+	 * and a Date
+	 * 
+	 * @author jfperren
+	 */
+	public static class HistoryEntry {
+		private final Displayable mItem;
+		private final Date mDate;
 
-        /**
-         * Constructor
-         * 
-         * @param friend
-         * @param date
-         */
-        public HistoryEntry(Displayable item, Date date) {
-            mItem = item;
-            mDate = date;
-        }
+		/**
+		 * Constructor
+		 * 
+		 * @param friend
+		 * @param date
+		 */
+		public HistoryEntry(Displayable item, Date date) {
+			mItem = item;
+			mDate = date;
+		}
 
-        public Date getDate() {
-            return mDate;
-        }
+		public Date getDate() {
+			return mDate;
+		}
 
-        public Displayable getItem() {
-            return mItem;
-        }
-    }
+		public Displayable getItem() {
+			return mItem;
+		}
+	}
 }

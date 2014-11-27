@@ -121,7 +121,7 @@
             android:name="ch.epfl.smartmap.activities.NotificationsActivity"
             android:label="@string/title_activity_notifications"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Dialog" >
+            android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
     </application>
 

@@ -2,6 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.gui.Utils;
 
@@ -35,11 +36,14 @@ public class FriendInvitation implements Invitation {
 
 	@Override
 	public Intent getIntent() {
+		Intent intent = null;
 		if (mStatus == READ) {
-			return new Intent(Utils.Context, UserInformationActivity.class);
-		} else {
-			return new Intent();
+			intent = new Intent(Utils.Context, FriendsPagerActivity.class);
+			intent.putExtra("invitation", true);
+		} else if (mStatus == ACCEPTED) {
+			intent = new Intent(Utils.Context, UserInformationActivity.class);
 		}
+		return intent;
 	}
 
 	@Override

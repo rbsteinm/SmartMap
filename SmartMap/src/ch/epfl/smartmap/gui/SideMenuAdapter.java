@@ -16,50 +16,50 @@ import ch.epfl.smartmap.R;
  */
 public class SideMenuAdapter extends ArrayAdapter<String> {
 
-    private final Context mContext;
-    private final String[] mListItems;
+	private final Context mContext;
+	private final String[] mListItems;
 
-    /**
-     * @param context
-     *            Context of the Activity where we want to display the user list
-     * @param listItems
-     *            list of String to display in the side menu
-     */
-    public SideMenuAdapter(Context context, String[] listItems) {
-        super(context, R.layout.drawer_list_item, listItems);
-        mContext = context;
-        mListItems = listItems;
-    }
+	/**
+	 * @param context
+	 *            Context of the Activity where we want to display the user list
+	 * @param listItems
+	 *            list of String to display in the side menu
+	 */
+	public SideMenuAdapter(Context context, String[] listItems) {
+		super(context, R.layout.drawer_list_item, listItems);
+		mContext = context;
+		mListItems = listItems;
+	}
 
-    /*
-     * (non-Javadoc)
-     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        // Log.d("sideMenuView is null", "NULLVIEW");
+	/*
+	 * (non-Javadoc)
+	 * @see android.widget.ArrayAdapter#getView(int, android.view.View,
+	 * android.view.ViewGroup)
+	 */
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		// Log.d("sideMenuView is null", "NULLVIEW");
 
-        // Create inflater,get item to construct
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.drawer_list_item, parent, false);
+		// Create inflater,get item to construct
+		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		convertView = inflater.inflate(R.layout.drawer_list_item, parent, false);
 
-        // Get item field
-        TextView sideMenuView = (TextView) convertView.findViewById(R.id.side_menu_text_view);
-        /*
-         * <<<<<<< HEAD
-         * if(sideMenuView == null){ Log.d("sideMenuView is null", "NULLVIEW");
-         * =======
-         * if(sideMenuView == null){
-         * Log.d("sideMenuView is null", "NULLVIEW");
-         * >>>>>>> gui-info
-         * }
-         */
-        // Set item field + id
-        sideMenuView.setText(mListItems[position]);
-        // set tag to each View
-        sideMenuView.setTag("side_menu_tag_" + position);
+		// Get item field
+		TextView sideMenuView = (TextView) convertView.findViewById(R.id.side_menu_text_view);
+		/*
+		 * <<<<<<< HEAD
+		 * if(sideMenuView == null){ Log.d("sideMenuView is null", "NULLVIEW");
+		 * =======
+		 * if(sideMenuView == null){
+		 * Log.d("sideMenuView is null", "NULLVIEW");
+		 * >>>>>>> gui-info
+		 * }
+		 */
+		// Set item field + id
+		sideMenuView.setText(mListItems[position]);
+		// set tag to each View
+		sideMenuView.setTag("side_menu_tag_" + position);
 
-        return convertView;
-    }
+		return convertView;
+	}
 }
