@@ -30,6 +30,7 @@ public class PublicEvent implements Event, Displayable, Parcelable {
     private long mID;
     private final Location mLocation;
     private String mPositionName;
+    private String mPositionCountryName;
     private String mCreatorName;
     private String mDescription;
 
@@ -37,7 +38,7 @@ public class PublicEvent implements Event, Displayable, Parcelable {
     public final static int EVENT_ICON = R.drawable.default_event;
     private final static int RIGHT_SHIFT_COUNT = 32;
 
-    public static final float MARKER_ANCHOR_X = (float) 0.5;
+    public static final float MARKER_ANCHOR_X = 0.5f;
     public static final float MARKER_ANCHOR_Y = 1;
 
     public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
@@ -69,6 +70,7 @@ public class PublicEvent implements Event, Displayable, Parcelable {
         mID = in.readLong();
         mLocation = in.readParcelable(Location.class.getClassLoader());
         mPositionName = in.readString();
+        mPositionCountryName = in.readString();
         mCreatorName = in.readString();
         mDescription = in.readString();
     }
@@ -119,6 +121,7 @@ public class PublicEvent implements Event, Displayable, Parcelable {
         mEndDate.setTimeInMillis(endDate.getTimeInMillis());
         mLocation = new Location(p);
         mPositionName = "";
+        mPositionCountryName = "";
         mCreatorName = creatorName;
         mDescription = "Tomorrow near Lausanne";
         mID = DEFAULT_ID;
@@ -227,6 +230,16 @@ public class PublicEvent implements Event, Displayable, Parcelable {
         return BitmapFactory.decodeResource(context.getResources(), EVENT_ICON);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ch.epfl.smartmap.cache.Event#getPositionCountryName()
+     */
+    @Override
+    public String getPositionCountryName() {
+        return mPositionCountryName;
+    }
+
     @Override
     public String getPositionName() {
         return mPositionName;
@@ -292,6 +305,9 @@ public class PublicEvent implements Event, Displayable, Parcelable {
 
     @Override
     public void setLocation(Location p) {
+        if (p == null) {
+            throw new IllegalArgumentException("The location cannot be null!");
+        }
         mLocation.set(p);
     }
 
@@ -309,8 +325,26 @@ public class PublicEvent implements Event, Displayable, Parcelable {
         mEvtName = newName;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ch.epfl.smartmap.cache.Event#setPositionCountryName(java.lang.String)
+     */
+    @Override
+    public void setPositionCountryName(String countryName) {
+        if (countryName == null) {
+            throw new IllegalArgumentException("The country name cannot be null");
+        }
+
+        mPositionCountryName = countryName;
+    }
+
     @Override
     public void setPositionName(String posName) {
+        if (posName == null) {
+            throw new IllegalArgumentException("The event's position name cannot be null");
+        }
+
         mPositionName = posName;
     }
 
@@ -338,6 +372,7 @@ public class PublicEvent implements Event, Displayable, Parcelable {
         dest.writeLong(mID);
         dest.writeParcelable(mLocation, flags);
         dest.writeString(mPositionName);
+        dest.writeString(mPositionCountryName);
         dest.writeString(mCreatorName);
         dest.writeString(mDescription);
     }

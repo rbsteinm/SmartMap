@@ -33,6 +33,14 @@ public interface Event extends Displayable, Parcelable {
     GregorianCalendar getEndDate();
 
     /**
+     * 
+     * @return The country where the event happens as a string (e.g. "Switzerland"), empty string if not set
+     * 
+     * @author SpicyCH
+     */
+    String getPositionCountryName();
+
+    /**
      * @return The event's position as a String (e.g. 'Lausanne')
      */
     String getPositionName();
@@ -105,6 +113,15 @@ public interface Event extends Displayable, Parcelable {
      *            The new name
      */
     void setName(String newName);
+
+    /**
+     * 
+     * @param countryName
+     *            the name of the country where the event takes place.
+     * 
+     * @author SpicyCH
+     */
+    void setPositionCountryName(String countryName);
 
     /**
      * Sets the user position's name
