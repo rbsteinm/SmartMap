@@ -184,18 +184,7 @@ class EventController {
                 throw new ControlLogicException('Error in getPublicEvents', 2, $e);
             }
 
-            $eventsArray[] = array(
-                'id' => $event->getId(),
-                'creatorId' => $event->getCreatorId(),
-                'startingDate' => $event->getStartingDate(),
-                'endingDate' => $event->getEndingDate(),
-                'longitude' => $event->getLongitude(),
-                'latitude' => $event->getLatitude(),
-                'positionName' => $event->getPositionName(),
-                'name' => $event->getName(),
-                'description' => $event->getDescription(),
-                'participants' => $participants
-            );
+            $eventsArray[] = $this->eventInfoArray($event, $participants);
         }
 
         $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventsArray);
@@ -252,5 +241,93 @@ class EventController {
 
         return new JsonResponse($response);
     }
-}
 
+    public function getEventInvitations(Request $request)
+    {
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        try
+        {
+            $eventsIds = $this->mRepo->getEventInvitations($userId);
+
+            $eventsInfo = array();
+
+            foreach ($eventsIds as $eventId)
+            {
+                $event = $this->mRepo->getEvent($eventId);
+
+                $eventParticipants = $this->mRepo->getEventParticipants($eventId);
+
+                $eventsInfo[] = $this->eventInfoArray($event, $eventParticipants);
+            }
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in getEventInvitations.', 2, $e);
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventsInfo);
+
+        return new JsonResponse($response);
+    }
+
+    public function ackEventInvitation(Request $request)
+    {
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        $eventId = RequestUtils::getPostParam($request, 'event_id');
+
+        try
+        {
+            $this->mRepo->removeEventInvitation($eventId, $userId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in ackEventInvitation.', 2, $e);
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Acknowledged event invitation.');
+
+        return new JsonResponse($response);
+    }
+
+    public function getEventInfo(Request $request)
+    {
+        RequestUtils::getIdFromRequest($request);
+
+        $eventId = RequestUtils::getPostParam($request, 'event_id');
+
+        try
+        {
+            $event = $this->mRepo->getEvent($eventId);
+
+            $participants = $this->mRepo->getEventParticipants($eventId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in getEventInfo.', 2, $e);
+        }
+
+        $eventsInfo = $this->eventInfoArray($event, $participants);
+
+        $response = array('status' => 'Ok', 'message' => 'Fetched event.', 'event' => $eventsInfo);
+
+        return new JsonResponse($response);
+    }
+
+    private function eventInfoArray(Event $event, $participants = array())
+    {
+        return array(
+            'id' => $event->getId(),
+            'creatorId' => $event->getCreatorId(),
+            'startingDate' => $event->getStartingDate(),
+            'endingDate' => $event->getEndingDate(),
+            'longitude' => $event->getLongitude(),
+            'latitude' => $event->getLatitude(),
+            'positionName' => $event->getPositionName(),
+            'name' => $event->getName(),
+            'description' => $event->getDescription(),
+            'participants' => $participants
+        );
+    }
+}

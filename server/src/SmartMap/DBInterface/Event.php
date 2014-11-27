@@ -207,7 +207,7 @@ class Event
     }
     
     /**
-     * Set the event's psition name.
+     * Set the event's position name.
      * 
      * @param string $name
      * @return \SmartMap\DBInterface\Event
