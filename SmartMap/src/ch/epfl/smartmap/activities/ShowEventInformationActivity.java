@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.gui.EventsListItemAdapter;
 
 /**
  * This activity shows an event in a complete screens.
@@ -24,6 +25,10 @@ public class ShowEventInformationActivity extends Activity {
     private Event mEvent;
     private TextView mEventTitle;
     private TextView mEventCreator;
+    private TextView mStart;
+    private TextView mEnd;
+    private TextView mEventDescription;
+    private TextView mPlaceNameAndCountry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,5 +91,18 @@ public class ShowEventInformationActivity extends Activity {
 
         mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
         mEventCreator.setText(this.getString(R.string.show_event_by) + " " + mEvent.getCreatorName());
+
+        mStart = (TextView) this.findViewById(R.id.show_event_info_start);
+        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "start"));
+
+        mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
+        mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));
+
+        mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
+        mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ": "
+                + mEvent.getDescription());
+
+        mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
+        mPlaceNameAndCountry.setText(mEvent.getPositionName() + ", " + "Country");
     }
 }

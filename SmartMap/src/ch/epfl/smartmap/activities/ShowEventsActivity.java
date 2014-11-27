@@ -36,7 +36,6 @@ import ch.epfl.smartmap.gui.EventsListItemAdapter;
  */
 public class ShowEventsActivity extends ListActivity {
 
-    @SuppressWarnings("unused")
     private final static String TAG = ShowEventsActivity.class.getSimpleName();
 
     private final static double EARTH_RADIUS_KM = 6378.1;
