@@ -552,8 +552,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 * 
 	 * @return A list of FriendInvitations
 	 */
-	public List<FriendInvitation> getFriendInvitations() {
-		List<FriendInvitation> invitations = new ArrayList<FriendInvitation>();
+	public List<Invitation> getFriendInvitations() {
+		List<Invitation> invitations = new ArrayList<Invitation>();
 
 		String query = "SELECT  * FROM " + TABLE_INVITATIONS;
 

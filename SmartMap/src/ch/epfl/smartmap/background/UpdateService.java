@@ -168,7 +168,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 	}
 
 	public void updateInvitationSet() {
-		for (FriendInvitation invitation : mHelper.getFriendInvitations()) {
+		for (Invitation invitation : mHelper.getFriendInvitations()) {
 			if ((invitation.getStatus() != Invitation.ACCEPTED)
 			    || (invitation.getStatus() != Invitation.REFUSED)) {
 				mInviterIds.add(invitation.getUserId());

@@ -2,8 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.activities.FriendsPagerActivity;
-import ch.epfl.smartmap.activities.UserInformationActivity;
+import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.gui.Utils;
 
 /**
@@ -11,22 +10,26 @@ import ch.epfl.smartmap.gui.Utils;
  * 
  * @author agpmilli
  */
-public class FriendInvitation implements Invitation {
+public class EventInvitation implements Invitation {
 	private final long mInvitationId;
 	private final long mUserId;
+	private final long mEventId;
 	private final String mUserName;
+	private final String mEventName;
 	private int mStatus;
 
 	public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
 	public static final int IMAGE_QUALITY = 100;
 	public static final String PROVIDER_NAME = "SmartMapServers";
 
-	public FriendInvitation(long invitationId, long userId, String userName, int status) {
+	public EventInvitation(long invitationId, long userId, String userName, long eventId, String eventName,
+	    int status) {
 		mInvitationId = invitationId;
 		mUserId = userId;
+		mEventId = eventId;
 		mUserName = userName;
+		mEventName = eventName;
 		mStatus = status;
-
 	}
 
 	@Override
@@ -38,10 +41,10 @@ public class FriendInvitation implements Invitation {
 	public Intent getIntent() {
 		Intent intent = null;
 		if (mStatus == READ) {
-			intent = new Intent(Utils.Context, FriendsPagerActivity.class);
+			intent = new Intent(Utils.Context, ShowEventsActivity.class);
 			intent.putExtra("invitation", true);
 		} else if (mStatus == ACCEPTED) {
-			intent = new Intent(Utils.Context, UserInformationActivity.class);
+			// intent = new Intent(Utils.Context, ShowEventInformationActivity.class);
 		}
 		return intent;
 	}
@@ -76,4 +79,11 @@ public class FriendInvitation implements Invitation {
 		mStatus = status;
 	}
 
+	public long getEventId() {
+		return mEventId;
+	}
+
+	public String getEventName() {
+		return mEventName;
+	}
 }

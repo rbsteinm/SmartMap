@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.EventInvitation;
 import ch.epfl.smartmap.cache.FriendInvitation;
+import ch.epfl.smartmap.cache.Invitation;
 
 /**
  * Customized adapter that displays a list of invitation in a target activity
@@ -18,10 +20,10 @@ import ch.epfl.smartmap.cache.FriendInvitation;
  * 
  * @author agpmilli
  */
-public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
+public class InvitationListItemAdapter extends ArrayAdapter<Invitation> {
 
 	private final Context mContext;
-	private final List<FriendInvitation> mItemsArrayList;
+	private final List<Invitation> mItemsArrayList;
 
 	/**
 	 * @param context
@@ -29,7 +31,7 @@ public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
 	 * @param userList
 	 *            list of users to display
 	 */
-	public InvitationListItemAdapter(Context context, List<FriendInvitation> itemsArrayList) {
+	public InvitationListItemAdapter(Context context, List<Invitation> itemsArrayList) {
 
 		super(context, R.layout.gui_notification_list_item, itemsArrayList);
 
@@ -51,14 +53,20 @@ public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
 
 		// Set the User's ID to the tag of its View
 		convertView.setTag(mItemsArrayList.get(position).getID());
-
-		// Set fields with friend attributes
-		title.setText(mContext.getString(R.string.notification_invitefriend_title));
-		text.setText(mItemsArrayList.get(position).getUserName() + " "
-		    + mContext.getString(R.string.notification_friend_invitation));
-
-		// convertView.setBackgroundColor(Utils.Context.getResources().getColor(R.color.main_blue));
-
+		if (mItemsArrayList.get(position).getClass() == FriendInvitation.class) {
+			// Set fields with friend attributes
+			title.setText(mItemsArrayList.get(position).getUserName() + " "
+			    + mContext.getString(R.string.notification_friend_invitation));
+			text.setText(mContext.getString(R.string.notification_open_friend_list));
+			// picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
+		} else if (mItemsArrayList.get(position).getClass() == EventInvitation.class) {
+			// Set fields with friend attributes
+			title.setText(mItemsArrayList.get(position).getUserName() + " "
+			    + mContext.getString(R.string.notification_event_invitation) + " "
+			    + ((EventInvitation) mItemsArrayList.get(position)).getEventName());
+			text.setText(mContext.getString(R.string.notification_open_event_list));
+			// picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
+		}
 		return convertView;
 	}
 }

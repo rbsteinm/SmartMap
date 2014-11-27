@@ -6,7 +6,6 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
@@ -40,21 +39,8 @@ public class NotificationsActivity extends ListActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		this.getMenuInflater().inflate(R.menu.show_events, menu);
-		return true;
-	}
-
-	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Intent invitationIntent = null;
-		if (this.getListView().getItemAtPosition(position).getClass() == FriendInvitation.class) {
-			invitationIntent = ((FriendInvitation) l.getItemAtPosition(position)).getIntent();
-		} else {
-			// invitationIntent = ((EventInvitation) l.getItemAtPosition(position)).getIntent();
-			// invitationIntent.putExtra("invitation", true);
-		}
+		Intent invitationIntent = ((FriendInvitation) l.getItemAtPosition(position)).getIntent();
 		NotificationsActivity.this.startActivity(invitationIntent);
 
 		super.onListItemClick(l, v, position, id);
@@ -69,7 +55,6 @@ public class NotificationsActivity extends ListActivity {
 		if (id == android.R.id.home) {
 			this.finish();
 		}
-
 		return super.onOptionsItemSelected(item);
 	}
 
