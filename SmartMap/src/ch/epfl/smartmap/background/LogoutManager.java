@@ -88,6 +88,9 @@ public final class LogoutManager {
             Session.getActiveSession().closeAndClearTokenInformation();
         }
 
+        // Stop the service
+        mContext.stopService(new Intent(mContext, UpdateService.class));
+
         // Go to the SartActivity where the user can log back again with (another) account.
         mContext.startActivity(new Intent(mContext, StartActivity.class));
     }
