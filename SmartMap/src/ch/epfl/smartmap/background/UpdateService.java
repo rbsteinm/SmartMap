@@ -46,8 +46,6 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
 public class UpdateService extends Service implements OnInvitationListUpdateListener,
     OnInvitationStatusUpdateListener {
 
-    public static final String BROADCAST_POS = "ch.epfl.smartmap.background.broadcastPos";
-    public static final String UPDATED_ROWS = "UpdatedRows";
     private static final int HANDLER_DELAY = 1000;
     private static final int POS_UPDATE_DELAY = 10000;
     private static final int INVITE_UPDATE_DELAY = 30000;
@@ -59,7 +57,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     public static final int IMAGE_QUALITY = 100;
 
     private final Handler mHandler = new Handler();
-    private Intent mFriendsPosIntent;
     private LocationManager mLocManager;
     private boolean mFriendsPosEnabled = true;
     private boolean mOwnPosEnabled = true;
@@ -76,7 +73,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
             if (mFriendsPosEnabled) {
                 if (mReady) {
                     new AsyncFriendsPos().execute();
-                    UpdateService.this.sendBroadcast(mFriendsPosIntent);
                 }
                 mHandler.postDelayed(this, POS_UPDATE_DELAY);
             }
@@ -112,7 +108,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         mHelper.addOnInvitationListUpdateListener(this);
         mHelper.addOnInvitationStatusUpdateListener(this);
         mGeocoder = new Geocoder(this.getBaseContext(), Locale.US);
-        mFriendsPosIntent = new Intent(BROADCAST_POS);
         mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         this.updateInvitationSet();
@@ -153,9 +148,11 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         }
 
         Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
         mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
             MIN_DISTANCE, new MyLocationListener());
+
+        Log.d("UpdateService", mLocManager.getBestProvider(criteria, true));
 
         return START_STICKY;
     }
@@ -265,17 +262,11 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
      * 
      * @author ritterni
      */
-    private class AsyncFriendsPos extends AsyncTask<Void, Void, Integer> {
+    private class AsyncFriendsPos extends AsyncTask<Void, Void, Void> {
         @Override
-        protected Integer doInBackground(Void... args0) {
-            int rows = 0;
-            rows = mHelper.refreshFriendsPos();
-            return rows;
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-            mFriendsPosIntent.putExtra(UPDATED_ROWS, result);
+        protected Void doInBackground(Void... args0) {
+            mHelper.refreshFriendsPos();
+            return null;
         }
     }
 
