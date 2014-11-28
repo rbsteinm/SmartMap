@@ -150,7 +150,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     @Deprecated
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, DATABASE_NAME + "_" + SettingsManager.initialize(context).getUserID(), null,
+            DATABASE_VERSION);
         mContext = context;
     }
 
