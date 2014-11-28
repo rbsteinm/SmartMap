@@ -215,11 +215,47 @@ class EventController {
             throw new ControlLogicException('Error in joinEvent.', 2, $e);
         }
 
-        $response = array('status' => 'Ok', 'message' => 'Joined event.');
+        $response = array('status' => 'Ok', 'message' => 'Event joined.');
 
         return new JsonResponse($response);
     }
 
+    /**
+     * Removes the user from the event with id in post parameter event_id.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
+    public function leaveEvent(Request $request)
+    {
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        $eventId = RequestUtils::getPostParam($request, 'event_id');
+
+        try
+        {
+            $this->mRepo->removeUserFromEvent($eventId, $userId);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in leaveEvent.', 2, $e);
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Event left.');
+
+        return new JsonResponse($response);
+    }
+
+    /**
+     * Sends invitations to an event to a list of users.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
     public function inviteUsersToEvent(Request $request)
     {
         RequestUtils::getIdFromRequest($request);
@@ -242,6 +278,14 @@ class EventController {
         return new JsonResponse($response);
     }
 
+    /**
+     * Get the events to which the user is invited.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
     public function getEventInvitations(Request $request)
     {
         $userId = RequestUtils::getIdFromRequest($request);
@@ -271,6 +315,14 @@ class EventController {
         return new JsonResponse($response);
     }
 
+    /**
+     * Acknowledges an event invitation so it is not sent in getEventInvitations.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
     public function ackEventInvitation(Request $request)
     {
         $userId = RequestUtils::getIdFromRequest($request);
@@ -291,6 +343,14 @@ class EventController {
         return new JsonResponse($response);
     }
 
+    /**
+     * Get an event's information.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
     public function getEventInfo(Request $request)
     {
         RequestUtils::getIdFromRequest($request);
@@ -315,6 +375,14 @@ class EventController {
         return new JsonResponse($response);
     }
 
+    /**
+     * Utility function generating an associative array from an event and
+     * a list of participants to generate JSON.
+     *
+     * @param Event $event
+     * @param array $participants
+     * @return array
+     */
     private function eventInfoArray(Event $event, $participants = array())
     {
         return array(
@@ -331,3 +399,4 @@ class EventController {
         );
     }
 }
+

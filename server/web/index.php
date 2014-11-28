@@ -160,6 +160,19 @@ $app->post('/updateEvent', 'event.controller:updateEvent');
 
 $app->post('/getPublicEvents', 'event.controller:getPublicEvents');
 
+$app->post('/joinEvent', 'event.controller:joinEvent');
+
+$app->post('/leaveEvent', 'event.controller:leaveEvent');
+
+$app->post('/inviteUsersToEvent', 'event.controller:inviteUsersToEvent');
+
+$app->post('/getEventInvitations', 'event.controller:getEventInvitations');
+
+$app->post('/ackEventInvitation', 'event.controller:ackEventInvitation');
+
+$app->post('/getEventInfo', 'event.controller:getEventInfo');
+
+
 if ($app['debug'] == true)
 {
     $app->post('/fakeAuth', 'authentication.controller:fakeAuth');

@@ -423,7 +423,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
         $response = $controller->joinEvent($request);
 
-        $validResponse = array('status' => 'Ok', 'message' => 'Joined event.');
+        $validResponse = array('status' => 'Ok', 'message' => 'Event joined.');
 
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
@@ -447,6 +447,48 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $controller = new EventController($this->mockRepo);
 
         $controller->joinEvent($request);
+    }
+
+    public function testLeaveEvent()
+    {
+        $this->mockRepo->expects($this->once())
+            ->method('removeUserFromEvent')
+            ->with($this->equalTo(1), $this->equalTo(14));
+
+        $request = new Request($query = array(), $request = array('event_id' => 1));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $response = $controller->leaveEvent($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Event left.');
+
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in leaveEvent.
+     */
+    public function testLeaveEventDBException()
+    {
+        $this->mockRepo
+            ->method('removeUserFromEvent')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('event_id' => 1));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $controller->leaveEvent($request);
     }
 
     public function testInviteUsersToEvent()
