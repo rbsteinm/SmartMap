@@ -55,13 +55,12 @@ public class SettingsManager {
     private static final String KEY_PRIVATE_EVENTS = "events_show_private";
 
     /**
-     * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
+     * SettingsManager constructor
      * 
      * @param context
      *            The app's context, needed to access the shared preferences
      */
-    @Deprecated
-    public SettingsManager(Context context) {
+    private SettingsManager(Context context) {
         mContext = context;
         mSharedPref = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         mEditor = mSharedPref.edit();

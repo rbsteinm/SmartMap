@@ -168,7 +168,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
             (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
-
     }
 
     /**
