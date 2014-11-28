@@ -26,10 +26,11 @@ import ch.epfl.smartmap.gui.FriendPickerListAdapter;
  */
 public class InviteFriendsActivity extends ListActivity {
 
+    private final String TAG = InviteFriendsActivity.class.getSimpleName();
+
     private FriendPickerListAdapter mAdapter;
     private List<Boolean> mSelectedPositions;
-    private final String TAG = InviteFriendsActivity.class.getSimpleName();
-    private InviteFriendsActivity mActivity;
+    private List<User> mUserList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +44,6 @@ public class InviteFriendsActivity extends ListActivity {
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-        mActivity = this;
-
         this.setAdapter();
 
     }
@@ -56,7 +55,7 @@ public class InviteFriendsActivity extends ListActivity {
         if (!mSelectedPositions.get(position)) {
             Log.d(TAG, "Friend at position " + position + " set to true");
             mSelectedPositions.set(position, true);
-            v.setBackgroundColor(Color.LTGRAY);
+            v.setBackgroundColor(Color.parseColor("#dcdcdc"));
         } else {
             Log.d(TAG, "Friend at position " + position + " set to false");
             mSelectedPositions.set(position, false);
@@ -77,11 +76,40 @@ public class InviteFriendsActivity extends ListActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == R.id.invite_friend_send_button) {
-            Toast.makeText(mActivity, "inviting friends...", Toast.LENGTH_LONG).show();
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case R.id.invite_friend_send_button:
+
+                // Get the friend ids to invite
+                List<Integer> posSelected = new ArrayList<Integer>();
+                for (int i = 0; i < mSelectedPositions.size(); i++) {
+                    if (mSelectedPositions.get(i)) {
+                        posSelected.add(i);
+                    }
+                }
+
+                List<Long> friendsIds = new ArrayList<Long>();
+                for (Integer i : posSelected) {
+                    friendsIds.add(mUserList.get(i).getID());
+                }
+
+                Log.d(TAG, "Friends ids to invite: " + friendsIds);
+
+                if (friendsIds.size() > 0) {
+                    Toast.makeText(this, this.getString(R.string.invite_friends_success), Toast.LENGTH_LONG).show();
+                    // TODO invite friends
+                } else {
+                    Toast.makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG)
+                            .show();
+                }
+
+                // Return to caller
+                this.setResult(RESULT_OK);
+                this.finish();
+                break;
+            default:
+                throw new UnsupportedOperationException();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -92,17 +120,17 @@ public class InviteFriendsActivity extends ListActivity {
      * @author SpicyCH
      */
     private void setAdapter() {
-        List<User> userList = DatabaseHelper.getInstance().getAllFriends();
+        mUserList = DatabaseHelper.getInstance().getAllFriends();
 
         // Create a new list of booleans with the size of the user list and and default value false
         mSelectedPositions = new ArrayList<Boolean>();
         for (@SuppressWarnings("unused")
-        User u : userList) {
+        User u : mUserList) {
             mSelectedPositions.add(false);
         }
 
         // Create custom Adapter and pass it to the Activity
-        mAdapter = new FriendPickerListAdapter(this, userList);
+        mAdapter = new FriendPickerListAdapter(this, mUserList);
         this.setListAdapter(mAdapter);
     }
 }

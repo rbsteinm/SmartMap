@@ -116,8 +116,10 @@
     <string name="unknown_country">Unkown Country</string>
     
     <!--  InviteFriendsActivity -->
+    <string name="title_activity_invite_friends">Select the friends you wish to invite</string>
     <string name="invite_friend_send_button">Invite</string>
     <string name="invite_friends_success">Invitations sent!</string>
+    <string name="invite_friends_no_items_selected">No invitations sent! Did you select any friends?</string>
 
     <!-- FacebookFragment -->
     <string name="fb_fragment_toast_cannot_connect_to_smartmap_server">Failed to log in to the SmartMap server</string>
@@ -148,7 +150,4 @@
     <string name="follow_checkbox">Follow</string>
 
     <!-- Nothing below this line! -->
-    <string name="title_activity_invite_friends">InviteFriendsActivity</string>
-    <string name="hello_world">Hello world!</string>
-
 </resources>
