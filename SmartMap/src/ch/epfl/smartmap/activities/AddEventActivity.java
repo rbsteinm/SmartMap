@@ -228,6 +228,7 @@ public class AddEventActivity extends FragmentActivity {
             event.setPositionName(mPlaceName.getText().toString());
             event.setPositionCountryName(mCountryName);
 
+            // TODO do this in the cache
             try {
                 NetworkSmartMapClient.getInstance().createPublicEvent(event);
             } catch (SmartMapClientException e) {
