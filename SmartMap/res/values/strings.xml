@@ -86,7 +86,7 @@
     <string name="show_event_on_the_map_loading">Opening event on the map...</string>
     <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
     <string name="show_event_details_button">See details</string>
-    
+
     <!-- ShowEventInformationActivity -->
     <string name="title_activity_show_event_information">Show event</string>
     <string name="show_event_info_invite_friends_button">Invite friends</string>
@@ -114,6 +114,10 @@
     <string name="add_event_toast_couldnt_retrieve_location_name">Sorry, couldn\'t retrieve the name of your event\'s place. Please specify it manually.</string>
     <string name="add_event_toast_indication_long_click_map_to_create_event">Long click the map at the location of your event</string>
     <string name="unknown_country">Unkown Country</string>
+    
+    <!--  InviteFriendsActivity -->
+    <string name="invite_friend_send_button">Invite</string>
+    <string name="invite_friends_success">Invitations sent!</string>
 
     <!-- FacebookFragment -->
     <string name="fb_fragment_toast_cannot_connect_to_smartmap_server">Failed to log in to the SmartMap server</string>
@@ -142,7 +146,9 @@
     <!-- FriendInformationActivity -->
     <string name="removeFriendDialogMessage">Remove from friends</string>
     <string name="follow_checkbox">Follow</string>
-    
-    
+
     <!-- Nothing below this line! -->
+    <string name="title_activity_invite_friends">InviteFriendsActivity</string>
+    <string name="hello_world">Hello world!</string>
+
 </resources>

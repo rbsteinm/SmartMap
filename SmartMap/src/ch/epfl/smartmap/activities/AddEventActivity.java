@@ -195,8 +195,8 @@ public class AddEventActivity extends FragmentActivity {
     private void createEvent() {
 
         if (!this.isValidDate(mPickEndDate.getText().toString())
-                || !this.isValidTime(mPickEndTime.getText().toString()) || mLatitude.getText().toString().equals("")
-                || mLongitude.getText().toString().equals("")
+                || !this.isValidTime(mPickEndTime.getText().toString()) || "".equals(mLatitude.getText().toString())
+                || "".equals(mLongitude.getText().toString())
                 || ((mPlaceName.getText().toString() == null) || mEventName.getText().toString().isEmpty())
                 || mCountryName.isEmpty()) {
             Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set), Toast.LENGTH_SHORT)
@@ -278,6 +278,7 @@ public class AddEventActivity extends FragmentActivity {
         mPickEndTime = (EditText) this.findViewById(R.id.addEventEndTime);
         mPickEndDate = (EditText) this.findViewById(R.id.addEventEndDate);
         mLatitude = (EditText) this.findViewById(R.id.addEventLatitude);
+        Log.d(TAG, mLatitude.toString());
         mLongitude = (EditText) this.findViewById(R.id.addEventLongitude);
         mDescription = (EditText) this.findViewById(R.id.addEventDescription);
         mPlaceName = (EditText) this.findViewById(R.id.addEventPlaceName);

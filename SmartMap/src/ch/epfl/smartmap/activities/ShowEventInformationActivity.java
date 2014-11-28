@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
@@ -51,8 +50,17 @@ public class ShowEventInformationActivity extends Activity {
 
     }
 
+    /**
+     * Triggered when the user clicks the "Invite friends" button.<br />
+     * It launches InviteFriendsActivity for a result.
+     * 
+     * @param v
+     * 
+     * @author SpicyCH
+     */
     public void inviteFriendsToEvent(View v) {
-        Toast.makeText(mContext, "Inviting friends..", Toast.LENGTH_SHORT).show();
+        Intent inviteFriends = new Intent(mContext, InviteFriendsActivity.class);
+        this.startActivityForResult(inviteFriends, 1);
     }
 
     @Override

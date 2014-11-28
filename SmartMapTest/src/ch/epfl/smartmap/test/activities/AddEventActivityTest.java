@@ -4,6 +4,7 @@ import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import android.os.Handler;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
@@ -22,6 +23,8 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  */
 public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
 
+    private final String TAG = AddEventActivityTest.class.getSimpleName();
+
     private AddEventActivity mAddEventActivity;
 
     public AddEventActivityTest() {
@@ -38,19 +41,32 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
 
     public void testCanCreateEventWithGoodFields() {
 
+        final EditText lat = (EditText) mAddEventActivity.findViewById(R.id.addEventLatitude);
+        final EditText lon = (EditText) mAddEventActivity.findViewById(R.id.addEventLongitude);
+        Log.d(TAG, lat.toString());
+
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("TEST_NAME"));
 
         mAddEventActivity.runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
-                EditText lat = (EditText) mAddEventActivity.findViewById(R.id.addEventLatitude);
-                EditText lon = (EditText) mAddEventActivity.findViewById(R.id.addEventLongitude);
+                Log.d(TAG, "Running setTexts in GUI Thread");
                 lat.setText("1");
                 lon.setText("3");
+                Log.d(TAG, "Lat: " + lat.getText().toString());
             }
 
         });
+
+        Log.d(TAG, "Lat outside of run: " + lat.getText().toString());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        Log.d(TAG, "Lat outside of run after 1 sec: " + lat.getText().toString());
 
         onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
         onView(ViewMatchers.withText("Done")).perform(ViewActions.click());

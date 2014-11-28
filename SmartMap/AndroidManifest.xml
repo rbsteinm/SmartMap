@@ -128,13 +128,21 @@
             android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.ShowEventInformationActivity"
+            android:name=".activities.ShowEventInformationActivity"
             android:label="@string/title_activity_show_event_information"
             android:parentActivityName=".activities.ShowEventsActivity"
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.smartmap.activities.ShowEventsActivity" />
+        </activity>
+        <activity
+            android:name="ch.epfl.smartmap.activities.InviteFriendsActivity"
+            android:label="@string/title_activity_invite_friends"
+            android:parentActivityName=".activities.ShowEventInformationActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.smartmap.activities.ShowEventInformationActivity" />
         </activity>
     </application>
 
