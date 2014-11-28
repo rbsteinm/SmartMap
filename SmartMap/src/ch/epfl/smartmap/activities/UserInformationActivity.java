@@ -75,7 +75,7 @@ public class UserInformationActivity extends Activity {
         builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                new RemoveFriend().execute(mUser.getID());
+                new RemoveFriend().execute(mUser.getId());
             }
         });
 
@@ -92,7 +92,7 @@ public class UserInformationActivity extends Activity {
     }
 
     public void followUnfollow(View view) {
-        new FollowFriend().execute(mUser.getID());
+        new FollowFriend().execute(mUser.getId());
     }
 
     @Override
@@ -122,10 +122,10 @@ public class UserInformationActivity extends Activity {
             String confirmString = "";
             try {
                 if (mFollowCheckBox.isChecked()) {
-                    NetworkSmartMapClient.getInstance().followFriend(mUser.getID());
+                    NetworkSmartMapClient.getInstance().followFriend(mUser.getId());
                     confirmString = "You're now following " + mUser.getName();
                 } else {
-                    NetworkSmartMapClient.getInstance().unfollowFriend(mUser.getID());
+                    NetworkSmartMapClient.getInstance().unfollowFriend(mUser.getId());
                     confirmString = "You're not following " + mUser.getName() + " anymore";
                 }
             } catch (SmartMapClientException e) {

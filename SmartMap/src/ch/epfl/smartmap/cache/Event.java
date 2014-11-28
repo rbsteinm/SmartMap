@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.cache;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 /**
  * Describes an event
@@ -9,6 +8,8 @@ import java.util.GregorianCalendar;
  * @author ritterni
  */
 public interface Event extends Displayable, Localisable {
+
+    void addParticipant(Long id);
 
     /**
      * @return The ID of the user who created the event
@@ -32,6 +33,8 @@ public interface Event extends Displayable, Localisable {
      *         starts
      */
     Calendar getStartDate();
+
+    void removeParticipant(Long id);
 
     /**
      * Sets the event creator's name
@@ -71,5 +74,5 @@ public interface Event extends Displayable, Localisable {
      * @param newDate
      *            The new start date (year, month, day, hour, minute)
      */
-    void setStartDate(GregorianCalendar newDate);
+    void setStartDate(Calendar newDate);
 }

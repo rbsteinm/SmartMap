@@ -5,9 +5,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
@@ -31,73 +29,41 @@ public class PublicEvent implements Event {
     private String mLocationString;
     private GregorianCalendar mStartDate;
     private GregorianCalendar mEndDate;
-    private List<User> mParticipants;
+    private List<Long> mParticipants;
 
     public final static int DEFAULT_ICON = R.drawable.default_event;
 
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
 
-    /**
-     * UserEvent constructor
-     * 
-     * @param name
-     *            The name of the event
-     * @param creatorId
-     *            The id of the user who created the event
-     * @param creatorName
-     *            The name of the user who created the event
-     * @param startDate
-     *            The date at which the event starts
-     * @param endDate
-     *            The date at which the event ends
-     * @param p
-     *            The event's location on the map
-     */
-    public PublicEvent(String name, long creatorId, Calendar startDate, Calendar endDate, Location p) {
-        if (name.isEmpty() || (name == null)) {
-            throw new IllegalArgumentException("Invalid event name!");
-        }
-        if (creatorName == null) {
-            throw new IllegalArgumentException("Invalid creator name!");
-        }
-        if (creatorId < 0) {
-            throw new IllegalArgumentException("Invalid creator ID!");
-        }
-        if (endDate.before(startDate)) {
-            throw new IllegalArgumentException("Invalid event dates!");
-        }
-        mEvtName = name;
-        mEvtCreator = creatorId;
-        mStartDate =
-            new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
-                startDate.get(Calendar.DATE), startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
+    protected PublicEvent(ImmutableEvent event) {
+        mCreator = UserCache.getUserById(event.getCreatorId());
+        mName = event.getName();
+        mStartDate = new GregorianCalendar(TimeZone.getDefault());
+        mEndDate = new GregorianCalendar(TimeZone.getDefault());
+        mStartDate.setTime(event.getStartDate().getTime());
+        mEndDate.setTime(event.getEndDate().getTime());
+        mLocation = new Location(event.getLocation());
+        mLocationString = event.getLocationString();
+        mDescription = event.getDescription();
 
-        mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
-        mStartDate.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
-        mStartDate.setTimeInMillis(startDate.getTimeInMillis());
-        mEndDate =
-            new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH),
-                endDate.get(Calendar.DATE), endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
+        // TODO : Handle listeners
+    }
 
-        mEndDate.set(GregorianCalendar.HOUR_OF_DAY, endDate.get(GregorianCalendar.HOUR_OF_DAY));
-        mEndDate.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
-        mEndDate.setTimeInMillis(endDate.getTimeInMillis());
-        mLocation = new Location(p);
-        mPositionName = "";
-        mCreatorName = creatorName;
-        mDescription = "Tomorrow near Lausanne";
-        mID = NO_ID;
+    @Override
+    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        // TODO Auto-generated method stub
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#addOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
-     * OnDisplayableUpdateListener)
+     * @see ch.epfl.smartmap.cache.Event#addParticipant(java.lang.Long)
      */
     @Override
-    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
-        // TODO Auto-generated method stub
+    public void addParticipant(Long id) {
+        if (!mParticipants.contains(Long.valueOf(id))) {
+            mParticipants.add(id);
+        }
     }
 
     /*
@@ -106,13 +72,13 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean equals(Object obj) {
-        return ((obj != null) && (this.getClass() == obj.getClass()) && (this.getID() == ((PublicEvent) obj)
-            .getID()));
+        return (obj != null) && (this.getClass() == obj.getClass())
+            && (this.getId() == ((PublicEvent) obj).getId());
     }
 
     @Override
     public long getCreatorId() {
-        return mCreator.getID();
+        return mCreator.getId();
     }
 
     @Override
@@ -126,14 +92,22 @@ public class PublicEvent implements Event {
     }
 
     @Override
-    public long getID() {
+    public long getId() {
         return mId;
     }
 
     @Override
-    public Bitmap getImage(Context context) {
-        // Returns a generic event picture
-        return BitmapFactory.decodeResource(context.getResources(), DEFAULT_ICON);
+    public Bitmap getImage() {
+        return Event.DEFAULT_IMAGE;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#getLatLng()
+     */
+    @Override
+    public LatLng getLatLng() {
+        return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
     }
 
     @Override
@@ -158,7 +132,7 @@ public class PublicEvent implements Event {
      * @author hugo-S
      */
     @Override
-    public MarkerOptions getMarkerOptions(Context context) {
+    public MarkerOptions getMarkerOptions() {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
             .title(this.getName())
@@ -193,8 +167,7 @@ public class PublicEvent implements Event {
      */
     @Override
     public String getTitle() {
-        // TODO Auto-generated method stub
-        return null;
+        return mName;
     }
 
     /*
@@ -204,6 +177,15 @@ public class PublicEvent implements Event {
     @Override
     public int hashCode() {
         return (int) mId;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#isShown()
+     */
+    @Override
+    public boolean isShown() {
+        return true;
     }
 
     /*
@@ -219,20 +201,20 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#removeParticipant(java.lang.Long)
+     */
+    @Override
+    public void removeParticipant(Long id) {
+        mParticipants.remove(Long.valueOf(id));
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Event#setCreator(long)
      */
     @Override
     public void setCreator(long id) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setCreatorName(String name) {
-        if (name.isEmpty() || (name == null)) {
-            throw new IllegalArgumentException("Invalid creator name!");
-        }
-        mCreatorName = name;
+        mCreator = UserCache.getUserById(id);
     }
 
     @Override
@@ -246,12 +228,6 @@ public class PublicEvent implements Event {
      */
     @Override
     public void setEndDate(Calendar newDate) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setEndDate(GregorianCalendar newDate) {
         if (newDate.before(mStartDate)) {
             throw new IllegalArgumentException("Invalid event dates!");
         }
@@ -260,24 +236,8 @@ public class PublicEvent implements Event {
     }
 
     @Override
-    public void setID(long newID) {
-        mID = newID;
-    }
-
-    @Override
-    public void setLatitude(double y) {
-        mLocation.setLatitude(y);
-    }
-
-    @Override
-    public void setLocation(Location p) {
-        mLocation.set(p);
-    }
-
-    @Override
-    public void setLongitude(double x) {
-        mLocation.setLongitude(x);
-
+    public void setLocation(Location newLocation) {
+        mLocation.set(newLocation);
     }
 
     @Override
@@ -285,16 +245,11 @@ public class PublicEvent implements Event {
         if (newName.isEmpty() || (newName == null)) {
             throw new IllegalArgumentException("Invalid event name!");
         }
-        mEvtName = newName;
+        mName = newName;
     }
 
     @Override
-    public void setPositionName(String posName) {
-        mPositionName = posName;
-    }
-
-    @Override
-    public void setStartDate(GregorianCalendar newDate) {
+    public void setStartDate(Calendar newDate) {
         if (mEndDate.before(newDate)) {
             throw new IllegalArgumentException("Invalid event dates!");
         }

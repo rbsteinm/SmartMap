@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.cache;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
 
@@ -14,7 +13,7 @@ public interface Displayable extends Stockable {
     // final Bitmap NO_IMAGE = Bitmap.createBitmap(R.drawable.default_event);
     final String NO_TITLE = "";
     final String NO_SUBTITLE = "";
-    final Bitmap NO_IMAGE = null;
+    final Bitmap DEFAULT_IMAGE = null;
 
     void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener);
 
@@ -23,7 +22,7 @@ public interface Displayable extends Stockable {
      *            The application's context, needed to access the memory
      * @return The object's picture
      */
-    Bitmap getImage(Context context);
+    Bitmap getImage();
 
     /**
      * @return Text containing various information (description, last seen,

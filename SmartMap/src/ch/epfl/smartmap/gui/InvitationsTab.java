@@ -221,7 +221,7 @@ public class InvitationsTab extends ListFragment {
                 .getInvitingUsers()));
             for (User newFriend : notificationBag.getNewFriends()) {
                 mDataBaseHelper.addUser(newFriend);
-                new AckAcceptedInvitations().execute(newFriend.getID());
+                new AckAcceptedInvitations().execute(newFriend.getId());
             }
         }
 

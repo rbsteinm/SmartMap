@@ -246,7 +246,7 @@ public class UpdateService extends Service {
 
                 for (User user : newFriends) {
                     mHelper.addUser(user);
-                    mHelper.deletePendingFriend(user.getID());
+                    mHelper.deletePendingFriend(user.getId());
                     UpdateService.this.showAcceptedNotif(user);
                 }
 
@@ -281,7 +281,7 @@ public class UpdateService extends Service {
         protected Void doInBackground(User... users) {
             try {
                 for (User user : users) {
-                    mClient.ackAcceptedInvitation(user.getID());
+                    mClient.ackAcceptedInvitation(user.getId());
                 }
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't send acks!");

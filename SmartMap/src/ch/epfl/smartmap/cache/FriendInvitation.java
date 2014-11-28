@@ -38,7 +38,7 @@ public class FriendInvitation implements Invitation, Displayable {
     }
 
     @Override
-    public long getID() {
+    public long getId() {
         return mId;
     }
 

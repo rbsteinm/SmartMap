@@ -75,7 +75,7 @@ public class FriendsTab extends ListFragment implements OnListUpdateListener {
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         Intent intent = new Intent(mContext, UserInformationActivity.class);
-        intent.putExtra("USER", user.getID());
+        intent.putExtra("USER", user.getId());
         this.startActivity(intent);
     }
 

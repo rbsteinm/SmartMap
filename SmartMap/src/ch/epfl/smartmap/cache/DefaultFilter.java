@@ -58,7 +58,7 @@ public class DefaultFilter implements Filter {
     }
 
     @Override
-    public long getID() {
+    public long getId() {
         return databaseID;
     }
 

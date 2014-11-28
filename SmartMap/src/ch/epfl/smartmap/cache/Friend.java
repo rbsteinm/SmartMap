@@ -1,18 +1,12 @@
 package ch.epfl.smartmap.cache;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
@@ -41,46 +35,16 @@ public final class Friend implements User {
     private String mEmail;
     private String mLocationString;
     private Location mLocation;
+    private Bitmap mImage;
 
-    protected Friend(long id, String name, String phoneNumber, String email, String locationString,
-        Location location) {
-        if (id < 0) {
-            throw new IllegalArgumentException("Cannot create Friend with negative ID !");
-        } else {
-            this.mID = id;
-        }
-
-        if (name == null) {
-            this.mName = NO_NAME;
-        } else if (name.equals("")) {
-            throw new IllegalArgumentException("Cannot create Friend with empty name !");
-        } else {
-            this.mName = name;
-        }
-
-        if (phoneNumber == null) {
-            this.mPhoneNumber = NO_NUMBER;
-        } else {
-            mPhoneNumber = phoneNumber;
-        }
-
-        if (email == null) {
-            this.mEmail = User.NO_EMAIL;
-        } else {
-            this.mEmail = email;
-        }
-
-        if (location == null) {
-            this.mLocation = new Location(PROVIDER_NAME);
-        } else {
-            this.mLocation = location;
-        }
-
-        if (mLocationString == null) {
-            this.mLocationString = NO_LOCATION_STRING;
-        } else {
-            this.mLocationString = locationString;
-        }
+    protected Friend(ImmutableUser user) {
+        mID = user.getId();
+        mName = user.getName();
+        mPhoneNumber = user.getPhoneNumber();
+        mEmail = user.getEmail();
+        mLocationString = user.getLocationString();
+        mLocation = user.getLocation();
+        mImage = user.getImage();
 
         mOnDisplayableUpdateListeners = new LinkedList<OnDisplayableUpdateListener>();
         mOnUserUpdateListeners = new LinkedList<OnUserUpdateListener>();
@@ -101,7 +65,7 @@ public final class Friend implements User {
      */
     @Override
     public boolean equals(Object that) {
-        return (that != null) && (that instanceof Friend) && (mID == ((User) that).getID());
+        return (that != null) && (that instanceof Friend) && (mID == ((User) that).getId());
     }
 
     /*
@@ -118,7 +82,7 @@ public final class Friend implements User {
      * @see ch.epfl.smartmap.cache.User#getID()
      */
     @Override
-    public long getID() {
+    public long getId() {
         return mID;
     }
 
@@ -127,21 +91,12 @@ public final class Friend implements User {
      * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
      */
     @Override
-    public Bitmap getImage(Context context) {
-        File file = new File(context.getFilesDir(), mID + ".png");
-
-        Bitmap pic = null;
-
-        if (file.exists()) {
-            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
-        } else {
-            pic = NO_IMAGE;
-        }
-        return pic;
+    public Bitmap getImage() {
+        return mImage;
     }
 
     public ImmutableUser getImmutableCopy() {
-        return new ImmutableUser(mID, mName, mPhoneNumber, mEmail, mLocation, mLocationString);
+        return new ImmutableUser(mID, mName, mPhoneNumber, mEmail, mLocation, mLocationString, mImage);
     }
 
     /*
@@ -153,6 +108,15 @@ public final class Friend implements User {
         Calendar lastSeen = GregorianCalendar.getInstance(TimeZone.getDefault());
         lastSeen.setTimeInMillis(mLocation.getTime());
         return lastSeen;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#getLatLng()
+     */
+    @Override
+    public LatLng getLatLng() {
+        return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
     }
 
     /*
@@ -178,12 +142,12 @@ public final class Friend implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
+     * @see ch.epfl.smartmap.cache.Localisable#getMarkerOptions()
      */
     @Override
-    public MarkerOptions getMarkerOptions(Context context) {
+    public MarkerOptions getMarkerOptions() {
         Bitmap friendProfilePicture =
-            Bitmap.createScaledBitmap(this.getImage(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+            Bitmap.createScaledBitmap(this.getImage(), PICTURE_WIDTH, PICTURE_HEIGHT, false);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
             .title(this.getName()).icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
@@ -229,7 +193,6 @@ public final class Friend implements User {
      */
     @Override
     public String getTitle() {
-        // TODO Auto-generated method stub
         return mName;
     }
 
@@ -244,13 +207,21 @@ public final class Friend implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#isVisible()
+     * @see ch.epfl.smartmap.cache.User#isFriend()
      */
     @Override
-    public boolean isVisibleOnMap() {
-        return (Calendar.getInstance(TimeZone.getTimeZone(("GMT+01:00"))).get(Calendar.MINUTE) - this
-            .getLastSeen().get(Calendar.MINUTE)) < SettingsManager.getInstance()
-            .getTimeToWaitBeforeHidingFriends();
+    public boolean isFriend() {
+        return true;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#isShown()
+     */
+    @Override
+    public boolean isShown() {
+        // TODO : Implement settings here
+        return true;
     }
 
     @Override
@@ -276,23 +247,11 @@ public final class Friend implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setPicture(android.graphics.Bitmap, android.content.Context)
+     * @see ch.epfl.smartmap.cache.User#setImage(android.graphics.Bitmap)
      */
     @Override
-    public void setImage(Bitmap newImage, Context context) throws FileNotFoundException, IOException {
-        if (newImage != null) {
-            File file = new File(context.getFilesDir(), mID + ".png");
-
-            if (file.exists()) {
-                file.delete();
-            }
-
-            FileOutputStream out = context.openFileOutput(mID + ".png", Context.MODE_PRIVATE);
-            newImage.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
-            out.close();
-
-            this.onImageChanged();
-        }
+    public void setImage(Bitmap newImage) {
+        mImage = newImage;
     }
 
     /*

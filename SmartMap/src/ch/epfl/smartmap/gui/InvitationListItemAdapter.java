@@ -57,7 +57,7 @@ public class InvitationListItemAdapter extends ArrayAdapter<User> {
         ImageView picture = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
 
         // Set the User's ID to the tag of its View
-        convertView.setTag(mItemsArrayList.get(position).getID());
+        convertView.setTag(mItemsArrayList.get(position).getId());
 
         // Set fields with friend attributes
         title.setText(mContext.getString(R.string.notification_invitefriend_title));

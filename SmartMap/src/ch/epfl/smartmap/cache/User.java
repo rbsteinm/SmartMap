@@ -3,8 +3,9 @@ package ch.epfl.smartmap.cache;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 
@@ -15,9 +16,10 @@ import android.location.Location;
  */
 public interface User extends Displayable, Localisable, Stockable {
 
-    String NO_NAME = "NO_NAME";
-    String NO_NUMBER = "NO_NUMBER";
-    String NO_EMAIL = "NO_EMAIL";
+    String NO_NUMBER = "No phone Number";
+    String NO_EMAIL = "No email";
+    String NO_NAME = "No name";
+    Calendar NO_LAST_SEEN = GregorianCalendar.getInstance(TimeZone.getDefault());
 
     Bitmap NO_IMAGE = null; // R.drawable.ic_default_user; // placeholder
 
@@ -50,7 +52,7 @@ public interface User extends Displayable, Localisable, Stockable {
 
     String getPhoneNumber();
 
-    boolean isVisibleOnMap();
+    boolean isFriend();
 
     /**
      * Sets the user's email
@@ -66,7 +68,7 @@ public interface User extends Displayable, Localisable, Stockable {
      * @param newImage
      *            The picture as a Bitmap object
      */
-    void setImage(Bitmap newImage, Context context) throws FileNotFoundException, IOException;
+    void setImage(Bitmap newImage) throws FileNotFoundException, IOException;
 
     /**
      * Sets the user's position (x and y)

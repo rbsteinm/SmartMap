@@ -11,7 +11,7 @@ public interface Invitation {
     /**
      * @return invitation's id
      */
-    long getID();
+    long getId();
 
     /**
      * @return invitation's intent

@@ -345,7 +345,7 @@ public class MainActivity extends FragmentActivity {
     public void openInformationActivity() {
         if (mCurrentItem instanceof User) {
             Intent intent = new Intent(this, UserInformationActivity.class);
-            intent.putExtra("USER", mCurrentItem.getID());
+            intent.putExtra("USER", mCurrentItem.getId());
             this.startActivity(intent);
         }
     }

@@ -122,18 +122,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *            The event to store
      */
     public void addEvent(Event event) throws IllegalArgumentException {
-        if (event.getID() < 0) {
+        if (event.getId() < 0) {
             throw new IllegalArgumentException("Invalid event ID");
         }
 
         Cursor cursor =
             DATABASE.query(TABLE_EVENT, EVENT_COLUMNS, KEY_ID + " = ?",
-                new String[]{String.valueOf(event.getID())}, null, null, null, null);
+                new String[]{String.valueOf(event.getId())}, null, null, null, null);
 
         // We check if the event is already there
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
-            values.put(KEY_ID, event.getID());
+            values.put(KEY_ID, event.getId());
             values.put(KEY_NAME, event.getName());
             values.put(KEY_EVTDESC, event.getDescription());
             values.put(KEY_USER_ID, event.getCreator());
@@ -192,12 +192,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int addInvitation(User user) {
         Cursor cursor =
             DATABASE.query(TABLE_INVITATIONS, INVITATION_COLUMNS, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getID())}, null, null, null, null);
+                new String[]{String.valueOf(user.getId())}, null, null, null, null);
 
         int result = 0;
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
-            values.put(KEY_USER_ID, user.getID());
+            values.put(KEY_USER_ID, user.getId());
             values.put(KEY_NAME, user.getName());
 
             DATABASE.insert(TABLE_INVITATIONS, null, values);
@@ -217,11 +217,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void addPendingFriend(User user) {
         Cursor cursor =
             DATABASE.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getID())}, null, null, null, null);
+                new String[]{String.valueOf(user.getId())}, null, null, null, null);
 
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
-            values.put(KEY_USER_ID, user.getID());
+            values.put(KEY_USER_ID, user.getId());
             values.put(KEY_NAME, user.getName());
 
             DATABASE.insert(TABLE_PENDING, null, values);
@@ -240,11 +240,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void addUser(ImmutableUser user) {
         Cursor cursor =
             DATABASE.query(TABLE_USER, USER_COLUMNS, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getID())}, null, null, null, null);
+                new String[]{String.valueOf(user.getId())}, null, null, null, null);
 
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
-            values.put(KEY_USER_ID, user.getID());
+            values.put(KEY_USER_ID, user.getId());
             values.put(KEY_NAME, user.getName());
             values.put(KEY_NUMBER, user.getNumber());
             values.put(KEY_EMAIL, user.getEmail());
@@ -660,7 +660,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int updateEvent(Event event) {
 
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, event.getID());
+        values.put(KEY_ID, event.getId());
         values.put(KEY_NAME, event.getName());
         values.put(KEY_EVTDESC, event.getDescription());
         values.put(KEY_USER_ID, event.getCreator());
@@ -673,7 +673,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int rows =
             DATABASE
-                .update(TABLE_EVENT, values, KEY_ID + " = ?", new String[]{String.valueOf(event.getID())});
+                .update(TABLE_EVENT, values, KEY_ID + " = ?", new String[]{String.valueOf(event.getId())});
 
         return rows;
     }
@@ -686,7 +686,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void updateFilter(Filter filter) {
 
-        this.deleteFilter(filter.getID());
+        this.deleteFilter(filter.getId());
         this.addFilter(filter);
     }
 
@@ -700,8 +700,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int updateFriend(ImmutableUser friend) {
         ContentValues values = new ContentValues();
 
-        if (friend.getID() != User.NO_ID) {
-            values.put(KEY_USER_ID, friend.getID());
+        if (friend.getId() != User.NO_ID) {
+            values.put(KEY_USER_ID, friend.getId());
         }
         if (friend.getName() != Friend.NO_NAME) {
             values.put(KEY_NAME, friend.getName());
@@ -726,7 +726,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int rows =
             DATABASE.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(friend.getID())});
+                new String[]{String.valueOf(friend.getId())});
 
         return rows;
     }

@@ -1,11 +1,7 @@
 package ch.epfl.smartmap.cache;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
@@ -21,6 +17,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class Stranger implements User {
 
+    private long mId;
+    private String mName;
+    private Bitmap mImage;
+
+    protected Stranger(ImmutableUser user) {
+        this.mId = user.getId();
+        this.mName = user.getName();
+        this.mImage = user.getImage();
+    }
+
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Displayable#addOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
@@ -33,20 +39,29 @@ public class Stranger implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#deletePicture(android.content.Context)
-     */
-    @Override
-    public void deletePicture(Context context) {
-        // TODO Implement this method
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.User#getEmail()
      */
     @Override
     public String getEmail() {
-        throw new UnsupportedOperationException();
+        return NO_EMAIL;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getID()
+     */
+    @Override
+    public long getId() {
+        return mId;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getImage()
+     */
+    @Override
+    public Bitmap getImage() {
+        return mImage;
     }
 
     /*
@@ -55,8 +70,25 @@ public class Stranger implements User {
      */
     @Override
     public Calendar getLastSeen() {
-        // TODO Auto-generated method stub
-        return null;
+        return NO_LAST_SEEN;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#getLatLng()
+     */
+    @Override
+    public LatLng getLatLng() {
+        throw new UnsupportedOperationException();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getLocation()
+     */
+    @Override
+    public Location getLocation() {
+        throw new UnsupportedOperationException();
     }
 
     /*
@@ -65,18 +97,25 @@ public class Stranger implements User {
      */
     @Override
     public String getLocationString() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
+     * @see ch.epfl.smartmap.cache.Localisable#getMarkerOptions()
      */
     @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        // TODO Auto-generated method stub
-        return null;
+    public MarkerOptions getMarkerOptions() {
+        throw new UnsupportedOperationException();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getName()
+     */
+    @Override
+    public String getName() {
+        return mName;
     }
 
     /*
@@ -84,28 +123,43 @@ public class Stranger implements User {
      * @see ch.epfl.smartmap.cache.User#getNumber()
      */
     @Override
-    public String getNumber() {
-        // TODO Auto-generated method stub
-        return null;
+    public String getPhoneNumber() {
+        return NO_NUMBER;
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getShortInfos()
+     * @see ch.epfl.smartmap.cache.Displayable#getSubtitle()
      */
     @Override
-    public String getShortInfos() {
-        // TODO Auto-generated method stub
-        return null;
+    public String getSubtitle() {
+        return "Add as Friend to see more informations";
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#isVisibleOnMap()
+     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
      */
     @Override
-    public boolean isVisibleOnMap() {
-        // TODO Auto-generated method stub
+    public String getTitle() {
+        return mName;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#isFriend()
+     */
+    @Override
+    public boolean isFriend() {
+        return false;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#isShown()
+     */
+    @Override
+    public boolean isShown() {
         return false;
     }
 
@@ -126,38 +180,20 @@ public class Stranger implements User {
      */
     @Override
     public void setEmail(String newEmail) {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException();
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setImage(android.graphics.Bitmap, android.content.Context)
+     * @see ch.epfl.smartmap.cache.User#setImage(android.graphics.Bitmap)
      */
     @Override
-    public void setImage(Bitmap newImage, Context context) throws FileNotFoundException, IOException {
-        // TODO Auto-generated method stub
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setLastSeen(java.util.Date)
-     */
-    @Override
-    public void setLastSeen(Date newDate) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setLatitude(double)
-     */
-    @Override
-    public void setLatitude(double newLatitude) {
-        // TODO Auto-generated method stub
-
+    public void setImage(Bitmap newImage) {
+        if (mImage != null) {
+            mImage = newImage;
+        } else {
+            mImage = NO_IMAGE;
+        }
     }
 
     /*
@@ -166,18 +202,7 @@ public class Stranger implements User {
      */
     @Override
     public void setLocation(Location newLocation) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setLongitude(double)
-     */
-    @Override
-    public void setLongitude(double newLongitude) {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException();
     }
 
     /*
@@ -186,8 +211,11 @@ public class Stranger implements User {
      */
     @Override
     public void setName(String newName) {
-        // TODO Auto-generated method stub
-
+        if (newName != null) {
+            mName = newName;
+        } else {
+            mName = NO_NAME;
+        }
     }
 
     /*
@@ -196,57 +224,6 @@ public class Stranger implements User {
      */
     @Override
     public void setPhoneNumber(String newNumber) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getID()
-     */
-    @Override
-    long getID() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getImage(android.content.Context)
-     */
-    @Override
-    Bitmap getImage(Context context) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getLatLng()
-     */
-    @Override
-    LatLng getLatLng() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getLocation()
-     */
-    @Override
-    Location getLocation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getName()
-     */
-    @Override
-    String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

@@ -59,7 +59,7 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         ImageView picture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
 
         // Set the User's ID to the tag of its View
-        convertView.setTag(mItemsArrayList.get(position).getID());
+        convertView.setTag(mItemsArrayList.get(position).getId());
 
         // Set fields with friend attributes
         User user = mItemsArrayList.get(position);

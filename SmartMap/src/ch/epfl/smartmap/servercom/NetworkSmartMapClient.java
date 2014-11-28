@@ -597,7 +597,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void updateEvent(Event event) throws SmartMapClientException {
 
         Map<String, String> params = this.getParamsForEvent(event);
-        params.put("eventId", Long.toString(event.getID()));
+        params.put("eventId", Long.toString(event.getId()));
         HttpURLConnection conn = this.getHttpURLConnection("/updateEvent");
 
         String response = this.sendViaPost(params, conn);
