@@ -24,6 +24,8 @@ import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -222,13 +224,17 @@ public class AddEventActivity extends FragmentActivity {
             PublicEvent event = new PublicEvent(mEventName.getText().toString(), setMng.getUserID(),
                     setMng.getUserName(), startDate, endDate, location);
 
-            // TODO send event to server (server-side code not written yet :( ),
-            // and use the returned event id
-            // in setID
-            event.setID(mNewEventId++);
             event.setDescription(mDescription.getText().toString());
             event.setPositionName(mPlaceName.getText().toString());
             event.setPositionCountryName(mCountryName);
+
+            try {
+                NetworkSmartMapClient.getInstance().createPublicEvent(event);
+            } catch (SmartMapClientException e) {
+                Log.e(TAG, e.getMessage());
+            }
+
+            event.setID(mNewEventId++);
 
             Log.d(TAG, "City name: " + event.getPositionName());
             Log.d(TAG, "Country name: " + event.getPositionCountryName());
