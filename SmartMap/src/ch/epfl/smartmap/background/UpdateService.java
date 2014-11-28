@@ -152,8 +152,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
             MIN_DISTANCE, new MyLocationListener());
 
-        Log.d("UpdateService", mLocManager.getBestProvider(criteria, true));
-
         return START_STICKY;
     }
 
