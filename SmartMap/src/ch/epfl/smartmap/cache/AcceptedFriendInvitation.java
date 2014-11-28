@@ -2,7 +2,6 @@ package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.gui.Utils;
 
@@ -11,39 +10,30 @@ import ch.epfl.smartmap.gui.Utils;
  * 
  * @author agpmilli
  */
-public class FriendInvitation implements Invitation {
+public class AcceptedFriendInvitation implements Invitation {
 	private final long mInvitationId;
 	private final long mUserId;
 	private final String mUserName;
-	private int mStatus;
 
 	public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
 	public static final int IMAGE_QUALITY = 100;
 	public static final String PROVIDER_NAME = "SmartMapServers";
 
-	public FriendInvitation(long invitationId, long userId, String userName, int status) {
+	public AcceptedFriendInvitation(long invitationId, long userId, String userName) {
 		mInvitationId = invitationId;
 		mUserId = userId;
 		mUserName = userName;
-		mStatus = status;
-
 	}
 
 	@Override
 	public int getStatus() {
-		return mStatus;
+		return ACCEPTED;
 	}
 
 	@Override
 	public Intent getIntent() {
-		Intent intent = null;
-		if ((mStatus == READ) || (mStatus == UNREAD)) {
-			intent = new Intent(Utils.context, FriendsPagerActivity.class);
-			intent.putExtra("INVITATION", true);
-		} else if (mStatus == ACCEPTED) {
-			intent = new Intent(Utils.context, UserInformationActivity.class);
-			intent.putExtra("USER", mUserId);
-		}
+		Intent intent = new Intent(Utils.context, UserInformationActivity.class);
+		intent.putExtra("USER", mUserId);
 		return intent;
 	}
 
@@ -54,13 +44,15 @@ public class FriendInvitation implements Invitation {
 
 	@Override
 	public String getText() {
-		return Utils.context.getResources().getString(R.string.notification_open_friend_list);
+		return Utils.context.getResources().getString(R.string.notification_open_friend_info1) + " "
+		    + mUserName + " "
+		    + Utils.context.getResources().getString(R.string.notification_open_friend_info2);
 	}
 
 	@Override
 	public String getTitle() {
-		return Utils.context.getResources().getString(R.string.notification_open_friend_list) + " "
-		    + mUserName;
+		return mUserName + " "
+		    + Utils.context.getResources().getString(R.string.notification_accepted_friend_title);
 	}
 
 	@Override
@@ -75,7 +67,7 @@ public class FriendInvitation implements Invitation {
 
 	@Override
 	public void setStatus(int status) {
-		mStatus = status;
+		// Status of an accepted friend invitation cannot be set
 	}
 
 }

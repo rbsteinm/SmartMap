@@ -86,7 +86,7 @@
     <string name="show_event_on_the_map_loading">Opening event on the map...</string>
     <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
     <string name="show_event_details_button">See details</string>
-    
+
     <!-- ShowEventInformationActivity -->
     <string name="title_activity_show_event_information">Show event</string>
     <string name="show_event_info_invite_friends_button">Invite friends</string>
@@ -96,8 +96,8 @@
     <!-- AddEventActivity -->
     <string name="add_event_title_text">Title</string>
     <string name="add_event_when_text">When</string>
-     <string name="add_event_where_text">Where</string>
-     <string name="add_event_what_text">What</string>
+    <string name="add_event_where_text">Where</string>
+    <string name="add_event_what_text">What</string>
     <string name="title_activity_add_event">Create a new event</string>
     <string name="addEventEventName">Event name</string>
     <string name="addEventButtonCreateEvent">Done</string>
@@ -141,11 +141,18 @@
     <!-- Notification Activity -->
     <string name="notification_img_content_description">Image of notification</string>
     <string name="title_activity_notifications">Invitations</string>
+    <string name="notification_open_friend_invitation_list">Click here to open your list of invitations.</string>
+    <string name="notification_open_event_invitation_list">Click here to open event description.</string>
+    <string name="notification_open_friend_info1">Click here to open </string>
+    <string name="notification_open_friend_info2">\'s profile </string>
+    <string name="notification_friend_request_title">Friend request from </string>
+    <string name="notification_event_request_title">Event request from </string>
+    <string name="notification_accepted_friend_title">accepted your invitation</string>
 
     <!-- FriendInformationActivity -->
     <string name="removeFriendDialogMessage">Remove from friends</string>
     <string name="follow_checkbox">Follow</string>
-    
-    
+
     <!-- Nothing below this line! -->
+
 </resources>

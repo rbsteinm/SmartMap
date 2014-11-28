@@ -56,12 +56,13 @@ public class EventInvitation implements Invitation {
 
 	@Override
 	public String getText() {
-		return "Click here to open the invitation";
+		return Utils.context.getResources().getString(R.string.notification_open_event_invitation_list);
 	}
 
 	@Override
 	public String getTitle() {
-		return "Friend request from " + mUserName;
+		return Utils.context.getResources().getString(R.string.notification_event_request_title) + " "
+		    + mUserName;
 	}
 
 	@Override
