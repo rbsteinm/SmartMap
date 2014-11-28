@@ -12,7 +12,7 @@ import android.preference.PreferenceManager;
  * @author SpicyCH (add support for the user settings - we might want to change the design if my methods are
  *         bottlenecks)
  */
-public class SettingsManager {
+public final class SettingsManager {
     public static final String PREFS_NAME = "settings";
     public static final String USER_ID = "UserID";
     public static final String USER_NAME = "UserName";
