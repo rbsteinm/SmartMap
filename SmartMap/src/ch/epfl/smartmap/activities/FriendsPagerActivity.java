@@ -53,7 +53,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
             R.color.main_blue)));
 
         mPager.setAdapter(pageAdapter);
-        mActionBar.setHomeButtonEnabled(false);
+        mActionBar.setHomeButtonEnabled(true);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Adding Tabs
