@@ -67,6 +67,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
     private Set<Long> mInviterIds = new HashSet<Long>();
 
+    // Settings
+    private int mPosUpdateDelay;
+
     private final Runnable friendsPosUpdate = new Runnable() {
         @Override
         public void run() {
@@ -74,7 +77,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                 if (mReady) {
                     new AsyncFriendsPos().execute();
                 }
-                mHandler.postDelayed(this, POS_UPDATE_DELAY);
+                mHandler.postDelayed(this, mPosUpdateDelay);
             }
         }
     };
@@ -93,6 +96,10 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         } catch (SmartMapClientException e) {
             Log.e("UpdateService", "Couldn't download picture #" + id + "!");
         }
+    }
+
+    private void loadSettings() {
+        mPosUpdateDelay = mManager.getRefreshFrequency();
     }
 
     @Override
@@ -132,6 +139,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        loadSettings();
         mHandler.removeCallbacks(friendsPosUpdate);
         mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
         mHandler.removeCallbacks(getInvitations);
@@ -149,7 +157,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
         Criteria criteria = new Criteria();
         criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
-        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
+        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), mPosUpdateDelay,
             MIN_DISTANCE, new MyLocationListener());
 
         return START_STICKY;
