@@ -416,7 +416,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *            The event's ID
      * @return The event associated to this ID
      */
-    public Event getEvent(long id) {
+    public ImmutableEvent getEvent(long id) {
 
         // SQLiteDatabase db = this.getReadableDatabase();
 
@@ -430,22 +430,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         GregorianCalendar startDate = new GregorianCalendar();
         GregorianCalendar endDate = new GregorianCalendar();
-
         startDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_DATE)));
         endDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_ENDDATE)));
 
-        Location loc = new Location("");
-        loc.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
-        loc.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
+        Location location = new Location(Localisable.PROVIDER_NAME);
+        location.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
+        location.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
+        String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
 
-        PublicEvent event =
-            new PublicEvent(cursor.getString(cursor.getColumnIndex(KEY_NAME)), cursor.getLong(cursor
-                .getColumnIndex(KEY_USER_ID)), cursor.getString(cursor.getColumnIndex(KEY_CREATOR_NAME)),
-                startDate, endDate, loc);
+        String name = cursor.getString(cursor.getColumnIndex(KEY_NAME));
+        String description = cursor.getString(cursor.getColumnIndex(KEY_EVTDESC));
+        long creatorId = cursor.getColumnIndex(KEY_USER_ID);
 
-        event.setID(id);
-        event.setDescription(cursor.getString(cursor.getColumnIndex(KEY_EVTDESC)));
-        event.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
+        ImmutableEvent event =
+            new ImmutableEvent(id, name, creatorId, description, startDate, endDate, location,
+                locationString, new ArrayList<Long>());
 
         cursor.close();
 

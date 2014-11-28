@@ -9,6 +9,8 @@ import java.util.Calendar;
  */
 public interface Event extends Displayable, Localisable {
 
+    public static final PublicEvent NOT_FOUND = null;
+
     void addParticipant(Long id);
 
     /**

@@ -110,5 +110,4 @@ public class UserCache {
     public static void removeOnListUpdateListener(OnListUpdateListener listener) {
         FRIENDLIST_LISTENERS.remove(listener);
     }
-
 }

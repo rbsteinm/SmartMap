@@ -60,7 +60,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      */
     @Override
     public Marker addMarker(T item, Context context) {
-        Marker marker = mGoogleMap.addMarker(item.getMarkerOptions(context));
+        Marker marker = mGoogleMap.addMarker(item.getMarkerOptions());
         mDisplayedItems.put(marker.getId(), item);
         mDictionnaryMarkers.put(marker.getId(), marker);
         return marker;
