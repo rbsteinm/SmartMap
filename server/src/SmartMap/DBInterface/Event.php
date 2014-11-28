@@ -360,16 +360,17 @@ class Event
      */
     public function checkDate($date)
     {
-        try
-        {
-            $dt = new \DateTime($date);
-        }
-        catch (\Exception $e)
+        // Credit for the regex to
+        // http://www.webdeveloper.com/forum/showthread.php?178277-Decent-Mysql-datetime-regular-expression
+        $regex = '/^([0-3][0-9]{3,3})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][1-9]|3[0-1])\s([0-1][0-9]|2[0-4])' .
+            ':([0-5][0-9]):([0-5][0-9])$/';
+
+        // We accept mysql default value.
+        if (!preg_match($regex, $date) && $date != "0000-00-00 00:00:00")
         {
             throw new \InvalidArgumentException('Invalid date format.');
         }
-        
-        // If we could create a date from the string, we return it in the right format.
-        return $dt->format(User::$DATE_FORMAT);
+
+        return $date;
     }
 }
