@@ -83,7 +83,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (this.getIntent().getBooleanExtra("invitation", false) == true) {
+		if (this.getIntent().getBooleanExtra("INVITATION", false) == true) {
 			mPager.setCurrentItem(INVITATION_INDEX);
 		}
 	}

@@ -37,11 +37,12 @@ public class FriendInvitation implements Invitation {
 	@Override
 	public Intent getIntent() {
 		Intent intent = null;
-		if (mStatus == READ) {
+		if ((mStatus == READ) || (mStatus == UNREAD)) {
 			intent = new Intent(Utils.context, FriendsPagerActivity.class);
-			intent.putExtra("invitation", true);
+			intent.putExtra("INVITATION", true);
 		} else if (mStatus == ACCEPTED) {
 			intent = new Intent(Utils.context, UserInformationActivity.class);
+			intent.putExtra("USER", mUserId);
 		}
 		return intent;
 	}

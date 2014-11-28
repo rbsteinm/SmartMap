@@ -26,7 +26,10 @@
         android:layout_alignBaseline="@id/add_event_title_text"
         android:layout_marginLeft="30dp"
         android:layout_toRightOf="@id/add_event_title_text"
-        android:hint="@string/addEventEventName" />
+        android:hint="@string/addEventEventName"
+        android:lines="1"
+        android:maxLines="1"
+        android:singleLine="true" />
 
     <TextView
         android:id="@+id/add_event_when_text"
@@ -50,14 +53,14 @@
         android:layout_toRightOf="@id/add_event_when_text"
         android:focusable="false"
         android:hint="@string/addEventEventDate"
-        android:inputType="date" >
-    </EditText>
+        android:inputType="date" />
 
     <EditText
         android:id="@+id/addEventEventTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/addEventEventDate"
+        android:layout_alignBaseline="@id/add_event_when_text"
+        android:layout_alignBottom="@id/addEventEventDate"
         android:layout_below="@id/add_event_title_text"
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@id/addEventEventDate"
@@ -75,10 +78,7 @@
         android:ems="10"
         android:focusable="false"
         android:hint="@string/addEventEndDate"
-        android:inputType="date" >
-
-        <requestFocus />
-    </EditText>
+        android:inputType="date" />
 
     <EditText
         android:id="@+id/addEventEndTime"
@@ -108,14 +108,15 @@
         android:id="@+id/addEventButtonPickLocation"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
         android:layout_alignBaseline="@id/add_event_where_text"
         android:layout_alignLeft="@id/addEventEndDate"
-        android:layout_alignRight="@id/addEventEndTime"
+        android:layout_alignRight="@id/addEventEndDate"
         android:layout_toRightOf="@id/add_event_where_text"
         android:onClick="pickLocation"
         android:text="@string/addEventButtonPickLocation"
-        android:textColor="#000000"
+        android:textColor="@color/main_blue"
+         android:background="@drawable/set_location_button_shape"
         android:textSize="18sp" />
     <!-- android:background="@drawable/set_location_button_shape" -->
 
@@ -123,12 +124,15 @@
         android:id="@+id/addEventPlaceName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/addEventButtonPickLocation"
-        android:layout_alignRight="@id/addEventButtonPickLocation"
+        android:layout_alignLeft="@id/addEventEndDate"
+        android:layout_alignRight="@id/addEventEndTime"
         android:layout_below="@id/add_event_where_text"
         android:layout_marginTop="10dp"
         android:ems="10"
-        android:hint="@string/addEventPlaceName" />
+        android:hint="@string/addEventPlaceName"
+        android:lines="1"
+        android:maxLines="1"
+        android:singleLine="true" />
 
     <TextView
         android:id="@+id/add_event_what_text"
@@ -152,14 +156,16 @@
         android:layout_below="@id/addEventPlaceName"
         android:layout_toRightOf="@id/add_event_what_text"
         android:ems="10"
-        android:hint="@string/addEventDescription" />
+        android:hint="@string/addEventDescription"
+        android:inputType="textMultiLine"
+        android:lines="5" />
 
     <EditText
         android:id="@+id/addEventLatitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/addEventPlaceName"
-        android:layout_marginTop="96dp"
+        android:layout_marginTop="200dp"
         android:layout_toLeftOf="@+id/addEventEndTime"
         android:ems="10"
         android:enabled="false"

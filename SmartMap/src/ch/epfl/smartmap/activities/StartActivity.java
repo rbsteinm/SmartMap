@@ -21,6 +21,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.gui.FacebookFragment;
+import ch.epfl.smartmap.gui.FontsOverride;
 
 import com.facebook.Session;
 
@@ -61,6 +62,8 @@ public class StartActivity extends FragmentActivity {
 
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.activity_start);
+
+		FontsOverride.setDefaultFont(this, "MONOSPACE", "fonts/Lato-Light.ttf");
 
 		// Set background color of activity
 		this.setActivityBackgroundColor(this.getResources().getColor(R.color.main_blue));
