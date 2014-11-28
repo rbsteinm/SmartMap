@@ -59,6 +59,7 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
             viewHolder.setName((TextView) convertView.findViewById(R.id.activity_friends_name));
             viewHolder.setLastSeen((TextView) convertView.findViewById(R.id.activity_friends_lastSeen));
             viewHolder.setPicture((ImageView) convertView.findViewById(R.id.activity_friends_picture));
+            viewHolder.setUserId(user.getID());
 
             convertView.setTag(viewHolder);
 
@@ -85,6 +86,7 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         private TextView mName;
         private TextView mLastSeen;
         private ImageView mPicture;
+        private long mUserId;
 
         public TextView getName() {
             return mName;
@@ -95,6 +97,9 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         public ImageView getPicture() {
             return mPicture;
         }
+        public long getUserId() {
+            return mUserId;
+        }
 
         public void setName(TextView name) {
             mName = name;
@@ -104,6 +109,9 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         }
         public void setPicture(ImageView picture) {
             mPicture = picture;
+        }
+        public void setUserId(long userId) {
+            mUserId = userId;
         }
     }
 }
