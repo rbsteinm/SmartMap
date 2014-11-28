@@ -130,7 +130,7 @@ public class InvitationsTab extends ListFragment {
             String confirmString = "";
             try {
                 mNetworkClient.acceptInvitation(params[0]);
-                mDataBaseHelper.addUser(NetworkSmartMapClient.getInstance().getUserInfo(params[0]));
+                mDataBaseHelper.addUser(NetworkSmartMapClient.getInstance().getFriendInfo(params[0]));
                 confirmString = "Accepted";
             } catch (SmartMapClientException e) {
                 confirmString = "Error";

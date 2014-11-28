@@ -42,7 +42,7 @@ public class EventCreatorNameRetriever {
         protected String doInBackground(Long... params) {
             User user = null;
             try {
-                user = NetworkSmartMapClient.getInstance().getUserInfo(params[0]);
+                user = NetworkSmartMapClient.getInstance().getFriendInfo(params[0]);
             } catch (SmartMapClientException e) {
                 return null;
             }

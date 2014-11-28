@@ -24,6 +24,7 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkNotificationBag;
@@ -58,7 +59,8 @@ public class UpdateService extends Service {
     private LocationManager mLocManager;
     private boolean mFriendsPosEnabled = true;
     private boolean mOwnPosEnabled = true;
-    private boolean mReady = false;
+    private boolean isFriendIDListRetrieved = false;
+    private boolean isDatabaseInitialized = false;
     private DatabaseHelper mHelper;
     private SettingsManager mManager;
     private Geocoder mGeocoder;
@@ -68,7 +70,7 @@ public class UpdateService extends Service {
         @Override
         public void run() {
             if (mFriendsPosEnabled) {
-                if (mReady) {
+                if (isFriendIDListRetrieved) {
                     new AsyncFriendsPos().execute();
                     UpdateService.this.sendBroadcast(mFriendsPosIntent);
                 }
@@ -102,7 +104,7 @@ public class UpdateService extends Service {
         mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), POS_UPDATE_DELAY,
             MIN_DISTANCE, new MyLocationListener());
-        new AsyncFriendsInit().execute();
+        new AsyncGetFriendsIDTask().execute();
     }
 
     @Override
@@ -153,21 +155,15 @@ public class UpdateService extends Service {
         Notifications.newFriendNotification(this, user);
     }
 
-    /**
-     * AsyncTask to send the user's own position to the server
-     * 
-     * @author ritterni
-     */
-    private class AsyncFriendsInit extends AsyncTask<Void, Void, Void> {
+    private class AsyncFillDatabaseWithFriend extends AsyncTask<Long, Void, Boolean> {
         @Override
-        protected Void doInBackground(Void... arg0) {
-            mHelper.initializeAllFriends();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            mReady = true;
+        protected Boolean doInBackground(Long... params) {
+            try {
+                ImmutableUser friend = mClient.getFriendInfo(params[0].longValue());
+            } catch (SmartMapClientException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 
@@ -187,6 +183,35 @@ public class UpdateService extends Service {
         @Override
         protected void onPostExecute(Integer result) {
             mFriendsPosIntent.putExtra(UPDATED_ROWS, result);
+        }
+    }
+
+    /**
+     * AsyncTask to send the user's own position to the server
+     * 
+     * @author ritterni
+     */
+    private class AsyncGetFriendsIDTask extends AsyncTask<Void, Void, List<Long>> {
+        @Override
+        protected List<Long> doInBackground(Void... arg0) {
+            List<Long> friendsIds;
+            try {
+                friendsIds = mClient.getFriendsIds();
+            } catch (SmartMapClientException e) {
+                // TODO Handle client errors
+                friendsIds = null;
+            }
+            return friendsIds;
+        }
+
+        @Override
+        protected void onPostExecute(List<Long> result) {
+            if (result != null) {
+                isFriendIDListRetrieved = true;
+            } else {
+                isFriendIDListRetrieved = false;
+            }
+
         }
     }
 

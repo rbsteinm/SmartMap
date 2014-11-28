@@ -30,7 +30,7 @@ import ch.epfl.smartmap.cache.DatabaseSearchEngine;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.SettingsManager;
-import ch.epfl.smartmap.cache.UniqueFriend;
+import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
@@ -100,9 +100,6 @@ public class MainActivity extends FragmentActivity {
         // starting the background service
         this.startService(new Intent(this, UpdateService.class));
 
-        // TODO resolve main activity test ?
-        mDbHelper = DatabaseHelper.initialize(this.getApplicationContext());
-
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
@@ -116,11 +113,6 @@ public class MainActivity extends FragmentActivity {
 
         mSideMenu = new SideMenu(this.getContext());
         mSideMenu.initializeDrawerLayout();
-
-        mDbHelper = DatabaseHelper.getInstance();
-        if (mDbHelper == null) {
-            DatabaseHelper.initialize(this);
-        }
 
         final SearchLayout mSearchLayout = (SearchLayout) this.findViewById(R.id.search_layout);
         mSearchLayout.setSearchEngine(new DatabaseSearchEngine(mDbHelper));
@@ -476,7 +468,7 @@ public class MainActivity extends FragmentActivity {
 
     private void initializeMarkers() {
         mEventMarkerManager.updateMarkers(this, mDbHelper.getAllEvents());
-        mFriendMarkerManager.updateMarkers(this, UniqueFriend.getAllFriends());
+        mFriendMarkerManager.updateMarkers(this, Friend.getAllFriends());
 
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
         allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());

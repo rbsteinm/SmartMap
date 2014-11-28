@@ -5,6 +5,7 @@ import java.util.List;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -129,6 +130,16 @@ public interface SmartMapClient {
     void followFriend(long id) throws SmartMapClientException;
 
     /**
+     * Asks to the server informations about the user with id id
+     * 
+     * @param id
+     *            : the id of the user for which we want infos
+     * @return the User for which we wanted for infos
+     * @throws SmartMapClientException
+     */
+    ImmutableUser getFriendInfo(long id) throws SmartMapClientException;
+
+    /**
      * @return the list of the friends ids
      * @throws SmartMapClientException
      */
@@ -160,16 +171,6 @@ public interface SmartMapClient {
      */
     List<Event> getPublicEvents(double latitude, double longitude, double radius)
         throws SmartMapClientException;
-
-    /**
-     * Asks to the server informations about the user with id id
-     * 
-     * @param id
-     *            : the id of the user for which we want infos
-     * @return the User for which we wanted for infos
-     * @throws SmartMapClientException
-     */
-    User getUserInfo(long id) throws SmartMapClientException;
 
     /**
      * Sends an invitation to the server for the friend with id "id"

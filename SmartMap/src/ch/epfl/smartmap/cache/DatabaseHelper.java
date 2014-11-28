@@ -237,7 +237,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param user
      *            The user to add to the database
      */
-    public void addUser(ImmutableFriend user) {
+    public void addUser(ImmutableUser user) {
         Cursor cursor =
             DATABASE.query(TABLE_USER, USER_COLUMNS, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(user.getID())}, null, null, null, null);
@@ -497,7 +497,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *            The user's unique ID
      * @return The user as a Friend object
      */
-    public ImmutableFriend getFriend(long id) {
+    public ImmutableUser getFriend(long id) {
 
         Cursor cursor =
             DATABASE.query(TABLE_USER, USER_COLUMNS, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)},
@@ -517,11 +517,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             cursor.close();
 
-            return new ImmutableFriend(id, name, phoneNumber, email, locationString, lastSeen, longitude,
+            return new ImmutableUser(id, name, phoneNumber, email, locationString, lastSeen, longitude,
                 latitude);
         }
 
-        return ImmutableFriend.NOT_FOUND;
+        return ImmutableUser.NOT_FOUND;
     }
 
     /**
@@ -697,7 +697,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *            The user to update
      * @return The number of rows that were updated
      */
-    public int updateFriend(ImmutableFriend friend) {
+    public int updateFriend(ImmutableUser friend) {
         ContentValues values = new ContentValues();
 
         if (friend.getID() != User.NO_ID) {
@@ -751,6 +751,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             mInstance = new DatabaseHelper(context);
             DATABASE = mInstance.getWritableDatabase();
         }
+
         return mInstance;
     }
 }

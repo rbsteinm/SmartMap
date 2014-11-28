@@ -2,6 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import android.content.Context;
@@ -20,19 +21,19 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * 
  * @author ritterni
  */
-public class PublicEvent implements Event, Displayable {
-    private String mEvtName;
-    private final long mEvtCreator; // the user who created the event
-    private final GregorianCalendar mStartDate;
-    private final GregorianCalendar mEndDate;
-    private long mID;
-    private final Location mLocation;
-    private String mPositionName;
-    private String mCreatorName;
+public class PublicEvent implements Event {
+
+    private long mId;
+    private String mName;
+    private User mCreator;
     private String mDescription;
-    public final static long DEFAULT_ID = -1;
-    public final static int EVENT_ICON = R.drawable.default_event;
-    private final static int RIGHT_SHIFT_COUNT = 32;
+    private Location mLocation;
+    private String mLocationString;
+    private GregorianCalendar mStartDate;
+    private GregorianCalendar mEndDate;
+    private List<User> mParticipants;
+
+    public final static int DEFAULT_ICON = R.drawable.default_event;
 
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
@@ -42,7 +43,7 @@ public class PublicEvent implements Event, Displayable {
      * 
      * @param name
      *            The name of the event
-     * @param creator
+     * @param creatorId
      *            The id of the user who created the event
      * @param creatorName
      *            The name of the user who created the event
@@ -53,22 +54,21 @@ public class PublicEvent implements Event, Displayable {
      * @param p
      *            The event's location on the map
      */
-    public PublicEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
-        GregorianCalendar endDate, Location p) {
+    public PublicEvent(String name, long creatorId, Calendar startDate, Calendar endDate, Location p) {
         if (name.isEmpty() || (name == null)) {
             throw new IllegalArgumentException("Invalid event name!");
         }
         if (creatorName == null) {
             throw new IllegalArgumentException("Invalid creator name!");
         }
-        if (creator < 0) {
+        if (creatorId < 0) {
             throw new IllegalArgumentException("Invalid creator ID!");
         }
         if (endDate.before(startDate)) {
             throw new IllegalArgumentException("Invalid event dates!");
         }
         mEvtName = name;
-        mEvtCreator = creator;
+        mEvtCreator = creatorId;
         mStartDate =
             new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
                 startDate.get(Calendar.DATE), startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
@@ -87,7 +87,7 @@ public class PublicEvent implements Event, Displayable {
         mPositionName = "";
         mCreatorName = creatorName;
         mDescription = "Tomorrow near Lausanne";
-        mID = DEFAULT_ID;
+        mID = NO_ID;
     }
 
     /*
@@ -98,7 +98,6 @@ public class PublicEvent implements Event, Displayable {
     @Override
     public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
         // TODO Auto-generated method stub
-
     }
 
     /*
@@ -107,37 +106,13 @@ public class PublicEvent implements Event, Displayable {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (this.getClass() != obj.getClass()) {
-            return false;
-        }
-        PublicEvent other = (PublicEvent) obj;
-        if (mEvtName == null) {
-            if (other.mEvtName != null) {
-                return false;
-            }
-        } else if (!mEvtName.equals(other.mEvtName)) {
-            return false;
-        }
-        if (mID != other.mID) {
-            return false;
-        }
-        return true;
+        return ((obj != null) && (this.getClass() == obj.getClass()) && (this.getID() == ((PublicEvent) obj)
+            .getID()));
     }
 
     @Override
-    public long getCreator() {
-        return mEvtCreator;
-    }
-
-    @Override
-    public String getCreatorName() {
-        return mCreatorName;
+    public long getCreatorId() {
+        return mCreator.getID();
     }
 
     @Override
@@ -146,29 +121,33 @@ public class PublicEvent implements Event, Displayable {
     }
 
     @Override
-    public GregorianCalendar getEndDate() {
-        return mEndDate;
+    public Calendar getEndDate() {
+        return (Calendar) mEndDate.clone();
     }
 
     @Override
     public long getID() {
-        return mID;
+        return mId;
     }
 
     @Override
     public Bitmap getImage(Context context) {
         // Returns a generic event picture
-        return BitmapFactory.decodeResource(context.getResources(), EVENT_ICON);
-    }
-
-    @Override
-    public LatLng getLatLng() {
-        return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+        return BitmapFactory.decodeResource(context.getResources(), DEFAULT_ICON);
     }
 
     @Override
     public Location getLocation() {
         return mLocation;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#getLocationString()
+     */
+    @Override
+    public String getLocationString() {
+        return mLocationString;
     }
 
     /*
@@ -181,7 +160,8 @@ public class PublicEvent implements Event, Displayable {
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(this.getLatLng()).title(this.getName())
+        markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
+            .title(this.getName())
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
             .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
         return markerOptions;
@@ -190,17 +170,7 @@ public class PublicEvent implements Event, Displayable {
 
     @Override
     public String getName() {
-        return mEvtName;
-    }
-
-    @Override
-    public String getPositionName() {
-        return mPositionName;
-    }
-
-    @Override
-    public String getShortInfos() {
-        return mDescription;
+        return mName;
     }
 
     @Override
@@ -210,17 +180,30 @@ public class PublicEvent implements Event, Displayable {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getSubtitle()
+     */
+    @Override
+    public String getSubtitle() {
+        return mDescription;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
+     */
+    @Override
+    public String getTitle() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-
-        result = (prime * result) + (mEvtName == null ? 0 : mEvtName.hashCode());
-        result = (prime * result) + (int) (mID ^ (mID >>> RIGHT_SHIFT_COUNT));
-
-        return result;
+        return (int) mId;
     }
 
     /*
@@ -230,6 +213,16 @@ public class PublicEvent implements Event, Displayable {
      */
     @Override
     public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#setCreator(long)
+     */
+    @Override
+    public void setCreator(long id) {
         // TODO Auto-generated method stub
 
     }
@@ -245,6 +238,16 @@ public class PublicEvent implements Event, Displayable {
     @Override
     public void setDescription(String desc) {
         mDescription = desc;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#setEndDate(java.util.Calendar)
+     */
+    @Override
+    public void setEndDate(Calendar newDate) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

@@ -14,8 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.UserInformationActivity;
-import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.UniqueFriend;
+import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.listeners.OnListUpdateListener;
 
@@ -28,7 +27,6 @@ public class FriendsTab extends ListFragment implements OnListUpdateListener {
     private List<User> mFriendList;
 
     private final Context mContext;
-    private DatabaseHelper mCacheDB;
 
     public FriendsTab(Context context) {
         mContext = context;
@@ -38,14 +36,14 @@ public class FriendsTab extends ListFragment implements OnListUpdateListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mFriendList = UniqueFriend.getAllFriends();
+        mFriendList = Friend.getAllFriends();
 
         // Create custom Adapter and pass it to the Activity
-        FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, UniqueFriend.getAllFriends());
+        FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, Friend.getAllFriends());
         this.setListAdapter(adapter);
 
         // Initialize the listener
-        UniqueFriend.addOnListUpdateListener(this);
+        Friend.addOnListUpdateListener(this);
 
         return view;
     }
@@ -56,7 +54,7 @@ public class FriendsTab extends ListFragment implements OnListUpdateListener {
      */
     @Override
     public void onElementAdded(long id) {
-        mFriendList = UniqueFriend.getAllFriends();
+        mFriendList = Friend.getAllFriends();
         this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
     }
 
@@ -66,7 +64,7 @@ public class FriendsTab extends ListFragment implements OnListUpdateListener {
      */
     @Override
     public void onElementRemoved(long id) {
-        mFriendList = UniqueFriend.getAllFriends();
+        mFriendList = Friend.getAllFriends();
         this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
     }
 
@@ -84,7 +82,7 @@ public class FriendsTab extends ListFragment implements OnListUpdateListener {
     @Override
     public void onResume() {
         super.onResume();
-        this.setListAdapter(new FriendListItemAdapter(mContext, UniqueFriend.getAllFriends()));
+        this.setListAdapter(new FriendListItemAdapter(mContext, Friend.getAllFriends()));
     }
 
 }

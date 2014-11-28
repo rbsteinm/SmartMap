@@ -74,7 +74,7 @@ public class DatabaseSearchEngine implements SearchEngine {
     }
 
     private void updateLists() {
-        mFriends = UniqueFriend.getAllFriends();
+        mFriends = Friend.getAllFriends();
         mEvents = mDatabaseHelper.getAllEvents();
         mFilters = mDatabaseHelper.getAllFilters();
     }

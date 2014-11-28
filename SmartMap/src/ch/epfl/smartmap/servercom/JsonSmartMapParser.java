@@ -13,7 +13,7 @@ import android.annotation.SuppressLint;
 import android.location.Location;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.ImmutableFriend;
+import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.cache.User;
 
@@ -497,6 +497,7 @@ public class JsonSmartMapParser implements SmartMapParser {
             this.checkEmail(email);
         }
 
-        return new ImmutableFriend(id, name, phoneNumber, email, latitude, longitude);
+        return new ImmutableUser(id, name, phoneNumber, email, User.NO_LOCATION_STRING, User.NO_LASTSEEN,
+            latitude, longitude);
     }
 }

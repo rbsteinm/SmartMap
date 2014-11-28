@@ -3,7 +3,6 @@ package ch.epfl.smartmap.cache;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,7 +10,6 @@ import android.location.Location;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
@@ -20,11 +18,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * 
  * @author jfperren
  */
-public final class ImmutableFriend implements User {
+public final class ImmutableUser implements User {
 
     // Instance saying that the
-    public static final ImmutableFriend NOT_FOUND = new ImmutableFriend(NO_ID, NO_NAME, NO_NUMBER, NO_EMAIL,
-        NO_LOCATION_STRING, NO_LASTSEEN, NO_LATITUDE, NO_LONGITUDE);
+    public static final ImmutableUser NOT_FOUND = new ImmutableUser(NO_ID, NO_NAME, NO_NUMBER, NO_EMAIL,
+        NO_LOCATION, NO_LOCATION_STRING);
 
     // User informations
     private final long mID;
@@ -35,8 +33,8 @@ public final class ImmutableFriend implements User {
     private Calendar mLastSeen;
     private final Location mLocation;
 
-    public ImmutableFriend(long id, String name, String phoneNumber, String email, String locationString,
-        Calendar lastSeen, double latitude, double longitude) {
+    public ImmutableUser(long id, String name, String phoneNumber, String email, Location location,
+        String locationString) {
         if (id < 0) {
             throw new IllegalArgumentException("Cannot create User with negative ID !");
         } else {
@@ -69,16 +67,7 @@ public final class ImmutableFriend implements User {
             this.mLocationString = NO_LOCATION_STRING;
         }
 
-        if (lastSeen != null) {
-            this.mLastSeen = (Calendar) lastSeen.clone();
-        } else {
-            this.mLastSeen = NO_LASTSEEN;
-        }
-
-        this.mLocation = new Location(User.PROVIDER_NAME);
-        mLocation.setLatitude(latitude);
-        mLocation.setLongitude(longitude);
-
+        this.mLocation = location;
     }
 
     /*
@@ -93,20 +82,11 @@ public final class ImmutableFriend implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#deletePicture(android.content.Context)
-     */
-    @Override
-    public void deletePicture(Context context) {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-     * (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object that) {
-        return (that != null) && (that instanceof UniqueFriend) && (mID == ((User) that).getID());
+        return (that != null) && (that instanceof Friend) && (mID == ((User) that).getID());
     }
 
     /*
@@ -142,16 +122,7 @@ public final class ImmutableFriend implements User {
      */
     @Override
     public Calendar getLastSeen() {
-        return (Calendar) mLastSeen.clone();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getLatLng()
-     */
-    @Override
-    public LatLng getLatLng() {
-        return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+        throw new UnsupportedOperationException();
     }
 
     /*
@@ -160,10 +131,7 @@ public final class ImmutableFriend implements User {
      */
     @Override
     public Location getLocation() {
-        Location location = new Location(mLocation.getProvider());
-        location.setLatitude(mLocation.getLatitude());
-        location.setLongitude(mLocation.getLongitude());
-        return location;
+        return mLocation;
     }
 
     /*
@@ -198,7 +166,7 @@ public final class ImmutableFriend implements User {
      * @see ch.epfl.smartmap.cache.User#getNumber()
      */
     @Override
-    public String getNumber() {
+    public String getPhoneNumber() {
         return mPhoneNumber;
     }
 
@@ -207,13 +175,22 @@ public final class ImmutableFriend implements User {
      * @see ch.epfl.smartmap.cache.Displayable#getShortInfos()
      */
     @Override
-    public String getShortInfos() {
+    public String getSubtitle() {
         String infos = "";
         infos += Utils.getLastSeenStringFromCalendar(this.getLastSeen());
         infos += " near ";
         infos += mLocationString;
 
         return infos;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
+     */
+    @Override
+    public String getTitle() {
+        throw new UnsupportedOperationException();
     }
 
     /*
@@ -264,37 +241,10 @@ public final class ImmutableFriend implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setLastSeen(java.util.Date)
-     */
-    @Override
-    public void setLastSeen(Date newDate) {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setLatitude(double)
-     */
-    @Override
-    public void setLatitude(double newLatitude) {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.User#setLocation(android.location.Location)
      */
     @Override
     public void setLocation(Location newLocation) {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setLongitude(double)
-     */
-    @Override
-    public void setLongitude(double newLongitude) {
         throw new UnsupportedOperationException();
     }
 

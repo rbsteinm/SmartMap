@@ -1,25 +1,19 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
-
-import android.location.Location;
 
 /**
  * Describes an event
  * 
  * @author ritterni
  */
-public interface Event extends Displayable {
+public interface Event extends Displayable, Localisable {
 
     /**
      * @return The ID of the user who created the event
      */
-    long getCreator();
-
-    /**
-     * @return The name of the event creator
-     */
-    String getCreatorName();
+    long getCreatorId();
 
     /**
      * @return The event's description
@@ -29,18 +23,15 @@ public interface Event extends Displayable {
     /**
      * @return The date (year, month, day, hour, minute) at which the event ends
      */
-    GregorianCalendar getEndDate();
+    Calendar getEndDate();
 
-    /**
-     * @return The event's position as a String (e.g. 'Lausanne')
-     */
-    String getPositionName();
+    String getName();
 
     /**
      * @return The date (year, month, day, hour, minute) at which the event
      *         starts
      */
-    GregorianCalendar getStartDate();
+    Calendar getStartDate();
 
     /**
      * Sets the event creator's name
@@ -48,7 +39,7 @@ public interface Event extends Displayable {
      * @param name
      *            The event creator's name
      */
-    void setCreatorName(String name);
+    void setCreator(long id);
 
     /**
      * Sets the event's description
@@ -56,7 +47,7 @@ public interface Event extends Displayable {
      * @param desc
      *            The new description
      */
-    void setDescription(String desc);
+    void setDescription(String description);
 
     /**
      * Changes the event's end date
@@ -64,39 +55,7 @@ public interface Event extends Displayable {
      * @param newDate
      *            The new start date (year, month, day, hour, minute)
      */
-    void setEndDate(GregorianCalendar newDate);
-
-    /**
-     * Sets the event's ID
-     * 
-     * @param newID
-     *            The new ID
-     */
-    void setID(long newID);
-
-    /**
-     * Sets the event's latitude
-     * 
-     * @param y
-     *            The latitude
-     */
-    void setLatitude(double y);
-
-    /**
-     * Sets the event's position
-     * 
-     * @param p
-     *            The new position
-     */
-    void setLocation(Location p);
-
-    /**
-     * Sets the events's longitude
-     * 
-     * @param x
-     *            The longitude
-     */
-    void setLongitude(double x);
+    void setEndDate(Calendar newDate);
 
     /**
      * Changes the event's name
@@ -105,14 +64,6 @@ public interface Event extends Displayable {
      *            The new name
      */
     void setName(String newName);
-
-    /**
-     * Sets the user position's name
-     * 
-     * @param posName
-     *            The event's position
-     */
-    void setPositionName(String posName);
 
     /**
      * Changes the event's start date
