@@ -18,6 +18,7 @@ import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.ServerFeedbackException;
+import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 // import org.junit.FixMethodOrder;
@@ -48,11 +49,12 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 			new GregorianCalendar(2014, 11, 27), LOCATION);
 	private static final long VALID_EVENT_ID = 3;
 	private Context mContext;
-
+	private SmartMapClient networkClient;
 	@Override
 	protected void setUp() throws Exception {
 
 		super.setUp();
+		networkClient = NetworkSmartMapClient.getInstance();
 		mContext = new RenamingDelegatingContext(this.getContext(), "test_");
 		SettingsManager.initialize(mContext);
 		LOCATION.setLatitude(LATITUDE);
@@ -64,24 +66,18 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 
 	@Test
 	public void testA_AuthServer() throws SmartMapClientException {
-
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-
 		networkClient.authServer(VALID_NAME, VALID_FACEBOOK_ID, VALID_FB_ACCESS_TOKEN);
 
 	}
 
 	@Test
 	public void testB_UpdatePos() throws SmartMapClientException {
-
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-
 		networkClient.updatePos(LOCATION);
 	}
 
 	@Test
 	public void testC_InviteFriend() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		try {
 			networkClient.inviteFriend(VALID_ID_1);
 		} catch (SmartMapClientException e) {
@@ -92,43 +88,43 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 
 	@Test
 	public void testD_FollowFriend() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		networkClient.followFriend(MY_ID);
 	}
 
 	@Test
 	public void testE_UnfollowFriend() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		networkClient.unfollowFriend(MY_ID);
 	}
 
 	@Test
 	public void ignoredtestF_AllowFriend() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		networkClient.allowFriend(MY_ID);
 	}
 
 	@Test
 	public void testG_DisallowFriend() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		networkClient.disallowFriend(MY_ID);
 	}
 
 	@Test
 	public void ignoredtestH_AllowFriendList() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		networkClient.allowFriendList(Arrays.asList(VALID_ID_1, VALID_ID_2, MY_ID));
 	}
 
 	@Test
 	public void testI_DisallowFriendList() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		networkClient.disallowFriendList(Arrays.asList(VALID_ID_1, VALID_ID_2, MY_ID));
 	}
 
 	@Test
 	public void testJ_GetUserInfo() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		User friend = networkClient.getUserInfo(VALID_ID_1);
 		this.assertValidIdAndName(friend);
 
@@ -136,7 +132,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 
 	@Test
 	public void testK_GetInvitations() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		NotificationBag notificationBag = networkClient.getInvitations();
 		List<User> inviters = notificationBag.getInvitingUsers();
 		assertTrue("Null inviter list", inviters != null);
@@ -160,7 +156,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	// FIXME should simulate an invitation on server side??
 	@Test
 	public void testQ_AcceptInvitation() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 
 		try {
 			networkClient.acceptInvitation(VALID_ID_1);
@@ -172,7 +168,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 
 	@Test
 	public void testL_ListFriendPos() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		List<User> users = networkClient.listFriendsPos();
 
 		assertTrue("Null list", users != null);
@@ -189,7 +185,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 
 	@Test
 	public void testM_FindUsers() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		List<User> friends = networkClient.findUsers("s");
 
 		assertTrue("Null list", friends != null);
@@ -201,13 +197,13 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	// FIXME normal that no error whereas no invitation to decline?
 	@Test
 	public void testN_declineInvitation() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		networkClient.declineInvitation(MY_ID);
 	}
 
 	@Test
 	public void testO_removeFriend() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		try {
 			networkClient.removeFriend(MY_ID);
 		} catch (ServerFeedbackException e) {
@@ -218,12 +214,12 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	// FIXME normal that no error whereas no accepted invitation to ack?
 	@Test
 	public void testP_AckAcceptedInvitation() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		networkClient.ackAcceptedInvitation(MY_ID);
 	}
 
 	public void testQ_GetFriendsIds() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		List<Long> ids = networkClient.getFriendsIds();
 		for (long id : ids) {
 			assertTrue("Unexpected id", id >= 0);
@@ -231,31 +227,31 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	}
 
 	public void testR_AckRemovedFriends() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		networkClient.ackRemovedFriend(MY_ID);
 	}
 
 	public void testS_GetProfilePicture() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		networkClient.getProfilePicture(MY_ID);
 	}
 
 	public void testT_createEvent() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		long eventId=networkClient.createPublicEvent(FOOTBALL_TOURNAMENT);
 		assertTrue("Unexpected id", eventId >= 0);
 
 	}
 
 	public void testU_updateEvent() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		FOOTBALL_TOURNAMENT.setName("Exposition");
 		networkClient.updateEvent(FOOTBALL_TOURNAMENT);
 	}
 
 	// TODO To complete
 	public void testV_getPublicEvents() throws SmartMapClientException {
-		NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+
 		List<Event> events = networkClient.getPublicEvents(45, 46, 1000);
 		for (Event event : events) {
 			assertTrue("Unexpected event id", event.getID() >= 0);
