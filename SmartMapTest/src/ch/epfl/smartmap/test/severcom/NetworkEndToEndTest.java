@@ -62,24 +62,26 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 		FOOTBALL_TOURNAMENT.setPositionName("Paris");
 		FOOTBALL_TOURNAMENT.setID(VALID_EVENT_ID);
 
-	}
-
-	@Test
-	public void testA_AuthServer() throws SmartMapClientException {
 		networkClient.authServer(VALID_NAME, VALID_FACEBOOK_ID, VALID_FB_ACCESS_TOKEN);
 
 	}
 
 	@Test
-	public void testB_UpdatePos() throws SmartMapClientException {
+	public void testAuthServer() throws SmartMapClientException {
+		networkClient.authServer(VALID_NAME, VALID_FACEBOOK_ID, VALID_FB_ACCESS_TOKEN);
+
+	}
+
+	@Test
+	public void testUpdatePos() throws SmartMapClientException {
 		networkClient.updatePos(LOCATION);
 	}
 
 	@Test
-	public void testC_InviteFriend() throws SmartMapClientException {
+	public void testInviteFriend() throws SmartMapClientException {
 
 		try {
-			networkClient.inviteFriend(VALID_ID_1);
+			networkClient.inviteFriend(MY_ID);
 		} catch (SmartMapClientException e) {
 			// ok, cannot invite yourself
 		}
@@ -87,43 +89,43 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void testD_FollowFriend() throws SmartMapClientException {
+	public void testFollowFriend() throws SmartMapClientException {
 
 		networkClient.followFriend(MY_ID);
 	}
 
 	@Test
-	public void testE_UnfollowFriend() throws SmartMapClientException {
+	public void testUnfollowFriend() throws SmartMapClientException {
 
 		networkClient.unfollowFriend(MY_ID);
 	}
 
 	@Test
-	public void ignoredtestF_AllowFriend() throws SmartMapClientException {
+	public void testAllowFriend() throws SmartMapClientException {
 
 		networkClient.allowFriend(MY_ID);
 	}
 
 	@Test
-	public void testG_DisallowFriend() throws SmartMapClientException {
+	public void testDisallowFriend() throws SmartMapClientException {
 
 		networkClient.disallowFriend(MY_ID);
 	}
 
 	@Test
-	public void ignoredtestH_AllowFriendList() throws SmartMapClientException {
+	public void testAllowFriendList() throws SmartMapClientException {
 
 		networkClient.allowFriendList(Arrays.asList(VALID_ID_1, VALID_ID_2, MY_ID));
 	}
 
 	@Test
-	public void testI_DisallowFriendList() throws SmartMapClientException {
+	public void testDisallowFriendList() throws SmartMapClientException {
 
 		networkClient.disallowFriendList(Arrays.asList(VALID_ID_1, VALID_ID_2, MY_ID));
 	}
 
 	@Test
-	public void testJ_GetUserInfo() throws SmartMapClientException {
+	public void testGetUserInfo() throws SmartMapClientException {
 
 		User friend = networkClient.getUserInfo(VALID_ID_1);
 		this.assertValidIdAndName(friend);
@@ -131,7 +133,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void testK_GetInvitations() throws SmartMapClientException {
+	public void testGetInvitations() throws SmartMapClientException {
 
 		NotificationBag notificationBag = networkClient.getInvitations();
 		List<User> inviters = notificationBag.getInvitingUsers();
@@ -153,9 +155,9 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 
 	}
 
-	// FIXME should simulate an invitation on server side??
+
 	@Test
-	public void testQ_AcceptInvitation() throws SmartMapClientException {
+	public void testAcceptInvitation() throws SmartMapClientException {
 
 
 		try {
@@ -167,7 +169,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void testL_ListFriendPos() throws SmartMapClientException {
+	public void testListFriendPos() throws SmartMapClientException {
 
 		List<User> users = networkClient.listFriendsPos();
 
@@ -184,7 +186,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	}
 
 	@Test
-	public void testM_FindUsers() throws SmartMapClientException {
+	public void testFindUsers() throws SmartMapClientException {
 
 		List<User> friends = networkClient.findUsers("s");
 
@@ -194,15 +196,15 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 		}
 	}
 
-	// FIXME normal that no error whereas no invitation to decline?
+
 	@Test
-	public void testN_declineInvitation() throws SmartMapClientException {
+	public void testDeclineInvitation() throws SmartMapClientException {
 
 		networkClient.declineInvitation(MY_ID);
 	}
 
 	@Test
-	public void testO_removeFriend() throws SmartMapClientException {
+	public void testRemoveFriend() throws SmartMapClientException {
 
 		try {
 			networkClient.removeFriend(MY_ID);
@@ -211,14 +213,14 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 		}
 	}
 
-	// FIXME normal that no error whereas no accepted invitation to ack?
+
 	@Test
-	public void testP_AckAcceptedInvitation() throws SmartMapClientException {
+	public void testAckAcceptedInvitation() throws SmartMapClientException {
 
 		networkClient.ackAcceptedInvitation(MY_ID);
 	}
 
-	public void testQ_GetFriendsIds() throws SmartMapClientException {
+	public void testGetFriendsIds() throws SmartMapClientException {
 
 		List<Long> ids = networkClient.getFriendsIds();
 		for (long id : ids) {
@@ -226,31 +228,31 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 		}
 	}
 
-	public void testR_AckRemovedFriends() throws SmartMapClientException {
+	public void testAckRemovedFriends() throws SmartMapClientException {
 
 		networkClient.ackRemovedFriend(MY_ID);
 	}
 
-	public void testS_GetProfilePicture() throws SmartMapClientException {
+	public void testGetProfilePicture() throws SmartMapClientException {
 
 		networkClient.getProfilePicture(MY_ID);
 	}
 
-	public void testT_createEvent() throws SmartMapClientException {
+	public void testCreateEvent() throws SmartMapClientException {
 
 		long eventId=networkClient.createPublicEvent(FOOTBALL_TOURNAMENT);
 		assertTrue("Unexpected id", eventId >= 0);
 
 	}
 
-	public void testU_updateEvent() throws SmartMapClientException {
+	public void testUpdateEvent() throws SmartMapClientException {
 
 		FOOTBALL_TOURNAMENT.setName("Exposition");
 		networkClient.updateEvent(FOOTBALL_TOURNAMENT);
 	}
 
 	// TODO To complete
-	public void testV_getPublicEvents() throws SmartMapClientException {
+	public void testGetPublicEvents() throws SmartMapClientException {
 
 		List<Event> events = networkClient.getPublicEvents(45, 46, 1000);
 		for (Event event : events) {
