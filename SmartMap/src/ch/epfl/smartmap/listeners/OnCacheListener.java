@@ -7,6 +7,16 @@ public class OnCacheListener implements CacheListener {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onAllLocationsUpdate()
+     */
+    @Override
+    public void onAllLocationsUpdate() {
+        // TODO Auto-generated method stub
+
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.listeners.CacheListener#onNewFriend(long)
      */
     @Override
@@ -24,5 +34,4 @@ public class OnCacheListener implements CacheListener {
         // TODO Auto-generated method stub
 
     }
-
 }
