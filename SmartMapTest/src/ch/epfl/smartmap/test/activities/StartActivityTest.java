@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.test.activities;
 
+
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.pressBack;
@@ -49,6 +50,7 @@ ActivityInstrumentationTestCase2<StartActivity> {
 		}
 		pressBack();
 	}
+
 
 	/*
 	 * Test if facebook button is displayed or not (depends if first log in or

@@ -1,15 +1,11 @@
 package ch.epfl.smartmap.cache;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -202,17 +198,7 @@ public class Friend implements User, Displayable, Parcelable {
 
     @Override
     public Bitmap getPicture(Context context) {
-
-        File file = new File(context.getFilesDir(), mId + ".png");
-
-        Bitmap pic = null;
-
-        if (file.exists()) {
-            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
-        } else {
-            pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE);
-        }
-        return pic;
+        return DatabaseHelper.initialize(context).getPictureById(this.getID());
     }
 
     @Override
@@ -295,22 +281,7 @@ public class Friend implements User, Displayable, Parcelable {
 
     @Override
     public void setPicture(Bitmap pic, Context context) {
-
-        File file = new File(context.getFilesDir(), mId + ".png");
-
-        if (file.exists()) {
-            file.delete();
-        }
-
-        try {
-            FileOutputStream out = context.openFileOutput(mId + ".png", Context.MODE_PRIVATE);
-            pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        DatabaseHelper.initialize(context).setUserPicture(pic, this.getID());
     }
 
     @Override

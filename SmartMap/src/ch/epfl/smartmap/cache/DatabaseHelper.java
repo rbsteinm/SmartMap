@@ -1,5 +1,9 @@
 package ch.epfl.smartmap.cache;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
@@ -12,8 +16,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.util.Log;
+import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
 import ch.epfl.smartmap.listeners.OnEventListUpdateListener;
@@ -21,6 +28,7 @@ import ch.epfl.smartmap.listeners.OnFilterListUpdateListener;
 import ch.epfl.smartmap.listeners.OnFriendListUpdateListener;
 import ch.epfl.smartmap.listeners.OnFriendsLocationUpdateListener;
 import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
+import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -34,6 +42,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "SmartMapDB";
 
+    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
+    public static final int IMAGE_QUALITY = 100;
+
     private final List<OnFriendsLocationUpdateListener> mOnFriendsLocationUpdateListeners =
         new ArrayList<OnFriendsLocationUpdateListener>();
     private final List<OnFriendListUpdateListener> mOnFriendListUpdateListeners =
@@ -44,6 +55,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         new ArrayList<OnFilterListUpdateListener>();
     private final List<OnInvitationListUpdateListener> mOnInvitationListUpdateListeners =
         new ArrayList<OnInvitationListUpdateListener>();
+    private final List<OnInvitationStatusUpdateListener> mOnInvitationStatusUpdateListeners =
+        new ArrayList<OnInvitationStatusUpdateListener>();
     private final Map<Displayable, List<OnDisplayableInformationsChangeListener>> mOnDisplayableInformationsChangeListeners =
         new HashMap<Displayable, List<OnDisplayableInformationsChangeListener>>();
 
@@ -126,6 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper mInstance;
     private static SQLiteDatabase mDatabase;
+    private final Context mContext;
 
     /**
      * DatabaseHelper constructor. Will be made private, so use initialize() or
@@ -137,6 +151,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Deprecated
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        mContext = context;
     }
 
     /**
@@ -257,6 +272,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void addOnInvitationListUpdateListener(OnInvitationListUpdateListener listener) {
         mOnInvitationListUpdateListeners.add(listener);
+    }
+
+    public void addOnInvitationStatusUpdateListener(OnInvitationStatusUpdateListener listener) {
+        mOnInvitationStatusUpdateListeners.add(listener);
     }
 
     /**
@@ -647,6 +666,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Returns a user's picture from the internal storage
+     * 
+     * @param userId
+     *            The user's ID
+     * @return The user's profile picture if it exists, a default picture otherwise
+     */
+    public Bitmap getPictureById(long userId) {
+        File file = new File(mContext.getFilesDir(), userId + ".png");
+
+        Bitmap pic = null;
+
+        if (file.exists()) {
+            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
+        }
+        if (pic == null) {
+            pic = BitmapFactory.decodeResource(mContext.getResources(), Friend.DEFAULT_PICTURE);
+        }
+
+        return pic;
+    }
+
+    /**
      * Returns a list of all unanswered received invitations
      * 
      * @return A list of {@code FriendInvitation}
@@ -799,6 +840,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Stores a profile picture
+     * 
+     * @param picture
+     *            The picture to store
+     * @param userId
+     *            The user's ID
+     */
+    public void setUserPicture(Bitmap picture, long userId) {
+        File file = new File(mContext.getFilesDir(), userId + ".png");
+
+        if (file.exists()) {
+            file.delete();
+        }
+
+        try {
+            FileOutputStream out = mContext.openFileOutput(userId + ".png", Context.MODE_PRIVATE);
+            picture.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Updates an event
      * 
      * @param event
@@ -866,6 +933,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (rows > 0) {
             this.notifyOnInvitationListUpdateListeners();
+        }
+        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.REFUSED)) {
+            this.notifyOnInvitationStatusUpdateListeners(invitation.getUserId(), invitation.getStatus());
         }
 
         return rows;
@@ -967,6 +1037,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void notifyOnInvitationListUpdateListeners() {
         for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
             listener.onInvitationListUpdate();
+        }
+    }
+
+    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
+        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
+            listener.onInvitationStatusUpdate(id, status);
         }
     }
 
