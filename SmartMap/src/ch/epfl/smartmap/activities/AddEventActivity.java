@@ -201,14 +201,18 @@ public class AddEventActivity extends FragmentActivity {
                 || "".equals(mLongitude.getText().toString())
                 || ((mPlaceName.getText().toString() == null) || mEventName.getText().toString().isEmpty())
                 || mCountryName.isEmpty()) {
+
             Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set), Toast.LENGTH_SHORT)
                     .show();
+
             Log.d(TAG, "Couldn't create a new event because not all fields have been set.\n" + "end date: "
                     + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
                     + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
                     + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mLatitude.getText().toString()
                     + "/" + mLongitude.getText().toString());
+
         } else {
+
             GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
                     mPickStartTime.getText().toString());
             GregorianCalendar endDate = this.getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime
