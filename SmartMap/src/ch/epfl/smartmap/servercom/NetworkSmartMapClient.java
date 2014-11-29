@@ -117,6 +117,30 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#ackEventInvitation(long)
+     */
+    @Override
+    public void ackEventInvitation(long eventId) throws SmartMapClientException {
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("event_id", Long.toString(eventId));
+        HttpURLConnection conn = this.getHttpURLConnection("/ackEventInvitation");
+        String response = this.sendViaPost(params, conn);
+
+        SmartMapParser parser = null;
+        try {
+            parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.servercom.SmartMapClient#ackRemovedFriend(long)
      */
     @Override
@@ -365,6 +389,63 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#getEventInfo(long)
+     */
+    @Override
+    public Event getEventInfo(long eventId) throws SmartMapClientException {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("event_id", Long.toString(eventId));
+        HttpURLConnection conn = this.getHttpURLConnection("/getEventInfo");
+        String response = this.sendViaPost(params, conn);
+
+        SmartMapParser parser = null;
+        Event event = null;
+        try {
+            parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+            event = parser.parseEvent(response);
+            new EventCreatorNameRetriever(event).setEventCreatorName();
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+        return event;
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#getEventInvitations()
+     */
+    @Override
+    public List<Event> getEventInvitations() throws SmartMapClientException {
+
+        HttpURLConnection conn = this.getHttpURLConnection("/getEventInvitations");
+        String response = this.sendViaPost(new HashMap<String, String>(), conn);
+
+        List<Event> eventInvitations = new ArrayList<Event>();
+
+        try {
+            SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+            eventInvitations = parser.parseEventList(response);
+
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+        for (Event event : eventInvitations) {
+            new EventCreatorNameRetriever(event).setEventCreatorName();
+        }
+        return eventInvitations;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.servercom.SmartMapClient#getFriendsIds()
      */
     @Override
@@ -513,6 +594,77 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/inviteFriend");
+        String response = this.sendViaPost(params, conn);
+
+        SmartMapParser parser = null;
+        try {
+            parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#inviteUsersToEvent(long, java.util.List)
+     */
+    @Override
+    public void inviteUsersToEvent(long eventId, List<Long> usersIds) throws SmartMapClientException {
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("event_id", Long.toString(eventId));
+        params.put("users_ids", this.longListToString(usersIds));
+        HttpURLConnection conn = this.getHttpURLConnection("/inviteUsersToEvent");
+        String response = this.sendViaPost(params, conn);
+
+        SmartMapParser parser = null;
+        try {
+            parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#joinEvent(long)
+     */
+    @Override
+    public void joinEvent(long eventId) throws SmartMapClientException {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("event_id", Long.toString(eventId));
+        HttpURLConnection conn = this.getHttpURLConnection("/joinEvent");
+        String response = this.sendViaPost(params, conn);
+
+        SmartMapParser parser = null;
+        try {
+            parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#leaveEvent(long)
+     */
+    @Override
+    public void leaveEvent(long eventId) throws SmartMapClientException {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("event_id", Long.toString(eventId));
+        HttpURLConnection conn = this.getHttpURLConnection("/leaveEvent");
         String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
@@ -790,4 +942,5 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
         return ONE_INSTANCE;
     }
+
 }

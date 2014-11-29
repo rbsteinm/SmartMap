@@ -36,6 +36,13 @@ public interface SmartMapClient {
     void ackAcceptedInvitation(long id) throws SmartMapClientException;
 
     /**
+     * Acknowledges the server that the invitation to the given event was received.
+     * 
+     * @param eventId
+     */
+    void ackEventInvitation(long eventId) throws SmartMapClientException;
+
+    /**
      * Confirm the server that the removed friend was received
      * 
      * @param id
@@ -130,6 +137,18 @@ public interface SmartMapClient {
     void followFriend(long id) throws SmartMapClientException;
 
     /**
+     * @param eventId
+     * @return the event for which we wanted informations
+     */
+    Event getEventInfo(long eventId) throws SmartMapClientException;
+
+    /**
+     * @return the events to which the user is invited.
+     *         For each retrieved invitation, must call {@code ackEventInvitation}
+     */
+    List<Event> getEventInvitations() throws SmartMapClientException;
+
+    /**
      * @return the list of the friends ids
      * @throws SmartMapClientException
      */
@@ -182,6 +201,28 @@ public interface SmartMapClient {
     void inviteFriend(long id) throws SmartMapClientException;
 
     /**
+     * Sends an invitation request for the given event to the given friends
+     * 
+     * @param eventId
+     * @param usersIds
+     */
+    void inviteUsersToEvent(long eventId, List<Long> usersIds) throws SmartMapClientException;
+
+    /**
+     * Asks the server to add the user to the event with the given id
+     * 
+     * @param eventId
+     */
+    void joinEvent(long eventId) throws SmartMapClientException;
+
+    /**
+     * Asks the server to remove the user from the event with the given id
+     * 
+     * @param eventId
+     */
+    void leaveEvent(long eventId) throws SmartMapClientException;
+
+    /**
      * Asks to the server the friends positions
      * 
      * @return a map that maps each friend id to a position
@@ -191,7 +232,7 @@ public interface SmartMapClient {
     List<User> listFriendsPos() throws SmartMapClientException;
 
     /**
-     * Remove the given friend
+     * Asks the server to remove the given friend
      * 
      * @param id
      * @throws SmartMapClientException
