@@ -126,7 +126,7 @@
     <string name="fb_fragment_toast_cannot_connect_to_internet">Your internet connection seems down. Please try again!</string>
     
     <!-- Settings -->
-    <string name="settings__key_notifications_enabled">notifications_enabled</string>
+    <string name="settings_key_notifications_enabled">notifications_enabled</string>
     <string name="settings_key_notifications_friend_requests">notifications_friend_requests</string>
     <string name="settings_key_notifications_friendship_confirmations">notifications_friendship_confirmations</string>
     <string name="settings_key_notifications_event_invitations">notifications_event_invitations</string>
