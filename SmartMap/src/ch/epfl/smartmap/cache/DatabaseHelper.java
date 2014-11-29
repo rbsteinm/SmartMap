@@ -224,7 +224,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         mDatabase.insert(TABLE_INVITATIONS, null, values);
 
-        notifyOnInvitationListUpdateListeners();
+        this.notifyOnInvitationListUpdateListeners();
     }
 
     public void addOnDisplayableInformationsChangeListener(Displayable displayable,
@@ -587,37 +587,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Returns a list of all unanswered received invitations
-     * 
-     * @return A list of {@code FriendInvitation}
-     */
-    public List<FriendInvitation> getUnansweredFriendInvitations() {
-        List<FriendInvitation> invitations = new ArrayList<FriendInvitation>();
-
-        String query = "SELECT  * FROM " + TABLE_INVITATIONS;
-
-        Cursor cursor = mDatabase.rawQuery(query, null);
-
-        FriendInvitation invitation = null;
-        if (cursor.moveToFirst()) {
-            do {
-                int status = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
-                if (status == Invitation.READ || status == Invitation.UNREAD) {
-                    invitation =
-                        new FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)),
-                            cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
-                                .getColumnIndex(KEY_NAME)), status);
-
-                    invitations.add(invitation);
-                }
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return invitations;
-    }
-
-    /**
      * Returns a list of all friend invitations with the specified status
      * 
      * @param status
@@ -678,6 +647,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Returns a list of all unanswered received invitations
+     * 
+     * @return A list of {@code FriendInvitation}
+     */
+    public List<FriendInvitation> getUnansweredFriendInvitations() {
+        List<FriendInvitation> invitations = new ArrayList<FriendInvitation>();
+
+        String query = "SELECT  * FROM " + TABLE_INVITATIONS;
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+
+        FriendInvitation invitation = null;
+        if (cursor.moveToFirst()) {
+            do {
+                int status = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
+                if ((status == Invitation.READ) || (status == Invitation.UNREAD)) {
+                    invitation =
+                        new FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)),
+                            cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
+                                .getColumnIndex(KEY_NAME)), status);
+
+                    invitations.add(invitation);
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return invitations;
+    }
+
+    /**
      * Gets a user from the database
      * 
      * @param id
@@ -728,45 +728,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.notifyOnFriendListUpdateListeners();
         this.notifyOnFriendsLocationUpdateListeners();
-    }
-
-    private void notifyOnDisplayableInformationListeners(Displayable d) {
-        if (mOnDisplayableInformationsChangeListeners.get(d) != null) {
-            for (OnDisplayableInformationsChangeListener listener : mOnDisplayableInformationsChangeListeners
-                .get(d)) {
-                listener.onDisplayableInformationsChange();
-            }
-        }
-    }
-
-    private void notifyOnEventListUpdateListeners() {
-        for (OnEventListUpdateListener listener : mOnEventListUpdateListeners) {
-            listener.onEventListUpdate();
-        }
-    }
-
-    private void notifyOnFilterListUpdateListeners() {
-        for (OnFilterListUpdateListener listener : mOnFilterListUpdateListeners) {
-            listener.onFilterListUpdate();
-        }
-    }
-
-    private void notifyOnFriendListUpdateListeners() {
-        for (OnFriendListUpdateListener listener : mOnFriendListUpdateListeners) {
-            listener.onFriendListUpdate();
-        }
-    }
-
-    private void notifyOnFriendsLocationUpdateListeners() {
-        for (OnFriendsLocationUpdateListener listener : mOnFriendsLocationUpdateListeners) {
-            listener.onFriendsLocationChange();
-        }
-    }
-
-    private void notifyOnInvitationListUpdateListeners() {
-        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
-            listener.onInvitationListUpdate();
-        }
     }
 
     @Override
@@ -931,7 +892,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (user.getEmail() != Friend.NO_EMAIL) {
             values.put(KEY_EMAIL, user.getEmail());
         }
-        if (user.getLocation().getLatitude() != 0.0 || user.getLocation().getLongitude() != 0.0) {
+        if ((user.getLocation().getLatitude() != 0.0) || (user.getLocation().getLongitude() != 0.0)) {
             values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
             values.put(KEY_LATITUDE, user.getLocation().getLatitude());
         }
@@ -968,6 +929,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.notifyOnFriendsLocationUpdateListeners();
         this.notifyOnDisplayableInformationListeners(friend);
+    }
+
+    private void notifyOnDisplayableInformationListeners(Displayable d) {
+        if (mOnDisplayableInformationsChangeListeners.get(d) != null) {
+            for (OnDisplayableInformationsChangeListener listener : mOnDisplayableInformationsChangeListeners
+                .get(d)) {
+                listener.onDisplayableInformationsChange();
+            }
+        }
+    }
+
+    private void notifyOnEventListUpdateListeners() {
+        for (OnEventListUpdateListener listener : mOnEventListUpdateListeners) {
+            listener.onEventListUpdate();
+        }
+    }
+
+    private void notifyOnFilterListUpdateListeners() {
+        for (OnFilterListUpdateListener listener : mOnFilterListUpdateListeners) {
+            listener.onFilterListUpdate();
+        }
+    }
+
+    private void notifyOnFriendListUpdateListeners() {
+        for (OnFriendListUpdateListener listener : mOnFriendListUpdateListeners) {
+            listener.onFriendListUpdate();
+        }
+    }
+
+    private void notifyOnFriendsLocationUpdateListeners() {
+        for (OnFriendsLocationUpdateListener listener : mOnFriendsLocationUpdateListeners) {
+            listener.onFriendsLocationChange();
+        }
+    }
+
+    private void notifyOnInvitationListUpdateListeners() {
+        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
+            listener.onInvitationListUpdate();
+        }
     }
 
     /**
