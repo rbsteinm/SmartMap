@@ -128,6 +128,8 @@ $app->post('/followFriend', 'authorization.controller:followFriend');
 
 $app->post('/unfollowFriend', 'authorization.controller:unfollowFriend');
 
+$app->post('/setVisibility', 'authorization.controller:setVisibility');
+
 $app->post('/getUserInfo', 'data.controller:getUserInfo');
 
 $app->post('/getProfilePicture', 'profile.controller:getProfilePicture');
