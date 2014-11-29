@@ -32,20 +32,29 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	private final static long VALID_FACEBOOK_ID = 1482245642055847L;
 	private final static String VALID_NAME = "SmartMap SwEng";
 	private final static String VALID_FB_ACCESS_TOKEN = "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
+	private final static long VALID_FACEBOOK_ID_2 = 1395136807427991L;
+	private final static String VALID_NAME_2 = "Smart Map";
+	private final static String VALID_FB_ACCESS_TOKEN_2 = "CAAEWMqbRPIkBAPayty1578xCWRA4mHMTAVORgG8HNFKDJHoReb05eaVvRR59fGL2JsrBtLlKhgG7ZB0ZAtVut4OpiiwXZCBx1SCEhZAegiu6IqKX8SnJjyZAA1ZCqQP7ctt3q1hhYv78x9UNInmYYAPQ2SdepRxlalCaJbVdrlZAanM0TIZAZBjQIqzVb9uvjEG8uoSNB4RJ2X9psGtBmm9mn";
 	private final static Location LOCATION = new Location("SmartMapServers");
 	private static final double LATITUDE = 45;
 	private static final double LONGITUDE = 46;
 	private static final long VALID_ID_1 = 1;
-	private static final long VALID_ID_2 = 2;
-	private static final long MY_ID = 3;
-	private static final User VALID_PEOPLE = new Friend(MY_ID, VALID_NAME);
+	private static final long MARION_ID = 11;
+	private static final long SMART_MAP_SWENG_ID = 3;
+	private static final User SMART_MAP_SWENG = new Friend(SMART_MAP_SWENG_ID, VALID_NAME);
+	private static final User MARION = new Friend(MARION_ID, VALID_NAME_2);
 	private static final Event FOOTBALL_TOURNAMENT = new PublicEvent(
-			"Football Tournament", VALID_PEOPLE.getID(),
-			VALID_PEOPLE.getName(), new GregorianCalendar(2014, 11, 23),
+			"Football Tournament", SMART_MAP_SWENG.getID(),
+			SMART_MAP_SWENG.getName(), new GregorianCalendar(2014, 11, 23),
 			new GregorianCalendar(2014, 11, 27), LOCATION,
 			Arrays.asList((long) 3));
+	private static final Event CONFERENCE = new PublicEvent(
+			"Conference", SMART_MAP_SWENG.getID(),
+			MARION.getName(), new GregorianCalendar(2014, 12, 23),
+			new GregorianCalendar(2014, 12, 25), LOCATION,
+			Arrays.asList((long) 11));
 	private static final long VALID_EVENT_ID_1 = 3;
-	private static final long VALID_EVENT_ID_2 = 3;
+	private static final long VALID_EVENT_ID_2 = 11;
 	private Context mContext;
 	private SmartMapClient networkClient;
 
@@ -60,6 +69,8 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 		LOCATION.setLongitude(LONGITUDE);
 		FOOTBALL_TOURNAMENT.setPositionName("Paris");
 		FOOTBALL_TOURNAMENT.setID(VALID_EVENT_ID_1);
+		CONFERENCE.setPositionName("Paris");
+		CONFERENCE.setID(VALID_EVENT_ID_2);
 
 		networkClient.authServer(VALID_NAME, VALID_FACEBOOK_ID,
 				VALID_FB_ACCESS_TOKEN);
@@ -82,7 +93,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	public void testInviteFriend() throws SmartMapClientException {
 
 		try {
-			networkClient.inviteFriend(MY_ID);
+			networkClient.inviteFriend(SMART_MAP_SWENG_ID);
 		} catch (SmartMapClientException e) {
 			// ok, cannot invite yourself
 		}
@@ -92,37 +103,37 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	@Test
 	public void testFollowFriend() throws SmartMapClientException {
 
-		networkClient.followFriend(MY_ID);
+		networkClient.followFriend(SMART_MAP_SWENG_ID);
 	}
 
 	@Test
 	public void testUnfollowFriend() throws SmartMapClientException {
 
-		networkClient.unfollowFriend(MY_ID);
+		networkClient.unfollowFriend(SMART_MAP_SWENG_ID);
 	}
 
 	@Test
 	public void testAllowFriend() throws SmartMapClientException {
 
-		networkClient.allowFriend(MY_ID);
+		networkClient.allowFriend(SMART_MAP_SWENG_ID);
 	}
 
 	@Test
 	public void testDisallowFriend() throws SmartMapClientException {
 
-		networkClient.disallowFriend(MY_ID);
+		networkClient.disallowFriend(SMART_MAP_SWENG_ID);
 	}
 
 	@Test
 	public void testAllowFriendList() throws SmartMapClientException {
 
-		networkClient.allowFriendList(Arrays.asList(VALID_ID_1, VALID_ID_2));
+		networkClient.allowFriendList(Arrays.asList(VALID_ID_1, MARION_ID));
 	}
 
 	@Test
 	public void testDisallowFriendList() throws SmartMapClientException {
 
-		networkClient.disallowFriendList(Arrays.asList(VALID_ID_1, VALID_ID_2));
+		networkClient.disallowFriendList(Arrays.asList(VALID_ID_1, MARION_ID));
 	}
 
 	@Test
@@ -200,14 +211,14 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	@Test
 	public void testDeclineInvitation() throws SmartMapClientException {
 
-		networkClient.declineInvitation(MY_ID);
+		networkClient.declineInvitation(SMART_MAP_SWENG_ID);
 	}
 
 	@Test
 	public void testRemoveFriend() throws SmartMapClientException {
 
 		try {
-			networkClient.removeFriend(MY_ID);
+			networkClient.removeFriend(SMART_MAP_SWENG_ID);
 		} catch (ServerFeedbackException e) {
 			// ok because I cannot remove myself
 		}
@@ -216,7 +227,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	@Test
 	public void testAckAcceptedInvitation() throws SmartMapClientException {
 
-		networkClient.ackAcceptedInvitation(MY_ID);
+		networkClient.ackAcceptedInvitation(SMART_MAP_SWENG_ID);
 	}
 
 	public void testGetFriendsIds() throws SmartMapClientException {
@@ -229,18 +240,23 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 
 	public void testAckRemovedFriends() throws SmartMapClientException {
 
-		networkClient.ackRemovedFriend(MY_ID);
+		networkClient.ackRemovedFriend(SMART_MAP_SWENG_ID);
 	}
 
 	public void testGetProfilePicture() throws SmartMapClientException {
 
-		networkClient.getProfilePicture(MY_ID);
+		networkClient.getProfilePicture(SMART_MAP_SWENG_ID);
 	}
 
 	public void testCreateEvent() throws SmartMapClientException {
 
 		long eventId = networkClient.createPublicEvent(FOOTBALL_TOURNAMENT);
 		assertTrue("Unexpected id", eventId >= 0);
+
+		networkClient.authServer(VALID_NAME_2, VALID_FACEBOOK_ID_2,
+				VALID_FB_ACCESS_TOKEN_2);
+		long eventId2 = networkClient.createPublicEvent(CONFERENCE);
+		assertTrue("Unexpected id", eventId2 >= 0);
 
 	}
 
@@ -268,7 +284,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 
 	public void testInviteUsersToEvent() throws SmartMapClientException {
 		networkClient.inviteUsersToEvent(VALID_EVENT_ID_1,
-				Arrays.asList(VALID_ID_1, VALID_ID_2));
+				Arrays.asList(VALID_ID_1, MARION_ID));
 	}
 
 	public void testGetEventInvitations() throws SmartMapClientException{
