@@ -306,6 +306,14 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
         });
     }
 
+    @Override
+    public void onInvitationListUpdate() {
+        // Update LayerDrawable's BadgeDrawable
+        Utils.setBadgeCount(MainActivity.this, mIcon,
+            mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
+
+    }
+
     public void onLocationChanged(Location location) {
         SettingsManager.getInstance().setLocation(location);
     }
@@ -523,14 +531,6 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
             }
             return false;
         }
-
-    }
-
-    @Override
-    public void onInvitationListUpdate() {
-        // Update LayerDrawable's BadgeDrawable
-        Utils.setBadgeCount(MainActivity.this, mIcon,
-            mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size());
 
     }
 

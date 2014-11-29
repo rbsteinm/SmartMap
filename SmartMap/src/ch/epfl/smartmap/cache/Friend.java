@@ -198,7 +198,7 @@ public class Friend implements User, Displayable, Parcelable {
 
     @Override
     public Bitmap getPicture(Context context) {
-        return DatabaseHelper.initialize(context).getPictureById(getID());
+        return DatabaseHelper.initialize(context).getPictureById(this.getID());
     }
 
     @Override
@@ -281,7 +281,7 @@ public class Friend implements User, Displayable, Parcelable {
 
     @Override
     public void setPicture(Bitmap pic, Context context) {
-        DatabaseHelper.initialize(context).setUserPicture(pic, getID());
+        DatabaseHelper.initialize(context).setUserPicture(pic, this.getID());
     }
 
     @Override
@@ -292,10 +292,6 @@ public class Friend implements User, Displayable, Parcelable {
     @Override
     public void setVisible(boolean isVisible) {
         mVisible = isVisible;
-    }
-
-    private void updateLocationString() {
-        mLocationString = Utils.getCityFromLocation(this.getLocation());
     }
 
     /*
@@ -313,5 +309,9 @@ public class Friend implements User, Displayable, Parcelable {
         dest.writeLong(mLastSeen.getTimeInMillis());
         boolean[] booleans = new boolean[]{mVisible};
         dest.writeBooleanArray(booleans);
+    }
+
+    private void updateLocationString() {
+        mLocationString = Utils.getCityFromLocation(this.getLocation());
     }
 }

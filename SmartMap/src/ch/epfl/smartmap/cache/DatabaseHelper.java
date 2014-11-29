@@ -239,7 +239,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         mDatabase.insert(TABLE_INVITATIONS, null, values);
 
-        notifyOnInvitationListUpdateListeners();
+        this.notifyOnInvitationListUpdateListeners();
     }
 
     public void addOnDisplayableInformationsChangeListener(Displayable displayable,
@@ -703,7 +703,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 int status = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
-                if (status == Invitation.READ || status == Invitation.UNREAD) {
+                if ((status == Invitation.READ) || (status == Invitation.UNREAD)) {
                     invitation =
                         new FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)),
                             cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
@@ -769,51 +769,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.notifyOnFriendListUpdateListeners();
         this.notifyOnFriendsLocationUpdateListeners();
-    }
-
-    private void notifyOnDisplayableInformationListeners(Displayable d) {
-        if (mOnDisplayableInformationsChangeListeners.get(d) != null) {
-            for (OnDisplayableInformationsChangeListener listener : mOnDisplayableInformationsChangeListeners
-                .get(d)) {
-                listener.onDisplayableInformationsChange();
-            }
-        }
-    }
-
-    private void notifyOnEventListUpdateListeners() {
-        for (OnEventListUpdateListener listener : mOnEventListUpdateListeners) {
-            listener.onEventListUpdate();
-        }
-    }
-
-    private void notifyOnFilterListUpdateListeners() {
-        for (OnFilterListUpdateListener listener : mOnFilterListUpdateListeners) {
-            listener.onFilterListUpdate();
-        }
-    }
-
-    private void notifyOnFriendListUpdateListeners() {
-        for (OnFriendListUpdateListener listener : mOnFriendListUpdateListeners) {
-            listener.onFriendListUpdate();
-        }
-    }
-
-    private void notifyOnFriendsLocationUpdateListeners() {
-        for (OnFriendsLocationUpdateListener listener : mOnFriendsLocationUpdateListeners) {
-            listener.onFriendsLocationChange();
-        }
-    }
-
-    private void notifyOnInvitationListUpdateListeners() {
-        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
-            listener.onInvitationListUpdate();
-        }
-    }
-
-    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
-        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
-            listener.onInvitationStatusUpdate(id, status);
-        }
     }
 
     @Override
@@ -979,8 +934,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (rows > 0) {
             this.notifyOnInvitationListUpdateListeners();
         }
-        if (invitation.getStatus() == Invitation.ACCEPTED || invitation.getStatus() == Invitation.REFUSED) {
-            notifyOnInvitationStatusUpdateListeners(invitation.getUserId(), invitation.getStatus());
+        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.REFUSED)) {
+            this.notifyOnInvitationStatusUpdateListeners(invitation.getUserId(), invitation.getStatus());
         }
 
         return rows;
@@ -1007,7 +962,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (user.getEmail() != Friend.NO_EMAIL) {
             values.put(KEY_EMAIL, user.getEmail());
         }
-        if (user.getLocation().getLatitude() != 0.0 || user.getLocation().getLongitude() != 0.0) {
+        if ((user.getLocation().getLatitude() != 0.0) || (user.getLocation().getLongitude() != 0.0)) {
             values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
             values.put(KEY_LATITUDE, user.getLocation().getLatitude());
         }
@@ -1044,6 +999,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         this.notifyOnFriendsLocationUpdateListeners();
         this.notifyOnDisplayableInformationListeners(friend);
+    }
+
+    private void notifyOnDisplayableInformationListeners(Displayable d) {
+        if (mOnDisplayableInformationsChangeListeners.get(d) != null) {
+            for (OnDisplayableInformationsChangeListener listener : mOnDisplayableInformationsChangeListeners
+                .get(d)) {
+                listener.onDisplayableInformationsChange();
+            }
+        }
+    }
+
+    private void notifyOnEventListUpdateListeners() {
+        for (OnEventListUpdateListener listener : mOnEventListUpdateListeners) {
+            listener.onEventListUpdate();
+        }
+    }
+
+    private void notifyOnFilterListUpdateListeners() {
+        for (OnFilterListUpdateListener listener : mOnFilterListUpdateListeners) {
+            listener.onFilterListUpdate();
+        }
+    }
+
+    private void notifyOnFriendListUpdateListeners() {
+        for (OnFriendListUpdateListener listener : mOnFriendListUpdateListeners) {
+            listener.onFriendListUpdate();
+        }
+    }
+
+    private void notifyOnFriendsLocationUpdateListeners() {
+        for (OnFriendsLocationUpdateListener listener : mOnFriendsLocationUpdateListeners) {
+            listener.onFriendsLocationChange();
+        }
+    }
+
+    private void notifyOnInvitationListUpdateListeners() {
+        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
+            listener.onInvitationListUpdate();
+        }
+    }
+
+    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
+        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
+            listener.onInvitationStatusUpdate(id, status);
+        }
     }
 
     /**

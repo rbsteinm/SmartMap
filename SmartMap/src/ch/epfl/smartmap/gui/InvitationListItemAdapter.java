@@ -20,49 +20,49 @@ import ch.epfl.smartmap.cache.FriendInvitation;
  */
 public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
 
-	private final Context mContext;
-	private final List<FriendInvitation> mItemsArrayList;
+    private final Context mContext;
+    private final List<FriendInvitation> mItemsArrayList;
 
-	/**
-	 * @param context
-	 *            Context of the Activity where we want to display the user list
-	 * @param userList
-	 *            list of users to display
-	 */
-	public InvitationListItemAdapter(Context context, List<FriendInvitation> itemsArrayList) {
+    /**
+     * @param context
+     *            Context of the Activity where we want to display the user list
+     * @param userList
+     *            list of users to display
+     */
+    public InvitationListItemAdapter(Context context, List<FriendInvitation> itemsArrayList) {
 
-		super(context, R.layout.gui_notification_list_item, itemsArrayList);
+        super(context, R.layout.gui_notification_list_item, itemsArrayList);
 
-		mContext = context;
-		mItemsArrayList = itemsArrayList;
-	}
+        mContext = context;
+        mItemsArrayList = itemsArrayList;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-	 * android.view.ViewGroup)
-	 * callback function automatically called one time for each user in the list
-	 */
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+    /*
+     * (non-Javadoc)
+     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
+     * android.view.ViewGroup)
+     * callback function automatically called one time for each user in the list
+     */
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-		// Create inflater,get item to construct
-		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		convertView = inflater.inflate(R.layout.gui_notification_list_item, parent, false);
+        // Create inflater,get item to construct
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.gui_notification_list_item, parent, false);
 
-		// Get FriendItem fields
-		TextView title = (TextView) convertView.findViewById(R.id.activity_notification_title);
-		TextView text = (TextView) convertView.findViewById(R.id.activity_notification_text);
-		// ImageView image = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
+        // Get FriendItem fields
+        TextView title = (TextView) convertView.findViewById(R.id.activity_notification_title);
+        TextView text = (TextView) convertView.findViewById(R.id.activity_notification_text);
+        // ImageView image = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
 
-		// Set the User's ID to the tag of its View
-		convertView.setTag(mItemsArrayList.get(position).getID());
+        // Set the User's ID to the tag of its View
+        convertView.setTag(mItemsArrayList.get(position).getID());
 
-		// Set fields with friend attributes
-		title.setText(mContext.getString(R.string.notification_invitefriend_title));
-		text.setText(mItemsArrayList.get(position).getUserName() + " "
-		    + mContext.getString(R.string.notification_friend_invitation));
+        // Set fields with friend attributes
+        title.setText(mContext.getString(R.string.notification_invitefriend_title));
+        text.setText(mItemsArrayList.get(position).getUserName() + " "
+            + mContext.getString(R.string.notification_friend_invitation));
 
-		return convertView;
-	}
+        return convertView;
+    }
 }

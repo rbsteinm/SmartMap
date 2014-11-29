@@ -9,71 +9,71 @@ import android.content.Intent;
  */
 public interface Invitation {
 
-	/**
-	 * int representing invitation status
-	 */
-	int UNREAD = 0;
-	int READ = 1;
-	int ACCEPTED = 2;
-	int REFUSED = 3;
+    /**
+     * int representing invitation status
+     */
+    int UNREAD = 0;
+    int READ = 1;
+    int ACCEPTED = 2;
+    int REFUSED = 3;
 
-	/**
-	 * @return invitation's id
-	 */
-	long getID();
+    /**
+     * @return invitation's id
+     */
+    long getID();
 
-	/**
-	 * @return user's name
-	 */
-	String getUserName();
+    /**
+     * @return invitation's intent
+     */
+    Intent getIntent();
 
-	/**
-	 * @return user's id
-	 */
-	long getUserId();
+    /**
+     * @return int representing invitation's status
+     */
+    int getStatus();
 
-	/**
-	 * @return invitation's intent
-	 */
-	Intent getIntent();
+    /**
+     * @return invitation's text
+     */
+    String getText();
 
-	/**
-	 * @return invitation's text
-	 */
-	String getText();
+    /**
+     * @return invitation's title
+     */
+    String getTitle();
 
-	/**
-	 * @return invitation's title
-	 */
-	String getTitle();
+    /**
+     * @return user's id
+     */
+    long getUserId();
 
-	/**
-	 * @return int representing invitation's status
-	 */
-	int getStatus();
+    /**
+     * @return user's name
+     */
+    String getUserName();
 
-	/**
-	 * Sets status of invitation
-	 * 
-	 * @param Status
-	 *            the int representing invitation status
-	 */
-	void setStatus(int status);
+    /**
+     * Sets status of invitation
+     * 
+     * @param Status
+     *            the int representing invitation status
+     */
+    void setStatus(int status);
 
-	/**
-	 * Set invitation's creator name
-	 * 
-	 * @param user
-	 *            the invitation's creator name
-	 */
-	void setUserName(String name);
+    /**
+     * Set invitation's creator id
+     * 
+     * @param user
+     *            the invitation's creator id
+     */
+    void setUserId(long id);
 
-	/**
-	 * Set invitation's creator id
-	 * 
-	 * @param user
-	 *            the invitation's creator id
-	 */
-	void setUserId(long id);
+    /**
+     * Set invitation's creator name
+     * 
+     * @param user
+     *            the invitation's creator name
+     */
+    void setUserName(String name);
 
 }

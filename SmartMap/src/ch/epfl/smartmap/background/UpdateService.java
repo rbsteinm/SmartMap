@@ -141,7 +141,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         new AsyncFriendsInit().execute();
         List<User> friends = mHelper.getAllFriends();
         for (User user : friends) {
-            File file = new File(getFilesDir(), user.getID() + ".png");
+            File file = new File(this.getFilesDir(), user.getID() + ".png");
             if (!file.exists()) {
                 new AsyncGetPictures().execute(user.getID());
             }
@@ -183,19 +183,19 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         }
     }
 
+    public void updateInvitationSet() {
+        mInviterIds = new HashSet<Long>();
+        for (FriendInvitation invitation : mHelper.getUnansweredFriendInvitations()) {
+            mInviterIds.add(invitation.getUserId());
+        }
+    }
+
     private void showAcceptedNotif(User user) {
         Notifications.acceptedFriendNotification(this, user);
     }
 
     private void showFriendNotif(User user) {
         Notifications.newFriendNotification(this, user);
-    }
-
-    public void updateInvitationSet() {
-        mInviterIds = new HashSet<Long>();
-        for (FriendInvitation invitation : mHelper.getUnansweredFriendInvitations()) {
-            mInviterIds.add(invitation.getUserId());
-        }
     }
 
     /**
@@ -337,7 +337,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         protected Void doInBackground(Long... ids) {
             for (long id : ids) {
-                downloadUserPicture(id);
+                UpdateService.this.downloadUserPicture(id);
             }
             return null;
         }

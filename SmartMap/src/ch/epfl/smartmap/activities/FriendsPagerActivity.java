@@ -81,6 +81,14 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (this.getIntent().getBooleanExtra("invitation", false) == true) {
+            mPager.setCurrentItem(INVITATION_INDEX);
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.pager, menu);
@@ -104,14 +112,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (this.getIntent().getBooleanExtra("invitation", false) == true) {
-            mPager.setCurrentItem(INVITATION_INDEX);
-        }
     }
 
     @Override
