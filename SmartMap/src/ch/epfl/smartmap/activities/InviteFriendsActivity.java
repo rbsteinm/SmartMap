@@ -108,8 +108,6 @@ public class InviteFriendsActivity extends ListActivity {
                 this.setResult(RESULT_OK);
                 this.finish();
                 break;
-            default:
-                throw new UnsupportedOperationException();
         }
         return super.onOptionsItemSelected(item);
     }
