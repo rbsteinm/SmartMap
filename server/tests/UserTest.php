@@ -30,15 +30,6 @@ class UserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($date, $user->getLastUpdate());
     }
 
-    public function testZeroDate()
-    {
-        $date = "0000-00-00 00:00:00";
-        $user = new User(23, 34, 'Toto', 'VISIBLE', 75.43, 22.88, $date);
-
-        $this->assertEquals(23, $user->getId());
-        $this->assertEquals($date, $user->getLastUpdate());
-    }
-
     public function testSetters()
     {
     	$user = new User(23, 34, 'Toto', 'VISIBLE', 75.43, 22.88);

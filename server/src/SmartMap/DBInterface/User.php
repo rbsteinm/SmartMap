@@ -277,8 +277,7 @@ class User
         $regex = '/^([0-3][0-9]{3,3})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][1-9]|3[0-1])\s([0-1][0-9]|2[0-4])' .
             ':([0-5][0-9]):([0-5][0-9])$/';
 
-        // We accept mysql default value.
-        if (!preg_match($regex, $date) && $date != "0000-00-00 00:00:00")
+        if (!preg_match($regex, $date) && $date)
         {
             throw new \InvalidArgumentException('Last update date must be in format ' . self::$DATE_FORMAT . '.');
         }

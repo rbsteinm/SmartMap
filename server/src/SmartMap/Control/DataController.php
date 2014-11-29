@@ -87,6 +87,8 @@ class DataController
         
         try
         {
+            $user = $this->mRepo->getUser($userId);
+
             $friendIds = $this->mRepo->getFriendsIds($userId, array('ALLOWED'), array('FOLLOWED'));
             
             $friends = $this->mRepo->getUsers($friendIds, array('VISIBLE'));
@@ -97,15 +99,18 @@ class DataController
         }
         
         $list = array();
-        
-        foreach ($friends as $friend)
+
+        // The user must be visible to see it's friends positions.
+        if ($user->getVisibility() == 'VISIBLE')
         {
-            $list[] = array(
-                'id' => $friend->getId(),
-                'longitude' => $friend->getLongitude(),
-                'latitude' => $friend->getLatitude(),
-                'lastUpdate' => $friend->getLastUpdate()
-            );
+            foreach ($friends as $friend) {
+                $list[] = array(
+                    'id' => $friend->getId(),
+                    'longitude' => $friend->getLongitude(),
+                    'latitude' => $friend->getLatitude(),
+                    'lastUpdate' => $friend->getLastUpdate()
+                );
+            }
         }
         
         $response = array(
@@ -175,7 +180,7 @@ class DataController
     }
 
     /**
-     * Sends an invitation to the user with id request parameter.
+     * Sends an invitation to the user with id in post parameter.
      *
      * @param Request $request
      * @return JsonResponse
