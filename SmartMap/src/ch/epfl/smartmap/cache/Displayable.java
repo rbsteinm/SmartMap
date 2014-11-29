@@ -4,9 +4,10 @@ import android.graphics.Bitmap;
 import ch.epfl.smartmap.listeners.DisplayableListener;
 
 /**
- * Objects that can be displayed on the bottom menu, and as a marker on the map
+ * Objects that can be displayed with image, title and subtitle.
  * 
  * @author ritterni
+ * @author jfperren
  */
 public interface Displayable extends Stockable {
 

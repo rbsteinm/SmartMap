@@ -5,18 +5,21 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import ch.epfl.smartmap.listeners.EventListener;
+
 /**
  * Describes an event
  * 
+ * @author jfperren
  * @author ritterni
  */
 public interface Event extends Displayable, Localisable {
 
-    static final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
-    static final String NO_DESCRIPTION = "NO_DESCRIPTION";
-    static final long NO_CREATOR_ID = NO_ID;
-    static final String NO_NAME = "NO_NAME";
-    static final Calendar NOT_A_DATE = GregorianCalendar.getInstance();
+    final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
+    final String NO_DESCRIPTION = "NO_DESCRIPTION";
+    final long NO_CREATOR_ID = NO_ID;
+    final String NO_NAME = "NO_NAME";
+    final Calendar NOT_A_DATE = GregorianCalendar.getInstance();
 
     void addEventListener(EventListener newListener);
 
@@ -45,7 +48,7 @@ public interface Event extends Displayable, Localisable {
      */
     Calendar getStartDate();
 
-    boolean isPublic();
+    Type getType();
 
     void removeEventListener(EventListener oldListener);
 
@@ -90,4 +93,9 @@ public interface Event extends Displayable, Localisable {
      *            The new start date (year, month, day, hour, minute)
      */
     void setStartDate(Calendar newDate);
+
+    enum Type {
+        PUBLIC,
+        PRIVATE;
+    }
 }

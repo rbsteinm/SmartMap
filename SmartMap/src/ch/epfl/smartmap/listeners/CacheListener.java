@@ -4,19 +4,8 @@ package ch.epfl.smartmap.listeners;
  * @author jfperren
  */
 public interface CacheListener {
-    /**
-     * Called when a Friend is added
-     * 
-     * @param id
-     *            id of the Friend added
-     */
-    void onElementAdded(long id);
 
-    /**
-     * Called when a Friend is removed
-     * 
-     * @param id
-     *            id of the Friend removed
-     */
-    void onElementRemoved(long id);
+    void onNewFriend(long id);
+
+    void onNewNotification(long id);
 }

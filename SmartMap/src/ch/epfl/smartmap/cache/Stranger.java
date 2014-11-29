@@ -146,10 +146,10 @@ public class Stranger extends AbstractUser {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Localisable#isShown()
+     * @see ch.epfl.smartmap.cache.Localisable#isVisible()
      */
     @Override
-    public boolean isShown() {
+    public boolean isVisible() {
         return false;
     }
 

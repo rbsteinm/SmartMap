@@ -8,7 +8,6 @@ import java.util.TimeZone;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.listeners.DisplayableListener;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -19,7 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * 
  * @author ritterni
  */
-public class PublicEvent implements Event {
+public class PublicEvent extends AbstractEvent {
 
     private long mId;
     private String mName;
@@ -37,7 +36,7 @@ public class PublicEvent implements Event {
     public static final float MARKER_ANCHOR_Y = 1;
 
     protected PublicEvent(ImmutableEvent event) {
-        mCreator = UserCache.getUserById(event.getCreatorId());
+        mCreator = Cache.getInstance().getUserById(event.getCreatorId());
         mName = event.getName();
         mStartDate = new GregorianCalendar(TimeZone.getDefault());
         mEndDate = new GregorianCalendar(TimeZone.getDefault());
@@ -50,15 +49,6 @@ public class PublicEvent implements Event {
         // TODO : Handle listeners
     }
 
-    @Override
-    public void addOnDisplayableUpdateListener(DisplayableListener listener) {
-        // TODO Auto-generated method stub
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Event#addParticipant(java.lang.Long)
-     */
     @Override
     public void addParticipant(Long id) {
         if (!mParticipants.contains(Long.valueOf(id))) {
@@ -172,6 +162,15 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#getType()
+     */
+    @Override
+    public Type getType() {
+        return Type.PUBLIC;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -184,19 +183,8 @@ public class PublicEvent implements Event {
      * @see ch.epfl.smartmap.cache.Localisable#isShown()
      */
     @Override
-    public boolean isShown() {
+    public boolean isVisible() {
         return true;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#removeOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
-     * OnDisplayableUpdateListener)
-     */
-    @Override
-    public void removeOnDisplayableUpdateListener(DisplayableListener listener) {
-        // TODO Auto-generated method stub
-
     }
 
     /*
@@ -214,7 +202,7 @@ public class PublicEvent implements Event {
      */
     @Override
     public void setCreatorId(long id) {
-        mCreator = UserCache.getUserById(id);
+        mCreator = Cache.getInstance().getUserById(id);
     }
 
     @Override

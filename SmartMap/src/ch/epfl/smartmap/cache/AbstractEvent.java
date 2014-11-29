@@ -4,11 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ch.epfl.smartmap.listeners.DisplayableListener;
+import ch.epfl.smartmap.listeners.EventListener;
 import ch.epfl.smartmap.listeners.LocalisableListener;
 
-/**
- * @author jfperren
- */
 /**
  * @author jfperren
  */

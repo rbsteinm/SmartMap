@@ -7,17 +7,22 @@ public class OnCacheListener implements CacheListener {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onElementAdded(long)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onNewFriend(long)
      */
     @Override
-    public void onElementAdded(long id) {
+    public void onNewFriend(long id) {
+        // TODO Auto-generated method stub
+
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onElementRemoved(long)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onNewNotification(long)
      */
     @Override
-    public void onElementRemoved(long id) {
+    public void onNewNotification(long id) {
+        // TODO Auto-generated method stub
+
     }
+
 }

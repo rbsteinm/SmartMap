@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * {@code getFriendFromId(int id)}
  * 
  * @author jfperren
+ * @author ritterni
  */
 public final class Friend extends AbstractUser {
 
@@ -203,8 +204,7 @@ public final class Friend extends AbstractUser {
      * @see ch.epfl.smartmap.cache.Localisable#isShown()
      */
     @Override
-    public boolean isShown() {
-        // TODO : Implement settings here
+    public boolean isVisible() {
         return true;
     }
 

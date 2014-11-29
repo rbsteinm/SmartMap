@@ -7,6 +7,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
+ * An object that can be displayed on the map must implement this.
+ * 
  * @author jfperren
  */
 public interface Localisable extends Stockable {
@@ -34,7 +36,7 @@ public interface Localisable extends Stockable {
      */
     MarkerOptions getMarkerOptions();
 
-    boolean isShown();
+    boolean isVisible();
 
     void removeLocalisableListener(LocalisableListener oldListener);
 
