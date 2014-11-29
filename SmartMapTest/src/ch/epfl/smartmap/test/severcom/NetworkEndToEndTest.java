@@ -42,7 +42,7 @@ public class NetworkEndToEndTest extends TestCase {
     private static final long MY_ID = 3;
     private static final User VALID_PEOPLE = new Friend(MY_ID, VALID_NAME);
     private static final Event FOOTBALL_TOURNAMENT = new PublicEvent("Football Tournament",
-        VALID_PEOPLE.getID(), VALID_PEOPLE.getName(), new GregorianCalendar(2014, 11, 23),
+        VALID_PEOPLE.getId(), VALID_PEOPLE.getName(), new GregorianCalendar(2014, 11, 23),
         new GregorianCalendar(2014, 11, 27), LOCATION);
     private static final long VALID_EVENT_ID = 3;
 
@@ -124,7 +124,7 @@ public class NetworkEndToEndTest extends TestCase {
     @Test
     public void testJ_GetUserInfo() throws SmartMapClientException {
         NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        User friend = networkClient.getUserInfo(VALID_ID_1);
+        User friend = networkClient.getFriendInfo(VALID_ID_1);
         this.assertValidIdAndName(friend);
 
     }
@@ -174,7 +174,7 @@ public class NetworkEndToEndTest extends TestCase {
 
         for (User user : users) {
             Location location = user.getLocation();
-            assertTrue("Invalid id", user.getID() > 0);
+            assertTrue("Invalid id", user.getId() > 0);
             assertTrue("Unexpected latitude", (-90 <= location.getLatitude())
                 && (location.getLatitude() <= 90));
             assertTrue("Unexpected longitude", (-180 <= location.getLongitude())
@@ -251,7 +251,7 @@ public class NetworkEndToEndTest extends TestCase {
         NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
         List<Event> events = networkClient.getPublicEvents(45, 46, 1000);
         for (Event event : events) {
-            assertTrue("Unexpected event id", event.getID() >= 0);
+            assertTrue("Unexpected event id", event.getId() >= 0);
             assertTrue("Unexpected creator id", event.getCreator() >= 0);
             assertTrue("Unexpected end and start dates", event.getEndDate().after(event.getStartDate()));
             assertTrue("Unexpected latitude", (-90 <= event.getLocation().getLatitude())
@@ -270,7 +270,7 @@ public class NetworkEndToEndTest extends TestCase {
     }
 
     private void assertValidIdAndName(User user) {
-        assertTrue("Unexpected id", user.getID() >= 0);
+        assertTrue("Unexpected id", user.getId() >= 0);
         assertTrue("Unexpected name", (2 < user.getName().length()) && (user.getName().length() <= 60));
     }
 

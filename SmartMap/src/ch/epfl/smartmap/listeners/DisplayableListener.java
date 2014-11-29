@@ -6,17 +6,12 @@ package ch.epfl.smartmap.listeners;
  * 
  * @author jfperren
  */
-public interface OnDisplayableUpdateListener {
+public interface DisplayableListener {
 
     /**
      * Called when the image of the Displayable changes
      */
     void onImageChanged();
-
-    /**
-     * Called when the location changes
-     */
-    void onLocationChanged();
 
     /**
      * Called when the name of the Displayable changes
@@ -26,5 +21,5 @@ public interface OnDisplayableUpdateListener {
     /**
      * Called when the short description of the Displayable changes
      */
-    void onShortInfoChanged();
+    void onSubtitleChanged();
 }

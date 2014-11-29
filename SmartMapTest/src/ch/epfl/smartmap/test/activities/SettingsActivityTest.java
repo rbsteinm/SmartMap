@@ -8,7 +8,7 @@ import org.hamcrest.Matchers;
 import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.activities.SettingsActivity;
-import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.background.SettingsManager;
 
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.android.apps.common.testing.ui.espresso.matcher.PreferenceMatchers;

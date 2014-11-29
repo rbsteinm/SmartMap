@@ -1,9 +1,14 @@
-package ch.epfl.smartmap.cache;
+package ch.epfl.smartmap.database;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.PublicEvent;
 
 import android.location.Location;
 

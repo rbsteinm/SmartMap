@@ -16,14 +16,14 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.listeners.OnListUpdateListener;
+import ch.epfl.smartmap.listeners.CacheListener;
 
 /**
  * Fragment displaying your friends in FriendsActivity
  * 
  * @author rbsteinm
  */
-public class FriendsTab extends ListFragment implements OnListUpdateListener {
+public class FriendsTab extends ListFragment implements CacheListener {
     private List<User> mFriendList;
 
     private final Context mContext;

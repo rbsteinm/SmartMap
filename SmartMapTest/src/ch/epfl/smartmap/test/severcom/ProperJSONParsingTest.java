@@ -102,7 +102,7 @@ public class ProperJSONParsingTest extends TestCase {
         SmartMapParser parser = new JsonSmartMapParser();
         User friend = parser.parseFriend(PROPER_FRIEND_JSON);
 
-        assertEquals("Friend's id does not match", 13, friend.getID());
+        assertEquals("Friend's id does not match", 13, friend.getId());
         assertEquals("Friend's name does not match", "Georges", friend.getName());
         assertEquals("Friend's email does not match", "georges@gmail.com", friend.getEmail());
         assertEquals("Friend's phone number does not match", "0782678654", friend.getNumber());
@@ -134,9 +134,9 @@ public class ProperJSONParsingTest extends TestCase {
     public void testParseFriends() throws SmartMapParseException {
         SmartMapParser parser = new JsonSmartMapParser();
         List<User> listFriends = parser.parseFriends(PROPER_FRIEND_LIST_JSON, "list");
-        assertEquals("First friend's id does not match", 13, listFriends.get(0).getID());
+        assertEquals("First friend's id does not match", 13, listFriends.get(0).getId());
         assertEquals("First friend's name does not match", "Georges", listFriends.get(0).getName());
-        assertEquals("Second friend's id does not match", 18, listFriends.get(1).getID());
+        assertEquals("Second friend's id does not match", 18, listFriends.get(1).getId());
         assertEquals("Second friend's name does not match", "Alice", listFriends.get(1).getName());
     }
 
@@ -208,7 +208,7 @@ public class ProperJSONParsingTest extends TestCase {
 
     private void checkEvent1(Event event) {
         assertEquals("creator id does not match", 3, event.getCreator());
-        assertEquals("event id does not match", 13, event.getID());
+        assertEquals("event id does not match", 13, event.getId());
         assertTrue("End date does not match",
             Math.abs(date1.getTimeInMillis() - event.getEndDate().getTimeInMillis()) < 1000);
         assertTrue("Start date does not match",
@@ -224,7 +224,7 @@ public class ProperJSONParsingTest extends TestCase {
 
     private void checkEvent2(Event event) {
         assertEquals("creator id does not match", 1, event.getCreator());
-        assertEquals("event id does not match", 11, event.getID());
+        assertEquals("event id does not match", 11, event.getId());
         assertTrue("End date does not match",
             Math.abs(date4.getTimeInMillis() - event.getEndDate().getTimeInMillis()) < 1000);
         assertTrue("Start date does not match",

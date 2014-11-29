@@ -19,9 +19,9 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.PublicEvent;
-import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
 

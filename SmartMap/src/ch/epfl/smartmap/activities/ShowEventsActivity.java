@@ -22,9 +22,9 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.EventViewHolder;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 

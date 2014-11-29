@@ -1,7 +1,7 @@
 package ch.epfl.smartmap.cache;
 
 import android.graphics.Bitmap;
-import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
+import ch.epfl.smartmap.listeners.DisplayableListener;
 
 /**
  * Objects that can be displayed on the bottom menu, and as a marker on the map
@@ -11,11 +11,11 @@ import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
 public interface Displayable extends Stockable {
 
     // final Bitmap NO_IMAGE = Bitmap.createBitmap(R.drawable.default_event);
-    final String NO_TITLE = "";
-    final String NO_SUBTITLE = "";
-    final Bitmap DEFAULT_IMAGE = null;
+    String NO_TITLE = "";
+    String NO_SUBTITLE = "";
+    Bitmap DEFAULT_IMAGE = null;
 
-    void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener);
+    void addDisplayableListener(DisplayableListener newListener);
 
     /**
      * @param context
@@ -35,5 +35,5 @@ public interface Displayable extends Stockable {
      */
     String getTitle();
 
-    void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener);
+    void removeDisplayableListener(DisplayableListener oldListener);
 }

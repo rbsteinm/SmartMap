@@ -1,0 +1,614 @@
+<Project>
+  <Name>SmartMap</Name>
+  <ProjectItem type="NClass.DiagramEditor.ClassDiagram.Diagram" assembly="NClass.DiagramEditor, Version=2.4.1823.0, Culture=neutral, PublicKeyToken=null">
+    <Name>Cache Organization</Name>
+    <Language>Java</Language>
+    <Entities>
+      <Entity type="Class">
+        <Name>ImmutableUser</Name>
+        <Access>Public</Access>
+        <Location left="559" top="828" />
+        <Size width="184" height="94" />
+        <Collapsed>True</Collapsed>
+        <Member type="Constructor">public ImmutableUser(long id, String name, String phoneNumber, String email, Location location, Bitmap image)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>Stranger</Name>
+        <Access>Public</Access>
+        <Location left="559" top="1074" />
+        <Size width="190" height="145" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private List&lt;UserListener&gt; listeners</Member>
+        <Member type="Field">private long mId</Member>
+        <Member type="Field">private String mName</Member>
+        <Member type="Constructor">public Stranger(ImmutableUser user)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>PublicEvent</Name>
+        <Access>Public</Access>
+        <Location left="1026" top="1074" />
+        <Size width="226" height="111" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private List&lt;EventListener&gt; listeners</Member>
+        <Member type="Constructor">public PublicEvent(ImmutableEvent event)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>ImmutableEvent</Name>
+        <Access>Public</Access>
+        <Location left="1420" top="895" />
+        <Size width="194" height="77" />
+        <Collapsed>True</Collapsed>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>OnEventListener</Name>
+        <Access>Public</Access>
+        <Location left="891" top="895" />
+        <Size width="190" height="77" />
+        <Collapsed>True</Collapsed>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>Displayable</Name>
+        <Access>Public</Access>
+        <Location left="325" top="194" />
+        <Size width="210" height="214" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">static final Bitmap NO_IMAGE</Member>
+        <Member type="Field">static final String NO_SUBTITLE</Member>
+        <Member type="Field">static final String NO_TITLE</Member>
+        <Member type="Method">public Bitmap getImage()</Member>
+        <Member type="Method">String getSubtitle()</Member>
+        <Member type="Method">String getTitle()</Member>
+        <Member type="Method">void setImage(Bitmap newImage)</Member>
+      </Entity>
+      <Entity type="Interface">
+        <Name>Localisable</Name>
+        <Access>Public</Access>
+        <Location left="1178" top="194" />
+        <Size width="218" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">static final Location NO_LOCATION</Member>
+        <Member type="Field">static final String NO_LOCATION_STRING</Member>
+        <Member type="Field">static final MarkerOptions NO_MARKER_OPTIONS</Member>
+        <Member type="Method">Location getLocation()</Member>
+        <Member type="Method">String getLocationString()</Member>
+        <Member type="Method">MarkerOptions getMarkerOptions()</Member>
+        <Member type="Method">void setLocation()</Member>
+      </Entity>
+      <Entity type="Interface">
+        <Name>Stockable</Name>
+        <Access>Public</Access>
+        <Location left="743" top="10" />
+        <Size width="162" height="118" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">static final long NO_ID</Member>
+        <Member type="Method">long getId()</Member>
+      </Entity>
+      <Entity type="Interface">
+        <Name>DisplayableListener</Name>
+        <Access>Public</Access>
+        <Location left="40" top="194" />
+        <Size width="267" height="128" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void onImageChanged()</Member>
+        <Member type="Method">void onTitleChanged()</Member>
+        <Member type="Method">void onSubtitleChanged()</Member>
+      </Entity>
+      <Entity type="Interface">
+        <Name>LocalisableListener</Name>
+        <Access>Public</Access>
+        <Location left="891" top="194" />
+        <Size width="269" height="128" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void onLocationChanged()</Member>
+        <Member type="Method">void onLocationStringChanged()</Member>
+        <Member type="Method">void onMarkerOptionsChanged()</Member>
+      </Entity>
+      <Entity type="Interface">
+        <Name>UserListener</Name>
+        <Access>Public</Access>
+        <Location left="40" top="559" />
+        <Size width="205" height="128" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void onEmailChanged()</Member>
+        <Member type="Method">void onNameChanged()</Member>
+        <Member type="Method">void onPhoneNumberChanged()</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>OnDisplayableListener</Name>
+        <Access>Public</Access>
+        <Location left="145" top="363" />
+        <Size width="162" height="77" />
+        <Collapsed>True</Collapsed>
+        <Modifier>Abstract</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>OnLocalisableListener</Name>
+        <Access>Public</Access>
+        <Location left="970" top="363" />
+        <Size width="190" height="77" />
+        <Collapsed>True</Collapsed>
+        <Modifier>Abstract</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>OnUserListener</Name>
+        <Access>Public</Access>
+        <Location left="40" top="828" />
+        <Size width="205" height="77" />
+        <Collapsed>True</Collapsed>
+        <Modifier>Abstract</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>EventListener</Name>
+        <Access>Public</Access>
+        <Location left="891" top="558" />
+        <Size width="190" height="145" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">void onParticipantsChanged()</Member>
+        <Member type="Method">void onCreatorIdChanged()</Member>
+        <Member type="Method">void onDescriptionChanged()</Member>
+        <Member type="Method">void onDatesChanged()</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>Friend</Name>
+        <Access>Public</Access>
+        <Location left="298" top="1074" />
+        <Size width="208" height="196" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private List&lt;UserListener&gt; listeners</Member>
+        <Member type="Field">private long mId</Member>
+        <Member type="Field">private String mEmail</Member>
+        <Member type="Field">private Location mLocation</Member>
+        <Member type="Field">private String mName</Member>
+        <Member type="Field">private String mPhoneNumber</Member>
+        <Member type="Constructor">public Friend(ImmutableUser user)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Comment">
+        <Text>This diagram represent the class hierarchy in the cache package.
+@author jfperren</Text>
+        <Location left="40" top="10" />
+        <Size width="253" height="63" />
+      </Entity>
+      <Entity type="Class">
+        <Name>Self</Name>
+        <Access>Public</Access>
+        <Location left="40" top="1074" />
+        <Size width="205" height="94" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private List&lt;UserObserver&gt; listeners</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Enum">
+        <Name>Type</Name>
+        <Access>Public</Access>
+        <Location left="559" top="558" />
+        <Size width="190" height="128" />
+        <Collapsed>False</Collapsed>
+        <Value>Friend</Value>
+        <Value>Stranger</Value>
+        <Value>Self</Value>
+      </Entity>
+      <Entity type="Interface">
+        <Name>User</Name>
+        <Access>Public</Access>
+        <Location left="267" top="559" />
+        <Size width="268" height="314" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">static final Bitmap DEFAULT_IMAGE</Member>
+        <Member type="Field">static final String NO_EMAIL</Member>
+        <Member type="Field">static final String NO_NAME</Member>
+        <Member type="Field">static final String NO_PHONE_NUMER</Member>
+        <Member type="Field">static final User NOBODY</Member>
+        <Member type="Method">void getEmail()</Member>
+        <Member type="Method">void getLastSeen()</Member>
+        <Member type="Method">void getName()</Member>
+        <Member type="Method">void getPhoneNumber()</Member>
+        <Member type="Method">User.Type getUserType()</Member>
+        <Member type="Method">void setEmail(String newEmail)</Member>
+        <Member type="Method">void setName(String newName)</Member>
+        <Member type="Method">void setPhoneNumber(String newPhoneNumber)</Member>
+      </Entity>
+      <Entity type="Enum">
+        <Name>Type</Name>
+        <Access>Public</Access>
+        <Location left="1420" top="558" />
+        <Size width="194" height="95" />
+        <Collapsed>False</Collapsed>
+        <Value>Public</Value>
+        <Value>Private</Value>
+      </Entity>
+      <Entity type="Interface">
+        <Name>Event</Name>
+        <Access>Public</Access>
+        <Location left="1104" top="558" />
+        <Size width="292" height="383" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">static final List&lt;Long&gt; NO_PARTICIPANTS</Member>
+        <Member type="Field">static final String NO_DESCRIPTION</Member>
+        <Member type="Field">static final long NO_CREATOR</Member>
+        <Member type="Field">static final String NO_NAME</Member>
+        <Member type="Field">static final Calendar NOT_A_DATE</Member>
+        <Member type="Method">void addParticipant(long id)</Member>
+        <Member type="Method">long getCreatorId()</Member>
+        <Member type="Method">String getDescription()</Member>
+        <Member type="Method">Calendar getEndDate()</Member>
+        <Member type="Method">Calendar getStartDate()</Member>
+        <Member type="Method">String getName()</Member>
+        <Member type="Method">Event.Type getType()</Member>
+        <Member type="Method">void removeParticipant(long id)</Member>
+        <Member type="Method">void setCreatorId(long id)</Member>
+        <Member type="Method">void setDescription(String description)</Member>
+        <Member type="Method">void setEndDate(Calendar newEndDate)</Member>
+        <Member type="Method">void setName(String newName)</Member>
+        <Member type="Method">void setStartDate(Calendar startDate)</Member>
+      </Entity>
+      <Entity type="Class">
+        <Name>PrivateEvent</Name>
+        <Access>Public</Access>
+        <Location left="1307" top="1074" />
+        <Size width="237" height="111" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private List&lt;EventListener&gt; listeners</Member>
+        <Member type="Constructor">public PrivateEvent(ImmutableEvent event)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+    </Entities>
+    <Relationships>
+      <Relationship type="Realization" first="11" second="8">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>219</X>
+          <Y>351</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Realization" first="12" second="9">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>1062</X>
+          <Y>355</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Realization" first="4" second="14">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="13" second="10">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="10" second="8">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>96</X>
+          <Y>524</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="14" second="9">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>933</X>
+          <Y>533</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="10" second="9">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>176</X>
+          <Y>534</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>933</X>
+          <Y>422</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="14" second="8">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1008</X>
+          <Y>533</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>96</X>
+          <Y>360</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="19" second="18">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>563</X>
+          <Y>580</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>534</X>
+          <Y>580</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Aggregation</AssociationType>
+      </Relationship>
+      <Relationship type="Realization" first="15" second="19">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>401</X>
+          <Y>1045</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Realization" first="1" second="19">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Realization" first="17" second="19">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="13" second="17">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>10</X>
+          <Y>912</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>10</X>
+          <Y>1135</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Aggregation</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="13" second="15">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>273</X>
+          <Y>912</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>273</X>
+          <Y>1136</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Aggregation</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="13" second="1">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>531</X>
+          <Y>912</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>531</X>
+          <Y>1136</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Aggregation</AssociationType>
+      </Relationship>
+      <Relationship type="Dependency" first="19" second="18">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>608</X>
+          <Y>789</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>787</X>
+          <Y>580</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Dependency" first="0" second="1">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>784</X>
+          <Y>850</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>784</X>
+          <Y>1202</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Dependency" first="0" second="15">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>784</X>
+          <Y>850</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>532</X>
+          <Y>1256</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Dependency" first="21" second="20">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1518</X>
+          <Y>824</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>1639</X>
+          <Y>581</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Association" first="5" second="7">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="6" second="7">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="19" second="5">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>430</X>
+          <Y>433</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="21" second="6">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1286</X>
+          <Y>532</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="21" second="5">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1286</X>
+          <Y>532</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>430</X>
+          <Y>495</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="4" second="2">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>986</X>
+          <Y>979</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>972</X>
+          <Y>1137</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Aggregation</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="4" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1279</X>
+          <Y>979</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>1279</X>
+          <Y>1135</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Aggregation</AssociationType>
+      </Relationship>
+      <Relationship type="Realization" first="2" second="21">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1129</X>
+          <Y>1033</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>1250</X>
+          <Y>1033</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Realization" first="22" second="21">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>1250</X>
+          <Y>1017</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Dependency" first="3" second="22">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1639</X>
+          <Y>917</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>1594</X>
+          <Y>1170</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Dependency" first="3" second="2">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1639</X>
+          <Y>1219</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>1277</X>
+          <Y>1170</Y>
+        </BendPoint>
+      </Relationship>
+    </Relationships>
+  </ProjectItem>
+</Project>

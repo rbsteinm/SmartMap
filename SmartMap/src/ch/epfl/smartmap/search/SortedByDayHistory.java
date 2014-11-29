@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.cache;
+package ch.epfl.smartmap.search;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,6 +6,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.History;
 
 /**
  * Represents an History of Search Queries sorting them by day.

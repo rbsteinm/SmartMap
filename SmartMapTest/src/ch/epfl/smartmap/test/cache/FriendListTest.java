@@ -20,8 +20,8 @@ public class FriendListTest extends AndroidTestCase {
     @Test
     public void testAddUser() {
         DefaultFilter fl = new DefaultFilter(listName);
-        fl.addUser(a.getID());
-        assertTrue(fl.getList().get(0) == a.getID());
+        fl.addUser(a.getId());
+        assertTrue(fl.getList().get(0) == a.getId());
     }
 
     @Test
@@ -30,19 +30,19 @@ public class FriendListTest extends AndroidTestCase {
         array.put(0, b);
         array.put(9909, c);
         DefaultFilter fl = new DefaultFilter(listName);
-        fl.addUser(a.getID());
-        fl.addUser(b.getID());
-        fl.addUser(c.getID());
+        fl.addUser(a.getId());
+        fl.addUser(b.getId());
+        fl.addUser(c.getId());
         assertTrue(fl.getUserList(array).get(0).equals(c));
     }
 
     @Test
     public void testRemoveUser() {
         DefaultFilter fl = new DefaultFilter(listName);
-        fl.addUser(b.getID());
-        fl.addUser(a.getID());
-        fl.removeUser(b.getID());
-        assertTrue(fl.getList().get(0) == a.getID());
+        fl.addUser(b.getId());
+        fl.addUser(a.getId());
+        fl.removeUser(b.getId());
+        assertTrue(fl.getList().get(0) == a.getId());
     }
 
     @Test

@@ -1,8 +1,12 @@
-package ch.epfl.smartmap.cache;
+package ch.epfl.smartmap.search;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.History;
+import ch.epfl.smartmap.database.MockDB;
 
 /**
  * Mock class that returns filtered Lists from {@code MockDB}.

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
+import ch.epfl.smartmap.listeners.DisplayableListener;
 
 /**
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
@@ -20,7 +20,7 @@ import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
  * 
  * @author jfperren
  */
-public class SearchResultView extends RelativeLayout implements OnDisplayableUpdateListener {
+public class SearchResultView extends RelativeLayout implements DisplayableListener {
 
     private static final String TAG = "SEARCH RESULT VIEW";
     @SuppressWarnings("unused")
@@ -58,7 +58,7 @@ public class SearchResultView extends RelativeLayout implements OnDisplayableUpd
         super(context);
 
         mItem = item;
-        mImage = item.getImage(context);
+        mImage = item.getImage();
 
         // Layout Parameters
         this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
@@ -79,7 +79,7 @@ public class SearchResultView extends RelativeLayout implements OnDisplayableUpd
         // Create mTitleView
         mTitleView = new TextView(context);
         mTitleView.setId(R.id.search_result_title);
-        mTitleView.setText(mItem.getName());
+        mTitleView.setText(mItem.getTitle());
         mTitleView.setTextSize(TITLE_TEXT_SIZE);
         mTitleView.setTypeface(null, Typeface.BOLD);
         mTitleView.setPadding(0, 0, 0, TITLE_BOTTOM_PADDING);
@@ -91,7 +91,7 @@ public class SearchResultView extends RelativeLayout implements OnDisplayableUpd
         // Create mShortInfoView
         mShortInfoView = new TextView(context);
         mShortInfoView.setId(R.id.search_result_short_info);
-        mShortInfoView.setText(item.getShortInfos());
+        mShortInfoView.setText(item.getSubtitle());
         mShortInfoView.setTextColor(this.getResources().getColor(R.color.lastSeenConnectionTextColor));
         LayoutParams shortInfoParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         shortInfoParams.addRule(RIGHT_OF, R.id.search_result_image);
@@ -159,7 +159,7 @@ public class SearchResultView extends RelativeLayout implements OnDisplayableUpd
      */
     @Override
     public void onImageChanged() {
-        this.mImageView.setImageBitmap(mItem.getImage(this.getContext()));
+        this.mImageView.setImageBitmap(mItem.getImage());
     }
 
     /*
@@ -177,7 +177,7 @@ public class SearchResultView extends RelativeLayout implements OnDisplayableUpd
      */
     @Override
     public void onNameChanged() {
-        this.mTitleView.setText(mItem.getName());
+        this.mTitleView.setText(mItem.getTitle());
     }
 
     /*
@@ -186,7 +186,7 @@ public class SearchResultView extends RelativeLayout implements OnDisplayableUpd
      */
     @Override
     public void onShortInfoChanged() {
-        this.mShortInfoView.setText(mItem.getName());
+        this.mShortInfoView.setText(mItem.getSubtitle());
     }
 
 }

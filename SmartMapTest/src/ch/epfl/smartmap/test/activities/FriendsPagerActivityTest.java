@@ -3,7 +3,7 @@ package ch.epfl.smartmap.test.activities;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.ListView;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
-import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.FriendsTab;
 import ch.epfl.smartmap.gui.PagerAdapter;
 

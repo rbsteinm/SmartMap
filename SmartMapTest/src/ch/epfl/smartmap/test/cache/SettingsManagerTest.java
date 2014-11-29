@@ -5,7 +5,7 @@ import org.junit.Test;
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
-import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.background.SettingsManager;
 
 public class SettingsManagerTest extends AndroidTestCase {
 

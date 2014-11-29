@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.cache;
+package ch.epfl.smartmap.background;
 
 import android.content.Context;
 import android.content.SharedPreferences;

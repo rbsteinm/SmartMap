@@ -1,8 +1,16 @@
-package ch.epfl.smartmap.cache;
+package ch.epfl.smartmap.search;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.History;
+import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserCache;
+import ch.epfl.smartmap.database.DatabaseHelper;
 
 /**
  * @author jfperren

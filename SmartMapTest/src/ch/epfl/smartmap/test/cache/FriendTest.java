@@ -47,7 +47,7 @@ public class FriendTest extends AndroidTestCase {
 
     @Test
     public void testGetID() {
-        assertTrue(friend.getID() == id);
+        assertTrue(friend.getId() == id);
     }
 
     @Test

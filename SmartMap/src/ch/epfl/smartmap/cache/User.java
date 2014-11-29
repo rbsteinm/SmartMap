@@ -7,7 +7,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.graphics.Bitmap;
-import android.location.Location;
+import ch.epfl.smartmap.listeners.UserListener;
 
 /**
  * Describes a generic user of the app
@@ -20,20 +20,22 @@ public interface User extends Displayable, Localisable, Stockable {
     String NO_EMAIL = "No email";
     String NO_NAME = "No name";
     Calendar NO_LAST_SEEN = GregorianCalendar.getInstance(TimeZone.getDefault());
-
     Bitmap NO_IMAGE = null; // R.drawable.ic_default_user; // placeholder
 
     User NOBODY = null;
-    User NOT_FOUND = null;
 
+    User NOT_FOUND = null;
     int IMAGE_QUALITY = 100;
 
     long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
 
     float MARKER_ANCHOR_X = (float) 0.5;
+
     float MARKER_ANCHOR_Y = 1;
     int PICTURE_WIDTH = 50;
     int PICTURE_HEIGHT = 50;
+
+    void addUserListener(UserListener newListener);
 
     /**
      * @return The user's email address
@@ -52,7 +54,9 @@ public interface User extends Displayable, Localisable, Stockable {
 
     String getPhoneNumber();
 
-    boolean isFriend();
+    Type getType();
+
+    void removeUserListener(UserListener oldListener);
 
     /**
      * Sets the user's email
@@ -71,15 +75,6 @@ public interface User extends Displayable, Localisable, Stockable {
     void setImage(Bitmap newImage) throws FileNotFoundException, IOException;
 
     /**
-     * Sets the user's position (x and y)
-     * 
-     * @param newLocation
-     *            The new position
-     */
-    @Override
-    void setLocation(Location newLocation);
-
-    /**
      * Sets the user's name
      * 
      * @param newName
@@ -94,4 +89,9 @@ public interface User extends Displayable, Localisable, Stockable {
      *            The new phone number
      */
     void setPhoneNumber(String newNumber);
+
+    public enum Type {
+        FRIEND,
+        STRANGER;
+    }
 }

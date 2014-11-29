@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.background;
+package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +12,6 @@ import android.support.v4.app.NotificationCompat;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
-import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.User;
 
 /**
  * This class creates different sort of notifications

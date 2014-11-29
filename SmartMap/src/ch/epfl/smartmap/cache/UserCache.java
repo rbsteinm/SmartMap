@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
-import ch.epfl.smartmap.listeners.OnListUpdateListener;
+import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.listeners.CacheListener;
 
 /**
  * @author jfperren
@@ -19,10 +20,10 @@ public class UserCache {
     private static final Map<Long, Friend> FRIEND_INSTANCES = new HashMap<Long, Friend>();
     private static final Map<Long, Stranger> STRANGER_INSTANCES = new HashMap<Long, Stranger>();
 
-    private static final List<OnListUpdateListener> FRIENDLIST_LISTENERS =
-        new LinkedList<OnListUpdateListener>();
-    private static final List<OnListUpdateListener> STRANGERLIST_LISTENERS =
-        new LinkedList<OnListUpdateListener>();
+    private static final List<CacheListener> FRIENDLIST_LISTENERS =
+        new LinkedList<CacheListener>();
+    private static final List<CacheListener> STRANGERLIST_LISTENERS =
+        new LinkedList<CacheListener>();
 
     public static void addFriend(ImmutableUser user) {
         // Create new Friend and puts it in the cache
@@ -30,12 +31,12 @@ public class UserCache {
         FRIEND_INSTANCES.put(user.getId(), newFriend);
 
         // Call listeners
-        for (OnListUpdateListener listener : FRIENDLIST_LISTENERS) {
+        for (CacheListener listener : FRIENDLIST_LISTENERS) {
             listener.onElementAdded(user.getId());
         }
     }
 
-    public static void addOnListUpdateListener(OnListUpdateListener listener) {
+    public static void addOnListUpdateListener(CacheListener listener) {
         FRIENDLIST_LISTENERS.add(listener);
     }
 
@@ -102,12 +103,12 @@ public class UserCache {
         FRIEND_INSTANCES.remove(id);
 
         // Call listeners
-        for (OnListUpdateListener listener : FRIENDLIST_LISTENERS) {
+        for (CacheListener listener : FRIENDLIST_LISTENERS) {
             listener.onElementRemoved(id);
         }
     }
 
-    public static void removeOnListUpdateListener(OnListUpdateListener listener) {
+    public static void removeOnListUpdateListener(CacheListener listener) {
         FRIENDLIST_LISTENERS.remove(listener);
     }
 }

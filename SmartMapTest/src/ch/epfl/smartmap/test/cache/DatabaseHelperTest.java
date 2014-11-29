@@ -8,11 +8,11 @@ import org.junit.Test;
 import android.location.Location;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
-import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.DefaultFilter;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.database.DatabaseHelper;
 
 /**
  * Tests for the DatabaseHelper class
@@ -41,13 +41,13 @@ public class DatabaseHelperTest extends AndroidTestCase {
         // to avoid erasing the actual database
 
         filter = new DefaultFilter(name);
-        filter.addUser(a.getID());
-        filter.addUser(b.getID());
-        filter.addUser(c.getID());
+        filter.addUser(a.getId());
+        filter.addUser(b.getId());
+        filter.addUser(c.getId());
 
         filter2 = new DefaultFilter(name);
-        filter.addUser(b.getID());
-        filter.addUser(c.getID());
+        filter.addUser(b.getId());
+        filter.addUser(c.getId());
 
         event.setID(123123);
         event2.setID(456789);
@@ -68,17 +68,17 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Test
     public void testAddEvent() {
         dbh.addEvent(event);
-        assertTrue(dbh.getEvent(event.getID()).getCreatorName().equals(event.getCreatorName())
-            && (dbh.getEvent(event.getID()).getStartDate().get(GregorianCalendar.MINUTE) == event
+        assertTrue(dbh.getEvent(event.getId()).getCreatorName().equals(event.getCreatorName())
+            && (dbh.getEvent(event.getId()).getStartDate().get(GregorianCalendar.MINUTE) == event
                 .getStartDate().get(GregorianCalendar.MINUTE))
-            && (dbh.getEvent(event.getID()).getLocation().getLatitude() == event.getLocation().getLatitude()));
+            && (dbh.getEvent(event.getId()).getLocation().getLatitude() == event.getLocation().getLatitude()));
     }
 
     @Test
     public void testAddFilter() {
         long id = dbh.addFilter(filter);
         assertTrue(dbh.getFilter(id).getListName().equals(filter.getListName())
-            && dbh.getFilter(id).getList().contains(b.getID()));
+            && dbh.getFilter(id).getList().contains(b.getId()));
     }
 
     @Test
@@ -87,13 +87,13 @@ public class DatabaseHelperTest extends AndroidTestCase {
         a.setName(name);
         // testing that adding a user with the same id erases the first one
         dbh.addUser(a);
-        assertTrue((dbh.getFriend(a.getID()).getID() == a.getID())
-            && dbh.getFriend(a.getID()).getName().equals(a.getName())
-            && dbh.getFriend(a.getID()).getNumber().equals(a.getNumber())
-            && dbh.getFriend(a.getID()).getEmail().equals(a.getEmail())
-            && dbh.getFriend(a.getID()).getLocationString().equals(a.getLocationString())
-            && (dbh.getFriend(a.getID()).getLocation().getLongitude() == a.getLocation().getLongitude())
-            && (dbh.getFriend(a.getID()).getLocation().getLatitude() == a.getLocation().getLatitude())
+        assertTrue((dbh.getFriend(a.getId()).getId() == a.getId())
+            && dbh.getFriend(a.getId()).getName().equals(a.getName())
+            && dbh.getFriend(a.getId()).getNumber().equals(a.getNumber())
+            && dbh.getFriend(a.getId()).getEmail().equals(a.getEmail())
+            && dbh.getFriend(a.getId()).getLocationString().equals(a.getLocationString())
+            && (dbh.getFriend(a.getId()).getLocation().getLongitude() == a.getLocation().getLongitude())
+            && (dbh.getFriend(a.getId()).getLocation().getLatitude() == a.getLocation().getLatitude())
             && (dbh.getAllFriends().size() == 1));
     }
 
@@ -101,14 +101,14 @@ public class DatabaseHelperTest extends AndroidTestCase {
     public void testDeleteEvent() {
         dbh.addEvent(event);
         dbh.addEvent(event2);
-        dbh.deleteEvent(event.getID());
-        assertTrue((dbh.getAllEvents().size() == 1) && (dbh.getAllEvents().get(0).getID() == event2.getID()));
+        dbh.deleteEvent(event.getId());
+        assertTrue((dbh.getAllEvents().size() == 1) && (dbh.getAllEvents().get(0).getId() == event2.getId()));
     }
 
     @Test
     public void testDeleteFilter() {
         dbh.addFilter(filter);
-        dbh.deleteFilter(filter.getID());
+        dbh.deleteFilter(filter.getId());
         assertTrue(dbh.getAllFilters().isEmpty());
     }
 
@@ -117,7 +117,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(a);
         dbh.addUser(b);
         dbh.addUser(c);
-        dbh.deleteUser(b.getID());
+        dbh.deleteUser(b.getId());
         List<User> list = dbh.getAllFriends();
         assertTrue((list.size() == 2));
     }
@@ -142,7 +142,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(b);
         dbh.addUser(c);
         List<User> list = dbh.getAllFriends();
-        assertTrue((list.size() == 3) && (dbh.getFriend(c.getID()).getID() == c.getID()));
+        assertTrue((list.size() == 3) && (dbh.getFriend(c.getId()).getId() == c.getId()));
     }
 
     @Test
@@ -150,15 +150,15 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addEvent(event);
         event.setName(name);
         long rows = dbh.updateEvent(event);
-        assertTrue(dbh.getEvent(event.getID()).getName().equals(name) && (rows == 1));
+        assertTrue(dbh.getEvent(event.getId()).getName().equals(name) && (rows == 1));
     }
 
     public void testUpdateUser() {
         a.setEmail("test email");
         dbh.addUser(a);
         dbh.addUser(b);
-        int rows = dbh.updateFriend(new Friend(a.getID(), c.getName()));
-        assertTrue(dbh.getFriend(a.getID()).getName().equals(c.getName())
-            && dbh.getFriend(a.getID()).getEmail().equals("test email") && (rows == 1));
+        int rows = dbh.updateFriend(new Friend(a.getId(), c.getName()));
+        assertTrue(dbh.getFriend(a.getId()).getName().equals(c.getName())
+            && dbh.getFriend(a.getId()).getEmail().equals("test email") && (rows == 1));
     }
 }

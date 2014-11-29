@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
-import ch.epfl.smartmap.listeners.OnListUpdateListener;
+import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.listeners.CacheListener;
 
 /**
  * @author jfperren
@@ -17,10 +18,10 @@ public class EventCache {
     @SuppressLint("UseSparseArrays")
     private static final Map<Long, PublicEvent> PUBLIC_EVENT_INSTANCES = new HashMap<Long, PublicEvent>();
 
-    private static final List<OnListUpdateListener> INSTANCES_LISTENERS =
-        new LinkedList<OnListUpdateListener>();
+    private static final List<CacheListener> INSTANCES_LISTENERS =
+        new LinkedList<CacheListener>();
 
-    public static void addOnListUpdateListener(OnListUpdateListener listener) {
+    public static void addOnListUpdateListener(CacheListener listener) {
         INSTANCES_LISTENERS.add(listener);
     }
 
@@ -30,7 +31,7 @@ public class EventCache {
         PUBLIC_EVENT_INSTANCES.put(publicEvent.getId(), publicEvent);
 
         // Call listeners
-        for (OnListUpdateListener listener : INSTANCES_LISTENERS) {
+        for (CacheListener listener : INSTANCES_LISTENERS) {
             listener.onElementAdded(publicEvent.getId());
         }
     }
@@ -60,7 +61,7 @@ public class EventCache {
         return publicEvent;
     }
 
-    public static void removeOnListUpdateListener(OnListUpdateListener listener) {
+    public static void removeOnListUpdateListener(CacheListener listener) {
         INSTANCES_LISTENERS.remove(listener);
     }
 
@@ -69,7 +70,7 @@ public class EventCache {
         PUBLIC_EVENT_INSTANCES.remove(id);
 
         // Call listeners
-        for (OnListUpdateListener listener : INSTANCES_LISTENERS) {
+        for (CacheListener listener : INSTANCES_LISTENERS) {
             listener.onElementRemoved(id);
         }
     }

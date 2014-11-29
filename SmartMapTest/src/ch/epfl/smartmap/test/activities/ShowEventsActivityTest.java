@@ -17,8 +17,8 @@ import android.view.View;
 import android.widget.SeekBar;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
-import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.PublicEvent;
+import ch.epfl.smartmap.database.DatabaseHelper;
 
 import com.google.android.apps.common.testing.ui.espresso.UiController;
 import com.google.android.apps.common.testing.ui.espresso.ViewAction;

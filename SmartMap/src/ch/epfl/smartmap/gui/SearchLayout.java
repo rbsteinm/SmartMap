@@ -15,9 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.MockSearchEngine;
-import ch.epfl.smartmap.cache.SearchEngine;
-import ch.epfl.smartmap.cache.SearchEngine.Type;
+import ch.epfl.smartmap.search.MockSearchEngine;
+import ch.epfl.smartmap.search.SearchEngine;
+import ch.epfl.smartmap.search.SearchEngine.Type;
 
 /**
  * Layout that contains different SearchResult lists with different result

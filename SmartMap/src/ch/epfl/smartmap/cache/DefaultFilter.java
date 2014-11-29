@@ -10,7 +10,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
+import ch.epfl.smartmap.listeners.DisplayableListener;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -45,7 +45,7 @@ public class DefaultFilter implements Filter {
      * OnDisplayableUpdateListener)
      */
     @Override
-    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+    public void addOnDisplayableUpdateListener(DisplayableListener listener) {
         // TODO Auto-generated method stub
 
     }
@@ -149,7 +149,7 @@ public class DefaultFilter implements Filter {
      * OnDisplayableUpdateListener)
      */
     @Override
-    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+    public void removeOnDisplayableUpdateListener(DisplayableListener listener) {
         // TODO Auto-generated method stub
 
     }

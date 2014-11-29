@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
+import ch.epfl.smartmap.listeners.DisplayableListener;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -32,7 +32,7 @@ public class FriendInvitation implements Invitation, Displayable {
      * OnDisplayableUpdateListener)
      */
     @Override
-    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+    public void addOnDisplayableUpdateListener(DisplayableListener listener) {
         // TODO Auto-generated method stub
 
     }
@@ -114,7 +114,7 @@ public class FriendInvitation implements Invitation, Displayable {
      * OnDisplayableUpdateListener)
      */
     @Override
-    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+    public void removeOnDisplayableUpdateListener(DisplayableListener listener) {
         // TODO Auto-generated method stub
 
     }

@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 import android.graphics.Bitmap;
 import android.location.Location;
-import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
+import ch.epfl.smartmap.listeners.DisplayableListener;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -15,7 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * 
  * @author jfperren
  */
-public class Stranger implements User {
+public class Stranger extends AbstractUser {
 
     private long mId;
     private String mName;
@@ -25,16 +25,6 @@ public class Stranger implements User {
         this.mId = user.getId();
         this.mName = user.getName();
         this.mImage = user.getImage();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#addOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
-     * OnDisplayableUpdateListener)
-     */
-    @Override
-    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
-        // TODO Implement this method
     }
 
     /*
@@ -147,11 +137,11 @@ public class Stranger implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#isFriend()
+     * @see ch.epfl.smartmap.cache.User#getType()
      */
     @Override
-    public boolean isFriend() {
-        return false;
+    public Type getType() {
+        return Type.STRANGER;
     }
 
     /*
@@ -161,17 +151,6 @@ public class Stranger implements User {
     @Override
     public boolean isShown() {
         return false;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#removeOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
-     * OnDisplayableUpdateListener)
-     */
-    @Override
-    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
-        // TODO Auto-generated method stub
-
     }
 
     /*
@@ -189,10 +168,11 @@ public class Stranger implements User {
      */
     @Override
     public void setImage(Bitmap newImage) {
-        if (mImage != null) {
+        if (newImage != null) {
             mImage = newImage;
-        } else {
-            mImage = NO_IMAGE;
+            for (DisplayableListener listener : mDisplayableListeners) {
+                listener.onImageChanged();
+            }
         }
     }
 

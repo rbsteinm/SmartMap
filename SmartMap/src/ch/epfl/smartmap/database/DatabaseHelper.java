@@ -1,10 +1,19 @@
-package ch.epfl.smartmap.cache;
+package ch.epfl.smartmap.database;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
+
+import ch.epfl.smartmap.cache.DefaultFilter;
+import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.ImmutableEvent;
+import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.Localisable;
+import ch.epfl.smartmap.cache.User;
 
 import android.content.ContentValues;
 import android.content.Context;

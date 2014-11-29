@@ -3,7 +3,7 @@ package ch.epfl.smartmap.listeners;
 /**
  * @author jfperren
  */
-public interface OnListUpdateListener {
+public interface CacheListener {
     /**
      * Called when a Friend is added
      * 

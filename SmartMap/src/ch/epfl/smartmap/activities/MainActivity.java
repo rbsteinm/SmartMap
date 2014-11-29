@@ -22,24 +22,24 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.Notifications;
-import ch.epfl.smartmap.background.Notifications.NotificationListener;
+import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.background.UpdateService;
-import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.DatabaseSearchEngine;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.Notifications;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.Notifications.NotificationListener;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.AddEventOnMapLongClickListener;
-import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
+import ch.epfl.smartmap.listeners.DisplayableListener;
 import ch.epfl.smartmap.map.DefaultMarkerManager;
 import ch.epfl.smartmap.map.DefaultZoomManager;
+import ch.epfl.smartmap.search.DatabaseSearchEngine;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -82,7 +82,7 @@ public class MainActivity extends FragmentActivity {
     private DefaultMarkerManager<Event> mEventMarkerManager;
     private DefaultZoomManager mMapZoomer;
     private SupportMapFragment mFragmentMap;
-    private OnDisplayableUpdateListener mCurrentOnDisplayableUpdateListener;
+    private DisplayableListener mCurrentOnDisplayableUpdateListener;
 
     private Menu mMenu;
     private MenuTheme mMenuTheme;
@@ -392,7 +392,7 @@ public class MainActivity extends FragmentActivity {
                 mCurrentItem.removeOnDisplayableUpdateListener(mCurrentOnDisplayableUpdateListener);
             }
             // Add new listener
-            mCurrentOnDisplayableUpdateListener = new OnDisplayableUpdateListener() {
+            mCurrentOnDisplayableUpdateListener = new DisplayableListener() {
                 @Override
                 public void onImageChanged() {
                     actionBar.setIcon(new BitmapDrawable(MainActivity.this.getResources(), item

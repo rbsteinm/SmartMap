@@ -2,15 +2,14 @@ package ch.epfl.smartmap.cache;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.TimeZone;
 
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.gui.Utils;
-import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
-import ch.epfl.smartmap.listeners.OnUserUpdateListener;
+import ch.epfl.smartmap.listeners.DisplayableListener;
+import ch.epfl.smartmap.listeners.LocalisableListener;
+import ch.epfl.smartmap.listeners.UserListener;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -22,11 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * 
  * @author jfperren
  */
-public final class Friend implements User {
-
-    // Instance Listeners
-    private final List<OnDisplayableUpdateListener> mOnDisplayableUpdateListeners;
-    private final List<OnUserUpdateListener> mOnUserUpdateListeners;
+public final class Friend extends AbstractUser {
 
     // Friend informations
     private final long mID;
@@ -38,6 +33,7 @@ public final class Friend implements User {
     private Bitmap mImage;
 
     protected Friend(ImmutableUser user) {
+        super();
         mID = user.getId();
         mName = user.getName();
         mPhoneNumber = user.getPhoneNumber();
@@ -45,18 +41,6 @@ public final class Friend implements User {
         mLocationString = user.getLocationString();
         mLocation = user.getLocation();
         mImage = user.getImage();
-
-        mOnDisplayableUpdateListeners = new LinkedList<OnDisplayableUpdateListener>();
-        mOnUserUpdateListeners = new LinkedList<OnUserUpdateListener>();
-    }
-
-    @Override
-    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
-        mOnDisplayableUpdateListeners.add(listener);
-    }
-
-    public void addOnUserUpdateListener(OnUserUpdateListener listener) {
-        mOnUserUpdateListeners.add(listener);
     }
 
     /*
@@ -198,20 +182,20 @@ public final class Friend implements User {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getType()
+     */
+    @Override
+    public Type getType() {
+        return Type.FRIEND;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see java.lang.Object#hashcode
      */
     @Override
     public int hashCode() {
         return (int) mID;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#isFriend()
-     */
-    @Override
-    public boolean isFriend() {
-        return true;
     }
 
     /*
@@ -224,15 +208,6 @@ public final class Friend implements User {
         return true;
     }
 
-    @Override
-    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
-        mOnDisplayableUpdateListeners.remove(listener);
-    }
-
-    public void removeOnUserUpdateListener(OnUserUpdateListener listener) {
-        mOnUserUpdateListeners.remove(listener);
-    }
-
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.User#setEmail(java.lang.String)
@@ -241,7 +216,9 @@ public final class Friend implements User {
     public void setEmail(String newEmail) {
         if (newEmail != null) {
             mEmail = newEmail;
-            this.onEmailChanged();
+            for (UserListener listener : mUserListeners) {
+                listener.onEmailChanged();
+            }
         }
     }
 
@@ -251,7 +228,12 @@ public final class Friend implements User {
      */
     @Override
     public void setImage(Bitmap newImage) {
-        mImage = newImage;
+        if (newImage != null) {
+            mImage = newImage;
+            for (DisplayableListener listener : mDisplayableListeners) {
+                listener.onImageChanged();
+            }
+        }
     }
 
     /*
@@ -261,6 +243,9 @@ public final class Friend implements User {
     @Override
     public void setLocation(Location newLocation) {
         this.mLocation = newLocation;
+        for (LocalisableListener listener : mLocalisableListeners) {
+            listener.onLocationChanged();
+        }
     }
 
     /*
@@ -271,7 +256,9 @@ public final class Friend implements User {
     public void setName(String newName) {
         if ((newName != null) && !newName.equals("")) {
             this.mName = newName;
-            this.onNameChanged();
+            for (UserListener listener : mUserListeners) {
+                listener.onNameChanged();
+            }
         }
     }
 
@@ -283,85 +270,9 @@ public final class Friend implements User {
     public void setPhoneNumber(String newPhoneNumber) {
         if ((newPhoneNumber != null) && !newPhoneNumber.equals("")) {
             this.mPhoneNumber = newPhoneNumber;
-            this.onPhoneNumberChange();
-        }
-    }
-
-    /**
-     * Calls listeners on email field
-     */
-    private void onEmailChanged() {
-        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
-            listener.onEmailChanged();
-        }
-    }
-
-    /**
-     * Calls listeners on image field
-     */
-    private void onImageChanged() {
-        for (OnDisplayableUpdateListener listener : mOnDisplayableUpdateListeners) {
-            listener.onImageChanged();
-        }
-        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
-            listener.onImageChanged();
-        }
-    }
-
-    /**
-     * Calls listeners on lastSeen field
-     */
-    private void onLastSeenChanged() {
-        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
-            listener.onLastSeenChanged();
-        }
-        for (OnDisplayableUpdateListener listener : mOnDisplayableUpdateListeners) {
-            listener.onShortInfoChanged();
-        }
-    }
-
-    /**
-     * Calls listeners on location field
-     */
-    private void onLocationChanged() {
-        for (OnDisplayableUpdateListener listener : mOnDisplayableUpdateListeners) {
-            listener.onLocationChanged();
-        }
-        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
-            listener.onLocationChanged();
-        }
-    }
-
-    /**
-     * Calls listeners on locationString field
-     */
-    private void onLocationStringChanged() {
-        for (OnDisplayableUpdateListener listener : mOnDisplayableUpdateListeners) {
-            listener.onShortInfoChanged();
-        }
-        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
-            listener.onLocationStringChanged();
-        }
-    }
-
-    /**
-     * Calls listeners on name field
-     */
-    private void onNameChanged() {
-        for (OnDisplayableUpdateListener listener : mOnDisplayableUpdateListeners) {
-            listener.onNameChanged();
-        }
-        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
-            listener.onNameChanged();
-        }
-    }
-
-    /**
-     * Calls listeners on phone number field
-     */
-    private void onPhoneNumberChange() {
-        for (OnUserUpdateListener listener : mOnUserUpdateListeners) {
-            listener.onPhoneNumberChanged();
+            for (UserListener listener : mUserListeners) {
+                listener.onPhoneNumberChanged();
+            }
         }
     }
 }

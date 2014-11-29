@@ -1,6 +1,9 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Describes an event
@@ -9,7 +12,13 @@ import java.util.Calendar;
  */
 public interface Event extends Displayable, Localisable {
 
-    public static final PublicEvent NOT_FOUND = null;
+    static final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
+    static final String NO_DESCRIPTION = "NO_DESCRIPTION";
+    static final long NO_CREATOR_ID = NO_ID;
+    static final String NO_NAME = "NO_NAME";
+    static final Calendar NOT_A_DATE = GregorianCalendar.getInstance();
+
+    void addEventListener(EventListener newListener);
 
     void addParticipant(Long id);
 
@@ -36,6 +45,10 @@ public interface Event extends Displayable, Localisable {
      */
     Calendar getStartDate();
 
+    boolean isPublic();
+
+    void removeEventListener(EventListener oldListener);
+
     void removeParticipant(Long id);
 
     /**
@@ -44,7 +57,7 @@ public interface Event extends Displayable, Localisable {
      * @param name
      *            The event creator's name
      */
-    void setCreator(long id);
+    void setCreatorId(long id);
 
     /**
      * Sets the event's description

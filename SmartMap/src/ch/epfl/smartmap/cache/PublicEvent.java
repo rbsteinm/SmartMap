@@ -8,7 +8,7 @@ import java.util.TimeZone;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.listeners.OnDisplayableUpdateListener;
+import ch.epfl.smartmap.listeners.DisplayableListener;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -51,7 +51,7 @@ public class PublicEvent implements Event {
     }
 
     @Override
-    public void addOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+    public void addOnDisplayableUpdateListener(DisplayableListener listener) {
         // TODO Auto-generated method stub
     }
 
@@ -194,7 +194,7 @@ public class PublicEvent implements Event {
      * OnDisplayableUpdateListener)
      */
     @Override
-    public void removeOnDisplayableUpdateListener(OnDisplayableUpdateListener listener) {
+    public void removeOnDisplayableUpdateListener(DisplayableListener listener) {
         // TODO Auto-generated method stub
 
     }
@@ -213,7 +213,7 @@ public class PublicEvent implements Event {
      * @see ch.epfl.smartmap.cache.Event#setCreator(long)
      */
     @Override
-    public void setCreator(long id) {
+    public void setCreatorId(long id) {
         mCreator = UserCache.getUserById(id);
     }
 

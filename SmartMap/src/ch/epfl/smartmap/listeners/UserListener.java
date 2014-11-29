@@ -6,7 +6,7 @@ package ch.epfl.smartmap.listeners;
  * 
  * @author jfperren
  */
-public interface OnUserUpdateListener extends OnDisplayableUpdateListener {
+public interface UserListener extends DisplayableListener, LocalisableListener {
 
     /**
      * Called when e-mail changes.
@@ -21,6 +21,7 @@ public interface OnUserUpdateListener extends OnDisplayableUpdateListener {
     /**
      * Called when location changes
      */
+    @Override
     void onLocationStringChanged();
 
     /**
