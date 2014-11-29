@@ -32,6 +32,7 @@ public class PublicEvent implements Event, Displayable {
     public final static long DEFAULT_ID = -1;
     public final static int EVENT_ICON = R.drawable.default_event;
     private final static int RIGHT_SHIFT_COUNT = 32;
+    // private final List<Long> mParticipants;
 
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
@@ -87,6 +88,8 @@ public class PublicEvent implements Event, Displayable {
         mCreatorName = creatorName;
         mDescription = "Tomorrow near Lausanne";
         mID = DEFAULT_ID;
+        // mParticipants = new ArrayList<Long>(participants);
+
     }
 
     /*

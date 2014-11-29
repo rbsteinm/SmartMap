@@ -79,9 +79,10 @@ public interface SmartMapClient {
      * 
      * @param event
      *            the event to create
+     * @return the event's id
      * @throws SmartMapClientException
      */
-    void createPublicEvent(Event event) throws SmartMapClientException;
+    long createPublicEvent(Event event) throws SmartMapClientException;
 
     /**
      * Decline the invitation of the user with the given id

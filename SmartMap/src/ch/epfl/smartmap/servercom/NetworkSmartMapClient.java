@@ -227,24 +227,26 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      * .cache.Event)
      */
     @Override
-    public void createPublicEvent(Event event) throws SmartMapClientException {
+    public long createPublicEvent(Event event) throws SmartMapClientException {
 
         Map<String, String> params = this.getParamsForEvent(event);
         HttpURLConnection conn = this.getHttpURLConnection("/createEvent");
         String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
+        long id = -1;
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
-            long id = parser.parseId(response);
-            event.setID(id);
+            id = parser.parseId(response);
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
 
         } catch (SmartMapParseException e) {
             throw new SmartMapClientException(e);
         }
+
+        return id;
 
     }
 
