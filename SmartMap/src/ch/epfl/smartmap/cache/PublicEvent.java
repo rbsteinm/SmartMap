@@ -1,7 +1,9 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import android.content.Context;
@@ -32,7 +34,7 @@ public class PublicEvent implements Event, Displayable {
     public final static long DEFAULT_ID = -1;
     public final static int EVENT_ICON = R.drawable.default_event;
     private final static int RIGHT_SHIFT_COUNT = 32;
-    // private final List<Long> mParticipants;
+    private final List<Long> mParticipants;
 
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
@@ -88,7 +90,47 @@ public class PublicEvent implements Event, Displayable {
         mCreatorName = creatorName;
         mDescription = "Tomorrow near Lausanne";
         mID = DEFAULT_ID;
-        // mParticipants = new ArrayList<Long>(participants);
+        mParticipants = new ArrayList<Long>();
+
+    }
+
+    // constructor taking a list of participants
+    public PublicEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
+        GregorianCalendar endDate, Location p, List<Long> participants) {
+        if (name.isEmpty() || (name == null)) {
+            throw new IllegalArgumentException("Invalid event name!");
+        }
+        if (creatorName == null) {
+            throw new IllegalArgumentException("Invalid creator name!");
+        }
+        if (creator < 0) {
+            throw new IllegalArgumentException("Invalid creator ID!");
+        }
+        if (endDate.before(startDate)) {
+            throw new IllegalArgumentException("Invalid event dates!");
+        }
+        mEvtName = name;
+        mEvtCreator = creator;
+        mStartDate =
+            new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
+                startDate.get(Calendar.DATE), startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
+
+        mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
+        mStartDate.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+        mStartDate.setTimeInMillis(startDate.getTimeInMillis());
+        mEndDate =
+            new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH),
+                endDate.get(Calendar.DATE), endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
+
+        mEndDate.set(GregorianCalendar.HOUR_OF_DAY, endDate.get(GregorianCalendar.HOUR_OF_DAY));
+        mEndDate.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+        mEndDate.setTimeInMillis(endDate.getTimeInMillis());
+        mLocation = new Location(p);
+        mPositionName = "";
+        mCreatorName = creatorName;
+        mDescription = "Tomorrow near Lausanne";
+        mID = DEFAULT_ID;
+        mParticipants = new ArrayList<Long>(participants);
 
     }
 
@@ -176,6 +218,11 @@ public class PublicEvent implements Event, Displayable {
     @Override
     public String getName() {
         return mEvtName;
+    }
+
+    @Override
+    public List<Long> getParticipants() {
+        return new ArrayList<Long>(mParticipants);
     }
 
     @Override

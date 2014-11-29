@@ -418,6 +418,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         String positionName = null;
         String name = null;
         String description = "";
+        List<Long> participants;
 
         try {
             id = jsonObject.getLong("id");
@@ -429,6 +430,7 @@ public class JsonSmartMapParser implements SmartMapParser {
             positionName = jsonObject.getString("positionName");
             name = jsonObject.getString("name");
             description = jsonObject.getString("description");
+            participants = this.parseIds(jsonObject.toString(), "participants");
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
@@ -443,7 +445,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         this.checkEventDescription(description);
         Event event =
             new PublicEvent(name, creatorId, Friend.NO_NAME, startingDate, endDate, new Location(
-                "SmartMapServer"));
+                "SmartMapServer"), new ArrayList<Long>(participants));
         event.setID(id);
         event.setPositionName(positionName);
         event.setDescription(description);

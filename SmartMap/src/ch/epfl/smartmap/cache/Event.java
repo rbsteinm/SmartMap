@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.cache;
 
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import android.location.Location;
 
@@ -30,6 +31,8 @@ public interface Event extends Displayable {
      * @return The date (year, month, day, hour, minute) at which the event ends
      */
     GregorianCalendar getEndDate();
+
+    List<Long> getParticipants();
 
     /**
      * @return The event's position as a String (e.g. 'Lausanne')

@@ -21,8 +21,7 @@ import ch.epfl.smartmap.servercom.ServerFeedbackException;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
-// import org.junit.FixMethodOrder;
-// import org.junit.runners.MethodSorters;
+
 
 /**
  * Tests whether we can interact with the real quiz server.
@@ -30,7 +29,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * @author marion-S
  */
 
-// @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+
 public class NetworkEndToEndTest extends AndroidTestCase {
 
 	private final static long VALID_FACEBOOK_ID = 1482245642055847L;
@@ -46,7 +45,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	private static final User VALID_PEOPLE = new Friend(MY_ID, VALID_NAME);
 	private static final Event FOOTBALL_TOURNAMENT = new PublicEvent("Football Tournament",
 			VALID_PEOPLE.getID(), VALID_PEOPLE.getName(), new GregorianCalendar(2014, 11, 23),
-			new GregorianCalendar(2014, 11, 27), LOCATION);
+			new GregorianCalendar(2014, 11, 27), LOCATION,Arrays.asList((long)3));
 	private static final long VALID_EVENT_ID = 3;
 	private Context mContext;
 	private SmartMapClient networkClient;
@@ -270,6 +269,10 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 			assertTrue("Unexpected creator name", ((2 < event.getCreatorName().length()) && (event
 					.getCreatorName().length() <= 60)));
 			assertTrue("Unexpected event description", (event.getName().length() <= 255));
+			assertTrue("Unexpected participants list", event.getParticipants()!=null);
+			for (long id : event.getParticipants()) {
+				assertTrue("Unexpected participants id", id >= 0);
+			}
 
 		}
 	}
