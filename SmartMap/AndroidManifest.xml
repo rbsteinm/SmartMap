@@ -139,10 +139,7 @@
         <activity
             android:name="ch.epfl.smartmap.activities.InviteFriendsActivity"
             android:label="@string/title_activity_invite_friends"
-            android:parentActivityName=".activities.ShowEventInformationActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.epfl.smartmap.activities.ShowEventInformationActivity" />
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 

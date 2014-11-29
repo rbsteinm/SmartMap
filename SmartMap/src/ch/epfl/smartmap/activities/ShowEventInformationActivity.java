@@ -37,16 +37,15 @@ public class ShowEventInformationActivity extends Activity {
         this.setContentView(R.layout.activity_show_event_information);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-        mEvent = this.getIntent().getParcelableExtra("event");
-        Log.d(TAG, "City name: " + mEvent.getPositionName());
-        Log.d(TAG, "Country name: " + mEvent.getPositionCountryName());
-
-        if (mEvent == null) {
-            // This activity needs an event to function properly
-            this.finish();
+        if (this.getIntent().getParcelableExtra("event") != null) {
+            mEvent = this.getIntent().getParcelableExtra("event");
+            Log.d(TAG, "City name: " + mEvent.getPositionName());
+            Log.d(TAG, "Country name: " + mEvent.getPositionCountryName());
         }
 
-        this.initializeGUI();
+        if (mEvent != null) {
+            this.initializeGUI();
+        }
 
     }
 

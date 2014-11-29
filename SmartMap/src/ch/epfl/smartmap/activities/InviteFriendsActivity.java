@@ -19,7 +19,8 @@ import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 
 /**
- * This activity lets the user invite friends to an event.
+ * This activity lets the user invite friends to an event. Launched from
+ * {@link ch.epfl.smartmap.activities.ShowEventInformationActivity}
  * 
  * 
  * @author SpicyCH
@@ -41,7 +42,7 @@ public class InviteFriendsActivity extends ListActivity {
         SettingsManager.initialize(this.getApplicationContext());
 
         // Makes the logo clickable (clicking it returns to previous activity)
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setHomeButtonEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
         this.setAdapter();
@@ -79,42 +80,54 @@ public class InviteFriendsActivity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 return true;
+            case android.R.id.home:
+                this.setResult(RESULT_CANCELED);
+                this.finish();
+                break;
             case R.id.invite_friend_send_button:
 
-                // Get the friend ids to invite
-                List<Integer> posSelected = new ArrayList<Integer>();
-                for (int i = 0; i < mSelectedPositions.size(); i++) {
-                    if (mSelectedPositions.get(i)) {
-                        posSelected.add(i);
-                    }
-                }
-
-                List<Long> friendsIds = new ArrayList<Long>();
-                for (Integer i : posSelected) {
-                    friendsIds.add(mUserList.get(i).getID());
-                }
-
-                Log.d(TAG, "Friends ids to invite: " + friendsIds);
-
-                if (friendsIds.size() > 0) {
-                    Toast.makeText(this, this.getString(R.string.invite_friends_success), Toast.LENGTH_LONG).show();
-                    // TODO invite friends
-                } else {
-                    Toast.makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG)
-                            .show();
-                }
+                this.inviteFriends();
 
                 // Return to caller
                 this.setResult(RESULT_OK);
                 this.finish();
+
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     /**
+     * Invites the selected friends. Displays a toast describing if the invitations were sent or not.
      * 
-     * 
+     * @author SpicyCH
+     */
+    private void inviteFriends() {
+        // Get the friend ids to invite
+        List<Integer> posSelected = new ArrayList<Integer>();
+        // TODO use iterator?
+        for (int i = 0; i < mSelectedPositions.size(); i++) {
+            if (mSelectedPositions.get(i)) {
+                posSelected.add(i);
+            }
+        }
+
+        List<Long> friendsIds = new ArrayList<Long>();
+        for (Integer i : posSelected) {
+            friendsIds.add(mUserList.get(i).getID());
+        }
+
+        Log.d(TAG, "Friends ids to invite: " + friendsIds);
+
+        if (friendsIds.size() > 0) {
+            Toast.makeText(this, this.getString(R.string.invite_friends_success), Toast.LENGTH_LONG).show();
+            // TODO invite friends
+        } else {
+            Toast.makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
      * @author SpicyCH
      */
     private void setAdapter() {
