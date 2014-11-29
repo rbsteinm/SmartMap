@@ -124,6 +124,19 @@
     <!-- FacebookFragment -->
     <string name="fb_fragment_toast_cannot_connect_to_smartmap_server">Failed to log in to the SmartMap server</string>
     <string name="fb_fragment_toast_cannot_connect_to_internet">Your internet connection seems down. Please try again!</string>
+    
+    <!-- Settings -->
+    <string name="settings__key_notifications_enabled">notifications_enabled</string>
+    <string name="settings_key_notifications_friend_requests">notifications_friend_requests</string>
+    <string name="settings_key_notifications_friendship_confirmations">notifications_friendship_confirmations</string>
+    <string name="settings_key_notifications_event_invitations">notifications_event_invitations</string>
+    <string name="settings_key_notifications_event_proximity">notifications_event_proximity</string>
+    <string name="settings_key_notifications_vibrate">notifications_vibrate</string>
+    <string name="settings_key_general_always_share">general_always_share</string>
+    <string name="settings_key_refresh_frequency">refresh_frequency</string>
+    <string name="settings_key_last_seen_max">last_seen_max</string>
+    <string name="settings_key_events_show_public">events_show_public</string>
+    <string name="settings_key_events_show_private">events_show_private</string>
 
     <!-- UserInformationActivity -->
     <string name="title_activity_user_information">Friend Informations</string>
