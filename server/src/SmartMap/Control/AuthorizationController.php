@@ -198,4 +198,32 @@ class AuthorizationController
         
         return new JsonResponse($response);
     }
+
+    public function setVisibility(Request $request)
+    {
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        $visibility = RequestUtils::getPostParam($request, 'visibility');
+
+        try
+        {
+            $user = $this->mRepo->getUser($userId);
+
+            $user->setVisibility($visibility);
+
+            $this->mRepo->updateUser($user);
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in setVisibility method.', 2, $e);
+        }
+        catch (\InvalidArgumentException $e)
+        {
+            throw new InvalidRequestException($e->getMessage());
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Visibility changed.');
+
+        return new JsonResponse($response);
+    }
 }
