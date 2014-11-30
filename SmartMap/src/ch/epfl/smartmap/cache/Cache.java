@@ -27,14 +27,17 @@ public final class Cache {
 
     // List containing ids of all Friends
     private List<Long> mFriendIds;
+    private List<Long> mPendingFriendIds;
+
     // Lists containing ids of all pinned/going events
-    private List<Long> mPinnedEventIds;
+    private List<Long> mNearEventIds;
     private List<Long> mGoingEventIds;
 
     // SparseArrays containing instances
     private final LongSparseArray<PublicEvent> mPublicEventInstances;
     private final LongSparseArray<Friend> mFriendInstances;
     private final LongSparseArray<Stranger> mStrangerInstances;
+
     // Listeners
     private final List<CacheListener> mListeners;
 
@@ -46,7 +49,7 @@ public final class Cache {
         // Init lists
         mFriendIds = new ArrayList<Long>();
 
-        mPinnedEventIds = new ArrayList<Long>();
+        mNearEventIds = new ArrayList<Long>();
         mGoingEventIds = new ArrayList<Long>();
 
         mPublicEventInstances = new LongSparseArray<PublicEvent>();
@@ -54,6 +57,20 @@ public final class Cache {
         mStrangerInstances = new LongSparseArray<Stranger>();
 
         mListeners = new LinkedList<CacheListener>();
+    }
+
+    public void addFriend(long id) {
+        mFriendIds.add(id);
+        mPendingFriendIds.remove(id);
+        mStrangerInstances.remove(id);
+    }
+
+    public void addPendingFriend(long id) {
+        mPendingFriendIds.add(id);
+    }
+
+    public void addPinnedEvent(long id) {
+        mNearEventIds.add(id);
     }
 
     public List<Friend> getAllFriends() {
@@ -89,24 +106,37 @@ public final class Cache {
         return allPinnedEvents;
     }
 
-    public List<Displayable> getAllVisibleLocalisable() {
-        List<Localisable> allVisibleDisplayable = new ArrayList<Localisable>();
+    public List<Markable> getAllVisibleMarkables() {
+        List<Markable> allVisibleMarkables = new ArrayList<Markable>();
         for (Long id : mFriendIds) {
             User user = this.getFriendById(id);
             if (user.isVisible()) {
-                allVisibleDisplayable.add(user);
+                allVisibleMarkables.add(user);
             }
         }
 
-        for (Long id : mPinnedEventIds) {
+        for (Long id : mNearEventIds) {
             Event event = this.getEventById(id);
             if (event.isVisible()) {
-                allVisibleDisplayable.add(event);
+                allVisibleMarkables.add(event);
             }
         }
 
-        return allVisibleDisplayable;
+        return allVisibleMarkables;
     }
+
+    // public List<Event> getAllPublicEventsNear(Location location, double radius)
+    // throws SmartMapClientException {
+    // List<Event> ids =
+    // mNetworkClient.getPublicEvents(location.getLatitude(), location.getLongitude(), radius);
+    // List<Event> allPublicEventsNear = new ArrayList<Event>();
+    //
+    // for (Event event : ids) {
+    // allPublicEventsNear.add(this.getPublicEventById(event.getId()));
+    // }
+    //
+    // return allPublicEventsNear;
+    // }
 
     public Event getEventById(long id) {
         // For the moment only check in public events
@@ -238,6 +268,113 @@ public final class Cache {
         } else {
             // Match as Friend
             return friend;
+        }
+    }
+
+    public void removeFriend(long id) {
+    }
+
+    public void removeGoingEvent(long id) {
+        mGoingEventIds.remove(id);
+    }
+
+    public void removeNearEvent(long id) {
+        mNearEventIds.remove(id);
+    }
+
+    public void removePendingFriend(long id) {
+        mPendingFriendIds.remove(id);
+    }
+
+    public void updateFriendList(List<ImmutableUser> newFriends) {
+        // Delete previous list
+        mFriendIds.clear();
+
+        for (ImmutableUser user : newFriends) {
+            mFriendIds.add(user.getId());
+            this.updateFriend(user);
+        }
+
+        // Notify listeners
+        for (CacheListener l : mListeners) {
+            l.onFriendListUpdate();
+        }
+    }
+
+    public void updateGoingEventList(List<ImmutableEvent> newEvents) {
+        // Delete previous list
+        mGoingEventIds.clear();
+
+        for (ImmutableEvent event : newEvents) {
+            mGoingEventIds.add(event.getID());
+            this.updatePublicEvent(event);
+        }
+
+        // Notify listeners
+        for (CacheListener l : mListeners) {
+            l.onGoingEventListUpdate();
+        }
+    }
+
+    public void updateNearPublicEventList(List<ImmutableEvent> newEvents) {
+        // Delete previous list
+        mNearEventIds.clear();
+
+        for (ImmutableEvent event : newEvents) {
+            mNearEventIds.add(event.getID());
+            this.updatePublicEvent(event);
+        }
+
+        // Notify listeners
+        for (CacheListener l : mListeners) {
+            l.onNearEventListUpdate();
+        }
+    }
+
+    public void updatePendingFriendList(List<ImmutableUser> newPendingFriends) {
+        // Delete previous list
+        mFriendIds.clear();
+
+        for (ImmutableUser user : newPendingFriends) {
+            mPendingFriendIds.add(user.getId());
+            this.updateFriend(user);
+        }
+
+        // Notify listeners
+        for (CacheListener l : mListeners) {
+            l.onPendingFriendListUpdate();
+        }
+    }
+
+    private boolean updateFriend(ImmutableUser user) {
+        // Check in cache
+        User cachedUser = mFriendInstances.get(user.getId());
+
+        if (cachedUser == null) {
+            // Not in cache
+            cachedUser = new Friend(user);
+            mFriendInstances.put(user.getId(), cachedUser);
+            return true;
+        } else {
+            // In cache
+            cachedUser.update(user);
+            return false;
+        }
+    }
+
+    private boolean updatePublicEvent(ImmutableEvent event) {
+        // Check in cache
+        Event cachedEvent = mPublicEventInstances.get(event.getID());
+
+        if (cachedEvent == null) {
+            // Not in cache
+            cachedEvent = new PublicEvent(event);
+            mPublicEventInstances.put(event.getID(), cachedEvent);
+            return true;
+        } else {
+            // In cache
+            cachedEvent.update(event);
+            return false;
         }
     }
 

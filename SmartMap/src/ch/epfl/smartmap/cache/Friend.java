@@ -275,4 +275,8 @@ public final class Friend extends AbstractUser {
             }
         }
     }
+
+    public void update(ImmutableUser user) {
+
+    }
 }

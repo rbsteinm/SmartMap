@@ -5,10 +5,12 @@ package ch.epfl.smartmap.listeners;
  */
 public interface CacheListener {
 
-    void onAllLocationsUpdate();
+    void onFriendListUpdate();
 
-    void onNewFriend(long id);
+    void onNearEventListUpdate();
 
-    void onNewNotification(long id);
+    void onPendingFriendListUpdate();
+
+    void onVisibleMarkableListUpdate();
 
 }

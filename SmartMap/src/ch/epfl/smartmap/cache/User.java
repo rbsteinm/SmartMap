@@ -14,7 +14,7 @@ import ch.epfl.smartmap.listeners.UserListener;
  * 
  * @author ritterni
  */
-public interface User extends Displayable, Localisable, Stockable {
+public interface User extends Displayable, Markable {
 
     String NO_NUMBER = "No phone Number";
     String NO_EMAIL = "No email";

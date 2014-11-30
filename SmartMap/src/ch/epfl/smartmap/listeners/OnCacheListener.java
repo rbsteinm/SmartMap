@@ -7,30 +7,40 @@ public class OnCacheListener implements CacheListener {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onAllLocationsUpdate()
+     * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
      */
     @Override
-    public void onAllLocationsUpdate() {
+    public void onFriendListUpdate() {
         // TODO Auto-generated method stub
 
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onNewFriend(long)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onNearEventListUpdate()
      */
     @Override
-    public void onNewFriend(long id) {
+    public void onNearEventListUpdate() {
         // TODO Auto-generated method stub
 
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onNewNotification(long)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onPendingFriendListUpdate()
      */
     @Override
-    public void onNewNotification(long id) {
+    public void onPendingFriendListUpdate() {
+        // TODO Auto-generated method stub
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onVisibleMarkableListUpdate()
+     */
+    @Override
+    public void onVisibleMarkableListUpdate() {
         // TODO Auto-generated method stub
 
     }
