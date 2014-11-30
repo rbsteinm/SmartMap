@@ -147,12 +147,10 @@ public class AddFriendActivity extends ListActivity {
         protected void onPostExecute(List<ImmutableUser> refreshedList) {
             super.onPostExecute(refreshedList);
             List<User> users = new ArrayList<User>();
-            for(ImmutableUser user : refreshedList) {
-                Cache.getInstance().addStranger(user);
+            for (ImmutableUser user : refreshedList) {
                 users.add(Cache.getInstance().getStrangerById(user.getId()));
             }
-            AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                users));
+            AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this, users));
         }
     }
 
@@ -182,7 +180,7 @@ public class AddFriendActivity extends ListActivity {
         @Override
         protected void onPostExecute(String confirmString) {
             Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG)
-            .show();
+                .show();
         }
     }
 }

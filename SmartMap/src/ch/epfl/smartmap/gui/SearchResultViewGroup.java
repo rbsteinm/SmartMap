@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.listeners.CacheListener;
 
 /**
  * Layout that contains different SearchResultViews that can be dynamically
@@ -19,7 +18,7 @@ import ch.epfl.smartmap.listeners.CacheListener;
  * 
  * @author jfperren
  */
-public class SearchResultViewGroup extends LinearLayout implements CacheListener {
+public class SearchResultViewGroup extends LinearLayout {
 
     private static final String TAG = "SEARCH_RESULT_VIEW_GROUP";
 

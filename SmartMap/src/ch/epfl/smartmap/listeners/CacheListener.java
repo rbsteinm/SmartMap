@@ -20,4 +20,5 @@ public interface CacheListener {
     void onPendingFriendListUpdate();
 
     void onVisibleLocalisableListUpdate();
+
 }

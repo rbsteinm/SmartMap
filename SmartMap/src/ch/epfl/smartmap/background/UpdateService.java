@@ -156,20 +156,6 @@ public class UpdateService extends Service {
         Notifications.newFriendNotification(this, user);
     }
 
-    private class AsyncFillDatabaseWithFriend extends AsyncTask<Long, Void, Void> {
-        @Override
-        protected Void doInBackground(Long... params) {
-            try {
-                ImmutableUser friend = mClient.getFriendInfo(params[0].longValue());
-                mHelper.addUser(friend);
-            } catch (SmartMapClientException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
-
     /**
      * AsyncTask to get friends' positions
      * 

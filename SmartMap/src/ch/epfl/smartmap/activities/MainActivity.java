@@ -26,7 +26,6 @@ import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.cache.Localisable;
 import ch.epfl.smartmap.cache.Notifications;
 import ch.epfl.smartmap.cache.Notifications.NotificationListener;
 import ch.epfl.smartmap.cache.User;
@@ -35,7 +34,6 @@ import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.AddEventOnMapLongClickListener;
-import ch.epfl.smartmap.listeners.DisplayableListener;
 import ch.epfl.smartmap.map.DefaultMarkerManager;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 import ch.epfl.smartmap.search.CacheSearchEngine;
@@ -77,10 +75,10 @@ public class MainActivity extends FragmentActivity {
     private Cache mCache;
     private SideMenu mSideMenu;
     private GoogleMap mGoogleMap;
-    private DefaultMarkerManager mMarkerManager;
+    private DefaultMarkerManager mFriendMarkerManager;
+    private DefaultMarkerManager mEventMarkerManager;
     private DefaultZoomManager mMapZoomer;
     private SupportMapFragment mFragmentMap;
-    private DisplayableListener mCurrentOnDisplayableUpdateListener;
 
     private Menu mMenu;
     private MenuTheme mMenuTheme;
@@ -121,7 +119,8 @@ public class MainActivity extends FragmentActivity {
 
         if (mGoogleMap != null) {
             // Set different tools for the GoogleMap
-            mMarkerManager = new DefaultMarkerManager(mGoogleMap);
+            mFriendMarkerManager = new DefaultMarkerManager(mGoogleMap);
+            mEventMarkerManager = new DefaultMarkerManager(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
 
             this.initializeMarkers();
@@ -310,9 +309,7 @@ public class MainActivity extends FragmentActivity {
                         this.setMainMenu();
                         break;
                     case ITEM:
-                        if (mCurrentItem instanceof Localisable) {
-                            mMapZoomer.zoomOnLocation(((Localisable) mCurrentItem).getLatLng());
-                        }
+                        mMapZoomer.zoomOnLocation(mCurrentItem.getLatLng());
 
                         break;
                     default:
@@ -357,9 +354,9 @@ public class MainActivity extends FragmentActivity {
      */
     public void performQuery(Displayable item) {
         // Focus on Friend
-        if (item instanceof Localisable) {
-            mMapZoomer.zoomOnLocation(((Localisable) item).getLatLng());
-        }
+
+        mMapZoomer.zoomOnLocation(item.getLatLng());
+
         this.setItemMenu(item);
     }
 
@@ -440,9 +437,12 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void initializeMarkers() {
-        mMarkerManager.updateMarkers(this, mCache.getAllVisibleLocalisables());
+        mFriendMarkerManager.updateMarkers(this, mCache.getAllVisibleFriends());
+        mEventMarkerManager.updateMarkers(this, mCache.getAllVisibleEvents());
 
-        List<Marker> allMarkers = new ArrayList<Marker>(mMarkerManager.getDisplayedMarkers());
+        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
+        allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
+
         Intent startingIntent = this.getIntent();
         if (startingIntent.getParcelableExtra("location") == null) {
             mMapZoomer.zoomAccordingToMarkers(allMarkers);
@@ -471,18 +471,17 @@ public class MainActivity extends FragmentActivity {
         public boolean onMarkerClick(Marker arg0) {
 
             if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
-                Displayable friendClicked = mFriendMarkerManager.getItemForMarker(arg0);
+                Displayable itemClicked = mFriendMarkerManager.getItemForMarker(arg0);
                 mMapZoomer.zoomOnLocation(arg0.getPosition());
-                MainActivity.this.setItemMenu(friendClicked);
+                MainActivity.this.setItemMenu(itemClicked);
                 return true;
             } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
-                Displayable eventClicked = mEventMarkerManager.getItemForMarker(arg0);
+                Displayable itemClicked = mEventMarkerManager.getItemForMarker(arg0);
                 mMapZoomer.zoomOnLocation(arg0.getPosition());
-                MainActivity.this.setItemMenu(eventClicked);
+                MainActivity.this.setItemMenu(itemClicked);
                 return true;
             }
             return false;
         }
-
     }
 }

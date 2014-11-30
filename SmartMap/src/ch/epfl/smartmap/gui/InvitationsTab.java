@@ -225,6 +225,5 @@ public class InvitationsTab extends ListFragment {
                 new AckAcceptedInvitations().execute(newFriend.getId());
             }
         }
-
     }
 }

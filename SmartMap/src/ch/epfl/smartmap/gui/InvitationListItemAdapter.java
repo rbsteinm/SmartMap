@@ -61,7 +61,7 @@ public class InvitationListItemAdapter extends ArrayAdapter<User> {
 
         // Set fields with friend attributes
         title.setText(mContext.getString(R.string.notification_invitefriend_title));
-        picture.setImageBitmap(mItemsArrayList.get(position).getImage(mContext));
+        picture.setImageBitmap(mItemsArrayList.get(position).getImage());
         text.setText(mItemsArrayList.get(position).getName() + " "
             + mContext.getString(R.string.notification_friend_invitation));
 

@@ -14,7 +14,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.Localisable;
+import ch.epfl.smartmap.cache.Displayable;
 
 /**
  * Class that count the redraw badge on app icon
@@ -32,7 +32,7 @@ public class Utils {
 
     public static String getCityFromLocation(Location location) {
         if (location == null) {
-            return Localisable.NO_LOCATION_STRING;
+            return Displayable.NO_LOCATION_STRING;
         }
 
         Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
@@ -45,10 +45,10 @@ public class Utils {
             } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {
-                return Localisable.NO_LOCATION_STRING;
+                return Displayable.NO_LOCATION_STRING;
             }
         } catch (IOException e) {
-            return Localisable.NO_LOCATION_STRING;
+            return Displayable.NO_LOCATION_STRING;
         }
     }
 

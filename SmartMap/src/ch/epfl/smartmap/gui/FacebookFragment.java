@@ -21,6 +21,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -99,8 +100,33 @@ public class FacebookFragment extends Fragment {
                                 .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
                             Toast.LENGTH_LONG).show();
                     } else {
-                        // Create and start the next activity
-                        FacebookFragment.this.startMainActivity();
+
+                        // Fill cache with friends
+                        new AsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                try {
+                                    List<Long> friendIds =
+                                        NetworkSmartMapClient.getInstance().getFriendsIds();
+
+                                    Cache.getInstance().setFriendList(friendIds);
+                                    for (Long id : friendIds) {
+                                        Cache.getInstance().addFriend(id);
+                                    }
+                                } catch (SmartMapClientException e) {
+                                    // Retry
+                                    this.execute();
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void result) {
+
+                                // Create and start the next activity
+                                FacebookFragment.this.startMainActivity();
+                            }
+                        }.execute();
                     }
 
                 } else if (response.getError() != null) {

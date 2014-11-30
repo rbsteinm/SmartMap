@@ -90,6 +90,10 @@ public final class Cache {
         }
     }
 
+    public void addOnCacheListener(CacheListener listener) {
+        mListeners.add(listener);
+    }
+
     public void addPendingFriend(long id) {
         mPendingFriendIds.add(id);
         for (CacheListener listener : mListeners) {
@@ -130,23 +134,15 @@ public final class Cache {
         return allPinnedEvents;
     }
 
-    public List<Displayable> getAllVisibleDisplayables() {
-        List<Displayable> allVisibleDisplayables = new ArrayList<Displayable>();
+    public List<Displayable> getAllVisibleEvents() {
+        List<Displayable> allVisibleEvents = new ArrayList<Displayable>();
         for (Long id : mFriendIds) {
-            User user = this.getFriendById(id);
-            if (user.isVisible()) {
-                allVisibleDisplayables.add(user);
-            }
-        }
-
-        for (Long id : mNearEventIds) {
             Event event = this.getEventById(id);
             if (event.isVisible()) {
-                allVisibleDisplayables.add(event);
+                allVisibleEvents.add(event);
             }
         }
-
-        return allVisibleDisplayables;
+        return allVisibleEvents;
     }
 
     // public List<Event> getAllPublicEventsNear(Location location, double radius)
@@ -161,6 +157,18 @@ public final class Cache {
     //
     // return allPublicEventsNear;
     // }
+
+    public List<Displayable> getAllVisibleFriends() {
+        List<Displayable> allVisibleUsers = new ArrayList<Displayable>();
+        for (Long id : mFriendIds) {
+            User user = this.getFriendById(id);
+            if (user.isVisible()) {
+                allVisibleUsers.add(user);
+            }
+        }
+
+        return allVisibleUsers;
+    }
 
     public Event getEventById(long id) {
         // For the moment only check in public events
@@ -216,7 +224,7 @@ public final class Cache {
             // If not found, check on the server
             ImmutableEvent networkResult;
             try {
-                networkResult = mNetworkClient.getEventInfo(id);
+                networkResult = mNetworkClient.getEventInfo();
             } catch (SmartMapClientException e) {
                 networkResult = null;
             }
@@ -308,6 +316,16 @@ public final class Cache {
 
     public void removePendingFriend(long id) {
         mPendingFriendIds.remove(id);
+    }
+
+    public void setFriendList(List<Long> newIds) {
+        mFriendIds.clear();
+        mFriendIds.addAll(newIds);
+
+        // Gets all friends
+        for (Long id : newIds) {
+            this.getFriendById(id);
+        }
     }
 
     public void updateFriendList(List<ImmutableUser> newFriends) {
