@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.EventViewHolder;
@@ -47,8 +48,6 @@ public class ShowEventsActivity extends ListActivity {
     private TextView mShowKilometers;
 
     private Context mContext;
-
-    private DatabaseHelper mDbHelper;
 
     private boolean mMyEventsChecked;
     private boolean mOngoingChecked;
@@ -81,36 +80,36 @@ public class ShowEventsActivity extends ListActivity {
         final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
         final Event event = eventViewHolder.getEvent();
 
-        String message =
-            EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "start") + " - "
-                + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
-                + "\nCreated by " + event.getCreatorName() + "\n\n" + event.getDescription();
+        String message = EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "start")
+                + " - " + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
+                + "\nCreated by " + Cache.getInstance().getFriendById(event.getCreatorId()).getName() + "\n\n"
+                + event.getDescription();
 
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(event.getName()
-            + " @ "
-            + event.getPositionName()
-            + "\n"
-            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
-                .getLatitude(), event.getLocation().getLongitude()) + " km away");
+                + " @ "
+                + event.getLocationString()
+                + "\n"
+                + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation().getLatitude(),
+                        event.getLocation().getLongitude()) + " km away");
         alertDialog.setMessage(message);
         final Activity activity = this;
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
-            this.getString(R.string.show_event_on_the_map_button), new DialogInterface.OnClickListener() {
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, this.getString(R.string.show_event_on_the_map_button),
+                new DialogInterface.OnClickListener() {
 
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
 
-                    Toast.makeText(activity,
-                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                        Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity,
+                                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                                Toast.LENGTH_SHORT).show();
 
-                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                    showEventIntent.putExtra("location", event.getLocation());
-                    ShowEventsActivity.this.startActivity(showEventIntent);
+                        Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                        showEventIntent.putExtra("location", event.getLocation());
+                        ShowEventsActivity.this.startActivity(showEventIntent);
 
-                }
-            });
+                    }
+                });
 
         alertDialog.show();
     }
@@ -231,9 +230,9 @@ public class ShowEventsActivity extends ListActivity {
 
         });
 
-        mDbHelper = DatabaseHelper.getInstance();
+        DatabaseHelper.getInstance();
 
-        mEventsList = mDbHelper.getAllEvents();
+        mEventsList = Cache.getInstance().getAllGoingEvents();
     }
 
     /**
@@ -242,7 +241,7 @@ public class ShowEventsActivity extends ListActivity {
     private void updateCurrentList() {
 
         mMyLocation = SettingsManager.getInstance().getLocation();
-        mEventsList = mDbHelper.getAllEvents();
+        mEventsList = Cache.getInstance().getAllGoingEvents();
         mCurrentList = new ArrayList<Event>();
 
         // Copy complete list into current list
@@ -252,7 +251,7 @@ public class ShowEventsActivity extends ListActivity {
 
         for (Event e : mEventsList) {
             if (mMyEventsChecked) {
-                if (!e.getCreatorName().equals(mMyName)) {
+                if (!Cache.getInstance().getFriendById(e.getCreatorId()).getName().equals(mMyName)) {
                     mCurrentList.remove(e);
                 }
             }
@@ -265,8 +264,7 @@ public class ShowEventsActivity extends ListActivity {
 
             if (mNearMeChecked) {
                 if (mMyLocation != null) {
-                    double distanceMeEvent =
-                        distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
+                    double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
                             mMyLocation.getLatitude(), mMyLocation.getLongitude());
                     String[] showKMContent = mShowKilometers.getText().toString().split(" ");
                     double distanceMax = Double.parseDouble(showKMContent[0]);
@@ -275,8 +273,8 @@ public class ShowEventsActivity extends ListActivity {
                     }
                 } else {
                     Toast.makeText(this.getApplicationContext(),
-                        this.getString(R.string.show_event_cannot_retrieve_current_location),
-                        Toast.LENGTH_SHORT).show();
+                            this.getString(R.string.show_event_cannot_retrieve_current_location), Toast.LENGTH_SHORT)
+                            .show();
                 }
             }
         }
@@ -286,8 +284,7 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired
-     * by
+     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired by
      * wikipedia. This is costly as there are several library calls to sin, cos, etc...
      * 
      * @param lat1
