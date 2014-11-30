@@ -106,8 +106,8 @@ public final class Cache {
         return allPinnedEvents;
     }
 
-    public List<Markable> getAllVisibleMarkables() {
-        List<Markable> allVisibleMarkables = new ArrayList<Markable>();
+    public List<Localisable> getAllVisibleMarkables() {
+        List<Localisable> allVisibleMarkables = new ArrayList<Localisable>();
         for (Long id : mFriendIds) {
             User user = this.getFriendById(id);
             if (user.isVisible()) {

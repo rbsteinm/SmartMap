@@ -13,7 +13,7 @@ import ch.epfl.smartmap.listeners.EventListener;
  * @author jfperren
  * @author ritterni
  */
-public interface Event extends Displayable, Markable {
+public interface Event extends Displayable, Localisable {
 
     final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
     final String NO_DESCRIPTION = "NO_DESCRIPTION";
