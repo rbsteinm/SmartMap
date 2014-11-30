@@ -23,8 +23,6 @@ public interface Event extends Displayable, Localisable {
 
     void addEventListener(EventListener newListener);
 
-    void addParticipant(Long id);
-
     /**
      * @return The ID of the user who created the event
      */
@@ -50,49 +48,7 @@ public interface Event extends Displayable, Localisable {
 
     Type getType();
 
-    void removeEventListener(EventListener oldListener);
-
-    void removeParticipant(Long id);
-
-    /**
-     * Sets the event creator's name
-     * 
-     * @param name
-     *            The event creator's name
-     */
-    void setCreatorId(long id);
-
-    /**
-     * Sets the event's description
-     * 
-     * @param desc
-     *            The new description
-     */
-    void setDescription(String description);
-
-    /**
-     * Changes the event's end date
-     * 
-     * @param newDate
-     *            The new start date (year, month, day, hour, minute)
-     */
-    void setEndDate(Calendar newDate);
-
-    /**
-     * Changes the event's name
-     * 
-     * @param newName
-     *            The new name
-     */
-    void setName(String newName);
-
-    /**
-     * Changes the event's start date
-     * 
-     * @param newDate
-     *            The new start date (year, month, day, hour, minute)
-     */
-    void setStartDate(Calendar newDate);
+    void update(ImmutableEvent event);
 
     enum Type {
         PUBLIC,

@@ -4,7 +4,7 @@ import java.util.List;
 
 import android.graphics.Bitmap;
 import android.location.Location;
-import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
 
@@ -82,7 +82,7 @@ public interface SmartMapClient {
      *            the event to create
      * @throws SmartMapClientException
      */
-    void createPublicEvent(Event event) throws SmartMapClientException;
+    void createPublicEvent(ImmutableEvent event) throws SmartMapClientException;
 
     /**
      * Decline the invitation of the user with the given id
@@ -169,7 +169,7 @@ public interface SmartMapClient {
      * @param radius
      * @return the public events in the given radius centered at the given point
      */
-    List<Event> getPublicEvents(double latitude, double longitude, double radius)
+    List<ImmutableEvent> getPublicEvents(double latitude, double longitude, double radius)
         throws SmartMapClientException;
 
     /**
@@ -188,7 +188,7 @@ public interface SmartMapClient {
      * @throws SmartMapClientException
      */
 
-    List<User> listFriendsPos() throws SmartMapClientException;
+    List<ImmutableUser> listFriendsPos() throws SmartMapClientException;
 
     /**
      * Remove the given friend
@@ -213,7 +213,7 @@ public interface SmartMapClient {
      * @param event
      * @throws SmartMapClientException
      */
-    void updateEvent(Event event) throws SmartMapClientException;
+    void updateEvent(ImmutableEvent event) throws SmartMapClientException;
 
     /**
      * Sends the latitude and longitude to the server

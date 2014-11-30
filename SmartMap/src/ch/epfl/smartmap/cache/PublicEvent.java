@@ -187,62 +187,7 @@ public class PublicEvent extends AbstractEvent {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Event#removeParticipant(java.lang.Long)
-     */
-    @Override
-    public void removeParticipant(Long id) {
-        mParticipants.remove(Long.valueOf(id));
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Event#setCreator(long)
-     */
-    @Override
-    public void setCreatorId(long id) {
-        mCreator = Cache.getInstance().getUserById(id);
-    }
-
-    @Override
-    public void setDescription(String desc) {
-        mDescription = desc;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Event#setEndDate(java.util.Calendar)
-     */
-    @Override
-    public void setEndDate(Calendar newDate) {
-        if (newDate.before(mStartDate)) {
-            throw new IllegalArgumentException("Invalid event dates!");
-        }
-        mEndDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
-            newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
-    }
-
-    @Override
-    public void setLocation(Location newLocation) {
-        mLocation.set(newLocation);
-    }
-
-    @Override
-    public void setName(String newName) {
-        if (newName.isEmpty() || (newName == null)) {
-            throw new IllegalArgumentException("Invalid event name!");
-        }
-        mName = newName;
-    }
-
-    @Override
-    public void setStartDate(Calendar newDate) {
-        if (mEndDate.before(newDate)) {
-            throw new IllegalArgumentException("Invalid event dates!");
-        }
-        mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
-            newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
+    public void update(ImmutableEvent event) {
 
     }
 }

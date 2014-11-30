@@ -7,9 +7,6 @@ import java.util.TimeZone;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.gui.Utils;
-import ch.epfl.smartmap.listeners.DisplayableListener;
-import ch.epfl.smartmap.listeners.LocalisableListener;
-import ch.epfl.smartmap.listeners.UserListener;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -206,74 +203,6 @@ public final class Friend extends AbstractUser {
     @Override
     public boolean isVisible() {
         return true;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setEmail(java.lang.String)
-     */
-    @Override
-    public void setEmail(String newEmail) {
-        if (newEmail != null) {
-            mEmail = newEmail;
-            for (UserListener listener : mUserListeners) {
-                listener.onEmailChanged();
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setImage(android.graphics.Bitmap)
-     */
-    @Override
-    public void setImage(Bitmap newImage) {
-        if (newImage != null) {
-            mImage = newImage;
-            for (DisplayableListener listener : mDisplayableListeners) {
-                listener.onImageChanged();
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setLocation(android.location.Location)
-     */
-    @Override
-    public void setLocation(Location newLocation) {
-        this.mLocation = newLocation;
-        for (LocalisableListener listener : mLocalisableListeners) {
-            listener.onLocationChanged();
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setName(java.lang.String)
-     */
-    @Override
-    public void setName(String newName) {
-        if ((newName != null) && !newName.equals("")) {
-            this.mName = newName;
-            for (UserListener listener : mUserListeners) {
-                listener.onNameChanged();
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setNumber(java.lang.String)
-     */
-    @Override
-    public void setPhoneNumber(String newPhoneNumber) {
-        if ((newPhoneNumber != null) && !newPhoneNumber.equals("")) {
-            this.mPhoneNumber = newPhoneNumber;
-            for (UserListener listener : mUserListeners) {
-                listener.onPhoneNumberChanged();
-            }
-        }
     }
 
     public void update(ImmutableUser user) {

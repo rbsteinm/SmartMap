@@ -2,7 +2,8 @@ package ch.epfl.smartmap.servercom;
 
 import java.util.List;
 
-import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.ImmutableEvent;
+import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -40,7 +41,7 @@ public interface SmartMapParser {
      * @return the event
      * @throws SmartMapParseException
      */
-    Event parseEvent(String s) throws SmartMapParseException;
+    ImmutableEvent parseEvent(String s) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns a list of events
@@ -50,7 +51,7 @@ public interface SmartMapParser {
      * @return the list of events
      * @throws SmartMapParseException
      */
-    List<Event> parseEventList(String s) throws SmartMapParseException;
+    List<ImmutableEvent> parseEventList(String s) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns a friend
@@ -75,7 +76,7 @@ public interface SmartMapParser {
      *             if s does not represent a valid list of friends (according to
      *             the format that the parser supports)
      */
-    List<User> parseFriends(String s, String key) throws SmartMapParseException;
+    List<ImmutableUser> parseFriends(String s, String key) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns the id
@@ -108,6 +109,6 @@ public interface SmartMapParser {
      *             if s does not represent a valid list of positions (according
      *             to the format that the parser supports)
      */
-    List<User> parsePositions(String s) throws SmartMapParseException;
+    List<ImmutableUser> parsePositions(String s) throws SmartMapParseException;
 
 }

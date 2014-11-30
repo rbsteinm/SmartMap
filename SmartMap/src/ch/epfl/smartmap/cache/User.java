@@ -1,13 +1,10 @@
 package ch.epfl.smartmap.cache;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.graphics.Bitmap;
-import ch.epfl.smartmap.listeners.UserListener;
 
 /**
  * Describes a generic user of the app
@@ -37,7 +34,7 @@ public interface User extends Displayable, Localisable {
     double NO_LATITUDE = 0.0;
     double NO_LONGITUDE = 0.0;
 
-    void addUserListener(UserListener newListener);
+    public void update(ImmutableUser user);
 
     /**
      * @return The user's email address
@@ -57,40 +54,6 @@ public interface User extends Displayable, Localisable {
     String getPhoneNumber();
 
     Type getType();
-
-    void removeUserListener(UserListener oldListener);
-
-    /**
-     * Sets the user's email
-     * 
-     * @param newEmail
-     *            The new email
-     */
-    void setEmail(String newEmail);
-
-    /**
-     * Stores a new profile picture for the user
-     * 
-     * @param newImage
-     *            The picture as a Bitmap object
-     */
-    void setImage(Bitmap newImage) throws FileNotFoundException, IOException;
-
-    /**
-     * Sets the user's name
-     * 
-     * @param newName
-     *            The new name
-     */
-    void setName(String newName);
-
-    /**
-     * Sets the user's phone number
-     * 
-     * @param newNumber
-     *            The new phone number
-     */
-    void setPhoneNumber(String newNumber);
 
     public enum Type {
         FRIEND,

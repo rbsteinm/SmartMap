@@ -4,7 +4,6 @@ import java.util.Calendar;
 
 import android.graphics.Bitmap;
 import android.location.Location;
-import ch.epfl.smartmap.listeners.DisplayableListener;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -153,57 +152,7 @@ public class Stranger extends AbstractUser {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setEmail(java.lang.String)
-     */
-    @Override
-    public void setEmail(String newEmail) {
-        throw new UnsupportedOperationException();
-    }
+    public void update(ImmutableUser user) {
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setImage(android.graphics.Bitmap)
-     */
-    @Override
-    public void setImage(Bitmap newImage) {
-        if (newImage != null) {
-            mImage = newImage;
-            for (DisplayableListener listener : mDisplayableListeners) {
-                listener.onImageChanged();
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setLocation(android.location.Location)
-     */
-    @Override
-    public void setLocation(Location newLocation) {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setName(java.lang.String)
-     */
-    @Override
-    public void setName(String newName) {
-        if (newName != null) {
-            mName = newName;
-        } else {
-            mName = NO_NAME;
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#setPhoneNumber(java.lang.String)
-     */
-    @Override
-    public void setPhoneNumber(String newNumber) {
-        throw new UnsupportedOperationException();
     }
 }

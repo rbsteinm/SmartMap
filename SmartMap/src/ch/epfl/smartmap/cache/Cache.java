@@ -63,14 +63,30 @@ public final class Cache {
         mFriendIds.add(id);
         mPendingFriendIds.remove(id);
         mStrangerInstances.remove(id);
+        for (CacheListener listener : mListeners) {
+            listener.onFriendListUpdate();
+        }
+    }
+
+    public void addGoingEvent(long id) {
+        mGoingEventIds.add(id);
+        for (CacheListener listener : mListeners) {
+            listener.onGoingEventListUpdate();
+        }
+    }
+
+    public void addNearEvent(long id) {
+        mNearEventIds.add(id);
+        for (CacheListener listener : mListeners) {
+            listener.onNearEventListUpdate();
+        }
     }
 
     public void addPendingFriend(long id) {
         mPendingFriendIds.add(id);
-    }
-
-    public void addPinnedEvent(long id) {
-        mNearEventIds.add(id);
+        for (CacheListener listener : mListeners) {
+            listener.onPendingFriendListUpdate();
+        }
     }
 
     public List<Friend> getAllFriends() {
@@ -95,9 +111,9 @@ public final class Cache {
         return allGoingEvents;
     }
 
-    public List<Event> getAllPinnedEvents() {
+    public List<Event> getAllNearEvents() {
         List<Event> allPinnedEvents = new ArrayList<Event>();
-        for (Long id : mGoingEventIds) {
+        for (Long id : mNearEventIds) {
             Event event = this.getEventById(id);
             if (event != null) {
                 allPinnedEvents.add(event);
