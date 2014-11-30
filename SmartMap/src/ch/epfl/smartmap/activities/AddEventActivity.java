@@ -1,10 +1,16 @@
 package ch.epfl.smartmap.activities;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Locale;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -24,34 +30,44 @@ import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
+import ch.epfl.smartmap.map.DefaultZoomManager;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * This activity lets the user create a new event.
  * 
  * @author SpicyCH
+ * @author agpmilli
  */
 public class AddEventActivity extends FragmentActivity {
 	@SuppressWarnings("unused")
 	private static final String TAG = AddEventActivity.class.getSimpleName();
 
+	private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+
 	static final int PICK_LOCATION_REQUEST = 1;
-	private static final String CITY_NAME = "CITY_NAME";
 	private static final int ELEMENTS_HH_MM = 2;
 	private static final int ELEMENTS_JJ_DD_YYYY = 3;
 
 	private Context mContext;
+	private GoogleMap mGoogleMap;
+	private SupportMapFragment mFragmentMap;
 	private EditText mDescription;
 	private EditText mEventName;
-	private EditText mLatitude;
-	private EditText mLongitude;
 	private int mNewEventId = 0;
 	private EditText mPickEndDate;
 	private EditText mPickEndTime;
 	private EditText mPickStartDate;
 	private EditText mPickStartTime;
 	private EditText mPlaceName;
+	private LatLng mEventPosition;
 
 	private TextWatcher mTextChangedListener;
 
@@ -66,19 +82,22 @@ public class AddEventActivity extends FragmentActivity {
 
 		this.initializeGUIComponents();
 
-		Bundle extras = this.getIntent().getExtras();
-		if (extras != null) {
-			LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
-			if ((latLng != null) && (Math.abs(latLng.latitude) > 0)) {
-				// The user long clicked the map in MainActivity and wants to
-				// create an event
-				this.updateLocation(this.getIntent());
+		mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
+
+			@Override
+			public void onMapClick(LatLng position) {
+				if (mEventPosition != null) {
+					mGoogleMap.clear();
+				}
+				Intent setLocationIntent = new Intent(AddEventActivity.this, SetLocationActivity.class);
+				AddEventActivity.this.startActivityForResult(setLocationIntent, PICK_LOCATION_REQUEST);
 			}
-		}
+		});
 	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.d(TAG, "OnActivityResult");
 		switch (requestCode) {
 			case PICK_LOCATION_REQUEST:
 				if (resultCode == RESULT_OK) {
@@ -91,8 +110,6 @@ public class AddEventActivity extends FragmentActivity {
 					    .makeText(mContext,
 					        this.getString(R.string.add_event_toast_couldnt_retrieve_location),
 					        Toast.LENGTH_LONG).show();
-					mLatitude.setText("");
-					mLongitude.setText("");
 					mPlaceName.setText("");
 				}
 				break;
@@ -128,17 +145,6 @@ public class AddEventActivity extends FragmentActivity {
 		}
 
 		return super.onOptionsItemSelected(item);
-	}
-
-	public void pickLocation(View v) {
-		Toast.makeText(mContext,
-		    this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
-		    Toast.LENGTH_LONG).show();
-
-		Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
-		pickLocationIntent.putExtra("pickLocationForEvent", true);
-		pickLocationIntent.setType(Context.LOCATION_SERVICE);
-		this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
 	}
 
 	/**
@@ -198,27 +204,25 @@ public class AddEventActivity extends FragmentActivity {
 	private void createEvent() {
 
 		if (!this.isValidDate(mPickEndDate.getText().toString())
-		    || !this.isValidTime(mPickEndTime.getText().toString())
-		    || mLatitude.getText().toString().equals("") || mLongitude.getText().toString().equals("")
+		    || !this.isValidTime(mPickEndTime.getText().toString()) || (mEventPosition.latitude == 0.0)
+		    || (mEventPosition.longitude == 0.0)
 		    || ((mPlaceName.getText().toString() == null) || mEventName.getText().toString().isEmpty())) {
 			Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set),
 			    Toast.LENGTH_SHORT).show();
 			Log.d(TAG, "Couldn't create a new event because not all fields have been set.\n" + "end date: "
 			    + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
 			    + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
-			    + mPlaceName.getText().toString() + "\n" + "event lat/long: "
-			    + mLatitude.getText().toString() + "/" + mLongitude.getText().toString());
+			    + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
+			    + mEventPosition.longitude);
 		} else {
 			GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
 			    mPickStartTime.getText().toString());
 			GregorianCalendar endDate = this.getDateFromTextFormat(mPickEndDate.getText().toString(),
 			    mPickEndTime.getText().toString());
 
-			double latitude = Double.parseDouble(mLatitude.getText().toString());
-			double longitude = Double.parseDouble(mLongitude.getText().toString());
 			Location location = new Location("Location set by user");
-			location.setLatitude(latitude);
-			location.setLongitude(longitude);
+			location.setLatitude(mEventPosition.latitude);
+			location.setLongitude(mEventPosition.longitude);
 
 			SettingsManager setMng = SettingsManager.getInstance();
 			PublicEvent event = new PublicEvent(mEventName.getText().toString(), setMng.getUserID(),
@@ -275,8 +279,7 @@ public class AddEventActivity extends FragmentActivity {
 		mDescription = (EditText) this.findViewById(R.id.addEventDescription);
 		mPlaceName = (EditText) this.findViewById(R.id.addEventPlaceName);
 
-		// mLongitude.setEnabled(false);
-		// mLatitude.setEnabled(false);
+		this.displayMap();
 
 		mTextChangedListener = new TextWatcher() {
 
@@ -367,21 +370,60 @@ public class AddEventActivity extends FragmentActivity {
 
 	/**
 	 * @author SpicyCH
+	 * @author agpmilli
 	 */
 	private void updateLocation(Intent data) {
 		Bundle extras = data.getExtras();
 
-		LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
-		mLatitude.setText(String.valueOf(latLng.latitude));
-		mLongitude.setText(String.valueOf(latLng.longitude));
+		mEventPosition = extras.getParcelable(LOCATION_SERVICE);
+		Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+		String cityName = "";
+		List<Address> addresses = null;
+		try {
+			addresses = geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		cityName = addresses.get(0).getLocality();
 
-		String cityName = extras.getString(CITY_NAME);
 		if ((cityName != null) && !cityName.equals("")) {
 			mPlaceName.setText(cityName);
+			mPlaceName.setFocusable(true);
+			mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
+			new DefaultZoomManager(mFragmentMap).zoomOnLocation(mEventPosition);
 		} else {
 			Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location_name),
 			    Toast.LENGTH_LONG).show();
 			mPlaceName.setText("");
+		}
+	}
+
+	/**
+	 * Display the map with the current location
+	 */
+	public void displayMap() {
+		int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+		// Showing status
+		if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+			// not available
+			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+			dialog.show();
+		} else {
+			// Google Play Services are available.
+			// Getting reference to the SupportMapFragment of activity_main.xml
+			mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(
+			    R.id.add_event_map);
+			// Getting GoogleMap object from the fragment
+			mGoogleMap = mFragmentMap.getMap();
+			// Enabling MyLocation Layer of Google Map
+			mGoogleMap.setMyLocationEnabled(true);
+
+			mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+			mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+			new DefaultZoomManager(mFragmentMap).zoomOnLocation(new LatLng(SettingsManager.getInstance()
+			    .getLocation().getLatitude(), SettingsManager.getInstance().getLocation().getLongitude()));
+
 		}
 	}
 }

@@ -97,6 +97,11 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name=".activities.SetLocationActivity"
+            android:label="@string/title_activity_set_location"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name=".activities.AddFriendActivity"
             android:label="@string/title_activity_add_friend"
             android:parentActivityName=".activities.FriendsPagerActivity"

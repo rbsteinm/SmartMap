@@ -97,6 +97,7 @@
     <string name="add_event_title_text">Title</string>
     <string name="add_event_when_text">When</string>
     <string name="add_event_where_text">Where</string>
+    <string name="add_event_map_text">Click on the map to set location</string>
     <string name="add_event_what_text">What</string>
     <string name="title_activity_add_event">Create a new event</string>
     <string name="addEventEventName">Event name</string>
@@ -148,6 +149,11 @@
     <string name="notification_friend_request_title">Friend request from </string>
     <string name="notification_event_request_title">Event request from </string>
     <string name="notification_accepted_friend_title">accepted your invitation</string>
+
+    <!-- Set Location Activity -->
+    <string name="title_activity_set_location">Set Location</string>
+    <string name="set_location_toast">Drag Marker where your event will take place and press "Done"</string>
+    <string name="set_location_done_button">Done</string>
 
     <!-- FriendInformationActivity -->
     <string name="removeFriendDialogMessage">Remove from friends</string>
