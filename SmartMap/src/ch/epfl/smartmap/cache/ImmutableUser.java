@@ -42,9 +42,10 @@ public final class ImmutableUser {
         if (locationString == null) {
             throw new IllegalArgumentException("locationString is null");
         }
-        if (image == null) {
-            throw new IllegalArgumentException("image is null");
-        }
+        //TODO set User.NO_IMAGE to the default profile picture
+        // if (image == null) {
+        // throw new IllegalArgumentException("image is null");
+        // }
 
         this.mId = id;
         this.mName = name;
