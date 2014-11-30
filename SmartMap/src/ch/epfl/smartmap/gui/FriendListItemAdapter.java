@@ -82,7 +82,7 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
      * ViewHolder pattern implementation for smoother scrolling
      * in lists populated by {@link ch.epfl.smartmap.gui.FriendListItemAdapter}
      */
-    static class FriendViewHolder{
+    public static class FriendViewHolder{
         private TextView mName;
         private TextView mLastSeen;
         private ImageView mPicture;

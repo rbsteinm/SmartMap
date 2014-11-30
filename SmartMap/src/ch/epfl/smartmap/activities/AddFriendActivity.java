@@ -21,9 +21,9 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
+import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
-
 /**
  * This Activity displays a list of users from the DB and lets you send them
  * friend requests
@@ -48,7 +48,7 @@ public class AddFriendActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView listView, View view, int position, long id) {
-        long userId = (Long) view.getTag();
+        long userId = ((FriendViewHolder) view.getTag()).getUserId();
         RelativeLayout rl = (RelativeLayout) view;
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
@@ -173,7 +173,7 @@ public class AddFriendActivity extends ListActivity {
         @Override
         protected void onPostExecute(String confirmString) {
             Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG)
-                .show();
+            .show();
         }
     }
 }

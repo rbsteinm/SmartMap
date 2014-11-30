@@ -40,6 +40,8 @@ public class UserInformationActivity extends Activity {
     // Children Views
     private ImageView mPictureView;
     private User mUser;
+    //TODO replace this by mUser.isFollowing() when implemented
+    private final boolean isFollowing = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,7 @@ public class UserInformationActivity extends Activity {
         mNameView.setText(mUser.getName());
         mInfosView.setText(mUser.getShortInfos());
         mPictureView.setImageBitmap(mUser.getPicture(this));
+        mFollowSwitch.setChecked(isFollowing);
     }
 
     public void displayDeleteConfirmationDialog(View view) {
