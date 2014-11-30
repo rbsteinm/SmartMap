@@ -417,26 +417,26 @@ public class MainActivity extends FragmentActivity implements OnFriendsLocationU
             mDbHelper.addOnDisplayableInformationsChangeListener(item,
                 new OnDisplayableInformationsChangeListener() {
 
-                @Override
-                public void onDisplayableInformationsChange() {
-                    if (item instanceof Friend) {
-                        if (item == mCurrentItem) {
-                            MainActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mCurrentItem = mDbHelper.getUser(item.getID());
-                                    ActionBar actionBar = MainActivity.this.getActionBar();
-                                    actionBar.setTitle(item.getName());
-                                    actionBar.setSubtitle(item.getShortInfos());
-                                    actionBar.setIcon(new BitmapDrawable(
-                                        MainActivity.this.getResources(), item
-                                        .getPicture(MainActivity.this)));
-                                }
-                            });
+                    @Override
+                    public void onDisplayableInformationsChange() {
+                        if (item instanceof Friend) {
+                            if (item == mCurrentItem) {
+                                MainActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mCurrentItem = mDbHelper.getUser(item.getID());
+                                        ActionBar actionBar = MainActivity.this.getActionBar();
+                                        actionBar.setTitle(item.getName());
+                                        actionBar.setSubtitle(item.getShortInfos());
+                                        actionBar.setIcon(new BitmapDrawable(
+                                            MainActivity.this.getResources(), item
+                                                .getPicture(MainActivity.this)));
+                                    }
+                                });
+                            }
                         }
                     }
-                }
-            });
+                });
         }
     }
 

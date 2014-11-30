@@ -52,7 +52,8 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         User user = mItemsArrayList.get(position);
 
         if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater =
+                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
             viewHolder = new FriendViewHolder();
 
@@ -79,10 +80,10 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
 
     /**
      * @author rbsteinm
-     * ViewHolder pattern implementation for smoother scrolling
-     * in lists populated by {@link ch.epfl.smartmap.gui.FriendListItemAdapter}
+     *         ViewHolder pattern implementation for smoother scrolling
+     *         in lists populated by {@link ch.epfl.smartmap.gui.FriendListItemAdapter}
      */
-    public static class FriendViewHolder{
+    public static class FriendViewHolder {
         private TextView mName;
         private TextView mLastSeen;
         private ImageView mPicture;
@@ -91,12 +92,15 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         public TextView getName() {
             return mName;
         }
+
         public TextView getLastSeen() {
             return mLastSeen;
         }
+
         public ImageView getPicture() {
             return mPicture;
         }
+
         public long getUserId() {
             return mUserId;
         }
@@ -104,12 +108,15 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         public void setName(TextView name) {
             mName = name;
         }
+
         public void setLastSeen(TextView lastSeen) {
             mLastSeen = lastSeen;
         }
+
         public void setPicture(ImageView picture) {
             mPicture = picture;
         }
+
         public void setUserId(long userId) {
             mUserId = userId;
         }

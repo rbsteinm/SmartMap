@@ -24,6 +24,7 @@ import ch.epfl.smartmap.gui.FriendListItemAdapter;
 import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
+
 /**
  * This Activity displays a list of users from the DB and lets you send them
  * friend requests
@@ -173,7 +174,7 @@ public class AddFriendActivity extends ListActivity {
         @Override
         protected void onPostExecute(String confirmString) {
             Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG)
-            .show();
+                .show();
         }
     }
 }
