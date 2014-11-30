@@ -11,7 +11,7 @@ import android.graphics.Bitmap;
  * 
  * @author ritterni
  */
-public interface User extends Displayable, Localisable {
+public interface User extends Displayable {
 
     String NO_NUMBER = "No phone Number";
     String NO_EMAIL = "No email";

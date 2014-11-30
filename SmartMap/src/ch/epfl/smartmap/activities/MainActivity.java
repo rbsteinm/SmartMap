@@ -24,13 +24,12 @@ import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.background.UpdateService;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.Localisable;
 import ch.epfl.smartmap.cache.Notifications;
-import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.Notifications.NotificationListener;
-import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
@@ -39,7 +38,7 @@ import ch.epfl.smartmap.listeners.AddEventOnMapLongClickListener;
 import ch.epfl.smartmap.listeners.DisplayableListener;
 import ch.epfl.smartmap.map.DefaultMarkerManager;
 import ch.epfl.smartmap.map.DefaultZoomManager;
-import ch.epfl.smartmap.search.DatabaseSearchEngine;
+import ch.epfl.smartmap.search.CacheSearchEngine;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -75,11 +74,10 @@ public class MainActivity extends FragmentActivity {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
-    private DatabaseHelper mDbHelper;
+    private Cache mCache;
     private SideMenu mSideMenu;
     private GoogleMap mGoogleMap;
-    private DefaultMarkerManager<User> mFriendMarkerManager;
-    private DefaultMarkerManager<Event> mEventMarkerManager;
+    private DefaultMarkerManager mMarkerManager;
     private DefaultZoomManager mMapZoomer;
     private SupportMapFragment mFragmentMap;
     private DisplayableListener mCurrentOnDisplayableUpdateListener;
@@ -94,7 +92,7 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Utils.sContext = this;
-
+        mCache = Cache.getInstance();
         this.setContentView(R.layout.activity_main);
 
         // starting the background service
@@ -115,7 +113,7 @@ public class MainActivity extends FragmentActivity {
         mSideMenu.initializeDrawerLayout();
 
         final SearchLayout mSearchLayout = (SearchLayout) this.findViewById(R.id.search_layout);
-        mSearchLayout.setSearchEngine(new DatabaseSearchEngine(mDbHelper));
+        mSearchLayout.setSearchEngine(new CacheSearchEngine());
 
         if (savedInstanceState == null) {
             this.displayMap();
@@ -123,8 +121,7 @@ public class MainActivity extends FragmentActivity {
 
         if (mGoogleMap != null) {
             // Set different tools for the GoogleMap
-            mEventMarkerManager = new DefaultMarkerManager<Event>(mGoogleMap);
-            mFriendMarkerManager = new DefaultMarkerManager<User>(mGoogleMap);
+            mMarkerManager = new DefaultMarkerManager(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
 
             this.initializeMarkers();
@@ -313,7 +310,10 @@ public class MainActivity extends FragmentActivity {
                         this.setMainMenu();
                         break;
                     case ITEM:
-                        mMapZoomer.zoomOnLocation(mCurrentItem.getLatLng());
+                        if (mCurrentItem instanceof Localisable) {
+                            mMapZoomer.zoomOnLocation(((Localisable) mCurrentItem).getLatLng());
+                        }
+
                         break;
                     default:
                         assert false;
@@ -357,7 +357,9 @@ public class MainActivity extends FragmentActivity {
      */
     public void performQuery(Displayable item) {
         // Focus on Friend
-        mMapZoomer.zoomOnLocation(item.getLatLng());
+        if (item instanceof Localisable) {
+            mMapZoomer.zoomOnLocation(((Localisable) item).getLatLng());
+        }
         this.setItemMenu(item);
     }
 
@@ -381,40 +383,11 @@ public class MainActivity extends FragmentActivity {
             mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
             // Change ActionBar title and icon
             final ActionBar actionBar = this.getActionBar();
-            actionBar.setTitle(item.getName());
-            actionBar.setSubtitle(item.getShortInfos());
-            actionBar.setIcon(new BitmapDrawable(this.getResources(), item.getImage(this)));
+            actionBar.setTitle(item.getTitle());
+            actionBar.setSubtitle(item.getSubtitle());
+            actionBar.setIcon(new BitmapDrawable(this.getResources(), item.getImage()));
             // ActionBar HomeIndicator
             actionBar.setHomeAsUpIndicator(null);
-
-            // Remove old listener
-            if (mCurrentOnDisplayableUpdateListener != null) {
-                mCurrentItem.removeOnDisplayableUpdateListener(mCurrentOnDisplayableUpdateListener);
-            }
-            // Add new listener
-            mCurrentOnDisplayableUpdateListener = new DisplayableListener() {
-                @Override
-                public void onImageChanged() {
-                    actionBar.setIcon(new BitmapDrawable(MainActivity.this.getResources(), item
-                        .getImage(MainActivity.this)));
-                }
-
-                @Override
-                public void onLocationChanged() {
-                    // Nothing to do
-                }
-
-                @Override
-                public void onNameChanged() {
-                    actionBar.setTitle(item.getName());
-                }
-
-                @Override
-                public void onShortInfoChanged() {
-                    actionBar.setSubtitle(item.getShortInfos());
-                }
-            };
-            item.addOnDisplayableUpdateListener(mCurrentOnDisplayableUpdateListener);
 
             mCurrentItem = item;
             mMenuTheme = MenuTheme.ITEM;
@@ -467,11 +440,9 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void initializeMarkers() {
-        mEventMarkerManager.updateMarkers(this, mDbHelper.getAllEvents());
-        mFriendMarkerManager.updateMarkers(this, Friend.getAllFriends());
+        mMarkerManager.updateMarkers(this, mCache.getAllVisibleLocalisables());
 
-        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
-        allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
+        List<Marker> allMarkers = new ArrayList<Marker>(mMarkerManager.getDisplayedMarkers());
         Intent startingIntent = this.getIntent();
         if (startingIntent.getParcelableExtra("location") == null) {
             mMapZoomer.zoomAccordingToMarkers(allMarkers);

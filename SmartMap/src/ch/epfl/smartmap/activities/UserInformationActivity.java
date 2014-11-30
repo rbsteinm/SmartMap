@@ -63,8 +63,8 @@ public class UserInformationActivity extends Activity {
         mCacheDB = DatabaseHelper.getInstance();
         // Set Informations
         mNameView.setText(mUser.getName());
-        mInfosView.setText(mUser.getShortInfos());
-        mPictureView.setImageBitmap(mUser.getImage(this));
+        mInfosView.setText(mUser.getSubtitle());
+        mPictureView.setImageBitmap(mUser.getImage());
     }
 
     public void displayDeleteConfirmationDialog(View view) {

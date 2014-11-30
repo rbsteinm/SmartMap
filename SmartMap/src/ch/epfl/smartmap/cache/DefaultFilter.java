@@ -4,16 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.util.LongSparseArray;
-import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.listeners.DisplayableListener;
-
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Describes a clientside, custom friend list (e.g. friends, family, etc.)
@@ -39,17 +31,6 @@ public class DefaultFilter implements Filter {
         idList = new ArrayList<Long>();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#addOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
-     * OnDisplayableUpdateListener)
-     */
-    @Override
-    public void addOnDisplayableUpdateListener(DisplayableListener listener) {
-        // TODO Auto-generated method stub
-
-    }
-
     @Override
     public void addUser(long id) {
         if (!idList.contains(id)) {
@@ -64,22 +45,10 @@ public class DefaultFilter implements Filter {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getPicture(android.content.Context)
+     * @see ch.epfl.smartmap.cache.Displayable#getImage()
      */
     @Override
-    public Bitmap getImage(Context context) {
-
-        Bitmap pic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_default_user);
-
-        return pic;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getLatLng()
-     */
-    @Override
-    public LatLng getLatLng() {
+    public Bitmap getImage() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -96,39 +65,22 @@ public class DefaultFilter implements Filter {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getLocation()
+     * @see ch.epfl.smartmap.cache.Displayable#getSubtitle()
      */
     @Override
-    public Location getLocation() {
-        return new Location("Lausanne");
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
-     */
-    @Override
-    public MarkerOptions getMarkerOptions(Context context) {
+    public String getSubtitle() {
         // TODO Auto-generated method stub
         return null;
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getName()
+     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
      */
     @Override
-    public String getName() {
-        return listName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getShortInfos()
-     */
-    @Override
-    public String getShortInfos() {
-        return "This is a Family Filter";
+    public String getTitle() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
@@ -141,17 +93,6 @@ public class DefaultFilter implements Filter {
         Collections.sort(uList, new UserComparator());
 
         return uList;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#removeOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
-     * OnDisplayableUpdateListener)
-     */
-    @Override
-    public void removeOnDisplayableUpdateListener(DisplayableListener listener) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

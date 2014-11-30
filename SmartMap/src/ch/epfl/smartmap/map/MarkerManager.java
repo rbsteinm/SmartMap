@@ -6,7 +6,7 @@ package ch.epfl.smartmap.map;
 import java.util.List;
 
 import android.content.Context;
-import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.Localisable;
 
 import com.google.android.gms.maps.model.Marker;
 
@@ -17,7 +17,7 @@ import com.google.android.gms.maps.model.Marker;
  *            the type of the items for which the manager displays markers
  * @author hugo-S
  */
-public interface MarkerManager<T extends Displayable> {
+public interface MarkerManager {
 
     /**
      * Add a marker to the map
@@ -25,12 +25,12 @@ public interface MarkerManager<T extends Displayable> {
      * @param event
      *            the item for which we want to add a marker
      */
-    Marker addMarker(T item, Context context);
+    Marker addMarker(Localisable item, Context context);
 
     /**
      * @return the list of items that are displayed
      */
-    List<T> getDisplayedItems();
+    List<Localisable> getDisplayedItems();
 
     /**
      * @return the list of the markers that are displayed
@@ -41,19 +41,19 @@ public interface MarkerManager<T extends Displayable> {
      * @param marker
      * @return the item that the marker represents
      */
-    T getItemForMarker(Marker marker);
+    Localisable getItemForMarker(Marker marker);
 
     /**
      * @param event
      * @return the marker that represents the given item
      */
-    Marker getMarkerForItem(T item);
+    Marker getMarkerForItem(Localisable item);
 
     /**
      * @param item
      * @return true if the item is displayed
      */
-    boolean isDisplayedItem(T item);
+    boolean isDisplayedItem(Localisable item);
 
     /**
      * @param marker
@@ -67,7 +67,7 @@ public interface MarkerManager<T extends Displayable> {
      * @param event
      *            the item for which we want to remove a marker
      */
-    Marker removeMarker(T item);
+    Marker removeMarker(Localisable item);
 
     /**
      * This method updates the markers on the map with the given list of items
@@ -78,6 +78,6 @@ public interface MarkerManager<T extends Displayable> {
      * @param friendsToDisplay
      *            the updated friends
      */
-    void updateMarkers(Context context, List<T> itemsToDisplay);
+    void updateMarkers(Context context, List<Localisable> itemsToDisplay);
 
 }

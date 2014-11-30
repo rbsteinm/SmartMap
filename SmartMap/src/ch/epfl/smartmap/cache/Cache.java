@@ -35,9 +35,9 @@ public final class Cache {
     private List<Long> mMyEventIds;
 
     // SparseArrays containing instances
-    private final LongSparseArray<PublicEvent> mPublicEventInstances;
-    private final LongSparseArray<Friend> mFriendInstances;
-    private final LongSparseArray<Stranger> mStrangerInstances;
+    private final LongSparseArray<Event> mPublicEventInstances;
+    private final LongSparseArray<User> mFriendInstances;
+    private final LongSparseArray<User> mStrangerInstances;
 
     // Listeners
     private final List<CacheListener> mListeners;
@@ -53,14 +53,15 @@ public final class Cache {
         mNearEventIds = new ArrayList<Long>();
         mGoingEventIds = new ArrayList<Long>();
 
-        mPublicEventInstances = new LongSparseArray<PublicEvent>();
-        mFriendInstances = new LongSparseArray<Friend>();
-        mStrangerInstances = new LongSparseArray<Stranger>();
+        mPublicEventInstances = new LongSparseArray<Event>();
+        mFriendInstances = new LongSparseArray<User>();
+        mStrangerInstances = new LongSparseArray<User>();
 
         mListeners = new LinkedList<CacheListener>();
     }
 
     public void addFriend(long id) {
+        // TODO : Notify database
         mFriendIds.add(id);
         mPendingFriendIds.remove(id);
         mStrangerInstances.remove(id);
@@ -70,6 +71,7 @@ public final class Cache {
     }
 
     public void addGoingEvent(long id) {
+        // TODO : Notify database
         mGoingEventIds.add(id);
         for (CacheListener listener : mListeners) {
             listener.onGoingEventListUpdate();
@@ -77,6 +79,7 @@ public final class Cache {
     }
 
     public void addMyEvent(long id) {
+        // TODO : Notify database
         mMyEventIds.add(id);
     }
 
@@ -94,10 +97,10 @@ public final class Cache {
         }
     }
 
-    public List<Friend> getAllFriends() {
-        List<Friend> allFriends = new ArrayList<Friend>();
+    public List<User> getAllFriends() {
+        List<User> allFriends = new ArrayList<User>();
         for (Long id : mFriendIds) {
-            Friend friend = this.getFriendById(id);
+            User friend = this.getFriendById(id);
             if (friend != null) {
                 allFriends.add(friend);
             }
@@ -127,23 +130,23 @@ public final class Cache {
         return allPinnedEvents;
     }
 
-    public List<Localisable> getAllVisibleMarkables() {
-        List<Localisable> allVisibleMarkables = new ArrayList<Localisable>();
+    public List<Displayable> getAllVisibleDisplayables() {
+        List<Displayable> allVisibleDisplayables = new ArrayList<Displayable>();
         for (Long id : mFriendIds) {
             User user = this.getFriendById(id);
             if (user.isVisible()) {
-                allVisibleMarkables.add(user);
+                allVisibleDisplayables.add(user);
             }
         }
 
         for (Long id : mNearEventIds) {
             Event event = this.getEventById(id);
             if (event.isVisible()) {
-                allVisibleMarkables.add(event);
+                allVisibleDisplayables.add(event);
             }
         }
 
-        return allVisibleMarkables;
+        return allVisibleDisplayables;
     }
 
     // public List<Event> getAllPublicEventsNear(Location location, double radius)
@@ -172,9 +175,9 @@ public final class Cache {
      *            long id of {@code Friend}
      * @return the {@code Friend} with given id, or {@code null} if there was no match.
      */
-    public Friend getFriendById(long id) {
+    public User getFriendById(long id) {
         // Check for live instance
-        Friend friend = mFriendInstances.get(id);
+        User friend = mFriendInstances.get(id);
 
         if (friend == null) {
             // If not found, check in database
@@ -205,9 +208,9 @@ public final class Cache {
         return friend;
     }
 
-    public PublicEvent getPublicEventById(long id) {
+    public Event getPublicEventById(long id) {
         // Check for live instance
-        PublicEvent publicEvent = mPublicEventInstances.get(id);
+        Event publicEvent = mPublicEventInstances.get(id);
 
         if (publicEvent == null) {
             // If not found, check on the server
@@ -239,9 +242,9 @@ public final class Cache {
      *            long id of {@code Friend}
      * @return the {@code Friend} with given id, or {@code null} if there was no match.
      */
-    public Stranger getStrangerById(long id) {
+    public User getStrangerById(long id) {
         // Check for live instance
-        Stranger stranger = mStrangerInstances.get(id);
+        User stranger = mStrangerInstances.get(id);
 
         if (stranger == null) {
             // If not found, check on the server
@@ -275,10 +278,10 @@ public final class Cache {
      */
     public User getUserById(long id) {
         // Search as Friend first
-        Friend friend = this.getFriendById(id);
+        User friend = this.getFriendById(id);
         if (friend == null) {
             // Search as Stranger
-            Stranger stranger = this.getStrangerById(id);
+            User stranger = this.getStrangerById(id);
             if (stranger != null) {
                 // Match as Stranger
                 return stranger;
@@ -369,16 +372,16 @@ public final class Cache {
 
     private boolean updateFriend(ImmutableUser user) {
         // Check in cache
-        User cachedUser = mFriendInstances.get(user.getId());
+        User cachedFriend = mFriendInstances.get(user.getId());
 
-        if (cachedUser == null) {
+        if (cachedFriend == null) {
             // Not in cache
-            cachedUser = new Friend(user);
-            mFriendInstances.put(user.getId(), cachedUser);
+            cachedFriend = new Friend(user);
+            mFriendInstances.put(user.getId(), cachedFriend);
             return true;
         } else {
             // In cache
-            cachedUser.update(user);
+            cachedFriend.update(user);
             return false;
         }
     }
