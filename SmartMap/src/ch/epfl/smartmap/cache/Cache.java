@@ -28,6 +28,7 @@ public final class Cache {
     // List containing ids of all Friends
     private List<Long> mFriendIds;
     private List<Long> mPendingFriendIds;
+    private List<Long> mInvitingUserIds;
 
     // Lists containing ids of all pinned/going events
     private List<Long> mNearEventIds;
@@ -60,11 +61,13 @@ public final class Cache {
         mListeners = new LinkedList<CacheListener>();
     }
 
-    public void addFriend(long id) {
+    public void addFriend(ImmutableUser newFriend) {
         // TODO : Notify database
-        mFriendIds.add(id);
-        mPendingFriendIds.remove(id);
-        mStrangerInstances.remove(id);
+        mFriendIds.add(newFriend.getId());
+        mPendingFriendIds.remove(newFriend.getId());
+        mStrangerInstances.remove(newFriend.getId());
+
+        mFriendInstances.put(newFriend.getId(), new Friend(newFriend));
         for (CacheListener listener : mListeners) {
             listener.onFriendListUpdate();
         }
@@ -121,6 +124,14 @@ public final class Cache {
             }
         }
         return allGoingEvents;
+    }
+
+    public List<User> getAllInvitingUsers() {
+        List<User> allInvitingUsers = new ArrayList<User>();
+        for (Long id : mInvitingUserIds) {
+            allInvitingUsers.add(this.getStrangerById(id));
+        }
+        return allInvitingUsers;
     }
 
     public List<Event> getAllNearEvents() {
@@ -222,12 +233,12 @@ public final class Cache {
 
         if (publicEvent == null) {
             // If not found, check on the server
-            ImmutableEvent networkResult;
-            try {
-                networkResult = mNetworkClient.getEventInfo();
-            } catch (SmartMapClientException e) {
-                networkResult = null;
-            }
+            ImmutableEvent networkResult = null;
+            // try {
+            // networkResult = mNetworkClient.getEventInfo();
+            // } catch (SmartMapClientException e) {
+            // networkResult = null;
+            // }
 
             if (networkResult != null) {
                 // Match on server

@@ -15,7 +15,6 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.listeners.OnCacheListener;
 
@@ -40,7 +39,7 @@ public class FriendsTab extends ListFragment {
         mFriendList = Cache.getInstance().getAllFriends();
 
         // Create custom Adapter and pass it to the Activity
-        FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, Friend.getAllFriends());
+        FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
         this.setListAdapter(adapter);
 
         // Initialize the listener
@@ -54,7 +53,6 @@ public class FriendsTab extends ListFragment {
 
         return view;
     }
-
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {

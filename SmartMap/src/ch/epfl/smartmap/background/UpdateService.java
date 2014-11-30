@@ -148,7 +148,7 @@ public class UpdateService extends Service {
         }
     }
 
-    private void showAcceptedNotif(User user) {
+    private void showAcceptedNotif(ImmutableUser user) {
         Notifications.acceptedFriendNotification(this, user);
     }
 
@@ -220,7 +220,7 @@ public class UpdateService extends Service {
                 // We set an empty notification bag as we couldn't retrieve data
                 // from the server.
                 nb =
-                    new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(),
+                    new NetworkNotificationBag(new ArrayList<Long>(), new ArrayList<Long>(),
                         new ArrayList<Long>());
             }
             return nb;
@@ -229,16 +229,15 @@ public class UpdateService extends Service {
         @Override
         protected void onPostExecute(NotificationBag result) {
             if (result != null) {
-                List<ImmutableUser> newFriends = result.getNewFriends();
+                List<Long> newFriends = result.getNewFriends();
                 List<Long> removedFriends = result.getRemovedFriendsIds();
 
-                for (ImmutableUser user : newFriends) {
-                    mHelper.addUser(user);
-                    mHelper.deletePendingFriend(user.getId());
-                    UpdateService.this.showAcceptedNotif(user);
+                for (long userId : newFriends) {
+                    Cache.getInstance().addFriend(userId);
+                    UpdateService.this.showAcceptedNotif(userId);
                 }
 
-                for (User user : result.getInvitingUsers()) {
+                for (long userId : result.getInvitingUsers()) {
                     if (mHelper.addInvitation(user) > 0) {
                         UpdateService.this.showFriendNotif(user);
                     }

@@ -110,9 +110,6 @@ public class FacebookFragment extends Fragment {
                                         NetworkSmartMapClient.getInstance().getFriendsIds();
 
                                     Cache.getInstance().setFriendList(friendIds);
-                                    for (Long id : friendIds) {
-                                        Cache.getInstance().addFriend(id);
-                                    }
                                 } catch (SmartMapClientException e) {
                                     // Retry
                                     this.execute();

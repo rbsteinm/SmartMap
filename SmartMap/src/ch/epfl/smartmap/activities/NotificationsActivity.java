@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.InvitationListItemAdapter;
 
@@ -48,8 +49,8 @@ public class NotificationsActivity extends ListActivity {
         super.onResume();
         // This is needed to show an update of the events' list after having
         // created an event
-        NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, mDbHelper
-            .getInvitations()));
+        NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, Cache.getInstance()
+            .getAllInvitingUsers()));
     }
 
     @Override

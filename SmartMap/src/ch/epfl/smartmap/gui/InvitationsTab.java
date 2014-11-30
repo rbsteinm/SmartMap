@@ -14,7 +14,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
@@ -218,10 +219,10 @@ public class InvitationsTab extends ListFragment {
         @Override
         protected void onPostExecute(NotificationBag notificationBag) {
             super.onPostExecute(notificationBag);
-            InvitationsTab.this.setListAdapter(new FriendListItemAdapter(mContext, notificationBag
-                .getInvitingUsers()));
-            for (User newFriend : notificationBag.getNewFriends()) {
-                mDataBaseHelper.addUser(newFriend);
+            InvitationsTab.this.setListAdapter(new FriendListItemAdapter(mContext, Cache.getInstance()
+                .getAllInvitingUsers()));
+            for (ImmutableUser newFriend : notificationBag.getNewFriends()) {
+                Cache.getInstance().addFriend(newFriend);
                 new AckAcceptedInvitations().execute(newFriend.getId());
             }
         }

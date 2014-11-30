@@ -9,7 +9,7 @@ import ch.epfl.smartmap.R;
  * 
  * @author ritterni
  */
-public class FriendInvitation implements Invitation, Displayable {
+public class FriendInvitation implements Invitation {
     private long mId;
     private Intent mIntent;
     private String mTitle;
@@ -33,12 +33,6 @@ public class FriendInvitation implements Invitation, Displayable {
     @Override
     public Intent getIntent() {
         return mIntent;
-    }
-
-    @Override
-    public String getSubtitle() {
-        return new String("Position : " + mUser.getLocationString() + "\n" + "Last seen : "
-            + mUser.getLastSeen());
     }
 
     @Override
