@@ -4,7 +4,6 @@ import java.util.List;
 
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
-import ch.epfl.smartmap.cache.User;
 
 /**
  * A SmartMapParser knows how to translate text into friends, server error
@@ -62,7 +61,7 @@ public interface SmartMapParser {
      * @throws SmartMapParseException
      */
 
-    User parseFriend(String s) throws SmartMapParseException;
+    ImmutableUser parseFriend(String s) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns the list of friends

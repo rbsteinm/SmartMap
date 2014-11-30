@@ -116,7 +116,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      * ch.epfl.smartmap.servercom.SmartMapParser#parseFriend(java.lang.String)
      */
     @Override
-    public User parseFriend(String s) throws SmartMapParseException {
+    public ImmutableUser parseFriend(String s) throws SmartMapParseException {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(s);
@@ -456,21 +456,17 @@ public class JsonSmartMapParser implements SmartMapParser {
      * @return a friend
      * @throws SmartMapParseException
      */
-    private User parseFriendFromJSON(JSONObject jsonObject) throws SmartMapParseException {
+    private ImmutableUser parseFriendFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = 0;
         String name = null;
-        String phoneNumber = null;
-        String email = null;
-        double latitude = UNITIALIZED_LATITUDE;
-        double longitude = UNITIALIZED_LONGITUDE;
+        String phoneNumber = User.NO_NUMBER;
+        String email = User.NO_EMAIL;
 
         try {
             id = jsonObject.getLong("id");
             name = jsonObject.getString("name");
-            latitude = jsonObject.optDouble("latitude", UNITIALIZED_LATITUDE);
-            longitude = jsonObject.optDouble("longitude", UNITIALIZED_LONGITUDE);
-            phoneNumber = jsonObject.optString("phoneNumber", null);
-            email = jsonObject.optString("email", null);
+            phoneNumber = jsonObject.optString("phoneNumber", User.NO_NUMBER);
+            email = jsonObject.optString("email", User.NO_EMAIL);
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
@@ -478,21 +474,14 @@ public class JsonSmartMapParser implements SmartMapParser {
         this.checkId(id);
         this.checkName(name);
 
-        if (latitude != UNITIALIZED_LATITUDE) {
-            this.checkLatitude(latitude);
-        }
-        if (longitude != UNITIALIZED_LONGITUDE) {
-            this.checkLongitude(longitude);
-        }
-
-        if (phoneNumber != null) {
+        if (!(phoneNumber.equals(User.NO_NUMBER))) {
             this.checkPhoneNumber(phoneNumber);
         }
-        if (email != null) {
+        if (!email.equals(User.NO_EMAIL)) {
             this.checkEmail(email);
         }
 
-        return new ImmutableUser(id, name, phoneNumber, email, User.NO_LOCATION_STRING, User.NO_LASTSEEN,
-            latitude, longitude);
+        return new ImmutableUser(id, name, phoneNumber, email, User.NO_LOCATION, User.NO_LOCATION_STRING,
+            User.NO_IMAGE);
     }
 }
