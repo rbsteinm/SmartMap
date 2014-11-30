@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.cache;
 
 import android.location.Location;
-import ch.epfl.smartmap.listeners.LocalisableListener;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -17,8 +16,6 @@ public interface Localisable extends Stockable {
     String PROVIDER_NAME = "SmartMapServers";
     Location NO_LOCATION = new Location(PROVIDER_NAME);
     MarkerOptions NO_MARKER_OPTIONS = null;
-
-    void addLocalisableListener(LocalisableListener newListener);
 
     LatLng getLatLng();
 
@@ -38,7 +35,4 @@ public interface Localisable extends Stockable {
 
     boolean isVisible();
 
-    void removeLocalisableListener(LocalisableListener oldListener);
-
-    void setLocation(Location newLocation);
 }

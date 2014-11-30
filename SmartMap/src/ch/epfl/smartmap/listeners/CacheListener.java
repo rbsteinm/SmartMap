@@ -13,10 +13,11 @@ public interface CacheListener {
 
     void onLocalisableUpdate(Localisable l);
 
+    void onMyEventListUpdate();
+
     void onNearEventListUpdate();
 
     void onPendingFriendListUpdate();
 
-    void onVisibleMarkableListUpdate();
-
+    void onVisibleLocalisableListUpdate();
 }

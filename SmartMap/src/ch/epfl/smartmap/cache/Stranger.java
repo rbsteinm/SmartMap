@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * 
  * @author jfperren
  */
-public class Stranger extends AbstractUser {
+public class Stranger implements User {
 
     private long mId;
     private String mName;
@@ -152,6 +152,7 @@ public class Stranger extends AbstractUser {
         return false;
     }
 
+    @Override
     public void update(ImmutableUser user) {
 
     }

@@ -34,8 +34,6 @@ public interface User extends Displayable, Localisable {
     double NO_LATITUDE = 0.0;
     double NO_LONGITUDE = 0.0;
 
-    public void update(ImmutableUser user);
-
     /**
      * @return The user's email address
      */
@@ -54,6 +52,8 @@ public interface User extends Displayable, Localisable {
     String getPhoneNumber();
 
     Type getType();
+
+    void update(ImmutableUser user);
 
     public enum Type {
         FRIEND,

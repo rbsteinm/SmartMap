@@ -32,6 +32,7 @@ public final class Cache {
     // Lists containing ids of all pinned/going events
     private List<Long> mNearEventIds;
     private List<Long> mGoingEventIds;
+    private List<Long> mMyEventIds;
 
     // SparseArrays containing instances
     private final LongSparseArray<PublicEvent> mPublicEventInstances;
@@ -73,6 +74,10 @@ public final class Cache {
         for (CacheListener listener : mListeners) {
             listener.onGoingEventListUpdate();
         }
+    }
+
+    public void addMyEvent(long id) {
+        mMyEventIds.add(id);
     }
 
     public void addNearEvent(long id) {

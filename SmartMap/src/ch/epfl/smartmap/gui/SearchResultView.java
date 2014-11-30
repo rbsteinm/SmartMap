@@ -12,7 +12,6 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.listeners.DisplayableListener;
 
 /**
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
@@ -20,7 +19,7 @@ import ch.epfl.smartmap.listeners.DisplayableListener;
  * 
  * @author jfperren
  */
-public class SearchResultView extends RelativeLayout implements DisplayableListener {
+public class SearchResultView extends RelativeLayout {
 
     private static final String TAG = "SEARCH RESULT VIEW";
     @SuppressWarnings("unused")
@@ -152,41 +151,4 @@ public class SearchResultView extends RelativeLayout implements DisplayableListe
 
         return auditErrors;
     }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.OnDisplayableUpdateListener#onImageChanged()
-     */
-    @Override
-    public void onImageChanged() {
-        this.mImageView.setImageBitmap(mItem.getImage());
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.OnDisplayableUpdateListener#onLocationChanged()
-     */
-    @Override
-    public void onLocationChanged() {
-        // Nothing to do
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.OnDisplayableUpdateListener#onNameChanged()
-     */
-    @Override
-    public void onNameChanged() {
-        this.mTitleView.setText(mItem.getTitle());
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.OnDisplayableUpdateListener#onShortInfoChanged()
-     */
-    @Override
-    public void onShortInfoChanged() {
-        this.mShortInfoView.setText(mItem.getSubtitle());
-    }
-
 }

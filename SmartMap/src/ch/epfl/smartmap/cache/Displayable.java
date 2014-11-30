@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.cache;
 
 import android.graphics.Bitmap;
-import ch.epfl.smartmap.listeners.DisplayableListener;
 
 /**
  * Objects that can be displayed with image, title and subtitle.
@@ -15,8 +14,6 @@ public interface Displayable extends Stockable {
     String NO_TITLE = "";
     String NO_SUBTITLE = "";
     Bitmap DEFAULT_IMAGE = null;
-
-    void addDisplayableListener(DisplayableListener newListener);
 
     /**
      * @param context
@@ -36,5 +33,4 @@ public interface Displayable extends Stockable {
      */
     String getTitle();
 
-    void removeDisplayableListener(DisplayableListener oldListener);
 }
