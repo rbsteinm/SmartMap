@@ -3,9 +3,11 @@ package ch.epfl.smartmap.activities;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -20,11 +22,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.PublicEvent;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -44,6 +48,7 @@ public class AddEventActivity extends FragmentActivity {
     private static final int ELEMENTS_JJ_DD_YYYY = 3;
 
     private Context mContext;
+    private Activity mActivity;
     private EditText mDescription;
     private EditText mEventName;
     private EditText mLatitude;
@@ -222,12 +227,40 @@ public class AddEventActivity extends FragmentActivity {
                     setMng.getUserID(), mDescription.getText().toString(), endDate, endDate, location, mPlaceName
                             .getText().toString(), PublicEvent.NO_PARTICIPANTS);
 
-            // TODO use the network client instead
-            DatabaseHelper.getInstance().addEvent(ev);
+            // TODO Create the event on our server and set the cache accordingly
+            AsyncTask<ImmutableEvent, Void, Boolean> createEventTask = new AsyncTask<ImmutableEvent, Void, Boolean>() {
 
-            Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_created), Toast.LENGTH_SHORT).show();
-            this.finish();
+                @Override
+                protected Boolean doInBackground(ImmutableEvent... params) {
+                    try {
+                        long id = NetworkSmartMapClient.getInstance().createPublicEvent(params[0]);
+                        Cache.getInstance().addMyEvent(id);
+                        return true;
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, e.getMessage());
+                        return false;
+                    }
+                }
 
+                @Override
+                protected void onPostExecute(Boolean b) {
+                    if (b) {
+
+                        Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
+                                Toast.LENGTH_SHORT).show();
+
+                        mActivity.finish();
+
+                    } else {
+                        Toast.makeText(mContext,
+                                "Couldn't not create your event. The error occurred on our server and we are sorry :(",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+            };
+
+            createEventTask.execute(ev);
         }
     }
 
@@ -256,6 +289,7 @@ public class AddEventActivity extends FragmentActivity {
      * @author SpicyCH
      */
     private void initializeGUIComponents() {
+        mActivity = this;
         mContext = this.getApplicationContext();
         mEventName = (EditText) this.findViewById(R.id.addEventEventName);
         mPickStartDate = (EditText) this.findViewById(R.id.addEventEventDate);
