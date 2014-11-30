@@ -22,14 +22,14 @@ public final class Cache {
     private static final Cache ONE_INSTANCE = new Cache();
 
     // Other members of the data hierarchy
-    private DatabaseHelper mDatabaseHelper;
-    private NetworkSmartMapClient mNetworkClient;
+    private final DatabaseHelper mDatabaseHelper;
+    private final NetworkSmartMapClient mNetworkClient;
 
     // List containing ids of all Friends
-    private List<Long> mFriendIds;
+    private final List<Long> mFriendIds;
     // Lists containing ids of all pinned/going events
-    private List<Long> mPinnedEventIds;
-    private List<Long> mGoingEventIds;
+    private final List<Long> mPinnedEventIds;
+    private final List<Long> mGoingEventIds;
 
     // SparseArrays containing instances
     private final LongSparseArray<PublicEvent> mPublicEventInstances;
@@ -127,7 +127,7 @@ public final class Cache {
 
         if (friend == null) {
             // If not found, check in database
-            ImmutableUser databaseResult = mDatabaseHelper.getFriendById(id);
+            ImmutableUser databaseResult = mDatabaseHelper.getFriend(id);
 
             if (databaseResult == null) {
                 // If not found, check on the server

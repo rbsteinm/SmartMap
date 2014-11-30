@@ -20,6 +20,8 @@ public final class ImmutableUser {
     private final Location mLocation;
     private final Bitmap mImage;
 
+    public final static ImmutableUser NOT_FOUND = null;
+
     public ImmutableUser(long id, String name, String phoneNumber, String email, Location location,
         String locationString, Bitmap image) {
         if (id < 0) {

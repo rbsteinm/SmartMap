@@ -60,7 +60,7 @@ public class UpdateService extends Service {
     private boolean mFriendsPosEnabled = true;
     private boolean mOwnPosEnabled = true;
     private boolean isFriendIDListRetrieved = false;
-    private boolean isDatabaseInitialized = false;
+    private final boolean isDatabaseInitialized = false;
     private DatabaseHelper mHelper;
     private SettingsManager mManager;
     private Geocoder mGeocoder;
@@ -155,15 +155,17 @@ public class UpdateService extends Service {
         Notifications.newFriendNotification(this, user);
     }
 
-    private class AsyncFillDatabaseWithFriend extends AsyncTask<Long, Void, Boolean> {
+    private class AsyncFillDatabaseWithFriend extends AsyncTask<Long, Void, Void> {
         @Override
-        protected Boolean doInBackground(Long... params) {
+        protected Void doInBackground(Long... params) {
             try {
                 ImmutableUser friend = mClient.getFriendInfo(params[0].longValue());
+                mHelper.addUser(friend);
             } catch (SmartMapClientException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            return null;
         }
     }
 
@@ -175,8 +177,11 @@ public class UpdateService extends Service {
     private class AsyncFriendsPos extends AsyncTask<Void, Void, Integer> {
         @Override
         protected Integer doInBackground(Void... args0) {
+            List<ImmutableUser> pos = mClient.listFriendsPos();
             int rows = 0;
-            rows = mHelper.refreshFriendsPos();
+            for (ImmutableUser user : pos) {
+                rows += mHelper.updateFriend(user);
+            }
             return rows;
         }
 
@@ -241,10 +246,10 @@ public class UpdateService extends Service {
         @Override
         protected void onPostExecute(NotificationBag result) {
             if (result != null) {
-                List<User> newFriends = result.getNewFriends();
+                List<ImmutableUser> newFriends = result.getNewFriends();
                 List<Long> removedFriends = result.getRemovedFriendsIds();
 
-                for (User user : newFriends) {
+                for (ImmutableUser user : newFriends) {
                     mHelper.addUser(user);
                     mHelper.deletePendingFriend(user.getId());
                     UpdateService.this.showAcceptedNotif(user);
