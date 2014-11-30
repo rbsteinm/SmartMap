@@ -18,12 +18,12 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DefaultFilter;
+import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
-import ch.epfl.smartmap.cache.Localisable;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -447,7 +447,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         startDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_DATE)));
         endDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_ENDDATE)));
 
-        Location location = new Location(Localisable.PROVIDER_NAME);
+        Location location = new Location(Displayable.PROVIDER_NAME);
         location.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
         location.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
         String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
@@ -530,7 +530,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             location.setLatitude(latitude);
             location.setTime(lastSeen);
             String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
-            Bitmap image = getPictureById(id);
+            Bitmap image = this.getPictureById(id);
 
             cursor.close();
 
@@ -558,7 +558,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 long id = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
                 friend =
                     new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)), User.NO_NUMBER,
-                        User.NO_EMAIL, new Location(""), "", getPictureById(id));
+                        User.NO_EMAIL, new Location(""), "", this.getPictureById(id));
 
                 invitations.add(friend);
             } while (cursor.moveToNext());
@@ -586,7 +586,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 long id = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
                 friend =
                     new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)), User.NO_NUMBER,
-                        User.NO_EMAIL, new Location(""), "", getPictureById(id));
+                        User.NO_EMAIL, new Location(""), "", this.getPictureById(id));
 
                 friends.add(friend);
             } while (cursor.moveToNext());

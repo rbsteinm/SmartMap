@@ -5,7 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.util.LongSparseArray;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Describes a clientside, custom friend list (e.g. friends, family, etc.)
@@ -53,6 +57,16 @@ public class DefaultFilter implements Filter {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getLatLng()
+     */
+    @Override
+    public LatLng getLatLng() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     @Override
     public List<Long> getList() {
         return new ArrayList<Long>(idList);
@@ -65,12 +79,38 @@ public class DefaultFilter implements Filter {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getLocation()
+     */
+    @Override
+    public Location getLocation() {
+        return NO_LOCATION;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getLocationString()
+     */
+    @Override
+    public String getLocationString() {
+        return NO_LOCATION_STRING;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions()
+     */
+    @Override
+    public MarkerOptions getMarkerOptions() {
+        return NO_MARKER_OPTIONS;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Displayable#getSubtitle()
      */
     @Override
     public String getSubtitle() {
-        // TODO Auto-generated method stub
-        return null;
+        return "this is a default filter";
     }
 
     /*
@@ -79,8 +119,7 @@ public class DefaultFilter implements Filter {
      */
     @Override
     public String getTitle() {
-        // TODO Auto-generated method stub
-        return null;
+        return "Filter";
     }
 
     @Override
@@ -93,6 +132,15 @@ public class DefaultFilter implements Filter {
         Collections.sort(uList, new UserComparator());
 
         return uList;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#isVisible()
+     */
+    @Override
+    public boolean isVisible() {
+        return false;
     }
 
     @Override

@@ -15,7 +15,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-import ch.epfl.smartmap.cache.Localisable;
+import ch.epfl.smartmap.cache.Displayable;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -40,7 +40,7 @@ public class DefaultMarkerManager implements MarkerManager {
      * A map that contains the displayed markers' ids, associated with the
      * item they represent
      */
-    private final Map<String, Localisable> mDisplayedItems;
+    private final Map<String, Displayable> mDisplayedItems;
 
     /**
      * A map that maps each marker with its id
@@ -49,7 +49,7 @@ public class DefaultMarkerManager implements MarkerManager {
 
     public DefaultMarkerManager(GoogleMap googleMap) {
         mGoogleMap = googleMap;
-        mDisplayedItems = new HashMap<String, Localisable>();
+        mDisplayedItems = new HashMap<String, Displayable>();
         mDictionnaryMarkers = new HashMap<String, Marker>();
     }
 
@@ -59,7 +59,7 @@ public class DefaultMarkerManager implements MarkerManager {
      * Displayable, android.content.Context)
      */
     @Override
-    public Marker addMarker(Localisable item, Context context) {
+    public Marker addMarker(Displayable item, Context context) {
         Marker marker = mGoogleMap.addMarker(item.getMarkerOptions());
         mDisplayedItems.put(marker.getId(), item);
         mDictionnaryMarkers.put(marker.getId(), marker);
@@ -101,8 +101,8 @@ public class DefaultMarkerManager implements MarkerManager {
      * @see ch.epfl.smartmap.map.MarkerManager#getDisplayedItems()
      */
     @Override
-    public List<Localisable> getDisplayedItems() {
-        return new ArrayList<Localisable>(mDisplayedItems.values());
+    public List<Displayable> getDisplayedItems() {
+        return new ArrayList<Displayable>(mDisplayedItems.values());
     }
 
     /*
@@ -121,7 +121,7 @@ public class DefaultMarkerManager implements MarkerManager {
      * .gms.maps.model.Marker)
      */
     @Override
-    public Localisable getItemForMarker(Marker marker) {
+    public Displayable getItemForMarker(Marker marker) {
         return mDisplayedItems.get(marker.getId());
     }
 
@@ -132,8 +132,8 @@ public class DefaultMarkerManager implements MarkerManager {
      * cache.Displayable)
      */
     @Override
-    public Marker getMarkerForItem(Localisable item) {
-        for (Entry<String, Localisable> entry : mDisplayedItems.entrySet()) {
+    public Marker getMarkerForItem(Displayable item) {
+        for (Entry<String, Displayable> entry : mDisplayedItems.entrySet()) {
             if (entry.getValue().equals(item)) {
                 return mDictionnaryMarkers.get(entry.getKey());
             }
@@ -148,7 +148,7 @@ public class DefaultMarkerManager implements MarkerManager {
      * .Displayable)
      */
     @Override
-    public boolean isDisplayedItem(Localisable item) {
+    public boolean isDisplayedItem(Displayable item) {
         return mDisplayedItems.containsValue(item);
     }
 
@@ -170,7 +170,7 @@ public class DefaultMarkerManager implements MarkerManager {
      * .Displayable)
      */
     @Override
-    public Marker removeMarker(Localisable item) {
+    public Marker removeMarker(Displayable item) {
         Marker marker = this.getMarkerForItem(item);
         mDisplayedItems.remove(marker.getId());
         mDictionnaryMarkers.remove(marker.getId());
@@ -185,10 +185,10 @@ public class DefaultMarkerManager implements MarkerManager {
      * java.util.List)
      */
     @Override
-    public void updateMarkers(Context context, List<Localisable> itemsToDisplay) {
+    public void updateMarkers(Context context, List<Displayable> itemsToDisplay) {
         // In the list friendsToDisplay, search if each friend s already
         // displayed
-        for (Localisable item : itemsToDisplay) {
+        for (Displayable item : itemsToDisplay) {
             Marker marker;
             // if the item is already displayed, get the marker for this
             // item, else add a new marker
@@ -201,7 +201,7 @@ public class DefaultMarkerManager implements MarkerManager {
         }
 
         // remove the markers that are not longer in the list to display
-        for (Localisable item : this.getDisplayedItems()) {
+        for (Displayable item : this.getDisplayedItems()) {
             if (!itemsToDisplay.contains(item)) {
                 // && (!getMarkerForItem(item).isInfoWindowShown())) {
                 Marker marker = this.removeMarker(item);

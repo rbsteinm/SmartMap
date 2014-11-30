@@ -6,7 +6,7 @@ package ch.epfl.smartmap.map;
 import java.util.List;
 
 import android.content.Context;
-import ch.epfl.smartmap.cache.Localisable;
+import ch.epfl.smartmap.cache.Displayable;
 
 import com.google.android.gms.maps.model.Marker;
 
@@ -25,12 +25,12 @@ public interface MarkerManager {
      * @param event
      *            the item for which we want to add a marker
      */
-    Marker addMarker(Localisable item, Context context);
+    Marker addMarker(Displayable item, Context context);
 
     /**
      * @return the list of items that are displayed
      */
-    List<Localisable> getDisplayedItems();
+    List<Displayable> getDisplayedItems();
 
     /**
      * @return the list of the markers that are displayed
@@ -41,19 +41,19 @@ public interface MarkerManager {
      * @param marker
      * @return the item that the marker represents
      */
-    Localisable getItemForMarker(Marker marker);
+    Displayable getItemForMarker(Marker marker);
 
     /**
      * @param event
      * @return the marker that represents the given item
      */
-    Marker getMarkerForItem(Localisable item);
+    Marker getMarkerForItem(Displayable item);
 
     /**
      * @param item
      * @return true if the item is displayed
      */
-    boolean isDisplayedItem(Localisable item);
+    boolean isDisplayedItem(Displayable item);
 
     /**
      * @param marker
@@ -67,7 +67,7 @@ public interface MarkerManager {
      * @param event
      *            the item for which we want to remove a marker
      */
-    Marker removeMarker(Localisable item);
+    Marker removeMarker(Displayable item);
 
     /**
      * This method updates the markers on the map with the given list of items
@@ -78,6 +78,6 @@ public interface MarkerManager {
      * @param friendsToDisplay
      *            the updated friends
      */
-    void updateMarkers(Context context, List<Localisable> itemsToDisplay);
+    void updateMarkers(Context context, List<Displayable> itemsToDisplay);
 
 }
