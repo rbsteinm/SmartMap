@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.activities;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,8 +20,11 @@ import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
+import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -48,7 +52,7 @@ public class AddFriendActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView listView, View view, int position, long id) {
-        long userId = (Long) view.getTag();
+        long userId = ((FriendViewHolder) view.getTag()).getUserId();
         RelativeLayout rl = (RelativeLayout) view;
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
@@ -124,10 +128,10 @@ public class AddFriendActivity extends ListActivity {
      * 
      * @author rbsteinm
      */
-    private class RefreshUserList extends AsyncTask<String, Void, List<User>> {
+    private class RefreshUserList extends AsyncTask<String, Void, List<ImmutableUser>> {
 
         @Override
-        protected List<User> doInBackground(String... params) {
+        protected List<ImmutableUser> doInBackground(String... params) {
             try {
                 if (params[0].equals("")) {
                     return Collections.emptyList();
@@ -140,10 +144,15 @@ public class AddFriendActivity extends ListActivity {
         }
 
         @Override
-        protected void onPostExecute(List<User> refreshedList) {
+        protected void onPostExecute(List<ImmutableUser> refreshedList) {
             super.onPostExecute(refreshedList);
+            List<User> users = new ArrayList<User>();
+            for(ImmutableUser user : refreshedList) {
+                Cache.getInstance().addStranger(user);
+                users.add(Cache.getInstance().getStrangerById(user.getId()));
+            }
             AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                refreshedList));
+                users));
         }
     }
 
@@ -173,7 +182,7 @@ public class AddFriendActivity extends ListActivity {
         @Override
         protected void onPostExecute(String confirmString) {
             Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG)
-                .show();
+            .show();
         }
     }
 }

@@ -14,16 +14,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.UserInformationActivity;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.listeners.CacheListener;
+import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
  * Fragment displaying your friends in FriendsActivity
  * 
  * @author rbsteinm
  */
-public class FriendsTab extends ListFragment implements CacheListener {
+public class FriendsTab extends ListFragment {
     private List<User> mFriendList;
 
     private final Context mContext;
@@ -36,37 +37,24 @@ public class FriendsTab extends ListFragment implements CacheListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mFriendList = Friend.getAllFriends();
+        mFriendList = Cache.getInstance().getAllFriends();
 
         // Create custom Adapter and pass it to the Activity
         FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, Friend.getAllFriends());
         this.setListAdapter(adapter);
 
         // Initialize the listener
-        Friend.addOnListUpdateListener(this);
+        Cache.getInstance().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onFriendListUpdate() {
+                mFriendList = Cache.getInstance().getAllFriends();
+                FriendsTab.this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
+            }
+        });
 
         return view;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.OnListUpdateListener#onElementAdded(long)
-     */
-    @Override
-    public void onElementAdded(long id) {
-        mFriendList = Friend.getAllFriends();
-        this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.OnListUpdateListener#onElementRemoved(long)
-     */
-    @Override
-    public void onElementRemoved(long id) {
-        mFriendList = Friend.getAllFriends();
-        this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
-    }
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
@@ -82,7 +70,7 @@ public class FriendsTab extends ListFragment implements CacheListener {
     @Override
     public void onResume() {
         super.onResume();
-        this.setListAdapter(new FriendListItemAdapter(mContext, Friend.getAllFriends()));
+        this.setListAdapter(new FriendListItemAdapter(mContext, Cache.getInstance().getAllFriends()));
     }
 
 }

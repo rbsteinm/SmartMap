@@ -4,6 +4,7 @@ import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import android.os.Handler;
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.EditText;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.AddEventActivity;
@@ -35,9 +36,35 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         mAddEventActivity = this.getActivity();
     }
 
-    @Override
-    protected void tearDown() {
-        this.getActivity().finish();
+    public void testCanCreateEventWithGoodFields() {
+
+        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("TEST_NAME"));
+
+        mAddEventActivity.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                EditText lat = (EditText) mAddEventActivity.findViewById(R.id.addEventLatitude);
+                EditText lon = (EditText) mAddEventActivity.findViewById(R.id.addEventLongitude);
+                lat.setText("1");
+                lon.setText("3");
+            }
+
+        });
+
+        onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
+        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+
+        onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
+        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+
+        onView(withId(R.id.addEventPlaceName)).perform(ViewActions.typeText("TEST_PLACE_NAME"));
+
+        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+
+        onView(withId(R.id.addEventDescription)).check(
+            ViewAssertions.matches(org.hamcrest.Matchers.not((ViewMatchers.isDisplayed()))));
+
     }
 
     public void testCannotCreateEventWith1Field() {
@@ -82,6 +109,7 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
     }
 
     public void testCannotCreateWithEmptyNameAndGoodOtherFields() {
+
         // Regression test for bug #40
 
         Handler myHandler = new Handler();
