@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
-import ch.epfl.smartmap.cache.User;
 
 /**
  * A client object to a SmartMap server that abstracts the underlying
@@ -26,7 +25,7 @@ public interface SmartMapClient {
      * @return the new Friend
      * @throws SmartMapClientException
      */
-    User acceptInvitation(long id) throws SmartMapClientException;
+    ImmutableUser acceptInvitation(long id) throws SmartMapClientException;
 
     /**
      * Confirm the server that the acceptation of the given friend was received
@@ -82,7 +81,7 @@ public interface SmartMapClient {
      *            the event to create
      * @throws SmartMapClientException
      */
-    void createPublicEvent(ImmutableEvent event) throws SmartMapClientException;
+    long createPublicEvent(ImmutableEvent event) throws SmartMapClientException;
 
     /**
      * Decline the invitation of the user with the given id
@@ -118,7 +117,7 @@ public interface SmartMapClient {
      * @return the list of friends
      * @throws SmartMapClientException
      */
-    List<User> findUsers(String text) throws SmartMapClientException;
+    List<ImmutableUser> findUsers(String text) throws SmartMapClientException;
 
     /**
      * Asks the server to follow the friend with id id
