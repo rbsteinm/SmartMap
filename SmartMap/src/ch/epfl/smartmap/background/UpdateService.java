@@ -69,6 +69,10 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
     // Settings
     private int mPosUpdateDelay;
+    private boolean mNotificationsEnabled;
+    private boolean mNotificationsForEventInvitations;
+    private boolean mNotificationsForFriendRequests;
+    private boolean mNotificationsForFriendshipConfirmations;
 
     private final Runnable friendsPosUpdate = new Runnable() {
         @Override
@@ -100,6 +104,10 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
     private void loadSettings() {
         mPosUpdateDelay = mManager.getRefreshFrequency();
+        mNotificationsEnabled = mManager.notificationsEnabled();
+        mNotificationsForEventInvitations = mManager.notificationsForEventInvitations();
+        mNotificationsForFriendRequests = mManager.notificationsForFriendRequests();
+        mNotificationsForFriendshipConfirmations = mManager.notificationsForFriendshipConfirmations();
     }
 
     @Override
@@ -309,7 +317,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                 for (User user : newFriends) {
                     mHelper.addUser(user);
                     mHelper.deletePendingFriend(user.getID());
-                    UpdateService.this.showAcceptedNotif(user);
+                    if (mNotificationsEnabled && mNotificationsForFriendshipConfirmations) {
+                        UpdateService.this.showAcceptedNotif(user);
+                    }
                 }
 
                 for (User user : result.getInvitingUsers()) {
@@ -317,7 +327,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                         mHelper.addFriendInvitation(new FriendInvitation(0, user.getID(), user.getName(),
                             Invitation.UNREAD));
                         new AsyncGetPictures().execute(user.getID());
-                        UpdateService.this.showFriendNotif(user);
+                        if (mNotificationsEnabled && mNotificationsForFriendRequests) {
+                            UpdateService.this.showFriendNotif(user);
+                        }
                     }
                 }
 
