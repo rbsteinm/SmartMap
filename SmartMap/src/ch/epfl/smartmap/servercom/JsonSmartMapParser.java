@@ -14,6 +14,7 @@ import android.location.Location;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.gui.Utils;
 
 /**
  * A {@link SmartMapParser} implementation that parses objects from Json format
@@ -28,7 +29,7 @@ public class JsonSmartMapParser implements SmartMapParser {
     private static final String ERROR_STATUS = "error";
     private static final String FEEDBACK_STATUS = "feedback";
 
-    private static final int SERVER_TIME_DIFFERENCE_THRESHHOLD = -15000;
+    private static final int SERVER_TIME_DIFFERENCE_THRESHHOLD = 15000;
 
     private static final int DATETIME_FORMAT_PARTS = 2;
     private static final int DATE_FORMAT_PARTS = 3;
@@ -223,14 +224,13 @@ public class JsonSmartMapParser implements SmartMapParser {
                 location.setTime(lastSeen.getTimeInMillis());
                 location.setLatitude(latitude);
                 location.setLongitude(longitude);
+                String locationString = Utils.getCityFromLocation(location);
 
                 ImmutableUser user =
-                    new ImmutableUser(userId, User.NO_NAME, User.NO_NUMBER, User.NO_EMAIL, location,
-                        User.NO_LOCATION_STRING, User.NO_IMAGE);
+                    new ImmutableUser(userId, null, null, null, location, locationString, null);
 
                 users.add(user);
             }
-
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
@@ -276,7 +276,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      */
     private void checkLastSeen(GregorianCalendar lastSeen) throws SmartMapParseException {
         GregorianCalendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        if ((now.getTimeInMillis() - lastSeen.getTimeInMillis()) < SERVER_TIME_DIFFERENCE_THRESHHOLD) {
+        if (Math.abs(now.getTimeInMillis() - lastSeen.getTimeInMillis()) < SERVER_TIME_DIFFERENCE_THRESHHOLD) {
             throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString()
                 + " compared to " + now.toString());
         }
@@ -459,14 +459,14 @@ public class JsonSmartMapParser implements SmartMapParser {
     private ImmutableUser parseFriendFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = 0;
         String name = null;
-        String phoneNumber = User.NO_NUMBER;
+        String phoneNumber = User.NO_PHONE_NUMBER;
         String email = User.NO_EMAIL;
 
         try {
             id = jsonObject.getLong("id");
             name = jsonObject.getString("name");
-            phoneNumber = jsonObject.optString("phoneNumber", User.NO_NUMBER);
-            email = jsonObject.optString("email", User.NO_EMAIL);
+            phoneNumber = jsonObject.optString("phoneNumber", null);
+            email = jsonObject.optString("email", null);
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
@@ -474,14 +474,13 @@ public class JsonSmartMapParser implements SmartMapParser {
         this.checkId(id);
         this.checkName(name);
 
-        if (!(phoneNumber.equals(User.NO_NUMBER))) {
+        if (phoneNumber != null) {
             this.checkPhoneNumber(phoneNumber);
         }
-        if (!email.equals(User.NO_EMAIL)) {
+        if (email != null) {
             this.checkEmail(email);
         }
 
-        return new ImmutableUser(id, name, phoneNumber, email, User.NO_LOCATION, User.NO_LOCATION_STRING,
-            User.NO_IMAGE);
+        return new ImmutableUser(id, name, phoneNumber, email, null, null, null);
     }
 }

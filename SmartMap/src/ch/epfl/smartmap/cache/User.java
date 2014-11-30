@@ -13,11 +13,15 @@ import android.graphics.Bitmap;
  */
 public interface User extends Displayable {
 
-    String NO_NUMBER = "No phone Number";
+    String NO_PHONE_NUMBER = "No phone Number";
+
     String NO_EMAIL = "No email";
-    String NO_NAME = "No name";
+
     Calendar NO_LAST_SEEN = GregorianCalendar.getInstance(TimeZone.getDefault());
-    Bitmap NO_IMAGE = null; // R.drawable.ic_default_user; // placeholder
+
+    // Bitmap NO_IMAGE = Bitmap.(Utils.sContext.getResources()
+    // .getDrawable(R.drawable.ic_default_user)).getBitmap();
+    Bitmap NO_IMAGE = null;
 
     User NOBODY = null;
 

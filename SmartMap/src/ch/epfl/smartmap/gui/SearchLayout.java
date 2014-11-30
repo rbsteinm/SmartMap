@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.search.CacheSearchEngine;
 import ch.epfl.smartmap.search.SearchEngine;
 import ch.epfl.smartmap.search.SearchEngine.Type;
 
@@ -73,6 +74,7 @@ public class SearchLayout extends LinearLayout {
         // Set default search query (needs to be done addSearchTypes)
         mCurrentQuery = DEFAULT_SEARCH_QUERY;
         // Initialize data structures
+        mSearchEngine = new CacheSearchEngine();
         mScrollViews = new HashMap<Type, ScrollView>();
         mSearchResultViewGroups = new HashMap<Type, SearchResultViewGroup>();
         mSearchTypeIndexes = new HashMap<Type, Integer>();

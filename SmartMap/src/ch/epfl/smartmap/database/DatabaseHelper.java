@@ -33,7 +33,7 @@ import ch.epfl.smartmap.cache.User;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "SmartMapDB";
 
     public static final String TABLE_USER = "users";
@@ -537,7 +537,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image);
         }
 
-        return ImmutableUser.NOT_FOUND;
+        return null;
     }
 
     /**
@@ -557,8 +557,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 long id = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
                 friend =
-                    new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)), User.NO_NUMBER,
-                        User.NO_EMAIL, new Location(""), "", this.getPictureById(id));
+                    new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)),
+                        User.NO_PHONE_NUMBER, User.NO_EMAIL, new Location(""), "", this.getPictureById(id));
 
                 invitations.add(friend);
             } while (cursor.moveToNext());
@@ -585,8 +585,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 long id = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
                 friend =
-                    new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)), User.NO_NUMBER,
-                        User.NO_EMAIL, new Location(""), "", this.getPictureById(id));
+                    new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)),
+                        User.NO_PHONE_NUMBER, User.NO_EMAIL, new Location(""), "", this.getPictureById(id));
 
                 friends.add(friend);
             } while (cursor.moveToNext());
@@ -764,10 +764,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (friend.getId() != User.NO_ID) {
             values.put(KEY_USER_ID, friend.getId());
         }
-        if (friend.getName() != Friend.NO_NAME) {
+        if (friend.getName() != null) {
             values.put(KEY_NAME, friend.getName());
         }
-        if (friend.getPhoneNumber() != Friend.NO_NUMBER) {
+        if (friend.getPhoneNumber() != Friend.NO_PHONE_NUMBER) {
             values.put(KEY_NUMBER, friend.getPhoneNumber());
         }
         if (friend.getEmail() != Friend.NO_EMAIL) {

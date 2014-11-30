@@ -34,6 +34,7 @@ import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.AddEventOnMapLongClickListener;
+import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.map.DefaultMarkerManager;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 import ch.epfl.smartmap.search.CacheSearchEngine;
@@ -58,7 +59,7 @@ import com.google.android.gms.maps.model.Marker;
  * @author agpmilli
  */
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements CacheListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -79,6 +80,9 @@ public class MainActivity extends FragmentActivity {
     private DefaultMarkerManager mEventMarkerManager;
     private DefaultZoomManager mMapZoomer;
     private SupportMapFragment mFragmentMap;
+
+    private CacheListener mMarkerUpdateListener;
+    private CacheListener mCurrentItemListener;
 
     private Menu mMenu;
     private MenuTheme mMenuTheme;
@@ -129,6 +133,9 @@ public class MainActivity extends FragmentActivity {
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
             mGoogleMap.setOnMarkerClickListener(new ShowInfoOnMarkerClick());
         }
+
+        Cache.getInstance().addOnCacheListener(this);
+
     }
 
     @Override
@@ -170,7 +177,6 @@ public class MainActivity extends FragmentActivity {
 
         if (mGoogleMap != null) {
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
-
         }
 
     }
@@ -205,6 +211,10 @@ public class MainActivity extends FragmentActivity {
 
     public Context getContext() {
         return this;
+    }
+
+    public MenuTheme getMenuTheme() {
+        return mMenuTheme;
     }
 
     @Override
@@ -286,8 +296,70 @@ public class MainActivity extends FragmentActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
+     */
+    @Override
+    public void onFriendListUpdate() {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mFriendMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
+                    .getAllVisibleFriends());
+            }
+        });
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onMyEventListUpdate()
+     */
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onGoingEventListUpdate()
+     */
+    @Override
+    public void onGoingEventListUpdate() {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
+                    .getAllVisibleFriends());
+            }
+        });
+    }
+
     public void onLocationChanged(Location location) {
         SettingsManager.getInstance().setLocation(location);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onNearEventListUpdate()
+     */
+    @Override
+    public void onMyEventListUpdate() {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
+                    .getAllVisibleFriends());
+            }
+        });
+    }
+
+    @Override
+    public void onNearEventListUpdate() {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
+                    .getAllVisibleFriends());
+            }
+        });
     }
 
     @Override
@@ -332,6 +404,15 @@ public class MainActivity extends FragmentActivity {
                 assert false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onPendingFriendListUpdate()
+     */
+    @Override
+    public void onPendingFriendListUpdate() {
+        // Nothing
     }
 
     /**

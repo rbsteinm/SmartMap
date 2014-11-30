@@ -2,7 +2,6 @@ package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -14,10 +13,7 @@ import java.util.List;
 public interface Event extends Displayable {
 
     final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
-    final String NO_DESCRIPTION = "NO_DESCRIPTION";
-    final long NO_CREATOR_ID = NO_ID;
-    final String NO_NAME = "NO_NAME";
-    final Calendar NOT_A_DATE = GregorianCalendar.getInstance();
+    final String NO_DESCRIPTION = "This event currently has no description";
 
     /**
      * @return The ID of the user who created the event

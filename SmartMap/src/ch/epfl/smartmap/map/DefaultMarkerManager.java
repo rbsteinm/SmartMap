@@ -13,6 +13,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import ch.epfl.smartmap.cache.Displayable;
@@ -186,6 +187,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public void updateMarkers(Context context, List<Displayable> itemsToDisplay) {
+        Log.d(TAG, "updateMarkers");
         // In the list friendsToDisplay, search if each friend s already
         // displayed
         for (Displayable item : itemsToDisplay) {

@@ -1,13 +1,9 @@
 package ch.epfl.smartmap.listeners;
 
-import ch.epfl.smartmap.cache.Displayable;
-
 /**
  * @author jfperren
  */
 public interface CacheListener {
-
-    void onDisplayableUpdate(Displayable updated);
 
     void onFriendListUpdate();
 
@@ -18,7 +14,5 @@ public interface CacheListener {
     void onNearEventListUpdate();
 
     void onPendingFriendListUpdate();
-
-    void onVisibleLocalisableListUpdate();
 
 }

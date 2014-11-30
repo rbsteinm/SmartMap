@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.util.Log;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
@@ -18,6 +19,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public final class Cache {
 
+    static final public String TAG = "Cache";
     // Unique instance
     private static final Cache ONE_INSTANCE = new Cache();
 
@@ -130,27 +132,30 @@ public final class Cache {
     public List<User> getAllInvitingUsers() {
         List<User> allInvitingUsers = new ArrayList<User>();
         for (Long id : mInvitingUserIds) {
-            allInvitingUsers.add(this.getStrangerById(id));
+            User invitingUser = this.getUserById(id);
+            if (invitingUser != null) {
+                allInvitingUsers.add(this.getStrangerById(id));
+            }
         }
         return allInvitingUsers;
     }
 
     public List<Event> getAllNearEvents() {
-        List<Event> allPinnedEvents = new ArrayList<Event>();
+        List<Event> allNearEvents = new ArrayList<Event>();
         for (Long id : mNearEventIds) {
             Event event = this.getEventById(id);
             if (event != null) {
-                allPinnedEvents.add(event);
+                allNearEvents.add(event);
             }
         }
-        return allPinnedEvents;
+        return allNearEvents;
     }
 
     public List<Displayable> getAllVisibleEvents() {
         List<Displayable> allVisibleEvents = new ArrayList<Displayable>();
         for (Long id : mFriendIds) {
             Event event = this.getEventById(id);
-            if (event.isVisible()) {
+            if ((event != null) && event.isVisible()) {
                 allVisibleEvents.add(event);
             }
         }
@@ -174,7 +179,7 @@ public final class Cache {
         List<Displayable> allVisibleUsers = new ArrayList<Displayable>();
         for (Long id : mFriendIds) {
             User user = this.getFriendById(id);
-            if (user.isVisible()) {
+            if ((user != null) && user.isVisible()) {
                 allVisibleUsers.add(user);
             }
         }
@@ -341,6 +346,7 @@ public final class Cache {
     }
 
     public void updateFriendList(List<ImmutableUser> newFriends) {
+        Log.d(TAG, "updateFriendList !");
         // Delete previous list
         mFriendIds.clear();
 

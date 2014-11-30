@@ -1,21 +1,9 @@
 package ch.epfl.smartmap.listeners;
 
-import ch.epfl.smartmap.cache.Displayable;
-
 /**
  * @author jfperren
  */
 public class OnCacheListener implements CacheListener {
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onDisplayableUpdate(ch.epfl.smartmap.cache.Displayable)
-     */
-    @Override
-    public void onDisplayableUpdate(Displayable updated) {
-        // TODO Auto-generated method stub
-
-    }
 
     /*
      * (non-Javadoc)
@@ -66,15 +54,4 @@ public class OnCacheListener implements CacheListener {
         // TODO Auto-generated method stub
 
     }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onVisibleLocalisableListUpdate()
-     */
-    @Override
-    public void onVisibleLocalisableListUpdate() {
-        // TODO Auto-generated method stub
-
-    }
-
 }

@@ -32,13 +32,42 @@ public final class Friend implements User {
 
     protected Friend(ImmutableUser user) {
         super();
-        mID = user.getId();
-        mName = user.getName();
-        mPhoneNumber = user.getPhoneNumber();
-        mEmail = user.getEmail();
-        mLocationString = user.getLocationString();
-        mLocation = user.getLocation();
-        mImage = user.getImage();
+
+        if (user.getId() < 0) {
+            throw new IllegalArgumentException();
+        } else {
+            mID = user.getId();
+        }
+        if (user.getName() == null) {
+            throw new IllegalArgumentException();
+        } else {
+            mName = user.getName();
+        }
+        if (user.getPhoneNumber() == null) {
+            mPhoneNumber = User.NO_PHONE_NUMBER;
+        } else {
+            mPhoneNumber = user.getPhoneNumber();
+        }
+        if (user.getEmail() == null) {
+            mEmail = User.NO_EMAIL;
+        } else {
+            mEmail = user.getEmail();
+        }
+        if (user.getLocationString() == null) {
+            mLocationString = User.NO_LOCATION_STRING;
+        } else {
+            mLocationString = user.getLocationString();
+        }
+        if (user.getLocation() == null) {
+            mLocation = User.NO_LOCATION;
+        } else {
+            mLocation = new Location(user.getLocation());
+        }
+        if (user.getImage() == null) {
+            mImage = User.NO_IMAGE;
+        } else {
+            mImage = user.getImage();
+        }
     }
 
     /*
@@ -207,6 +236,23 @@ public final class Friend implements User {
 
     @Override
     public void update(ImmutableUser user) {
-
+        if (user.getName() != null) {
+            mName = user.getName();
+        }
+        if (user.getPhoneNumber() != null) {
+            mPhoneNumber = user.getPhoneNumber();
+        }
+        if (user.getEmail() != null) {
+            mEmail = user.getEmail();
+        }
+        if (user.getLocationString() != null) {
+            mLocationString = user.getLocationString();
+        }
+        if (user.getLocation() != null) {
+            mLocation = new Location(user.getLocation());
+        }
+        if (user.getImage() != null) {
+            mImage = user.getImage();
+        }
     }
 }

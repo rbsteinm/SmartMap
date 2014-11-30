@@ -266,6 +266,7 @@ public class FacebookFragment extends Fragment {
     }
 
     private void startMainActivity() {
+        Log.d(TAG, "START MAIN ACTIVITY");
         Activity currentActivity = this.getActivity();
         Intent intent = new Intent(this.getActivity(), MainActivity.class);
         this.startActivity(intent);

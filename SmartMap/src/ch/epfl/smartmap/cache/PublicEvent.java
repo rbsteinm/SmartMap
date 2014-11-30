@@ -22,7 +22,7 @@ public class PublicEvent implements Event {
 
     private long mId;
     private String mName;
-    private User mCreator;
+    private long mCreatorId;
     private String mDescription;
     private Location mLocation;
     private String mLocationString;
@@ -36,17 +36,48 @@ public class PublicEvent implements Event {
     public static final float MARKER_ANCHOR_Y = 1;
 
     protected PublicEvent(ImmutableEvent event) {
-        mCreator = Cache.getInstance().getUserById(event.getCreatorId());
-        mName = event.getName();
-        mStartDate = new GregorianCalendar(TimeZone.getDefault());
-        mEndDate = new GregorianCalendar(TimeZone.getDefault());
-        mStartDate.setTime(event.getStartDate().getTime());
-        mEndDate.setTime(event.getEndDate().getTime());
-        mLocation = new Location(event.getLocation());
-        mLocationString = event.getLocationString();
-        mDescription = event.getDescription();
+        if (event.getID() < -1) {
+            throw new IllegalArgumentException();
+        } else {
+            mId = event.getID();
+        }
 
-        // TODO : Handle listeners
+        if ((event.getName() == null) || event.getName().equals("")) {
+            throw new IllegalArgumentException();
+        } else {
+            mName = event.getName();
+        }
+
+        if (event.getCreatorId() < 0) {
+            throw new IllegalArgumentException();
+        } else {
+            mCreatorId = event.getCreatorId();
+        }
+
+        if ((event.getStartDate() == null) || (event.getEndDate() == null)) {
+            throw new IllegalArgumentException();
+        } else {
+            mStartDate = new GregorianCalendar(TimeZone.getDefault());
+            mEndDate = new GregorianCalendar(TimeZone.getDefault());
+        }
+
+        if (event.getLocation() == null) {
+            throw new IllegalArgumentException();
+        } else {
+            mLocation = new Location(event.getLocation());
+        }
+
+        if (event.getLocationString() == null) {
+            mLocationString = Displayable.NO_LOCATION_STRING;
+        } else {
+            mLocationString = event.getLocationString();
+        }
+
+        if (event.getDescription() == null) {
+            mDescription = Event.NO_DESCRIPTION;
+        } else {
+            mDescription = event.getDescription();
+        }
     }
 
     /*
@@ -61,7 +92,7 @@ public class PublicEvent implements Event {
 
     @Override
     public long getCreatorId() {
-        return mCreator.getId();
+        return mCreatorId;
     }
 
     @Override
@@ -182,6 +213,29 @@ public class PublicEvent implements Event {
 
     @Override
     public void update(ImmutableEvent event) {
+        if ((event.getName() != null) && !event.getName().equals("")) {
+            mName = event.getName();
+        }
 
+        if (event.getCreatorId() > 0) {
+            mCreatorId = event.getCreatorId();
+        }
+
+        if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
+            mStartDate = new GregorianCalendar(TimeZone.getDefault());
+            mEndDate = new GregorianCalendar(TimeZone.getDefault());
+        }
+
+        if (event.getLocation() != null) {
+            mLocation = new Location(event.getLocation());
+        }
+
+        if (event.getLocationString() != null) {
+            mLocationString = event.getLocationString();
+        }
+
+        if (event.getDescription() == null) {
+            mDescription = event.getDescription();
+        }
     }
 }
