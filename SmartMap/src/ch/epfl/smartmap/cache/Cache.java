@@ -61,13 +61,12 @@ public final class Cache {
         mListeners = new LinkedList<CacheListener>();
     }
 
-    public void addFriend(ImmutableUser newFriend) {
+    public void addFriend(long id) {
         // TODO : Notify database
-        mFriendIds.add(newFriend.getId());
-        mPendingFriendIds.remove(newFriend.getId());
-        mStrangerInstances.remove(newFriend.getId());
+        mFriendIds.add(id);
+        mStrangerInstances.remove(id);
+        this.getFriendById(id);
 
-        mFriendInstances.put(newFriend.getId(), new Friend(newFriend));
         for (CacheListener listener : mListeners) {
             listener.onFriendListUpdate();
         }
@@ -76,6 +75,7 @@ public final class Cache {
     public void addGoingEvent(long id) {
         // TODO : Notify database
         mGoingEventIds.add(id);
+        this.getPublicEventById(id);
         for (CacheListener listener : mListeners) {
             listener.onGoingEventListUpdate();
         }
@@ -84,6 +84,7 @@ public final class Cache {
     public void addMyEvent(long id) {
         // TODO : Notify database
         mMyEventIds.add(id);
+        this.getPublicEventById(id);
     }
 
     public void addNearEvent(long id) {

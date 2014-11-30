@@ -15,7 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.search.MockSearchEngine;
 import ch.epfl.smartmap.search.SearchEngine;
 import ch.epfl.smartmap.search.SearchEngine.Type;
 
@@ -79,7 +78,6 @@ public class SearchLayout extends LinearLayout {
         mSearchTypeIndexes = new HashMap<Type, Integer>();
         mActiveSearchTypes = new LinkedList<Type>();
         mTitleTextViews = new HashMap<Type, TextView>();
-        this.setSearchEngine(new MockSearchEngine());
         // Initialize Views
         mTitleBar = new LinearLayout(context);
         // Initialize search types

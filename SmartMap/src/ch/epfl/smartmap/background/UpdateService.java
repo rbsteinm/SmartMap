@@ -148,12 +148,12 @@ public class UpdateService extends Service {
         }
     }
 
-    private void showAcceptedNotif(ImmutableUser user) {
-        Notifications.acceptedFriendNotification(this, user);
+    private void showAcceptedNotif(long id) {
+        Notifications.acceptedFriendNotification(this, Cache.getInstance().getUserById(id));
     }
 
-    private void showFriendNotif(User user) {
-        Notifications.newFriendNotification(this, user);
+    private void showFriendNotif(long id) {
+        Notifications.newFriendNotification(this, Cache.getInstance().getUserById(id));
     }
 
     /**
@@ -238,8 +238,8 @@ public class UpdateService extends Service {
                 }
 
                 for (long userId : result.getInvitingUsers()) {
-                    if (mHelper.addInvitation(user) > 0) {
-                        UpdateService.this.showFriendNotif(user);
+                    if (mHelper.addInvitation(Cache.getInstance().getUserById(userId)) > 0) {
+                        UpdateService.this.showFriendNotif(userId);
                     }
                 }
 
