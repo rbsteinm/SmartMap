@@ -41,7 +41,7 @@ public class ImmutableEvent {
      * @param location
      *            The event's location on the map
      */
-    protected ImmutableEvent(long id, String name, long creatorId, String description, Calendar startDate,
+    public ImmutableEvent(long id, String name, long creatorId, String description, Calendar startDate,
         Calendar endDate, Location location, String locationString, List<Long> participants) {
 
         if (name == null) {

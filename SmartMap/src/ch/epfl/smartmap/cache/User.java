@@ -34,6 +34,8 @@ public interface User extends Displayable, Markable {
     float MARKER_ANCHOR_Y = 1;
     int PICTURE_WIDTH = 50;
     int PICTURE_HEIGHT = 50;
+    double NO_LATITUDE = 0.0;
+    double NO_LONGITUDE = 0.0;
 
     void addUserListener(UserListener newListener);
 

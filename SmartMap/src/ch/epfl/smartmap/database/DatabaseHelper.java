@@ -1,11 +1,22 @@
 package ch.epfl.smartmap.database;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Location;
+import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.DefaultFilter;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Filter;
@@ -14,13 +25,6 @@ import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Localisable;
 import ch.epfl.smartmap.cache.User;
-
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.location.Location;
 
 /**
  * SQLite helper
@@ -69,8 +73,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String[] FILTER_USER_COLUMNS = {KEY_ID, KEY_FILTER_ID, KEY_USER_ID};
 
     // Columns for the Event table
-    private static final String[] EVENT_COLUMNS = {KEY_ID, KEY_NAME, KEY_EVTDESC, KEY_USER_ID,
-        KEY_CREATOR_NAME, KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_DATE, KEY_ENDDATE};
+    private static final String[] EVENT_COLUMNS = {KEY_ID, KEY_NAME, KEY_EVTDESC, KEY_USER_ID, KEY_LONGITUDE,
+        KEY_LATITUDE, KEY_DATE, KEY_ENDDATE};
 
     // Columns for the Invitations table
     private static final String[] INVITATION_COLUMNS = {KEY_USER_ID, KEY_NAME};
@@ -96,8 +100,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Table of events
     private static final String CREATE_TABLE_EVENT = "CREATE TABLE IF NOT EXISTS " + TABLE_EVENT + "("
         + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_EVTDESC + " TEXT," + KEY_USER_ID
-        + " INTEGER," + KEY_CREATOR_NAME + " TEXT," + KEY_LONGITUDE + " DOUBLE," + KEY_LATITUDE + " DOUBLE,"
-        + KEY_POSNAME + " TEXT," + KEY_DATE + " INTEGER," + KEY_ENDDATE + " INTEGER" + ")";
+        + " INTEGER," + KEY_LONGITUDE + " DOUBLE," + KEY_LATITUDE + " DOUBLE," + KEY_DATE + " INTEGER,"
+        + KEY_ENDDATE + " INTEGER" + ")";
 
     // Table of invitations
     private static final String CREATE_TABLE_INVITATIONS = "CREATE TABLE IF NOT EXISTS " + TABLE_INVITATIONS
@@ -106,9 +110,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Table of invitations
     private static final String CREATE_TABLE_PENDING = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING + "("
         + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
+    private static final int IMAGE_QUALITY = 100;
 
     private static DatabaseHelper mInstance;
     private static SQLiteDatabase DATABASE;
+    private final Context mContext;
 
     /**
      * DatabaseHelper constructor. Will be made private, so use initialize() or
@@ -120,6 +126,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Deprecated
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        mContext = context;
     }
 
     /**
@@ -145,11 +152,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_ID, event.getId());
             values.put(KEY_NAME, event.getName());
             values.put(KEY_EVTDESC, event.getDescription());
-            values.put(KEY_USER_ID, event.getCreator());
-            values.put(KEY_CREATOR_NAME, event.getCreatorName());
+            values.put(KEY_USER_ID, event.getCreatorId());
             values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
             values.put(KEY_LATITUDE, event.getLocation().getLatitude());
-            values.put(KEY_POSNAME, event.getPositionName());
             values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
             values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
 
@@ -255,12 +260,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_USER_ID, user.getId());
             values.put(KEY_NAME, user.getName());
-            values.put(KEY_NUMBER, user.getNumber());
+            values.put(KEY_NUMBER, user.getPhoneNumber());
             values.put(KEY_EMAIL, user.getEmail());
             values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
             values.put(KEY_LATITUDE, user.getLocation().getLatitude());
             values.put(KEY_POSNAME, user.getLocationString());
-            values.put(KEY_LASTSEEN, user.getLastSeen().getTimeInMillis());
+            values.put(KEY_LASTSEEN, user.getLocation().getTime());
 
             DATABASE.insert(TABLE_USER, null, values);
         } else {
@@ -349,8 +354,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * @return the {@code List} of all events
      */
-    public List<Event> getAllEvents() {
-        ArrayList<Event> events = new ArrayList<Event>();
+    public List<ImmutableEvent> getAllEvents() {
+        ArrayList<ImmutableEvent> events = new ArrayList<ImmutableEvent>();
 
         String query = "SELECT  * FROM " + TABLE_EVENT;
 
@@ -517,16 +522,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String name = cursor.getString(cursor.getColumnIndex(KEY_NAME));
             String phoneNumber = cursor.getString(cursor.getColumnIndex(KEY_NUMBER));
             String email = cursor.getString(cursor.getColumnIndex(KEY_EMAIL));
+            long lastSeen = cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN));
             double longitude = cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE));
             double latitude = cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE));
+            Location location = new Location("database");
+            location.setLongitude(longitude);
+            location.setLatitude(latitude);
+            location.setTime(lastSeen);
             String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
-            Calendar lastSeen = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
-            lastSeen.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
+            Bitmap image = getPictureById(id);
 
             cursor.close();
 
-            return new ImmutableUser(id, name, phoneNumber, email, locationString, lastSeen, longitude,
-                latitude);
+            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image);
         }
 
         return ImmutableUser.NOT_FOUND;
@@ -537,19 +545,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * 
      * @return A list of users who sent requests
      */
-    public List<User> getInvitations() {
-        List<User> invitations = new ArrayList<User>();
+    public List<ImmutableUser> getInvitations() {
+        List<ImmutableUser> invitations = new ArrayList<ImmutableUser>();
 
         String query = "SELECT  * FROM " + TABLE_INVITATIONS;
 
         Cursor cursor = DATABASE.rawQuery(query, null);
 
-        Friend friend = null;
+        ImmutableUser friend = null;
         if (cursor.moveToFirst()) {
             do {
+                long id = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
                 friend =
-                    new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
-                        .getColumnIndex(KEY_NAME)));
+                    new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)), User.NO_NUMBER,
+                        User.NO_EMAIL, new Location(""), "", getPictureById(id));
 
                 invitations.add(friend);
             } while (cursor.moveToNext());
@@ -564,19 +573,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * 
      * @return A list of users who were sent friend requests
      */
-    public List<User> getPendingFriends() {
-        List<User> friends = new ArrayList<User>();
+    public List<ImmutableUser> getPendingFriends() {
+        List<ImmutableUser> friends = new ArrayList<ImmutableUser>();
 
         String query = "SELECT  * FROM " + TABLE_PENDING;
 
         Cursor cursor = DATABASE.rawQuery(query, null);
 
-        Friend friend = null;
+        ImmutableUser friend = null;
         if (cursor.moveToFirst()) {
             do {
+                long id = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
                 friend =
-                    new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
-                        .getColumnIndex(KEY_NAME)));
+                    new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)), User.NO_NUMBER,
+                        User.NO_EMAIL, new Location(""), "", getPictureById(id));
 
                 friends.add(friend);
             } while (cursor.moveToNext());
@@ -584,6 +594,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return friends;
+    }
+
+    /**
+     * Returns a user's picture from the internal storage
+     * 
+     * @param userId
+     *            The user's ID
+     * @return The user's profile picture if it exists, a default picture otherwise
+     */
+    public Bitmap getPictureById(long userId) {
+        File file = new File(mContext.getFilesDir(), userId + ".png");
+        Bitmap pic = null;
+        if (file.exists()) {
+            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
+        }
+        if (pic == null) {
+            pic = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_default_user);
+        }
+        return pic;
     }
 
     /**
@@ -610,6 +639,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_INVITATIONS);
         db.execSQL(CREATE_TABLE_PENDING);
     }
+
+    /**
+     * Uses listFriendsPos() to update the entire friends database with updated
+     * positions
+     * 
+     * @return The number of rows (i.e. friends) that were updated
+     */
+    // public int refreshFriendsPos() {
+    // int updatedRows = 0;
+    // try {
+    // List<User> updatedUsers = NetworkSmartMapClient.getInstance().listFriendsPos();
+    //
+    // for (User user : updatedUsers) {
+    // this.updateUser(user);
+    // updatedRows++;
+    // }
+    // } catch (SmartMapClientException e) {
+    // e.printStackTrace();
+    // }
+    // return updatedRows;
+    // }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -638,25 +688,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // }
 
     /**
-     * Uses listFriendsPos() to update the entire friends database with updated
-     * positions
+     * Stores a profile picture
      * 
-     * @return The number of rows (i.e. friends) that were updated
+     * @param picture
+     *            The picture to store
+     * @param userId
+     *            The user's ID
      */
-    // public int refreshFriendsPos() {
-    // int updatedRows = 0;
-    // try {
-    // List<User> updatedUsers = NetworkSmartMapClient.getInstance().listFriendsPos();
-    //
-    // for (User user : updatedUsers) {
-    // this.updateUser(user);
-    // updatedRows++;
-    // }
-    // } catch (SmartMapClientException e) {
-    // e.printStackTrace();
-    // }
-    // return updatedRows;
-    // }
+    public void setUserPicture(Bitmap picture, long userId) {
+        File file = new File(mContext.getFilesDir(), userId + ".png");
+
+        if (file.exists()) {
+            file.delete();
+        }
+
+        try {
+            FileOutputStream out = mContext.openFileOutput(userId + ".png", Context.MODE_PRIVATE);
+            picture.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Updates an event
@@ -671,11 +726,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_ID, event.getId());
         values.put(KEY_NAME, event.getName());
         values.put(KEY_EVTDESC, event.getDescription());
-        values.put(KEY_USER_ID, event.getCreator());
-        values.put(KEY_CREATOR_NAME, event.getCreatorName());
+        values.put(KEY_USER_ID, event.getCreatorId());
         values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
         values.put(KEY_LATITUDE, event.getLocation().getLatitude());
-        values.put(KEY_POSNAME, event.getPositionName());
         values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
         values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
 
@@ -714,22 +767,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (friend.getName() != Friend.NO_NAME) {
             values.put(KEY_NAME, friend.getName());
         }
-        if (friend.getNumber() != Friend.NO_NUMBER) {
-            values.put(KEY_NUMBER, friend.getNumber());
+        if (friend.getPhoneNumber() != Friend.NO_NUMBER) {
+            values.put(KEY_NUMBER, friend.getPhoneNumber());
         }
         if (friend.getEmail() != Friend.NO_EMAIL) {
             values.put(KEY_EMAIL, friend.getEmail());
         }
-        if ((friend.getLocation().getLatitude() != Friend.NO_LATITUDE)
-            || (friend.getLocation().getLongitude() != Friend.NO_LONGITUDE)) {
+        if ((friend.getLocation().getLatitude() != User.NO_LATITUDE)
+            || (friend.getLocation().getLongitude() != User.NO_LONGITUDE)) {
             values.put(KEY_LONGITUDE, friend.getLocation().getLongitude());
             values.put(KEY_LATITUDE, friend.getLocation().getLatitude());
         }
         if (friend.getLocationString() != Friend.NO_LOCATION_STRING) {
             values.put(KEY_POSNAME, friend.getLocationString());
-        }
-        if (friend.getLastSeen().getTimeInMillis() != 0) {
-            values.put(KEY_LASTSEEN, friend.getLastSeen().getTimeInMillis());
         }
 
         int rows =
