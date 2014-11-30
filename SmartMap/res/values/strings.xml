@@ -18,6 +18,7 @@
         <item>Events</item>
         <item>Filters</item>
         <item>Settings</item>
+        <item>Logout</item>
     </string-array>
 
     
@@ -133,7 +134,8 @@
     <string name="title_activity_notifications">Invitations</string>
 
     <!-- FriendInformationActivity -->
-    <string name="removeFriendDialogMessage">Remove from friends</string>
-    <string name="follow_checkbox">Follow</string>
+    <string name="remove_friend_button_text">Remove</string>
+    <string name="block_button_text">Block</string>
+    <string name="follow_switch">Follow</string>
 
 </resources>

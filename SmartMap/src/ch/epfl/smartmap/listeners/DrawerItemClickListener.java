@@ -20,6 +20,7 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     private static final int INDEX_EVENTS = 2;
     private static final int INDEX_FILTERS = 3;
     private static final int INDEX_SETTINGS = 4;
+    private static final int INDEX_LOGOUT = 5;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -39,6 +40,8 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
                 break;
             case INDEX_SETTINGS:
                 view.getContext().startActivity(new Intent(view.getContext(), SettingsActivity.class));
+                break;
+            case INDEX_LOGOUT:
                 break;
             default:
                 break;
