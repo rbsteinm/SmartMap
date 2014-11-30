@@ -134,7 +134,7 @@ class EventRepository
         }
         catch (\InvalidArgumentException $e)
         {
-            throw new DatabaseException('Event with invalid state in database with id ' . $id . '.');
+            throw new DatabaseException('Event with invalid state in database with id ' . $id . '.', 1, $e);
         }
 
         return $event;

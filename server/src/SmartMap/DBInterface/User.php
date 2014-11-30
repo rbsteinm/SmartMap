@@ -272,12 +272,9 @@ class User
 
     private function checkLastUpdate($date)
     {
-        // Credit for the regex to
-        // http://www.webdeveloper.com/forum/showthread.php?178277-Decent-Mysql-datetime-regular-expression
-        $regex = '/^([0-3][0-9]{3,3})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][1-9]|3[0-1])\s([0-1][0-9]|2[0-4])' .
-            ':([0-5][0-9]):([0-5][0-9])$/';
+        $dt = \DateTIme::createFromFormat(self::$DATE_FORMAT, $date);
 
-        if (!preg_match($regex, $date) && $date)
+        if (!$dt || $dt->format(self::$DATE_FORMAT) != $date)
         {
             throw new \InvalidArgumentException('Last update date must be in format ' . self::$DATE_FORMAT . '.');
         }

@@ -4,6 +4,8 @@ namespace SmartMap\DBInterface;
 
 class Event
 {
+    public static $DATE_FORMAT = 'Y-m-d H:i:s';
+
     private $mId;
     
     private $mCreatorId;
@@ -358,15 +360,11 @@ class Event
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function checkDate($date)
+    private function checkDate($date)
     {
-        // Credit for the regex to
-        // http://www.webdeveloper.com/forum/showthread.php?178277-Decent-Mysql-datetime-regular-expression
-        $regex = '/^([0-3][0-9]{3,3})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][1-9]|3[0-1])\s([0-1][0-9]|2[0-4])' .
-            ':([0-5][0-9]):([0-5][0-9])$/';
+        $dt = \DateTIme::createFromFormat(self::$DATE_FORMAT, $date);
 
-        // We accept mysql default value.
-        if (!preg_match($regex, $date) && $date != "0000-00-00 00:00:00")
+        if (!$dt || $dt->format(self::$DATE_FORMAT) != $date)
         {
             throw new \InvalidArgumentException('Invalid date format.');
         }
