@@ -19,7 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * @author jfperren
  * @author ritterni
  */
-public final class Friend extends AbstractUser {
+public final class Friend implements User {
 
     // Friend informations
     private final long mID;
@@ -205,6 +205,7 @@ public final class Friend extends AbstractUser {
         return true;
     }
 
+    @Override
     public void update(ImmutableUser user) {
 
     }

@@ -1,14 +1,8 @@
 package ch.epfl.smartmap.cache;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.location.Location;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.listeners.DisplayableListener;
-
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * A class to represent the user's friends
@@ -26,25 +20,14 @@ public class FriendInvitation implements Invitation, Displayable {
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#addOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
-     * OnDisplayableUpdateListener)
-     */
-    @Override
-    public void addOnDisplayableUpdateListener(DisplayableListener listener) {
-        // TODO Auto-generated method stub
-
-    }
-
     @Override
     public long getId() {
         return mId;
     }
 
     @Override
-    public Bitmap getImage(Context context) {
-        return mUser.getImage(context);
+    public Bitmap getImage() {
+        return mUser.getImage();
     }
 
     @Override
@@ -52,38 +35,8 @@ public class FriendInvitation implements Invitation, Displayable {
         return mIntent;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getLatLng()
-     */
     @Override
-    public LatLng getLatLng() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Location getLocation() {
-        return mUser.getLocation();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
-     */
-    @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getName() {
-        return mUser.getName();
-    }
-
-    @Override
-    public String getShortInfos() {
+    public String getSubtitle() {
         return new String("Position : " + mUser.getLocationString() + "\n" + "Last seen : "
             + mUser.getLastSeen());
     }
@@ -106,17 +59,6 @@ public class FriendInvitation implements Invitation, Displayable {
     @Override
     public boolean isRead() {
         return mIsRead;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#removeOnDisplayableUpdateListener(ch.epfl.smartmap.listeners.
-     * OnDisplayableUpdateListener)
-     */
-    @Override
-    public void removeOnDisplayableUpdateListener(DisplayableListener listener) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

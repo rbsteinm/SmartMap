@@ -123,7 +123,7 @@ public class Notifications {
 
         String[] events = new String[2];
         events[0] =
-            new String(event.getCreatorName() + " "
+            new String(Cache.getInstance().getUserById(event.getCreatorId()) + " "
                 + context.getString(R.string.notification_event_invitation) + " " + event.getName());
         events[1] = context.getString(R.string.notification_open_event_list);
 
@@ -142,12 +142,14 @@ public class Notifications {
                 .setAutoCancel(true)
                 .setContentTitle(context.getString(R.string.notification_inviteevent_title))
                 .setContentText(
-                    event.getCreatorName() + " " + context.getString(R.string.notification_event_invitation)
-                        + event.getName() + "\n" + context.getString(R.string.notification_open_event_list))
+                    Cache.getInstance().getUserById(event.getCreatorId()) + " "
+                        + context.getString(R.string.notification_event_invitation) + event.getName() + "\n"
+                        + context.getString(R.string.notification_open_event_list))
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(
-                    event.getCreatorName() + " " + context.getString(R.string.notification_event_invitation)
-                        + event.getName()).setVibrate(PATTERN).setContentIntent(pEventIntent);
+                    Cache.getInstance().getUserById(event.getCreatorId()) + " "
+                        + context.getString(R.string.notification_event_invitation) + event.getName())
+                .setVibrate(PATTERN).setContentIntent(pEventIntent);
 
         displayNotification(context, noti.build(), notificationID);
 

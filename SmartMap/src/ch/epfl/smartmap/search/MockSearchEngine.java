@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Locale;
 
 import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.History;
+import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.database.MockDB;
 
 /**
@@ -20,8 +22,8 @@ public class MockSearchEngine implements SearchEngine {
     private static final String AUDIT_TAG = "Audit : " + TAG;
 
     private final History mHistory;
-    private final List<Displayable> mUsers;
-    private final List<Displayable> mEvents;
+    private final List<User> mUsers;
+    private final List<Event> mEvents;
 
     /**
      * Constructor
@@ -55,12 +57,12 @@ public class MockSearchEngine implements SearchEngine {
                 result.addAll(mUsers);
                 result.addAll(mEvents);
             } else {
-                for (Displayable f : mUsers) {
+                for (User f : mUsers) {
                     if (f.getName().toLowerCase(Locale.US).contains(query)) {
                         result.add(f);
                     }
                 }
-                for (Displayable f : mEvents) {
+                for (Event f : mEvents) {
                     if (f.getName().toLowerCase(Locale.US).contains(query)) {
                         result.add(f);
                     }
@@ -70,7 +72,7 @@ public class MockSearchEngine implements SearchEngine {
             if (query.equals("")) {
                 result.addAll(mUsers);
             } else {
-                for (Displayable f : mUsers) {
+                for (User f : mUsers) {
                     if (f.getName().toLowerCase(Locale.US).contains(query)) {
                         result.add(f);
                     }
@@ -80,7 +82,7 @@ public class MockSearchEngine implements SearchEngine {
             if (query.equals("")) {
                 result.addAll(mEvents);
             } else {
-                for (Displayable f : mEvents) {
+                for (Event f : mEvents) {
                     if (f.getName().toLowerCase(Locale.US).contains(query)) {
                         result.add(f);
                     }

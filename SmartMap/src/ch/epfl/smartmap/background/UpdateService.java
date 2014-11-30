@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Notifications;
 import ch.epfl.smartmap.cache.User;
@@ -174,20 +175,16 @@ public class UpdateService extends Service {
      * 
      * @author ritterni
      */
-    private class AsyncFriendsPos extends AsyncTask<Void, Void, Integer> {
+    private class AsyncFriendsPos extends AsyncTask<Void, Void, Void> {
         @Override
-        protected Integer doInBackground(Void... args0) {
-            List<ImmutableUser> pos = mClient.listFriendsPos();
-            int rows = 0;
-            for (ImmutableUser user : pos) {
-                rows += mHelper.updateFriend(user);
+        protected Void doInBackground(Void... args0) {
+            try {
+                List<ImmutableUser> friendsWithNewLocations = mClient.listFriendsPos();
+                Cache.getInstance().updateFriendList(friendsWithNewLocations);
+            } catch (SmartMapClientException e) {
+                e.printStackTrace();
             }
-            return rows;
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-            mFriendsPosIntent.putExtra(UPDATED_ROWS, result);
+            return null;
         }
     }
 

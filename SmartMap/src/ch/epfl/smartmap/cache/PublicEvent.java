@@ -18,7 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * 
  * @author ritterni
  */
-public class PublicEvent extends AbstractEvent {
+public class PublicEvent implements Event {
 
     private long mId;
     private String mName;
@@ -47,13 +47,6 @@ public class PublicEvent extends AbstractEvent {
         mDescription = event.getDescription();
 
         // TODO : Handle listeners
-    }
-
-    @Override
-    public void addParticipant(Long id) {
-        if (!mParticipants.contains(Long.valueOf(id))) {
-            mParticipants.add(id);
-        }
     }
 
     /*
@@ -187,6 +180,7 @@ public class PublicEvent extends AbstractEvent {
         return true;
     }
 
+    @Override
     public void update(ImmutableEvent event) {
 
     }

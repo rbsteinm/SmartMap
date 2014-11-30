@@ -1,7 +1,10 @@
 package ch.epfl.smartmap.cache;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import android.graphics.Bitmap;
-import ch.epfl.smartmap.listeners.DisplayableListener;
+import android.location.Location;
 
 /**
  * Objects that can be displayed with image, title and subtitle.
@@ -15,8 +18,6 @@ public interface Displayable extends Stockable {
     String NO_TITLE = "";
     String NO_SUBTITLE = "";
     Bitmap DEFAULT_IMAGE = null;
-
-    void addDisplayableListener(DisplayableListener newListener);
 
     /**
      * @param context
@@ -35,6 +36,28 @@ public interface Displayable extends Stockable {
      * @return A name for the panel (e.g. the username, event name, etc.)
      */
     String getTitle();
+    
+    String NO_LOCATION_STRING = "Unknown Location";
+    String PROVIDER_NAME = "SmartMapServers";
+    Location NO_LOCATION = new Location(PROVIDER_NAME);
+    MarkerOptions NO_MARKER_OPTIONS = null;
 
-    void removeDisplayableListener(DisplayableListener oldListener);
+    LatLng getLatLng();
+
+    /**
+     * @return GoogleMap Location of the Displayable
+     */
+    Location getLocation();
+
+    String getLocationString();
+
+    /**
+     * @param context
+     *            , the application's context
+     * @return the options to display the marker
+     */
+    MarkerOptions getMarkerOptions();
+
+    boolean isVisible();
+
 }

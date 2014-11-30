@@ -5,12 +5,11 @@ import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import ch.epfl.smartmap.cache.Displayable;
+import android.location.Location;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.PublicEvent;
-
-import android.location.Location;
+import ch.epfl.smartmap.cache.User;
 
 /**
  * Static Database
@@ -43,11 +42,10 @@ public class MockDB {
         MARION.getName(), new GregorianCalendar(2014, 11, 20), new GregorianCalendar(2014, 11, 20),
         new Location("Marion's"));
 
-    public static final ArrayList<Displayable> FRIENDS_LIST = new ArrayList<Displayable>(Arrays.asList(
-        JULIEN, ALAIN, ROBIN, MATTHIEU, NICOLAS, MARION, RAPHAEL, HUGO, GUILLAUME, SELINE, CYRIL, PIETRO,
-        CHRISTIE, MARIE));
+    public static final ArrayList<User> FRIENDS_LIST = new ArrayList<User>(Arrays.asList(JULIEN, ALAIN,
+        ROBIN, MATTHIEU, NICOLAS, MARION, RAPHAEL, HUGO, GUILLAUME, SELINE, CYRIL, PIETRO, CHRISTIE, MARIE));
 
-    public static final ArrayList<Displayable> EVENTS_LIST = new ArrayList<Displayable>(Arrays.asList(
+    public static final ArrayList<Event> EVENTS_LIST = new ArrayList<Event>(Arrays.asList(
         FOOTBALL_TOURNAMENT, CONFERENCE, MARION_BIRTHDAY));
 
     public static List<Event> getEventsList() {
