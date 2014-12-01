@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.cache;
 
-
 /**
  * Mock class that returns filtered Lists from {@code MockDB}.
  * 

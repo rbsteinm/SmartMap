@@ -14,49 +14,49 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public interface Displayable extends Stockable {
 
-	// final Bitmap NO_IMAGE = Bitmap.createBitmap(R.drawable.default_event);
-	String NO_TITLE = "";
-	String NO_SUBTITLE = "";
-	Bitmap DEFAULT_IMAGE = null;
+    // final Bitmap NO_IMAGE = Bitmap.createBitmap(R.drawable.default_event);
+    String NO_TITLE = "";
+    String NO_SUBTITLE = "";
+    Bitmap DEFAULT_IMAGE = null;
 
-	/**
-	 * @param context
-	 *            The application's context, needed to access the memory
-	 * @return The object's picture
-	 */
-	Bitmap getImage();
+    /**
+     * @param context
+     *            The application's context, needed to access the memory
+     * @return The object's picture
+     */
+    Bitmap getImage();
 
-	/**
-	 * @return Text containing various information (description, last seen,
-	 *         etc.)
-	 */
-	String getSubtitle();
+    /**
+     * @return Text containing various information (description, last seen,
+     *         etc.)
+     */
+    String getSubtitle();
 
-	/**
-	 * @return A name for the panel (e.g. the username, event name, etc.)
-	 */
-	String getTitle();
+    /**
+     * @return A name for the panel (e.g. the username, event name, etc.)
+     */
+    String getTitle();
 
-	String NO_LOCATION_STRING = "Unknown Location";
-	String PROVIDER_NAME = "SmartMapServers";
-	Location NO_LOCATION = new Location(PROVIDER_NAME);
-	MarkerOptions NO_MARKER_OPTIONS = null;
+    String NO_LOCATION_STRING = "Unknown Location";
+    String PROVIDER_NAME = "SmartMapServers";
+    Location NO_LOCATION = new Location(PROVIDER_NAME);
+    MarkerOptions NO_MARKER_OPTIONS = null;
 
-	LatLng getLatLng();
+    LatLng getLatLng();
 
-	/**
-	 * @return GoogleMap Location of the Displayable
-	 */
-	Location getLocation();
+    /**
+     * @return GoogleMap Location of the Displayable
+     */
+    Location getLocation();
 
-	String getLocationString();
+    String getLocationString();
 
-	/**
-	 * @param context
-	 *            , the application's context
-	 * @return the options to display the marker
-	 */
-	MarkerOptions getMarkerOptions();
+    /**
+     * @param context
+     *            , the application's context
+     * @return the options to display the marker
+     */
+    MarkerOptions getMarkerOptions();
 
-	boolean isVisible();
+    boolean isVisible();
 }

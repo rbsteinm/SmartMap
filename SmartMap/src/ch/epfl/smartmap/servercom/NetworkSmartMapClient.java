@@ -27,8 +27,7 @@ import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 
 /**
- * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider}
- * to communicate with a SmartMap
+ * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider} to communicate with a SmartMap
  * server.
  * 
  * @author marion-S
