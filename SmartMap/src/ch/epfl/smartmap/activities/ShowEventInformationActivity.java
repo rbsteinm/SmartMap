@@ -36,18 +36,26 @@ public class ShowEventInformationActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_show_event_information);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
         if (this.getIntent().getParcelableExtra("event") != null) {
             mEvent = this.getIntent().getParcelableExtra("event");
             Log.d(TAG, "City name: " + mEvent.getLocationString());
             Log.d(TAG, "Country name: " + "UNIMPLEMENTED");
         }
+
         if (mEvent != null) {
             this.initializeGUI();
         }
-        ;
-
     }
 
+    /**
+     * Triggered when the user clicks the "Invite friends" button.<br />
+     * It launches InviteFriendsActivity for a result.
+     * 
+     * @param v
+     * 
+     * @author SpicyCH
+     */
     public void inviteFriendsToEvent(View v) {
         Intent inviteFriends = new Intent(mContext, InviteFriendsActivity.class);
         this.startActivityForResult(inviteFriends, 1);
@@ -70,11 +78,8 @@ public class ShowEventInformationActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        switch (id) {
+
+        switch (item.getItemId()) {
             case R.id.action_settings:
                 return true;
             case android.R.id.home:
@@ -85,6 +90,7 @@ public class ShowEventInformationActivity extends Activity {
             default:
                 break;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
