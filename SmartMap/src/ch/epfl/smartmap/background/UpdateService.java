@@ -89,6 +89,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final Runnable getInvitations = new Runnable() {
         @Override
         public void run() {
+            loadSettings();
             new AsyncGetInvitations().execute();
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
         }

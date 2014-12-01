@@ -833,6 +833,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
+        this.onCreate(db);
+    }
+
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
@@ -841,11 +852,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
         this.onCreate(db);
-
-        this.notifyOnFriendListUpdateListeners();
-        this.notifyOnFriendsLocationUpdateListeners();
-        this.notifyOnEventListUpdateListeners();
-        this.notifyOnFilterListUpdateListeners();
     }
 
     /**
