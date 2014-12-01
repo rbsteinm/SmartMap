@@ -479,7 +479,7 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	 * @expectedException SmartMap\DBInterface\DatabaseException
 	 * @expectedExceptionMessage Invalid value for follow status !
 	 */
-	public function testSetFriendshipFollowkWithInvalidStatus()
+	public function testSetFriendshipFollowWithInvalidStatus()
 	{
 	    $repo = new UserRepository(self::$doctrine);
 	     
@@ -501,10 +501,21 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    
 	    $repo = new UserRepository(self::$doctrine);
 	     
-	    $ids = $repo->addInvitation(1, 5);
+	    $repo->addInvitation(2, 3);
 	    
 	    $this->assertEquals(2, $this->getConnection()->getRowCount('invitations'), "Post-Condition");
 	}
+
+    /**
+     * @expectedException SmartMap\DBInterface\DatabaseException
+     * @expectedExceptionMessage Trying to add a non existing user as a friend.
+     */
+    public function testAddNonExistingFriendInvitation()
+    {
+        $repo = new UserRepository(self::$doctrine);
+
+        $repo->addInvitation(1, 56); // User with id 56 does not exist.
+    }
 	
 	public function testRemoveInvitation()
 	{

@@ -51,7 +51,7 @@ class EventTest extends PHPUnit_Framework_TestCase
             'Presentation of SmartMap app.',
             'SmartMap is an app that shows you your friends and events on a map.'
         );
-        
+
         $e->setId(2);
         $e->setCreatorId(3);
         $e->setStartingDate('2014-11-18 08:15:59');
@@ -61,7 +61,7 @@ class EventTest extends PHPUnit_Framework_TestCase
         $e->setPositionName('UNIL');
         $e->setName('Sheep meeting');
         $e->setDescription('Eating grass.');
-        
+
         $this->assertEquals(2, $e->getId());
         $this->assertEquals(3, $e->getCreatorId());
         $this->assertEquals('2014-11-18 08:15:59', $e->getStartingDate());
@@ -72,7 +72,7 @@ class EventTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Sheep meeting', $e->getName());
         $this->assertEquals('Eating grass.', $e->getDescription());
     }
-    
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Id must be greater than 0.
@@ -383,6 +383,26 @@ class EventTest extends PHPUnit_Framework_TestCase
         );
 
         $e->setEndingDate('2014-11-12 00:00:00');
+    }
+
+    // regression test for bug in checkDate
+    public function testSetValidDate()
+    {
+        $e = new Event(
+            1,
+            12345,
+            '2014-11-18 08:15:00',
+            '2014-11-18 08:40:00',
+            6.56186974,
+            46.51895762,
+            'EPFL',
+            'Presentation of SmartMap app.',
+            'SmartMap is an app that shows you your friends and events on a map.'
+        );
+
+        $e->setEndingDate('2014-11-20 20:00:00');
+
+        $this->assertEquals('2014-11-20 20:00:00', $e->getEndingDate());
     }
 
 }

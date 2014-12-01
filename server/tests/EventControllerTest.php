@@ -20,7 +20,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 {
     private $mockRepo;
 
-    private $mValidEvent; // This field is public so it can be returned by the mockRepo
+    private $mValidEvent;
 
     public function setUp()
     {
@@ -353,10 +353,11 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
     public function testGetPublicEvents()
     {
+        $eventsIds = array(5, 22, 54);
 
         $this->mockRepo
              ->method('getEventsInRadius')
-             ->willReturn($this->mValidEvent);
+             ->willReturn($eventsIds);
 
         $this->mockRepo->expects($this->once())
              ->method('getEventsInRadius')
@@ -379,17 +380,295 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $validResponse = array(
             'status' => 'Ok',
             'message' => 'Fetched events.',
-            'events' => array(
-                'id' => $this->mValidEvent->getId(),
-                'creatorId' => $this->mValidEvent->getCreatorId(),
-                'startingDate' => $this->mValidEvent->getStartingDate(),
-                'endingDate' => $this->mValidEvent->getEndingDate(),
-                'longitude' => $this->mValidEvent->getLongitude(),
-                'latitude' => $this->mValidEvent->getLatitude(),
-                'positionName' => $this->mValidEvent->getPositionName(),
-                'name' => $this->mValidEvent->getName(),
-                'description' => $this->mValidEvent->getDescription()
-            )
+            'events' => $eventsIds
         );
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    public function testJoinEvent()
+    {
+        $this->mockRepo->expects($this->once())
+             ->method('addUserToEvent')
+             ->with($this->equalTo(1), $this->equalTo(14));
+
+        $request = new Request($query = array(), $request = array('event_id' => 1));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $response = $controller->joinEvent($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Event joined.');
+
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in joinEvent.
+     */
+    public function testJoinEventDBException()
+    {
+        $this->mockRepo
+            ->method('addUserToEvent')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('event_id' => 1));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $controller->joinEvent($request);
+    }
+
+    public function testLeaveEvent()
+    {
+        $this->mockRepo->expects($this->once())
+            ->method('removeUserFromEvent')
+            ->with($this->equalTo(1), $this->equalTo(14));
+
+        $request = new Request($query = array(), $request = array('event_id' => 1));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $response = $controller->leaveEvent($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Event left.');
+
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in leaveEvent.
+     */
+    public function testLeaveEventDBException()
+    {
+        $this->mockRepo
+            ->method('removeUserFromEvent')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('event_id' => 1));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $controller->leaveEvent($request);
+    }
+
+    public function testInviteUsersToEvent()
+    {
+        $this->mockRepo->expects($this->once())
+             ->method('addEventInvitations')
+             ->with($this->equalTo(3), $this->equalTo(array(1, 12, 14)));
+
+        $request = new Request($query = array(), $request = array('event_id' => 3, 'users_ids' => '1,12,14'));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $response = $controller->inviteUsersToEvent($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Invited users.');
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in inviteUsersToEvent.
+     */
+    public function testInviteUsersDBException()
+    {
+        $this->mockRepo
+            ->method('addEventInvitations')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('event_id' => 1, 'users_ids' => '1,12,14'));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $controller->inviteUsersToEvent($request);
+    }
+
+    public function testGetEventInvitations()
+    {
+        $eventsIds = array(5, 7, 9);
+        $this->mockRepo
+             ->method('getEventInvitations')
+             ->willReturn($eventsIds);
+
+        $this->mockRepo->expects($this->once())
+              ->method('getEventInvitations')
+              ->with($this->equalTo(14));
+
+        $request = new Request($query = array(), $request = array());
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $response = $controller->getEventInvitations($request);
+
+        $validResponse = array(
+            'status' => 'Ok',
+            'message' => 'Fetched events.',
+            'events' => $eventsIds
+        );
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in getEventInvitations.
+     */
+    public function testGetEventInvitationsDBException()
+    {
+        $this->mockRepo
+             ->method('getEventInvitations')
+             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException('Toto')));
+
+        $request = new Request($query = array(), $request = array());
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $controller->getEventInvitations($request);
+    }
+
+    public function testAckEventInvitation()
+    {
+        $this->mockRepo->expects($this->once())
+             ->method('removeEventInvitation')
+             ->with($this->equalTo(36), $this->equalTo(14));
+
+        $request = new Request($query = array(), $request = array('event_id' => 36));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $response = $controller->ackEventInvitation($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Acknowledged event invitation.');
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in ackEventInvitation.
+     */
+    public function testAckEventInvitationDBException()
+    {
+        $this->mockRepo
+            ->method('removeEventInvitation')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('event_id' => 36));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $controller->ackEventInvitation($request);
+    }
+
+    public function testGetEventInfo()
+    {
+        $this->mockRepo
+             ->method('getEvent')
+             ->willReturn($this->mValidEvent);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getEvent')
+            ->with($this->equalTo(36));
+
+        $this->mockRepo
+             ->method('getEventParticipants')
+             ->willReturn(array(1,2,3));
+
+        $this->mockRepo->expects($this->once())
+             ->method('getEventParticipants')
+             ->with($this->equalTo(36));
+
+        $request = new Request($query = array(), $request = array('event_id' => 36));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $response = $controller->getEventInfo($request);
+
+        $event = array(
+            'id' => $this->mValidEvent->getId(),
+            'creatorId' => $this->mValidEvent->getCreatorId(),
+            'startingDate' => $this->mValidEvent->getStartingDate(),
+            'endingDate' => $this->mValidEvent->getEndingDate(),
+            'longitude' => $this->mValidEvent->getLongitude(),
+            'latitude' => $this->mValidEvent->getLatitude(),
+            'positionName' => $this->mValidEvent->getPositionName(),
+            'name' => $this->mValidEvent->getName(),
+            'description' => $this->mValidEvent->getDescription(),
+        );
+        $event['participants'] = array(1,2,3);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Fetched event.', 'event' => $event);
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in getEventInfo.
+     */
+    public function testGetEventInfoDBException()
+    {
+        $this->mockRepo
+            ->method('getEvent')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('event_id' => 36));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new EventController($this->mockRepo);
+
+        $controller->getEventInfo($request);
     }
 }
