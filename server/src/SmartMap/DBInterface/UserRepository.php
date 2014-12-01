@@ -106,7 +106,7 @@ class UserRepository
         }
         catch (\InvalidArgumentException $e)
         {
-            throw new DatabaseException('User with invalid state in database with id ' . $id . '.');
+            throw new DatabaseException('User with invalid state in database with id ' . $id . '.', 1, $e);
         }
                         
         return $user;
@@ -772,9 +772,10 @@ class UserRepository
                     $userData['last_update']
                 );
             }
-            catch (\Exception $e)
+            catch (\InvaliArgumentException $e)
             {
-                throw DatabaseException('User with invalid state in database with id ' . $userData['idusers'] . '.');
+                throw DatabaseException('User with invalid state in database with id ' . $userData['idusers'] . '.',
+                    1, $e);
             }
         }
         

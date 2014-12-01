@@ -198,7 +198,7 @@ class EventRepository
                     );
                 } catch (\InvalidArgumentException $e) {
                     throw new DatabaseException('Event with invalid state in database with id '
-                        . $eventData['id'] . '.');
+                        . $eventData['id'] . '.', 1, $e);
                 }
 
                 $events[] = $event;
