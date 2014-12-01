@@ -21,6 +21,9 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -99,31 +102,8 @@ public class FacebookFragment extends Fragment {
                                 .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
                             Toast.LENGTH_LONG).show();
                     } else {
-
-                        // Fill cache with friends
-                        new AsyncTask<Void, Void, Void>() {
-                            @Override
-                            protected Void doInBackground(Void... params) {
-                                try {
-                                    List<Long> friendIds =
-                                        NetworkSmartMapClient.getInstance().getFriendsIds();
-
-                                    Cache.getInstance().initFriendList(friendIds);
-
-                                } catch (SmartMapClientException e) {
-                                    // Retry
-                                    this.execute();
-                                }
-                                return null;
-                            }
-
-                            @Override
-                            protected void onPostExecute(Void result) {
-
-                                // Create and start the next activity
-                                FacebookFragment.this.startMainActivity();
-                            }
-                        }.execute();
+                        // If all is ok, start filling Cache
+                        new InitCache().execute();
                     }
 
                 } else if (response.getError() != null) {
@@ -270,6 +250,62 @@ public class FacebookFragment extends Fragment {
         Context currentActivity = this.getActivity().getBaseContext();
         Intent intent = new Intent(currentActivity, MainActivity.class);
         this.startActivity(intent);
+    }
+
+    /**
+     * The goal of this Task is to compute the location of the displayable multiple times on start so that
+     * they don't appear at false positions because of google locations.
+     * 
+     * @author jfperren
+     */
+    private class ComputeLocations extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            for (User user : Cache.getInstance().getAllFriends()) {
+                user.update(user.getImmutableCopy());
+            }
+            for (Event event : Cache.getInstance().getAllEvents()) {
+                event.update(event.getImmutableCopy());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // Create and start the next activity
+            FacebookFragment.this.startMainActivity();
+        }
+    }
+
+    /**
+     * Initialize Cache with NetworkClient, or with Database if connection issues.
+     * 
+     * @author jfperren
+     */
+    private class InitCache extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            List<Long> friendIds;
+            try {
+                // Try to get the list of friend ids online
+                friendIds = NetworkSmartMapClient.getInstance().getFriendsIds();
+            } catch (SmartMapClientException e) {
+                // If there is connection issues, get it in the database
+                friendIds = DatabaseHelper.getInstance().getFriendIds();
+            }
+            if (friendIds != null) {
+                Cache.getInstance().initFriendList(friendIds);
+            } else {
+                // TODO : Handle this case
+                this.doInBackground(params);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            new ComputeLocations().execute();
+        }
     }
 
     /**

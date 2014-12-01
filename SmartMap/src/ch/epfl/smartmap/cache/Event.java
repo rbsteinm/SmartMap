@@ -22,6 +22,11 @@ public interface Event extends Displayable {
     long getCreatorId();
 
     /**
+     * @return The name of creator
+     */
+    String getCreatorName();
+
+    /**
      * @return The event's description
      */
     String getDescription();
@@ -30,6 +35,8 @@ public interface Event extends Displayable {
      * @return The date (year, month, day, hour, minute) at which the event ends
      */
     Calendar getEndDate();
+
+    ImmutableEvent getImmutableCopy();
 
     String getName();
 
@@ -49,9 +56,4 @@ public interface Event extends Displayable {
         PUBLIC,
         PRIVATE;
     }
-
-    /**
-     * @return The name of creator
-     */
-    String getCreatorName();
 }

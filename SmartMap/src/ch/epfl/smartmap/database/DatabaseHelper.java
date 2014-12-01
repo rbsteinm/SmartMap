@@ -423,41 +423,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return filters;
     }
 
-    // /**
-    // * @return the {@code List} of all friends
-    // */
-    // public List<User> getAllFriends() {
-    // ArrayList<User> friends = new ArrayList<User>();
-    //
-    // String query = "SELECT  * FROM " + TABLE_USER;
-    //
-    // Cursor cursor = mDatabase.rawQuery(query, null);
-    //
-    // Friend friend = null;
-    // if (cursor.moveToFirst()) {
-    // do {
-    // friend =
-    // new Friend(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
-    // .getColumnIndex(KEY_NAME)));
-    // friend.setNumber(cursor.getString(cursor.getColumnIndex(KEY_NUMBER)));
-    // friend.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
-    // friend.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
-    // friend.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
-    // friend.setPositionName(cursor.getString(cursor.getColumnIndex(KEY_POSNAME)));
-    // GregorianCalendar cal = new GregorianCalendar();
-    // cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_LASTSEEN)));
-    // friend.setLastSeen(cal);
-    // friend.setVisible(cursor.getInt(cursor.getColumnIndex(KEY_VISIBLE)) == 1); // int
-    // // to
-    // // boolean
-    // friends.add(friend);
-    // } while (cursor.moveToNext());
-    // }
-    //
-    // cursor.close();
-    // return friends;
-    // }
-
     /**
      * @param id
      *            The event's ID
@@ -569,6 +534,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return null;
+    }
+
+    /**
+     * @return the {@code List} containing all friend ids
+     */
+    public List<Long> getFriendIds() {
+        List<Long> friendIds = new ArrayList<Long>();
+
+        String query = "SELECT  * FROM " + TABLE_USER;
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                friendIds.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return friendIds;
     }
 
     /**
@@ -710,18 +695,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return invitations;
     }
 
-    private void notifyOnInvitationListUpdateListeners() {
-        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
-            listener.onInvitationListUpdate();
-        }
-    }
-
-    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
-        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
-            listener.onInvitationStatusUpdate(id, status);
-        }
-    }
-
     /**
      * Fills the friend database with server data
      */
@@ -746,21 +719,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_INVITATIONS);
         db.execSQL(CREATE_TABLE_PENDING);
     }
-
-    // /**
-    // * Fully updates the friends database (not only positions)
-    // */
-    // public void refreshFriendsInfo() {
-    // List<User> friends = this.getAllFriends();
-    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-    // for (User f : friends) {
-    // try {
-    // this.updateUser(client.getUserInfo(f.getID()));
-    // } catch (SmartMapClientException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // }
 
     /**
      * Uses listFriendsPos() to update the entire friends database with updated
@@ -804,6 +762,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
         this.onCreate(db);
     }
+
+    // /**
+    // * Fully updates the friends database (not only positions)
+    // */
+    // public void refreshFriendsInfo() {
+    // List<User> friends = this.getAllFriends();
+    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+    // for (User f : friends) {
+    // try {
+    // this.updateUser(client.getUserInfo(f.getID()));
+    // } catch (SmartMapClientException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // }
 
     /**
      * Stores a profile picture
@@ -934,6 +907,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return rows;
+    }
+
+    private void notifyOnInvitationListUpdateListeners() {
+        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
+            listener.onInvitationListUpdate();
+        }
+    }
+
+    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
+        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
+            listener.onInvitationStatusUpdate(id, status);
+        }
     }
 
     /**

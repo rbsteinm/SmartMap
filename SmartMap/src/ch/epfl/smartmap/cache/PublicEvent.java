@@ -99,6 +99,11 @@ public class PublicEvent implements Event {
     }
 
     @Override
+    public String getCreatorName() {
+        return Cache.getInstance().getUserById(mCreatorId).getName();
+    }
+
+    @Override
     public String getDescription() {
         return mDescription;
     }
@@ -116,6 +121,12 @@ public class PublicEvent implements Event {
     @Override
     public Bitmap getImage() {
         return Event.DEFAULT_IMAGE;
+    }
+
+    @Override
+    public ImmutableEvent getImmutableCopy() {
+        return new ImmutableEvent(mId, mName, mCreatorId, mDescription, mStartDate, mEndDate, mLocation,
+            mLocationString, mParticipants);
     }
 
     /*
@@ -245,10 +256,5 @@ public class PublicEvent implements Event {
         if (event.getDescription() == null) {
             mDescription = event.getDescription();
         }
-    }
-
-    @Override
-    public String getCreatorName() {
-        return Cache.getInstance().getUserById(mCreatorId).getName();
     }
 }
