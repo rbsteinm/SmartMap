@@ -34,7 +34,7 @@ public class Stranger implements User {
         }
 
         if (user.getImage() == null) {
-            throw new IllegalArgumentException();
+            mImage = User.NO_IMAGE;
         } else {
             mImage = Bitmap.createBitmap(user.getImage());
         }

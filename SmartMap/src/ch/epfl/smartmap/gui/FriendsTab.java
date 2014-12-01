@@ -2,6 +2,7 @@ package ch.epfl.smartmap.gui;
 
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -47,7 +48,12 @@ public class FriendsTab extends ListFragment {
             @Override
             public void onFriendListUpdate() {
                 mFriendList = Cache.getInstance().getAllFriends();
-                FriendsTab.this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
+                ((Activity) FriendsTab.this.mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        FriendsTab.this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
+                    }
+                });
             }
         });
 
@@ -69,6 +75,10 @@ public class FriendsTab extends ListFragment {
     public void onResume() {
         super.onResume();
         this.setListAdapter(new FriendListItemAdapter(mContext, Cache.getInstance().getAllFriends()));
+    }
+
+    private void createList() {
+
     }
 
 }

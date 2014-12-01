@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.activities;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,11 +19,10 @@ import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
+import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -128,15 +126,15 @@ public class AddFriendActivity extends ListActivity {
      * 
      * @author rbsteinm
      */
-    private class RefreshUserList extends AsyncTask<String, Void, List<ImmutableUser>> {
+    private class RefreshUserList extends AsyncTask<String, Void, List<User>> {
 
         @Override
-        protected List<ImmutableUser> doInBackground(String... params) {
+        protected List<User> doInBackground(String... params) {
             try {
                 if (params[0].equals("")) {
                     return Collections.emptyList();
                 } else {
-                    return NetworkSmartMapClient.getInstance().findUsers(params[0]);
+                    return CachedOnlineSearchEngine.getInstance().findStrangerByQuery(params[0]);
                 }
             } catch (SmartMapClientException e) {
                 return Collections.emptyList();
@@ -144,13 +142,10 @@ public class AddFriendActivity extends ListActivity {
         }
 
         @Override
-        protected void onPostExecute(List<ImmutableUser> refreshedList) {
+        protected void onPostExecute(List<User> refreshedList) {
             super.onPostExecute(refreshedList);
-            List<User> users = new ArrayList<User>();
-            for (ImmutableUser user : refreshedList) {
-                users.add(Cache.getInstance().getStrangerById(user.getId()));
-            }
-            AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this, users));
+            AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
+                refreshedList));
         }
     }
 
