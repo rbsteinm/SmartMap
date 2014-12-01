@@ -329,6 +329,8 @@ public class AddEventActivity extends FragmentActivity {
 		mDescription = (EditText) this.findViewById(R.id.addEventDescription);
 		mPlaceName = (EditText) this.findViewById(R.id.addEventPlaceName);
 
+		mPlaceName.setFocusable(true);
+
 		mTextChangedListener = new TextWatcher() {
 
 			@Override
@@ -432,11 +434,9 @@ public class AddEventActivity extends FragmentActivity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		cityName = addresses.get(0).getLocality();
-
-		if ((cityName != null) && !cityName.equals("")) {
+		if ((!addresses.isEmpty()) || ((cityName != null) && !cityName.equals(""))) {
+			cityName = addresses.get(0).getLocality();
 			mPlaceName.setText(cityName);
-			mPlaceName.setFocusable(true);
 			mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
 			new DefaultZoomManager(mFragmentMap).zoomOnLocation(mEventPosition);
 		} else {
@@ -444,6 +444,8 @@ public class AddEventActivity extends FragmentActivity {
 			    Toast.LENGTH_LONG).show();
 			mPlaceName.setText("");
 		}
+		mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
+		new DefaultZoomManager(mFragmentMap).zoomOnLocation(mEventPosition);
 	}
 
 	/**
