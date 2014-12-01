@@ -125,6 +125,14 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         }
     }
 
+    private void loadSettings() {
+        mPosUpdateDelay = mManager.getRefreshFrequency() * 1000;
+        mNotificationsEnabled = mManager.notificationsEnabled();
+        mNotificationsForEventInvitations = mManager.notificationsForEventInvitations();
+        mNotificationsForFriendRequests = mManager.notificationsForFriendRequests();
+        mNotificationsForFriendshipConfirmations = mManager.notificationsForFriendshipConfirmations();
+    }
+
     @Override
     public IBinder onBind(Intent arg0) {
         return null;
@@ -230,14 +238,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         for (FriendInvitation invitation : mHelper.getUnansweredFriendInvitations()) {
             mInviterIds.add(invitation.getUserId());
         }
-    }
-
-    private void loadSettings() {
-        mPosUpdateDelay = mManager.getRefreshFrequency() * 1000;
-        mNotificationsEnabled = mManager.notificationsEnabled();
-        mNotificationsForEventInvitations = mManager.notificationsForEventInvitations();
-        mNotificationsForFriendRequests = mManager.notificationsForFriendRequests();
-        mNotificationsForFriendshipConfirmations = mManager.notificationsForFriendshipConfirmations();
     }
 
     /**
