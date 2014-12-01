@@ -53,7 +53,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private static final int POS_UPDATE_DELAY = 10000;
     private static final int INVITE_UPDATE_DELAY = 30000;
 
-    private static final float MIN_DISTANCE = 5; // minimum distance to update
+    private static final float MIN_DISTANCE = 0; // minimum distance to update
                                                  // position
 
     private static final int RESTART_DELAY = 2000;
@@ -81,15 +81,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final Runnable friendsPosUpdate = new Runnable() {
         @Override
         public void run() {
-            if (mFriendsPosEnabled) {
-                Log.d("SERVICE", "friendposupdate");
-                new AsyncFriendsPos().execute();
-
-                if (isFriendIDListRetrieved) {
-                    new AsyncFriendsPos().execute();
-                }
-                mHandler.postDelayed(this, mPosUpdateDelay * 1000);
-            }
+            Log.d("SERVICE", "friendposupdate");
+            new AsyncFriendsPos().execute();
+            mHandler.postDelayed(this, mPosUpdateDelay * 1000);
         }
     };
 
@@ -311,10 +305,16 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                 List<Long> removedFriends = result.getRemovedFriendsIds();
 
                 for (long userId : newFriends) {
-                    Cache.getInstance().addFriend(userId);
-                    User newFriend = Cache.getInstance().getFriendById(userId);
-                    Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
 
+                    new AsyncTask<Long, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Long... params) {
+                            Cache.getInstance().addFriend(params[0]);
+                            User newFriend = Cache.getInstance().getFriendById(params[0]);
+                            Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
+                            return null;
+                        }
+                    }.execute(userId);
                 }
 
                 for (long userId : result.getInvitingUsers()) {

@@ -30,7 +30,7 @@ public class JsonSmartMapParser implements SmartMapParser {
     private static final String ERROR_STATUS = "error";
     private static final String FEEDBACK_STATUS = "feedback";
 
-    private static final int SERVER_TIME_DIFFERENCE_THRESHHOLD = 15000;
+    private static final int SERVER_TIME_DIFFERENCE_THRESHHOLD = 60000;
 
     private static final int DATETIME_FORMAT_PARTS = 2;
     private static final int DATE_FORMAT_PARTS = 3;

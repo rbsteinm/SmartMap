@@ -398,6 +398,7 @@ public class Cache {
     }
 
     public void removeFriend(long id) {
+
     }
 
     public void removeGoingEvent(long id) {

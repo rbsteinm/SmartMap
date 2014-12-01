@@ -87,63 +87,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
     private LayerDrawable mIcon;
 
-    /**
-     * Display the map with the current location
-     */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            // Enabling MyLocation Layer of Google Map
-            mGoogleMap.setMyLocationEnabled(true);
-        }
-    }
-
-    public Context getContext() {
-        return this;
-    }
-
-    public MenuTheme getMenuTheme() {
-        return mMenuTheme;
-    }
-
-    private void initializeMarkers() {
-        mFriendMarkerManager.updateMarkers(this, mCache.getAllVisibleFriends());
-        mEventMarkerManager.updateMarkers(this, mCache.getAllVisibleEvents());
-
-        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
-        allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
-
-        Intent startingIntent = this.getIntent();
-        if (startingIntent.getParcelableExtra("location") == null) {
-            mMapZoomer.zoomAccordingToMarkers(allMarkers);
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        switch (mMenuTheme) {
-            case MAP:
-                super.onBackPressed();
-                break;
-            case SEARCH:
-            case ITEM:
-                this.setMainMenu();
-                break;
-            default:
-                assert false;
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -193,6 +136,95 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        // TODO A method to unregister to the service when the map is not opened?
+        // this.unregisterReceiver(mBroadcastReceiver);
+        // stopService(mUpdateServiceIntent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // startService(mUpdateServiceIntent);
+        // this.registerReceiver(mBroadcastReceiver, new IntentFilter(UpdateService.BROADCAST_POS));
+        if (mGoogleMap != null) {
+            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
+        }
+        // get Intent that started this Activity
+        Intent startingIntent = this.getIntent();
+        // get the value of the user string
+        Location eventLocation = startingIntent.getParcelableExtra("location");
+        if (eventLocation != null) {
+            mMapZoomer.zoomOnLocation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
+            eventLocation = null;
+        }
+
+        // Set menu Style
+        switch (mMenuTheme) {
+            case SEARCH:
+                this.setSearchMenu();
+                break;
+            case ITEM:
+                this.setItemMenu(mCurrentItem);
+                break;
+            case MAP:
+                break;
+            default:
+                assert false;
+        }
+
+        if (mGoogleMap != null) {
+            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
+        }
+
+    }
+
+    /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+            // not available
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+            dialog.show();
+        } else {
+            // Google Play Services are available.
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = mFragmentMap.getMap();
+            // Enabling MyLocation Layer of Google Map
+            mGoogleMap.setMyLocationEnabled(true);
+        }
+    }
+
+    public Context getContext() {
+        return this;
+    }
+
+    public MenuTheme getMenuTheme() {
+        return mMenuTheme;
+    }
+
+    @Override
+    public void onBackPressed() {
+        switch (mMenuTheme) {
+            case MAP:
+                super.onBackPressed();
+                break;
+            case SEARCH:
+            case ITEM:
+                this.setMainMenu();
+                break;
+            default:
+                assert false;
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.main, menu);
@@ -210,9 +242,14 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         DatabaseHelper.getInstance().addOnInvitationListUpdateListener(new OnInvitationListUpdateListener() {
             @Override
             public void onInvitationListUpdate() {
-                // Update LayerDrawable's BadgeDrawable
-                Utils.setBadgeCount(MainActivity.this, mIcon, DatabaseHelper.getInstance()
-                    .getFriendInvitationsByStatus(Invitation.UNREAD).size());
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Update LayerDrawable's BadgeDrawable
+                        Utils.setBadgeCount(MainActivity.this, mIcon, DatabaseHelper.getInstance()
+                            .getFriendInvitationsByStatus(Invitation.UNREAD).size());
+                    }
+                });
             }
         });
 
@@ -376,14 +413,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // TODO A method to unregister to the service when the map is not opened?
-        // this.unregisterReceiver(mBroadcastReceiver);
-        // stopService(mUpdateServiceIntent);
-    }
-
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.listeners.CacheListener#onPendingFriendListUpdate()
@@ -391,43 +420,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     @Override
     public void onPendingFriendListUpdate() {
         // Nothing
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // startService(mUpdateServiceIntent);
-        // this.registerReceiver(mBroadcastReceiver, new IntentFilter(UpdateService.BROADCAST_POS));
-        if (mGoogleMap != null) {
-            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
-        }
-        // get Intent that started this Activity
-        Intent startingIntent = this.getIntent();
-        // get the value of the user string
-        Location eventLocation = startingIntent.getParcelableExtra("location");
-        if (eventLocation != null) {
-            mMapZoomer.zoomOnLocation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
-            eventLocation = null;
-        }
-
-        // Set menu Style
-        switch (mMenuTheme) {
-            case SEARCH:
-                this.setSearchMenu();
-                break;
-            case ITEM:
-                this.setItemMenu(mCurrentItem);
-                break;
-            case MAP:
-                break;
-            default:
-                assert false;
-        }
-
-        if (mGoogleMap != null) {
-            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
-        }
-
     }
 
     /**
@@ -538,6 +530,19 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             actionBar.setTitle(mCurrentItem.getTitle());
             actionBar.setSubtitle(mCurrentItem.getSubtitle());
             actionBar.setIcon(new BitmapDrawable(this.getResources(), mCurrentItem.getImage()));
+        }
+    }
+
+    private void initializeMarkers() {
+        mFriendMarkerManager.updateMarkers(this, mCache.getAllVisibleFriends());
+        mEventMarkerManager.updateMarkers(this, mCache.getAllVisibleEvents());
+
+        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
+        allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
+
+        Intent startingIntent = this.getIntent();
+        if (startingIntent.getParcelableExtra("location") == null) {
+            mMapZoomer.zoomAccordingToMarkers(allMarkers);
         }
     }
 
