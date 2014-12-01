@@ -279,8 +279,6 @@ public class AddEventActivity extends FragmentActivity {
 		mDescription = (EditText) this.findViewById(R.id.addEventDescription);
 		mPlaceName = (EditText) this.findViewById(R.id.addEventPlaceName);
 
-		this.displayMap();
-
 		mTextChangedListener = new TextWatcher() {
 
 			@Override
@@ -356,6 +354,8 @@ public class AddEventActivity extends FragmentActivity {
 				newFragment.show(AddEventActivity.this.getSupportFragmentManager(), "timePicker");
 			}
 		});
+
+		this.displayMap();
 	}
 
 	private boolean isValidDate(String s) {

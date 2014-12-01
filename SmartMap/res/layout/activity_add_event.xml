@@ -124,7 +124,7 @@
             android:id="@+id/add_event_map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="fill_parent"
-            android:layout_height="200dp"
+            android:layout_height="100dp"
             android:layout_below="@id/add_event_map_text"
             android:layout_alignLeft="@id/add_event_map_text"/>
 

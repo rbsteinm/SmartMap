@@ -3,6 +3,7 @@ package ch.epfl.smartmap.activities;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -106,6 +107,17 @@ public class UserInformationActivity extends Activity {
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		switch (id) {
+			case android.R.id.home:
+				if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+					this.startActivity(new Intent(this, MainActivity.class));
+				}
+				this.finish();
+			default:
+				break;
+		}
+
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -178,5 +190,13 @@ public class UserInformationActivity extends Activity {
 			Toast.makeText(UserInformationActivity.this, confirmString, Toast.LENGTH_LONG).show();
 		}
 
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+			this.startActivity(new Intent(this, MainActivity.class));
+		}
+		this.finish();
 	}
 }

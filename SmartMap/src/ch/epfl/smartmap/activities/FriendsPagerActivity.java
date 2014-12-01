@@ -106,6 +106,9 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 			case R.id.activity_friends_add_button:
 				this.startAddFriendActivity(null);
 			case android.R.id.home:
+				if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+					this.startActivity(new Intent(this, MainActivity.class));
+				}
 				this.finish();
 			default:
 				break;
@@ -140,6 +143,14 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
 	public ViewPager getViewPager() {
 		return mPager;
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+			this.startActivity(new Intent(this, MainActivity.class));
+		}
+		this.finish();
 	}
 
 }

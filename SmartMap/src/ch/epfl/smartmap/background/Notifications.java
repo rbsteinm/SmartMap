@@ -8,7 +8,8 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
-import ch.epfl.smartmap.activities.ShowEventsActivity;
+import ch.epfl.smartmap.activities.ShowEventInformationActivity;
+import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.User;
 
@@ -42,8 +43,11 @@ public class Notifications {
 		notificationID++;
 
 		// Prepare intent that redirects the user to FriendActivity
-		PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0, new Intent(context,
-		    FriendsPagerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+		Intent friendsInfoIntent = new Intent(context, UserInformationActivity.class);
+		friendsInfoIntent.putExtra("NOTIFICATION", true);
+		friendsInfoIntent.putExtra("USER", user);
+		PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0, friendsInfoIntent,
+		    PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// Add Big View Specific Configuration
 		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -93,8 +97,12 @@ public class Notifications {
 		notificationID++;
 
 		// Prepare intent that redirect the user to EventActivity
-		PendingIntent pEventIntent = PendingIntent.getActivity(context, 0, new Intent(context,
-		    ShowEventsActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+		Intent showEventIntent = new Intent(context, ShowEventInformationActivity.class);
+		showEventIntent.putExtra("NOTIFICATION", true);
+		showEventIntent.putExtra("EVENT", event);
+		// TODO mettre l'id de l'event
+		PendingIntent pEventIntent = PendingIntent.getActivity(context, 0, showEventIntent,
+		    PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// Add Big View Specific Configuration
 		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -145,7 +153,8 @@ public class Notifications {
 
 		// Prepare intent that redirects the user to FriendActivity
 		Intent showFriendIntent = new Intent(context, FriendsPagerActivity.class);
-		showFriendIntent.putExtra("invitation", true);
+		showFriendIntent.putExtra("INVITATION", true);
+		showFriendIntent.putExtra("NOTIFICATION", true);
 		PendingIntent pFriendIntent = PendingIntent.getActivity(context, 0, showFriendIntent,
 		    PendingIntent.FLAG_UPDATE_CURRENT);
 
