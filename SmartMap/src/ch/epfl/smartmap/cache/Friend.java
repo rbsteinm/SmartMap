@@ -15,6 +15,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.map.CircularMarkerIconMaker;
+import ch.epfl.smartmap.map.MarkerIconMaker;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -181,12 +183,16 @@ public class Friend implements User, Displayable, Parcelable {
      */
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
-        Bitmap friendProfilePicture =
+        MarkerIconMaker iconMaker = new CircularMarkerIconMaker(context);
+
+        Bitmap profilePicture =
             Bitmap.createScaledBitmap(this.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+
+        Bitmap markerIcon = iconMaker.getMarkerIcon(profilePicture);
+
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(this.getLatLng()).title(this.getName())
-            .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
-            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+            .icon(BitmapDescriptorFactory.fromBitmap(markerIcon)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
         return markerOptions;
     }
 

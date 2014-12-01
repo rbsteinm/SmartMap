@@ -24,18 +24,15 @@ import ch.epfl.smartmap.R;
 public class CircularMarkerIconMaker implements MarkerIconMaker {
 
     private Bitmap mMarkerShape;
+    private final Context mContext;
 
-    public CircularMarkerIconMaker() {
-
+    public CircularMarkerIconMaker(Context context) {
+        mContext = context;
     }
 
-    public Bitmap getMarkerShape() {
-        return mMarkerShape;
-    }
-
-    public void setMarkerShape(Context context) {
+    private void setMarkerShape() {
         int idForm = R.drawable.marker_forme;
-        mMarkerShape = BitmapFactory.decodeResource(context.getResources(), idForm);
+        mMarkerShape = BitmapFactory.decodeResource(mContext.getResources(), idForm);
         mMarkerShape = Bitmap.createScaledBitmap(mMarkerShape, 46, 60, false);
         Log.d("MarkerTool", "found form " + idForm);
 
@@ -76,7 +73,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
 
     }
 
-    public static Bitmap scaleMarker(Bitmap img, float coeff) {
+    private Bitmap scaleMarker(Bitmap img, float coeff) {
         int newWidth = Math.round(coeff * img.getWidth());
         int newHeight = Math.round(coeff * img.getHeight());
         return Bitmap.createScaledBitmap(img, newWidth, newHeight, false);
@@ -84,7 +81,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     }
 
     // this function combines the center of the second image to the center of the first image
-    public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
         try {
             int maxWidth = (bmp1.getWidth() > bmp2.getWidth() ? bmp1.getWidth() : bmp2.getWidth());
             int maxHeight = (bmp1.getHeight() > bmp2.getHeight() ? bmp1.getHeight() : bmp2.getHeight());
@@ -112,11 +109,12 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     @Override
     public Bitmap getMarkerIcon(Bitmap profilePicture) {
         // TODO Auto-generated method stub
+        this.setMarkerShape();
         profilePicture =
             Bitmap.createScaledBitmap(profilePicture, mMarkerShape.getWidth() - 12,
                 mMarkerShape.getWidth() - 12, false);
         Bitmap roundProfile = this.cropProfilePicture(profilePicture, profilePicture.getWidth());
-        Bitmap finalMarker = overlay(mMarkerShape, roundProfile);
+        Bitmap finalMarker = this.scaleMarker(this.overlay(mMarkerShape, roundProfile), 1.7f);
         Log.d("MAKER TOOL", "makeProfileMarker done");
         return finalMarker;
     }
