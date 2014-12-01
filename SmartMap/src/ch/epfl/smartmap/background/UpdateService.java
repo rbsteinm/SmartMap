@@ -447,5 +447,4 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 			}
 		}
 	}
-
 }

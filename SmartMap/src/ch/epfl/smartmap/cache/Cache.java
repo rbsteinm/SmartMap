@@ -62,6 +62,7 @@ public class Cache {
 
         mNearEventIds = new ArrayList<Long>();
         mGoingEventIds = new ArrayList<Long>();
+        mMyEventIds = new ArrayList<Long>();
 
         mPublicEventInstances = new LongSparseArray<Event>();
         mFriendInstances = new LongSparseArray<User>();
@@ -158,7 +159,10 @@ public class Cache {
 
         List<Event> result = new ArrayList<Event>();
         for (long id : allEventIds) {
-            result.add(this.getEventById(id));
+            Event event = this.getEventById(id);
+            if (event != null) {
+                result.add(event);
+            }
         }
 
         return result;
