@@ -64,7 +64,7 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
         }
 
         viewHolder.name.setText(user.getName());
-        viewHolder.picture.setImageBitmap(user.getPicture(mContext));
+        viewHolder.picture.setImageBitmap(user.getImage());
 
         return convertView;
     }
