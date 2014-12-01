@@ -24,6 +24,7 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
  * 
  * @author rbsteinm
  */
+
 public class FriendsTab extends ListFragment {
     private List<User> mFriendList;
 
@@ -56,7 +57,6 @@ public class FriendsTab extends ListFragment {
                 });
             }
         });
-
         return view;
     }
 

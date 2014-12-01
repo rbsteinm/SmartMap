@@ -15,7 +15,7 @@ import ch.epfl.smartmap.cache.User;
  */
 public class CacheSearchEngine implements SearchEngine {
 
-    private Cache mCache;
+    private final Cache mCache;
 
     public CacheSearchEngine() {
         mCache = Cache.getInstance();

@@ -9,19 +9,20 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.EventInvitation;
 import ch.epfl.smartmap.cache.FriendInvitation;
+import ch.epfl.smartmap.cache.Invitation;
 
 /**
- * Customized adapter that displays a list of notification in a target activity
- * This adapter dynamically creates a row in the activity for each notification
- * It displays in each row: user name, user status
+ * Customized adapter that displays a list of invitation in a target activity
+ * This adapter dynamically creates a row in the activity for each invitation
+ * It displays in each row: a title, a picture and a text
  * 
  * @author agpmilli
  */
-public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
-
+public class InvitationListItemAdapter extends ArrayAdapter<Invitation> {
     private final Context mContext;
-    private final List<FriendInvitation> mItemsArrayList;
+    private final List<Invitation> mItemsArrayList;
 
     /**
      * @param context
@@ -29,7 +30,7 @@ public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
      * @param userList
      *            list of users to display
      */
-    public InvitationListItemAdapter(Context context, List<FriendInvitation> itemsArrayList) {
+    public InvitationListItemAdapter(Context context, List<Invitation> itemsArrayList) {
 
         super(context, R.layout.gui_notification_list_item, itemsArrayList);
 
@@ -37,12 +38,6 @@ public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
         mItemsArrayList = itemsArrayList;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-     * android.view.ViewGroup)
-     * callback function automatically called one time for each user in the list
-     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -57,12 +52,20 @@ public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
 
         // Set the User's ID to the tag of its View
         convertView.setTag(mItemsArrayList.get(position).getId());
-
-        // Set fields with friend attributes
-        title.setText(mContext.getString(R.string.notification_invitefriend_title));
-        text.setText(mItemsArrayList.get(position).getUserName() + " "
-            + mContext.getString(R.string.notification_friend_invitation));
-
+        if (mItemsArrayList.get(position).getClass() == FriendInvitation.class) {
+            // Set fields with friend attributes
+            title.setText(mItemsArrayList.get(position).getUserName() + " "
+                + mContext.getString(R.string.notification_friend_invitation));
+            text.setText(mContext.getString(R.string.notification_open_friend_list));
+            // picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
+        } else if (mItemsArrayList.get(position).getClass() == EventInvitation.class) {
+            // Set fields with friend attributes
+            title.setText(mItemsArrayList.get(position).getUserName() + " "
+                + mContext.getString(R.string.notification_event_invitation) + " "
+                + ((EventInvitation) mItemsArrayList.get(position)).getEventName());
+            text.setText(mContext.getString(R.string.notification_open_event_list));
+            // picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
+        }
         return convertView;
     }
 }

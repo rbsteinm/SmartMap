@@ -18,7 +18,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * An event that can be seen on the map
  * 
  * @author ritterni
+ * @author SpicyCH (PublicEvents are now Parcelable)
  */
+
 public class PublicEvent implements Event {
 
     private long mId;
@@ -243,5 +245,10 @@ public class PublicEvent implements Event {
         if (event.getDescription() == null) {
             mDescription = event.getDescription();
         }
+    }
+
+    @Override
+    public String getCreatorName() {
+        return Cache.getInstance().getUserById(mCreatorId).getName();
     }
 }

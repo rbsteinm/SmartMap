@@ -157,4 +157,5 @@ public class DefaultFilter implements Filter {
     public void setListName(String newName) {
         listName = newName;
     }
+
 }

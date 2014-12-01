@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * @author jfperren
  * @author ritterni
  */
+
 public final class Friend implements User {
 
     // Friend informations
@@ -106,6 +107,7 @@ public final class Friend implements User {
         return mImage;
     }
 
+    @Override
     public ImmutableUser getImmutableCopy() {
         return new ImmutableUser(mID, mName, mPhoneNumber, mEmail, mLocation, mLocationString, mImage);
     }

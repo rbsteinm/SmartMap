@@ -11,7 +11,6 @@ import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.History;
-import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
@@ -74,12 +73,9 @@ public final class CachedOnlineSearchEngine implements SearchEngine {
         }
 
         if (!foundInCache) {
-            List<ImmutableEvent> networkResult =
+            resultIds =
                 NetworkSmartMapClient.getInstance().getPublicEvents(location.getLatitude(),
                     location.getLongitude(), radius);
-            for (ImmutableEvent event : networkResult) {
-                resultIds.add(event.getID());
-            }
         }
         List<Event> result = new ArrayList<Event>();
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.preference.PreferenceManager;
+import ch.epfl.smartmap.R;
 
 /**
  * Used to get and set settings and local info using SharedPreferences
@@ -12,6 +13,7 @@ import android.preference.PreferenceManager;
  * @author SpicyCH (add support for the user settings - we might want to change the design if my methods are
  *         bottlenecks)
  */
+
 public final class SettingsManager {
     public static final String PREFS_NAME = "settings";
     public static final String USER_ID = "UserID";
@@ -40,20 +42,6 @@ public final class SettingsManager {
     private final SharedPreferences.Editor mEditor;
     private static SettingsManager mInstance;
 
-    // The following constant Strings must match the keys defined in
-    // res/xml/pref_notifications.xml
-    private final static String KEY_NOTIFICATIONS_ENABLED = "notifications_enabled";
-    private final static String KEY_FRIEND_REQUEST = "notifications_friend_requests";
-    private final static String KEY_FRIENDSHIP_CONFIRMATIONS = "notifications_friendship_confirmations";
-    private final static String KEY_EVENT_INVITATIONS = "notifications_event_invitations";
-    private final static String KEY_EVENT_PROXIMITY = "notifications_event_proximity";
-    private final static String KEY_VIBRATE = "notifications_vibrate";
-    private static final String KEY_ALWAYS_SHARE = "general_always_share";
-    private static final String KEY_REFRESH_FREQUENCY = "refresh_frequency";
-    private static final String KEY_TIME_TO_WAIT_BEFORE_HIDING_FRIENDS = "last_seen_max";
-    private static final String KEY_PUBLIC_EVENTS = "events_show_public";
-    private static final String KEY_PRIVATE_EVENTS = "events_show_private";
-
     /**
      * SettingsManager constructor
      * 
@@ -72,7 +60,8 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public boolean alwaysShare() {
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_ALWAYS_SHARE, true);
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
+                mContext.getString(R.string.settings_key_general_always_share), true);
     }
 
     /**
@@ -124,18 +113,17 @@ public final class SettingsManager {
      */
     public int getRefreshFrequency() {
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-            KEY_REFRESH_FREQUENCY, "10"));
+                mContext.getString(R.string.settings_key_refresh_frequency), "10"));
     }
 
     /**
-     * @return the time to wait in minutes before hiding inactive friends from the map. Or the int value -1 if
-     *         the user
+     * @return the time to wait in minutes before hiding inactive friends from the map. Or the int value -1 if the user
      *         never wants to hide inactive friends.
      * @author SpicyCH
      */
     public int getTimeToWaitBeforeHidingFriends() {
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-            KEY_TIME_TO_WAIT_BEFORE_HIDING_FRIENDS, "30"));
+                mContext.getString(R.string.settings_key_last_seen_max), "30"));
     }
 
     /**
@@ -178,54 +166,50 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsEnabled() {
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_NOTIFICATIONS_ENABLED,
-            true);
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
+                mContext.getString(R.string.settings_key_notifications_enabled), true);
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event
-     *         invitations and the user
-     *         activated the notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for event invitations and the user activated the
+     *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_EVENT_INVITATIONS, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
+                mContext.getString(R.string.settings_key_notifications_event_invitations), true) : false;
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event
-     *         proximity and the user
-     *         activated the notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for event proximity and the user activated the
+     *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_EVENT_PROXIMITY, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
+                mContext.getString(R.string.settings_key_notifications_event_proximity), true) : false;
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for
-     *         friend requests and the user
-     *         activated the notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for friend requests and the user activated the
+     *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_FRIEND_REQUEST, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
+                mContext.getString(R.string.settings_key_notifications_friend_requests), true) : false;
     }
 
     /**
      * A friendship confirmation happens when another user accepts your friend request.
      * 
-     * @return <code>true</code> if the user enabled the notifications for
-     *         friendship confirmations and the
-     *         user activated the notifications in general, <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the user
+     *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_FRIENDSHIP_CONFIRMATIONS, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
+                mContext.getString(R.string.settings_key_notifications_friendship_confirmations), true) : false;
     }
 
     /**
@@ -234,8 +218,8 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsVibrate() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
-            .getBoolean(KEY_VIBRATE, true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
+                mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
     }
 
     /**
@@ -360,21 +344,21 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user wants to see his private events on his map, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> if the user wants to see his private events on his map, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean showPrivateEvents() {
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_PRIVATE_EVENTS, true);
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
+                mContext.getString(R.string.settings_key_events_show_private), true);
     }
 
     /**
-     * @return <code>true</code> if the user wants to see public events on his map, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> if the user wants to see public events on his map, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean showPublicEvents() {
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(KEY_PUBLIC_EVENTS, true);
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
+                mContext.getString(R.string.settings_key_events_show_public), true);
     }
 
     /**

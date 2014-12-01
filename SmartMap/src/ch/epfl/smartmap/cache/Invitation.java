@@ -61,22 +61,5 @@ public interface Invitation {
      * @param Status
      *            the int representing invitation status
      */
-    void setStatus(int status);
-
-    /**
-     * Set invitation's creator id
-     * 
-     * @param user
-     *            the invitation's creator id
-     */
-    void setUserId(long id);
-
-    /**
-     * Set invitation's creator name
-     * 
-     * @param user
-     *            the invitation's creator name
-     */
-    void setUserName(String name);
-
+    void setStatus(int newStatus);
 }

@@ -3,6 +3,7 @@ package ch.epfl.smartmap.cache;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.gui.Utils;
 
@@ -13,8 +14,8 @@ import ch.epfl.smartmap.gui.Utils;
  */
 public class FriendInvitation implements Invitation {
     private final long mInvitationId;
-    private long mUserId;
-    private String mUserName;
+    private final long mUserId;
+    private final String mUserName;
     private int mStatus;
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
@@ -29,52 +30,38 @@ public class FriendInvitation implements Invitation {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Invitation#getId()
-     */
-    @Override
-    public long getId() {
-        return mInvitationId;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Invitation#getImage()
-     */
-    @Override
-    public Bitmap getImage() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Intent getIntent() {
-        if (mStatus == READ) {
-            return new Intent(Utils.sContext, UserInformationActivity.class);
-        } else {
-            return new Intent();
-        }
-    }
-
     @Override
     public int getStatus() {
         return mStatus;
     }
 
     @Override
+    public Intent getIntent() {
+        Intent intent = null;
+        if ((mStatus == READ) || (mStatus == UNREAD)) {
+            intent = new Intent(Utils.sContext, FriendsPagerActivity.class);
+            intent.putExtra("INVITATION", true);
+        } else if (mStatus == ACCEPTED) {
+            intent = new Intent(Utils.sContext, UserInformationActivity.class);
+            intent.putExtra("USER", mUserId);
+        }
+        return intent;
+    }
+
+    @Override
+    public long getId() {
+        return mInvitationId;
+    }
+
+    @Override
     public String getText() {
-        return "Click here to open the invitation";
+        return Utils.sContext.getResources().getString(R.string.notification_open_friend_list);
     }
 
     @Override
     public String getTitle() {
-        return "Friend request from " + mUserName;
-    }
-
-    @Override
-    public long getUserId() {
-        return mUserId;
+        return Utils.sContext.getResources().getString(R.string.notification_open_friend_list) + " "
+            + mUserName;
     }
 
     @Override
@@ -83,18 +70,18 @@ public class FriendInvitation implements Invitation {
     }
 
     @Override
-    public void setStatus(int status) {
-        mStatus = status;
+    public long getUserId() {
+        return mUserId;
     }
 
     @Override
-    public void setUserId(long id) {
-        mUserId = id;
+    public Bitmap getImage() {
+        return Cache.getInstance().getUserById(mUserId).getImage();
     }
 
     @Override
-    public void setUserName(String name) {
-        mUserName = name;
+    public void setStatus(int newStatus) {
+        mStatus = newStatus;
     }
 
 }

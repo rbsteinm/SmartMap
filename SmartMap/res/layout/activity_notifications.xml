@@ -4,13 +4,13 @@
     android:layout_width="@dimen/notification_activity_width"
     android:layout_height="@dimen/notification_activity_height"
     android:layout_gravity="bottom"
+    android:color="@color/main_blue"
     tools:context="ch.epfl.smartmap.activities.NotificationsActivity" >
     
     <ListView
         android:id="@android:id/list"
         android:tag="@+id/notifications_list"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_marginLeft="14dp"/>
+        android:layout_height="fill_parent"/>
 
 </RelativeLayout>

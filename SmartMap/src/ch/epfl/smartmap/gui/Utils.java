@@ -22,8 +22,8 @@ import ch.epfl.smartmap.cache.Displayable;
  * @author agpmilli
  */
 public class Utils {
-    public static Context sContext;
 
+    public static Context sContext;
     public static final long ONE_SECOND = 1000;
     public static final long ONE_MINUTE = 60 * ONE_SECOND;
     public static final long ONE_HOUR = 60 * ONE_MINUTE;

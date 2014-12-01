@@ -34,14 +34,14 @@ public class Cache {
     private final NetworkSmartMapClient mNetworkClient;
 
     // List containing ids of all Friends
-    private List<Long> mFriendIds;
-    private List<Long> mPendingFriendIds;
-    private List<Long> mInvitingUserIds;
+    private final Set<Long> mFriendIds;
+    private final Set<Long> mPendingFriendIds;
+    private final Set<Long> mInvitingUserIds;
 
     // Lists containing ids of all pinned/going events
-    private List<Long> mNearEventIds;
-    private List<Long> mGoingEventIds;
-    private List<Long> mMyEventIds;
+    private final Set<Long> mNearEventIds;
+    private final Set<Long> mGoingEventIds;
+    private final Set<Long> mMyEventIds;
 
     // SparseArrays containing instances
     private final LongSparseArray<Event> mPublicEventInstances;
@@ -57,12 +57,13 @@ public class Cache {
         mNetworkClient = NetworkSmartMapClient.getInstance();
 
         // Init lists
-        mFriendIds = new ArrayList<Long>();
-        mInvitingUserIds = new ArrayList<Long>();
+        mFriendIds = new HashSet<Long>();
+        mPendingFriendIds = new HashSet<Long>();
+        mInvitingUserIds = new HashSet<Long>();
 
-        mNearEventIds = new ArrayList<Long>();
-        mGoingEventIds = new ArrayList<Long>();
-        mMyEventIds = new ArrayList<Long>();
+        mNearEventIds = new HashSet<Long>();
+        mGoingEventIds = new HashSet<Long>();
+        mMyEventIds = new HashSet<Long>();
 
         mPublicEventInstances = new LongSparseArray<Event>();
         mFriendInstances = new LongSparseArray<User>();
@@ -224,8 +225,12 @@ public class Cache {
     // }
 
     public List<Displayable> getAllVisibleEvents() {
+        List<Long> allEventIds = new ArrayList<Long>(mGoingEventIds);
+        allEventIds.addAll(mMyEventIds);
+        allEventIds.addAll(mNearEventIds);
+
         List<Displayable> allVisibleEvents = new ArrayList<Displayable>();
-        for (Long id : mFriendIds) {
+        for (Long id : mGoingEventIds) {
             Event event = this.getEventById(id);
             if ((event != null) && event.isVisible()) {
                 allVisibleEvents.add(event);
@@ -265,7 +270,10 @@ public class Cache {
 
         if (friend == null) {
             // If not found, check in database
-            ImmutableUser databaseResult = mDatabaseHelper.getFriend(id);
+            ImmutableUser databaseResult = null;
+            if (mDatabaseHelper != null) {
+                databaseResult = mDatabaseHelper.getFriend(id);
+            }
 
             if (databaseResult == null) {
                 // If not found, check on the server
@@ -298,12 +306,12 @@ public class Cache {
 
         if (publicEvent == null) {
             // If not found, check on the server
-            ImmutableEvent networkResult = null;
-            // try {
-            // networkResult = mNetworkClient.getEventInfo();
-            // } catch (SmartMapClientException e) {
-            // networkResult = null;
-            // }
+            ImmutableEvent networkResult;
+            try {
+                networkResult = NetworkSmartMapClient.getInstance().getEventInfo(id);
+            } catch (SmartMapClientException e) {
+                networkResult = null;
+            }
 
             if (networkResult != null) {
                 // Match on server
@@ -465,22 +473,6 @@ public class Cache {
         }
     }
 
-    private boolean updateFriend(ImmutableUser user) {
-        // Check in cache
-        User cachedFriend = mFriendInstances.get(user.getId());
-
-        if (cachedFriend == null) {
-            // Not in cache
-            cachedFriend = new Friend(user);
-            mFriendInstances.put(user.getId(), cachedFriend);
-            return true;
-        } else {
-            // In cache
-            cachedFriend.update(user);
-            return false;
-        }
-    }
-
     private boolean updatePublicEvent(ImmutableEvent event) {
         // Check in cache
         Event cachedEvent = mPublicEventInstances.get(event.getID());
@@ -493,6 +485,23 @@ public class Cache {
         } else {
             // In cache
             cachedEvent.update(event);
+            return false;
+        }
+    }
+
+    boolean updateFriend(ImmutableUser user) {
+        // Check in cache
+        User cachedFriend = mFriendInstances.get(user.getId());
+
+        if (cachedFriend == null) {
+            // Not in cache
+            cachedFriend = new Friend(user);
+            mFriendInstances.put(user.getId(), cachedFriend);
+            mDatabaseHelper.addUser(user);
+            return true;
+        } else {
+            // In cache
+            cachedFriend.update(user);
             return false;
         }
     }

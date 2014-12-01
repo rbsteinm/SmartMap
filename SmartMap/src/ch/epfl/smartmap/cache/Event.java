@@ -10,6 +10,7 @@ import java.util.List;
  * @author jfperren
  * @author ritterni
  */
+
 public interface Event extends Displayable {
 
     final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
@@ -48,4 +49,9 @@ public interface Event extends Displayable {
         PUBLIC,
         PRIVATE;
     }
+
+    /**
+     * @return The name of creator
+     */
+    String getCreatorName();
 }

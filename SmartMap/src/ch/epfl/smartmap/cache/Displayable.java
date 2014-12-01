@@ -1,10 +1,10 @@
 package ch.epfl.smartmap.cache;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import android.graphics.Bitmap;
 import android.location.Location;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Objects that can be displayed with image, title and subtitle.
@@ -36,7 +36,7 @@ public interface Displayable extends Stockable {
      * @return A name for the panel (e.g. the username, event name, etc.)
      */
     String getTitle();
-    
+
     String NO_LOCATION_STRING = "Unknown Location";
     String PROVIDER_NAME = "SmartMapServers";
     Location NO_LOCATION = new Location(PROVIDER_NAME);
@@ -59,5 +59,4 @@ public interface Displayable extends Stockable {
     MarkerOptions getMarkerOptions();
 
     boolean isVisible();
-
 }

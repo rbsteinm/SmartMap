@@ -32,9 +32,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Makes the logo clickable (clicking it returns to previous activity)
-        // getActionBar().setDisplayHomeAsUpEnabled(true);
-
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_friends_pager);
 
@@ -83,7 +80,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     @Override
     protected void onResume() {
         super.onResume();
-        if (this.getIntent().getBooleanExtra("invitation", false) == true) {
+        if (this.getIntent().getBooleanExtra("INVITATION", false) == true) {
             mPager.setCurrentItem(INVITATION_INDEX);
         }
     }
@@ -106,6 +103,9 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
             case R.id.activity_friends_add_button:
                 this.startAddFriendActivity(null);
             case android.R.id.home:
+                if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+                    this.startActivity(new Intent(this, MainActivity.class));
+                }
                 this.finish();
             default:
                 break;
@@ -136,6 +136,14 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     public void startAddFriendActivity(MenuItem menu) {
         Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
         this.startActivity(displayActivityIntent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+        this.finish();
     }
 
 }

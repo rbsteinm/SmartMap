@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ch.epfl.smartmap.InviteFriendsActivity" >
+
+    <item
+        android:id="@+id/invite_friend_send_button"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/invite_friend_send_button"/>
+
+</menu>

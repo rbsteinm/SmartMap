@@ -1,5 +1,7 @@
 package ch.epfl.smartmap.activities;
 
+import java.util.List;
+
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.InvitationListItemAdapter;
@@ -37,33 +40,18 @@ public class NotificationsActivity extends ListActivity {
     }
 
     @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        Intent showFriendIntent = new Intent(mContext, FriendsPagerActivity.class);
-        showFriendIntent.putExtra("invitation", true);
-        NotificationsActivity.this.startActivity(showFriendIntent);
-
-        super.onListItemClick(l, v, position, id);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, mDbHelper
-            .getFriendInvitations()));
-
-        for (int i = 0; i < mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).size(); i++) {
-            mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).get(i).setStatus(Invitation.READ);
-            mDbHelper
-                .updateFriendInvitation(mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD).get(i));
-        }
-
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.show_events, menu);
         return true;
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Intent invitationIntent = ((FriendInvitation) l.getItemAtPosition(position)).getIntent();
+        NotificationsActivity.this.startActivity(invitationIntent);
+
+        super.onListItemClick(l, v, position, id);
     }
 
     @Override
@@ -77,5 +65,19 @@ public class NotificationsActivity extends ListActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NotificationsActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, mDbHelper
+            .getFriendInvitations()));
+
+        List<FriendInvitation> unreadInvitations = mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD);
+        for (int i = 0; i < unreadInvitations.size(); i++) {
+            unreadInvitations.get(i).setStatus(Invitation.READ);
+            mDbHelper.updateFriendInvitation(unreadInvitations.get(i));
+        }
+
     }
 }

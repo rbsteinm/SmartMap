@@ -36,7 +36,8 @@ public interface SmartMapClient {
     void ackAcceptedInvitation(long id) throws SmartMapClientException;
 
     /**
-     * Acknowledges the server that the invitation to the given event was received.
+     * Acknowledges the server that the invitation to the given event was
+     * received.
      * 
      * @param eventId
      */
@@ -146,7 +147,7 @@ public interface SmartMapClient {
      * @return the events to which the user is invited.
      *         For each retrieved invitation, must call {@code ackEventInvitation}
      */
-    List<ImmutableEvent> getEventInvitations() throws SmartMapClientException;
+    List<Long> getEventInvitations() throws SmartMapClientException;
 
     /**
      * @return the list of the friends ids
@@ -156,10 +157,13 @@ public interface SmartMapClient {
 
     /**
      * Retrieve the invitations from the server, and also the list of users that
-     * accepted an invitation from us, and the list of users that removed us from their friends
+     * accepted an invitation from us, and the list of users that removed us
+     * from their friends
      * 
-     * @return an object of type {@link NotificationBag} that encapsulates the 3 lists and offers methods
-     *         to ack the removed friends and the new friends. Must call this two methods to ack the server
+     * @return an object of type {@link NotificationBag} that encapsulates the 3
+     *         lists and offers methods
+     *         to ack the removed friends and the new friends. Must call this
+     *         two methods to ack the server
      *         that the new friends and the removed friends were retrieved
      * @throws SmartMapClientException
      */
@@ -178,7 +182,7 @@ public interface SmartMapClient {
      * @param radius
      * @return the public events in the given radius centered at the given point
      */
-    List<ImmutableEvent> getPublicEvents(double latitude, double longitude, double radius)
+    List<Long> getPublicEvents(double latitude, double longitude, double radius)
         throws SmartMapClientException;
 
     ImmutableUser getUserInfo(long id) throws SmartMapClientException;
@@ -254,5 +258,4 @@ public interface SmartMapClient {
      * @throws SmartMapClientException
      */
     void updatePos(Location location) throws SmartMapClientException;
-
 }

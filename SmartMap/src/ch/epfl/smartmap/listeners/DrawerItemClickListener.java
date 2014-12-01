@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.listeners;
 
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -46,7 +45,6 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
                 view.getContext().startActivity(new Intent(view.getContext(), SettingsActivity.class));
                 break;
             case INDEX_LOGOUT:
-                Log.d(TAG, "Logout pressed");
                 LogoutManager.initialize(parent.getContext());
                 LogoutManager.getInstance().showConfirmationThenLogout();
                 break;
