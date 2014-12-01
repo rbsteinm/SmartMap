@@ -537,9 +537,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor cursor = mDatabase.query(TABLE_USER, USER_COLUMNS, KEY_USER_ID + " = ?",
 		    new String[] {String.valueOf(id)}, null, null, null, null);
 
-		if (cursor != null) {
-			cursor.moveToFirst();
-
+		if ((cursor != null) && cursor.moveToFirst()) {
 			String name = cursor.getString(cursor.getColumnIndex(KEY_NAME));
 			String phoneNumber = cursor.getString(cursor.getColumnIndex(KEY_NUMBER));
 			String email = cursor.getString(cursor.getColumnIndex(KEY_EMAIL));
