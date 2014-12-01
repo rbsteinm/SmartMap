@@ -77,102 +77,6 @@ public class AddEventActivity extends FragmentActivity {
 
     private TextWatcher mTextChangedListener;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_add_event);
-
-        // Makes the logo clickable (clicking it returns to previous activity)
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
-        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        this.initializeGUIComponents();
-
-        mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
-
-            @Override
-            public void onMapClick(LatLng position) {
-                if (mEventPosition != null) {
-                    mGoogleMap.clear();
-                }
-                Intent setLocationIntent = new Intent(AddEventActivity.this, SetLocationActivity.class);
-                AddEventActivity.this.startActivityForResult(setLocationIntent, PICK_LOCATION_REQUEST);
-            }
-        });
-
-        Bundle extras = this.getIntent().getExtras();
-        if (extras != null) {
-            LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
-            if ((latLng != null) && (Math.abs(latLng.latitude) > 0)) {
-                // The user long clicked the map in MainActivity and wants to
-                // create an event
-                this.updateLocation(this.getIntent());
-            }
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case PICK_LOCATION_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    // All went smoothly, update location in this activity
-                    this.updateLocation(data);
-
-                } else {
-                    // Google wasn't able to retrieve the location name associated to the coordinates
-                    Toast
-                        .makeText(mContext,
-                            this.getString(R.string.add_event_toast_couldnt_retrieve_location),
-                            Toast.LENGTH_LONG).show();
-                    mPlaceName.setText("");
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.add_event, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                break;
-            case R.id.addEventButtonCreateEvent:
-                this.createEvent();
-                break;
-            default:
-                // No other menu items!
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void pickLocation(View v) {
-        Toast.makeText(mContext,
-            this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
-            Toast.LENGTH_LONG).show();
-
-        Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
-        pickLocationIntent.putExtra("pickLocationForEvent", true);
-        pickLocationIntent.setType(Context.LOCATION_SERVICE);
-        this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
-    }
-
     /**
      * Ensures the end of the event is after its start and end of the event is not in the past. Displays a
      * toast and
@@ -301,6 +205,35 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+            // not available
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+            dialog.show();
+        } else {
+            // Google Play Services are available.
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            mFragmentMap =
+                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = mFragmentMap.getMap();
+            // Enabling MyLocation Layer of Google Map
+            mGoogleMap.setMyLocationEnabled(true);
+
+            mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+            mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+            new DefaultZoomManager(mFragmentMap).zoomOnLocation(new LatLng(SettingsManager.getInstance()
+                .getLocation().getLatitude(), SettingsManager.getInstance().getLocation().getLongitude()));
+
+        }
+    }
+
+    /**
      * @param dayMonthYear
      *            a String like "16/09/1993"
      * @param hourMinute
@@ -424,6 +357,102 @@ public class AddEventActivity extends FragmentActivity {
         return sArray.length == ELEMENTS_HH_MM;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case PICK_LOCATION_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    // All went smoothly, update location in this activity
+                    this.updateLocation(data);
+
+                } else {
+                    // Google wasn't able to retrieve the location name associated to the coordinates
+                    Toast
+                        .makeText(mContext,
+                            this.getString(R.string.add_event_toast_couldnt_retrieve_location),
+                            Toast.LENGTH_LONG).show();
+                    mPlaceName.setText("");
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_add_event);
+
+        // Makes the logo clickable (clicking it returns to previous activity)
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        this.initializeGUIComponents();
+
+        mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
+
+            @Override
+            public void onMapClick(LatLng position) {
+                if (mEventPosition != null) {
+                    mGoogleMap.clear();
+                }
+                Intent setLocationIntent = new Intent(AddEventActivity.this, SetLocationActivity.class);
+                AddEventActivity.this.startActivityForResult(setLocationIntent, PICK_LOCATION_REQUEST);
+            }
+        });
+
+        Bundle extras = this.getIntent().getExtras();
+        if (extras != null) {
+            LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
+            if ((latLng != null) && (Math.abs(latLng.latitude) > 0)) {
+                // The user long clicked the map in MainActivity and wants to
+                // create an event
+                this.updateLocation(this.getIntent());
+            }
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.add_event, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                break;
+            case R.id.addEventButtonCreateEvent:
+                this.createEvent();
+                break;
+            default:
+                // No other menu items!
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void pickLocation(View v) {
+        Toast.makeText(mContext,
+            this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
+            Toast.LENGTH_LONG).show();
+
+        Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
+        pickLocationIntent.putExtra("pickLocationForEvent", true);
+        pickLocationIntent.setType(Context.LOCATION_SERVICE);
+        this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
+    }
+
     /**
      * @author SpicyCH
      */
@@ -439,7 +468,9 @@ public class AddEventActivity extends FragmentActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        cityName = addresses.get(0).getLocality();
+        if (!addresses.isEmpty()) {
+            cityName = addresses.get(0).getLocality();
+        }
 
         if ((cityName != null) && !cityName.equals("")) {
             mPlaceName.setText(cityName);
@@ -450,35 +481,6 @@ public class AddEventActivity extends FragmentActivity {
             Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location_name),
                 Toast.LENGTH_LONG).show();
             mPlaceName.setText("");
-        }
-    }
-
-    /**
-     * Display the map with the current location
-     */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap =
-                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            // Enabling MyLocation Layer of Google Map
-            mGoogleMap.setMyLocationEnabled(true);
-
-            mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
-            mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
-
-            new DefaultZoomManager(mFragmentMap).zoomOnLocation(new LatLng(SettingsManager.getInstance()
-                .getLocation().getLatitude(), SettingsManager.getInstance().getLocation().getLongitude()));
-
         }
     }
 }

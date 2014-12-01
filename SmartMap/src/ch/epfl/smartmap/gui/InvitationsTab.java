@@ -15,6 +15,7 @@ import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.FriendInvitation;
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.database.DatabaseHelper;
 
 /**
@@ -36,6 +37,51 @@ public class InvitationsTab extends ListFragment {
         mContext = context;
         // mNetworkClient = NetworkSmartMapClient.getInstance();
         // mDataBaseHelper = DatabaseHelper.initialize(mContext);
+    }
+
+    /**
+     * A dialog to ask whether to accept or decline the invitation of the given
+     * user
+     * 
+     * @param name
+     *            the user's name
+     * @param userId
+     *            the user's id
+     */
+    private void displayAcceptFriendDialog(final FriendInvitation invitation) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+        builder.setMessage("Accept " + invitation.getUserName() + " to become your friend?");
+
+        // Add positive button
+        builder.setPositiveButton("Yes, accept", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // new AcceptInvitation().execute(userId);
+                invitation.setStatus(Invitation.ACCEPTED);
+                mCacheDB.updateFriendInvitation(invitation);
+                Cache.getInstance().addFriend(invitation.getUserId());
+                mInvitationList = mCacheDB.getUnansweredFriendInvitations();
+                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
+                    mInvitationList));
+
+            }
+        });
+
+        // Add negative button
+        builder.setNegativeButton("No, decline", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // new DeclineInvitation().execute(userId);
+                invitation.setStatus(Invitation.REFUSED);
+                mCacheDB.updateFriendInvitation(invitation);
+                mInvitationList = mCacheDB.getUnansweredFriendInvitations();
+                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
+                    mInvitationList));
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
     }
 
     /*
@@ -85,50 +131,5 @@ public class InvitationsTab extends ListFragment {
         // new RefreshInvitationsList().execute();
         mInvitationList = mCacheDB.getUnansweredFriendInvitations();
         this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
-    }
-
-    /**
-     * A dialog to ask whether to accept or decline the invitation of the given
-     * user
-     * 
-     * @param name
-     *            the user's name
-     * @param userId
-     *            the user's id
-     */
-    private void displayAcceptFriendDialog(final FriendInvitation invitation) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-        builder.setMessage("Accept " + invitation.getUserName() + " to become your friend?");
-
-        // Add positive button
-        builder.setPositiveButton("Yes, accept", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                // new AcceptInvitation().execute(userId);
-                // invitation.setStatus(Invitation.ACCEPTED);
-                mCacheDB.updateFriendInvitation(invitation);
-                Cache.getInstance().addFriend(invitation.getUserId());
-                mInvitationList = mCacheDB.getUnansweredFriendInvitations();
-                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
-                    mInvitationList));
-
-            }
-        });
-
-        // Add negative button
-        builder.setNegativeButton("No, decline", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                // new DeclineInvitation().execute(userId);
-                // invitation.setStatus(Invitation.REFUSED);
-                mCacheDB.updateFriendInvitation(invitation);
-                mInvitationList = mCacheDB.getUnansweredFriendInvitations();
-                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
-                    mInvitationList));
-            }
-        });
-
-        // display the AlertDialog
-        builder.create().show();
     }
 }

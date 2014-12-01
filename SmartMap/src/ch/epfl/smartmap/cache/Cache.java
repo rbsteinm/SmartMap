@@ -34,14 +34,14 @@ public class Cache {
     private final NetworkSmartMapClient mNetworkClient;
 
     // List containing ids of all Friends
-    private List<Long> mFriendIds;
-    private List<Long> mPendingFriendIds;
-    private List<Long> mInvitingUserIds;
+    private final Set<Long> mFriendIds;
+    private Set<Long> mPendingFriendIds;
+    private final Set<Long> mInvitingUserIds;
 
     // Lists containing ids of all pinned/going events
-    private List<Long> mNearEventIds;
-    private List<Long> mGoingEventIds;
-    private List<Long> mMyEventIds;
+    private final List<Long> mNearEventIds;
+    private final List<Long> mGoingEventIds;
+    private final List<Long> mMyEventIds;
 
     // SparseArrays containing instances
     private final LongSparseArray<Event> mPublicEventInstances;
@@ -57,8 +57,8 @@ public class Cache {
         mNetworkClient = NetworkSmartMapClient.getInstance();
 
         // Init lists
-        mFriendIds = new ArrayList<Long>();
-        mInvitingUserIds = new ArrayList<Long>();
+        mFriendIds = new HashSet<Long>();
+        mInvitingUserIds = new HashSet<Long>();
 
         mNearEventIds = new ArrayList<Long>();
         mGoingEventIds = new ArrayList<Long>();
@@ -265,7 +265,10 @@ public class Cache {
 
         if (friend == null) {
             // If not found, check in database
-            ImmutableUser databaseResult = mDatabaseHelper.getFriend(id);
+            ImmutableUser databaseResult = null;
+            if (mDatabaseHelper != null) {
+                databaseResult = mDatabaseHelper.getFriend(id);
+            }
 
             if (databaseResult == null) {
                 // If not found, check on the server
@@ -404,6 +407,23 @@ public class Cache {
         mPendingFriendIds.remove(id);
     }
 
+    boolean updateFriend(ImmutableUser user) {
+        // Check in cache
+        User cachedFriend = mFriendInstances.get(user.getId());
+
+        if (cachedFriend == null) {
+            // Not in cache
+            cachedFriend = new Friend(user);
+            mFriendInstances.put(user.getId(), cachedFriend);
+            mDatabaseHelper.addUser(user);
+            return true;
+        } else {
+            // In cache
+            cachedFriend.update(user);
+            return false;
+        }
+    }
+
     public void updateFriendList(List<ImmutableUser> newFriends) {
         Log.d(TAG, "updateFriendList !");
         // Delete previous list
@@ -462,22 +482,6 @@ public class Cache {
         // Notify listeners
         for (CacheListener l : mListeners) {
             l.onPendingFriendListUpdate();
-        }
-    }
-
-    private boolean updateFriend(ImmutableUser user) {
-        // Check in cache
-        User cachedFriend = mFriendInstances.get(user.getId());
-
-        if (cachedFriend == null) {
-            // Not in cache
-            cachedFriend = new Friend(user);
-            mFriendInstances.put(user.getId(), cachedFriend);
-            return true;
-        } else {
-            // In cache
-            cachedFriend.update(user);
-            return false;
         }
     }
 

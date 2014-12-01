@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.DefaultFilter;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
@@ -37,7 +38,7 @@ import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int mDatabase_VERSION = 6;
+    private static final int mDatabase_VERSION = 7;
     private static final String mDatabase_NAME = "SmartMapDB";
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
@@ -136,9 +137,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param context
      *            The application's context, used to access the files
      */
-    @Deprecated
-    public DatabaseHelper(Context context) {
-        super(context, mDatabase_NAME, null, mDatabase_VERSION);
+    private DatabaseHelper(Context context) {
+        super(context, mDatabase_NAME + "_" + SettingsManager.initialize(context).getUserID(), null,
+            mDatabase_VERSION);
         mContext = context;
     }
 
@@ -709,6 +710,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return invitations;
     }
 
+    private void notifyOnInvitationListUpdateListeners() {
+        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
+            listener.onInvitationListUpdate();
+        }
+    }
+
+    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
+        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
+            listener.onInvitationStatusUpdate(id, status);
+        }
+    }
+
     /**
      * Fills the friend database with server data
      */
@@ -734,6 +747,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_PENDING);
     }
 
+    // /**
+    // * Fully updates the friends database (not only positions)
+    // */
+    // public void refreshFriendsInfo() {
+    // List<User> friends = this.getAllFriends();
+    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+    // for (User f : friends) {
+    // try {
+    // this.updateUser(client.getUserInfo(f.getID()));
+    // } catch (SmartMapClientException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // }
+
     /**
      * Uses listFriendsPos() to update the entire friends database with updated
      * positions
@@ -756,7 +784,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
@@ -766,20 +794,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-    // /**
-    // * Fully updates the friends database (not only positions)
-    // */
-    // public void refreshFriendsInfo() {
-    // List<User> friends = this.getAllFriends();
-    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-    // for (User f : friends) {
-    // try {
-    // this.updateUser(client.getUserInfo(f.getID()));
-    // } catch (SmartMapClientException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // }
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
+        this.onCreate(db);
+    }
 
     /**
      * Stores a profile picture
@@ -910,18 +934,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return rows;
-    }
-
-    private void notifyOnInvitationListUpdateListeners() {
-        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
-            listener.onInvitationListUpdate();
-        }
-    }
-
-    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
-        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
-            listener.onInvitationStatusUpdate(id, status);
-        }
     }
 
     /**
