@@ -18,6 +18,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.DefaultFilter;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
@@ -934,6 +935,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return rows;
+    }
+
+    /**
+     * Updates the database contents to be up-to-date with the cache
+     */
+    public void updateFromCache() {
+        List<User> friends = Cache.getInstance().getAllFriends();
+        List<Event> events = Cache.getInstance().getAllGoingEvents();
+
+        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        onCreate(mDatabase);
+
+        for (User user : friends) {
+            addUser(user.getImmutableCopy());
+        }
+        for (Event event : events) {
+            addEvent(event.getImmutableCopy());
+        }
     }
 
     /**
