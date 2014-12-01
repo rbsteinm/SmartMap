@@ -10,42 +10,47 @@ import java.util.List;
  * @author jfperren
  * @author ritterni
  */
+
 public interface Event extends Displayable {
 
-    final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
-    final String NO_DESCRIPTION = "This event currently has no description";
+	final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
+	final String NO_DESCRIPTION = "This event currently has no description";
 
-    /**
-     * @return The ID of the user who created the event
-     */
-    long getCreatorId();
+	/**
+	 * @return The ID of the user who created the event
+	 */
+	long getCreatorId();
 
-    /**
-     * @return The event's description
-     */
-    String getDescription();
+	/**
+	 * @return The event's description
+	 */
+	String getDescription();
 
-    /**
-     * @return The date (year, month, day, hour, minute) at which the event ends
-     */
-    Calendar getEndDate();
+	/**
+	 * @return The date (year, month, day, hour, minute) at which the event ends
+	 */
+	Calendar getEndDate();
 
-    String getName();
+	String getName();
 
-    List<Long> getParticipants();
+	List<Long> getParticipants();
 
-    /**
-     * @return The date (year, month, day, hour, minute) at which the event
-     *         starts
-     */
-    Calendar getStartDate();
+	/**
+	 * @return The date (year, month, day, hour, minute) at which the event
+	 *         starts
+	 */
+	Calendar getStartDate();
 
-    Type getType();
+	Type getType();
 
-    void update(ImmutableEvent event);
+	void update(ImmutableEvent event);
 
-    enum Type {
-        PUBLIC,
-        PRIVATE;
-    }
+	enum Type {
+		PUBLIC, PRIVATE;
+	}
+
+	/**
+	 * @return The name of creator
+	 */
+	String getCreatorName();
 }

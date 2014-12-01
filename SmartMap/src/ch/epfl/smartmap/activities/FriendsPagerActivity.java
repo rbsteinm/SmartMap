@@ -21,121 +21,132 @@ import ch.epfl.smartmap.gui.PagerAdapter;
  */
 public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = FriendsPagerActivity.class.getSimpleName();
+	@SuppressWarnings("unused")
+	private static final String TAG = FriendsPagerActivity.class.getSimpleName();
 
-    private ViewPager mPager;
-    private ActionBar mActionBar;
-    private final String[] mTabs = {"Friends", "Invitations"};
-    private static final int INVITATION_INDEX = 1;
+	private ViewPager mPager;
+	private ActionBar mActionBar;
+	private final String[] mTabs = {"Friends", "Invitations"};
+	private static final int INVITATION_INDEX = 1;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
 
-        // Makes the logo clickable (clicking it returns to previous activity)
-        // getActionBar().setDisplayHomeAsUpEnabled(true);
+		// Makes the logo clickable (clicking it returns to previous activity)
+		// getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_friends_pager);
+		super.onCreate(savedInstanceState);
+		this.setContentView(R.layout.activity_friends_pager);
 
-        mPager = (ViewPager) this.findViewById(R.id.myViewPager);
-        mActionBar = this.getActionBar();
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        PagerAdapter pageAdapter = new PagerAdapter(this, this.getSupportFragmentManager());
+		mPager = (ViewPager) this.findViewById(R.id.myViewPager);
+		mActionBar = this.getActionBar();
+		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		PagerAdapter pageAdapter = new PagerAdapter(this, this.getSupportFragmentManager());
 
-        // Set action bar and tab color to main color
-        mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-        mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this.getResources().getColor(
-            R.color.main_blue)));
+		// Set action bar and tab color to main color
+		mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+		mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this.getResources().getColor(
+		    R.color.main_blue)));
 
-        mPager.setAdapter(pageAdapter);
-        mActionBar.setHomeButtonEnabled(true);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		mPager.setAdapter(pageAdapter);
+		mActionBar.setHomeButtonEnabled(true);
+		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        // Adding Tabs
-        for (String tabName : mTabs) {
-            mActionBar.addTab(mActionBar.newTab().setText(tabName).setTabListener(this));
-        }
+		// Adding Tabs
+		for (String tabName : mTabs) {
+			mActionBar.addTab(mActionBar.newTab().setText(tabName).setTabListener(this));
+		}
 
-        /**
-         * on swiping, the viewpager makes respective tab selected
-         */
-        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+		/**
+		 * on swiping, the viewpager makes respective tab selected
+		 */
+		mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-            }
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+			}
 
-            @Override
-            public void onPageScrollStateChanged(int arg0) {
-            }
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+			}
 
-            @Override
-            public void onPageSelected(int position) {
-                // on changing the page
-                // make respected tab selected
-                mActionBar.setSelectedNavigationItem(position);
-            }
-        });
+			@Override
+			public void onPageSelected(int position) {
+				// on changing the page
+				// make respected tab selected
+				mActionBar.setSelectedNavigationItem(position);
+			}
+		});
 
-    }
+	}
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (this.getIntent().getBooleanExtra("invitation", false) == true) {
-            mPager.setCurrentItem(INVITATION_INDEX);
-        }
-    }
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (this.getIntent().getBooleanExtra("INVITATION", false) == true) {
+			mPager.setCurrentItem(INVITATION_INDEX);
+		}
+	}
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.pager, menu);
-        return true;
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		this.getMenuInflater().inflate(R.menu.pager, menu);
+		return true;
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
 
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.activity_friends_add_button:
-                this.startAddFriendActivity(null);
-            case android.R.id.home:
-                this.finish();
-            default:
-                break;
-        }
+		int id = item.getItemId();
+		switch (id) {
+			case R.id.activity_friends_add_button:
+				this.startAddFriendActivity(null);
+			case android.R.id.home:
+				if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+					this.startActivity(new Intent(this, MainActivity.class));
+				}
+				this.finish();
+			default:
+				break;
+		}
 
-        return super.onOptionsItemSelected(item);
-    }
+		return super.onOptionsItemSelected(item);
+	}
 
-    @Override
-    public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
-        // nothing
-    }
+	@Override
+	public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
+		// nothing
+	}
 
-    @Override
-    public void onTabSelected(Tab tab, FragmentTransaction arg1) {
-        // on tab selected
-        // show respected fragment view
-        mPager.setCurrentItem(tab.getPosition());
+	@Override
+	public void onTabSelected(Tab tab, FragmentTransaction arg1) {
+		// on tab selected
+		// show respected fragment view
+		mPager.setCurrentItem(tab.getPosition());
 
-    }
+	}
 
-    @Override
-    public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
-        // nothing
+	@Override
+	public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
+		// nothing
 
-    }
+	}
 
-    public void startAddFriendActivity(MenuItem menu) {
-        Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
-        this.startActivity(displayActivityIntent);
-    }
+	public void startAddFriendActivity(MenuItem menu) {
+		Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
+		this.startActivity(displayActivityIntent);
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+			this.startActivity(new Intent(this, MainActivity.class));
+		}
+		this.finish();
+	}
 
 }

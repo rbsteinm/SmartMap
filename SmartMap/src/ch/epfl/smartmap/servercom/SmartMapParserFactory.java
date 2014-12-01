@@ -8,24 +8,24 @@ package ch.epfl.smartmap.servercom;
  */
 public class SmartMapParserFactory {
 
-    /**
-     * Obtains a parser for the given MIME type.
-     * 
-     * @param contentType
-     *            The MIME type that the parser should understand, e.g.,
-     *            "application/json"
-     * @return A parser for the given contentType
-     * @throws NoSuchFormatException
-     *             If no known parser supports this content type
-     */
-    public static SmartMapParser parserForContentType(String contentType) throws NoSuchFormatException {
+	/**
+	 * Obtains a parser for the given MIME type.
+	 * 
+	 * @param contentType
+	 *            The MIME type that the parser should understand, e.g.,
+	 *            "application/json"
+	 * @return A parser for the given contentType
+	 * @throws NoSuchFormatException
+	 *             If no known parser supports this content type
+	 */
+	public static SmartMapParser parserForContentType(String contentType) throws NoSuchFormatException {
 
-        if (contentType.equals("application/json")) {
-            return new JsonSmartMapParser();
+		if (contentType.equals("application/json")) {
+			return new JsonSmartMapParser();
 
-        } else {
-            throw new NoSuchFormatException();
-        }
-    }
+		} else {
+			throw new NoSuchFormatException();
+		}
+	}
 
 }

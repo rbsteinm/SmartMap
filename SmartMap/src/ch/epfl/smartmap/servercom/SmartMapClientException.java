@@ -11,17 +11,17 @@ package ch.epfl.smartmap.servercom;
  */
 public class SmartMapClientException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public SmartMapClientException() {
-        super();
-    }
+	public SmartMapClientException() {
+		super();
+	}
 
-    public SmartMapClientException(String message) {
-        super(message);
-    }
+	public SmartMapClientException(String message) {
+		super(message);
+	}
 
-    public SmartMapClientException(Throwable throwable) {
-        super(throwable);
-    }
+	public SmartMapClientException(Throwable throwable) {
+		super(throwable);
+	}
 }

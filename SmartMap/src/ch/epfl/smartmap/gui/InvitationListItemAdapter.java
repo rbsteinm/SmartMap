@@ -9,60 +9,63 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.EventInvitation;
 import ch.epfl.smartmap.cache.FriendInvitation;
+import ch.epfl.smartmap.cache.Invitation;
 
 /**
- * Customized adapter that displays a list of notification in a target activity
- * This adapter dynamically creates a row in the activity for each notification
- * It displays in each row: user name, user status
+ * Customized adapter that displays a list of invitation in a target activity
+ * This adapter dynamically creates a row in the activity for each invitation
+ * It displays in each row: a title, a picture and a text
  * 
  * @author agpmilli
  */
-public class InvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
+public class InvitationListItemAdapter extends ArrayAdapter<Invitation> {
+	private final Context mContext;
+	private final List<Invitation> mItemsArrayList;
 
-    private final Context mContext;
-    private final List<FriendInvitation> mItemsArrayList;
+	/**
+	 * @param context
+	 *            Context of the Activity where we want to display the user list
+	 * @param userList
+	 *            list of users to display
+	 */
+	public InvitationListItemAdapter(Context context, List<Invitation> itemsArrayList) {
 
-    /**
-     * @param context
-     *            Context of the Activity where we want to display the user list
-     * @param userList
-     *            list of users to display
-     */
-    public InvitationListItemAdapter(Context context, List<FriendInvitation> itemsArrayList) {
+		super(context, R.layout.gui_notification_list_item, itemsArrayList);
 
-        super(context, R.layout.gui_notification_list_item, itemsArrayList);
+		mContext = context;
+		mItemsArrayList = itemsArrayList;
+	}
 
-        mContext = context;
-        mItemsArrayList = itemsArrayList;
-    }
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
 
-    /*
-     * (non-Javadoc)
-     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-     * android.view.ViewGroup)
-     * callback function automatically called one time for each user in the list
-     */
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+		// Create inflater,get item to construct
+		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		convertView = inflater.inflate(R.layout.gui_notification_list_item, parent, false);
 
-        // Create inflater,get item to construct
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.gui_notification_list_item, parent, false);
+		// Get FriendItem fields
+		TextView title = (TextView) convertView.findViewById(R.id.activity_notification_title);
+		TextView text = (TextView) convertView.findViewById(R.id.activity_notification_text);
+		// ImageView image = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
 
-        // Get FriendItem fields
-        TextView title = (TextView) convertView.findViewById(R.id.activity_notification_title);
-        TextView text = (TextView) convertView.findViewById(R.id.activity_notification_text);
-        // ImageView image = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
-
-        // Set the User's ID to the tag of its View
-        convertView.setTag(mItemsArrayList.get(position).getId());
-
-        // Set fields with friend attributes
-        title.setText(mContext.getString(R.string.notification_invitefriend_title));
-        text.setText(mItemsArrayList.get(position).getUserName() + " "
-            + mContext.getString(R.string.notification_friend_invitation));
-
-        return convertView;
-    }
+		// Set the User's ID to the tag of its View
+		convertView.setTag(mItemsArrayList.get(position).getId());
+		if (mItemsArrayList.get(position).getClass() == FriendInvitation.class) {
+			// Set fields with friend attributes
+			title.setText(mItemsArrayList.get(position).getUserName() + " "
+			    + mContext.getString(R.string.notification_friend_invitation));
+			text.setText(mContext.getString(R.string.notification_open_friend_list));
+			// picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
+		} else if (mItemsArrayList.get(position).getClass() == EventInvitation.class) {
+			// Set fields with friend attributes
+			title.setText(mItemsArrayList.get(position).getUserName() + " "
+			    + mContext.getString(R.string.notification_event_invitation) + " "
+			    + ((EventInvitation) mItemsArrayList.get(position)).getEventName());
+			text.setText(mContext.getString(R.string.notification_open_event_list));
+			// picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
+		}
+		return convertView;
+	}
 }

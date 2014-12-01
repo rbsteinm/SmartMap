@@ -16,24 +16,24 @@ import java.util.List;
  */
 public interface NotificationBag {
 
-    /**
-     * Get a list of the users that sent an invitation request.
-     * 
-     * @return a list of the inviting users.
-     */
-    List<Long> getInvitingUsers();
+	/**
+	 * Get a list of the users that sent an invitation request.
+	 * 
+	 * @return a list of the inviting users.
+	 */
+	List<Long> getInvitingUsers();
 
-    /**
-     * Get a list of the friends that accepted the user's friend requests.
-     * 
-     * @return a list of the new friends.
-     */
-    List<Long> getNewFriends();
+	/**
+	 * Get a list of the friends that accepted the user's friend requests.
+	 * 
+	 * @return a list of the new friends.
+	 */
+	List<Long> getNewFriends();
 
-    /**
-     * Get a list of the ids of friends that removed the user.
-     * 
-     * @return a list of ids.
-     */
-    List<Long> getRemovedFriendsIds();
+	/**
+	 * Get a list of the ids of friends that removed the user.
+	 * 
+	 * @return a list of ids.
+	 */
+	List<Long> getRemovedFriendsIds();
 }
