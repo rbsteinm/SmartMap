@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -159,6 +160,11 @@ public class PublicEvent implements Event {
     @Override
     public String getName() {
         return mName;
+    }
+
+    @Override
+    public List<Long> getParticipants() {
+        return new ArrayList<Long>(mParticipants);
     }
 
     @Override

@@ -7,23 +7,15 @@ import java.util.Locale;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.History;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.database.DatabaseHelper;
 
 /**
  * @author jfperren
  */
 public class CacheSearchEngine implements SearchEngine {
 
-    private DatabaseHelper mDatabaseHelper;
-
     private Cache mCache;
-
-    private List<User> mFriends;
-    private List<Event> mEvents;
-    private List<Filter> mFilters;
 
     public CacheSearchEngine() {
         mCache = Cache.getInstance();
@@ -62,12 +54,7 @@ public class CacheSearchEngine implements SearchEngine {
                 }
                 break;
             case EVENTS:
-                for (Event e : mCache.getAllNearEvents()) {
-                    if (e.getName().toLowerCase(Locale.US).contains(query)) {
-                        results.add(e);
-                    }
-                }
-                for (Event e : mCache.getAllGoingEvents()) {
+                for (Event e : mCache.getAllEvents()) {
                     if (e.getName().toLowerCase(Locale.US).contains(query)) {
                         results.add(e);
                     }

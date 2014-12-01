@@ -12,7 +12,7 @@ import android.preference.PreferenceManager;
  * @author SpicyCH (add support for the user settings - we might want to change the design if my methods are
  *         bottlenecks)
  */
-public class SettingsManager {
+public final class SettingsManager {
     public static final String PREFS_NAME = "settings";
     public static final String USER_ID = "UserID";
     public static final String USER_NAME = "UserName";
@@ -55,13 +55,12 @@ public class SettingsManager {
     private static final String KEY_PRIVATE_EVENTS = "events_show_private";
 
     /**
-     * SettingsManager constructor. Will be made private, use initialize() or getInstance() instead.
+     * SettingsManager constructor
      * 
      * @param context
      *            The app's context, needed to access the shared preferences
      */
-    @Deprecated
-    public SettingsManager(Context context) {
+    private SettingsManager(Context context) {
         mContext = context;
         mSharedPref = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         mEditor = mSharedPref.edit();

@@ -26,15 +26,16 @@ import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.cache.Notifications;
-import ch.epfl.smartmap.cache.Notifications.NotificationListener;
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.AddEventOnMapLongClickListener;
 import ch.epfl.smartmap.listeners.CacheListener;
+import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
 import ch.epfl.smartmap.map.DefaultMarkerManager;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 import ch.epfl.smartmap.search.CacheSearchEngine;
@@ -59,7 +60,7 @@ import com.google.android.gms.maps.model.Marker;
  * @author agpmilli
  */
 
-public class MainActivity extends FragmentActivity implements CacheListener {
+public class MainActivity extends FragmentActivity implements CacheListener, OnInvitationListUpdateListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -237,25 +238,16 @@ public class MainActivity extends FragmentActivity implements CacheListener {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.main, menu);
 
+        // Get menu
+        mMenu = menu;
         // Get the notifications MenuItem and
         // its LayerDrawable (layer-list)
-        MenuItem item = menu.findItem(R.id.action_notifications);
+        MenuItem item = mMenu.findItem(R.id.action_notifications);
         mIcon = (LayerDrawable) item.getIcon();
 
-        // Update LayerDrawable's BadgeDrawable
-        Utils.setBadgeCount(this, mIcon,
-            Notifications.getNumberOfEventNotification() + Notifications.getNumberOfFriendNotification());
+        Utils.setBadgeCount(MainActivity.this, mIcon, DatabaseHelper.getInstance()
+            .getFriendInvitationsByStatus(Invitation.UNREAD).size());
 
-        Notifications.addNotificationListener(new NotificationListener() {
-            @Override
-            public void onNewNotification() {
-                // Update LayerDrawable's BadgeDrawable
-                Utils.setBadgeCount(MainActivity.this, mIcon, Notifications.getNumberOfEventNotification()
-                    + Notifications.getNumberOfFriendNotification());
-            }
-        });
-
-        mMenu = menu;
         // Get Views
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView mSearchView = (SearchView) searchItem.getActionView();
@@ -332,6 +324,14 @@ public class MainActivity extends FragmentActivity implements CacheListener {
         });
     }
 
+    @Override
+    public void onInvitationListUpdate() {
+        // Update LayerDrawable's BadgeDrawable
+        Utils.setBadgeCount(MainActivity.this, mIcon, DatabaseHelper.getInstance()
+            .getFriendInvitationsByStatus(Invitation.UNREAD).size());
+
+    }
+
     public void onLocationChanged(Location location) {
         SettingsManager.getInstance().setLocation(location);
     }
@@ -391,10 +391,10 @@ public class MainActivity extends FragmentActivity implements CacheListener {
                 }
                 break;
             case R.id.action_notifications:
-                Notifications.setNumberOfUnreadEventNotification(0);
-                Notifications.setNumberOfUnreadFriendNotification(0);
+                Utils.setBadgeCount(MainActivity.this, mIcon, 0);
                 Intent pNotifIntent = new Intent(this, NotificationsActivity.class);
                 this.startActivity(pNotifIntent);
+
                 return true;
             case R.id.action_hide_search:
                 this.setMainMenu();
@@ -576,4 +576,5 @@ public class MainActivity extends FragmentActivity implements CacheListener {
             return false;
         }
     }
+
 }

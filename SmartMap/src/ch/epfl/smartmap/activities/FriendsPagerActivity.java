@@ -11,13 +11,11 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.PagerAdapter;
 
 /**
- * This activity displays your friends in one tab, and your friend request (both sent and received) in another
- * tab
+ * This activity displays your friends in one tab, and your friend request (both
+ * sent and received) in another tab
  * 
  * @author rbsteinm
  */
@@ -29,15 +27,13 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     private ViewPager mPager;
     private ActionBar mActionBar;
     private final String[] mTabs = {"Friends", "Invitations"};
+    private static final int INVITATION_INDEX = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        DatabaseHelper.initialize(this.getApplicationContext());
-        SettingsManager.initialize(this.getApplicationContext());
-
         // Makes the logo clickable (clicking it returns to previous activity)
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        // getActionBar().setDisplayHomeAsUpEnabled(true);
 
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_friends_pager);
@@ -85,6 +81,14 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (this.getIntent().getBooleanExtra("invitation", false) == true) {
+            mPager.setCurrentItem(INVITATION_INDEX);
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.pager, menu);
@@ -93,17 +97,17 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
 
-        switch (item.getItemId()) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.activity_friends_add_button:
+                this.startAddFriendActivity(null);
             case android.R.id.home:
                 this.finish();
-                break;
             default:
-                // No other menu items!
                 break;
         }
 
@@ -132,10 +136,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     public void startAddFriendActivity(MenuItem menu) {
         Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
         this.startActivity(displayActivityIntent);
-    }
-
-    public ViewPager getViewPager() {
-        return mPager;
     }
 
 }

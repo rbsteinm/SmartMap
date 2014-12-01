@@ -117,6 +117,30 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#ackEventInvitation(long)
+     */
+    @Override
+    public void ackEventInvitation(long eventId) throws SmartMapClientException {
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("event_id", Long.toString(eventId));
+        HttpURLConnection conn = this.getHttpURLConnection("/ackEventInvitation");
+        String response = this.sendViaPost(params, conn);
+
+        SmartMapParser parser = null;
+        try {
+            parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.servercom.SmartMapClient#ackRemovedFriend(long)
      */
     @Override
@@ -239,7 +263,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
             id = parser.parseId(response);
-
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
 
@@ -368,26 +391,48 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getUserInfo(int)
      */
     @Override
-    public ImmutableUser getFriendInfo(long id) throws SmartMapClientException {
-
+    public ImmutableEvent getEventInfo(long eventId) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("user_id", Long.toString(id));
-        HttpURLConnection conn = this.getHttpURLConnection("/getUserInfo");
+        params.put("event_id", Long.toString(eventId));
+        HttpURLConnection conn = this.getHttpURLConnection("/getEventInfo");
         String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
-        ImmutableUser friend = null;
+        ImmutableEvent event = null;
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
-            friend = parser.parseFriend(response);
+            event = parser.parseEvent(response);
+
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+        return event;
+
+    }
+
+    @Override
+    public List<ImmutableEvent> getEventInvitations() throws SmartMapClientException {
+
+        HttpURLConnection conn = this.getHttpURLConnection("/getEventInvitations");
+        String response = this.sendViaPost(new HashMap<String, String>(), conn);
+
+        List<ImmutableEvent> eventInvitations = new ArrayList<ImmutableEvent>();
+
+        try {
+            SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+            eventInvitations = parser.parseEventList(response);
+
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
         } catch (SmartMapParseException e) {
             throw new SmartMapClientException(e);
         }
 
-        return friend;
+        return eventInvitations;
     }
 
     /*
@@ -511,6 +556,33 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#getEventInvitations()
+     */
+    @Override
+    public ImmutableUser getUserInfo(long id) throws SmartMapClientException {
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("user_id", Long.toString(id));
+        HttpURLConnection conn = this.getHttpURLConnection("/getUserInfo");
+        String response = this.sendViaPost(params, conn);
+
+        SmartMapParser parser = null;
+        ImmutableUser friend = null;
+        try {
+            parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+            friend = parser.parseFriend(response);
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException();
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException();
+        }
+
+        return friend;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.servercom.SmartMapClient#inviteFriend(int)
      */
     @Override
@@ -518,6 +590,77 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/inviteFriend");
+        String response = this.sendViaPost(params, conn);
+
+        SmartMapParser parser = null;
+        try {
+            parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#inviteUsersToEvent(long, java.util.List)
+     */
+    @Override
+    public void inviteUsersToEvent(long eventId, List<Long> usersIds) throws SmartMapClientException {
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("event_id", Long.toString(eventId));
+        params.put("users_ids", this.longListToString(usersIds));
+        HttpURLConnection conn = this.getHttpURLConnection("/inviteUsersToEvent");
+        String response = this.sendViaPost(params, conn);
+
+        SmartMapParser parser = null;
+        try {
+            parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#joinEvent(long)
+     */
+    @Override
+    public void joinEvent(long eventId) throws SmartMapClientException {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("event_id", Long.toString(eventId));
+        HttpURLConnection conn = this.getHttpURLConnection("/joinEvent");
+        String response = this.sendViaPost(params, conn);
+
+        SmartMapParser parser = null;
+        try {
+            parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#leaveEvent(long)
+     */
+    @Override
+    public void leaveEvent(long eventId) throws SmartMapClientException {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("event_id", Long.toString(eventId));
+        HttpURLConnection conn = this.getHttpURLConnection("/leaveEvent");
         String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
@@ -795,4 +938,5 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
         return ONE_INSTANCE;
     }
+
 }

@@ -76,9 +76,4 @@ public class FriendsTab extends ListFragment {
         super.onResume();
         this.setListAdapter(new FriendListItemAdapter(mContext, Cache.getInstance().getAllFriends()));
     }
-
-    private void createList() {
-
-    }
-
 }

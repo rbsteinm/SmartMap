@@ -3,83 +3,98 @@ package ch.epfl.smartmap.cache;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.activities.UserInformationActivity;
+import ch.epfl.smartmap.gui.Utils;
 
 /**
- * A class to represent the user's friends
+ * A class to represent the user's invitations
  * 
- * @author ritterni
+ * @author agpmilli
  */
 public class FriendInvitation implements Invitation {
-    private long mId;
-    private Intent mIntent;
-    private String mTitle;
-    private String mText;
-    private User mUser;
-    private boolean mIsRead;
+    private final long mInvitationId;
+    private long mUserId;
+    private String mUserName;
+    private int mStatus;
+
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
 
-    @Override
-    public long getId() {
-        return mId;
+    public FriendInvitation(long invitationId, long userId, String userName, int status) {
+        mInvitationId = invitationId;
+        mUserId = userId;
+        mUserName = userName;
+        mStatus = status;
+
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#getId()
+     */
+    @Override
+    public long getId() {
+        return mInvitationId;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#getImage()
+     */
     @Override
     public Bitmap getImage() {
-        return mUser.getImage();
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
     public Intent getIntent() {
-        return mIntent;
+        if (mStatus == READ) {
+            return new Intent(Utils.sContext, UserInformationActivity.class);
+        } else {
+            return new Intent();
+        }
+    }
+
+    @Override
+    public int getStatus() {
+        return mStatus;
     }
 
     @Override
     public String getText() {
-        return mText;
+        return "Click here to open the invitation";
     }
 
     @Override
     public String getTitle() {
-        return mTitle;
+        return "Friend request from " + mUserName;
     }
 
     @Override
-    public User getUser() {
-        return mUser;
+    public long getUserId() {
+        return mUserId;
     }
 
     @Override
-    public boolean isRead() {
-        return mIsRead;
+    public String getUserName() {
+        return mUserName;
     }
 
     @Override
-    public void setIntent(Intent intent) {
-        mIntent = intent;
-
+    public void setStatus(int status) {
+        mStatus = status;
     }
 
     @Override
-    public void setRead(boolean isRead) {
-        mIsRead = isRead;
-
+    public void setUserId(long id) {
+        mUserId = id;
     }
 
     @Override
-    public void setText(String text) {
-        mText = text;
-    }
-
-    @Override
-    public void setTitle(String title) {
-        mTitle = title;
-    }
-
-    @Override
-    public void setUser(User user) {
-        mUser = user;
+    public void setUserName(String name) {
+        mUserName = name;
     }
 
 }

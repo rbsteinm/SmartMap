@@ -32,6 +32,8 @@ public interface Event extends Displayable {
 
     String getName();
 
+    List<Long> getParticipants();
+
     /**
      * @return The date (year, month, day, hour, minute) at which the event
      *         starts

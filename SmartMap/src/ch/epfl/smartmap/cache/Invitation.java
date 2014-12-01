@@ -9,6 +9,15 @@ import android.graphics.Bitmap;
  * @author agpmilli
  */
 public interface Invitation {
+
+    /**
+     * int representing invitation status
+     */
+    int UNREAD = 0;
+    int READ = 1;
+    int ACCEPTED = 2;
+    int REFUSED = 3;
+
     /**
      * @return invitation's id
      */
@@ -22,6 +31,11 @@ public interface Invitation {
     Intent getIntent();
 
     /**
+     * @return int representing invitation's status
+     */
+    int getStatus();
+
+    /**
      * @return invitation's text
      */
     String getText();
@@ -32,53 +46,37 @@ public interface Invitation {
     String getTitle();
 
     /**
-     * @return invitation's creator
+     * @return user's id
      */
-    User getUser();
+    long getUserId();
 
     /**
-     * @return True if invitation has been read
+     * @return user's name
      */
-    boolean isRead();
+    String getUserName();
 
     /**
-     * Set invitation's intent
+     * Sets status of invitation
      * 
-     * @param intent
-     *            the invitation's intent
+     * @param Status
+     *            the int representing invitation status
      */
-    void setIntent(Intent intent);
+    void setStatus(int status);
 
     /**
-     * Sets whether or not the user has read the invitation
-     * 
-     * @param isRead
-     *            True if invitation has been read
-     */
-    void setRead(boolean isRead);
-
-    /**
-     * Set invitation's text
-     * 
-     * @param text
-     *            the invitation's text
-     */
-    void setText(String text);
-
-    /**
-     * Set invitation's title
-     * 
-     * @param title
-     *            the invitation's title
-     */
-    void setTitle(String title);
-
-    /**
-     * Set invitation's creator
+     * Set invitation's creator id
      * 
      * @param user
-     *            the invitation's creator
+     *            the invitation's creator id
      */
-    void setUser(User user);
+    void setUserId(long id);
+
+    /**
+     * Set invitation's creator name
+     * 
+     * @param user
+     *            the invitation's creator name
+     */
+    void setUserName(String name);
 
 }

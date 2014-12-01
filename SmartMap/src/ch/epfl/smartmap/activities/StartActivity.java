@@ -21,6 +21,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.FacebookFragment;
+import ch.epfl.smartmap.gui.Utils;
 
 import com.facebook.Session;
 
@@ -53,6 +54,7 @@ public class StartActivity extends FragmentActivity {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
             }
+            Utils.sContext = this;
         } catch (NameNotFoundException e) {
             Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
         } catch (NoSuchAlgorithmException e) {

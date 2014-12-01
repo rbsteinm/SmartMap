@@ -1,8 +1,10 @@
 package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import android.util.Log;
 import android.util.LongSparseArray;
@@ -149,6 +151,19 @@ public class Cache {
         mStrangerInstances.put(user.getId(), new Stranger(user));
     }
 
+    public List<Event> getAllEvents() {
+        Set<Long> allEventIds = new HashSet<Long>(mNearEventIds);
+        allEventIds.addAll(mGoingEventIds);
+        allEventIds.addAll(mMyEventIds);
+
+        List<Event> result = new ArrayList<Event>();
+        for (long id : allEventIds) {
+            result.add(this.getEventById(id));
+        }
+
+        return result;
+    }
+
     /**
      * @return a list containing all the user's Friends.
      */
@@ -191,17 +206,6 @@ public class Cache {
         return allInvitingUsers;
     }
 
-    public List<Displayable> getAllVisibleEvents() {
-        List<Displayable> allVisibleEvents = new ArrayList<Displayable>();
-        for (Long id : mFriendIds) {
-            Event event = this.getEventById(id);
-            if ((event != null) && event.isVisible()) {
-                allVisibleEvents.add(event);
-            }
-        }
-        return allVisibleEvents;
-    }
-
     // public List<Event> getAllPublicEventsNear(Location location, double radius)
     // throws SmartMapClientException {
     // List<Event> ids =
@@ -214,6 +218,17 @@ public class Cache {
     //
     // return allPublicEventsNear;
     // }
+
+    public List<Displayable> getAllVisibleEvents() {
+        List<Displayable> allVisibleEvents = new ArrayList<Displayable>();
+        for (Long id : mFriendIds) {
+            Event event = this.getEventById(id);
+            if ((event != null) && event.isVisible()) {
+                allVisibleEvents.add(event);
+            }
+        }
+        return allVisibleEvents;
+    }
 
     public List<Displayable> getAllVisibleFriends() {
         List<Displayable> allVisibleUsers = new ArrayList<Displayable>();
@@ -252,7 +267,7 @@ public class Cache {
                 // If not found, check on the server
                 ImmutableUser networkResult;
                 try {
-                    networkResult = mNetworkClient.getFriendInfo(id);
+                    networkResult = mNetworkClient.getUserInfo(id);
                 } catch (SmartMapClientException e) {
                     networkResult = null;
                 }
@@ -315,7 +330,7 @@ public class Cache {
             // If not found, check on the server
             ImmutableUser networkResult;
             try {
-                networkResult = mNetworkClient.getFriendInfo(id);
+                networkResult = mNetworkClient.getUserInfo(id);
             } catch (SmartMapClientException e) {
                 networkResult = null;
             }
@@ -360,6 +375,16 @@ public class Cache {
         }
     }
 
+    public void initFriendList(List<Long> newIds) {
+        mFriendIds.clear();
+        mFriendIds.addAll(newIds);
+
+        // Gets all friends
+        for (Long id : newIds) {
+            this.getFriendById(id);
+        }
+    }
+
     public void removeFriend(long id) {
     }
 
@@ -373,16 +398,6 @@ public class Cache {
 
     public void removePendingFriend(long id) {
         mPendingFriendIds.remove(id);
-    }
-
-    public void setFriendList(List<Long> newIds) {
-        mFriendIds.clear();
-        mFriendIds.addAll(newIds);
-
-        // Gets all friends
-        for (Long id : newIds) {
-            this.getFriendById(id);
-        }
     }
 
     public void updateFriendList(List<ImmutableUser> newFriends) {

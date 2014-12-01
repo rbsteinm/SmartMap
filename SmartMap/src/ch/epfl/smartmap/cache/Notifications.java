@@ -1,8 +1,5 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -26,9 +23,6 @@ public class Notifications {
     private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME, SILENT_NOTIFICATION_TIME,
         VIBRATE_NOTIFICATION_TIME};
     private static long notificationID = 0;
-    private static int numberOfEventNotification = 0;
-    private static int numberOfFriendNotification = 0;
-    private static List<NotificationListener> listeners = new ArrayList<NotificationListener>();
 
     /**
      * Create an accepted friend invitation notification and notify it
@@ -82,19 +76,6 @@ public class Notifications {
 
         displayNotification(context, noti.build(), notificationID);
 
-        notifyListeners();
-    }
-
-    public static void addNotificationListener(NotificationListener listener) {
-        listeners.add(listener);
-    }
-
-    public static int getNumberOfEventNotification() {
-        return numberOfEventNotification;
-    }
-
-    public static int getNumberOfFriendNotification() {
-        return numberOfFriendNotification;
     }
 
     /**
@@ -111,7 +92,6 @@ public class Notifications {
 
         // Get ID and the number of ongoing Event notifications
         notificationID++;
-        setNumberOfUnreadEventNotification(getNumberOfEventNotification() + 1);
 
         // Prepare intent that redirect the user to EventActivity
         PendingIntent pEventIntent =
@@ -152,8 +132,6 @@ public class Notifications {
                 .setVibrate(PATTERN).setContentIntent(pEventIntent);
 
         displayNotification(context, noti.build(), notificationID);
-
-        notifyListeners();
     }
 
     /**
@@ -170,12 +148,12 @@ public class Notifications {
 
         // Get ID and the number of ongoing Friend notifications
         notificationID++;
-        setNumberOfUnreadFriendNotification(getNumberOfFriendNotification() + 1);
 
         // Prepare intent that redirects the user to FriendActivity
+        Intent showFriendIntent = new Intent(context, FriendsPagerActivity.class);
+        showFriendIntent.putExtra("invitation", true);
         PendingIntent pFriendIntent =
-            PendingIntent.getActivity(context, 0, new Intent(context, FriendsPagerActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent.getActivity(context, 0, showFriendIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Add Big View Specific Configuration
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -206,16 +184,6 @@ public class Notifications {
                     user.getName() + " " + context.getString(R.string.notification_friend_invitation) + "\n"
                         + context.getString(R.string.notification_open_friend_list));
         displayNotification(context, noti.build(), notificationID);
-
-        notifyListeners();
-    }
-
-    public static void setNumberOfUnreadEventNotification(int numberOfEvent) {
-        Notifications.numberOfEventNotification = numberOfEvent;
-    }
-
-    public static void setNumberOfUnreadFriendNotification(int numberOfFriend) {
-        Notifications.numberOfFriendNotification = numberOfFriend;
     }
 
     /**
@@ -232,22 +200,5 @@ public class Notifications {
         NotificationManager notificationManager =
             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify((int) notificationId, notification);
-    }
-
-    private static void notifyListeners() {
-        for (NotificationListener l : listeners) {
-            l.onNewNotification();
-        }
-    }
-
-    /**
-     * Listener use to listen when notifications arrive
-     * 
-     * @author agpmilli
-     */
-    public static class NotificationListener {
-        public void onNewNotification() {
-
-        }
     }
 }

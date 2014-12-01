@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.location.Location;
+import android.util.Log;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
@@ -81,12 +82,14 @@ public class JsonSmartMapParser implements SmartMapParser {
     @Override
     public ImmutableEvent parseEvent(String s) throws SmartMapParseException {
         JSONObject jsonObject = null;
+        JSONObject eventJsonObject = null;
         try {
             jsonObject = new JSONObject(s);
+            eventJsonObject = jsonObject.getJSONObject("event");
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
-        return this.parseEventFromJSON(jsonObject);
+        return this.parseEventFromJSON(eventJsonObject);
     }
 
     @Override
@@ -102,7 +105,7 @@ public class JsonSmartMapParser implements SmartMapParser {
                 JSONObject eventJSON = eventsArray.getJSONObject(i);
                 ImmutableEvent event = this.parseEventFromJSON(eventJSON);
                 events.add(event);
-                // Log.d("events", event.getName());
+                Log.d("events", event.getName());
             }
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
@@ -416,6 +419,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         String positionName = null;
         String name = null;
         String description = "";
+        List<Long> participants;
 
         try {
             id = jsonObject.getLong("id");
@@ -427,6 +431,7 @@ public class JsonSmartMapParser implements SmartMapParser {
             positionName = jsonObject.getString("positionName");
             name = jsonObject.getString("name");
             description = jsonObject.getString("description");
+            participants = this.parseIds(jsonObject.toString(), "participants");
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }

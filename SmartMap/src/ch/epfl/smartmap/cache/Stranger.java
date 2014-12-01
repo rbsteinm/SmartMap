@@ -69,6 +69,16 @@ public class Stranger implements User {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getImmutableCopy()
+     */
+    @Override
+    public ImmutableUser getImmutableCopy() {
+        // TODO Auto-generated method stub
+        return new ImmutableUser(mId, mName, null, null, null, null, mImage);
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.User#getLastSeen()
      */
     @Override

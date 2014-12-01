@@ -43,6 +43,8 @@ public interface User extends Displayable {
      */
     String getEmail();
 
+    ImmutableUser getImmutableCopy();
+
     /**
      * @return The user's name
      */

@@ -20,7 +20,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
 /**
  * @author jfperren
  */
-public class CachedOnlineSearchEngine implements SearchEngine {
+public final class CachedOnlineSearchEngine implements SearchEngine {
 
     private static final CachedOnlineSearchEngine ONE_INSTANCE = new CachedOnlineSearchEngine();
 
