@@ -9,9 +9,8 @@
     <string name="greet_user">Log In successful!</string>
     <string name="search_text">Search</string>
     <string name="add_friend">Add a friend</string>
-    
-    
-	<!-- Side menu Strings -->
+
+    <!-- Side menu Strings -->
     <string-array name="sideMenuElements">
         <item>Profile</item>
         <item>Friends</item>
@@ -21,7 +20,6 @@
         <item>Logout</item>
     </string-array>
 
-    
     <string name="title_activity_pager">Friends</string>
     <string name="search_bar_hint">Search...</string>
     <string name="title_activity_map_fragment">MapFragment</string>
@@ -72,12 +70,12 @@
     <string name="unknown">--Unknown--</string>
     <string name="unknown_activity_request_code">        Received an unknown activity request code %1$d in onActivityResult.</string>
     <string name="title_activity_add_friend">Add a friend</string>
-	
+
     <!-- StartActivity -->
     <string name="welcome">W E L C O M E</string>
-    <string name="loading_text">Logging In...</string>
+    <string name="loading_text">Logging in...</string>
     <string name="logo_description">logo</string>
-    
+
     <!-- ShowEventsActivity -->
     <string name="title_activity_show_events">Events</string>
     <string name="ShowEventsCheckBoxMyEv">My events</string>
@@ -87,8 +85,20 @@
     <string name="show_event_on_the_map_button">Show on the map</string>
     <string name="show_event_on_the_map_loading">Opening event on the map...</string>
     <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
+    <string name="show_event_details_button">See details</string>
+
+    <!-- ShowEventInformationActivity -->
+    <string name="title_activity_show_event_information">Show event</string>
+    <string name="show_event_info_invite_friends_button">Invite friends</string>
+    <string name="show_event_by">By</string>
+    <string name="show_event_info_event_description">Description</string>
 
     <!-- AddEventActivity -->
+    <string name="add_event_title_text">Title</string>
+    <string name="add_event_when_text">When</string>
+    <string name="add_event_where_text">Where</string>
+    <string name="add_event_map_text">Click on the map to set location</string>
+    <string name="add_event_what_text">What</string>
     <string name="title_activity_add_event">Create a new event</string>
     <string name="addEventEventName">Event name</string>
     <string name="addEventButtonCreateEvent">Done</string>
@@ -98,7 +108,7 @@
     <string name="addEventEventTime">Event is now!</string>
     <string name="addEventLatitude">Latitude</string>
     <string name="addEventLongitude">Longitude</string>
-    <string name="addEventPlaceName">Place (town, canton, etc...)</string>
+    <string name="addEventPlaceName">Name of the place</string>
     <string name="addEventDescription">Description (optional)</string>
     <string name="addEventButtonPickLocation">Set location</string>
     <string name="add_event_toast_event_cannot_end_before_starting">The event cannot end before it begins!</string>
@@ -128,14 +138,28 @@
     <string name="notification_invitation_accepted"> accepted your invitation</string>
     <string name="notification_open_friend_list">Click here to open your list of friends.</string>
     <string name="notification_open_event_list">Click here to open your list of events.</string>
-    
+
     <!-- Notification Activity -->
     <string name="notification_img_content_description">Image of notification</string>
     <string name="title_activity_notifications">Invitations</string>
+    <string name="notification_open_friend_invitation_list">Click here to open your list of invitations.</string>
+    <string name="notification_open_event_invitation_list">Click here to open event description.</string>
+    <string name="notification_open_friend_info1">Click here to open </string>
+    <string name="notification_open_friend_info2">\'s profile </string>
+    <string name="notification_friend_request_title">Friend request from </string>
+    <string name="notification_event_request_title">Event request from </string>
+    <string name="notification_accepted_friend_title">accepted your invitation</string>
+
+    <!-- Set Location Activity -->
+    <string name="title_activity_set_location">Set Location</string>
+    <string name="set_location_toast">Drag Marker where your event will take place and press "Done"</string>
+    <string name="set_location_done_button">Done</string>
 
     <!-- FriendInformationActivity -->
     <string name="remove_friend_button_text">Remove</string>
     <string name="block_button_text">Block</string>
     <string name="follow_switch">Follow</string>
+
+    <!-- Nothing below this line! -->
 
 </resources>

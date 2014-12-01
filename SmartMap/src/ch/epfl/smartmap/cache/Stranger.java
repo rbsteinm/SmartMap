@@ -21,9 +21,23 @@ public class Stranger implements User {
     private Bitmap mImage;
 
     protected Stranger(ImmutableUser user) {
-        this.mId = user.getId();
-        this.mName = user.getName();
-        this.mImage = user.getImage();
+        if (user.getId() < 0) {
+            throw new IllegalArgumentException();
+        } else {
+            mId = user.getId();
+        }
+
+        if ((user.getName() == null) || user.getName().equals("")) {
+            throw new IllegalArgumentException();
+        } else {
+            mName = user.getName();
+        }
+
+        if (user.getImage() == null) {
+            mImage = User.NO_IMAGE;
+        } else {
+            mImage = Bitmap.createBitmap(user.getImage());
+        }
     }
 
     /*
@@ -51,6 +65,16 @@ public class Stranger implements User {
     @Override
     public Bitmap getImage() {
         return mImage;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getImmutableCopy()
+     */
+    @Override
+    public ImmutableUser getImmutableCopy() {
+        // TODO Auto-generated method stub
+        return new ImmutableUser(mId, mName, null, null, null, null, mImage);
     }
 
     /*
@@ -113,7 +137,7 @@ public class Stranger implements User {
      */
     @Override
     public String getPhoneNumber() {
-        return NO_NUMBER;
+        return NO_PHONE_NUMBER;
     }
 
     /*
@@ -154,6 +178,11 @@ public class Stranger implements User {
 
     @Override
     public void update(ImmutableUser user) {
-
+        if (user.getName() != null) {
+            mName = user.getName();
+        }
+        if (user.getImage() != null) {
+            mImage = user.getImage();
+        }
     }
 }

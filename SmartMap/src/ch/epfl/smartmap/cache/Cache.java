@@ -1,9 +1,12 @@
 package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import android.util.Log;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
@@ -11,12 +14,17 @@ import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
- * Acts as a Cache for every item the GUI needs to access. When a value is not found, search through the local
- * database or the server and puts it in cache automatically.
+ * The Cache contains all instances of network objects that are used by the GUI. Therefore, every request to
+ * find an
+ * user or an event should go through it. It will automatically fill itself with the database on creation, and
+ * then
+ * updates the database as changes are made.
  * 
  * @author jfperren
  */
-public final class Cache {
+public class Cache {
+
+    static final public String TAG = "Cache";
 
     // Unique instance
     private static final Cache ONE_INSTANCE = new Cache();
@@ -50,9 +58,11 @@ public final class Cache {
 
         // Init lists
         mFriendIds = new ArrayList<Long>();
+        mInvitingUserIds = new ArrayList<Long>();
 
         mNearEventIds = new ArrayList<Long>();
         mGoingEventIds = new ArrayList<Long>();
+        mMyEventIds = new ArrayList<Long>();
 
         mPublicEventInstances = new LongSparseArray<Event>();
         mFriendInstances = new LongSparseArray<User>();
@@ -61,8 +71,12 @@ public final class Cache {
         mListeners = new LinkedList<CacheListener>();
     }
 
+    /**
+     * Add a Friend, and fill the cache with its informations.
+     * 
+     * @param id
+     */
     public void addFriend(long id) {
-        // TODO : Notify database
         mFriendIds.add(id);
         mStrangerInstances.remove(id);
         this.getFriendById(id);
@@ -72,8 +86,12 @@ public final class Cache {
         }
     }
 
+    /**
+     * Mark an Event as Going and fill the cache with its informations.
+     * 
+     * @param id
+     */
     public void addGoingEvent(long id) {
-        // TODO : Notify database
         mGoingEventIds.add(id);
         this.getPublicEventById(id);
         for (CacheListener listener : mListeners) {
@@ -81,30 +99,78 @@ public final class Cache {
         }
     }
 
+    /**
+     * Mark an Event as Self-created event and fill the cache with its informations.
+     * 
+     * @param id
+     */
     public void addMyEvent(long id) {
-        // TODO : Notify database
         mMyEventIds.add(id);
         this.getPublicEventById(id);
     }
 
+    /**
+     * Mark an Event as Near and fill the cache with its informations.
+     * 
+     * @param id
+     */
     public void addNearEvent(long id) {
         mNearEventIds.add(id);
+        this.getPublicEventById(id);
         for (CacheListener listener : mListeners) {
             listener.onNearEventListUpdate();
         }
     }
 
+    /**
+     * @param listener
+     *            Listener to be added
+     */
     public void addOnCacheListener(CacheListener listener) {
         mListeners.add(listener);
     }
 
+    /**
+     * Mark Stranger as Pending and fill cache with its informations.
+     * 
+     * @param id
+     */
     public void addPendingFriend(long id) {
         mPendingFriendIds.add(id);
+        this.getStrangerById(id);
         for (CacheListener listener : mListeners) {
             listener.onPendingFriendListUpdate();
         }
     }
 
+    /**
+     * Fill Cache with an unknown User's informations.
+     * 
+     * @param user
+     */
+    public void addStranger(ImmutableUser user) {
+        mStrangerInstances.put(user.getId(), new Stranger(user));
+    }
+
+    public List<Event> getAllEvents() {
+        Set<Long> allEventIds = new HashSet<Long>(mNearEventIds);
+        allEventIds.addAll(mGoingEventIds);
+        allEventIds.addAll(mMyEventIds);
+
+        List<Event> result = new ArrayList<Event>();
+        for (long id : allEventIds) {
+            Event event = this.getEventById(id);
+            if (event != null) {
+                result.add(event);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * @return a list containing all the user's Friends.
+     */
     public List<User> getAllFriends() {
         List<User> allFriends = new ArrayList<User>();
         for (Long id : mFriendIds) {
@@ -116,6 +182,9 @@ public final class Cache {
         return allFriends;
     }
 
+    /**
+     * @return a list containing all the user's Going Events.
+     */
     public List<Event> getAllGoingEvents() {
         List<Event> allGoingEvents = new ArrayList<Event>();
         for (Long id : mGoingEventIds) {
@@ -127,34 +196,18 @@ public final class Cache {
         return allGoingEvents;
     }
 
+    /**
+     * @return a list containing all the people who has invited the users
+     */
     public List<User> getAllInvitingUsers() {
         List<User> allInvitingUsers = new ArrayList<User>();
         for (Long id : mInvitingUserIds) {
-            allInvitingUsers.add(this.getStrangerById(id));
+            User invitingUser = this.getUserById(id);
+            if (invitingUser != null) {
+                allInvitingUsers.add(this.getStrangerById(id));
+            }
         }
         return allInvitingUsers;
-    }
-
-    public List<Event> getAllNearEvents() {
-        List<Event> allPinnedEvents = new ArrayList<Event>();
-        for (Long id : mNearEventIds) {
-            Event event = this.getEventById(id);
-            if (event != null) {
-                allPinnedEvents.add(event);
-            }
-        }
-        return allPinnedEvents;
-    }
-
-    public List<Displayable> getAllVisibleEvents() {
-        List<Displayable> allVisibleEvents = new ArrayList<Displayable>();
-        for (Long id : mFriendIds) {
-            Event event = this.getEventById(id);
-            if (event.isVisible()) {
-                allVisibleEvents.add(event);
-            }
-        }
-        return allVisibleEvents;
     }
 
     // public List<Event> getAllPublicEventsNear(Location location, double radius)
@@ -170,11 +223,22 @@ public final class Cache {
     // return allPublicEventsNear;
     // }
 
+    public List<Displayable> getAllVisibleEvents() {
+        List<Displayable> allVisibleEvents = new ArrayList<Displayable>();
+        for (Long id : mFriendIds) {
+            Event event = this.getEventById(id);
+            if ((event != null) && event.isVisible()) {
+                allVisibleEvents.add(event);
+            }
+        }
+        return allVisibleEvents;
+    }
+
     public List<Displayable> getAllVisibleFriends() {
         List<Displayable> allVisibleUsers = new ArrayList<Displayable>();
         for (Long id : mFriendIds) {
             User user = this.getFriendById(id);
-            if (user.isVisible()) {
+            if ((user != null) && user.isVisible()) {
                 allVisibleUsers.add(user);
             }
         }
@@ -207,7 +271,7 @@ public final class Cache {
                 // If not found, check on the server
                 ImmutableUser networkResult;
                 try {
-                    networkResult = mNetworkClient.getFriendInfo(id);
+                    networkResult = mNetworkClient.getUserInfo(id);
                 } catch (SmartMapClientException e) {
                     networkResult = null;
                 }
@@ -270,7 +334,7 @@ public final class Cache {
             // If not found, check on the server
             ImmutableUser networkResult;
             try {
-                networkResult = mNetworkClient.getFriendInfo(id);
+                networkResult = mNetworkClient.getUserInfo(id);
             } catch (SmartMapClientException e) {
                 networkResult = null;
             }
@@ -315,6 +379,16 @@ public final class Cache {
         }
     }
 
+    public void initFriendList(List<Long> newIds) {
+        mFriendIds.clear();
+        mFriendIds.addAll(newIds);
+
+        // Gets all friends
+        for (Long id : newIds) {
+            this.getFriendById(id);
+        }
+    }
+
     public void removeFriend(long id) {
     }
 
@@ -330,17 +404,8 @@ public final class Cache {
         mPendingFriendIds.remove(id);
     }
 
-    public void setFriendList(List<Long> newIds) {
-        mFriendIds.clear();
-        mFriendIds.addAll(newIds);
-
-        // Gets all friends
-        for (Long id : newIds) {
-            this.getFriendById(id);
-        }
-    }
-
     public void updateFriendList(List<ImmutableUser> newFriends) {
+        Log.d(TAG, "updateFriendList !");
         // Delete previous list
         mFriendIds.clear();
 

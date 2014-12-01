@@ -11,7 +11,6 @@ import ch.epfl.smartmap.database.DatabaseHelper;
 import com.facebook.Session;
 
 /**
- * 
  * Lets the user logout from SmartMap. This is a singleton, use LogoutManager.getInstance().
  * 
  * @author SpicyCH
@@ -31,7 +30,6 @@ public final class LogoutManager {
     }
 
     /**
-     * 
      * First shows an alert dialog to the user for confirmation, then logout user from SmartMap.
      * 
      * @author SpicyCH
@@ -73,11 +71,11 @@ public final class LogoutManager {
      * Note: we don't need to destroy the PHP session on the server since we can re-auth with another login on top of
      * the previous one.
      * 
-     * 
      * @author SpicyCH
      */
     private void logout() {
-        // Clear cache and database. Note: the preferences set in the SettingsActivity will be kept since they are local
+        // Clear cache and database. Note: the preferences set in the SettingsActivity will be kept since they
+        // are local
         // to the device.
         DatabaseHelper.getInstance().clearAll();
         SettingsManager.getInstance().clearAll();
@@ -86,9 +84,6 @@ public final class LogoutManager {
         if (Session.getActiveSession() != null) {
             Session.getActiveSession().closeAndClearTokenInformation();
         }
-
-        // Stop the service
-        mContext.stopService(new Intent(mContext, UpdateService.class));
 
         // Go to the SartActivity where the user can log back again with (another) account.
         mContext.startActivity(new Intent(mContext, StartActivity.class));
@@ -99,7 +94,6 @@ public final class LogoutManager {
      * 
      * @param context
      * @return the unique instance
-     * 
      * @author SpicyCH
      */
     public static LogoutManager getInstance() {

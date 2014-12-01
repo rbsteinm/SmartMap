@@ -2,7 +2,6 @@ package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -11,43 +10,47 @@ import java.util.List;
  * @author jfperren
  * @author ritterni
  */
+
 public interface Event extends Displayable {
 
-    final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
-    final String NO_DESCRIPTION = "NO_DESCRIPTION";
-    final long NO_CREATOR_ID = NO_ID;
-    final String NO_NAME = "NO_NAME";
-    final Calendar NOT_A_DATE = GregorianCalendar.getInstance();
+	final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
+	final String NO_DESCRIPTION = "This event currently has no description";
 
-    /**
-     * @return The ID of the user who created the event
-     */
-    long getCreatorId();
+	/**
+	 * @return The ID of the user who created the event
+	 */
+	long getCreatorId();
 
-    /**
-     * @return The event's description
-     */
-    String getDescription();
+	/**
+	 * @return The event's description
+	 */
+	String getDescription();
 
-    /**
-     * @return The date (year, month, day, hour, minute) at which the event ends
-     */
-    Calendar getEndDate();
+	/**
+	 * @return The date (year, month, day, hour, minute) at which the event ends
+	 */
+	Calendar getEndDate();
 
-    String getName();
+	String getName();
 
-    /**
-     * @return The date (year, month, day, hour, minute) at which the event
-     *         starts
-     */
-    Calendar getStartDate();
+	List<Long> getParticipants();
 
-    Type getType();
+	/**
+	 * @return The date (year, month, day, hour, minute) at which the event
+	 *         starts
+	 */
+	Calendar getStartDate();
 
-    void update(ImmutableEvent event);
+	Type getType();
 
-    enum Type {
-        PUBLIC,
-        PRIVATE;
-    }
+	void update(ImmutableEvent event);
+
+	enum Type {
+		PUBLIC, PRIVATE;
+	}
+
+	/**
+	 * @return The name of creator
+	 */
+	String getCreatorName();
 }

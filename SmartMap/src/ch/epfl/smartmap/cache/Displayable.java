@@ -1,10 +1,10 @@
 package ch.epfl.smartmap.cache;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import android.graphics.Bitmap;
 import android.location.Location;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Objects that can be displayed with image, title and subtitle.
@@ -14,50 +14,49 @@ import android.location.Location;
  */
 public interface Displayable extends Stockable {
 
-    // final Bitmap NO_IMAGE = Bitmap.createBitmap(R.drawable.default_event);
-    String NO_TITLE = "";
-    String NO_SUBTITLE = "";
-    Bitmap DEFAULT_IMAGE = null;
+	// final Bitmap NO_IMAGE = Bitmap.createBitmap(R.drawable.default_event);
+	String NO_TITLE = "";
+	String NO_SUBTITLE = "";
+	Bitmap DEFAULT_IMAGE = null;
 
-    /**
-     * @param context
-     *            The application's context, needed to access the memory
-     * @return The object's picture
-     */
-    Bitmap getImage();
+	/**
+	 * @param context
+	 *            The application's context, needed to access the memory
+	 * @return The object's picture
+	 */
+	Bitmap getImage();
 
-    /**
-     * @return Text containing various information (description, last seen,
-     *         etc.)
-     */
-    String getSubtitle();
+	/**
+	 * @return Text containing various information (description, last seen,
+	 *         etc.)
+	 */
+	String getSubtitle();
 
-    /**
-     * @return A name for the panel (e.g. the username, event name, etc.)
-     */
-    String getTitle();
-    
-    String NO_LOCATION_STRING = "Unknown Location";
-    String PROVIDER_NAME = "SmartMapServers";
-    Location NO_LOCATION = new Location(PROVIDER_NAME);
-    MarkerOptions NO_MARKER_OPTIONS = null;
+	/**
+	 * @return A name for the panel (e.g. the username, event name, etc.)
+	 */
+	String getTitle();
 
-    LatLng getLatLng();
+	String NO_LOCATION_STRING = "Unknown Location";
+	String PROVIDER_NAME = "SmartMapServers";
+	Location NO_LOCATION = new Location(PROVIDER_NAME);
+	MarkerOptions NO_MARKER_OPTIONS = null;
 
-    /**
-     * @return GoogleMap Location of the Displayable
-     */
-    Location getLocation();
+	LatLng getLatLng();
 
-    String getLocationString();
+	/**
+	 * @return GoogleMap Location of the Displayable
+	 */
+	Location getLocation();
 
-    /**
-     * @param context
-     *            , the application's context
-     * @return the options to display the marker
-     */
-    MarkerOptions getMarkerOptions();
+	String getLocationString();
 
-    boolean isVisible();
+	/**
+	 * @param context
+	 *            , the application's context
+	 * @return the options to display the marker
+	 */
+	MarkerOptions getMarkerOptions();
 
+	boolean isVisible();
 }

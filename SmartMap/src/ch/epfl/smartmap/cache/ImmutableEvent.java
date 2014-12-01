@@ -26,48 +26,21 @@ public class ImmutableEvent {
     private final List<Long> mParticipants;
 
     /**
-     * This class only represents a container of informations
+     * Constructor, put {@code null} (or {@code User.NO_ID} for id) if you dont want the value to be taken
+     * into account.
      * 
+     * @param id
      * @param name
-     *            The name of the event
      * @param creatorId
-     *            The id of the user who created the event
-     * @param creatorName
-     *            The name of the user who created the event
+     * @param description
      * @param startDate
-     *            The date at which the event starts
      * @param endDate
-     *            The date at which the event ends
      * @param location
-     *            The event's location on the map
+     * @param locationString
+     * @param participants
      */
     public ImmutableEvent(long id, String name, long creatorId, String description, Calendar startDate,
         Calendar endDate, Location location, String locationString, List<Long> participants) {
-
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-        if (creatorId < 0) {
-            throw new IllegalArgumentException("creatorId not valid");
-        }
-        if (description == null) {
-            throw new IllegalArgumentException("description is null");
-        }
-        if (startDate == null) {
-            throw new IllegalArgumentException("startDate is null");
-        }
-        if (endDate == null) {
-            throw new IllegalArgumentException("endDate is null");
-        }
-        if (location == null) {
-            throw new IllegalArgumentException("location is null");
-        }
-        if (locationString == null) {
-            throw new IllegalArgumentException("locationString is null");
-        }
-        if (participants == null) {
-            throw new IllegalArgumentException("participants is null");
-        }
 
         mId = id;
         mName = name;

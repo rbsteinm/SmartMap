@@ -20,31 +20,20 @@ public final class ImmutableUser {
     private final Location mLocation;
     private final Bitmap mImage;
 
-    public final static ImmutableUser NOT_FOUND = null;
-
+    /**
+     * Constructor, put {@code null} (or {@code User.NO_ID} for id) if you dont want the value to be taken
+     * into account.
+     * 
+     * @param id
+     * @param name
+     * @param phoneNumber
+     * @param email
+     * @param location
+     * @param locationString
+     * @param image
+     */
     public ImmutableUser(long id, String name, String phoneNumber, String email, Location location,
         String locationString, Bitmap image) {
-        if (id < 0) {
-            throw new IllegalArgumentException("Cannot create User with negative ID !");
-        }
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-        if (phoneNumber == null) {
-            throw new IllegalArgumentException("phoneNumber is null");
-        }
-        if (email == null) {
-            throw new IllegalArgumentException("email is null");
-        }
-        if (location == null) {
-            throw new IllegalArgumentException("location is null");
-        }
-        if (locationString == null) {
-            throw new IllegalArgumentException("locationString is null");
-        }
-        if (image == null) {
-            throw new IllegalArgumentException("image is null");
-        }
 
         this.mId = id;
         this.mName = name;

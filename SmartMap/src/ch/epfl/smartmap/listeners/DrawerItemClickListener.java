@@ -10,11 +10,13 @@ import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.background.LogoutManager;
 
 /**
- * Listener handling the clics on each element in the left drawer menu
+ * Listener handling the clicks on each element in the left drawer menu.
  * 
  * @author rbsteinm
  */
 public class DrawerItemClickListener implements ListView.OnItemClickListener {
+
+    private final static String TAG = DrawerItemClickListener.class.getSimpleName();
 
     private static final int INDEX_PROFILE = 0;
     private static final int INDEX_FRIENDS = 1;
