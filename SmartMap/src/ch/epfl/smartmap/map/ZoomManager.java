@@ -30,6 +30,10 @@ public interface ZoomManager {
      * @param map
      *            the map on which we want to zoom
      */
-    void zoomOnLocation(LatLng latlng);
+    void zoomWithAnimation(LatLng latlng);
+
+    public void zoomWithoutAnimation(LatLng latLng);
+
+    public void centerOnLocation(LatLng latLng);
 
 }

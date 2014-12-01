@@ -105,7 +105,7 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
      * , com.google.android.gms.maps.GoogleMap)
      */
     @Override
-    public void zoomOnLocation(LatLng latLng) {
+    public void zoomWithAnimation(LatLng latLng) {
 
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, GMAP_ZOOM_LEVEL));
         /*
@@ -113,5 +113,16 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
          * exact address. = 11 represents a town = 6 represents a country We can
          * make some functionality to define the asked precision.
          */
+    }
+
+    @Override
+    public void zoomWithoutAnimation(LatLng latLng) {
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, GMAP_ZOOM_LEVEL));
+    }
+
+    @Override
+    public void centerOnLocation(LatLng latLng) {
+
+        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 }
