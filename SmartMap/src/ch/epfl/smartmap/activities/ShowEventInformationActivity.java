@@ -4,11 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Event;
@@ -21,6 +21,7 @@ import ch.epfl.smartmap.gui.EventsListItemAdapter;
  */
 public class ShowEventInformationActivity extends Activity {
 
+    private static final String TAG = ShowEventInformationActivity.class.getSimpleName();
     private Context mContext;
     private Event mEvent;
     private TextView mEventTitle;
@@ -35,20 +36,29 @@ public class ShowEventInformationActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_show_event_information);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        mEvent = this.getIntent().getParcelableExtra("EVENT");
-
-        if (mEvent == null) {
-            // This activity needs an event to function properly
-            this.finish();
+        if (this.getIntent().getParcelableExtra("event") != null) {
+            mEvent = this.getIntent().getParcelableExtra("event");
+            Log.d(TAG, "City name: " + mEvent.getLocationString());
+            Log.d(TAG, "Country name: " + "UNIMPLEMENTED");
         }
-
-        this.initializeGUI();
+        if (mEvent != null) {
+            this.initializeGUI();
+        }
+        ;
 
     }
 
     public void inviteFriendsToEvent(View v) {
-        Toast.makeText(mContext, "Inviting friends..", Toast.LENGTH_SHORT).show();
+        Intent inviteFriends = new Intent(mContext, InviteFriendsActivity.class);
+        this.startActivityForResult(inviteFriends, 1);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+        this.finish();
     }
 
     @Override
@@ -99,28 +109,19 @@ public class ShowEventInformationActivity extends Activity {
 
         mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
         mEventCreator.setText(this.getString(R.string.show_event_by) + " "
-            + Cache.getInstance().getUserById(mEvent.getCreatorId()).getName());
+                + Cache.getInstance().getUserById(mEvent.getCreatorId()).getName());
 
         mStart = (TextView) this.findViewById(R.id.show_event_info_start);
-        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(),
-            "start"));
+        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "start"));
 
         mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
         mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));
 
         mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
         mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ": "
-            + mEvent.getDescription());
+                + mEvent.getDescription());
 
         mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
         mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
-            this.startActivity(new Intent(this, MainActivity.class));
-        }
-        this.finish();
     }
 }
