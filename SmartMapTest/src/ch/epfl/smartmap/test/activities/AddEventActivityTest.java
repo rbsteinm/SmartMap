@@ -14,130 +14,151 @@ import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertio
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
 /**
- * Tests for AddEventActivity
- * For some reason, espresso sometimes fail to click on a view. Just relaunch
- * the test if this happens.
+ * Tests for AddEventActivity For some reason, espresso sometimes fail to click
+ * on a view. Just relaunch the test if this happens.
  * 
  * @author SpicyCH
  */
-public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
+public class AddEventActivityTest extends
+ActivityInstrumentationTestCase2<AddEventActivity> {
 
-    private AddEventActivity mAddEventActivity;
+	private AddEventActivity mAddEventActivity;
 
-    public AddEventActivityTest() {
-        super(AddEventActivity.class);
-    }
+	public AddEventActivityTest() {
+		super(AddEventActivity.class);
+	}
 
-    // The standard JUnit 3 setUp method run for for every test
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        this.getActivity();
-        mAddEventActivity = this.getActivity();
-    }
+	// The standard JUnit 3 setUp method run for for every test
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		this.getActivity();
+		mAddEventActivity = this.getActivity();
+	}
 
-    public void testCanCreateEventWithGoodFields() {
+	public void testCanCreateEventWithGoodFields() {
 
-        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("TEST_NAME"));
+		onView(withId(R.id.addEventEventName)).perform(
+				ViewActions.typeText("TEST_NAME"));
 
-        mAddEventActivity.runOnUiThread(new Runnable() {
+		mAddEventActivity.runOnUiThread(new Runnable() {
 
-            @Override
-            public void run() {
-                EditText lat = (EditText) mAddEventActivity.findViewById(R.id.addEventLatitude);
-                EditText lon = (EditText) mAddEventActivity.findViewById(R.id.addEventLongitude);
-                lat.setText("1");
-                lon.setText("3");
-            }
+			@Override
+			public void run() {
+				EditText lat = (EditText) mAddEventActivity
+						.findViewById(R.id.addEventLatitude);
+				EditText lon = (EditText) mAddEventActivity
+						.findViewById(R.id.addEventLongitude);
+				lat.setText("1");
+				lon.setText("3");
+			}
 
-        });
+		});
 
-        onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
-        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+		onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
+		onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
 
-        onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
-        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+		onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
+		onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
 
-        onView(withId(R.id.addEventPlaceName)).perform(ViewActions.typeText("TEST_PLACE_NAME"));
+		onView(withId(R.id.addEventPlaceName)).perform(
+				ViewActions.typeText("TEST_PLACE_NAME"));
 
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+		onView(withId(R.id.addEventButtonCreateEvent)).perform(
+				ViewActions.click());
 
-        onView(withId(R.id.addEventDescription)).check(
-            ViewAssertions.matches(org.hamcrest.Matchers.not((ViewMatchers.isDisplayed()))));
+		onView(withId(R.id.addEventDescription)).check(
+				ViewAssertions.matches(org.hamcrest.Matchers.not((ViewMatchers
+						.isDisplayed()))));
 
-    }
+	}
 
-    public void testCannotCreateEventWith1Field() {
-        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("TEST_NAME"));
+	public void testCannotCreateEventWith1Field() {
+		onView(withId(R.id.addEventEventName)).perform(
+				ViewActions.typeText("TEST_NAME"));
 
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+		onView(withId(R.id.addEventButtonCreateEvent)).perform(
+				ViewActions.click());
 
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    }
+		onView(withId(R.id.addEventDescription)).check(
+				ViewAssertions.matches(ViewMatchers.isDisplayed()));
+	}
 
-    public void testCannotCreateEventWith2Field() {
-        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("TEST_NAME"));
+	public void testCannotCreateEventWith2Field() {
+		onView(withId(R.id.addEventEventName)).perform(
+				ViewActions.typeText("TEST_NAME"));
 
-        onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
-        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+		onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
+		onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
 
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+		onView(withId(R.id.addEventButtonCreateEvent)).perform(
+				ViewActions.click());
 
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    }
+		onView(withId(R.id.addEventDescription)).check(
+				ViewAssertions.matches(ViewMatchers.isDisplayed()));
+	}
 
-    public void testCannotCreateEventWith3Field() {
-        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("TEST_NAME"));
+	public void testCannotCreateEventWith3Field() {
+		onView(withId(R.id.addEventEventName)).perform(
+				ViewActions.typeText("TEST_NAME"));
 
-        onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
-        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+		onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
+		onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
 
-        onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
-        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+		onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
+		onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
 
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+		onView(withId(R.id.addEventButtonCreateEvent)).perform(
+				ViewActions.click());
 
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    }
+		onView(withId(R.id.addEventDescription)).check(
+				ViewAssertions.matches(ViewMatchers.isDisplayed()));
+	}
 
-    public void testCannotCreateEventWithoutFields() {
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
-        // If the description is displayed, we are still in AddEventActivity,
-        // hence the event couldn't be created.
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+	public void testCannotCreateEventWithoutFields() {
+		onView(withId(R.id.addEventButtonCreateEvent)).perform(
+				ViewActions.click());
+		// If the description is displayed, we are still in AddEventActivity,
+		// hence the event couldn't be created.
+		onView(withId(R.id.addEventDescription)).check(
+				ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
-    }
+	}
 
-    public void testCannotCreateWithEmptyNameAndGoodOtherFields() {
+	public void testCannotCreateWithEmptyNameAndGoodOtherFields() {
 
-        // Regression test for bug #40
+		// Regression test for bug #40
 
-        Handler myHandler = new Handler();
+		Handler myHandler = new Handler();
 
-        Runnable updateRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // call the activity method that updates the UI
+		Runnable updateRunnable = new Runnable() {
+			@Override
+			public void run() {
+				// call the activity method that updates the UI
 
-                TextView latitude = (TextView) mAddEventActivity.findViewById(R.id.addEventLatitude);
-                TextView longitude = (TextView) mAddEventActivity.findViewById(R.id.addEventLongitude);
+				TextView latitude = (TextView) mAddEventActivity
+						.findViewById(R.id.addEventLatitude);
+				TextView longitude = (TextView) mAddEventActivity
+						.findViewById(R.id.addEventLongitude);
 
-                latitude.setText("1");
-                longitude.setText("2");
-            }
-        };
+				latitude.setText("1");
+				longitude.setText("2");
+			}
+		};
 
-        myHandler.post(updateRunnable);
+		myHandler.post(updateRunnable);
 
-        onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
-        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+		onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
+		onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
 
-        onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
-        onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
+		onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
+		onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
 
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+		onView(withId(R.id.addEventButtonCreateEvent)).perform(
+				ViewActions.click());
 
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+		onView(withId(R.id.addEventDescription)).check(
+				ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
-    }
+	}
 }

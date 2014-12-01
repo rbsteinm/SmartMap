@@ -13,7 +13,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.util.Log;
 import ch.epfl.smartmap.R;
 
 /**
@@ -23,24 +22,46 @@ import ch.epfl.smartmap.R;
  */
 public class CircularMarkerIconMaker implements MarkerIconMaker {
 
-    private Bitmap mMarkerShape;
+    private final Bitmap mMarkerShape;
     private final Context mContext;
+    public static final float CIRCLE_CENTER_INCREMENT = 0.7f;
+    public static final float CIRCLE_RADIUS_INCREMENT = 0.1f;
+    public static final int SCALE_PROFILE_PICTURE_INCREMENT = 34;
+    public static final float SCALE_MARKER = 0.25f;
+    public static final int CENTER_MARKER_SHAPE_INREMENT = -18;
 
     public CircularMarkerIconMaker(Context context) {
         mContext = context;
-    }
-
-    private void setMarkerShape() {
         int idForm = R.drawable.marker_forme;
         mMarkerShape = BitmapFactory.decodeResource(mContext.getResources(), idForm);
-        // mMarkerShape = Bitmap.createScaledBitmap(mMarkerShape, 46, 60, false);
-        // Log.d("MarkerTool", "found form " + idForm);
-
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.map.MarkerIconMaker#getMarkerIcon(android.graphics.Bitmap)
+     */
+    @Override
+    public Bitmap getMarkerIcon(Bitmap profilePicture) {
+
+        profilePicture =
+            Bitmap.createScaledBitmap(profilePicture, mMarkerShape.getWidth()
+                - SCALE_PROFILE_PICTURE_INCREMENT, mMarkerShape.getWidth() - SCALE_PROFILE_PICTURE_INCREMENT,
+                false);
+        Bitmap roundProfile = this.cropProfilePicture(profilePicture, profilePicture.getWidth());
+        Bitmap finalMarker = overlay(mMarkerShape, roundProfile);
+        finalMarker = scaleMarker(finalMarker, SCALE_MARKER);
+        return finalMarker;
+    }
+
+    /**
+     * This function crops the given image in a circle form with the given radius
+     * 
+     * @param profPic
+     * @param radius
+     * @return the cropped image
+     */
     private Bitmap cropProfilePicture(Bitmap profPic, int radius) {
         Paint color = new Paint();
-        // color.setTextSize(35);
         color.setColor(Color.BLACK);
         Bitmap preOut;
 
@@ -53,72 +74,58 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         Bitmap output = Bitmap.createBitmap(preOut.getWidth(), preOut.getHeight(), Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
-        // int color = 0xffa19774;
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, preOut.getWidth(), preOut.getHeight());
 
         paint.setAntiAlias(true); // AntiAliasing smooths out the edges of what is being drawn
         paint.setFilterBitmap(true); // Filtering affects the sampling of bitmaps when they are transformed.
-        paint.setDither(true);// Dithering affects how colors that are higher precision than the device are
-                              // down-sampled
+        paint.setDither(true); // Dithering affects how colors that are higher precision than the device are
+                               // down-sampled
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(Color.parseColor("#BAB399"));
-        canvas.drawCircle((preOut.getWidth() / 2) + 0.7f, (preOut.getHeight() / 2) + 0.7f,
-            (preOut.getWidth() / 2) + 0.1f, paint);
+        canvas.drawCircle((preOut.getWidth() / 2) + CIRCLE_CENTER_INCREMENT, (preOut.getHeight() / 2)
+            + CIRCLE_CENTER_INCREMENT, (preOut.getWidth() / 2) + CIRCLE_RADIUS_INCREMENT, paint);
         paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN)); // crop the image depending on the drawn //
                                                                 // object
         canvas.drawBitmap(preOut, rect, rect, paint);
 
-        Log.d("MAKER TOOL", "crop round");
         return output;
 
     }
 
+    /**
+     * this function combines the center of the second image on the center of the first image
+     * 
+     * @param bmp1
+     * @param bmp2
+     * @return the combined bitmap
+     */
+    public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+
+        int maxWidth = bmp1.getWidth() > bmp2.getWidth() ? bmp1.getWidth() : bmp2.getWidth();
+        int maxHeight = bmp1.getHeight() > bmp2.getHeight() ? bmp1.getHeight() : bmp2.getHeight();
+        Bitmap bmOverlay = Bitmap.createBitmap(maxWidth, maxHeight, bmp1.getConfig());
+        Canvas canvas = new Canvas(bmOverlay);
+        canvas.drawBitmap(bmp1, 0, 0, null);
+        int cx = (bmp1.getWidth() / 2) - (bmp2.getWidth() / 2);
+        int cy = ((bmp1.getHeight() / 2) - (bmp2.getHeight() / 2)) + CENTER_MARKER_SHAPE_INREMENT;
+        canvas.drawBitmap(bmp2, cx, cy, null);
+        return bmOverlay;
+
+    }
+
+    /**
+     * This function scales the given image with the given coefficient
+     * 
+     * @param img
+     * @param coeff
+     * @return the scaled image
+     */
     public static Bitmap scaleMarker(Bitmap img, float coeff) {
         int newWidth = Math.round(coeff * img.getWidth());
         int newHeight = Math.round(coeff * img.getHeight());
         return Bitmap.createScaledBitmap(img, newWidth, newHeight, false);
 
-    }
-
-    // this function combines the center of the second image to the center of the first image
-    public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
-        try {
-            int maxWidth = (bmp1.getWidth() > bmp2.getWidth() ? bmp1.getWidth() : bmp2.getWidth());
-            int maxHeight = (bmp1.getHeight() > bmp2.getHeight() ? bmp1.getHeight() : bmp2.getHeight());
-            Bitmap bmOverlay = Bitmap.createBitmap(maxWidth, maxHeight, bmp1.getConfig());
-            Canvas canvas = new Canvas(bmOverlay);
-            canvas.drawBitmap(bmp1, 0, 0, null);
-            int c_x = (bmp1.getWidth() / 2) - (bmp2.getWidth() / 2);
-            int c_y = (bmp1.getHeight() / 2) - (bmp2.getHeight() / 2) - 18;
-            canvas.drawBitmap(bmp2, c_x, c_y, null);
-            Log.d("MAKER TOOL", "overlay done");
-            // bmOverlay = scaleImage(bmOverlay, 1.2f);
-            return bmOverlay;
-
-        } catch (Exception e) {
-            // TODO: handle exception
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.map.MarkerIconMaker#getMarkerIcon(android.graphics.Bitmap)
-     */
-    @Override
-    public Bitmap getMarkerIcon(Bitmap profilePicture) {
-        // TODO Auto-generated method stub
-        this.setMarkerShape();
-        profilePicture =
-            Bitmap.createScaledBitmap(profilePicture, mMarkerShape.getWidth() - 34,
-                mMarkerShape.getWidth() - 34, false);
-        Bitmap roundProfile = this.cropProfilePicture(profilePicture, profilePicture.getWidth());
-        Bitmap finalMarker = overlay(mMarkerShape, roundProfile);
-        finalMarker = scaleMarker(finalMarker, 0.25f);
-        Log.d("MAKER TOOL", "makeProfileMarker done");
-        return finalMarker;
     }
 
 }

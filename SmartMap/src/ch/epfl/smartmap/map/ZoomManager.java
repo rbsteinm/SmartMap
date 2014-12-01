@@ -13,6 +13,13 @@ import com.google.android.gms.maps.model.Marker;
 public interface ZoomManager {
 
     /**
+     * Center on the specified location, without changing the zoom level
+     * 
+     * @param latLng
+     */
+    void centerOnLocation(LatLng latLng);
+
+    /**
      * Set bound and zoom with regards to all markers positions on the map
      * 
      * @param markers
@@ -34,12 +41,5 @@ public interface ZoomManager {
      * @param latLng
      */
     void zoomWithoutAnimation(LatLng latLng);
-
-    /**
-     * Center on the specified location, without changing the zoom level
-     * 
-     * @param latLng
-     */
-    void centerOnLocation(LatLng latLng);
 
 }
