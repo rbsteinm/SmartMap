@@ -160,17 +160,7 @@ class EventRepositoryTest extends PHPUnit_Extensions_Database_TestCase
         $repo = new EventRepository(self::$doctrine);
 
         // Only events ending in future !
-        $correct = array(new Event(
-            4,
-            3,
-            '2030-11-18 10:30:00',
-            '2030-11-18 12:00:00',
-            6.56186974,
-            46.51895762,
-            'UNIL',
-            'Seminar on usefulness of philosophy',
-            'Of course philosophy is useless !'
-        ));
+        $correct = array(4);
 
         $events = $repo->getEventsInRadius(6.76186181 ,46.81875763, 3735); // 3735 is just before second event
 

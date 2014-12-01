@@ -353,23 +353,15 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
     public function testGetPublicEvents()
     {
-        $participants = array(2, 5, 137);
+        $eventsIds = array(5, 22, 54);
 
         $this->mockRepo
              ->method('getEventsInRadius')
-             ->willReturn(array($this->mValidEvent));
+             ->willReturn($eventsIds);
 
         $this->mockRepo->expects($this->once())
              ->method('getEventsInRadius')
              ->with($this->equalTo(1.02), $this->equalTo(5.23), $this->equalTo(100));
-
-        $this->mockRepo
-             ->method('getEventParticipants')
-             ->willReturn($participants);
-
-        $this->mockRepo->expects($this->once())
-             ->method('getEventParticipants')
-             ->with($this->equalTo($this->mValidEvent->getId()));
 
         $request = new Request($query = array(), $request = array(
             'radius' => '100',
@@ -385,23 +377,10 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
         $response = $controller->getPublicEvents($request);
 
-        $validList = array(array(
-            'id' => $this->mValidEvent->getId(),
-            'creatorId' => $this->mValidEvent->getCreatorId(),
-            'startingDate' => $this->mValidEvent->getStartingDate(),
-            'endingDate' => $this->mValidEvent->getEndingDate(),
-            'longitude' => $this->mValidEvent->getLongitude(),
-            'latitude' => $this->mValidEvent->getLatitude(),
-            'positionName' => $this->mValidEvent->getPositionName(),
-            'name' => $this->mValidEvent->getName(),
-            'description' => $this->mValidEvent->getDescription(),
-            'participants' => $participants
-        ));
-
         $validResponse = array(
             'status' => 'Ok',
             'message' => 'Fetched events.',
-            'events' => $validList
+            'events' => $eventsIds
         );
 
         $this->assertEquals(json_encode($validResponse), $response->getContent());
@@ -535,35 +514,14 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
     public function testGetEventInvitations()
     {
+        $eventsIds = array(5, 7, 9);
         $this->mockRepo
              ->method('getEventInvitations')
-             ->willReturn(array(5, 7, 9));
+             ->willReturn($eventsIds);
 
         $this->mockRepo->expects($this->once())
               ->method('getEventInvitations')
               ->with($this->equalTo(14));
-
-        $this->mockRepo
-             ->method('getEvent')
-             ->will($this->onConsecutiveCalls($this->mValidEvent, $this->mValidEvent, $this->mValidEvent));
-
-        $this->mockRepo->expects($this->exactly(3))
-             ->method('getEvent')
-             ->withConsecutive(
-                 array($this->equalTo(5)),
-                 array($this->equalTo(7)),
-                 array($this->equalTo(9)));
-
-        $this->mockRepo
-            ->method('getEventParticipants')
-            ->will($this->onConsecutiveCalls(array(7, 9), array(1), array()));
-
-        $this->mockRepo->expects($this->exactly(3))
-            ->method('getEventParticipants')
-            ->withConsecutive(
-                array($this->equalTo(5)),
-                array($this->equalTo(7)),
-                array($this->equalTo(9)));
 
         $request = new Request($query = array(), $request = array());
 
@@ -575,36 +533,10 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
         $response = $controller->getEventInvitations($request);
 
-        $event = array(
-            'id' => $this->mValidEvent->getId(),
-            'creatorId' => $this->mValidEvent->getCreatorId(),
-            'startingDate' => $this->mValidEvent->getStartingDate(),
-            'endingDate' => $this->mValidEvent->getEndingDate(),
-            'longitude' => $this->mValidEvent->getLongitude(),
-            'latitude' => $this->mValidEvent->getLatitude(),
-            'positionName' => $this->mValidEvent->getPositionName(),
-            'name' => $this->mValidEvent->getName(),
-            'description' => $this->mValidEvent->getDescription(),
-        );
-
-        $eventsList = array();
-
-        $event1 = $event;
-        $event1['participants'] = array(7, 9);
-        $eventsList[] = $event1;
-
-        $event2 = $event;
-        $event2['participants'] = array(1);
-        $eventsList[] = $event2;
-
-        $event3 = $event;
-        $event3['participants'] = array();
-        $eventsList[] = $event3;
-
         $validResponse = array(
             'status' => 'Ok',
             'message' => 'Fetched events.',
-            'events' => $eventsList
+            'events' => $eventsIds
         );
 
         $this->assertEquals(json_encode($validResponse), $response->getContent());

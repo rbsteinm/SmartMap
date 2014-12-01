@@ -164,30 +164,14 @@ class EventController {
 
         try
         {
-            $events = $this->mRepo->getEventsInRadius($longitude, $latitude, $radius);
+            $eventsIds = $this->mRepo->getEventsInRadius($longitude, $latitude, $radius);
         }
         catch (DatabaseException $e)
         {
             throw new ControlLogicException('Error in getPublicEvents', 2, $e);
         }
 
-        $eventsArray = array();
-
-        foreach ($events as $event)
-        {
-            try
-            {
-                $participants = $this->mRepo->getEventParticipants($event->getId());
-            }
-            catch (DatabaseException $e)
-            {
-                throw new ControlLogicException('Error in getPublicEvents', 2, $e);
-            }
-
-            $eventsArray[] = $this->eventInfoArray($event, $participants);
-        }
-
-        $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventsArray);
+        $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventsIds);
 
         return new JsonResponse($response);
     }
@@ -293,24 +277,13 @@ class EventController {
         try
         {
             $eventsIds = $this->mRepo->getEventInvitations($userId);
-
-            $eventsInfo = array();
-
-            foreach ($eventsIds as $eventId)
-            {
-                $event = $this->mRepo->getEvent($eventId);
-
-                $eventParticipants = $this->mRepo->getEventParticipants($eventId);
-
-                $eventsInfo[] = $this->eventInfoArray($event, $eventParticipants);
-            }
         }
         catch (DatabaseException $e)
         {
             throw new ControlLogicException('Error in getEventInvitations.', 2, $e);
         }
 
-        $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventsInfo);
+        $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventsIds);
 
         return new JsonResponse($response);
     }

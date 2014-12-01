@@ -153,7 +153,7 @@ class EventRepository
     public function getEventsInRadius($longitude, $latitude, $radius)
     {
         // We only send events that are not finished yet.
-        $req = "SELECT  * FROM events WHERE ending_date > NOW()";
+        $req = "SELECT id, longitude, latitude FROM events WHERE ending_date > NOW()";
 
         try
         {
@@ -164,7 +164,7 @@ class EventRepository
             throw new DatabaseException('Error in getEventsInRadius.', 1, $e);
         }
 
-        $events = array();
+        $eventsIds = array();
 
         $lat1 = deg2rad($latitude);
         $long1 = deg2rad($longitude);
@@ -184,28 +184,11 @@ class EventRepository
             $d = self::$EARTH_RADIUS * $c;
 
             if ($d <= $radius) {
-                try {
-                    $event = new Event(
-                        (int) $eventData['id'],
-                        (int) $eventData['creator_id'],
-                        $eventData['starting_date'],
-                        $eventData['ending_date'],
-                        (double) $eventData['longitude'],
-                        (double) $eventData['latitude'],
-                        $eventData['position_name'],
-                        $eventData['name'],
-                        $eventData['description']
-                    );
-                } catch (\InvalidArgumentException $e) {
-                    throw new DatabaseException('Event with invalid state in database with id '
-                        . $eventData['id'] . '.', 1, $e);
-                }
-
-                $events[] = $event;
+                $eventsIds[] = $eventData['id'];
             }
         }
 
-        return $events;
+        return $eventsIds;
     }
 
     /**
