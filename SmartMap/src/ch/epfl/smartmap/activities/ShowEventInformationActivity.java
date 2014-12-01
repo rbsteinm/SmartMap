@@ -54,7 +54,6 @@ public class ShowEventInformationActivity extends Activity {
      * It launches InviteFriendsActivity for a result.
      * 
      * @param v
-     * 
      * @author SpicyCH
      */
     public void inviteFriendsToEvent(View v) {
@@ -116,17 +115,18 @@ public class ShowEventInformationActivity extends Activity {
 
         mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
         mEventCreator.setText(this.getString(R.string.show_event_by) + " "
-                + Cache.getInstance().getUserById(mEvent.getCreatorId()).getName());
+            + Cache.getInstance().getUserById(mEvent.getCreatorId()).getName());
 
         mStart = (TextView) this.findViewById(R.id.show_event_info_start);
-        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "start"));
+        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(),
+            "start"));
 
         mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
         mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));
 
         mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
         mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ": "
-                + mEvent.getDescription());
+            + mEvent.getDescription());
 
         mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
         mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");

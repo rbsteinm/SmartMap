@@ -49,7 +49,7 @@ public class FriendsTab extends ListFragment {
             @Override
             public void onFriendListUpdate() {
                 mFriendList = Cache.getInstance().getAllFriends();
-                ((Activity) FriendsTab.this.mContext).runOnUiThread(new Runnable() {
+                ((Activity) mContext).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         FriendsTab.this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));

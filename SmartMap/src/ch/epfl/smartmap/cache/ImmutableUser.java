@@ -35,13 +35,13 @@ public final class ImmutableUser {
     public ImmutableUser(long id, String name, String phoneNumber, String email, Location location,
         String locationString, Bitmap image) {
 
-        this.mId = id;
-        this.mName = name;
-        this.mPhoneNumber = phoneNumber;
-        this.mEmail = email;
-        this.mLocation = location;
-        this.mLocationString = locationString;
-        this.mImage = image;
+        mId = id;
+        mName = name;
+        mPhoneNumber = phoneNumber;
+        mEmail = email;
+        mLocation = location;
+        mLocationString = locationString;
+        mImage = image;
     }
 
     public String getEmail() {
