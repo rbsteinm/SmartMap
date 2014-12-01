@@ -15,25 +15,31 @@ public interface ZoomManager {
     /**
      * Set bound and zoom with regards to all markers positions on the map
      * 
-     * @param map
-     *            the map on which we want to zoom
      * @param markers
      *            the list of markers to take in account
      */
     void zoomAccordingToMarkers(final List<Marker> markers);
 
     /**
-     * Zoom on the specified location
+     * Zoom on the specified location, with animation
      * 
      * @param location
      *            the location where we want to zoom
-     * @param map
-     *            the map on which we want to zoom
      */
     void zoomWithAnimation(LatLng latlng);
 
-    public void zoomWithoutAnimation(LatLng latLng);
+    /**
+     * Zoom on the specified location, without changing the zoom level
+     * 
+     * @param latLng
+     */
+    void zoomWithoutAnimation(LatLng latLng);
 
-    public void centerOnLocation(LatLng latLng);
+    /**
+     * Center on the specified location, without changing the zoom level
+     * 
+     * @param latLng
+     */
+    void centerOnLocation(LatLng latLng);
 
 }

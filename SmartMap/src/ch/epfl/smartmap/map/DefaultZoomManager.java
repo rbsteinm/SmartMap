@@ -115,14 +115,21 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
          */
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.map.ZoomManager#zoomWithoutAnimation(com.google.android.gms.maps.model.LatLng)
+     */
     @Override
     public void zoomWithoutAnimation(LatLng latLng) {
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, GMAP_ZOOM_LEVEL));
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.map.ZoomManager#centerOnLocation(com.google.android.gms.maps.model.LatLng)
+     */
     @Override
     public void centerOnLocation(LatLng latLng) {
-
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 }
