@@ -5,6 +5,9 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.gui.Utils;
 
 /**
  * Describes a generic user of the app
@@ -20,9 +23,7 @@ public interface User extends Displayable {
 
 	Calendar NO_LAST_SEEN = GregorianCalendar.getInstance(TimeZone.getDefault());
 
-	// Bitmap NO_IMAGE = Bitmap.(Utils.sContext.getResources()
-	// .getDrawable(R.drawable.ic_default_user)).getBitmap();
-	Bitmap NO_IMAGE = null;
+	Bitmap NO_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(), R.drawable.ic_default_user);
 
 	User NOBODY = null;
 

@@ -68,8 +68,6 @@ public class AddEventActivity extends FragmentActivity {
 	private Activity mActivity;
 	private EditText mDescription;
 	private EditText mEventName;
-	private EditText mLatitude;
-	private EditText mLongitude;
 	private final int mNewEventId = 0;
 	private EditText mPickEndDate;
 	private EditText mPickEndTime;
@@ -127,8 +125,6 @@ public class AddEventActivity extends FragmentActivity {
 					    .makeText(mContext,
 					        this.getString(R.string.add_event_toast_couldnt_retrieve_location),
 					        Toast.LENGTH_LONG).show();
-					mLatitude.setText("");
-					mLongitude.setText("");
 					mPlaceName.setText("");
 				}
 				break;
@@ -234,16 +230,16 @@ public class AddEventActivity extends FragmentActivity {
 	private void createEvent() {
 
 		if (!this.isValidDate(mPickEndDate.getText().toString())
-		    || !this.isValidTime(mPickEndTime.getText().toString())
-		    || mLatitude.getText().toString().equals("") || mLongitude.getText().toString().equals("")
+		    || !this.isValidTime(mPickEndTime.getText().toString()) || (mEventPosition.latitude == 0.0)
+		    || (mEventPosition.longitude == 0.0)
 		    || ((mPlaceName.getText().toString() == null) || mEventName.getText().toString().isEmpty())) {
 			Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set),
 			    Toast.LENGTH_SHORT).show();
 			Log.d(TAG, "Couldn't create a new event because not all fields have been set.\n" + "end date: "
 			    + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
 			    + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
-			    + mPlaceName.getText().toString() + "\n" + "event lat/long: "
-			    + mLatitude.getText().toString() + "/" + mLongitude.getText().toString());
+			    + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
+			    + mEventPosition.longitude);
 		} else {
 			GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
 			    mPickStartTime.getText().toString());
@@ -332,9 +328,6 @@ public class AddEventActivity extends FragmentActivity {
 		mPickEndDate = (EditText) this.findViewById(R.id.addEventEndDate);
 		mDescription = (EditText) this.findViewById(R.id.addEventDescription);
 		mPlaceName = (EditText) this.findViewById(R.id.addEventPlaceName);
-
-		mLongitude.setEnabled(false);
-		mLatitude.setEnabled(false);
 
 		mTextChangedListener = new TextWatcher() {
 
