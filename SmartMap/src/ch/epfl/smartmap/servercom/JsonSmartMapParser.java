@@ -444,7 +444,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         location.setLongitude(longitude);
         ImmutableEvent event =
             new ImmutableEvent(id, name, creatorId, description, startingDate, endDate, location,
-                description, new ArrayList<Long>());
+                positionName, new ArrayList<Long>());
 
         return event;
     }

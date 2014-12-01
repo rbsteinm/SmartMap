@@ -15,6 +15,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
@@ -61,8 +62,8 @@ public class UserInformationActivity extends Activity {
     protected void onResume() {
         super.onResume();
         // Get User & Database
-        mUser = this.getIntent().getParcelableExtra("USER");
-        mCacheDB = DatabaseHelper.getInstance();
+        mUser = Cache.getInstance().getUserById(this.getIntent().getLongExtra("USER", User.NO_ID));
+
         // Set Informations
         mNameView.setText(mUser.getName());
         mInfosView.setText(mUser.getSubtitle());

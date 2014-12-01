@@ -307,6 +307,7 @@ public class MainActivity extends FragmentActivity implements CacheListener {
             public void run() {
                 mFriendMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
                     .getAllVisibleFriends());
+                MainActivity.this.updateItemMenu();
             }
         });
     }
@@ -326,6 +327,7 @@ public class MainActivity extends FragmentActivity implements CacheListener {
             public void run() {
                 mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
                     .getAllVisibleFriends());
+                MainActivity.this.updateItemMenu();
             }
         });
     }
@@ -343,9 +345,9 @@ public class MainActivity extends FragmentActivity implements CacheListener {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
                     .getAllVisibleFriends());
+                MainActivity.this.updateItemMenu();
             }
         });
     }
@@ -355,9 +357,9 @@ public class MainActivity extends FragmentActivity implements CacheListener {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
                     .getAllVisibleFriends());
+                MainActivity.this.updateItemMenu();
             }
         });
     }
@@ -451,7 +453,7 @@ public class MainActivity extends FragmentActivity implements CacheListener {
     public void setItemMenu(final Displayable item) {
         final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
         // Closes panel and change only if panel could close
-        if ((mSearchPanel.close() || mSearchPanel.isClosed()) && !item.equals(mCurrentItem)) {
+        if (mSearchPanel.close() || mSearchPanel.isClosed()) {
             // Set visibility of MenuItems
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).getActionView().clearFocus();
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).collapseActionView();
@@ -514,6 +516,15 @@ public class MainActivity extends FragmentActivity implements CacheListener {
             actionBar.setSubtitle(null);
             actionBar.setIcon(R.drawable.ic_launcher);
             mMenuTheme = MenuTheme.SEARCH;
+        }
+    }
+
+    public void updateItemMenu() {
+        if (mMenuTheme == MenuTheme.ITEM) {
+            ActionBar actionBar = this.getActionBar();
+            actionBar.setTitle(mCurrentItem.getTitle());
+            actionBar.setSubtitle(mCurrentItem.getSubtitle());
+            actionBar.setIcon(new BitmapDrawable(this.getResources(), mCurrentItem.getImage()));
         }
     }
 
