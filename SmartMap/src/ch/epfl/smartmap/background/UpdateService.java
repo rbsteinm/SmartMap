@@ -74,6 +74,21 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
             if (mFriendsPosEnabled) {
                 Log.d("SERVICE", "friendposupdate");
                 new AsyncFriendsPos().execute();
+
+                (new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... args0) {
+                        Log.d("SERVICE", "AsyncFriendPos");
+                        try {
+                            List<ImmutableUser> friendsWithNewLocations = mClient.listFriendsPos();
+                            Cache.getInstance().updateFriendList(friendsWithNewLocations);
+                        } catch (SmartMapClientException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                }).execute();
+
                 mHandler.postDelayed(this, POS_UPDATE_DELAY);
             }
         }

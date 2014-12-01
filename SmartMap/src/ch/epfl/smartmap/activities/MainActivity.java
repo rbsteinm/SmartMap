@@ -82,9 +82,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     private DefaultZoomManager mMapZoomer;
     private SupportMapFragment mFragmentMap;
 
-    private CacheListener mMarkerUpdateListener;
-    private CacheListener mCurrentItemListener;
-
     private Menu mMenu;
     private MenuTheme mMenuTheme;
     private Displayable mCurrentItem;

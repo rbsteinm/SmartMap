@@ -16,8 +16,8 @@
       <Entity type="Class">
         <Name>Stranger</Name>
         <Access>Public</Access>
-        <Location left="559" top="1074" />
-        <Size width="190" height="145" />
+        <Location left="559" top="1162" />
+        <Size width="190" height="162" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private List&lt;UserListener&gt; listeners</Member>
         <Member type="Field">private long mId</Member>
@@ -28,7 +28,7 @@
       <Entity type="Class">
         <Name>PublicEvent</Name>
         <Access>Public</Access>
-        <Location left="1026" top="1074" />
+        <Location left="1018" top="1159" />
         <Size width="226" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private List&lt;EventListener&gt; listeners</Member>
@@ -38,7 +38,7 @@
       <Entity type="Class">
         <Name>ImmutableEvent</Name>
         <Access>Public</Access>
-        <Location left="1420" top="895" />
+        <Location left="1420" top="928" />
         <Size width="194" height="77" />
         <Collapsed>True</Collapsed>
         <Modifier>None</Modifier>
@@ -46,7 +46,7 @@
       <Entity type="Class">
         <Name>OnEventListener</Name>
         <Access>Public</Access>
-        <Location left="891" top="895" />
+        <Location left="891" top="928" />
         <Size width="190" height="77" />
         <Collapsed>True</Collapsed>
         <Modifier>None</Modifier>
@@ -156,7 +156,7 @@
       <Entity type="Class">
         <Name>Friend</Name>
         <Access>Public</Access>
-        <Location left="298" top="1074" />
+        <Location left="306" top="1162" />
         <Size width="208" height="196" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private List&lt;UserListener&gt; listeners</Member>
@@ -177,7 +177,7 @@
       <Entity type="Class">
         <Name>Self</Name>
         <Access>Public</Access>
-        <Location left="40" top="1074" />
+        <Location left="48" top="1162" />
         <Size width="205" height="94" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private List&lt;UserObserver&gt; listeners</Member>
@@ -197,18 +197,20 @@
         <Name>User</Name>
         <Access>Public</Access>
         <Location left="267" top="559" />
-        <Size width="268" height="314" />
+        <Size width="268" height="332" />
         <Collapsed>False</Collapsed>
         <Member type="Field">static final Bitmap DEFAULT_IMAGE</Member>
         <Member type="Field">static final String NO_EMAIL</Member>
         <Member type="Field">static final String NO_NAME</Member>
         <Member type="Field">static final String NO_PHONE_NUMER</Member>
         <Member type="Field">static final User NOBODY</Member>
+        <Member type="Method">void addUserListener(UserListener newListener)</Member>
         <Member type="Method">void getEmail()</Member>
         <Member type="Method">void getLastSeen()</Member>
         <Member type="Method">void getName()</Member>
         <Member type="Method">void getPhoneNumber()</Member>
         <Member type="Method">User.Type getUserType()</Member>
+        <Member type="Method">void removeUserListener(UserListener oldListener)</Member>
         <Member type="Method">void setEmail(String newEmail)</Member>
         <Member type="Method">void setName(String newName)</Member>
         <Member type="Method">void setPhoneNumber(String newPhoneNumber)</Member>
@@ -226,20 +228,22 @@
         <Name>Event</Name>
         <Access>Public</Access>
         <Location left="1104" top="558" />
-        <Size width="292" height="383" />
+        <Size width="292" height="417" />
         <Collapsed>False</Collapsed>
-        <Member type="Field">static final List&lt;Long&gt; NO_PARTICIPANTS</Member>
-        <Member type="Field">static final String NO_DESCRIPTION</Member>
         <Member type="Field">static final long NO_CREATOR</Member>
+        <Member type="Field">static final String NO_DESCRIPTION</Member>
         <Member type="Field">static final String NO_NAME</Member>
+        <Member type="Field">static final List&lt;Long&gt; NO_PARTICIPANTS</Member>
         <Member type="Field">static final Calendar NOT_A_DATE</Member>
+        <Member type="Method">void addEventListener(EventListener newListener)</Member>
         <Member type="Method">void addParticipant(long id)</Member>
         <Member type="Method">long getCreatorId()</Member>
         <Member type="Method">String getDescription()</Member>
         <Member type="Method">Calendar getEndDate()</Member>
-        <Member type="Method">Calendar getStartDate()</Member>
         <Member type="Method">String getName()</Member>
+        <Member type="Method">Calendar getStartDate()</Member>
         <Member type="Method">Event.Type getType()</Member>
+        <Member type="Method">void removeEventListener(EventListener oldListener)</Member>
         <Member type="Method">void removeParticipant(long id)</Member>
         <Member type="Method">void setCreatorId(long id)</Member>
         <Member type="Method">void setDescription(String description)</Member>
@@ -250,7 +254,7 @@
       <Entity type="Class">
         <Name>PrivateEvent</Name>
         <Access>Public</Access>
-        <Location left="1307" top="1074" />
+        <Location left="1299" top="1159" />
         <Size width="237" height="111" />
         <Collapsed>False</Collapsed>
         <Member type="Field">private List&lt;EventListener&gt; listeners</Member>
@@ -359,17 +363,25 @@
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
         <BendPoint relativeToStartShape="True">
-          <X>401</X>
-          <Y>1045</Y>
+          <X>409</X>
+          <Y>1133</Y>
         </BendPoint>
       </Relationship>
       <Relationship type="Realization" first="1" second="19">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>408</X>
+          <Y>916</Y>
+        </BendPoint>
       </Relationship>
       <Relationship type="Realization" first="17" second="19">
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>408</X>
+          <Y>916</Y>
+        </BendPoint>
       </Relationship>
       <Relationship type="Association" first="13" second="17">
         <Label>
@@ -377,12 +389,12 @@
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
-          <X>10</X>
-          <Y>912</Y>
+          <X>11</X>
+          <Y>984</Y>
         </BendPoint>
         <BendPoint relativeToStartShape="False">
-          <X>10</X>
-          <Y>1135</Y>
+          <X>18</X>
+          <Y>1223</Y>
         </BendPoint>
         <Direction>Unidirectional</Direction>
         <AssociationType>Aggregation</AssociationType>
@@ -394,11 +406,11 @@
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
           <X>273</X>
-          <Y>912</Y>
+          <Y>984</Y>
         </BendPoint>
         <BendPoint relativeToStartShape="False">
-          <X>273</X>
-          <Y>1136</Y>
+          <X>281</X>
+          <Y>1224</Y>
         </BendPoint>
         <Direction>Unidirectional</Direction>
         <AssociationType>Aggregation</AssociationType>
@@ -409,12 +421,12 @@
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
-          <X>531</X>
-          <Y>912</Y>
+          <X>530</X>
+          <Y>984</Y>
         </BendPoint>
         <BendPoint relativeToStartShape="False">
           <X>531</X>
-          <Y>1136</Y>
+          <Y>1224</Y>
         </BendPoint>
         <Direction>Unidirectional</Direction>
         <AssociationType>Aggregation</AssociationType>
@@ -444,7 +456,7 @@
         </BendPoint>
         <BendPoint relativeToStartShape="False">
           <X>784</X>
-          <Y>1202</Y>
+          <Y>1290</Y>
         </BendPoint>
       </Relationship>
       <Relationship type="Dependency" first="0" second="15">
@@ -453,12 +465,12 @@
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
-          <X>784</X>
-          <Y>850</Y>
+          <X>785</X>
+          <Y>852</Y>
         </BendPoint>
         <BendPoint relativeToStartShape="False">
-          <X>532</X>
-          <Y>1256</Y>
+          <X>540</X>
+          <Y>1344</Y>
         </BendPoint>
       </Relationship>
       <Relationship type="Dependency" first="21" second="20">
@@ -536,11 +548,11 @@
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
           <X>986</X>
-          <Y>979</Y>
+          <Y>1066</Y>
         </BendPoint>
         <BendPoint relativeToStartShape="False">
-          <X>972</X>
-          <Y>1137</Y>
+          <X>964</X>
+          <Y>1222</Y>
         </BendPoint>
         <Direction>Unidirectional</Direction>
         <AssociationType>Aggregation</AssociationType>
@@ -551,12 +563,12 @@
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
-          <X>1279</X>
-          <Y>979</Y>
+          <X>1271</X>
+          <Y>1066</Y>
         </BendPoint>
         <BendPoint relativeToStartShape="False">
-          <X>1279</X>
-          <Y>1135</Y>
+          <X>1271</X>
+          <Y>1220</Y>
         </BendPoint>
         <Direction>Unidirectional</Direction>
         <AssociationType>Aggregation</AssociationType>
@@ -565,12 +577,12 @@
         <StartOrientation>Vertical</StartOrientation>
         <EndOrientation>Vertical</EndOrientation>
         <BendPoint relativeToStartShape="True">
-          <X>1129</X>
-          <Y>1033</Y>
+          <X>1121</X>
+          <Y>1118</Y>
         </BendPoint>
         <BendPoint relativeToStartShape="False">
           <X>1250</X>
-          <Y>1033</Y>
+          <Y>1067</Y>
         </BendPoint>
       </Relationship>
       <Relationship type="Realization" first="22" second="21">
@@ -578,7 +590,7 @@
         <EndOrientation>Vertical</EndOrientation>
         <BendPoint relativeToStartShape="False">
           <X>1250</X>
-          <Y>1017</Y>
+          <Y>1051</Y>
         </BendPoint>
       </Relationship>
       <Relationship type="Dependency" first="3" second="22">
@@ -588,11 +600,11 @@
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
           <X>1639</X>
-          <Y>917</Y>
+          <Y>951</Y>
         </BendPoint>
         <BendPoint relativeToStartShape="False">
-          <X>1594</X>
-          <Y>1170</Y>
+          <X>1582</X>
+          <Y>1254</Y>
         </BendPoint>
       </Relationship>
       <Relationship type="Dependency" first="3" second="2">
@@ -601,12 +613,12 @@
         <StartOrientation>Horizontal</StartOrientation>
         <EndOrientation>Horizontal</EndOrientation>
         <BendPoint relativeToStartShape="True">
-          <X>1639</X>
-          <Y>1219</Y>
+          <X>1638</X>
+          <Y>1330</Y>
         </BendPoint>
         <BendPoint relativeToStartShape="False">
-          <X>1277</X>
-          <Y>1170</Y>
+          <X>1269</X>
+          <Y>1255</Y>
         </BendPoint>
       </Relationship>
     </Relationships>
