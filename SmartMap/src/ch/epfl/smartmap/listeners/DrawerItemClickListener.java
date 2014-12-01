@@ -7,6 +7,7 @@ import android.widget.ListView;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.SettingsActivity;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
+import ch.epfl.smartmap.background.LogoutManager;
 
 /**
  * Listener handling the clics on each element in the left drawer menu
@@ -42,6 +43,8 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
                 view.getContext().startActivity(new Intent(view.getContext(), SettingsActivity.class));
                 break;
             case INDEX_LOGOUT:
+                LogoutManager.initialize(parent.getContext());
+                LogoutManager.getInstance().showConfirmationThenLogout();
                 break;
             default:
                 break;
