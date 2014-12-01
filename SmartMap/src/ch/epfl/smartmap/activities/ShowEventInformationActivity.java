@@ -38,7 +38,8 @@ public class ShowEventInformationActivity extends Activity {
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
         if (this.getIntent().getParcelableExtra("event") != null) {
-            mEvent = this.getIntent().getParcelableExtra("event");
+            long eventId = this.getIntent().getParcelableExtra("EVENT");
+            mEvent = Cache.getInstance().getEventById(eventId);
             Log.d(TAG, "City name: " + mEvent.getLocationString());
             Log.d(TAG, "Country name: " + "UNIMPLEMENTED");
         }
