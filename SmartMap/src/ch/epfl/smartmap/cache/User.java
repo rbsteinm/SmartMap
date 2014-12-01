@@ -23,8 +23,6 @@ public interface User extends Displayable {
 
 	Calendar NO_LAST_SEEN = GregorianCalendar.getInstance(TimeZone.getDefault());
 
-	// Bitmap NO_IMAGE = Bitmap.(Utils.sContext.getResources()
-	// .getDrawable(R.drawable.ic_default_user)).getBitmap();
 	Bitmap NO_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(), R.drawable.ic_default_user);
 
 	User NOBODY = null;
