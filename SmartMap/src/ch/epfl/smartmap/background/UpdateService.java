@@ -62,8 +62,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private LocationManager mLocManager;
     private boolean mFriendsPosEnabled = true;
     private boolean mOwnPosEnabled = true;
-    private boolean isFriendIDListRetrieved = false;
-    private final boolean isDatabaseInitialized = false;
     private DatabaseHelper mHelper;
     private SettingsManager mManager;
     private Geocoder mGeocoder;
@@ -74,9 +72,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         public void run() {
             if (mFriendsPosEnabled) {
-                if (isFriendIDListRetrieved) {
-                    new AsyncFriendsPos().execute();
-                }
+                Log.d("SERVICE", "friendposupdate");
+                new AsyncFriendsPos().execute();
                 mHandler.postDelayed(this, POS_UPDATE_DELAY);
             }
         }
@@ -184,14 +181,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         }
     }
 
-    private void showAcceptedNotif(User user) {
-        Notifications.acceptedFriendNotification(this, user);
-    }
-
-    private void showFriendNotif(long id) {
-        Notifications.newFriendNotification(this, Cache.getInstance().getUserById(id));
-    }
-
     /**
      * AsyncTask to accept friend requests
      * 
@@ -238,6 +227,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private class AsyncFriendsPos extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... args0) {
+            Log.d("SERVICE", "AsyncFriendPos");
             try {
                 List<ImmutableUser> friendsWithNewLocations = mClient.listFriendsPos();
                 Cache.getInstance().updateFriendList(friendsWithNewLocations);
