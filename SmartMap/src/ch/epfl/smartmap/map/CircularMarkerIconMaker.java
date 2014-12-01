@@ -33,13 +33,14 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     private void setMarkerShape() {
         int idForm = R.drawable.marker_forme;
         mMarkerShape = BitmapFactory.decodeResource(mContext.getResources(), idForm);
-        mMarkerShape = Bitmap.createScaledBitmap(mMarkerShape, 46, 60, false);
-        Log.d("MarkerTool", "found form " + idForm);
+        // mMarkerShape = Bitmap.createScaledBitmap(mMarkerShape, 46, 60, false);
+        // Log.d("MarkerTool", "found form " + idForm);
 
     }
 
     private Bitmap cropProfilePicture(Bitmap profPic, int radius) {
         Paint color = new Paint();
+        // color.setTextSize(35);
         color.setColor(Color.BLACK);
         Bitmap preOut;
 
@@ -73,7 +74,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
 
     }
 
-    private Bitmap scaleMarker(Bitmap img, float coeff) {
+    public static Bitmap scaleMarker(Bitmap img, float coeff) {
         int newWidth = Math.round(coeff * img.getWidth());
         int newHeight = Math.round(coeff * img.getHeight());
         return Bitmap.createScaledBitmap(img, newWidth, newHeight, false);
@@ -81,15 +82,15 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     }
 
     // this function combines the center of the second image to the center of the first image
-    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+    public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
         try {
             int maxWidth = (bmp1.getWidth() > bmp2.getWidth() ? bmp1.getWidth() : bmp2.getWidth());
             int maxHeight = (bmp1.getHeight() > bmp2.getHeight() ? bmp1.getHeight() : bmp2.getHeight());
             Bitmap bmOverlay = Bitmap.createBitmap(maxWidth, maxHeight, bmp1.getConfig());
             Canvas canvas = new Canvas(bmOverlay);
             canvas.drawBitmap(bmp1, 0, 0, null);
-            int c_x = (bmp1.getWidth() / 2) - (bmp2.getWidth() / 2) - 2;
-            int c_y = (bmp1.getHeight() / 2) - (bmp2.getHeight() / 2) - 6;
+            int c_x = (bmp1.getWidth() / 2) - (bmp2.getWidth() / 2);
+            int c_y = (bmp1.getHeight() / 2) - (bmp2.getHeight() / 2) - 18;
             canvas.drawBitmap(bmp2, c_x, c_y, null);
             Log.d("MAKER TOOL", "overlay done");
             // bmOverlay = scaleImage(bmOverlay, 1.2f);
@@ -111,10 +112,11 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         // TODO Auto-generated method stub
         this.setMarkerShape();
         profilePicture =
-            Bitmap.createScaledBitmap(profilePicture, mMarkerShape.getWidth() - 12,
-                mMarkerShape.getWidth() - 12, false);
+            Bitmap.createScaledBitmap(profilePicture, mMarkerShape.getWidth() - 34,
+                mMarkerShape.getWidth() - 34, false);
         Bitmap roundProfile = this.cropProfilePicture(profilePicture, profilePicture.getWidth());
-        Bitmap finalMarker = this.scaleMarker(this.overlay(mMarkerShape, roundProfile), 1.7f);
+        Bitmap finalMarker = overlay(mMarkerShape, roundProfile);
+        finalMarker = scaleMarker(finalMarker, 0.25f);
         Log.d("MAKER TOOL", "makeProfileMarker done");
         return finalMarker;
     }
