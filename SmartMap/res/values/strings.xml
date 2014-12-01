@@ -119,6 +119,12 @@
     <string name="add_event_toast_couldnt_retrieve_location_name">Sorry, couldn\'t retrieve the name of your event\'s place. Please specify it manually.</string>
     <string name="add_event_toast_indication_long_click_map_to_create_event">Long click the map at the location of your event</string>
 
+    <!-- InviteFriendsActivity -->
+    <string name="title_activity_invite_friends">Select friends</string>
+    <string name="invite_friend_send_button">Invite</string>
+    <string name="invite_friends_success">Invitations sent!</string>
+    <string name="invite_friends_no_items_selected">No invitations sent! Did you select any friends?</string>
+
     <!-- FacebookFragment -->
     <string name="fb_fragment_toast_cannot_connect_to_smartmap_server">Failed to log in to the SmartMap server</string>
     <string name="fb_fragment_toast_cannot_connect_to_internet">Your internet connection seems down. Please try again!</string>
