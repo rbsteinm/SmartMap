@@ -141,13 +141,13 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     @Override
     public void onInvitationStatusUpdate(long userID, int newStatus) {
         // if the updated notification is among the pending ones
-        if (mInviterIds.contains(userID)) {
-            if (newStatus == Invitation.ACCEPTED) {
-                new AsyncAcceptFriends().execute(userID);
-            } else if (newStatus == Invitation.REFUSED) {
-                new AsyncDeclineFriends().execute(userID);
-            }
+        // if (mInviterIds.contains(userID)) {
+        if (newStatus == Invitation.ACCEPTED) {
+            new AsyncAcceptFriends().execute(userID);
+        } else if (newStatus == Invitation.REFUSED) {
+            new AsyncDeclineFriends().execute(userID);
         }
+        // }
     }
 
     @Override

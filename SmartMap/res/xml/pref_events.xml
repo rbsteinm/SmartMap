@@ -2,12 +2,12 @@
 
     <CheckBoxPreference
         android:defaultValue="true"
-        android:key="events_show_public"
+        android:key="@string/settings_key_events_show_public"
         android:title="@string/pref_title_show_public_events" />
     
     <CheckBoxPreference
         android:defaultValue="true"
-        android:key="events_show_private"
+        android:key="@string/settings_key_events_show_private"
         android:title="@string/pref_title_show_private_events" />
 
 </PreferenceScreen>

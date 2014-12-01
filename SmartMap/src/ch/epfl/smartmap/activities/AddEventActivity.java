@@ -137,15 +137,18 @@ public class AddEventActivity extends FragmentActivity {
         if (!this.isValidDate(mPickEndDate.getText().toString())
             || !this.isValidTime(mPickEndTime.getText().toString()) || (mEventPosition.latitude == 0.0)
             || (mEventPosition.longitude == 0.0)
-            || ((mPlaceName.getText().toString() == null) || mEventName.getText().toString().isEmpty())) {
+            || ("".equals(mPlaceName.getText().toString()) || "".equals(mEventName.getText().toString()))) {
+
             Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set),
                 Toast.LENGTH_SHORT).show();
+
             Log.d(TAG, "Couldn't create a new event because not all fields have been set.\n" + "end date: "
                 + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
                 + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
                 + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
                 + mEventPosition.longitude);
         } else {
+
             GregorianCalendar startDate =
                 this.getDateFromTextFormat(mPickStartDate.getText().toString(), mPickStartTime.getText()
                     .toString());
@@ -160,7 +163,7 @@ public class AddEventActivity extends FragmentActivity {
 
             ImmutableEvent ev =
                 new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), setMng.getUserID(),
-                    mDescription.getText().toString(), endDate, endDate, location, mPlaceName.getText()
+                    mDescription.getText().toString(), startDate, endDate, location, mPlaceName.getText()
                         .toString(), PublicEvent.NO_PARTICIPANTS);
 
             // TODO Create the event on our server and set the cache accordingly
@@ -172,7 +175,7 @@ public class AddEventActivity extends FragmentActivity {
                         try {
                             long id = NetworkSmartMapClient.getInstance().createPublicEvent(params[0]);
                             Cache.getInstance().addMyEvent(id);
-                            return true;
+                            return (id > 0);
                         } catch (SmartMapClientException e) {
                             Log.e(TAG, e.getMessage());
                             return false;
@@ -468,9 +471,7 @@ public class AddEventActivity extends FragmentActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (!addresses.isEmpty()) {
-            cityName = addresses.get(0).getLocality();
-        }
+        cityName = addresses.get(0).getLocality();
 
         if ((cityName != null) && !cityName.equals("")) {
             mPlaceName.setText(cityName);

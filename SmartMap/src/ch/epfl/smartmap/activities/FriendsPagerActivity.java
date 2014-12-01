@@ -32,9 +32,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Makes the logo clickable (clicking it returns to previous activity)
-        // getActionBar().setDisplayHomeAsUpEnabled(true);
-
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_friends_pager);
 
