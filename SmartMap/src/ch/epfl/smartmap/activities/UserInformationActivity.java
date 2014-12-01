@@ -101,6 +101,14 @@ public class UserInformationActivity extends Activity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+        this.finish();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.user_information, menu);
@@ -195,13 +203,5 @@ public class UserInformationActivity extends Activity {
             Toast.makeText(UserInformationActivity.this, confirmString, Toast.LENGTH_LONG).show();
         }
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
-            this.startActivity(new Intent(this, MainActivity.class));
-        }
-        this.finish();
     }
 }

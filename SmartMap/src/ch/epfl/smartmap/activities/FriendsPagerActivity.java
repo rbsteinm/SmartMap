@@ -86,6 +86,14 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     }
 
     @Override
+    public void onBackPressed() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+        this.finish();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.pager, menu);
@@ -136,14 +144,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     public void startAddFriendActivity(MenuItem menu) {
         Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
         this.startActivity(displayActivityIntent);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
-            this.startActivity(new Intent(this, MainActivity.class));
-        }
-        this.finish();
     }
 
 }

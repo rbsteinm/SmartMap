@@ -89,12 +89,12 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         private ImageView mPicture;
         private long mUserId;
 
-        public TextView getName() {
-            return mName;
-        }
-
         public TextView getLastSeen() {
             return mLastSeen;
+        }
+
+        public TextView getName() {
+            return mName;
         }
 
         public ImageView getPicture() {
@@ -105,12 +105,12 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
             return mUserId;
         }
 
-        public void setName(TextView name) {
-            mName = name;
-        }
-
         public void setLastSeen(TextView lastSeen) {
             mLastSeen = lastSeen;
+        }
+
+        public void setName(TextView name) {
+            mName = name;
         }
 
         public void setPicture(ImageView picture) {

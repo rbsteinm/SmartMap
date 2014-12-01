@@ -60,6 +60,59 @@ public class SetLocationActivity extends FragmentActivity {
         this.displayMap();
     }
 
+    /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+            // not available
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+            dialog.show();
+        } else {
+            // Google Play Services are available.
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            mFragmentMap =
+                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.set_location_map);
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = mFragmentMap.getMap();
+            mGoogleMap.setMyLocationEnabled(true);
+
+            // Get my position from SettingsManager
+            mMyPosition =
+                new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
+                    .getInstance().getLocation().getLongitude());
+
+            mEventPosition =
+                new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
+                    .getInstance().getLocation().getLongitude());
+
+            // Enabling MyLocation Layer of Google Map
+            new DefaultZoomManager(mFragmentMap).zoomOnLocation(mMyPosition);
+
+            mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition).draggable(true));
+
+            mGoogleMap.setOnMarkerDragListener(new OnMarkerDragListener() {
+
+                @Override
+                public void onMarkerDrag(Marker marker) {
+                    mEventPosition = marker.getPosition();
+                }
+
+                @Override
+                public void onMarkerDragEnd(Marker marker) {
+                    mEventPosition = marker.getPosition();
+                }
+
+                @Override
+                public void onMarkerDragStart(Marker marker) {
+                    mEventPosition = marker.getPosition();
+                }
+            });
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -107,58 +160,5 @@ public class SetLocationActivity extends FragmentActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Display the map with the current location
-     */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap =
-                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.set_location_map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            mGoogleMap.setMyLocationEnabled(true);
-
-            // Get my position from SettingsManager
-            mMyPosition =
-                new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
-                    .getInstance().getLocation().getLongitude());
-
-            mEventPosition =
-                new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
-                    .getInstance().getLocation().getLongitude());
-
-            // Enabling MyLocation Layer of Google Map
-            new DefaultZoomManager(mFragmentMap).zoomOnLocation(mMyPosition);
-
-            mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition).draggable(true));
-
-            mGoogleMap.setOnMarkerDragListener(new OnMarkerDragListener() {
-
-                @Override
-                public void onMarkerDragStart(Marker marker) {
-                    mEventPosition = marker.getPosition();
-                }
-
-                @Override
-                public void onMarkerDragEnd(Marker marker) {
-                    mEventPosition = marker.getPosition();
-                }
-
-                @Override
-                public void onMarkerDrag(Marker marker) {
-                    mEventPosition = marker.getPosition();
-                }
-            });
-        }
     }
 }

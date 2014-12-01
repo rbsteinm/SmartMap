@@ -13,9 +13,8 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * Displays each user in a row. The friend items are clickable to signify they are invited. Use ViewHolder pattern as in
- * {@link ch.epfl.smartmap.gui.EventsListItemAdapter}.
- * 
+ * Displays each user in a row. The friend items are clickable to signify they are invited. Use ViewHolder
+ * pattern as in {@link ch.epfl.smartmap.gui.EventsListItemAdapter}.
  * 
  * @author SpicyCH
  */
@@ -40,8 +39,8 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup) callback function
+     * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup) callback
+     * function
      * automatically called one time for each user in the list
      */
     @Override

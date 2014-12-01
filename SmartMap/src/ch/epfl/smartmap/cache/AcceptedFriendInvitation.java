@@ -27,8 +27,13 @@ public class AcceptedFriendInvitation implements Invitation {
     }
 
     @Override
-    public int getStatus() {
-        return ACCEPTED;
+    public long getId() {
+        return mInvitationId;
+    }
+
+    @Override
+    public Bitmap getImage() {
+        return Cache.getInstance().getUserById(mUserId).getImage();
     }
 
     @Override
@@ -39,8 +44,8 @@ public class AcceptedFriendInvitation implements Invitation {
     }
 
     @Override
-    public long getId() {
-        return mInvitationId;
+    public int getStatus() {
+        return ACCEPTED;
     }
 
     @Override
@@ -57,18 +62,13 @@ public class AcceptedFriendInvitation implements Invitation {
     }
 
     @Override
-    public String getUserName() {
-        return mUserName;
-    }
-
-    @Override
     public long getUserId() {
         return mUserId;
     }
 
     @Override
-    public Bitmap getImage() {
-        return Cache.getInstance().getUserById(mUserId).getImage();
+    public String getUserName() {
+        return mUserName;
     }
 
     @Override
