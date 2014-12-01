@@ -104,6 +104,14 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         }
     }
 
+    private void loadSettings() {
+        mPosUpdateDelay = mManager.getRefreshFrequency() * 1000;
+        mNotificationsEnabled = mManager.notificationsEnabled();
+        mNotificationsForEventInvitations = mManager.notificationsForEventInvitations();
+        mNotificationsForFriendRequests = mManager.notificationsForFriendRequests();
+        mNotificationsForFriendshipConfirmations = mManager.notificationsForFriendshipConfirmations();
+    }
+
     @Override
     public IBinder onBind(Intent arg0) {
         return null;
@@ -207,14 +215,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         for (FriendInvitation invitation : mHelper.getUnansweredFriendInvitations()) {
             mInviterIds.add(invitation.getUserId());
         }
-    }
-
-    private void loadSettings() {
-        mPosUpdateDelay = mManager.getRefreshFrequency() * 1000;
-        mNotificationsEnabled = mManager.notificationsEnabled();
-        mNotificationsForEventInvitations = mManager.notificationsForEventInvitations();
-        mNotificationsForFriendRequests = mManager.notificationsForFriendRequests();
-        mNotificationsForFriendshipConfirmations = mManager.notificationsForFriendshipConfirmations();
     }
 
     /**
@@ -344,7 +344,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                 }
 
                 if (!newFriends.isEmpty()) {
-                    new AsyncInvitationAck().execute(newFriends.toArray(new User[newFriends.size()]));
+                    new AsyncInvitationAck().execute(newFriends.toArray(new Long[newFriends.size()]));
                 }
 
                 if (!removedFriends.isEmpty()) {
@@ -374,12 +374,12 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
      * 
      * @author ritterni
      */
-    private class AsyncInvitationAck extends AsyncTask<User, Void, Void> {
+    private class AsyncInvitationAck extends AsyncTask<Long, Void, Void> {
         @Override
-        protected Void doInBackground(User... users) {
+        protected Void doInBackground(Long... users) {
             try {
-                for (User user : users) {
-                    mClient.ackAcceptedInvitation(user.getId());
+                for (long user : users) {
+                    mClient.ackAcceptedInvitation(user);
                 }
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't send acks!");
