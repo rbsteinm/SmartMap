@@ -152,19 +152,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param event
      *            The event to store
      */
-    public void addEvent(Event event) throws IllegalArgumentException {
-        if (event.getId() < 0) {
+    public void addEvent(ImmutableEvent event) throws IllegalArgumentException {
+        if (event.getID() < 0) {
             throw new IllegalArgumentException("Invalid event ID");
         }
 
         Cursor cursor =
             mDatabase.query(TABLE_EVENT, EVENT_COLUMNS, KEY_ID + " = ?",
-                new String[]{String.valueOf(event.getId())}, null, null, null, null);
+                new String[]{String.valueOf(event.getID())}, null, null, null, null);
 
         // We check if the event is already there
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
-            values.put(KEY_ID, event.getId());
+            values.put(KEY_ID, event.getID());
             values.put(KEY_NAME, event.getName());
             values.put(KEY_EVTDESC, event.getDescription());
             values.put(KEY_USER_ID, event.getCreatorId());
@@ -812,10 +812,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *            The event to update
      * @return The number of rows that were affected
      */
-    public int updateEvent(Event event) {
+    public int updateEvent(ImmutableEvent event) {
 
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, event.getId());
+        values.put(KEY_ID, event.getID());
         values.put(KEY_NAME, event.getName());
         values.put(KEY_EVTDESC, event.getDescription());
         values.put(KEY_USER_ID, event.getCreatorId());
@@ -826,7 +826,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int rows =
             mDatabase.update(TABLE_EVENT, values, KEY_ID + " = ?",
-                new String[]{String.valueOf(event.getId())});
+                new String[]{String.valueOf(event.getID())});
 
         return rows;
     }
@@ -910,18 +910,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rows;
     }
 
-    private void notifyOnInvitationListUpdateListeners() {
-        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
-            listener.onInvitationListUpdate();
-        }
-    }
-
-    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
-        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
-            listener.onInvitationStatusUpdate(id, status);
-        }
-    }
-
     /**
      * Updates the database contents to be up-to-date with the cache
      */
@@ -931,13 +919,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
-        onCreate(mDatabase);
+        this.onCreate(mDatabase);
 
         for (User user : friends) {
-            addUser(user.getImmutableCopy());
+            this.addUser(user.getImmutableCopy());
         }
         for (Event event : events) {
-            addEvent(event.getImmutableCopy());
+            this.addEvent(event.getImmutableCopy());
+        }
+    }
+
+    private void notifyOnInvitationListUpdateListeners() {
+        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
+            listener.onInvitationListUpdate();
+        }
+    }
+
+    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
+        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
+            listener.onInvitationStatusUpdate(id, status);
         }
     }
 

@@ -108,6 +108,21 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         }
     };
 
+    private final Runnable updateDatabase = new Runnable() {
+        @Override
+        public void run() {
+            Log.d("SERVICE", "Update Database");
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                public Void doInBackground(Void... params) {
+                    DatabaseHelper.getInstance().updateFromCache();
+                    return null;
+                }
+            }.execute();
+            mHandler.postDelayed(this, 60000);
+        }
+    };
+
     private final Runnable getInvitations = new Runnable() {
         @Override
         public void run() {
@@ -123,14 +138,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         } catch (SmartMapClientException e) {
             Log.e("UpdateService", "Couldn't download picture #" + id + "!");
         }
-    }
-
-    private void loadSettings() {
-        mPosUpdateDelay = mManager.getRefreshFrequency() * 1000;
-        mNotificationsEnabled = mManager.notificationsEnabled();
-        mNotificationsForEventInvitations = mManager.notificationsForEventInvitations();
-        mNotificationsForFriendRequests = mManager.notificationsForFriendRequests();
-        mNotificationsForFriendshipConfirmations = mManager.notificationsForFriendshipConfirmations();
     }
 
     @Override
@@ -165,7 +172,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         } else if (newStatus == Invitation.REFUSED) {
             new AsyncDeclineFriends().execute(userID);
         }
-        // }
     }
 
     @Override
@@ -177,6 +183,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         mHandler.postDelayed(getInvitations, HANDLER_DELAY);
         mHandler.removeCallbacks(nearEventsUpdate);
         mHandler.postDelayed(nearEventsUpdate, HANDLER_DELAY);
+        mHandler.removeCallbacks(updateDatabase);
+        mHandler.postDelayed(updateDatabase, HANDLER_DELAY);
         new AsyncLogin().execute();
 
         Criteria criteria = new Criteria();
@@ -238,6 +246,14 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         for (FriendInvitation invitation : mHelper.getUnansweredFriendInvitations()) {
             mInviterIds.add(invitation.getUserId());
         }
+    }
+
+    private void loadSettings() {
+        mPosUpdateDelay = mManager.getRefreshFrequency() * 1000;
+        mNotificationsEnabled = mManager.notificationsEnabled();
+        mNotificationsForEventInvitations = mManager.notificationsForEventInvitations();
+        mNotificationsForFriendRequests = mManager.notificationsForFriendRequests();
+        mNotificationsForFriendshipConfirmations = mManager.notificationsForFriendshipConfirmations();
     }
 
     /**
