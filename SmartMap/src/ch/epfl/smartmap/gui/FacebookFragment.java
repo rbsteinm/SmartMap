@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -268,10 +267,9 @@ public class FacebookFragment extends Fragment {
 
     private void startMainActivity() {
         Log.d(TAG, "START MAIN ACTIVITY");
-        Activity currentActivity = this.getActivity();
-        Intent intent = new Intent(this.getActivity(), MainActivity.class);
+        Context currentActivity = this.getActivity().getBaseContext();
+        Intent intent = new Intent(currentActivity, MainActivity.class);
         this.startActivity(intent);
-        currentActivity.finish();
     }
 
     /**

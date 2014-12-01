@@ -35,6 +35,7 @@ import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
 import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
+import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkNotificationBag;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
@@ -83,7 +84,27 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         public void run() {
             Log.d("SERVICE", "friendposupdate");
             new AsyncFriendsPos().execute();
-            mHandler.postDelayed(this, mPosUpdateDelay * 1000);
+            mHandler.postDelayed(this, 10000);
+        }
+    };
+
+    private final Runnable nearEventsUpdate = new Runnable() {
+        @Override
+        public void run() {
+            Log.d("SERVICE", "neareventsupdate");
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                public Void doInBackground(Void... params) {
+                    try {
+                        CachedOnlineSearchEngine.getInstance().getAllNearEvents(
+                            SettingsManager.getInstance().getLocation(), 100000);
+                    } catch (SmartMapClientException e) {
+                        Log.e("UPDATE SERVICE", "Can't retrieve nearby events");
+                    }
+                    return null;
+                }
+            }.execute();
+            mHandler.postDelayed(this, 20000);
         }
     };
 
@@ -146,6 +167,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
         mHandler.removeCallbacks(getInvitations);
         mHandler.postDelayed(getInvitations, HANDLER_DELAY);
+        mHandler.removeCallbacks(nearEventsUpdate);
+        mHandler.postDelayed(nearEventsUpdate, HANDLER_DELAY);
         new AsyncLogin().execute();
 
         Criteria criteria = new Criteria();
@@ -328,7 +351,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                             if (!mInviterIds.contains(user.getId())) {
                                 mHelper.addFriendInvitation(new FriendInvitation(0, user.getId(), user
                                     .getName(), Invitation.UNREAD));
-
+                                mInviterIds.add(user.getId());
                                 new AsyncGetPictures().execute(user.getId());
                                 if (mNotificationsEnabled && mNotificationsForFriendRequests) {
                                     Notifications.newFriendNotification(Utils.sContext, user);
@@ -344,7 +367,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                 }
 
                 if (!newFriends.isEmpty()) {
-                    new AsyncInvitationAck().execute(newFriends.toArray(new User[newFriends.size()]));
+                    new AsyncInvitationAck().execute(newFriends.toArray(new Long[newFriends.size()]));
                 }
 
                 if (!removedFriends.isEmpty()) {
@@ -374,12 +397,12 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
      * 
      * @author ritterni
      */
-    private class AsyncInvitationAck extends AsyncTask<User, Void, Void> {
+    private class AsyncInvitationAck extends AsyncTask<Long, Void, Void> {
         @Override
-        protected Void doInBackground(User... users) {
+        protected Void doInBackground(Long... users) {
             try {
-                for (User user : users) {
-                    mClient.ackAcceptedInvitation(user.getId());
+                for (long user : users) {
+                    mClient.ackAcceptedInvitation(user);
                 }
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't send acks!");

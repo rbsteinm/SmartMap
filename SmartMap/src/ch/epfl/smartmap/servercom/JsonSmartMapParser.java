@@ -221,7 +221,6 @@ public class JsonSmartMapParser implements SmartMapParser {
                 this.checkId(userId);
                 this.checkLatitude(latitude);
                 this.checkLongitude(longitude);
-                this.checkLastSeen(lastSeen);
 
                 Location location = new Location("SmartMapServers");
                 location.setTime(lastSeen.getTimeInMillis());
@@ -279,7 +278,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      */
     private void checkLastSeen(GregorianCalendar lastSeen) throws SmartMapParseException {
         GregorianCalendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        if (Math.abs(now.getTimeInMillis() - lastSeen.getTimeInMillis()) < SERVER_TIME_DIFFERENCE_THRESHHOLD) {
+        if (Math.abs(now.getTimeInMillis() - lastSeen.getTimeInMillis()) > SERVER_TIME_DIFFERENCE_THRESHHOLD) {
             throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString()
                 + " compared to " + now.toString());
         }

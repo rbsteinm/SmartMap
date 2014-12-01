@@ -211,19 +211,6 @@ public class Cache {
         return allInvitingUsers;
     }
 
-    // public List<Event> getAllPublicEventsNear(Location location, double radius)
-    // throws SmartMapClientException {
-    // List<Event> ids =
-    // mNetworkClient.getPublicEvents(location.getLatitude(), location.getLongitude(), radius);
-    // List<Event> allPublicEventsNear = new ArrayList<Event>();
-    //
-    // for (Event event : ids) {
-    // allPublicEventsNear.add(this.getPublicEventById(event.getId()));
-    // }
-    //
-    // return allPublicEventsNear;
-    // }
-
     public List<Displayable> getAllVisibleEvents() {
         List<Long> allEventIds = new ArrayList<Long>(mGoingEventIds);
         allEventIds.addAll(mMyEventIds);
