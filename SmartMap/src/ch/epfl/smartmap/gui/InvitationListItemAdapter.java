@@ -21,51 +21,51 @@ import ch.epfl.smartmap.cache.Invitation;
  * @author agpmilli
  */
 public class InvitationListItemAdapter extends ArrayAdapter<Invitation> {
-	private final Context mContext;
-	private final List<Invitation> mItemsArrayList;
+    private final Context mContext;
+    private final List<Invitation> mItemsArrayList;
 
-	/**
-	 * @param context
-	 *            Context of the Activity where we want to display the user list
-	 * @param userList
-	 *            list of users to display
-	 */
-	public InvitationListItemAdapter(Context context, List<Invitation> itemsArrayList) {
+    /**
+     * @param context
+     *            Context of the Activity where we want to display the user list
+     * @param userList
+     *            list of users to display
+     */
+    public InvitationListItemAdapter(Context context, List<Invitation> itemsArrayList) {
 
-		super(context, R.layout.gui_notification_list_item, itemsArrayList);
+        super(context, R.layout.gui_notification_list_item, itemsArrayList);
 
-		mContext = context;
-		mItemsArrayList = itemsArrayList;
-	}
+        mContext = context;
+        mItemsArrayList = itemsArrayList;
+    }
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-		// Create inflater,get item to construct
-		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		convertView = inflater.inflate(R.layout.gui_notification_list_item, parent, false);
+        // Create inflater,get item to construct
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.gui_notification_list_item, parent, false);
 
-		// Get FriendItem fields
-		TextView title = (TextView) convertView.findViewById(R.id.activity_notification_title);
-		TextView text = (TextView) convertView.findViewById(R.id.activity_notification_text);
-		// ImageView image = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
+        // Get FriendItem fields
+        TextView title = (TextView) convertView.findViewById(R.id.activity_notification_title);
+        TextView text = (TextView) convertView.findViewById(R.id.activity_notification_text);
+        // ImageView image = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
 
-		// Set the User's ID to the tag of its View
-		convertView.setTag(mItemsArrayList.get(position).getId());
-		if (mItemsArrayList.get(position).getClass() == FriendInvitation.class) {
-			// Set fields with friend attributes
-			title.setText(mItemsArrayList.get(position).getUserName() + " "
-			    + mContext.getString(R.string.notification_friend_invitation));
-			text.setText(mContext.getString(R.string.notification_open_friend_list));
-			// picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
-		} else if (mItemsArrayList.get(position).getClass() == EventInvitation.class) {
-			// Set fields with friend attributes
-			title.setText(mItemsArrayList.get(position).getUserName() + " "
-			    + mContext.getString(R.string.notification_event_invitation) + " "
-			    + ((EventInvitation) mItemsArrayList.get(position)).getEventName());
-			text.setText(mContext.getString(R.string.notification_open_event_list));
-			// picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
-		}
-		return convertView;
-	}
+        // Set the User's ID to the tag of its View
+        convertView.setTag(mItemsArrayList.get(position).getId());
+        if (mItemsArrayList.get(position).getClass() == FriendInvitation.class) {
+            // Set fields with friend attributes
+            title.setText(mItemsArrayList.get(position).getUserName() + " "
+                + mContext.getString(R.string.notification_friend_invitation));
+            text.setText(mContext.getString(R.string.notification_open_friend_list));
+            // picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
+        } else if (mItemsArrayList.get(position).getClass() == EventInvitation.class) {
+            // Set fields with friend attributes
+            title.setText(mItemsArrayList.get(position).getUserName() + " "
+                + mContext.getString(R.string.notification_event_invitation) + " "
+                + ((EventInvitation) mItemsArrayList.get(position)).getEventName());
+            text.setText(mContext.getString(R.string.notification_open_event_list));
+            // picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
+        }
+        return convertView;
+    }
 }

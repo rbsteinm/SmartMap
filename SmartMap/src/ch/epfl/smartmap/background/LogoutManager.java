@@ -42,22 +42,22 @@ public final class LogoutManager {
 
         // set dialog message
         alertDialogBuilder.setMessage("Do you really want to logout from SmartMap?").setCancelable(false)
-                .setPositiveButton("Logout", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // if this button is clicked, close
-                        // current activity
-                        Toast.makeText(mContext, "Logging out...", Toast.LENGTH_SHORT).show();
-                        LogoutManager.this.logout();
-                    }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // if this button is clicked, just close
-                        // the dialog box and do nothing
-                        dialog.cancel();
-                    }
-                });
+            .setPositiveButton("Logout", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // if this button is clicked, close
+                    // current activity
+                    Toast.makeText(mContext, "Logging out...", Toast.LENGTH_SHORT).show();
+                    LogoutManager.this.logout();
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // if this button is clicked, just close
+                    // the dialog box and do nothing
+                    dialog.cancel();
+                }
+            });
 
         // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -68,7 +68,8 @@ public final class LogoutManager {
 
     /**
      * Clears the cache, the database and return to the StartActivity. <br />
-     * Note: we don't need to destroy the PHP session on the server since we can re-auth with another login on top of
+     * Note: we don't need to destroy the PHP session on the server since we can re-auth with another login on
+     * top of
      * the previous one.
      * 
      * @author SpicyCH
@@ -99,7 +100,7 @@ public final class LogoutManager {
     public static LogoutManager getInstance() {
         if (mContext == null) {
             throw new UnsupportedOperationException(
-                    "You must initialize the LogoutManager before you can get an instance");
+                "You must initialize the LogoutManager before you can get an instance");
         }
         if (mInstance == null) {
             mInstance = new LogoutManager(mContext);
