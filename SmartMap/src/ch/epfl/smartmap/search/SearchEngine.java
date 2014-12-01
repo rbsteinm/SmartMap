@@ -13,41 +13,41 @@ import ch.epfl.smartmap.cache.History;
  */
 public interface SearchEngine {
 
-	/**
-	 * @return History of searches of this SearchEngine
-	 */
-	History getHistory();
+    /**
+     * @return History of searches of this SearchEngine
+     */
+    History getHistory();
 
-	/**
-	 * Sends a Query, computes it and return matched results
-	 * 
-	 * @param query
-	 * @return a List containing the result
-	 */
-	List<Displayable> sendQuery(String query, Type searchType);
+    /**
+     * Sends a Query, computes it and return matched results
+     * 
+     * @param query
+     * @return a List containing the result
+     */
+    List<Displayable> sendQuery(String query, Type searchType);
 
-	/**
-	 * Define the diffent type of searches that can be performed on
-	 * the SearchEngine
-	 * 
-	 * @author jfperren
-	 */
-	public enum Type {
-		FRIENDS("Friends"),
-		EVENTS("Events"),
-		TAGS("Filters"),
-		GROUPS("Groups"),
-		HISTORY("History"),
-		ALL("Everything");
+    /**
+     * Define the diffent type of searches that can be performed on
+     * the SearchEngine
+     * 
+     * @author jfperren
+     */
+    public enum Type {
+        FRIENDS("Friends"),
+        EVENTS("Events"),
+        TAGS("Filters"),
+        GROUPS("Groups"),
+        HISTORY("History"),
+        ALL("Everything");
 
-		private final String mTitle;
+        private final String mTitle;
 
-		private Type(String title) {
-			mTitle = title;
-		}
+        private Type(String title) {
+            mTitle = title;
+        }
 
-		public String getTitle() {
-			return mTitle;
-		}
-	}
+        public String getTitle() {
+            return mTitle;
+        }
+    }
 }

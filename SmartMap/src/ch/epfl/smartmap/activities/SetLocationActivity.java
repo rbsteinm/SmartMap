@@ -33,130 +33,132 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class SetLocationActivity extends FragmentActivity {
 
-	@SuppressWarnings("unused")
-	private static final String TAG = SetLocationActivity.class.getSimpleName();
+    @SuppressWarnings("unused")
+    private static final String TAG = SetLocationActivity.class.getSimpleName();
 
-	private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-	private static final String CITY_NAME = "CITY_NAME";
-	static final int PICK_LOCATION_REQUEST = 1;
+    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+    private static final String CITY_NAME = "CITY_NAME";
+    static final int PICK_LOCATION_REQUEST = 1;
 
-	private GoogleMap mGoogleMap;
-	private SupportMapFragment mFragmentMap;
-	private LatLng mMyPosition;
-	private LatLng mEventPosition;
+    private GoogleMap mGoogleMap;
+    private SupportMapFragment mFragmentMap;
+    private LatLng mMyPosition;
+    private LatLng mEventPosition;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.activity_set_location);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_set_location);
 
-		// Makes the logo clickable (clicking it returns to previous activity)
-		this.getActionBar().setDisplayHomeAsUpEnabled(true);
-		this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+        // Makes the logo clickable (clicking it returns to previous activity)
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-		// Maybe set it longer, how?
-		Toast.makeText(this, this.getString(R.string.set_location_toast), Toast.LENGTH_LONG).show();
+        // Maybe set it longer, how?
+        Toast.makeText(this, this.getString(R.string.set_location_toast), Toast.LENGTH_LONG).show();
 
-		this.displayMap();
-	}
+        this.displayMap();
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		this.getMenuInflater().inflate(R.menu.set_location, menu);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.set_location, menu);
 
-		return super.onCreateOptionsMenu(menu);
-	}
+        return super.onCreateOptionsMenu(menu);
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
 
-		int id = item.getItemId();
-		switch (id) {
-			case R.id.set_location_done:
-				Intent addEventIntent = new Intent(this, AddEventActivity.class);
-				Bundle extras = new Bundle();
-				Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-				String cityName = "";
-				List<Address> addresses;
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.set_location_done:
+                Intent addEventIntent = new Intent(this, AddEventActivity.class);
+                Bundle extras = new Bundle();
+                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+                String cityName = "";
+                List<Address> addresses;
 
-				try {
-					addresses = geocoder
-					    .getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
-					if (addresses.size() > 0) {
-						// Makes sure that an address is associated to the coordinates, the user could
-						// have long
-						// clicked in the middle of the sea after all :)
-						cityName = addresses.get(0).getLocality();
-					}
-				} catch (IOException e) {
-				}
+                try {
+                    addresses =
+                        geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
+                    if (addresses.size() > 0) {
+                        // Makes sure that an address is associated to the coordinates, the user could
+                        // have long
+                        // clicked in the middle of the sea after all :)
+                        cityName = addresses.get(0).getLocality();
+                    }
+                } catch (IOException e) {
+                }
 
-				extras.putString(CITY_NAME, cityName);
-				extras.putParcelable(LOCATION_SERVICE, mEventPosition);
-				addEventIntent.putExtras(extras);
-				this.setResult(RESULT_OK, addEventIntent);
-				this.finish();
-			case android.R.id.home:
-				this.finish();
-			default:
-				break;
-		}
+                extras.putString(CITY_NAME, cityName);
+                extras.putParcelable(LOCATION_SERVICE, mEventPosition);
+                addEventIntent.putExtras(extras);
+                this.setResult(RESULT_OK, addEventIntent);
+                this.finish();
+            case android.R.id.home:
+                this.finish();
+            default:
+                break;
+        }
 
-		return super.onOptionsItemSelected(item);
-	}
+        return super.onOptionsItemSelected(item);
+    }
 
-	/**
-	 * Display the map with the current location
-	 */
-	public void displayMap() {
-		int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-		// Showing status
-		if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-			// not available
-			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-			dialog.show();
-		} else {
-			// Google Play Services are available.
-			// Getting reference to the SupportMapFragment of activity_main.xml
-			mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(
-			    R.id.set_location_map);
-			// Getting GoogleMap object from the fragment
-			mGoogleMap = mFragmentMap.getMap();
-			mGoogleMap.setMyLocationEnabled(true);
+    /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+            // not available
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+            dialog.show();
+        } else {
+            // Google Play Services are available.
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            mFragmentMap =
+                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.set_location_map);
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = mFragmentMap.getMap();
+            mGoogleMap.setMyLocationEnabled(true);
 
-			// Get my position from SettingsManager
-			mMyPosition = new LatLng(SettingsManager.getInstance().getLocation().getLatitude(),
-			    SettingsManager.getInstance().getLocation().getLongitude());
+            // Get my position from SettingsManager
+            mMyPosition =
+                new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
+                    .getInstance().getLocation().getLongitude());
 
-			mEventPosition = new LatLng(SettingsManager.getInstance().getLocation().getLatitude(),
-			    SettingsManager.getInstance().getLocation().getLongitude());
+            mEventPosition =
+                new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
+                    .getInstance().getLocation().getLongitude());
 
-			// Enabling MyLocation Layer of Google Map
-			new DefaultZoomManager(mFragmentMap).zoomOnLocation(mMyPosition);
+            // Enabling MyLocation Layer of Google Map
+            new DefaultZoomManager(mFragmentMap).zoomOnLocation(mMyPosition);
 
-			mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition).draggable(true));
+            mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition).draggable(true));
 
-			mGoogleMap.setOnMarkerDragListener(new OnMarkerDragListener() {
+            mGoogleMap.setOnMarkerDragListener(new OnMarkerDragListener() {
 
-				@Override
-				public void onMarkerDragStart(Marker marker) {
-					mEventPosition = marker.getPosition();
-				}
+                @Override
+                public void onMarkerDragStart(Marker marker) {
+                    mEventPosition = marker.getPosition();
+                }
 
-				@Override
-				public void onMarkerDragEnd(Marker marker) {
-					mEventPosition = marker.getPosition();
-				}
+                @Override
+                public void onMarkerDragEnd(Marker marker) {
+                    mEventPosition = marker.getPosition();
+                }
 
-				@Override
-				public void onMarkerDrag(Marker marker) {
-					mEventPosition = marker.getPosition();
-				}
-			});
-		}
-	}
+                @Override
+                public void onMarkerDrag(Marker marker) {
+                    mEventPosition = marker.getPosition();
+                }
+            });
+        }
+    }
 }

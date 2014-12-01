@@ -13,40 +13,40 @@ import ch.epfl.smartmap.cache.Event;
  * @author SpicyCH
  */
 public class EventViewHolder {
-	private Event mEvent;
-	private TextView mNameTextView;
-	private TextView mStartTextView;
-	private TextView mEndTextView;
+    private Event mEvent;
+    private TextView mNameTextView;
+    private TextView mStartTextView;
+    private TextView mEndTextView;
 
-	public TextView getEndTextView() {
-		return mEndTextView;
-	}
+    public TextView getEndTextView() {
+        return mEndTextView;
+    }
 
-	public Event getEvent() {
-		return mEvent;
-	}
+    public Event getEvent() {
+        return mEvent;
+    }
 
-	public TextView getNameTextView() {
-		return mNameTextView;
-	}
+    public TextView getNameTextView() {
+        return mNameTextView;
+    }
 
-	public TextView getStartTextView() {
-		return mStartTextView;
-	}
+    public TextView getStartTextView() {
+        return mStartTextView;
+    }
 
-	public void setEndTextView(TextView v) {
-		mEndTextView = v;
-	}
+    public void setEndTextView(TextView v) {
+        mEndTextView = v;
+    }
 
-	public void setEvent(Event e) {
-		mEvent = e;
-	}
+    public void setEvent(Event e) {
+        mEvent = e;
+    }
 
-	public void setNameTextView(TextView v) {
-		mNameTextView = v;
-	}
+    public void setNameTextView(TextView v) {
+        mNameTextView = v;
+    }
 
-	public void setStarTextView(TextView v) {
-		mStartTextView = v;
-	}
+    public void setStarTextView(TextView v) {
+        mStartTextView = v;
+    }
 }

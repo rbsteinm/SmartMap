@@ -3,7 +3,7 @@
     <CheckBoxPreference
         android:id="@+id/pref_general_always_share"
         android:defaultValue="true"
-        android:key="general_always_share"
+        android:key="@string/settings_key_general_always_share"
         android:summary="@string/pref_description_always_share"
         android:title="@string/pref_title_always_share" />
     
@@ -12,7 +12,7 @@
         android:defaultValue="10"
         android:entries="@array/pref_sync_frequency_titles"
         android:entryValues="@array/pref_sync_frequency_values"
-        android:key="refresh_frequency"
+        android:key="@string/settings_key_refresh_frequency"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
         android:title="@string/pref_title_refresh_frequency" />
@@ -21,7 +21,7 @@
         android:defaultValue="60"
         android:entries="@array/pref_last_seen_max_titles"
         android:entryValues="@array/pref_last_seen_max_values"
-        android:key="last_seen_max"
+        android:key="@string/settings_key_last_seen_max"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
         android:title="@string/pref_title_last_seen_max" />

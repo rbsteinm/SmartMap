@@ -414,17 +414,17 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     }
 
     @Override
-    public List<ImmutableEvent> getEventInvitations() throws SmartMapClientException {
+    public List<Long> getEventInvitations() throws SmartMapClientException {
 
         HttpURLConnection conn = this.getHttpURLConnection("/getEventInvitations");
         String response = this.sendViaPost(new HashMap<String, String>(), conn);
 
-        List<ImmutableEvent> eventInvitations = new ArrayList<ImmutableEvent>();
+        List<Long> eventInvitations = new ArrayList<Long>();
 
         try {
             SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
-            eventInvitations = parser.parseEventList(response);
+            eventInvitations = parser.parseIds(response, "events");
 
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
@@ -527,7 +527,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     }
 
     @Override
-    public List<ImmutableEvent> getPublicEvents(double latitude, double longitude, double radius)
+    public List<Long> getPublicEvents(double latitude, double longitude, double radius)
         throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
@@ -538,12 +538,12 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         HttpURLConnection conn = this.getHttpURLConnection("/getPublicEvents");
         String response = this.sendViaPost(params, conn);
 
-        List<ImmutableEvent> publicEvents = new ArrayList<ImmutableEvent>();
+        List<Long> publicEvents = new ArrayList<Long>();
 
         try {
             SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
-            publicEvents = parser.parseEventList(response);
+            publicEvents = parser.parseIds(response, "events");
 
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
@@ -606,7 +606,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.servercom.SmartMapClient#inviteUsersToEvent(long, java.util.List)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#inviteUsersToEvent(long,
+     * java.util.List)
      */
     @Override
     public void inviteUsersToEvent(long eventId, List<Long> usersIds) throws SmartMapClientException {

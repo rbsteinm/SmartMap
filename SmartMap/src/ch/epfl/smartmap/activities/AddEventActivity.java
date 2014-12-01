@@ -162,159 +162,6 @@ public class AddEventActivity extends FragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void pickLocation(View v) {
-		Toast.makeText(mContext,
-		    this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
-		    Toast.LENGTH_LONG).show();
-
-		Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
-		pickLocationIntent.putExtra("pickLocationForEvent", true);
-		pickLocationIntent.setType(Context.LOCATION_SERVICE);
-		this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
-	}
-
-	/**
-	 * Ensures the end of the event is after its start and end of the event is not in the past. Displays a
-	 * toast and
-	 * reset the bad field set by the user if necessary.
-	 * 
-	 * @param startDate
-	 * @param startTime
-	 * @param endDate
-	 * @param endTime
-	 * @author SpicyCH
-	 */
-	private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
-
-		if (this.isValidDate(endDate.getText().toString()) && this.isValidTime(endTime.getText().toString())) {
-			// The end of the event has been set by the user
-
-			GregorianCalendar start = this.getDateFromTextFormat(startDate.getText().toString(), startTime
-			    .getText().toString());
-
-			GregorianCalendar end = this.getDateFromTextFormat(endDate.getText().toString(), endTime
-			    .getText().toString());
-
-			GregorianCalendar now = new GregorianCalendar();
-
-			// Needed to let the user click the default time without errors.
-			now.add(GregorianCalendar.MINUTE, -1);
-
-			if (end.before(start)) {
-				// The user is trying to create the end of the event before its
-				// start!
-
-				endDate.setText("");
-				endTime.setText("");
-
-				Toast.makeText(mContext,
-				    this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
-				    Toast.LENGTH_LONG).show();
-			} else if (end.before(now)) {
-				// The user is trying to create an event in the past
-
-				endDate.setText("");
-				endTime.setText("");
-
-				Toast.makeText(mContext,
-				    this.getString(R.string.add_event_toast_event_end_cannot_be_in_past), Toast.LENGTH_LONG)
-				    .show();
-			}
-		}
-
-	}
-
-	/**
-	 * @author SpicyCH
-	 */
-	private void createEvent() {
-
-		if (!this.isValidDate(mPickEndDate.getText().toString())
-		    || !this.isValidTime(mPickEndTime.getText().toString()) || (mEventPosition.latitude == 0.0)
-		    || (mEventPosition.longitude == 0.0)
-		    || ((mPlaceName.getText().toString() == null) || mEventName.getText().toString().isEmpty())) {
-			Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set),
-			    Toast.LENGTH_SHORT).show();
-			Log.d(TAG, "Couldn't create a new event because not all fields have been set.\n" + "end date: "
-			    + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
-			    + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
-			    + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
-			    + mEventPosition.longitude);
-		} else {
-			GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
-			    mPickStartTime.getText().toString());
-			GregorianCalendar endDate = this.getDateFromTextFormat(mPickEndDate.getText().toString(),
-			    mPickEndTime.getText().toString());
-
-			Location location = new Location("Location set by user");
-			location.setLatitude(mEventPosition.latitude);
-			location.setLongitude(mEventPosition.longitude);
-			SettingsManager setMng = SettingsManager.getInstance();
-
-			ImmutableEvent ev = new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(),
-			    setMng.getUserID(), mDescription.getText().toString(), endDate, endDate, location, mPlaceName
-			        .getText().toString(), PublicEvent.NO_PARTICIPANTS);
-
-			// TODO Create the event on our server and set the cache accordingly
-			AsyncTask<ImmutableEvent, Void, Boolean> createEventTask = new AsyncTask<ImmutableEvent, Void, Boolean>() {
-
-				@Override
-				protected Boolean doInBackground(ImmutableEvent... params) {
-					try {
-						long id = NetworkSmartMapClient.getInstance().createPublicEvent(params[0]);
-						Cache.getInstance().addMyEvent(id);
-						return true;
-					} catch (SmartMapClientException e) {
-						Log.e(TAG, e.getMessage());
-						return false;
-					}
-				}
-
-				@Override
-				protected void onPostExecute(Boolean b) {
-					if (b) {
-
-						Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
-						    Toast.LENGTH_SHORT).show();
-
-						mActivity.finish();
-
-					} else {
-						Toast
-						    .makeText(
-						        mContext,
-						        "Couldn't not create your event. The error occurred on our server and we are sorry :(",
-						        Toast.LENGTH_SHORT).show();
-					}
-				}
-
-			};
-
-			createEventTask.execute(ev);
-		}
-	}
-
-	/**
-	 * @param dayMonthYear
-	 *            a String like "16/09/1993"
-	 * @param hourMinute
-	 *            a String like "17:03"
-	 * @return a GregorianDate constructed from the given parameters
-	 * @author SpicyCH
-	 */
-	private GregorianCalendar getDateFromTextFormat(String dayMonthYear, String hourMinute) {
-		assert this.isValidDate(dayMonthYear) : "The string dayMonthYear isn't in the expected format";
-		assert this.isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
-
-		String[] s1 = dayMonthYear.split("/");
-		String[] s2 = hourMinute.split(":");
-		// Don't forget to substract 1 to the month in text format
-		GregorianCalendar date = new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1,
-		    Integer.parseInt(s1[0]), Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
-
-		return date;
-	}
-
 	/**
 	 * @author SpicyCH
 	 */
@@ -476,4 +323,161 @@ public class AddEventActivity extends FragmentActivity {
 
 		}
 	}
+
+	public void pickLocation(View v) {
+		Toast.makeText(mContext,
+		    this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
+		    Toast.LENGTH_LONG).show();
+
+		Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
+		pickLocationIntent.putExtra("pickLocationForEvent", true);
+		pickLocationIntent.setType(Context.LOCATION_SERVICE);
+		this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
+	}
+
+	/**
+	 * Ensures the end of the event is after its start and end of the event is not in the past. Displays a
+	 * toast and
+	 * reset the bad field set by the user if necessary.
+	 * 
+	 * @param startDate
+	 * @param startTime
+	 * @param endDate
+	 * @param endTime
+	 * @author SpicyCH
+	 */
+	private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
+
+		if (this.isValidDate(endDate.getText().toString()) && this.isValidTime(endTime.getText().toString())) {
+			// The end of the event has been set by the user
+
+			GregorianCalendar start = this.getDateFromTextFormat(startDate.getText().toString(), startTime
+			    .getText().toString());
+
+			GregorianCalendar end = this.getDateFromTextFormat(endDate.getText().toString(), endTime
+			    .getText().toString());
+
+			GregorianCalendar now = new GregorianCalendar();
+
+			// Needed to let the user click the default time without errors.
+			now.add(GregorianCalendar.MINUTE, -1);
+
+			if (end.before(start)) {
+				// The user is trying to create the end of the event before its
+				// start!
+
+				endDate.setText("");
+				endTime.setText("");
+
+				Toast.makeText(mContext,
+				    this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
+				    Toast.LENGTH_LONG).show();
+			} else if (end.before(now)) {
+				// The user is trying to create an event in the past
+
+				endDate.setText("");
+				endTime.setText("");
+
+				Toast.makeText(mContext,
+				    this.getString(R.string.add_event_toast_event_end_cannot_be_in_past), Toast.LENGTH_LONG)
+				    .show();
+			}
+		}
+
+	}
+
+	/**
+	 * @author SpicyCH
+	 */
+	private void createEvent() {
+
+		if (!this.isValidDate(mPickEndDate.getText().toString())
+		    || !this.isValidTime(mPickEndTime.getText().toString()) || (mEventPosition.latitude == 0.0)
+		    || (mEventPosition.longitude == 0.0)
+		    || ("".equals(mPlaceName.getText().toString()) || "".equals(mEventName.getText().toString()))) {
+
+			Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set),
+			    Toast.LENGTH_SHORT).show();
+
+			Log.d(TAG, "Couldn't create a new event because not all fields have been set.\n" + "end date: "
+			    + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
+			    + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
+			    + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
+			    + mEventPosition.longitude);
+		} else {
+
+			GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
+			    mPickStartTime.getText().toString());
+			GregorianCalendar endDate = this.getDateFromTextFormat(mPickEndDate.getText().toString(),
+			    mPickEndTime.getText().toString());
+
+			Location location = new Location("Location set by user");
+			location.setLatitude(mEventPosition.latitude);
+			location.setLongitude(mEventPosition.longitude);
+			SettingsManager setMng = SettingsManager.getInstance();
+
+			ImmutableEvent ev = new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(),
+			    setMng.getUserID(), mDescription.getText().toString(), startDate, endDate, location,
+			    mPlaceName.getText().toString(), PublicEvent.NO_PARTICIPANTS);
+
+			// TODO Create the event on our server and set the cache accordingly
+			AsyncTask<ImmutableEvent, Void, Boolean> createEventTask = new AsyncTask<ImmutableEvent, Void, Boolean>() {
+
+				@Override
+				protected Boolean doInBackground(ImmutableEvent... params) {
+					try {
+						long id = NetworkSmartMapClient.getInstance().createPublicEvent(params[0]);
+						Cache.getInstance().addMyEvent(id);
+						return (id > 0);
+					} catch (SmartMapClientException e) {
+						Log.e(TAG, e.getMessage());
+						return false;
+					}
+				}
+
+				@Override
+				protected void onPostExecute(Boolean b) {
+					if (b) {
+
+						Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
+						    Toast.LENGTH_SHORT).show();
+
+						mActivity.finish();
+
+					} else {
+						Toast
+						    .makeText(
+						        mContext,
+						        "Couldn't not create your event. The error occurred on our server and we are sorry :(",
+						        Toast.LENGTH_SHORT).show();
+					}
+				}
+
+			};
+
+			createEventTask.execute(ev);
+		}
+	}
+
+	/**
+	 * @param dayMonthYear
+	 *            a String like "16/09/1993"
+	 * @param hourMinute
+	 *            a String like "17:03"
+	 * @return a GregorianDate constructed from the given parameters
+	 * @author SpicyCH
+	 */
+	private GregorianCalendar getDateFromTextFormat(String dayMonthYear, String hourMinute) {
+		assert this.isValidDate(dayMonthYear) : "The string dayMonthYear isn't in the expected format";
+		assert this.isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
+
+		String[] s1 = dayMonthYear.split("/");
+		String[] s2 = hourMinute.split(":");
+		// Don't forget to substract 1 to the month in text format
+		GregorianCalendar date = new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1,
+		    Integer.parseInt(s1[0]), Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
+
+		return date;
+	}
+
 }
