@@ -56,10 +56,9 @@ public class ProperJSONParsingTest extends TestCase {
 			+ "\"lastUpdate\": \"2014-10-23 05:07:54\"" + "}\n" + "  ]\n"
 			+ "}\n";
 
-	private static final String PROPER_ID_JSON= "{\n"
-			+ " \"id\" : 3" + "}\n";
+	private static final String PROPER_ID_JSON = "{\n" + " \"id\" : 3" + "}\n";
 
-	private static final String PROPER_ID_LIST_JSON= "{\n"
+	private static final String PROPER_ID_LIST_JSON = "{\n"
 			+ " \"friends\" : [ 3, 4, 5 ]" + "}\n";
 
 	private static final String PROPER_FRIEND_EMPTY_LIST_JSON = "{\n"
@@ -71,15 +70,15 @@ public class ProperJSONParsingTest extends TestCase {
 	private static final String PROPER_IDS_EMPTY_LIST_JSON = "{\n"
 			+ " \"friends\" : [ ]" + "}\n";
 
-	private static final String PROPER_EVENT_JSON = "{\n"
-			+ " \"id\" : \"13\", \n" + " \"creatorId\" : \"3\", \n"
+	private static final String PROPER_EVENT_JSON = "{\n" + "\"event\":"
+			+ "{\n" + " \"id\" : \"13\", \n" + " \"creatorId\" : \"3\", \n"
 			+ " \"startingDate\" : \"2014-10-23 05:07:54\", \n"
 			+ " \"endingDate\" : \"2014-11-12 23:54:22\", \n"
 			+ " \"longitude\" : \"26.85\", \n"
 			+ " \"latitude\" : \"20.03\", \n" + " \"name\" : \"MyEvent\", \n"
 			+ " \"description\" : \"description\", \n"
 			+ " \"participants\" : [\n 3, 4, 1 \n] , \n"
-			+ " \"positionName\" : \"Tokyo\" \n" + "}\n";
+			+ " \"positionName\" : \"Tokyo\" \n" + "}\n" + "}\n";
 
 	private static final String PROPER_EVENT_LIST_JSON = "{\n"
 			+ " \"events\" : [\n" + "{\n" + " \"id\" : \"13\", \n"
@@ -218,20 +217,19 @@ public class ProperJSONParsingTest extends TestCase {
 
 	}
 
-	public void testParseId() throws SmartMapParseException{
+	public void testParseId() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		long id=parser.parseId(PROPER_ID_JSON);
+		long id = parser.parseId(PROPER_ID_JSON);
 		assertEquals("Id do not match", 3, id);
 	}
 
-	public void testParseIds() throws SmartMapParseException{
+	public void testParseIds() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<Long> ids=parser.parseIds(PROPER_ID_LIST_JSON, "friends");
+		List<Long> ids = parser.parseIds(PROPER_ID_LIST_JSON, "friends");
 		assertTrue("Did not parse the 3 ids", ids.size() == 3);
 		assertEquals("First Id do not match", Long.valueOf(3), ids.get(0));
 		assertEquals("Second Id do not match", Long.valueOf(4), ids.get(1));
 		assertEquals("Third Id do not match", Long.valueOf(5), ids.get(2));
-
 
 	}
 
@@ -307,11 +305,14 @@ public class ProperJSONParsingTest extends TestCase {
 		assertEquals("Event description does not match", "description",
 				event.getDescription());
 
-		assertTrue("Did not parse the 3 participants", event.getParticipants().size() == 3);
-		assertEquals("First participant do not match", Long.valueOf(3), event.getParticipants().get(0));
-		assertEquals("Second participant do not match", Long.valueOf(4), event.getParticipants().get(1));
-		assertEquals("Third participant do not match", Long.valueOf(1), event.getParticipants().get(2));
-
+		assertTrue("Did not parse the 3 participants", event.getParticipants()
+				.size() == 3);
+		assertEquals("First participant do not match", Long.valueOf(3), event
+				.getParticipants().get(0));
+		assertEquals("Second participant do not match", Long.valueOf(4), event
+				.getParticipants().get(1));
+		assertEquals("Third participant do not match", Long.valueOf(1), event
+				.getParticipants().get(2));
 
 	}
 
@@ -335,8 +336,10 @@ public class ProperJSONParsingTest extends TestCase {
 		assertEquals("Event name does not match", "YourEvent", event.getName());
 		assertEquals("Event description does not match", "description2",
 				event.getDescription());
-		assertTrue("Did not parse the participant", event.getParticipants().size() == 1);
-		assertEquals("First participant do not match", Long.valueOf(1), event.getParticipants().get(0));
+		assertTrue("Did not parse the participant", event.getParticipants()
+				.size() == 1);
+		assertEquals("First participant do not match", Long.valueOf(1), event
+				.getParticipants().get(0));
 
 	}
 
