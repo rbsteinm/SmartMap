@@ -29,3 +29,33 @@ events:
     position_name: "Somewhere"
     name: "Christmas night"
     description: "Gifts for everyone !"
+  -
+    id: 4
+    creator_id: 3
+    starting_date: "2030-11-18 10:30:00"
+    ending_date: "2030-11-18 12:00:00"
+    longitude: 6.56186974
+    latitude: 46.51895762
+    position_name: "UNIL"
+    name: "Seminar on usefulness of philosophy"
+    description: "Of course philosophy is useless !"
+events_invitations:
+  -
+    id_event: 1
+    id_user: 14
+  -
+    id_event: 1
+    id_user: 12
+  -
+    id_event: 1
+    id_user: 20
+  -
+    id_event: 2
+    id_user: 20
+events_participants:
+  -
+    id_event: 1
+    id_user: 13
+  -
+    id_event: 1
+    id_user: 5

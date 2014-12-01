@@ -16,7 +16,7 @@ use SmartMap\Control\InvalidRequestException;
 class User
 {
     public static $DATE_FORMAT = 'Y-m-d H:i:s';
-    
+
     private $mId;
     private $mFbId;
     private $mName;
@@ -24,7 +24,7 @@ class User
     private $mLongitude;
     private $mLatitude;
     private $mLastUpdate;
-    
+
     /**
      * Constructor
      * @param int $id
@@ -55,16 +55,17 @@ class User
         {
             $lastUpdate = date(self::$DATE_FORMAT);
         }
-        
+        $this->checkLastUpdate($lastUpdate);
+
         $this->mId = $id;
         $this->mFbId = $fbId;
         $this->mName = $name;
         $this->mVisibility = $visibility;
         $this->mLongitude = $longitude;
         $this->mLatitude = $latitude;
-        $this->mLastUpdate = $this->checkLastUpdate($lastUpdate);
+        $this->mLastUpdate = $lastUpdate;
     }
-    
+
     /**
      * Get the user's id.
      * @return a Long representing the user id
@@ -73,7 +74,7 @@ class User
     {
         return $this->mId;
     }
-    
+
     /**
      * Set the user's id.
      * @param Long $id
@@ -82,12 +83,12 @@ class User
     public function setId($id)
     {
         $this->checkId($id);
-        
+
         $this->mId = $id;
-        
+
         return $this;
     }
-    
+
     /**
      * Get the user's facebook id.
      * @return the facebook id associated to this user
@@ -96,7 +97,7 @@ class User
     {
         return $this->mFbId;
     }
-    
+
     /**
      * Set the user's facebook id.
      * @param Long $fbId the facebook id to associate to the user
@@ -104,13 +105,13 @@ class User
      */
     public function setFbId($fbId)
     {
-    	$this->checkId($fbId);
-    	
+        $this->checkId($fbId);
+
         $this->mFbId = $fbId;
-        
+
         return $this;
     }
-    
+
     /**
      * Get the user's name.
      * @return a String for the user's name
@@ -119,7 +120,7 @@ class User
     {
         return $this->mName;
     }
-    
+
     /**
      * Set the user's name.
      * @param String $name
@@ -127,13 +128,13 @@ class User
      */
     public function setName($name)
     {
-    	$this->checkName($name);
-    	
+        $this->checkName($name);
+
         $this->mName = $name;
-        
+
         return $this;
     }
-    
+
     /**
      * Get the user's visibility.
      * @return the visibility: VISIBLE or INVISIBLE
@@ -142,7 +143,7 @@ class User
     {
         return $this->mVisibility;
     }
-    
+
     /**
      * Set the user's visibility.
      * @param enum $visibility the visibility, VISIBLE or INVISIBLE
@@ -151,12 +152,12 @@ class User
     public function setVisibility($visibility)
     {
         $this->checkVisibility($visibility);
-        
+
         $this->mVisibility = $visibility;
-        
+
         return $this;
     }
-    
+
     /**
      * Get the user's longitude coordinate.
      * @return the longitude
@@ -165,7 +166,7 @@ class User
     {
         return $this->mLongitude;
     }
-    
+
     /**
      * Set the user's longitude coordinate.
      * @param double $longitude the longitude to set
@@ -173,13 +174,13 @@ class User
      */
     public function setLongitude($longitude)
     {
-    	$this->checkLongitude($longitude);
-    	
+        $this->checkLongitude($longitude);
+
         $this->mLongitude = $longitude;
-        
+
         return $this;
     }
-    
+
     /**
      * Get the user's latitude coordinate.
      * @return the latitude
@@ -188,7 +189,7 @@ class User
     {
         return $this->mLatitude;
     }
-    
+
     /**
      * Set the user's latitude coordinate.
      * @param unknown $latitude the latitude
@@ -196,18 +197,18 @@ class User
      */
     public function setLatitude($latitude)
     {
-    	$this->checkLatitude($latitude);
-    	
+        $this->checkLatitude($latitude);
+
         $this->mLatitude = $latitude;
-        
+
         return $this;
     }
-    
+
     public function getLastUpdate()
     {
         return $this->mLastUpdate;
     }
-    
+
     /** Checks the validity of an id parameter.
      * @param Long $id
      * @throws \InvalidArgumentException if the id is below 1
@@ -219,20 +220,20 @@ class User
             throw new \InvalidArgumentException('Id must be greater than 0.');
         }
     }
-    
-   /** Checks the validity of a name parameter
-    * @param string $name
-    * @throws \InvalidArgumentException
-    */
+
+    /** Checks the validity of a name parameter
+     * @param string $name
+     * @throws \InvalidArgumentException
+     */
     private function checkName($name)
     {
-    	$length = strlen($name);
-    	if ($length < 2 OR $length > 60)
-    	{
-    		throw new \InvalidArgumentException('Name must be between 2 and 60 characters.');
-    	}
+        $length = strlen($name);
+        if ($length < 2 OR $length > 60)
+        {
+            throw new \InvalidArgumentException('Name must be between 2 and 60 characters.');
+        }
     }
-    
+
     /** Checks the validity of a visibility parameter.
      * @param string $visibility
      * @throws \InvalidArgumentException if the visibility is not VISIBLE or INVISIBLE
@@ -244,19 +245,19 @@ class User
             throw new \InvalidArgumentException('Visibility must be VISIBLE or INVISIBLE.');
         }
     }
-    
+
     /** Checks the validity of a longitude parameter.
      * @param double $longitude
      * @throws \InvalidArgumentException
      */
     private function checkLongitude($longitude)
     {
-    	if ($longitude < -180.0 OR $longitude > 180.0)
-    	{
-    		throw new \InvalidArgumentException('Longitude must be between -180 and 180.');
-    	}
+        if ($longitude < -180.0 OR $longitude > 180.0)
+        {
+            throw new \InvalidArgumentException('Longitude must be between -180 and 180.');
+        }
     }
-    
+
     /** Checks the validity of a latitude parameter.
      * @param double $latitude
      * @throws \InvalidArgumentException
@@ -268,22 +269,19 @@ class User
             throw new \InvalidArgumentException('Latitude must be between -90 and 90.');
         }
     }
-    
+
     private function checkLastUpdate($date)
     {
-        try
-        {
-            $dt = new \DateTime($date);
-        }
-        catch (\Exception $e)
+        $dt = \DateTIme::createFromFormat(self::$DATE_FORMAT, $date);
+
+        if (!$dt || $dt->format(self::$DATE_FORMAT) != $date)
         {
             throw new \InvalidArgumentException('Last update date must be in format ' . self::$DATE_FORMAT . '.');
         }
-        if ($dt->getTimestamp() > time())
+
+        if (strtotime($date) > time())
         {
             throw new \InvalidArgumentException('Last update date must not be in the future.');
         }
-        // If we could create a date from the string, we return it in the right format.
-        return $dt->format(self::$DATE_FORMAT);
     }
 }

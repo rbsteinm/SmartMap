@@ -360,4 +360,111 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
         
         $controller->unfollowFriend($request);
     }
+
+    public function testValidSetVisibility()
+    {
+        $user = new User(14, 12345, 'Toto', 'VISIBLE', 1.0, 2.0, '2014-09-03 22:34:59');
+
+        $modifiedUser = new User(14, 12345, 'Toto', 'INVISIBLE', 1.0, 2.0, '2014-09-03 22:34:59');
+
+        $this->mockRepo
+             ->method('getUser')
+             ->willReturn($user);
+
+        $this->mockRepo->expects($this->once())
+             ->method('getUser')
+             ->with($this->equalTo(14));
+
+        $this->mockRepo->expects($this->once())
+             ->method('updateUser')
+             ->with($modifiedUser);
+
+        $request = new Request($query = array(), $request = array('visibility' => 'INVISIBLE'));
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $response = $controller->setVisibility($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Visibility changed.');
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\InvalidRequestException
+     * @expectedExceptionMessage Visibility must be VISIBLE or INVISIBLE.
+     */
+    public function testInvalidParamSetVisibility()
+    {
+        $user = new User(14, 12345, 'Toto', 'VISIBLE', 1.0, 2.0, '2014-09-03 22:34:59');
+
+        $this->mockRepo
+            ->method('getUser')
+            ->willReturn($user);
+
+        $request = new Request($query = array(), $request = array('visibility' => 'Toto'));
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $controller->setVisibility($request);
+    }
+
+    // Setting the same visibility should not result in an error.
+    public function testSetSameVisibility()
+    {
+        $user = new User(14, 12345, 'Toto', 'INVISIBLE', 1.0, 2.0, '2014-09-03 22:34:59');
+
+        $modifiedUser = new User(14, 12345, 'Toto', 'INVISIBLE', 1.0, 2.0, '2014-09-03 22:34:59');
+
+        $this->mockRepo
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getUser')
+            ->with($this->equalTo(14));
+
+        $this->mockRepo->expects($this->once())
+            ->method('updateUser')
+            ->with($modifiedUser);
+
+        $request = new Request($query = array(), $request = array('visibility' => 'INVISIBLE'));
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $response = $controller->setVisibility($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Visibility changed.');
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in setVisibility method.
+     */
+    public function testSetVisibilityDBException()
+    {
+        $this->mockRepo
+            ->method('getUser')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('visibility' => 'INVISIBLE'));
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $controller->setVisibility($request);
+    }
 }

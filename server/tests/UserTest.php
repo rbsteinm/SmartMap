@@ -29,7 +29,7 @@ class UserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(22.88, $user->getLatitude());
         $this->assertEquals($date, $user->getLastUpdate());
     }
-    
+
     public function testSetters()
     {
     	$user = new User(23, 34, 'Toto', 'VISIBLE', 75.43, 22.88);

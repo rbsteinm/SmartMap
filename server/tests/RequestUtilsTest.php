@@ -79,4 +79,39 @@ class RequestUtilsTest extends PHPUnit_Framework_TestCase
 
         RequestUtils::getIdFromRequest($request);
     }
+
+    public function testGetIntArrayFromString1()
+    {
+        $string = '1';
+
+        $this->assertEquals(array(1), RequestUtils::getIntArrayFromString($string));
+    }
+
+    public function testGetIntArrayFromString2()
+    {
+        $string = '1,2,3';
+
+        $this->assertEquals(array(1, 2, 3), RequestUtils::getIntArrayFromString($string));
+    }
+
+    public function testGetIntArrayFromString3()
+    {
+        $string = '1, 2,3,  5';
+
+        $this->assertEquals(array(1, 2, 3, 5), RequestUtils::getIntArrayFromString($string));
+    }
+
+    public function testGetIntArrayFromString4()
+    {
+        $string = '1, 2, 3,';
+
+        $this->assertEquals(array(1, 2, 3), RequestUtils::getIntArrayFromString($string));
+    }
+
+    public function testGetIntArrayFromString5()
+    {
+        $string = '  1, 2,   , 3,  ';
+
+        $this->assertEquals(array(1, 2, 3), RequestUtils::getIntArrayFromString($string));
+    }
 }

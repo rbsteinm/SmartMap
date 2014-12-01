@@ -128,6 +128,8 @@ $app->post('/followFriend', 'authorization.controller:followFriend');
 
 $app->post('/unfollowFriend', 'authorization.controller:unfollowFriend');
 
+$app->post('/setVisibility', 'authorization.controller:setVisibility');
+
 $app->post('/getUserInfo', 'data.controller:getUserInfo');
 
 $app->post('/getProfilePicture', 'profile.controller:getProfilePicture');
@@ -159,6 +161,19 @@ $app->post('/createEvent', 'event.controller:createEvent');
 $app->post('/updateEvent', 'event.controller:updateEvent');
 
 $app->post('/getPublicEvents', 'event.controller:getPublicEvents');
+
+$app->post('/joinEvent', 'event.controller:joinEvent');
+
+$app->post('/leaveEvent', 'event.controller:leaveEvent');
+
+$app->post('/inviteUsersToEvent', 'event.controller:inviteUsersToEvent');
+
+$app->post('/getEventInvitations', 'event.controller:getEventInvitations');
+
+$app->post('/ackEventInvitation', 'event.controller:ackEventInvitation');
+
+$app->post('/getEventInfo', 'event.controller:getEventInfo');
+
 
 if ($app['debug'] == true)
 {

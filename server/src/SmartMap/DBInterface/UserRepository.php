@@ -106,7 +106,7 @@ class UserRepository
         }
         catch (\InvalidArgumentException $e)
         {
-            throw new DatabaseException('User with invalid state in database with id ' . $id . '.');
+            throw new DatabaseException('User with invalid state in database with id ' . $id . '.', 1, $e);
         }
                         
         return $user;
@@ -548,6 +548,21 @@ class UserRepository
     {
         try
         {
+            $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE idusers = ?";
+            $user = $this->mDb->fetchAssoc($req, array((int) $idFriend));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error adding invitation in addInvitations.', 1, $e);
+        }
+
+        if (!$user)
+        {
+            throw new DatabaseException('Trying to add a non existing user as a friend.');
+        }
+
+        try
+        {
             $this->mDb->insert(self::$TABLE_INVITATIONS, array(
                 'id1' => (int) $idUser,
                 'id2' => (int) $idFriend
@@ -757,9 +772,10 @@ class UserRepository
                     $userData['last_update']
                 );
             }
-            catch (\Exception $e)
+            catch (\InvaliArgumentException $e)
             {
-                throw DatabaseException('User with invalid state in database with id ' . $userData['idusers'] . '.');
+                throw DatabaseException('User with invalid state in database with id ' . $userData['idusers'] . '.',
+                    1, $e);
             }
         }
         
