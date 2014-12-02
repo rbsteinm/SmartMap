@@ -365,8 +365,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 							User user = Cache.getInstance().getUserById(params[0]);
 
 							if (!mInviterIds.contains(user.getId())) {
-								mHelper.addFriendInvitation(new FriendInvitation(0, user.getId(), user
-								    .getName(), Invitation.UNREAD));
+								// mHelper.addFriendInvitation(new FriendInvitation(0, user.getId(), user
+								// .getName(), Invitation.UNREAD));
+
 								mInviterIds.add(user.getId());
 								new AsyncGetPictures().execute(user.getId());
 								if (mNotificationsEnabled && mNotificationsForFriendRequests) {
