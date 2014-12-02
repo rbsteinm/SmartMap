@@ -124,7 +124,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             mEventMarkerManager = new DefaultMarkerManager(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
 
-            this.initializeMarkers();
+            // this.zoomAccordingToAllMarkers();
 
             // Add listeners to the GoogleMap
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
@@ -178,6 +178,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
         }
 
+        this.zoomAccordingToAllMarkers();
     }
 
     /**
@@ -304,6 +305,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             public void run() {
                 mFriendMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
                     .getAllVisibleFriends());
+                // MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -324,6 +326,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             public void run() {
                 mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
                     .getAllVisibleFriends());
+                // MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -352,6 +355,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             public void run() {
                 mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
                     .getAllVisibleFriends());
+                // MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -364,6 +368,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             public void run() {
                 mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
                     .getAllVisibleFriends());
+                MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -533,9 +538,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         }
     }
 
-    private void initializeMarkers() {
-        mFriendMarkerManager.updateMarkers(this, mCache.getAllVisibleFriends());
-        mEventMarkerManager.updateMarkers(this, mCache.getAllVisibleEvents());
+    private void zoomAccordingToAllMarkers() {
 
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
         allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
