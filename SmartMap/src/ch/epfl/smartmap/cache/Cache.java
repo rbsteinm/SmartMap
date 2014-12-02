@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import android.util.Log;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
@@ -308,44 +307,6 @@ public class Cache {
         }
     }
 
-    public void removeGoingEvent(long id) {
-        mGoingEventIds.remove(id);
-
-        // Notify listeners
-        for (CacheListener l : mListeners) {
-            l.onGoingEventListUpdate();
-        }
-    }
-
-    public void removeNearEvent(long id) {
-        mNearEventIds.remove(id);
-
-        // Notify listeners
-        for (CacheListener l : mListeners) {
-            l.onNearEventListUpdate();
-        }
-    }
-
-    public void removePendingFriend(long id) {
-        mPendingFriendIds.remove(id);
-    }
-
-    public void updateFriendList(List<ImmutableUser> newFriends) {
-        Log.d(TAG, "updateFriendList !");
-        // Delete previous list
-        mFriendIds.clear();
-
-        for (ImmutableUser user : newFriends) {
-            mFriendIds.add(user.getId());
-            this.updateFriend(user);
-        }
-
-        // Notify listeners
-        for (CacheListener l : mListeners) {
-            l.onFriendListUpdate();
-        }
-    }
-
     public void updateFromNetwork(SmartMapClient networkClient) throws SmartMapClientException {
         // Fetch friend ids
         HashSet<Long> newFriendIds = new HashSet<Long>(networkClient.getFriendsIds());
@@ -377,51 +338,6 @@ public class Cache {
         }
 
         // TODO : Update Events
-    }
-
-    public void updateGoingEventList(List<ImmutableEvent> newEvents) {
-        // Delete previous list
-        mGoingEventIds.clear();
-
-        for (ImmutableEvent event : newEvents) {
-            mGoingEventIds.add(event.getID());
-            this.updatePublicEvent(event);
-        }
-
-        // Notify listeners
-        for (CacheListener l : mListeners) {
-            l.onGoingEventListUpdate();
-        }
-    }
-
-    public void updateNearPublicEventList(List<ImmutableEvent> newEvents) {
-        // Delete previous list
-        mNearEventIds.clear();
-
-        for (ImmutableEvent event : newEvents) {
-            mNearEventIds.add(event.getID());
-            this.updatePublicEvent(event);
-        }
-
-        // Notify listeners
-        for (CacheListener l : mListeners) {
-            l.onNearEventListUpdate();
-        }
-    }
-
-    public void updatePendingFriendList(List<ImmutableUser> newPendingFriends) {
-        // Delete previous list
-        mFriendIds.clear();
-
-        for (ImmutableUser user : newPendingFriends) {
-            mPendingFriendIds.add(user.getId());
-            this.updateFriend(user);
-        }
-
-        // Notify listeners
-        for (CacheListener l : mListeners) {
-            l.onPendingFriendListUpdate();
-        }
     }
 
     private boolean updatePublicEvent(ImmutableEvent event) {

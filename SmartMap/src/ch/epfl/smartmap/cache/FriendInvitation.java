@@ -17,17 +17,18 @@ public class FriendInvitation implements Invitation {
     private final long mUserId;
     private final String mUserName;
     private int mStatus;
+    private Bitmap mImage;
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
 
-    public FriendInvitation(long invitationId, long userId, String userName, int status) {
+    public FriendInvitation(long invitationId, long userId, String userName, int status, Bitmap image) {
         mInvitationId = invitationId;
         mUserId = userId;
         mUserName = userName;
         mStatus = status;
-
+        mImage = image;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class FriendInvitation implements Invitation {
 
     @Override
     public Bitmap getImage() {
-        return Cache.getInstance().getUserById(mUserId).getImage();
+        return mImage;
     }
 
     @Override
