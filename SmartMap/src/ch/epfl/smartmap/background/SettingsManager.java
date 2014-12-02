@@ -152,8 +152,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user agreed to share his position even when the app is closed,
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the user is offline, <code>false</code> otherwise (if he's online).
      * @author SpicyCH
      */
     public boolean isOffline() {
