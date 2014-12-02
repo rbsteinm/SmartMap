@@ -18,9 +18,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.SettingsManager;
-import ch.epfl.smartmap.gui.FacebookFragment;
+import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.gui.Utils;
 
 import com.facebook.Session;
 
@@ -35,7 +34,7 @@ public class StartActivity extends FragmentActivity {
 
     private static final String TAG = StartActivity.class.getSimpleName();
 
-    private FacebookFragment mFacebookFragment;
+    private LoginFragment mFacebookFragment;
     private ImageView mLogoImage;
     private TextView mWelcomeText;
     private ProgressBar mProgressBar;
@@ -53,6 +52,7 @@ public class StartActivity extends FragmentActivity {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
             }
+            Utils.sContext = this;
         } catch (NameNotFoundException e) {
             Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
         } catch (NoSuchAlgorithmException e) {
@@ -94,7 +94,7 @@ public class StartActivity extends FragmentActivity {
             mWelcomeText.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mFacebookFragment = new FacebookFragment();
+                    mFacebookFragment = new LoginFragment();
                     StartActivity.this.getSupportFragmentManager().beginTransaction()
                         .add(android.R.id.content, mFacebookFragment).commit();
                     Log.d(TAG, "facebook session is open");
@@ -106,13 +106,12 @@ public class StartActivity extends FragmentActivity {
             mWelcomeText.setVisibility(View.INVISIBLE);
             mLogoImage.setVisibility(View.INVISIBLE);
 
-            mFacebookFragment = new FacebookFragment();
+            mFacebookFragment = new LoginFragment();
             this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment)
                 .commit();
         }
 
         SettingsManager.initialize(this.getApplicationContext());
-        DatabaseHelper.initialize(this.getApplicationContext());
     }
 
     /**

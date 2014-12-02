@@ -1,15 +1,14 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.os.Parcel;
-import android.os.Parcelable;
 import ch.epfl.smartmap.R;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -20,161 +19,89 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * An event that can be seen on the map
  * 
  * @author ritterni
- * @author SpicyCH (Events are now Parcelable, add support for event's country name)
+ * @author SpicyCH (PublicEvents are now Parcelable)
  */
-public class PublicEvent implements Event, Displayable, Parcelable {
-    private String mEvtName;
-    private final long mEvtCreator; // the user who created the event
-    private final GregorianCalendar mStartDate;
-    private final GregorianCalendar mEndDate;
-    private long mID;
-    private final Location mLocation;
-    private String mPositionName;
-    private String mPositionCountryName;
-    private String mCreatorName;
+
+public class PublicEvent implements Event {
+
+    private long mId;
+    private String mName;
+    private long mCreatorId;
     private String mDescription;
+    private Location mLocation;
+    private String mLocationString;
+    private GregorianCalendar mStartDate;
+    private GregorianCalendar mEndDate;
+    private List<Long> mParticipants;
 
-    public final static long DEFAULT_ID = -1;
-    public final static int EVENT_ICON = R.drawable.default_event;
-    private final static int RIGHT_SHIFT_COUNT = 32;
+    public final static int DEFAULT_ICON = R.drawable.default_event;
 
-    public static final float MARKER_ANCHOR_X = 0.5f;
+    public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
 
-    public static final Parcelable.Creator<Event> CREATOR = new Parcelable.Creator<Event>() {
-        @Override
-        public PublicEvent createFromParcel(Parcel source) {
-            return new PublicEvent(source);
+    protected PublicEvent(ImmutableEvent event) {
+        if (event.getID() < -1) {
+            throw new IllegalArgumentException();
+        } else {
+            mId = event.getID();
         }
 
-        @Override
-        public PublicEvent[] newArray(int size) {
-            return new PublicEvent[size];
+        if ((event.getName() == null) || event.getName().equals("")) {
+            throw new IllegalArgumentException();
+        } else {
+            mName = event.getName();
         }
-    };
 
-    /**
-     * 
-     * Constructor
-     * 
-     * @param in
-     * @author SpicyCH
-     */
-    public PublicEvent(Parcel in) {
-        mEvtName = in.readString();
-        mEvtCreator = in.readLong();
-        mStartDate = new GregorianCalendar();
-        mStartDate.setTimeInMillis(in.readLong());
-        mEndDate = new GregorianCalendar();
-        mEndDate.setTimeInMillis(in.readLong());
-        mID = in.readLong();
-        mLocation = in.readParcelable(Location.class.getClassLoader());
-        mPositionName = in.readString();
-        mPositionCountryName = in.readString();
-        mCreatorName = in.readString();
-        mDescription = in.readString();
-    }
+        if (event.getCreatorId() < 0) {
+            throw new IllegalArgumentException();
+        } else {
+            mCreatorId = event.getCreatorId();
+        }
 
-    /**
-     * UserEvent constructor
-     * 
-     * @param name
-     *            The name of the event
-     * @param creator
-     *            The id of the user who created the event
-     * @param creatorName
-     *            The name of the user who created the event
-     * @param startDate
-     *            The date at which the event starts
-     * @param endDate
-     *            The date at which the event ends
-     * @param p
-     *            The event's location on the map
-     */
-    public PublicEvent(String name, long creator, String creatorName, GregorianCalendar startDate,
-            GregorianCalendar endDate, Location p) {
-        if (name.isEmpty() || (name == null)) {
-            throw new IllegalArgumentException("Invalid event name!");
+        if ((event.getStartDate() == null) || (event.getEndDate() == null)) {
+            throw new IllegalArgumentException();
+        } else {
+            mStartDate = new GregorianCalendar(TimeZone.getDefault());
+            mEndDate = new GregorianCalendar(TimeZone.getDefault());
         }
-        if (creatorName == null) {
-            throw new IllegalArgumentException("Invalid creator name!");
-        }
-        if (creator < 0) {
-            throw new IllegalArgumentException("Invalid creator ID!");
-        }
-        if (endDate.before(startDate)) {
-            throw new IllegalArgumentException("Invalid event dates!");
-        }
-        mEvtName = name;
-        mEvtCreator = creator;
-        mStartDate = new GregorianCalendar(startDate.get(Calendar.YEAR), startDate.get(Calendar.MONTH),
-                startDate.get(Calendar.DATE), startDate.get(Calendar.HOUR), startDate.get(Calendar.MINUTE));
 
-        mStartDate.set(GregorianCalendar.HOUR_OF_DAY, startDate.get(GregorianCalendar.HOUR_OF_DAY));
-        mStartDate.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
-        mStartDate.setTimeInMillis(startDate.getTimeInMillis());
-        mEndDate = new GregorianCalendar(endDate.get(Calendar.YEAR), endDate.get(Calendar.MONTH),
-                endDate.get(Calendar.DATE), endDate.get(Calendar.HOUR), endDate.get(Calendar.MINUTE));
+        if (event.getLocation() == null) {
+            throw new IllegalArgumentException();
+        } else {
+            mLocation = new Location(event.getLocation());
+        }
 
-        mEndDate.set(GregorianCalendar.HOUR_OF_DAY, endDate.get(GregorianCalendar.HOUR_OF_DAY));
-        mEndDate.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
-        mEndDate.setTimeInMillis(endDate.getTimeInMillis());
-        mLocation = new Location(p);
-        mPositionName = "";
-        mPositionCountryName = "";
-        mCreatorName = creatorName;
-        mDescription = "Tomorrow near Lausanne";
-        mID = DEFAULT_ID;
+        if (event.getLocationString() == null) {
+            mLocationString = Displayable.NO_LOCATION_STRING;
+        } else {
+            mLocationString = event.getLocationString();
+        }
+
+        if (event.getDescription() == null) {
+            mDescription = Event.NO_DESCRIPTION;
+        } else {
+            mDescription = event.getDescription();
+        }
     }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see android.os.Parcelable#describeContents()
-     */
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (this.getClass() != obj.getClass()) {
-            return false;
-        }
-        PublicEvent other = (PublicEvent) obj;
-        if (mEvtName == null) {
-            if (other.mEvtName != null) {
-                return false;
-            }
-        } else if (!mEvtName.equals(other.mEvtName)) {
-            return false;
-        }
-        if (mID != other.mID) {
-            return false;
-        }
-        return true;
+        return (obj != null) && (this.getClass() == obj.getClass())
+            && (this.getId() == ((PublicEvent) obj).getId());
     }
 
     @Override
-    public long getCreator() {
-        return mEvtCreator;
+    public long getCreatorId() {
+        return mCreatorId;
     }
 
     @Override
     public String getCreatorName() {
-        return mCreatorName;
+        return Cache.getInstance().getUserById(mCreatorId).getName();
     }
 
     @Override
@@ -183,15 +110,30 @@ public class PublicEvent implements Event, Displayable, Parcelable {
     }
 
     @Override
-    public GregorianCalendar getEndDate() {
-        return mEndDate;
+    public Calendar getEndDate() {
+        return (Calendar) mEndDate.clone();
     }
 
     @Override
-    public long getID() {
-        return mID;
+    public long getId() {
+        return mId;
     }
 
+    @Override
+    public Bitmap getImage() {
+        return Event.DEFAULT_IMAGE;
+    }
+
+    @Override
+    public ImmutableEvent getImmutableCopy() {
+        return new ImmutableEvent(mId, mName, mCreatorId, mDescription, mStartDate, mEndDate, mLocation,
+            mLocationString, mParticipants);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#getLatLng()
+     */
     @Override
     public LatLng getLatLng() {
         return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
@@ -204,50 +146,39 @@ public class PublicEvent implements Event, Displayable, Parcelable {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context )
-     * 
+     * @see ch.epfl.smartmap.cache.Localisable#getLocationString()
+     */
+    @Override
+    public String getLocationString() {
+        return mLocationString;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
+     * )
      * @author hugo-S
      */
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(this.getLatLng()).title(this.getName())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-                .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+        markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
+            .title(this.getName())
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
         return markerOptions;
 
     }
 
     @Override
     public String getName() {
-        return mEvtName;
+        return mName;
     }
 
     @Override
-    public Bitmap getPicture(Context context) {
-        // Returns a generic event picture
-        return BitmapFactory.decodeResource(context.getResources(), EVENT_ICON);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ch.epfl.smartmap.cache.Event#getPositionCountryName()
-     */
-    @Override
-    public String getPositionCountryName() {
-        return mPositionCountryName;
-    }
-
-    @Override
-    public String getPositionName() {
-        return mPositionName;
-    }
-
-    @Override
-    public String getShortInfos() {
-        return mDescription;
+    public List<Long> getParticipants() {
+        return new ArrayList<Long>(mParticipants);
     }
 
     @Override
@@ -257,123 +188,74 @@ public class PublicEvent implements Event, Displayable, Parcelable {
 
     /*
      * (non-Javadoc)
-     * 
+     * @see ch.epfl.smartmap.cache.Displayable#getSubtitle()
+     */
+    @Override
+    public String getSubtitle() {
+        return mDescription;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
+     */
+    @Override
+    public String getTitle() {
+        return mName;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#getType()
+     */
+    @Override
+    public Type getType() {
+        return Type.PUBLIC;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-
-        result = (prime * result) + (mEvtName == null ? 0 : mEvtName.hashCode());
-        result = (prime * result) + (int) (mID ^ (mID >>> RIGHT_SHIFT_COUNT));
-
-        return result;
-    }
-
-    @Override
-    public void setCreatorName(String name) {
-        if (name.isEmpty() || (name == null)) {
-            throw new IllegalArgumentException("Invalid creator name!");
-        }
-        mCreatorName = name;
-    }
-
-    @Override
-    public void setDescription(String desc) {
-        mDescription = desc;
-    }
-
-    @Override
-    public void setEndDate(GregorianCalendar newDate) {
-        if (newDate.before(mStartDate)) {
-            throw new IllegalArgumentException("Invalid event dates!");
-        }
-        mEndDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
-                newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
-    }
-
-    @Override
-    public void setID(long newID) {
-        mID = newID;
-    }
-
-    @Override
-    public void setLatitude(double y) {
-        mLocation.setLatitude(y);
-    }
-
-    @Override
-    public void setLocation(Location p) {
-        if (p == null) {
-            throw new IllegalArgumentException("The location cannot be null!");
-        }
-        mLocation.set(p);
-    }
-
-    @Override
-    public void setLongitude(double x) {
-        mLocation.setLongitude(x);
-
-    }
-
-    @Override
-    public void setName(String newName) {
-        if (newName.isEmpty() || (newName == null)) {
-            throw new IllegalArgumentException("Invalid event name!");
-        }
-        mEvtName = newName;
+        return (int) mId;
     }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see ch.epfl.smartmap.cache.Event#setPositionCountryName(java.lang.String)
+     * @see ch.epfl.smartmap.cache.Localisable#isShown()
      */
     @Override
-    public void setPositionCountryName(String countryName) {
-        if (countryName == null) {
-            throw new IllegalArgumentException("The country name cannot be null");
-        }
-
-        mPositionCountryName = countryName;
+    public boolean isVisible() {
+        return true;
     }
 
     @Override
-    public void setPositionName(String posName) {
-        if (posName == null) {
-            throw new IllegalArgumentException("The event's position name cannot be null");
+    public void update(ImmutableEvent event) {
+        if ((event.getName() != null) && !event.getName().equals("")) {
+            mName = event.getName();
         }
 
-        mPositionName = posName;
-    }
-
-    @Override
-    public void setStartDate(GregorianCalendar newDate) {
-        if (mEndDate.before(newDate)) {
-            throw new IllegalArgumentException("Invalid event dates!");
+        if (event.getCreatorId() > 0) {
+            mCreatorId = event.getCreatorId();
         }
-        mStartDate.set(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH), newDate.get(Calendar.DATE),
-                newDate.get(Calendar.HOUR), newDate.get(Calendar.MINUTE));
 
-    }
+        if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
+            mStartDate = new GregorianCalendar(TimeZone.getDefault());
+            mEndDate = new GregorianCalendar(TimeZone.getDefault());
+        }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
-     */
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mEvtName);
-        dest.writeLong(mEvtCreator);
-        dest.writeLong(mStartDate.getTimeInMillis());
-        dest.writeLong(mEndDate.getTimeInMillis());
-        dest.writeLong(mID);
-        dest.writeParcelable(mLocation, flags);
-        dest.writeString(mPositionName);
-        dest.writeString(mPositionCountryName);
-        dest.writeString(mCreatorName);
-        dest.writeString(mDescription);
+        if (event.getLocation() != null) {
+            mLocation = new Location(event.getLocation());
+        }
+
+        if (event.getLocationString() != null) {
+            mLocationString = event.getLocationString();
+        }
+
+        if (event.getDescription() == null) {
+            mDescription = event.getDescription();
+        }
     }
 }

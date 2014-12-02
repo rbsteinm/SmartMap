@@ -67,4 +67,29 @@ class RequestUtils
 
         return $id;
     }
+
+    /**
+     * Utility function transforming a list of numbers separated by commas
+     * in an array of integers. Ignores spaces and empty string between commas.
+     *
+     * @param string $string
+     * @return array
+     */
+    public static function getIntArrayFromString($string)
+    {
+        $parts = explode(',', $string);
+
+        $intArray = array();
+
+        for ($i = 0; $i < count($parts); $i++)
+        {
+            $number = trim($parts[$i]);
+            if (!empty($number))
+            {
+                $intArray[] = (int) $number;
+            }
+        }
+
+        return $intArray;
+    }
 } 

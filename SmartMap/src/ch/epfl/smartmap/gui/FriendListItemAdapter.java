@@ -1,10 +1,8 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +15,7 @@ import ch.epfl.smartmap.cache.User;
 /**
  * Customized adapter that displays a list of users in a target activity This
  * adapter dynamically creates a row in the activity for each user It displays
- * in each row: user name, user status, TODO user picture
+ * in each row: user name, user status, user picture
  * 
  * @author rbsteinm
  */
@@ -50,33 +48,77 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         // Create inflater,get item to construct
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
-
-        // Get FriendItem fields
-        TextView name = (TextView) convertView.findViewById(R.id.activity_friends_name);
-        TextView lastSeen = (TextView) convertView.findViewById(R.id.activity_friends_lastSeen);
-        ImageView picture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
-
-        // Set the User's ID to the tag of its View
-        convertView.setTag(mItemsArrayList.get(position).getID());
-
-        // Set fields with friend attributes
+        FriendViewHolder viewHolder;
         User user = mItemsArrayList.get(position);
-        name.setText(user.getName());
-        picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
 
-        // build String "Last seen d/m/y at hour/min"
-        String lastSeenString =
-            "Last seen " + user.getLastSeen().get(GregorianCalendar.DAY_OF_MONTH) + "/"
-                + (user.getLastSeen().get(GregorianCalendar.MONTH) + 1) + "/"
-                + user.getLastSeen().get(GregorianCalendar.YEAR) + " at "
-                + user.getLastSeen().get(GregorianCalendar.HOUR) + ":"
-                + user.getLastSeen().get(GregorianCalendar.MINUTE);
+        if (convertView == null) {
+            LayoutInflater inflater =
+                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
+            viewHolder = new FriendViewHolder();
 
-        lastSeen.setText(lastSeenString);
-        lastSeen.setTextColor(Color.GRAY);
+            viewHolder.setName((TextView) convertView.findViewById(R.id.activity_friends_name));
+            viewHolder.setLastSeen((TextView) convertView.findViewById(R.id.activity_friends_lastSeen));
+            viewHolder.setPicture((ImageView) convertView.findViewById(R.id.activity_friends_picture));
+            viewHolder.setUserId(user.getId());
+
+            convertView.setTag(viewHolder);
+
+        } else {
+            viewHolder = (FriendViewHolder) convertView.getTag();
+        }
+
+        // Set fields with user attributes
+        if (user != null) {
+            viewHolder.getName().setText(user.getName());
+            viewHolder.getPicture().setImageBitmap(user.getImage());
+            viewHolder.getLastSeen().setText(user.getSubtitle());
+        }
 
         return convertView;
+    }
+
+    /**
+     * @author rbsteinm
+     *         ViewHolder pattern implementation for smoother scrolling
+     *         in lists populated by {@link ch.epfl.smartmap.gui.FriendListItemAdapter}
+     */
+    public static class FriendViewHolder {
+        private TextView mName;
+        private TextView mLastSeen;
+        private ImageView mPicture;
+        private long mUserId;
+
+        public TextView getLastSeen() {
+            return mLastSeen;
+        }
+
+        public TextView getName() {
+            return mName;
+        }
+
+        public ImageView getPicture() {
+            return mPicture;
+        }
+
+        public long getUserId() {
+            return mUserId;
+        }
+
+        public void setLastSeen(TextView lastSeen) {
+            mLastSeen = lastSeen;
+        }
+
+        public void setName(TextView name) {
+            mName = name;
+        }
+
+        public void setPicture(ImageView picture) {
+            mPicture = picture;
+        }
+
+        public void setUserId(long userId) {
+            mUserId = userId;
+        }
     }
 }

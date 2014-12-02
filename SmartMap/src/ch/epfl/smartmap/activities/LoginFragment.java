@@ -1,11 +1,10 @@
-package ch.epfl.smartmap.gui;
+package ch.epfl.smartmap.activities;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -20,7 +19,8 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.activities.MainActivity;
+import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -44,9 +44,9 @@ import com.facebook.widget.LoginButton;
  * 
  * @author SpicyCH
  */
-public class FacebookFragment extends Fragment {
+public class LoginFragment extends Fragment {
 
-    private static final String TAG = FacebookFragment.class.getSimpleName();
+    private static final String TAG = LoginFragment.class.getSimpleName();
 
     private static final String FACEBOOK_ID_POST_NAME = "facebookId";
     private static final String FACEBOOK_TOKEN_POST_NAME = "facebookToken";
@@ -59,11 +59,11 @@ public class FacebookFragment extends Fragment {
     private final Session.StatusCallback callback = new Session.StatusCallback() {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
-            FacebookFragment.this.onSessionStateChange(session, state, exception);
+            LoginFragment.this.onSessionStateChange(session, state, exception);
         }
     };
 
-    public FacebookFragment() {
+    public LoginFragment() {
         // We will need to access the user's friends list
         mPermissions = Arrays.asList("user_status", "user_friends");
     }
@@ -92,15 +92,15 @@ public class FacebookFragment extends Fragment {
                     Log.i(TAG, "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
                     Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
 
-                    if (!FacebookFragment.this.sendDataToServer(params)) {
+                    if (!LoginFragment.this.sendDataToServer(params)) {
                         Toast.makeText(
-                            FacebookFragment.this.getActivity(),
-                            FacebookFragment.this
+                            LoginFragment.this.getActivity(),
+                            LoginFragment.this
                                 .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
                             Toast.LENGTH_LONG).show();
                     } else {
-                        // Create and start the next activity
-                        FacebookFragment.this.startMainActivity();
+                        // If all is ok, start filling Cache
+                        new InitCache().execute();
                     }
 
                 } else if (response.getError() != null) {
@@ -243,10 +243,69 @@ public class FacebookFragment extends Fragment {
     }
 
     private void startMainActivity() {
-        Activity currentActivity = this.getActivity();
-        Intent intent = new Intent(this.getActivity(), MainActivity.class);
+        Log.d(TAG, "START MAIN ACTIVITY");
+        Context currentActivity = this.getActivity().getBaseContext();
+        Intent intent = new Intent(currentActivity, MainActivity.class);
         this.startActivity(intent);
-        currentActivity.finish();
+    }
+
+    /**
+     * The goal of this Task is to compute the location of the displayable multiple times on start so that
+     * they don't appear at false positions because of google locations.
+     * 
+     * @author jfperren
+     */
+    private class ComputeLocations extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            // TODO : Handle bug with markers at wrong place
+
+            // for (User user : Cache.getInstance().getAllFriends()) {
+            // user.update(user.getImmutableCopy());
+            // }
+            // for (Event event : Cache.getInstance().getAllEvents()) {
+            // event.update(event.getImmutableCopy());
+            // }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // Create and start the next activity
+            LoginFragment.this.startMainActivity();
+        }
+    }
+
+    /**
+     * Initialize Cache with NetworkClient, or with Database if connection issues.
+     * 
+     * @author jfperren
+     */
+    private class InitCache extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            List<Long> friendIds;
+            try {
+                // Try to get the list of friend ids online
+                friendIds = NetworkSmartMapClient.getInstance().getFriendsIds();
+            } catch (SmartMapClientException e) {
+                // If there is connection issues, get it in the database
+                friendIds = DatabaseHelper.getInstance().getFriendIds();
+            }
+            if (friendIds != null) {
+                Cache.getInstance().initFriendList(friendIds);
+            } else {
+                // TODO : Handle this case
+                this.doInBackground(params);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            new ComputeLocations().execute();
+        }
     }
 
     /**

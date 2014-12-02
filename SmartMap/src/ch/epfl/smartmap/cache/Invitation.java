@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 
 /**
  * Describes a generic invitation of the app
@@ -8,15 +9,31 @@ import android.content.Intent;
  * @author agpmilli
  */
 public interface Invitation {
+
+    /**
+     * int representing invitation status
+     */
+    int UNREAD = 0;
+    int READ = 1;
+    int ACCEPTED = 2;
+    int REFUSED = 3;
+
     /**
      * @return invitation's id
      */
-    long getID();
+    long getId();
+
+    Bitmap getImage();
 
     /**
      * @return invitation's intent
      */
     Intent getIntent();
+
+    /**
+     * @return int representing invitation's status
+     */
+    int getStatus();
 
     /**
      * @return invitation's text
@@ -29,53 +46,20 @@ public interface Invitation {
     String getTitle();
 
     /**
-     * @return invitation's creator
+     * @return user's id
      */
-    User getUser();
+    long getUserId();
 
     /**
-     * @return True if invitation has been read
+     * @return user's name
      */
-    boolean isRead();
+    String getUserName();
 
     /**
-     * Set invitation's intent
+     * Sets status of invitation
      * 
-     * @param intent
-     *            the invitation's intent
+     * @param Status
+     *            the int representing invitation status
      */
-    void setIntent(Intent intent);
-
-    /**
-     * Sets whether or not the user has read the invitation
-     * 
-     * @param isRead
-     *            True if invitation has been read
-     */
-    void setRead(boolean isRead);
-
-    /**
-     * Set invitation's text
-     * 
-     * @param text
-     *            the invitation's text
-     */
-    void setText(String text);
-
-    /**
-     * Set invitation's title
-     * 
-     * @param title
-     *            the invitation's title
-     */
-    void setTitle(String title);
-
-    /**
-     * Set invitation's creator
-     * 
-     * @param user
-     *            the invitation's creator
-     */
-    void setUser(User user);
-
+    void setStatus(int newStatus);
 }

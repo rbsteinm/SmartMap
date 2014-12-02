@@ -122,15 +122,25 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $controller->updatePos($request);
     }
     
-    public function testValidListFriendPos()
+    public function testValidListFriendsPos()
     {
         $friendsIds = array(1, 2);
-        
+
+        $user = new User(14, 1234, 'Me', 'VISIBLE', 10, 20, '2014-11-21 21:44:54');
+
         $returnUsers = array(
             new User(1, 2, 'Toto', 'VISIBLE', 1.0, 2.0, '2014-11-12 13:33:45'),
             new User(2, 3, 'Titi', 'VISIBLE', 3.0, 4.0, '2014-11-13 01:56:22'),
         );
-        
+
+        $this->mockRepo
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getUser')
+            ->with($this->equalTo(14));
+
         $this->mockRepo
              ->method('getFriendsIds')
              ->willReturn($friendsIds);
@@ -164,6 +174,58 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         
         $validResponse = array('status' => 'Ok', 'message' => 'Fetched friends positions !', 'positions' => $list);
         
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    public function testInvisibleListFriendsPos()
+    {
+        $friendsIds = array(1, 2);
+
+        $user = new User(14, 1234, 'Me', 'INVISIBLE', 10, 20, '2014-11-21 21:44:54');
+
+        $returnUsers = array(
+            new User(1, 2, 'Toto', 'VISIBLE', 1.0, 2.0, '2014-11-12 13:33:45'),
+            new User(2, 3, 'Titi', 'VISIBLE', 3.0, 4.0, '2014-11-13 01:56:22'),
+        );
+
+        $this->mockRepo
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getUser')
+            ->with($this->equalTo(14));
+
+        $this->mockRepo
+            ->method('getFriendsIds')
+            ->willReturn($friendsIds);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getFriendsIds')
+            ->with($this->equalTo(14), $this->equalTo(array('ALLOWED')), $this->equalTo(array('FOLLOWED')));
+
+        $this->mockRepo
+            ->method('getUsers')
+            ->willReturn($returnUsers);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getUsers')
+            ->with($this->equalTo($friendsIds), $this->equalTo(array('VISIBLE')));
+
+        $request = new Request();
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new DataController($this->mockRepo);
+
+        $response = $controller->listFriendsPos($request);
+
+        $list = array();
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Fetched friends positions !', 'positions' => $list);
+
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
     

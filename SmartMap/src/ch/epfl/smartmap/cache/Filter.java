@@ -26,7 +26,7 @@ public interface Filter extends Displayable {
      * @return The ID
      */
     @Override
-    long getID();
+    long getId();
 
     /**
      * @return The whole list of IDs

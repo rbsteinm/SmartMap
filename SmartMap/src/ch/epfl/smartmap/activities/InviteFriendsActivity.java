@@ -13,15 +13,15 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 
 /**
  * This activity lets the user invite friends to an event. Launched from
- * {@link ch.epfl.smartmap.activities.ShowEventInformationActivity}
- * 
+ * {@link ch.epfl.smartmap.activities.EventInformationActivity}
  * 
  * @author SpicyCH
  */
@@ -114,7 +114,7 @@ public class InviteFriendsActivity extends ListActivity {
 
         List<Long> friendsIds = new ArrayList<Long>();
         for (Integer i : posSelected) {
-            friendsIds.add(mUserList.get(i).getID());
+            friendsIds.add(mUserList.get(i).getId());
         }
 
         Log.d(TAG, "Friends ids to invite: " + friendsIds);
@@ -123,7 +123,9 @@ public class InviteFriendsActivity extends ListActivity {
             Toast.makeText(this, this.getString(R.string.invite_friends_success), Toast.LENGTH_LONG).show();
             // TODO invite friends
         } else {
-            Toast.makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG).show();
+            Toast
+                .makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG)
+                .show();
         }
     }
 
@@ -131,7 +133,7 @@ public class InviteFriendsActivity extends ListActivity {
      * @author SpicyCH
      */
     private void setAdapter() {
-        mUserList = DatabaseHelper.getInstance().getAllFriends();
+        mUserList = Cache.getInstance().getAllFriends();
 
         // Create a new list of booleans with the size of the user list and and default value false
         mSelectedPositions = new ArrayList<Boolean>();

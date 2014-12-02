@@ -4,14 +4,13 @@
 package ch.epfl.smartmap.test.severcom;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.NetworkNotificationBag;
 import ch.epfl.smartmap.servercom.NotificationBag;
 
@@ -20,143 +19,139 @@ import ch.epfl.smartmap.servercom.NotificationBag;
  */
 public class NetworkNotificationBagTest extends TestCase {
 
-    @SuppressWarnings("unused")
-    @Test
-    public void testContructor() {
+	@SuppressWarnings("unused")
+	@Test
+	public void testContructor() {
 
-        try {
-            NotificationBag nb =
-                new NetworkNotificationBag(null, new ArrayList<User>(), new ArrayList<Long>());
-            fail("Exception was not raised by constructor !");
-        } catch (IllegalArgumentException e) {
-            // Success
-        }
+		try {
+			NotificationBag nb =
+					new NetworkNotificationBag(null, new ArrayList<Long>(), new ArrayList<Long>());
+			fail("Exception was not raised by constructor !");
+		} catch (IllegalArgumentException e) {
+			// Success
+		}
 
-        try {
-            NotificationBag nb =
-                new NetworkNotificationBag(new ArrayList<User>(), null, new ArrayList<Long>());
-            fail("Exception was not raised by constructor !");
-        } catch (IllegalArgumentException e) {
-            // Success
-        }
+		try {
+			NotificationBag nb =
+					new NetworkNotificationBag(new ArrayList<Long>(), null, new ArrayList<Long>());
+			fail("Exception was not raised by constructor !");
+		} catch (IllegalArgumentException e) {
+			// Success
+		}
 
-        try {
-            NotificationBag nb =
-                new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(), null);
-            fail("Exception was not raised by constructor !");
-        } catch (IllegalArgumentException e) {
-            // Success
-        }
-    }
+		try {
+			NotificationBag nb =
+					new NetworkNotificationBag(new ArrayList<Long>(), new ArrayList<Long>(), null);
+			fail("Exception was not raised by constructor !");
+		} catch (IllegalArgumentException e) {
+			// Success
+		}
+	}
 
-    @Test
-    public void testGetInvitingUsers() {
+	@Test
+	public void testGetInvitingUsers() {
 
-        List<User> invitersList = new ArrayList<User>();
-        invitersList.add(new Friend(1, "Toto"));
-        invitersList.add(new Friend(2, "Titi"));
+		List<Long> invitersList = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
 
-        NotificationBag nb =
-            new NetworkNotificationBag(invitersList, new ArrayList<User>(), new ArrayList<Long>());
 
-        // Test for structural equality (with method equals), not reference equality !
-        assertTrue("The IntitingUsers list is not equal to the one given to the constructor",
-            invitersList.equals(nb.getInvitingUsers()));
-    }
+		NotificationBag nb =
+				new NetworkNotificationBag(invitersList, new ArrayList<Long>(), new ArrayList<Long>());
 
-    @Test
-    public void testGetNewFriends() {
+		// Test for structural equality (with method equals), not reference equality !
+		assertTrue("The IntitingUsers list is not equal to the one given to the constructor",
+				invitersList.equals(nb.getInvitingUsers()));
+	}
 
-        List<User> newFriends = new ArrayList<User>();
-        newFriends.add(new Friend(1, "Toto"));
-        newFriends.add(new Friend(2, "Titi"));
+	@Test
+	public void testGetNewFriends() {
 
-        NotificationBag nb =
-            new NetworkNotificationBag(new ArrayList<User>(), newFriends, new ArrayList<Long>());
+		List<Long> newFriends = Arrays.asList(Long.valueOf(1),Long.valueOf(2));
 
-        // Test for structural equality (with method equals), not reference equality !
-        assertTrue("The newFriends list is not equal to the one given to the constructor",
-            newFriends.equals(nb.getNewFriends()));
-    }
 
-    @Test
-    public void testGetRemovedFriendsIds() {
+		NotificationBag nb =
+				new NetworkNotificationBag(new ArrayList<Long>(), newFriends, new ArrayList<Long>());
 
-        List<Long> removedIds = new ArrayList<Long>();
-        removedIds.add((long) 4);
-        removedIds.add((long) 54);
+		// Test for structural equality (with method equals), not reference equality !
+		assertTrue("The newFriends list is not equal to the one given to the constructor",
+				newFriends.equals(nb.getNewFriends()));
+	}
 
-        NotificationBag nb =
-            new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(), removedIds);
+	@Test
+	public void testGetRemovedFriendsIds() {
 
-        // Test for structural equality (with method equals), not reference equality !
-        assertTrue("The newFriends list is not equal to the one given to the constructor",
-            removedIds.equals(nb.getRemovedFriendsIds()));
-    }
+		List<Long> removedIds = new ArrayList<Long>();
+		removedIds.add((long) 4);
+		removedIds.add((long) 54);
 
-    @Test
-    public void testInvitingFriendsDefensiveCopy() {
+		NotificationBag nb =
+				new NetworkNotificationBag(new ArrayList<Long>(), new ArrayList<Long>(), removedIds);
 
-        List<User> invitersList = new ArrayList<User>();
-        invitersList.add(new Friend(1, "Toto"));
-        invitersList.add(new Friend(2, "Titi"));
+		// Test for structural equality (with method equals), not reference equality !
+		assertTrue("The newFriends list is not equal to the one given to the constructor",
+				removedIds.equals(nb.getRemovedFriendsIds()));
+	}
 
-        NotificationBag nb =
-            new NetworkNotificationBag(invitersList, new ArrayList<User>(), new ArrayList<Long>());
+	@Test
+	public void testInvitingFriendsDefensiveCopy() {
 
-        invitersList.add(new Friend(3, "Tata"));
+		List<Long> invitersList = new ArrayList<Long>(Arrays.asList(Long.valueOf(1),Long.valueOf(2)));
 
-        assertTrue("The constructor does not make a defensive copy of inviting users list.",
-            invitersList.size() != nb.getInvitingUsers().size());
 
-        List<User> getList = nb.getInvitingUsers();
-        getList.add(new Friend(4, "Tutu"));
+		NotificationBag nb =
+				new NetworkNotificationBag(invitersList, new ArrayList<Long>(), new ArrayList<Long>());
 
-        assertTrue("The getter does not return a defensive copy of inviting users list.",
-            getList.size() != nb.getInvitingUsers().size());
-    }
+		invitersList.add(Long.valueOf(3));
 
-    @Test
-    public void testNewFriendsDefensiveCopy() {
+		assertTrue("The constructor does not make a defensive copy of inviting users list.",
+				invitersList.size() != nb.getInvitingUsers().size());
 
-        List<User> friendsList = new ArrayList<User>();
-        friendsList.add(new Friend(1, "Toto"));
-        friendsList.add(new Friend(2, "Titi"));
+		List<Long> getList = nb.getInvitingUsers();
+		getList.add(Long.valueOf(4));
 
-        NotificationBag nb =
-            new NetworkNotificationBag(new ArrayList<User>(), friendsList, new ArrayList<Long>());
+		assertTrue("The getter does not return a defensive copy of inviting users list.",
+				getList.size() != nb.getInvitingUsers().size());
+	}
 
-        friendsList.add(new Friend(3, "Tata"));
+	@Test
+	public void testIRemovedFriendsDefensiveCopy() {
 
-        assertTrue("The constructor does not make a defensive copy of new friends list.",
-            friendsList.size() != nb.getNewFriends().size());
+		List<Long> removedIds = new ArrayList<Long>();
+		removedIds.add((long) 4);
+		removedIds.add((long) 54);
 
-        List<User> getList = nb.getNewFriends();
-        getList.add(new Friend(4, "Tutu"));
+		NotificationBag nb =
+				new NetworkNotificationBag(new ArrayList<Long>(), new ArrayList<Long>(), removedIds);
 
-        assertTrue("The getter does not return a defensive copy of new friends list.", getList.size() != nb
-            .getNewFriends().size());
-    }
+		removedIds.add((long) 5);
 
-    @Test
-    public void testIRemovedFriendsDefensiveCopy() {
+		assertTrue("The constructor does not make a defensive copy of removed ids list.",
+				removedIds.size() != nb.getRemovedFriendsIds().size());
 
-        List<Long> removedIds = new ArrayList<Long>();
-        removedIds.add((long) 4);
-        removedIds.add((long) 54);
+		List<Long> getList = nb.getRemovedFriendsIds();
+		getList.add((long) 10);
 
-        NotificationBag nb =
-            new NetworkNotificationBag(new ArrayList<User>(), new ArrayList<User>(), removedIds);
+		assertTrue("The getter does not return a defensive copy of removed ids list.", getList.size() != nb
+				.getRemovedFriendsIds().size());
+	}
 
-        removedIds.add((long) 5);
+	@Test
+	public void testNewFriendsDefensiveCopy() {
 
-        assertTrue("The constructor does not make a defensive copy of removed ids list.",
-            removedIds.size() != nb.getRemovedFriendsIds().size());
+		List<Long> friendsList = new ArrayList<Long>(Arrays.asList(Long.valueOf(1),Long.valueOf(2))) ;
 
-        List<Long> getList = nb.getRemovedFriendsIds();
-        getList.add((long) 10);
 
-        assertTrue("The getter does not return a defensive copy of removed ids list.", getList.size() != nb
-            .getRemovedFriendsIds().size());
-    }
+		NotificationBag nb =
+				new NetworkNotificationBag(new ArrayList<Long>(), friendsList, new ArrayList<Long>());
+
+		friendsList.add(Long.valueOf(3));
+
+		assertTrue("The constructor does not make a defensive copy of new friends list.",
+				friendsList.size() != nb.getNewFriends().size());
+
+		List<Long> getList = nb.getNewFriends();
+		getList.add(Long.valueOf(4));
+
+		assertTrue("The getter does not return a defensive copy of new friends list.", getList.size() != nb
+				.getNewFriends().size());
+	}
 }

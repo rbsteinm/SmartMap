@@ -6,10 +6,8 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.util.LongSparseArray;
-import ch.epfl.smartmap.R;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -46,8 +44,18 @@ public class DefaultFilter implements Filter {
     }
 
     @Override
-    public long getID() {
+    public long getId() {
         return databaseID;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getImage()
+     */
+    @Override
+    public Bitmap getImage() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /*
@@ -76,47 +84,43 @@ public class DefaultFilter implements Filter {
      */
     @Override
     public Location getLocation() {
-        return new Location("Lausanne");
+        return NO_LOCATION;
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
+     * @see ch.epfl.smartmap.cache.Displayable#getLocationString()
+     */
+    @Override
+    public String getLocationString() {
+        return NO_LOCATION_STRING;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions()
      */
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
-        // TODO Auto-generated method stub
-        return null;
+        return NO_MARKER_OPTIONS;
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getName()
+     * @see ch.epfl.smartmap.cache.Displayable#getSubtitle()
      */
     @Override
-    public String getName() {
-        return listName;
+    public String getSubtitle() {
+        return "this is a default filter";
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getPicture(android.content.Context)
+     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
      */
     @Override
-    public Bitmap getPicture(Context context) {
-
-        Bitmap pic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_default_user);
-
-        return pic;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getShortInfos()
-     */
-    @Override
-    public String getShortInfos() {
-        return "This is a Family Filter";
+    public String getTitle() {
+        return "Filter";
     }
 
     @Override
@@ -129,6 +133,15 @@ public class DefaultFilter implements Filter {
         Collections.sort(uList, new UserComparator());
 
         return uList;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#isVisible()
+     */
+    @Override
+    public boolean isVisible() {
+        return false;
     }
 
     @Override
@@ -145,4 +158,5 @@ public class DefaultFilter implements Filter {
     public void setListName(String newName) {
         listName = newName;
     }
+
 }

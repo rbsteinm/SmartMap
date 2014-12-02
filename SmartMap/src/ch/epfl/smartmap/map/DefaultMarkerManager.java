@@ -13,9 +13,11 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.Event;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -25,11 +27,9 @@ import com.google.android.gms.maps.model.Marker;
 /**
  * A default implementation of {@link MarkerManager}
  * 
- * @param <T>
- *            the type of the items for which the class displays markers
  * @author hugo-S
  */
-public class DefaultMarkerManager<T extends Displayable> implements MarkerManager<T> {
+public class DefaultMarkerManager implements MarkerManager {
 
     public static final String TAG = "MARKER MANAGER";
 
@@ -40,7 +40,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * A map that contains the displayed markers' ids, associated with the
      * item they represent
      */
-    private final Map<String, T> mDisplayedItems;
+    private final Map<String, Displayable> mDisplayedItems;
 
     /**
      * A map that maps each marker with its id
@@ -49,7 +49,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
 
     public DefaultMarkerManager(GoogleMap googleMap) {
         mGoogleMap = googleMap;
-        mDisplayedItems = new HashMap<String, T>();
+        mDisplayedItems = new HashMap<String, Displayable>();
         mDictionnaryMarkers = new HashMap<String, Marker>();
     }
 
@@ -59,7 +59,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * Displayable, android.content.Context)
      */
     @Override
-    public Marker addMarker(T item, Context context) {
+    public Marker addMarker(Displayable item, Context context) {
         Marker marker = mGoogleMap.addMarker(item.getMarkerOptions(context));
         mDisplayedItems.put(marker.getId(), item);
         mDictionnaryMarkers.put(marker.getId(), marker);
@@ -101,8 +101,8 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * @see ch.epfl.smartmap.map.MarkerManager#getDisplayedItems()
      */
     @Override
-    public List<T> getDisplayedItems() {
-        return new ArrayList<T>(mDisplayedItems.values());
+    public List<Displayable> getDisplayedItems() {
+        return new ArrayList<Displayable>(mDisplayedItems.values());
     }
 
     /*
@@ -121,7 +121,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * .gms.maps.model.Marker)
      */
     @Override
-    public T getItemForMarker(Marker marker) {
+    public Displayable getItemForMarker(Marker marker) {
         return mDisplayedItems.get(marker.getId());
     }
 
@@ -132,8 +132,8 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * cache.Displayable)
      */
     @Override
-    public Marker getMarkerForItem(T item) {
-        for (Entry<String, T> entry : mDisplayedItems.entrySet()) {
+    public Marker getMarkerForItem(Displayable item) {
+        for (Entry<String, Displayable> entry : mDisplayedItems.entrySet()) {
             if (entry.getValue().equals(item)) {
                 return mDictionnaryMarkers.get(entry.getKey());
             }
@@ -148,7 +148,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * .Displayable)
      */
     @Override
-    public boolean isDisplayedItem(T item) {
+    public boolean isDisplayedItem(Displayable item) {
         return mDisplayedItems.containsValue(item);
     }
 
@@ -170,7 +170,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * .Displayable)
      */
     @Override
-    public Marker removeMarker(T item) {
+    public Marker removeMarker(Displayable item) {
         Marker marker = this.getMarkerForItem(item);
         mDisplayedItems.remove(marker.getId());
         mDictionnaryMarkers.remove(marker.getId());
@@ -185,10 +185,14 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
      * java.util.List)
      */
     @Override
-    public void updateMarkers(Context context, List<T> itemsToDisplay) {
+    public void updateMarkers(Context context, List<Displayable> itemsToDisplay) {
+        Log.d(TAG, "updateMarkers");
         // In the list friendsToDisplay, search if each friend s already
         // displayed
-        for (T item : itemsToDisplay) {
+        for (Displayable item : itemsToDisplay) {
+            if (item instanceof Event) {
+                Log.d("Markers", "Display event !");
+            }
             Marker marker;
             // if the item is already displayed, get the marker for this
             // item, else add a new marker
@@ -201,7 +205,7 @@ public class DefaultMarkerManager<T extends Displayable> implements MarkerManage
         }
 
         // remove the markers that are not longer in the list to display
-        for (T item : this.getDisplayedItems()) {
+        for (Displayable item : this.getDisplayedItems()) {
             if (!itemsToDisplay.contains(item)) {
                 // && (!getMarkerForItem(item).isInfoWindowShown())) {
                 Marker marker = this.removeMarker(item);

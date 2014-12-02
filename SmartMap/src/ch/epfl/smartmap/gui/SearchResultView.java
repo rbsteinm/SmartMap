@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.gui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -12,9 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
-import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
 
 /**
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
@@ -60,10 +57,9 @@ public class SearchResultView extends RelativeLayout {
         super(context);
 
         mItem = item;
-        mImage = item.getPicture(context);
+        mImage = item.getImage();
 
         // Layout Parameters
-
         this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
 
@@ -82,7 +78,7 @@ public class SearchResultView extends RelativeLayout {
         // Create mTitleView
         mTitleView = new TextView(context);
         mTitleView.setId(R.id.search_result_title);
-        mTitleView.setText(mItem.getName());
+        mTitleView.setText(mItem.getTitle());
         mTitleView.setTextSize(TITLE_TEXT_SIZE);
         mTitleView.setTypeface(null, Typeface.BOLD);
         mTitleView.setPadding(0, 0, 0, TITLE_BOTTOM_PADDING);
@@ -94,7 +90,7 @@ public class SearchResultView extends RelativeLayout {
         // Create mShortInfoView
         mShortInfoView = new TextView(context);
         mShortInfoView.setId(R.id.search_result_short_info);
-        mShortInfoView.setText(item.getShortInfos());
+        mShortInfoView.setText(item.getSubtitle());
         mShortInfoView.setTextColor(this.getResources().getColor(R.color.lastSeenConnectionTextColor));
         LayoutParams shortInfoParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         shortInfoParams.addRule(RIGHT_OF, R.id.search_result_image);
@@ -134,23 +130,6 @@ public class SearchResultView extends RelativeLayout {
                 return true;
             }
         });
-
-        DatabaseHelper.initialize(context).addOnDisplayableInformationsChangeListener(mItem,
-            new OnDisplayableInformationsChangeListener() {
-                @Override
-                public void onDisplayableInformationsChange() {
-                    mItem = DatabaseHelper.getInstance().getUser(mItem.getID());
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mTitleView.setText(mItem.getName());
-                            mShortInfoView.setText(mItem.getShortInfos());
-                            mImageView.setImageBitmap(mItem.getPicture(context));
-                        }
-
-                    });
-                }
-            });
     }
 
     /**
@@ -172,5 +151,4 @@ public class SearchResultView extends RelativeLayout {
 
         return auditErrors;
     }
-
 }

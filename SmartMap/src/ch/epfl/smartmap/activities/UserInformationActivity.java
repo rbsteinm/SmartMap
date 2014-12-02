@@ -3,6 +3,7 @@ package ch.epfl.smartmap.activities;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,13 +11,14 @@ import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -33,13 +35,15 @@ public class UserInformationActivity extends Activity {
 
     private DatabaseHelper mCacheDB;
 
-    private CheckBox mFollowCheckBox;
+    private Switch mFollowSwitch;
     private TextView mInfosView;
     private TextView mNameView;
 
     // Children Views
     private ImageView mPictureView;
     private User mUser;
+    // TODO replace this by mUser.isFollowing() when implemented
+    private final boolean isFollowing = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +53,7 @@ public class UserInformationActivity extends Activity {
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
         mNameView = (TextView) this.findViewById(R.id.user_info_name);
         mInfosView = (TextView) this.findViewById(R.id.user_info_infos);
-        mFollowCheckBox = (CheckBox) this.findViewById(R.id.user_info_checkbox);
+        mFollowSwitch = (Switch) this.findViewById(R.id.user_info_follow_switch);
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
@@ -59,12 +63,13 @@ public class UserInformationActivity extends Activity {
     protected void onResume() {
         super.onResume();
         // Get User & Database
-        mUser = this.getIntent().getParcelableExtra("USER");
-        mCacheDB = DatabaseHelper.getInstance();
+        mUser = Cache.getInstance().getUserById(this.getIntent().getLongExtra("USER", User.NO_ID));
+
         // Set Informations
         mNameView.setText(mUser.getName());
-        mInfosView.setText(mUser.getShortInfos());
-        mPictureView.setImageBitmap(mUser.getPicture(this));
+        mInfosView.setText(mUser.getSubtitle());
+        mPictureView.setImageBitmap(mUser.getImage());
+        mFollowSwitch.setChecked(isFollowing);
     }
 
     public void displayDeleteConfirmationDialog(View view) {
@@ -75,7 +80,7 @@ public class UserInformationActivity extends Activity {
         builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                new RemoveFriend().execute(mUser.getID());
+                new RemoveFriend().execute(mUser.getId());
             }
         });
 
@@ -92,7 +97,15 @@ public class UserInformationActivity extends Activity {
     }
 
     public void followUnfollow(View view) {
-        new FollowFriend().execute(mUser.getID());
+        new FollowFriend().execute(mUser.getId());
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+        this.finish();
     }
 
     @Override
@@ -107,6 +120,17 @@ public class UserInformationActivity extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+                    this.startActivity(new Intent(this, MainActivity.class));
+                }
+                this.finish();
+            default:
+                break;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -121,11 +145,11 @@ public class UserInformationActivity extends Activity {
         protected String doInBackground(Long... params) {
             String confirmString = "";
             try {
-                if (mFollowCheckBox.isChecked()) {
-                    NetworkSmartMapClient.getInstance().followFriend(mUser.getID());
+                if (mFollowSwitch.isChecked()) {
+                    NetworkSmartMapClient.getInstance().followFriend(mUser.getId());
                     confirmString = "You're now following " + mUser.getName();
                 } else {
-                    NetworkSmartMapClient.getInstance().unfollowFriend(mUser.getID());
+                    NetworkSmartMapClient.getInstance().unfollowFriend(mUser.getId());
                     confirmString = "You're not following " + mUser.getName() + " anymore";
                 }
             } catch (SmartMapClientException e) {
@@ -136,7 +160,7 @@ public class UserInformationActivity extends Activity {
 
         @Override
         protected void onPostExecute(String confirmString) {
-            Toast.makeText(UserInformationActivity.this, confirmString, Toast.LENGTH_LONG).show();
+            Toast.makeText(UserInformationActivity.this, confirmString, Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -164,7 +188,7 @@ public class UserInformationActivity extends Activity {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mCacheDB.deleteUser(userId);
+                        Cache.getInstance().removeFriend(userId);
                     }
                 });
 

@@ -1,174 +1,70 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.location.Location;
-import android.os.Parcelable;
-
-import com.google.android.gms.maps.model.LatLng;
+import android.graphics.BitmapFactory;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.gui.Utils;
 
 /**
  * Describes a generic user of the app
  * 
  * @author ritterni
  */
-public interface User extends Parcelable, Displayable {
 
-    /**
-     *
-     */
-    void deletePicture(Context context);
+public interface User extends Displayable {
+
+    String NO_PHONE_NUMBER = "No phone Number";
+
+    String NO_EMAIL = "No email";
+
+    Calendar NO_LAST_SEEN = GregorianCalendar.getInstance(TimeZone.getDefault());
+
+    Bitmap NO_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(), R.drawable.ic_default_user);
+
+    User NOBODY = null;
+
+    User NOT_FOUND = null;
+    int IMAGE_QUALITY = 100;
+
+    long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
+
+    float MARKER_ANCHOR_X = (float) 0.5;
+
+    float MARKER_ANCHOR_Y = 1;
+    int PICTURE_WIDTH = 50;
+    int PICTURE_HEIGHT = 50;
+    double NO_LATITUDE = 0.0;
+    double NO_LONGITUDE = 0.0;
 
     /**
      * @return The user's email address
      */
     String getEmail();
 
-    /**
-     * @return The user's ID
-     */
-    @Override
-    long getID();
-
-    /**
-     * @return The date/hour at which the user was last seen
-     */
-    GregorianCalendar getLastSeen();
-
-    /**
-     * @return The user's latitude and longitude
-     */
-
-    @Override
-    LatLng getLatLng();
-
-    /**
-     * @return The user's position
-     */
-    @Override
-    Location getLocation();
-
-    /**
-     * @return The user's position as a String (e.g. 'Lausanne')
-     */
-    String getLocationString();
+    ImmutableUser getImmutableCopy();
 
     /**
      * @return The user's name
      */
+    /**
+     * @return The date/hour at which the user was last seen
+     */
+    Calendar getLastSeen();
 
-    @Override
     String getName();
 
-    /**
-     * @return The user's phone number
-     */
-    String getNumber();
+    String getPhoneNumber();
 
-    /**
-     * @return A user picture to display
-     */
-    @Override
-    Bitmap getPicture(Context context);
+    Type getType();
 
-    /**
-     * Deprecated. Use getLastSeen() instead.
-     * 
-     * @return True if the user is online
-     */
-    @Deprecated
-    boolean isOnline();
+    void update(ImmutableUser user);
 
-    /**
-     * @return True if the user's location is visible
-     */
-    boolean isVisible();
-
-    /**
-     * Sets the user's email
-     * 
-     * @param newEmail
-     *            The new email
-     */
-    void setEmail(String newEmail);
-
-    /**
-     * @param date
-     *            The date/hour at which the user was last seen
-     */
-    void setLastSeen(GregorianCalendar date);
-
-    /**
-     * Sets the user's latitude
-     * 
-     * @param y
-     *            The latitude
-     */
-    void setLatitude(double y);
-
-    /**
-     * Sets the user's position (x and y)
-     * 
-     * @param p
-     *            The new position
-     */
-    void setLocation(Location p);
-
-    /**
-     * Sets the user's longitude
-     * 
-     * @param x
-     *            The longitude
-     */
-    void setLongitude(double x);
-
-    /**
-     * Sets the user's name
-     * 
-     * @param newName
-     *            The new name
-     */
-    void setName(String newName);
-
-    /**
-     * Sets the user's phone number
-     * 
-     * @param newNumber
-     *            The new phone number
-     */
-    void setNumber(String newNumber);
-
-    /**
-     * Sets whether or not the user is online. (Deprecated, use setLastSeen()
-     * instead)
-     * 
-     * @param isOnline
-     *            True if the user is online
-     */
-    @Deprecated
-    void setOnline(boolean isOnline);
-
-    /**
-     * Stores a new profile picture for the user
-     * 
-     * @param pic
-     *            The picture as a Bitmap object
-     */
-    void setPicture(Bitmap pic, Context context);
-
-    /**
-     * Sets the user position's name
-     * 
-     * @param posName
-     *            The user's position
-     */
-    void setPositionName(String posName);
-
-    /**
-     * @param isVisible
-     *            True if the user is visible
-     */
-    void setVisible(boolean isVisible);
+    public enum Type {
+        FRIEND,
+        STRANGER;
+    }
 }

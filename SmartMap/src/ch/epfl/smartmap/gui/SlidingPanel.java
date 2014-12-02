@@ -18,7 +18,6 @@ import ch.epfl.smartmap.R;
  * @author jfperren
  */
 public class SlidingPanel extends FrameLayout {
-
     @SuppressWarnings("unused")
     private static final String TAG = "INFORMATION_PANEL";
 

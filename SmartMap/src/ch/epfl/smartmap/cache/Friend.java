@@ -1,134 +1,77 @@
 package ch.epfl.smartmap.cache;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.os.Parcel;
-import android.os.Parcelable;
-import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.map.CircularMarkerIconMaker;
+import ch.epfl.smartmap.map.MarkerIconMaker;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * A class to represent the user's friends
+ * Represents a Friend, for each there is only one single instance that can be accessed via static method
+ * {@code getFriendFromId(int id)}
  * 
+ * @author jfperren
  * @author ritterni
  */
-public class Friend implements User, Displayable, Parcelable {
 
-    private final long mId; // the user's unique ID
-    private String mName; // the user's name as it will be displayed
+public final class Friend implements User {
+
+    // Friend informations
+    private final long mID;
+    private String mName;
     private String mPhoneNumber;
     private String mEmail;
     private String mLocationString;
-    private GregorianCalendar mLastSeen;
-    private final Location mLocation;
-    private boolean mVisible;
+    private Location mLocation;
+    private Bitmap mImage;
 
-    public static final String NO_NAME = "";
-    public static final String NO_NUMBER = "No phone number specified";
-    public static final String NO_EMAIL = "No email address specified";
-    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
-    public static final int IMAGE_QUALITY = 100;
-    public static final String PROVIDER_NAME = "SmartMapServers";
-    public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
-    // until a user is
-    // considered
-    // offline
+    protected Friend(ImmutableUser user) {
+        super();
 
-    public static final float MARKER_ANCHOR_X = (float) 0.5;
-    public static final float MARKER_ANCHOR_Y = 1;
-    public static final int PICTURE_WIDTH = 50;
-    public static final int PICTURE_HEIGHT = 50;
-
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
-        @Override
-        public Friend createFromParcel(Parcel source) {
-            return new Friend(source);
+        if (user.getId() < 0) {
+            throw new IllegalArgumentException();
+        } else {
+            mID = user.getId();
         }
-
-        @Override
-        public Friend[] newArray(int size) {
-            return new Friend[size];
+        if (user.getName() == null) {
+            throw new IllegalArgumentException();
+        } else {
+            mName = user.getName();
         }
-    };
-
-    /**
-     * Friend constructor
-     * 
-     * @param userID
-     *            The id of the contact we're creating
-     * @param userName
-     *            The name of the friend
-     * @param userNumber
-     *            The friend's phone number
-     * @author ritterni
-     */
-    public Friend(long userID, String userName) {
-        if (userID < 0) {
-            throw new IllegalArgumentException("Invalid user ID!");
+        if (user.getPhoneNumber() == null) {
+            mPhoneNumber = User.NO_PHONE_NUMBER;
+        } else {
+            mPhoneNumber = user.getPhoneNumber();
         }
-        if (userName == null) {
-            throw new IllegalArgumentException("Invalid user name!");
+        if (user.getEmail() == null) {
+            mEmail = User.NO_EMAIL;
+        } else {
+            mEmail = user.getEmail();
         }
-        mId = userID;
-        mName = userName;
-        mPhoneNumber = NO_NUMBER;
-        mEmail = NO_EMAIL;
-        mLocationString = Utils.UNKNOWN_LOCATION;
-        mLastSeen = new GregorianCalendar();
-        mLastSeen.setTimeInMillis(0);
-        mLocation = new Location(PROVIDER_NAME);
-        mVisible = true;
-    }
-
-    public Friend(long userID, String userName, double longitude, double latitude) {
-        this(userID, userName);
-
-        this.setLatitude(latitude);
-        this.setLongitude(longitude);
-    }
-
-    public Friend(Parcel in) {
-        mId = in.readLong();
-        mName = in.readString();
-        mPhoneNumber = in.readString();
-        mEmail = in.readString();
-        mLocation = in.readParcelable(Location.class.getClassLoader());
-        mLocationString = in.readString();
-        mLastSeen = new GregorianCalendar();
-        mLastSeen.setTimeInMillis(in.readLong());
-        boolean[] booleans = new boolean[1];
-        in.readBooleanArray(booleans);
-        mVisible = booleans[0];
-    }
-
-    @Override
-    public void deletePicture(Context context) {
-        File file = new File(context.getFilesDir(), mId + ".png");
-        if (file.exists()) {
-            file.delete();
+        if (user.getLocationString() == null) {
+            mLocationString = User.NO_LOCATION_STRING;
+        } else {
+            mLocationString = user.getLocationString();
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.os.Parcelable#describeContents()
-     */
-    @Override
-    public int describeContents() {
-        return 1;
+        if (user.getLocation() == null) {
+            mLocation = User.NO_LOCATION;
+        } else {
+            mLocation = new Location(user.getLocation());
+        }
+        if (user.getImage() == null) {
+            mImage = User.NO_IMAGE;
+        } else {
+            mImage = user.getImage();
+        }
     }
 
     /*
@@ -137,36 +80,77 @@ public class Friend implements User, Displayable, Parcelable {
      */
     @Override
     public boolean equals(Object that) {
-        return (that != null) && (that instanceof Friend) && (mId == ((Friend) that).mId);
+        return (that != null) && (that instanceof Friend) && (mID == ((User) that).getId());
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getEmail()
+     */
     @Override
     public String getEmail() {
         return mEmail;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getID()
+     */
     @Override
-    public long getID() {
-        return mId;
+    public long getId() {
+        return mID;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
+     */
+    @Override
+    public Bitmap getImage() {
+        return mImage;
     }
 
     @Override
-    public GregorianCalendar getLastSeen() {
-        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        g.setTimeInMillis(mLastSeen.getTimeInMillis());
-        return g;
+    public ImmutableUser getImmutableCopy() {
+        return new ImmutableUser(mID, mName, mPhoneNumber, mEmail, mLocation, mLocationString, mImage);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getLastSeen()
+     */
+    @Override
+    public Calendar getLastSeen() {
+        Calendar lastSeen = GregorianCalendar.getInstance(TimeZone.getDefault());
+        lastSeen.setTimeInMillis(mLocation.getTime());
+        return lastSeen;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#getLatLng()
+     */
     @Override
     public LatLng getLatLng() {
         return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getLocation()
+     */
     @Override
     public Location getLocation() {
-        return mLocation;
+        Location location = new Location(mLocation.getProvider());
+        location.setLatitude(mLocation.getLatitude());
+        location.setLongitude(mLocation.getLongitude());
+        return location;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getLocationString()
+     */
     @Override
     public String getLocationString() {
         return mLocationString;
@@ -174,49 +158,48 @@ public class Friend implements User, Displayable, Parcelable {
 
     /*
      * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
-     * )
-     * @author hugo-S
+     * @see ch.epfl.smartmap.cache.Localisable#getMarkerOptions()
      */
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
-        Bitmap friendProfilePicture =
-            Bitmap.createScaledBitmap(this.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+        MarkerIconMaker iconMaker = new CircularMarkerIconMaker(context);
+
+        Bitmap profilePicture =
+            Bitmap.createScaledBitmap(this.getImage(), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+
+        Bitmap markerIcon = iconMaker.getMarkerIcon(profilePicture);
+
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(this.getLatLng()).title(this.getName())
-            .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
-            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+            .icon(BitmapDescriptorFactory.fromBitmap(markerIcon)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+
         return markerOptions;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getName()
+     */
     @Override
     public String getName() {
         return mName;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getNumber()
+     */
     @Override
-    public String getNumber() {
+    public String getPhoneNumber() {
         return mPhoneNumber;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getShortInfos()
+     */
     @Override
-    public Bitmap getPicture(Context context) {
-
-        File file = new File(context.getFilesDir(), mId + ".png");
-
-        Bitmap pic = null;
-
-        if (file.exists()) {
-            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
-        } else {
-            pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE);
-        }
-        return pic;
-    }
-
-    @Override
-    public String getShortInfos() {
+    public String getSubtitle() {
         String infos = "";
         infos += Utils.getLastSeenStringFromCalendar(this.getLastSeen());
         infos += " near ";
@@ -227,120 +210,59 @@ public class Friend implements User, Displayable, Parcelable {
 
     /*
      * (non-Javadoc)
-     * @see java.lang.Object#hashCode()
+     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
      */
     @Override
-    public int hashCode() {
-        final int prime = 31;
-
-        return ((int) mId) * prime;
-    }
-
-    @Override
-    public boolean isOnline() {
-        return (new GregorianCalendar().getTimeInMillis() - mLastSeen.getTimeInMillis()) < ONLINE_TIMEOUT;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return mVisible;
-    }
-
-    @Override
-    public void setEmail(String newEmail) {
-        mEmail = newEmail;
-    }
-
-    @Override
-    public void setLastSeen(GregorianCalendar date) {
-        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        g.setTimeInMillis(date.getTimeInMillis());
-        mLastSeen = g;
-    }
-
-    @Override
-    public void setLatitude(double latitude) {
-        mLocation.setLatitude(latitude);
-    }
-
-    @Override
-    public void setLocation(Location p) {
-        mLocation.set(p);
-    }
-
-    @Override
-    public void setLongitude(double longitude) {
-        mLocation.setLongitude(longitude);
-
-    }
-
-    @Override
-    public void setName(String newName) {
-        if (newName.isEmpty() || (newName == null)) {
-            throw new IllegalArgumentException("Invalid user name!");
-        }
-        mName = newName;
-    }
-
-    @Override
-    public void setNumber(String newNumber) {
-        mPhoneNumber = newNumber;
-    }
-
-    @Override
-    @Deprecated
-    public void setOnline(boolean status) {
-        // deprecated
-    }
-
-    @Override
-    public void setPicture(Bitmap pic, Context context) {
-
-        File file = new File(context.getFilesDir(), mId + ".png");
-
-        if (file.exists()) {
-            file.delete();
-        }
-
-        try {
-            FileOutputStream out = context.openFileOutput(mId + ".png", Context.MODE_PRIVATE);
-            pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void setPositionName(String posName) {
-        mLocationString = posName;
-    }
-
-    @Override
-    public void setVisible(boolean isVisible) {
-        mVisible = isVisible;
+    public String getTitle() {
+        return mName;
     }
 
     /*
      * (non-Javadoc)
-     * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
+     * @see ch.epfl.smartmap.cache.User#getType()
      */
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(mId);
-        dest.writeString(mName);
-        dest.writeString(mPhoneNumber);
-        dest.writeString(mEmail);
-        dest.writeParcelable(mLocation, flags);
-        dest.writeString(mLocationString);
-        dest.writeLong(mLastSeen.getTimeInMillis());
-        boolean[] booleans = new boolean[]{mVisible};
-        dest.writeBooleanArray(booleans);
+    public Type getType() {
+        return Type.FRIEND;
     }
 
-    private void updateLocationString() {
-        mLocationString = Utils.getCityFromLocation(this.getLocation());
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#hashcode
+     */
+    @Override
+    public int hashCode() {
+        return (int) mID;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#isShown()
+     */
+    @Override
+    public boolean isVisible() {
+        return true;
+    }
+
+    @Override
+    public void update(ImmutableUser user) {
+        if (user.getName() != null) {
+            mName = user.getName();
+        }
+        if (user.getPhoneNumber() != null) {
+            mPhoneNumber = user.getPhoneNumber();
+        }
+        if (user.getEmail() != null) {
+            mEmail = user.getEmail();
+        }
+        if (user.getLocationString() != null) {
+            mLocationString = user.getLocationString();
+        }
+        if (user.getLocation() != null) {
+            mLocation = new Location(user.getLocation());
+        }
+        if (user.getImage() != null) {
+            mImage = user.getImage();
+        }
     }
 }

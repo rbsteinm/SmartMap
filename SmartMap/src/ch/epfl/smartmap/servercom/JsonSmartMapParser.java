@@ -11,10 +11,11 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.location.Location;
-import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.PublicEvent;
+import android.util.Log;
+import ch.epfl.smartmap.cache.ImmutableEvent;
+import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.gui.Utils;
 
 /**
  * A {@link SmartMapParser} implementation that parses objects from Json format
@@ -29,7 +30,7 @@ public class JsonSmartMapParser implements SmartMapParser {
     private static final String ERROR_STATUS = "error";
     private static final String FEEDBACK_STATUS = "feedback";
 
-    private static final int SERVER_TIME_DIFFERENCE_THRESHHOLD = -15000;
+    private static final int SERVER_TIME_DIFFERENCE_THRESHHOLD = 60000;
 
     private static final int DATETIME_FORMAT_PARTS = 2;
     private static final int DATE_FORMAT_PARTS = 3;
@@ -79,19 +80,21 @@ public class JsonSmartMapParser implements SmartMapParser {
     }
 
     @Override
-    public Event parseEvent(String s) throws SmartMapParseException {
+    public ImmutableEvent parseEvent(String s) throws SmartMapParseException {
         JSONObject jsonObject = null;
+        JSONObject eventJsonObject = null;
         try {
             jsonObject = new JSONObject(s);
+            eventJsonObject = jsonObject.getJSONObject("event");
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
-        return this.parseEventFromJSON(jsonObject);
+        return this.parseEventFromJSON(eventJsonObject);
     }
 
     @Override
-    public List<Event> parseEventList(String s) throws SmartMapParseException {
-        List<Event> events = new ArrayList<Event>();
+    public List<ImmutableEvent> parseEventList(String s) throws SmartMapParseException {
+        List<ImmutableEvent> events = new ArrayList<ImmutableEvent>();
 
         try {
             JSONObject jsonObject = new JSONObject(s);
@@ -100,9 +103,9 @@ public class JsonSmartMapParser implements SmartMapParser {
 
             for (int i = 0; i < eventsArray.length(); i++) {
                 JSONObject eventJSON = eventsArray.getJSONObject(i);
-                Event event = this.parseEventFromJSON(eventJSON);
+                ImmutableEvent event = this.parseEventFromJSON(eventJSON);
                 events.add(event);
-                // Log.d("events", event.getName());
+                Log.d("events", event.getName());
             }
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
@@ -117,7 +120,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      * ch.epfl.smartmap.servercom.SmartMapParser#parseFriend(java.lang.String)
      */
     @Override
-    public User parseFriend(String s) throws SmartMapParseException {
+    public ImmutableUser parseFriend(String s) throws SmartMapParseException {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(s);
@@ -133,9 +136,9 @@ public class JsonSmartMapParser implements SmartMapParser {
      * ch.epfl.smartmap.servercom.SmartMapParser#parseFriends(java.lang.String)
      */
     @Override
-    public List<User> parseFriends(String s, String key) throws SmartMapParseException {
+    public List<ImmutableUser> parseFriends(String s, String key) throws SmartMapParseException {
 
-        List<User> friends = new ArrayList<User>();
+        List<ImmutableUser> friends = new ArrayList<ImmutableUser>();
 
         try {
             JSONObject jsonObject = new JSONObject(s);
@@ -144,7 +147,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 
             for (int i = 0; i < usersArray.length(); i++) {
                 JSONObject userJSON = usersArray.getJSONObject(i);
-                User friend = this.parseFriendFromJSON(userJSON);
+                ImmutableUser friend = this.parseFriendFromJSON(userJSON);
                 friends.add(friend);
             }
         } catch (JSONException e) {
@@ -199,9 +202,9 @@ public class JsonSmartMapParser implements SmartMapParser {
     }
 
     @Override
-    public List<User> parsePositions(String s) throws SmartMapParseException {
+    public List<ImmutableUser> parsePositions(String s) throws SmartMapParseException {
 
-        List<User> users = new ArrayList<User>();
+        List<ImmutableUser> users = new ArrayList<ImmutableUser>();
 
         try {
             JSONObject jsonObject = new JSONObject(s);
@@ -218,21 +221,18 @@ public class JsonSmartMapParser implements SmartMapParser {
                 this.checkId(userId);
                 this.checkLatitude(latitude);
                 this.checkLongitude(longitude);
-                this.checkLastSeen(lastSeen);
 
                 Location location = new Location("SmartMapServers");
+                location.setTime(lastSeen.getTimeInMillis());
                 location.setLatitude(latitude);
                 location.setLongitude(longitude);
-                User user = null;
+                String locationString = Utils.getCityFromLocation(location);
 
-                user = new Friend(userId, Friend.NO_NAME);
-
-                user.setLocation(location);
-                user.setLastSeen(lastSeen);
+                ImmutableUser user =
+                    new ImmutableUser(userId, null, null, null, location, locationString, null);
 
                 users.add(user);
             }
-
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
@@ -278,7 +278,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      */
     private void checkLastSeen(GregorianCalendar lastSeen) throws SmartMapParseException {
         GregorianCalendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        if ((now.getTimeInMillis() - lastSeen.getTimeInMillis()) < SERVER_TIME_DIFFERENCE_THRESHHOLD) {
+        if (Math.abs(now.getTimeInMillis() - lastSeen.getTimeInMillis()) > SERVER_TIME_DIFFERENCE_THRESHHOLD) {
             throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString()
                 + " compared to " + now.toString());
         }
@@ -408,7 +408,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         return g;
     }
 
-    private Event parseEventFromJSON(JSONObject jsonObject) throws SmartMapParseException {
+    private ImmutableEvent parseEventFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = -1;
         long creatorId = -1;
         GregorianCalendar startingDate = null;
@@ -418,6 +418,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         String positionName = null;
         String name = null;
         String description = "";
+        List<Long> participants;
 
         try {
             id = jsonObject.getLong("id");
@@ -429,6 +430,7 @@ public class JsonSmartMapParser implements SmartMapParser {
             positionName = jsonObject.getString("positionName");
             name = jsonObject.getString("name");
             description = jsonObject.getString("description");
+            participants = this.parseIds(jsonObject.toString(), "participants");
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
@@ -441,14 +443,12 @@ public class JsonSmartMapParser implements SmartMapParser {
         this.checkName(positionName);
         this.checkName(name);
         this.checkEventDescription(description);
-        Event event =
-            new PublicEvent(name, creatorId, Friend.NO_NAME, startingDate, endDate, new Location(
-                "SmartMapServer"));
-        event.setID(id);
-        event.setPositionName(positionName);
-        event.setDescription(description);
-        event.getLocation().setLatitude(latitude);
-        event.getLocation().setLongitude(longitude);
+        Location location = new Location("SmartMapServers");
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        ImmutableEvent event =
+            new ImmutableEvent(id, name, creatorId, description, startingDate, endDate, location,
+                positionName, new ArrayList<Long>());
 
         return event;
     }
@@ -460,19 +460,15 @@ public class JsonSmartMapParser implements SmartMapParser {
      * @return a friend
      * @throws SmartMapParseException
      */
-    private User parseFriendFromJSON(JSONObject jsonObject) throws SmartMapParseException {
+    private ImmutableUser parseFriendFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = 0;
         String name = null;
-        String phoneNumber = null;
-        String email = null;
-        double latitude = UNITIALIZED_LATITUDE;
-        double longitude = UNITIALIZED_LONGITUDE;
+        String phoneNumber = User.NO_PHONE_NUMBER;
+        String email = User.NO_EMAIL;
 
         try {
             id = jsonObject.getLong("id");
             name = jsonObject.getString("name");
-            latitude = jsonObject.optDouble("latitude", UNITIALIZED_LATITUDE);
-            longitude = jsonObject.optDouble("longitude", UNITIALIZED_LONGITUDE);
             phoneNumber = jsonObject.optString("phoneNumber", null);
             email = jsonObject.optString("email", null);
         } catch (JSONException e) {
@@ -482,27 +478,13 @@ public class JsonSmartMapParser implements SmartMapParser {
         this.checkId(id);
         this.checkName(name);
 
-        Friend friend = new Friend(id, name);
-
-        if (latitude != UNITIALIZED_LATITUDE) {
-            this.checkLatitude(latitude);
-            friend.setLatitude(latitude);
-        }
-        if (longitude != UNITIALIZED_LONGITUDE) {
-            this.checkLongitude(longitude);
-            friend.setLongitude(longitude);
-        }
-
         if (phoneNumber != null) {
             this.checkPhoneNumber(phoneNumber);
-            friend.setNumber(phoneNumber);
         }
         if (email != null) {
             this.checkEmail(email);
-            friend.setEmail(email);
         }
 
-        return friend;
+        return new ImmutableUser(id, name, phoneNumber, email, null, null, null);
     }
-
 }

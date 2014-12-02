@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.gui;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -90,8 +91,8 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
         // Set fields with event's attributes
 
-        GregorianCalendar start = event.getStartDate();
-        GregorianCalendar end = event.getEndDate();
+        Calendar start = event.getStartDate();
+        Calendar end = event.getEndDate();
 
         viewHolder.getStartTextView().setText(getTextFromDate(start, end, "start"));
         viewHolder.getEndTextView().setText(getTextFromDate(start, end, "end"));
@@ -102,7 +103,7 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
                     .getLocation().getLongitude());
         distanceMeEvent = Math.floor(distanceMeEvent * HUNDRED_PERCENT) / HUNDRED_PERCENT;
 
-        viewHolder.getNameTextView().setText(event.getName() + " @ " + event.getPositionName());
+        viewHolder.getNameTextView().setText(event.getName() + " @ " + event.getLocationString());
 
         convertView.setId(position);
 
@@ -123,7 +124,7 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
      * @return a String of the form "Today at 04:01"
      * @author SpicyCH
      */
-    public static String getTextFromDate(GregorianCalendar date1, GregorianCalendar date2, String s) {
+    public static String getTextFromDate(Calendar date1, Calendar date2, String s) {
 
         if (date1.after(date2)) {
             throw new IllegalArgumentException("date1 must be before date2");

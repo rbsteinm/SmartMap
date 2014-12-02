@@ -4,6 +4,8 @@ namespace SmartMap\DBInterface;
 
 class Event
 {
+    public static $DATE_FORMAT = 'Y-m-d H:i:s';
+
     private $mId;
     
     private $mCreatorId;
@@ -207,7 +209,7 @@ class Event
     }
     
     /**
-     * Set the event's psition name.
+     * Set the event's position name.
      * 
      * @param string $name
      * @return \SmartMap\DBInterface\Event
@@ -358,18 +360,15 @@ class Event
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function checkDate($date)
+    private function checkDate($date)
     {
-        try
-        {
-            $dt = new \DateTime($date);
-        }
-        catch (\Exception $e)
+        $dt = \DateTIme::createFromFormat(self::$DATE_FORMAT, $date);
+
+        if (!$dt || $dt->format(self::$DATE_FORMAT) != $date)
         {
             throw new \InvalidArgumentException('Invalid date format.');
         }
-        
-        // If we could create a date from the string, we return it in the right format.
-        return $dt->format(User::$DATE_FORMAT);
+
+        return $date;
     }
 }

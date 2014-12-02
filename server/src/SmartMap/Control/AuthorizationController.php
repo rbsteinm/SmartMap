@@ -96,7 +96,7 @@ class AuthorizationController
         
         $friendsIds = RequestUtils::getPostParam($request, 'friend_ids');
         
-        $friendsIds = $this->getIntArrayFromString($friendsIds);
+        $friendsIds = RequestUtils::getIntArrayFromString($friendsIds);
         
         try
         {
@@ -127,7 +127,7 @@ class AuthorizationController
         
         $friendsIds = RequestUtils::getPostParam($request, 'friend_ids');
         
-        $friendsIds = $this->getIntArrayFromString($friendsIds);
+        $friendsIds = RequestUtils::getIntArrayFromString($friendsIds);
         
         try
         {
@@ -198,23 +198,32 @@ class AuthorizationController
         
         return new JsonResponse($response);
     }
-    
-    /** 
-     * Utility function transforming a list of numbers separated by commas
-     * in an array of integers.
-     * 
-     * @param string $string
-     * @return array
-     */
-    private function getIntArrayFromString($string)
+
+    public function setVisibility(Request $request)
     {
-        $array = explode(',', $string);
-        
-        for ($i = 0; $i < count($array); $i++)
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        $visibility = RequestUtils::getPostParam($request, 'visibility');
+
+        try
         {
-            $array[$i] = (int) $array[$i];
+            $user = $this->mRepo->getUser($userId);
+
+            $user->setVisibility($visibility);
+
+            $this->mRepo->updateUser($user);
         }
-        
-        return $array;
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in setVisibility method.', 2, $e);
+        }
+        catch (\InvalidArgumentException $e)
+        {
+            throw new InvalidRequestException($e->getMessage());
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Visibility changed.');
+
+        return new JsonResponse($response);
     }
 }

@@ -13,23 +13,33 @@ import com.google.android.gms.maps.model.Marker;
 public interface ZoomManager {
 
     /**
+     * Center on the specified location, without changing the zoom level
+     * 
+     * @param latLng
+     */
+    void centerOnLocation(LatLng latLng);
+
+    /**
      * Set bound and zoom with regards to all markers positions on the map
      * 
-     * @param map
-     *            the map on which we want to zoom
      * @param markers
      *            the list of markers to take in account
      */
     void zoomAccordingToMarkers(final List<Marker> markers);
 
     /**
-     * Zoom on the specified location
+     * Zoom on the specified location, with animation
      * 
      * @param location
      *            the location where we want to zoom
-     * @param map
-     *            the map on which we want to zoom
      */
-    void zoomOnLocation(LatLng latlng);
+    void zoomWithAnimation(LatLng latlng);
+
+    /**
+     * Zoom on the specified location, without changing the zoom level
+     * 
+     * @param latLng
+     */
+    void zoomWithoutAnimation(LatLng latLng);
 
 }

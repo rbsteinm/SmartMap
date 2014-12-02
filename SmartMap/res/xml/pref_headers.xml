@@ -9,7 +9,7 @@
         android:fragment="ch.epfl.smartmap.SettingsActivity$NotificationPreferenceFragment"
         android:title="@string/pref_header_notifications" />
     <header
-        android:fragment="ch.epfl.smartmap.SettingsActivity$DataSyncPreferenceFragment"
-        android:title="@string/pref_header_data_sync" />
+        android:fragment="ch.epfl.smartmap.SettingsActivity$EventsPreferenceFragment"
+        android:title="@string/pref_header_events" />
 
 </preference-headers>

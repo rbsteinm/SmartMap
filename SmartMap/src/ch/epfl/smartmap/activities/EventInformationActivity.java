@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.activities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,19 +9,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 
 /**
  * This activity shows an event in a complete screens.
  * 
- * 
  * @author SpicyCH
  */
-public class ShowEventInformationActivity extends Activity {
+public class EventInformationActivity extends Activity {
 
-    private static final String TAG = ShowEventInformationActivity.class.getSimpleName();
-    private Context mContext;
+    private static final String TAG = EventInformationActivity.class.getSimpleName();
     private Event mEvent;
     private TextView mEventTitle;
     private TextView mEventCreator;
@@ -38,15 +36,15 @@ public class ShowEventInformationActivity extends Activity {
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
         if (this.getIntent().getParcelableExtra("event") != null) {
-            mEvent = this.getIntent().getParcelableExtra("event");
-            Log.d(TAG, "City name: " + mEvent.getPositionName());
-            Log.d(TAG, "Country name: " + mEvent.getPositionCountryName());
+            long eventId = this.getIntent().getParcelableExtra("EVENT");
+            mEvent = Cache.getInstance().getEventById(eventId);
+            Log.d(TAG, "City name: " + mEvent.getLocationString());
+            Log.d(TAG, "Country name: " + "UNIMPLEMENTED");
         }
 
         if (mEvent != null) {
             this.initializeGUI();
         }
-
     }
 
     /**
@@ -54,12 +52,19 @@ public class ShowEventInformationActivity extends Activity {
      * It launches InviteFriendsActivity for a result.
      * 
      * @param v
-     * 
      * @author SpicyCH
      */
     public void inviteFriendsToEvent(View v) {
-        Intent inviteFriends = new Intent(mContext, InviteFriendsActivity.class);
+        Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
         this.startActivityForResult(inviteFriends, 1);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+        this.finish();
     }
 
     @Override
@@ -71,18 +76,24 @@ public class ShowEventInformationActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case android.R.id.home:
+                if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+                    this.startActivity(new Intent(this, MainActivity.class));
+                }
+                this.finish();
+            default:
+                break;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
     public void openMapAtEventLocation(View v) {
-        Intent showEventIntent = new Intent(mContext, MainActivity.class);
+        Intent showEventIntent = new Intent(this, MainActivity.class);
         showEventIntent.putExtra("location", mEvent.getLocation());
         this.startActivity(showEventIntent);
     }
@@ -94,26 +105,27 @@ public class ShowEventInformationActivity extends Activity {
      */
     private void initializeGUI() {
 
-        mContext = this.getApplicationContext();
         this.setTitle(mEvent.getName());
 
         mEventTitle = (TextView) this.findViewById(R.id.show_event_info_event_name);
         mEventTitle.setText(mEvent.getName());
 
         mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
-        mEventCreator.setText(this.getString(R.string.show_event_by) + " " + mEvent.getCreatorName());
+        mEventCreator.setText(this.getString(R.string.show_event_by) + " "
+            + Cache.getInstance().getUserById(mEvent.getCreatorId()).getName());
 
         mStart = (TextView) this.findViewById(R.id.show_event_info_start);
-        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "start"));
+        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(),
+            "start"));
 
         mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
         mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));
 
         mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
-        mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ":\n"
-                + mEvent.getDescription());
+        mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ": "
+            + mEvent.getDescription());
 
         mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
-        mPlaceNameAndCountry.setText(mEvent.getPositionName() + ", " + mEvent.getPositionCountryName());
+        mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");
     }
 }

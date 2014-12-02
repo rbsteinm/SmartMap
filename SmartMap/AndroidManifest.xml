@@ -97,6 +97,11 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name=".activities.SetLocationActivity"
+            android:label="@string/title_activity_set_location"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name=".activities.AddFriendActivity"
             android:label="@string/title_activity_add_friend"
             android:parentActivityName=".activities.FriendsPagerActivity"
@@ -125,10 +130,10 @@
             android:name=".activities.NotificationsActivity"
             android:label="@string/title_activity_notifications"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Dialog" >
+            android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
         <activity
-            android:name=".activities.ShowEventInformationActivity"
+            android:name=".activities.EventInformationActivity"
             android:label="@string/title_activity_show_event_information"
             android:parentActivityName=".activities.ShowEventsActivity"
             android:screenOrientation="portrait" >
@@ -137,9 +142,14 @@
                 android:value="ch.epfl.smartmap.activities.ShowEventsActivity" />
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.InviteFriendsActivity"
-            android:label="@string/title_activity_invite_friends"
-            android:screenOrientation="portrait" >
+            android:name="ch.epfl.smartmap.activities.AboutActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_about"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/FullscreenTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.smartmap.activities.MainActivity" />
         </activity>
     </application>
 

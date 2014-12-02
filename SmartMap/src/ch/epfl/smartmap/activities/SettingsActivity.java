@@ -17,15 +17,11 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.database.DatabaseHelper;
 
 /**
- * A {@link PreferenceActivity} that presents a set of application settings. On handset devices, settings are
- * presented
- * as a single list. On tablets, settings are split by category, with category headers shown to the left of
- * the list of
- * settings.
+ * A {@link PreferenceActivity} to handle our settings.
  * 
  * @author SpicyCH
  */

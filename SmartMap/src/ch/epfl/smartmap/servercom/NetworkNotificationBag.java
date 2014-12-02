@@ -6,19 +6,17 @@ package ch.epfl.smartmap.servercom;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.epfl.smartmap.cache.User;
-
 /**
  * @author Pamoi
  */
 public class NetworkNotificationBag implements NotificationBag {
 
-    private List<User> mInvitingUsers;
+    private final List<Long> mInvitingUsers;
 
-    private List<User> mNewFriends;
-    private List<Long> mRemovedFriends;
+    private final List<Long> mNewFriends;
+    private final List<Long> mRemovedFriends;
 
-    public NetworkNotificationBag(List<User> invitingUsers, List<User> newFriends,
+    public NetworkNotificationBag(List<Long> invitingUsers, List<Long> newFriends,
         List<Long> removedFriendsIds) {
         if (invitingUsers == null) {
             throw new IllegalArgumentException("invitingUsers list is null.");
@@ -30,8 +28,8 @@ public class NetworkNotificationBag implements NotificationBag {
             throw new IllegalArgumentException("removedFriendsIds list is null.");
         }
 
-        mInvitingUsers = new ArrayList<User>(invitingUsers);
-        mNewFriends = new ArrayList<User>(newFriends);
+        mInvitingUsers = new ArrayList<Long>(invitingUsers);
+        mNewFriends = new ArrayList<Long>(newFriends);
         mRemovedFriends = new ArrayList<Long>(removedFriendsIds);
     }
 
@@ -40,8 +38,8 @@ public class NetworkNotificationBag implements NotificationBag {
      * @see ch.epfl.smartmap.servercom.NotificationBag#getInvitingUsers()
      */
     @Override
-    public List<User> getInvitingUsers() {
-        return new ArrayList<User>(mInvitingUsers);
+    public List<Long> getInvitingUsers() {
+        return new ArrayList<Long>(mInvitingUsers);
     }
 
     /*
@@ -49,8 +47,8 @@ public class NetworkNotificationBag implements NotificationBag {
      * @see ch.epfl.smartmap.servercom.NotificationBag#getNewFriends()
      */
     @Override
-    public List<User> getNewFriends() {
-        return new ArrayList<User>(mNewFriends);
+    public List<Long> getNewFriends() {
+        return new ArrayList<Long>(mNewFriends);
     }
 
     /*

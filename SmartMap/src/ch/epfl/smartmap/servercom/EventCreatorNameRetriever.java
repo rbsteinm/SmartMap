@@ -2,7 +2,7 @@ package ch.epfl.smartmap.servercom;
 
 import android.os.AsyncTask;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.ImmutableUser;
 
 /**
  * A class to retrieve the name of the event creator from his id
@@ -24,7 +24,7 @@ public class EventCreatorNameRetriever {
      *             if the retrieved name is null, meaning that the server request failed n the AsynTask
      */
     public void setEventCreatorName() throws SmartMapClientException {
-        new SetEventCreatorName().execute(mEvent.getCreator());
+        new SetEventCreatorName().execute(mEvent.getCreatorId());
         if (mEvent.getCreatorName() == null) {
             throw new SmartMapClientException("Network error");
         }
@@ -40,7 +40,7 @@ public class EventCreatorNameRetriever {
 
         @Override
         protected String doInBackground(Long... params) {
-            User user = null;
+            ImmutableUser user = null;
             try {
                 user = NetworkSmartMapClient.getInstance().getUserInfo(params[0]);
             } catch (SmartMapClientException e) {
@@ -49,12 +49,6 @@ public class EventCreatorNameRetriever {
             return user.getName();
 
         }
-
-        @Override
-        protected void onPostExecute(String name) {
-            mEvent.setCreatorName(name);
-        }
-
     }
 
 }

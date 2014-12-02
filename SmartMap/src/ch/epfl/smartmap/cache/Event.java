@@ -1,24 +1,36 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.GregorianCalendar;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
-import android.location.Location;
-import android.os.Parcelable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.gui.Utils;
 
 /**
  * Describes an event
  * 
+ * @author jfperren
  * @author ritterni
  */
-public interface Event extends Displayable, Parcelable {
+
+public interface Event extends Displayable {
+
+    final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
+    final String NO_DESCRIPTION = "This event currently has no description";
+
+    final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(),
+        R.drawable.default_event);
 
     /**
      * @return The ID of the user who created the event
      */
-    long getCreator();
+    long getCreatorId();
 
     /**
-     * @return The name of the event creator
+     * @return The name of creator
      */
     String getCreatorName();
 
@@ -30,112 +42,26 @@ public interface Event extends Displayable, Parcelable {
     /**
      * @return The date (year, month, day, hour, minute) at which the event ends
      */
-    GregorianCalendar getEndDate();
+    Calendar getEndDate();
+
+    ImmutableEvent getImmutableCopy();
+
+    String getName();
+
+    List<Long> getParticipants();
 
     /**
-     * 
-     * @return The country where the event happens as a string (e.g. "Switzerland"), empty string if not set
-     * 
-     * @author SpicyCH
+     * @return The date (year, month, day, hour, minute) at which the event
+     *         starts
      */
-    String getPositionCountryName();
+    Calendar getStartDate();
 
-    /**
-     * @return The event's position as a String (e.g. 'Lausanne')
-     */
-    String getPositionName();
+    Type getType();
 
-    /**
-     * @return The date (year, month, day, hour, minute) at which the event starts
-     */
-    GregorianCalendar getStartDate();
+    void update(ImmutableEvent event);
 
-    /**
-     * Sets the event creator's name
-     * 
-     * @param name
-     *            The event creator's name
-     */
-    void setCreatorName(String name);
-
-    /**
-     * Sets the event's description
-     * 
-     * @param desc
-     *            The new description
-     */
-    void setDescription(String desc);
-
-    /**
-     * Changes the event's end date
-     * 
-     * @param newDate
-     *            The new start date (year, month, day, hour, minute)
-     */
-    void setEndDate(GregorianCalendar newDate);
-
-    /**
-     * Sets the event's ID
-     * 
-     * @param newID
-     *            The new ID
-     */
-    void setID(long newID);
-
-    /**
-     * Sets the event's latitude
-     * 
-     * @param y
-     *            The latitude
-     */
-    void setLatitude(double y);
-
-    /**
-     * Sets the event's position
-     * 
-     * @param p
-     *            The new position
-     */
-    void setLocation(Location p);
-
-    /**
-     * Sets the events's longitude
-     * 
-     * @param x
-     *            The longitude
-     */
-    void setLongitude(double x);
-
-    /**
-     * Changes the event's name
-     * 
-     * @param newName
-     *            The new name
-     */
-    void setName(String newName);
-
-    /**
-     * 
-     * @param countryName
-     *            the name of the country where the event takes place.
-     * 
-     * @author SpicyCH
-     */
-    void setPositionCountryName(String countryName);
-
-    /**
-     * Sets the user position's name
-     * 
-     * @param posName
-     *            The event's position
-     */
-    void setPositionName(String posName);
-
-    /**
-     * Changes the event's start date
-     * 
-     * @param newDate
-     *            The new start date (year, month, day, hour, minute)
-     */
-    void setStartDate(GregorianCalendar newDate);
+    enum Type {
+        PUBLIC,
+        PRIVATE;
+    }
 }

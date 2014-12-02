@@ -21,6 +21,8 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
+import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
+import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -48,7 +50,7 @@ public class AddFriendActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView listView, View view, int position, long id) {
-        long userId = (Long) view.getTag();
+        long userId = ((FriendViewHolder) view.getTag()).getUserId();
         RelativeLayout rl = (RelativeLayout) view;
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
@@ -132,7 +134,7 @@ public class AddFriendActivity extends ListActivity {
                 if (params[0].equals("")) {
                     return Collections.emptyList();
                 } else {
-                    return NetworkSmartMapClient.getInstance().findUsers(params[0]);
+                    return CachedOnlineSearchEngine.getInstance().findStrangerByQuery(params[0]);
                 }
             } catch (SmartMapClientException e) {
                 return Collections.emptyList();
