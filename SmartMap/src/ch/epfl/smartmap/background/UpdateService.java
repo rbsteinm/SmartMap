@@ -46,7 +46,6 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * 
  * @author ritterni
  */
-
 public class UpdateService extends Service implements OnInvitationListUpdateListener,
     OnInvitationStatusUpdateListener {
 
@@ -82,8 +81,15 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final Runnable friendsPosUpdate = new Runnable() {
         @Override
         public void run() {
-            Log.d("SERVICE", "friendposupdate");
             new AsyncFriendsPos().execute();
+            mHandler.postDelayed(this, 10000);
+        }
+    };
+
+    private final Runnable ownPosUpdate = new Runnable() {
+        @Override
+        public void run() {
+            new AsyncOwnPos().execute();
             mHandler.postDelayed(this, 10000);
         }
     };
@@ -91,7 +97,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final Runnable nearEventsUpdate = new Runnable() {
         @Override
         public void run() {
-            Log.d("SERVICE", "neareventsupdate");
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 public Void doInBackground(Void... params) {
@@ -111,7 +116,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final Runnable updateDatabase = new Runnable() {
         @Override
         public void run() {
-            Log.d("SERVICE", "Update Database");
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 public Void doInBackground(Void... params) {
@@ -188,6 +192,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         this.loadSettings();
+        new AsyncLogin().execute();
         mHandler.removeCallbacks(friendsPosUpdate);
         mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
         mHandler.removeCallbacks(getInvitations);
@@ -196,9 +201,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         mHandler.postDelayed(nearEventsUpdate, HANDLER_DELAY);
         mHandler.removeCallbacks(updateDatabase);
         mHandler.postDelayed(updateDatabase, HANDLER_DELAY);
-        new AsyncLogin().execute();
-
-        mManager.setLocation(mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+        mHandler.removeCallbacks(ownPosUpdate);
+        mHandler.postDelayed(ownPosUpdate, HANDLER_DELAY);
 
         Criteria criteria = new Criteria();
         criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
@@ -495,9 +499,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         public void onLocationChanged(Location locFromGps) {
             mManager.setLocation(locFromGps);
-            if (mOwnPosEnabled) {
-                new AsyncOwnPos().execute();
-            }
+            // if (mOwnPosEnabled) {
+            // new AsyncOwnPos().execute();
+            // }
             // Sets the location name
             try {
                 List<Address> addresses =
