@@ -13,8 +13,6 @@ import com.google.android.gms.maps.model.Marker;
 /**
  * A generic manager for markers, that keeps track of the displayed markers
  * 
- * @param <T>
- *            the type of the items for which the manager displays markers
  * @author hugo-S
  */
 public interface MarkerManager {

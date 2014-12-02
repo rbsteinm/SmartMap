@@ -26,8 +26,6 @@ import com.google.android.gms.maps.model.Marker;
 /**
  * A default implementation of {@link MarkerManager}
  * 
- * @param <T>
- *            the type of the items for which the class displays markers
  * @author hugo-S
  */
 public class DefaultMarkerManager implements MarkerManager {
