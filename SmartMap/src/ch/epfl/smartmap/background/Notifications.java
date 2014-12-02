@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
@@ -78,6 +79,9 @@ public class Notifications {
 		    .setSmallIcon(R.drawable.ic_launcher)
 		    .setTicker(user.getName() + " " + context.getString(R.string.notification_invitation_accepted))
 		    .setContentIntent(pFriendIntent);
+
+		Log.d("DEBUG-NOTIFICATION", "notificationVibrate : "
+		    + SettingsManager.getInstance().notificationsVibrate());
 		if (SettingsManager.getInstance().notificationsVibrate()) {
 			noti.setVibrate(PATTERN);
 		} else {
@@ -199,6 +203,9 @@ public class Notifications {
 		        user.getName() + " " + context.getString(R.string.notification_friend_invitation) + "\n"
 		            + context.getString(R.string.notification_open_friend_list));
 
+		// TODO A FIX
+		Log.d("DEBUG-NOTIFICATION", "notificationVibrate : "
+		    + SettingsManager.getInstance().notificationsVibrate());
 		if (SettingsManager.getInstance().notificationsVibrate()) {
 			noti.setVibrate(PATTERN);
 		} else {
