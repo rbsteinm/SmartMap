@@ -489,6 +489,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
 		@Override
 		public void onLocationChanged(Location locFromGps) {
+			Log.d("DEBUG_POSITION", "C'est appelé");
 			mManager.setLocation(locFromGps);
 			if (mOwnPosEnabled) {
 				new AsyncOwnPos().execute();
