@@ -16,7 +16,7 @@ import com.facebook.Session;
  * @author Alain
  */
 public class StartActivityTest extends
-		ActivityInstrumentationTestCase2<StartActivity> {
+ActivityInstrumentationTestCase2<StartActivity> {
 	public StartActivityTest() {
 		super(StartActivity.class);
 	}

@@ -46,11 +46,41 @@ public class ParseEventMalformedJSONParsingTest extends TestCase {
 	}
 
 	@Test
+	public void testParseEventEmptyEventName() throws JSONException {
+		JSONObject jsonObject = new JSONObject(EVENT_JSON);
+		JSONObject eventJson=jsonObject.getJSONObject("event");
+		eventJson.put("name", "");
+		SmartMapParser parser = new JsonSmartMapParser();
+
+		try {
+			parser.parseEvent(eventJson.toString());
+			fail("parsed empty event name");
+		} catch (SmartMapParseException e) {
+			// success
+		}
+	}
+
+	@Test
 	public void testParseEventEmptyJson() {
 		SmartMapParser parser = new JsonSmartMapParser();
 		try {
 			parser.parseEvent(new JSONObject().toString());
 			fail("parsed empty Json");
+		} catch (SmartMapParseException e) {
+			// success
+		}
+	}
+
+	@Test
+	public void testParseEventEmptyPositionName() throws JSONException {
+		JSONObject jsonObject = new JSONObject(EVENT_JSON);
+		JSONObject eventJson=jsonObject.getJSONObject("event");
+		eventJson.put("positionName", "");
+		SmartMapParser parser = new JsonSmartMapParser();
+
+		try {
+			parser.parseEvent(eventJson.toString());
+			fail("parsed empty position name");
 		} catch (SmartMapParseException e) {
 			// success
 		}
@@ -72,14 +102,66 @@ public class ParseEventMalformedJSONParsingTest extends TestCase {
 
 	}
 
-	public void testParseEventWrongEventId() throws JSONException {
-		SmartMapParser parser = new JsonSmartMapParser();
+	public void testParseEventStartingDateAfterEnding() throws JSONException {
 		JSONObject jsonObject = new JSONObject(EVENT_JSON);
 		JSONObject eventJson=jsonObject.getJSONObject("event");
-		eventJson.put("id", -5);
+		eventJson.put("startingDate", "2014-11-13 23:23:34");
+		SmartMapParser parser = new JsonSmartMapParser();
+
 		try {
 			parser.parseEvent(eventJson.toString());
-			fail("wrong event id");
+			fail("starting date after ending date");
+		} catch (SmartMapParseException e) {
+			// success
+		}
+	}
+
+	@Test
+	public void testParseEventTooLongDescription() throws JSONException {
+		JSONObject jsonObject = new JSONObject(EVENT_JSON);
+		JSONObject eventJson=jsonObject.getJSONObject("event");
+		eventJson
+		.put("description",
+				"egrhgpiergbpwifbowiegforwgtoiedfbéwgfboéwagrfowéargforwgfowaugfowiegfowaifgoawéietgéwagprigfsgfgjkaegoirgorigéraoigpwrgoéwigaowigfvbrofgroivrhtoghroufgvborthgoéaiegéorifgogareaihfroeitghoireguodfgosuegrouergfoerughuoerhffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+		SmartMapParser parser = new JsonSmartMapParser();
+
+		try {
+			parser.parseEvent(eventJson.toString());
+			fail("parsed too long description");
+		} catch (SmartMapParseException e) {
+			// success
+		}
+	}
+
+	@Test
+	public void testParseEventTooLongEventName() throws JSONException {
+		JSONObject jsonObject = new JSONObject(EVENT_JSON);
+		JSONObject eventJson=jsonObject.getJSONObject("event");
+		eventJson
+		.put("name",
+				"egrhgpiergbpwifbowiegforwgtoiedfbéwgfboéwagrfowéargforwgfowaugfowiegfowaifgoawéietgéwagprigfsgfgjkaegoirgorigéraoigpwrgoéwigaowigfvbrofgroivrhtoghroufgvborthgoéaiegéorifgoga");
+		SmartMapParser parser = new JsonSmartMapParser();
+
+		try {
+			parser.parseEvent(eventJson.toString());
+			fail("parsed too long event name");
+		} catch (SmartMapParseException e) {
+			// success
+		}
+	}
+
+	@Test
+	public void testParseEventTooLongPositionName() throws JSONException {
+		JSONObject jsonObject = new JSONObject(EVENT_JSON);
+		JSONObject eventJson=jsonObject.getJSONObject("event");
+		eventJson
+		.put("positionName",
+				"egrhgpiergbpwifbowiegforwgtoiedfbéwgfboéwagrfowéargforwgfowaugfowiegfowaifgoawéietgéwagprigfsgfgjkaegoirgorigéraoigpwrgoéwigaowigfvbrofgroivrhtoghroufgvborthgoéaiegéorifgoga");
+		SmartMapParser parser = new JsonSmartMapParser();
+
+		try {
+			parser.parseEvent(eventJson.toString());
+			fail("parsed too long position name");
 		} catch (SmartMapParseException e) {
 			// success
 		}
@@ -128,15 +210,14 @@ public class ParseEventMalformedJSONParsingTest extends TestCase {
 		}
 	}
 
-	public void testParseEventStartingDateAfterEnding() throws JSONException {
+	public void testParseEventWrongEventId() throws JSONException {
+		SmartMapParser parser = new JsonSmartMapParser();
 		JSONObject jsonObject = new JSONObject(EVENT_JSON);
 		JSONObject eventJson=jsonObject.getJSONObject("event");
-		eventJson.put("startingDate", "2014-11-13 23:23:34");
-		SmartMapParser parser = new JsonSmartMapParser();
-
+		eventJson.put("id", -5);
 		try {
 			parser.parseEvent(eventJson.toString());
-			fail("starting date after ending date");
+			fail("wrong event id");
 		} catch (SmartMapParseException e) {
 			// success
 		}
@@ -167,87 +248,6 @@ public class ParseEventMalformedJSONParsingTest extends TestCase {
 		try {
 			parser.parseEvent(eventJson.toString());
 			fail("parsed wrong longitude");
-		} catch (SmartMapParseException e) {
-			// success
-		}
-	}
-
-	@Test
-	public void testParseEventEmptyEventName() throws JSONException {
-		JSONObject jsonObject = new JSONObject(EVENT_JSON);
-		JSONObject eventJson=jsonObject.getJSONObject("event");
-		eventJson.put("name", "");
-		SmartMapParser parser = new JsonSmartMapParser();
-
-		try {
-			parser.parseEvent(eventJson.toString());
-			fail("parsed empty event name");
-		} catch (SmartMapParseException e) {
-			// success
-		}
-	}
-
-	@Test
-	public void testParseEventTooLongEventName() throws JSONException {
-		JSONObject jsonObject = new JSONObject(EVENT_JSON);
-		JSONObject eventJson=jsonObject.getJSONObject("event");
-		eventJson
-		.put("name",
-				"egrhgpiergbpwifbowiegforwgtoiedfbéwgfboéwagrfowéargforwgfowaugfowiegfowaifgoawéietgéwagprigfsgfgjkaegoirgorigéraoigpwrgoéwigaowigfvbrofgroivrhtoghroufgvborthgoéaiegéorifgoga");
-		SmartMapParser parser = new JsonSmartMapParser();
-
-		try {
-			parser.parseEvent(eventJson.toString());
-			fail("parsed too long event name");
-		} catch (SmartMapParseException e) {
-			// success
-		}
-	}
-
-	@Test
-	public void testParseEventEmptyPositionName() throws JSONException {
-		JSONObject jsonObject = new JSONObject(EVENT_JSON);
-		JSONObject eventJson=jsonObject.getJSONObject("event");
-		eventJson.put("positionName", "");
-		SmartMapParser parser = new JsonSmartMapParser();
-
-		try {
-			parser.parseEvent(eventJson.toString());
-			fail("parsed empty position name");
-		} catch (SmartMapParseException e) {
-			// success
-		}
-	}
-
-	@Test
-	public void testParseEventTooLongPositionName() throws JSONException {
-		JSONObject jsonObject = new JSONObject(EVENT_JSON);
-		JSONObject eventJson=jsonObject.getJSONObject("event");
-		eventJson
-		.put("positionName",
-				"egrhgpiergbpwifbowiegforwgtoiedfbéwgfboéwagrfowéargforwgfowaugfowiegfowaifgoawéietgéwagprigfsgfgjkaegoirgorigéraoigpwrgoéwigaowigfvbrofgroivrhtoghroufgvborthgoéaiegéorifgoga");
-		SmartMapParser parser = new JsonSmartMapParser();
-
-		try {
-			parser.parseEvent(eventJson.toString());
-			fail("parsed too long position name");
-		} catch (SmartMapParseException e) {
-			// success
-		}
-	}
-
-	@Test
-	public void testParseEventTooLongDescription() throws JSONException {
-		JSONObject jsonObject = new JSONObject(EVENT_JSON);
-		JSONObject eventJson=jsonObject.getJSONObject("event");
-		eventJson
-		.put("description",
-				"egrhgpiergbpwifbowiegforwgtoiedfbéwgfboéwagrfowéargforwgfowaugfowiegfowaifgoawéietgéwagprigfsgfgjkaegoirgorigéraoigpwrgoéwigaowigfvbrofgroivrhtoghroufgvborthgoéaiegéorifgogareaihfroeitghoireguodfgosuegrouergfoerughuoerhffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-		SmartMapParser parser = new JsonSmartMapParser();
-
-		try {
-			parser.parseEvent(eventJson.toString());
-			fail("parsed too long description");
 		} catch (SmartMapParseException e) {
 			// success
 		}

@@ -2,6 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import java.util.Calendar;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 
@@ -118,7 +119,7 @@ public class Stranger implements User {
      * @see ch.epfl.smartmap.cache.Localisable#getMarkerOptions()
      */
     @Override
-    public MarkerOptions getMarkerOptions() {
+    public MarkerOptions getMarkerOptions(Context context) {
         throw new UnsupportedOperationException();
     }
 

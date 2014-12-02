@@ -23,7 +23,6 @@ import ch.epfl.smartmap.gui.FriendPickerListAdapter;
  * This activity lets the user invite friends to an event. Launched from
  * {@link ch.epfl.smartmap.activities.EventInformationActivity}
  * 
- * 
  * @author SpicyCH
  */
 public class InviteFriendsActivity extends ListActivity {
@@ -124,7 +123,9 @@ public class InviteFriendsActivity extends ListActivity {
             Toast.makeText(this, this.getString(R.string.invite_friends_success), Toast.LENGTH_LONG).show();
             // TODO invite friends
         } else {
-            Toast.makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG).show();
+            Toast
+                .makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG)
+                .show();
         }
     }
 

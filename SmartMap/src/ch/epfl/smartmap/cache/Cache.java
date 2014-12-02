@@ -175,7 +175,7 @@ public class Cache {
 
         List<Event> result = new ArrayList<Event>();
         for (long id : allEventIds) {
-            Event event = this.getEventById(id);
+            Event event = mPublicEventInstances.get(id);
             if (event != null) {
                 result.add(event);
             }
@@ -190,7 +190,7 @@ public class Cache {
     public List<User> getAllFriends() {
         List<User> allFriends = new ArrayList<User>();
         for (Long id : mFriendIds) {
-            User friend = this.getFriendById(id);
+            User friend = mFriendInstances.get(id);
             if (friend != null) {
                 allFriends.add(friend);
             }
@@ -204,7 +204,7 @@ public class Cache {
     public List<Event> getAllGoingEvents() {
         List<Event> allGoingEvents = new ArrayList<Event>();
         for (Long id : mGoingEventIds) {
-            Event event = this.getEventById(id);
+            Event event = mPublicEventInstances.get(id);
             if (event != null) {
                 allGoingEvents.add(event);
             }
@@ -232,7 +232,7 @@ public class Cache {
     public List<Event> getAllNearEvents() {
         List<Event> allNearEvents = new ArrayList<Event>();
         for (Long id : mNearEventIds) {
-            Event event = this.getEventById(id);
+            Event event = mPublicEventInstances.get(id);
             if (event != null) {
                 allNearEvents.add(event);
             }
@@ -247,7 +247,7 @@ public class Cache {
 
         List<Displayable> allVisibleEvents = new ArrayList<Displayable>();
         for (Long id : mGoingEventIds) {
-            Event event = this.getEventById(id);
+            Event event = mPublicEventInstances.get(id);
             if ((event != null) && event.isVisible()) {
                 allVisibleEvents.add(event);
             }
@@ -258,7 +258,7 @@ public class Cache {
     public List<Displayable> getAllVisibleFriends() {
         List<Displayable> allVisibleUsers = new ArrayList<Displayable>();
         for (Long id : mFriendIds) {
-            User user = this.getFriendById(id);
+            User user = mFriendInstances.get(id);
             if ((user != null) && user.isVisible()) {
                 allVisibleUsers.add(user);
             }

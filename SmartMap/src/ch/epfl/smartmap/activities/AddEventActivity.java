@@ -230,7 +230,7 @@ public class AddEventActivity extends FragmentActivity {
             mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
             mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-            new DefaultZoomManager(mFragmentMap).zoomOnLocation(new LatLng(SettingsManager.getInstance()
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(SettingsManager.getInstance()
                 .getLocation().getLatitude(), SettingsManager.getInstance().getLocation().getLongitude()));
 
         }
@@ -273,6 +273,10 @@ public class AddEventActivity extends FragmentActivity {
         mPlaceName = (EditText) this.findViewById(R.id.addEventPlaceName);
 
         mPlaceName.setFocusable(true);
+        // Initialize mEventPosition to position of user
+        mEventPosition =
+            new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
+                .getInstance().getLocation().getLongitude());
 
         mTextChangedListener = new TextWatcher() {
 
@@ -477,14 +481,14 @@ public class AddEventActivity extends FragmentActivity {
             cityName = addresses.get(0).getLocality();
             mPlaceName.setText(cityName);
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
-            new DefaultZoomManager(mFragmentMap).zoomOnLocation(mEventPosition);
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
         } else {
             Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location_name),
                 Toast.LENGTH_LONG).show();
             mPlaceName.setText("");
         }
         mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
-        new DefaultZoomManager(mFragmentMap).zoomOnLocation(mEventPosition);
+        new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
     }
 
 }

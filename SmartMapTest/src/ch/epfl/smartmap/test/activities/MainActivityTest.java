@@ -20,7 +20,7 @@ import ch.epfl.smartmap.activities.MainActivity;
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 
 public class MainActivityTest extends
-		ActivityInstrumentationTestCase2<MainActivity> {
+ActivityInstrumentationTestCase2<MainActivity> {
 	public MainActivityTest() {
 		super(MainActivity.class);
 	}
@@ -53,6 +53,15 @@ public class MainActivityTest extends
 		// TODO : Check there is only one result
 	}
 
+	public void testOpenAndCloseNotificationActivityUsingHome() {
+		onView(withId(R.id.action_notifications)).perform(click());
+		onView(withId(R.id.notification_activity))
+		.check(matches(isDisplayed()));
+		pressBack();
+		// onView(withId(R.id.notification_activity)).check(
+		// matches(not(hasFocus())));
+	}
+
 	public void testOpenAndCloseSideMenu() throws Exception {
 		openDrawer(R.id.drawer_layout);
 		onView(withId(R.id.drawer_layout)).check(matches(isOpen()));
@@ -74,7 +83,7 @@ public class MainActivityTest extends
 	public void testOpenNotificationActivity() {
 		onView(withId(R.id.action_notifications)).perform(click());
 		onView(withId(R.id.notification_activity))
-				.check(matches(isDisplayed()));
+		.check(matches(isDisplayed()));
 	}
 
 	public void testOpenSearchView() {
@@ -104,14 +113,5 @@ public class MainActivityTest extends
 		onView(withId(R.id.action_search)).perform(
 				ViewActions.typeText("flksdh�fjkslkfshdfljkshfd"));
 		// TODO : Check no result is displayed
-	}
-
-	public void testOpenAndCloseNotificationActivityUsingHome() {
-		onView(withId(R.id.action_notifications)).perform(click());
-		onView(withId(R.id.notification_activity))
-				.check(matches(isDisplayed()));
-		pressBack();
-		// onView(withId(R.id.notification_activity)).check(
-		// matches(not(hasFocus())));
 	}
 }

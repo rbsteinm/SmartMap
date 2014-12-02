@@ -33,9 +33,22 @@ public class EventInvitation implements Invitation {
         mStatus = status;
     }
 
+    public long getEventId() {
+        return mEventId;
+    }
+
+    public String getEventName() {
+        return mEventName;
+    }
+
     @Override
-    public int getStatus() {
-        return mStatus;
+    public long getId() {
+        return mInvitationId;
+    }
+
+    @Override
+    public Bitmap getImage() {
+        return null;
     }
 
     @Override
@@ -51,8 +64,8 @@ public class EventInvitation implements Invitation {
     }
 
     @Override
-    public long getId() {
-        return mInvitationId;
+    public int getStatus() {
+        return mStatus;
     }
 
     @Override
@@ -67,26 +80,13 @@ public class EventInvitation implements Invitation {
     }
 
     @Override
-    public String getUserName() {
-        return mUserName;
-    }
-
-    @Override
     public long getUserId() {
         return mUserId;
     }
 
-    public long getEventId() {
-        return mEventId;
-    }
-
-    public String getEventName() {
-        return mEventName;
-    }
-
     @Override
-    public Bitmap getImage() {
-        return null;
+    public String getUserName() {
+        return mUserName;
     }
 
     @Override

@@ -4,9 +4,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.map.CircularMarkerIconMaker;
+import ch.epfl.smartmap.map.MarkerIconMaker;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -158,13 +161,18 @@ public final class Friend implements User {
      * @see ch.epfl.smartmap.cache.Localisable#getMarkerOptions()
      */
     @Override
-    public MarkerOptions getMarkerOptions() {
-        Bitmap friendProfilePicture =
+    public MarkerOptions getMarkerOptions(Context context) {
+        MarkerIconMaker iconMaker = new CircularMarkerIconMaker(context);
+
+        Bitmap profilePicture =
             Bitmap.createScaledBitmap(this.getImage(), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+
+        Bitmap markerIcon = iconMaker.getMarkerIcon(profilePicture);
+
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
-            .title(this.getName()).icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
-            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+        markerOptions.position(this.getLatLng()).title(this.getName())
+            .icon(BitmapDescriptorFactory.fromBitmap(markerIcon)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
+
         return markerOptions;
     }
 

@@ -77,12 +77,24 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
     }
 
+    public ViewPager getViewPager() {
+        return mPager;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         if (this.getIntent().getBooleanExtra("INVITATION", false) == true) {
             mPager.setCurrentItem(INVITATION_INDEX);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+        this.finish();
     }
 
     @Override
@@ -136,14 +148,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     public void startAddFriendActivity(MenuItem menu) {
         Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
         this.startActivity(displayActivityIntent);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
-            this.startActivity(new Intent(this, MainActivity.class));
-        }
-        this.finish();
     }
 
 }

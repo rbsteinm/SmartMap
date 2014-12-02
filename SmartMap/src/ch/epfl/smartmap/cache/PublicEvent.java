@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
@@ -160,7 +161,7 @@ public class PublicEvent implements Event {
      * @author hugo-S
      */
     @Override
-    public MarkerOptions getMarkerOptions() {
+    public MarkerOptions getMarkerOptions(Context context) {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
             .title(this.getName())

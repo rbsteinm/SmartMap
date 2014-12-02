@@ -125,7 +125,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             mEventMarkerManager = new DefaultMarkerManager(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
 
-            this.initializeMarkers();
+            // this.zoomAccordingToAllMarkers();
 
             // Add listeners to the GoogleMap
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
@@ -157,7 +157,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         // get the value of the user string
         Location eventLocation = startingIntent.getParcelableExtra("location");
         if (eventLocation != null) {
-            mMapZoomer.zoomOnLocation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
+            mMapZoomer
+                .zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
             eventLocation = null;
         }
 
@@ -179,6 +180,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
         }
 
+        this.zoomAccordingToAllMarkers();
     }
 
     /**
@@ -305,6 +307,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             public void run() {
                 mFriendMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
                     .getAllVisibleFriends());
+                // MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -335,7 +338,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         // Update LayerDrawable's BadgeDrawable
         Utils.setBadgeCount(MainActivity.this, mIcon, DatabaseHelper.getInstance()
             .getFriendInvitationsByStatus(Invitation.UNREAD).size());
-
     }
 
     public void onLocationChanged(Location location) {
@@ -389,7 +391,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                         this.setMainMenu();
                         break;
                     case ITEM:
-                        mMapZoomer.zoomOnLocation(mCurrentItem.getLatLng());
+
+                        mMapZoomer.zoomWithAnimation(mCurrentItem.getLatLng());
 
                         break;
                     default:
@@ -448,7 +451,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     public void performQuery(Displayable item) {
         // Focus on Friend
 
-        mMapZoomer.zoomOnLocation(item.getLatLng());
+        mMapZoomer.zoomWithAnimation(item.getLatLng());
 
         this.setItemMenu(item);
     }
@@ -538,9 +541,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         }
     }
 
-    private void initializeMarkers() {
-        mFriendMarkerManager.updateMarkers(this, mCache.getAllVisibleFriends());
-        mEventMarkerManager.updateMarkers(this, mCache.getAllVisibleEvents());
+    private void zoomAccordingToAllMarkers() {
 
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
         allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
@@ -574,12 +575,12 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
             if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
                 Displayable itemClicked = mFriendMarkerManager.getItemForMarker(arg0);
-                mMapZoomer.zoomOnLocation(arg0.getPosition());
+                mMapZoomer.centerOnLocation(arg0.getPosition());
                 MainActivity.this.setItemMenu(itemClicked);
                 return true;
             } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
                 Displayable itemClicked = mEventMarkerManager.getItemForMarker(arg0);
-                mMapZoomer.zoomOnLocation(arg0.getPosition());
+                mMapZoomer.centerOnLocation(arg0.getPosition());
                 MainActivity.this.setItemMenu(itemClicked);
                 return true;
             }
