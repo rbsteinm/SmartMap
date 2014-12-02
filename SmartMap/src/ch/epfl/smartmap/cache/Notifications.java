@@ -10,6 +10,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
+import ch.epfl.smartmap.gui.Utils;
 
 /**
  * This class creates different sort of notifications
@@ -24,6 +25,9 @@ public class Notifications {
 	private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME, SILENT_NOTIFICATION_TIME,
 	    VIBRATE_NOTIFICATION_TIME};
 	private static long notificationID = 0;
+
+	private static final NotificationManager mNotificationManager = (NotificationManager) Utils.sContext
+	    .getSystemService(Context.NOTIFICATION_SERVICE);
 
 	/**
 	 * Create an accepted friend invitation notification and notify it

@@ -219,7 +219,7 @@ public class Notifications {
 	/**
 	 * Build the notification and notify it with notification manager.
 	 * 
-	 * @param activity
+	 * @param context
 	 *            current activity
 	 * @param notification
 	 *            notification to notify
@@ -230,5 +230,19 @@ public class Notifications {
 		NotificationManager notificationManager = (NotificationManager) context
 		    .getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify((int) notificationId, notification);
+	}
+
+	/**
+	 * Cancel the notification in statusBar using notification manager.
+	 * 
+	 * @param context
+	 *            current context
+	 * @param notifyId
+	 *            id of current notification
+	 */
+	public static void cancelNotification(Context context, int notifyId) {
+		NotificationManager notificationManager = (NotificationManager) context
+		    .getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.cancel(notifyId);
 	}
 }
