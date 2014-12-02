@@ -70,6 +70,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private Geocoder mGeocoder;
     private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
     private Set<Long> mInviterIds = new HashSet<Long>();
+    private Cache mCache;
 
     // Settings
     private int mPosUpdateDelay;
@@ -81,7 +82,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final Runnable friendsPosUpdate = new Runnable() {
         @Override
         public void run() {
-            new AsyncFriendsPos().execute();
+            if (!mManager.isOffline()) {
+                new AsyncFriendsPos().execute();
+            }
             mHandler.postDelayed(this, 10000);
         }
     };
@@ -89,7 +92,10 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final Runnable ownPosUpdate = new Runnable() {
         @Override
         public void run() {
-            new AsyncOwnPos().execute();
+            if (!mManager.isOffline()) {
+                new AsyncOwnPos().execute();
+                Log.d("UpdateService", "OwnPos");
+            }
             mHandler.postDelayed(this, 10000);
         }
     };
@@ -165,6 +171,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         }
         mManager = SettingsManager.initialize(this.getApplicationContext());
         mHelper = DatabaseHelper.initialize(this.getApplicationContext());
+        mCache = Cache.getInstance();
         mHelper.addOnInvitationListUpdateListener(this);
         mHelper.addOnInvitationStatusUpdateListener(this);
         mGeocoder = new Geocoder(this.getBaseContext(), Locale.US);
