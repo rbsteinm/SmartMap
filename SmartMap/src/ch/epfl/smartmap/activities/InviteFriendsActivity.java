@@ -21,7 +21,7 @@ import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 
 /**
  * This activity lets the user invite friends to an event. Launched from
- * {@link ch.epfl.smartmap.activities.ShowEventInformationActivity}
+ * {@link ch.epfl.smartmap.activities.EventInformationActivity}
  * 
  * 
  * @author SpicyCH

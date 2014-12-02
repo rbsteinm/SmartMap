@@ -917,15 +917,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<User> friends = Cache.getInstance().getAllFriends();
         List<Event> events = Cache.getInstance().getAllGoingEvents();
 
-        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
-        this.onCreate(mDatabase);
-
         for (User user : friends) {
-            this.addUser(user.getImmutableCopy());
+            this.updateFriend(user.getImmutableCopy());
         }
         for (Event event : events) {
-            this.addEvent(event.getImmutableCopy());
+            this.updateEvent(event.getImmutableCopy());
         }
     }
 

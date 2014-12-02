@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
-import ch.epfl.smartmap.activities.ShowEventInformationActivity;
+import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Event;
@@ -101,7 +101,7 @@ public class Notifications {
         notificationID++;
 
         // Prepare intent that redirect the user to EventActivity
-        Intent showEventIntent = new Intent(context, ShowEventInformationActivity.class);
+        Intent showEventIntent = new Intent(context, EventInformationActivity.class);
         showEventIntent.putExtra("NOTIFICATION", true);
         showEventIntent.putExtra("EVENT", event.getId());
         // TODO mettre l'id de l'event

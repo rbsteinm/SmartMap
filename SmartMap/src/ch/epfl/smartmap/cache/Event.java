@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.gui.Utils;
+
 /**
  * Describes an event
  * 
@@ -15,6 +20,9 @@ public interface Event extends Displayable {
 
     final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
     final String NO_DESCRIPTION = "This event currently has no description";
+
+    final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(),
+        R.drawable.default_event);
 
     /**
      * @return The ID of the user who created the event

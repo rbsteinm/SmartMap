@@ -133,7 +133,7 @@
             android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.ShowEventInformationActivity"
+            android:name="ch.epfl.smartmap.activities.EventInformationActivity"
             android:label="@string/title_activity_show_event_information"
             android:parentActivityName=".activities.ShowEventsActivity"
             android:screenOrientation="portrait" >

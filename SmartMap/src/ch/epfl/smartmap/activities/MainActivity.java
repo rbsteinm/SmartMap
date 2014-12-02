@@ -25,6 +25,7 @@ import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.background.UpdateService;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.database.DatabaseHelper;
@@ -323,7 +324,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             @Override
             public void run() {
                 mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
-                    .getAllVisibleFriends());
+                    .getAllVisibleEvents());
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -351,7 +352,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             @Override
             public void run() {
                 mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
-                    .getAllVisibleFriends());
+                    .getAllVisibleEvents());
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -363,7 +364,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             @Override
             public void run() {
                 mEventMarkerManager.updateMarkers(MainActivity.this, Cache.getInstance()
-                    .getAllVisibleFriends());
+                    .getAllVisibleEvents());
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -431,6 +432,10 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         if (mCurrentItem instanceof User) {
             Intent intent = new Intent(this, UserInformationActivity.class);
             intent.putExtra("USER", mCurrentItem.getId());
+            this.startActivity(intent);
+        } else if (mCurrentItem instanceof Event) {
+            Intent intent = new Intent(this, EventInformationActivity.class);
+            intent.putExtra("EVENT", mCurrentItem.getId());
             this.startActivity(intent);
         }
     }

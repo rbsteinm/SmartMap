@@ -111,13 +111,28 @@ public class Cache {
     }
 
     /**
-     * Mark an Event as Near and fill the cache with its informations.
+     * Mark an Event as Near and fill the cache with its informations. Call listeners
      * 
      * @param id
      */
     public void addNearEvent(long id) {
         mNearEventIds.add(id);
         this.getPublicEventById(id);
+        for (CacheListener listener : mListeners) {
+            listener.onNearEventListUpdate();
+        }
+    }
+
+    /**
+     * Mark several Events as Near and fill the cache with their informations. Call listeners
+     * 
+     * @param id
+     */
+    public void addNearEvents(List<Long> ids) {
+        mNearEventIds.addAll(ids);
+        for (long id : ids) {
+            this.getEventById(id);
+        }
         for (CacheListener listener : mListeners) {
             listener.onNearEventListUpdate();
         }
@@ -209,6 +224,20 @@ public class Cache {
             }
         }
         return allInvitingUsers;
+    }
+
+    /**
+     * @return a list containing all the near Events.
+     */
+    public List<Event> getAllNearEvents() {
+        List<Event> allNearEvents = new ArrayList<Event>();
+        for (Long id : mNearEventIds) {
+            Event event = this.getEventById(id);
+            if (event != null) {
+                allNearEvents.add(event);
+            }
+        }
+        return allNearEvents;
     }
 
     public List<Displayable> getAllVisibleEvents() {
@@ -310,6 +339,7 @@ public class Cache {
         }
         // At this point a friend was found either online or in the database, so we cache him
         mPublicEventInstances.put(Long.valueOf(publicEvent.getId()), publicEvent);
+
         return publicEvent;
     }
 

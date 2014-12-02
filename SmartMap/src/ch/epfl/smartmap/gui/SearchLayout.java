@@ -4,8 +4,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
@@ -15,7 +18,11 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.search.CacheSearchEngine;
+import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
 import ch.epfl.smartmap.search.SearchEngine;
 import ch.epfl.smartmap.search.SearchEngine.Type;
 
@@ -26,7 +33,7 @@ import ch.epfl.smartmap.search.SearchEngine.Type;
  * 
  * @author jfperren
  */
-public class SearchLayout extends LinearLayout {
+public class SearchLayout extends LinearLayout implements CacheListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = "SEARCH_RESULT_SWIPEABLE_CONTAINER";
@@ -62,9 +69,11 @@ public class SearchLayout extends LinearLayout {
     // Information about current state
     private Type mCurrentSearchType;
     private String mCurrentQuery;
+    private Context mContext;
 
     public SearchLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
         // Layout relative informations
         this.setOrientation(VERTICAL);
         this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
@@ -86,6 +95,52 @@ public class SearchLayout extends LinearLayout {
         this.addSearchTypes(Type.ALL, Type.FRIENDS, Type.EVENTS, Type.TAGS, Type.GROUPS);
         // Set default search type
         this.setSearchType(DEFAULT_SEARCH_TYPE);
+        Cache.getInstance().addOnCacheListener(this);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
+     */
+    @Override
+    public void onFriendListUpdate() {
+        this.updateCurrentPanel();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onGoingEventListUpdate()
+     */
+    @Override
+    public void onGoingEventListUpdate() {
+        this.updateCurrentPanel();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onMyEventListUpdate()
+     */
+    @Override
+    public void onMyEventListUpdate() {
+        this.updateCurrentPanel();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onNearEventListUpdate()
+     */
+    @Override
+    public void onNearEventListUpdate() {
+        this.updateCurrentPanel();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onPendingFriendListUpdate()
+     */
+    @Override
+    public void onPendingFriendListUpdate() {
+        // Nothing
     }
 
     /**
@@ -204,7 +259,7 @@ public class SearchLayout extends LinearLayout {
      */
     private void onSwipeRight() {
         this.setSearchType(this.previousSearchType());
-    }
+    };
 
     private Type previousSearchType() {
         // Need to add mActiveSearchTypes.size() to avoid negative numbers with
@@ -239,8 +294,24 @@ public class SearchLayout extends LinearLayout {
     }
 
     private void updateCurrentPanel() {
-        mSearchResultViewGroups.get(mCurrentSearchType).setResultList(
-            mSearchEngine.sendQuery(mCurrentQuery, mCurrentSearchType));
+        Log.d("SearchLayout", "Update current panel");
+
+        new AsyncTask<Void, Void, List<Displayable>>() {
+            @Override
+            public List<Displayable> doInBackground(Void... params) {
+                return CachedOnlineSearchEngine.getInstance().sendQuery(mCurrentQuery, mCurrentSearchType);
+            }
+
+            @Override
+            public void onPostExecute(final List<Displayable> result) {
+                ((Activity) mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSearchResultViewGroups.get(mCurrentSearchType).setResultList(result);
+                    }
+                });
+            }
+        }.execute();
 
     }
 
@@ -295,7 +366,7 @@ public class SearchLayout extends LinearLayout {
                 }
             });
         }
-    };
+    }
 
     /**
      * Provides a Vertical ScrollView that listens to Horizontal Swipes and
