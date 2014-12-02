@@ -415,15 +415,30 @@ public class Cache {
     }
 
     public void removeFriend(long id) {
+        mFriendIds.remove(id);
 
+        // Notify listeners
+        for (CacheListener l : mListeners) {
+            l.onFriendListUpdate();
+        }
     }
 
     public void removeGoingEvent(long id) {
         mGoingEventIds.remove(id);
+
+        // Notify listeners
+        for (CacheListener l : mListeners) {
+            l.onGoingEventListUpdate();
+        }
     }
 
     public void removeNearEvent(long id) {
         mNearEventIds.remove(id);
+
+        // Notify listeners
+        for (CacheListener l : mListeners) {
+            l.onNearEventListUpdate();
+        }
     }
 
     public void removePendingFriend(long id) {

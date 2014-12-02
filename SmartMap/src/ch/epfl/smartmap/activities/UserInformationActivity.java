@@ -188,7 +188,7 @@ public class UserInformationActivity extends Activity {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mCacheDB.deleteUser(userId);
+                        Cache.getInstance().removeFriend(userId);
                     }
                 });
 
