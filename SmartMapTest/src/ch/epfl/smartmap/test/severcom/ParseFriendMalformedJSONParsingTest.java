@@ -34,11 +34,53 @@ public class ParseFriendMalformedJSONParsingTest extends TestCase {
 	}
 
 	@Test
+	public void ignoredTestParseFriendWrongEmail() throws JSONException {
+		JSONObject jsonObject = new JSONObject(FRIEND_JSON);
+		jsonObject.put("email", "wrong email");
+		SmartMapParser parser = new JsonSmartMapParser();
+
+		try {
+			parser.parseFriend(jsonObject.toString());
+			fail("parsed wrong email");
+		} catch (SmartMapParseException e) {
+			// success
+		}
+	}
+
+	@Test
+	public void ignoredTestParseFriendWrongPhoneNumber() throws JSONException {
+		JSONObject jsonObject = new JSONObject(FRIEND_JSON);
+		jsonObject.put("phone number", "021");
+		SmartMapParser parser = new JsonSmartMapParser();
+
+		try {
+			parser.parseFriend(jsonObject.toString());
+			fail("parsed wrong phone number");
+		} catch (SmartMapParseException e) {
+			// success
+		}
+	}
+
+	@Test
 	public void testParseFriendEmptyJson() {
 		SmartMapParser parser = new JsonSmartMapParser();
 		try {
 			parser.parseFriend(new JSONObject().toString());
 			fail("parsed empty Json");
+		} catch (SmartMapParseException e) {
+			// success
+		}
+	}
+
+	@Test
+	public void testParseFriendEmptyName() throws JSONException {
+		JSONObject jsonObject = new JSONObject(FRIEND_JSON);
+		jsonObject.put("name", "");
+		SmartMapParser parser = new JsonSmartMapParser();
+
+		try {
+			parser.parseFriend(jsonObject.toString());
+			fail("parsed empty name");
 		} catch (SmartMapParseException e) {
 			// success
 		}
@@ -71,33 +113,7 @@ public class ParseFriendMalformedJSONParsingTest extends TestCase {
 		}
 	}
 
-	@Test
-	public void testParseFriendWrongId() throws JSONException {
-		JSONObject jsonObject = new JSONObject(FRIEND_JSON);
-		jsonObject.put("id", -3);
-		SmartMapParser parser = new JsonSmartMapParser();
 
-		try {
-			parser.parseFriend(jsonObject.toString());
-			fail("parsed negative id");
-		} catch (SmartMapParseException e) {
-			// success
-		}
-	}
-
-	@Test
-	public void testParseFriendEmptyName() throws JSONException {
-		JSONObject jsonObject = new JSONObject(FRIEND_JSON);
-		jsonObject.put("name", "");
-		SmartMapParser parser = new JsonSmartMapParser();
-
-		try {
-			parser.parseFriend(jsonObject.toString());
-			fail("parsed empty name");
-		} catch (SmartMapParseException e) {
-			// success
-		}
-	}
 
 	@Test
 	public void testParseFriendTooLongName() throws JSONException {
@@ -116,31 +132,15 @@ public class ParseFriendMalformedJSONParsingTest extends TestCase {
 		}
 	}
 
-
-
 	@Test
-	public void ignoredTestParseFriendWrongEmail() throws JSONException {
+	public void testParseFriendWrongId() throws JSONException {
 		JSONObject jsonObject = new JSONObject(FRIEND_JSON);
-		jsonObject.put("email", "wrong email");
+		jsonObject.put("id", -3);
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
 			parser.parseFriend(jsonObject.toString());
-			fail("parsed wrong email");
-		} catch (SmartMapParseException e) {
-			// success
-		}
-	}
-
-	@Test
-	public void ignoredTestParseFriendWrongPhoneNumber() throws JSONException {
-		JSONObject jsonObject = new JSONObject(FRIEND_JSON);
-		jsonObject.put("phone number", "021");
-		SmartMapParser parser = new JsonSmartMapParser();
-
-		try {
-			parser.parseFriend(jsonObject.toString());
-			fail("parsed wrong phone number");
+			fail("parsed negative id");
 		} catch (SmartMapParseException e) {
 			// success
 		}

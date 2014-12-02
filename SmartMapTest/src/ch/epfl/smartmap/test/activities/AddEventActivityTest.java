@@ -21,7 +21,7 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  */
 
 public class AddEventActivityTest extends
-		ActivityInstrumentationTestCase2<AddEventActivity> {
+ActivityInstrumentationTestCase2<AddEventActivity> {
 
 	private AddEventActivity mAddEventActivity;
 
@@ -168,6 +168,6 @@ public class AddEventActivityTest extends
 	public void testOpenSetLocationWhenClickOnMap() {
 		onView(withId(R.id.add_event_map)).perform(click());
 		onView(withId(R.id.set_location_activity))
-				.check(matches(isDisplayed()));
+		.check(matches(isDisplayed()));
 	}
 }

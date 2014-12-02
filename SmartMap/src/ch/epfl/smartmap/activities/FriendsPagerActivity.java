@@ -77,6 +77,10 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
     }
 
+    public ViewPager getViewPager() {
+        return mPager;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();

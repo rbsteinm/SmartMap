@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.util.LongSparseArray;
@@ -100,7 +101,7 @@ public class DefaultFilter implements Filter {
      * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions()
      */
     @Override
-    public MarkerOptions getMarkerOptions() {
+    public MarkerOptions getMarkerOptions(Context context) {
         return NO_MARKER_OPTIONS;
     }
 

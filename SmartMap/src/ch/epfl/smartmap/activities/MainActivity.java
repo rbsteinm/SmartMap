@@ -156,7 +156,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         // get the value of the user string
         Location eventLocation = startingIntent.getParcelableExtra("location");
         if (eventLocation != null) {
-            mMapZoomer.zoomOnLocation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
+            mMapZoomer
+                .zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
             eventLocation = null;
         }
 
@@ -393,7 +394,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                         this.setMainMenu();
                         break;
                     case ITEM:
-                        mMapZoomer.zoomOnLocation(mCurrentItem.getLatLng());
+
+                        mMapZoomer.zoomWithAnimation(mCurrentItem.getLatLng());
 
                         break;
                     default:
@@ -448,7 +450,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     public void performQuery(Displayable item) {
         // Focus on Friend
 
-        mMapZoomer.zoomOnLocation(item.getLatLng());
+        mMapZoomer.zoomWithAnimation(item.getLatLng());
 
         this.setItemMenu(item);
     }
@@ -572,12 +574,12 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
             if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
                 Displayable itemClicked = mFriendMarkerManager.getItemForMarker(arg0);
-                mMapZoomer.zoomOnLocation(arg0.getPosition());
+                mMapZoomer.centerOnLocation(arg0.getPosition());
                 MainActivity.this.setItemMenu(itemClicked);
                 return true;
             } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
                 Displayable itemClicked = mEventMarkerManager.getItemForMarker(arg0);
-                mMapZoomer.zoomOnLocation(arg0.getPosition());
+                mMapZoomer.centerOnLocation(arg0.getPosition());
                 MainActivity.this.setItemMenu(itemClicked);
                 return true;
             }

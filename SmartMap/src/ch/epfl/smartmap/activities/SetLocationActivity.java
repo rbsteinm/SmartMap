@@ -89,7 +89,7 @@ public class SetLocationActivity extends FragmentActivity {
                     .getInstance().getLocation().getLongitude());
 
             // Enabling MyLocation Layer of Google Map
-            new DefaultZoomManager(mFragmentMap).zoomOnLocation(mMyPosition);
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mMyPosition);
 
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition).draggable(true));
 

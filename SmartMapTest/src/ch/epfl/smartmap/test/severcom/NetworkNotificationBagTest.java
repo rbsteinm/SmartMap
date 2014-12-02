@@ -113,27 +113,6 @@ public class NetworkNotificationBagTest extends TestCase {
 	}
 
 	@Test
-	public void testNewFriendsDefensiveCopy() {
-
-		List<Long> friendsList = new ArrayList<Long>(Arrays.asList(Long.valueOf(1),Long.valueOf(2))) ;
-
-
-		NotificationBag nb =
-				new NetworkNotificationBag(new ArrayList<Long>(), friendsList, new ArrayList<Long>());
-
-		friendsList.add(Long.valueOf(3));
-
-		assertTrue("The constructor does not make a defensive copy of new friends list.",
-				friendsList.size() != nb.getNewFriends().size());
-
-		List<Long> getList = nb.getNewFriends();
-		getList.add(Long.valueOf(4));
-
-		assertTrue("The getter does not return a defensive copy of new friends list.", getList.size() != nb
-				.getNewFriends().size());
-	}
-
-	@Test
 	public void testIRemovedFriendsDefensiveCopy() {
 
 		List<Long> removedIds = new ArrayList<Long>();
@@ -153,5 +132,26 @@ public class NetworkNotificationBagTest extends TestCase {
 
 		assertTrue("The getter does not return a defensive copy of removed ids list.", getList.size() != nb
 				.getRemovedFriendsIds().size());
+	}
+
+	@Test
+	public void testNewFriendsDefensiveCopy() {
+
+		List<Long> friendsList = new ArrayList<Long>(Arrays.asList(Long.valueOf(1),Long.valueOf(2))) ;
+
+
+		NotificationBag nb =
+				new NetworkNotificationBag(new ArrayList<Long>(), friendsList, new ArrayList<Long>());
+
+		friendsList.add(Long.valueOf(3));
+
+		assertTrue("The constructor does not make a defensive copy of new friends list.",
+				friendsList.size() != nb.getNewFriends().size());
+
+		List<Long> getList = nb.getNewFriends();
+		getList.add(Long.valueOf(4));
+
+		assertTrue("The getter does not return a defensive copy of new friends list.", getList.size() != nb
+				.getNewFriends().size());
 	}
 }

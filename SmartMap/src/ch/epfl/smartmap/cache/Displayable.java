@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.cache;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 
@@ -48,7 +49,7 @@ public interface Displayable extends Stockable {
      *            , the application's context
      * @return the options to display the marker
      */
-    MarkerOptions getMarkerOptions();
+    MarkerOptions getMarkerOptions(Context context);
 
     /**
      * @return Text containing various information (description, last seen,
