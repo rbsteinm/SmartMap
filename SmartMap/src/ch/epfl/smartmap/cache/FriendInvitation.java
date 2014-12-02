@@ -13,6 +13,7 @@ import ch.epfl.smartmap.gui.Utils;
  * @author agpmilli
  */
 public class FriendInvitation implements Invitation {
+
 	private final long mInvitationId;
 	private final long mUserId;
 	private final String mUserName;
@@ -29,7 +30,6 @@ public class FriendInvitation implements Invitation {
 		mUserName = userName;
 		mStatus = status;
 		mImage = image;
-
 	}
 
 	@Override

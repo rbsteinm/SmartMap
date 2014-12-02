@@ -5,10 +5,6 @@ package ch.epfl.smartmap.listeners;
  */
 public interface InvitationListener {
 
-	void onInvitingUserListUpdate();
-
-	void onPendingEventListUpdate();
-
-	void onPendingFriendListUpdate();
+	void onInvitationListUpdate();
 
 }

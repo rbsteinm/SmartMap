@@ -63,7 +63,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 	private final Handler mHandler = new Handler();
 	private LocationManager mLocManager;
 	private boolean mFriendsPosEnabled = true;
-	private boolean mOwnPosEnabled = true;
+	private final boolean mOwnPosEnabled = true;
 	private final boolean isFriendIDListRetrieved = true;
 	private final boolean isDatabaseInitialized = false;
 	private DatabaseHelper mHelper;
@@ -348,8 +348,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 					new AsyncTask<Long, Void, Void>() {
 						@Override
 						protected Void doInBackground(Long... params) {
-							Cache.getInstance().addFriend(params[0]);
-							User newFriend = Cache.getInstance().getFriendById(params[0]);
+							User newFriend = CachedOnlineSearchEngine.getInstance().findFriendById(params[0]);
 							Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
 							return null;
 						}
@@ -362,12 +361,11 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
 						@Override
 						protected Void doInBackground(Long... params) {
-							User user = Cache.getInstance().getUserById(params[0]);
+							User user = CachedOnlineSearchEngine.getInstance().findStrangerById(params[0]);
 
 							if (!mInviterIds.contains(user.getId())) {
-								// mHelper.addFriendInvitation(new FriendInvitation(0, user.getId(), user
-								// .getName(), Invitation.UNREAD));
-
+								mHelper.addFriendInvitation(new FriendInvitation(0, user.getId(), user
+								    .getName(), Invitation.UNREAD));
 								mInviterIds.add(user.getId());
 								new AsyncGetPictures().execute(user.getId());
 								if (mNotificationsEnabled && mNotificationsForFriendRequests) {
@@ -490,7 +488,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
 		@Override
 		public void onLocationChanged(Location locFromGps) {
-			Log.d("DEBUG_POSITION", "C'est appelé");
 			mManager.setLocation(locFromGps);
 			if (mOwnPosEnabled) {
 				new AsyncOwnPos().execute();

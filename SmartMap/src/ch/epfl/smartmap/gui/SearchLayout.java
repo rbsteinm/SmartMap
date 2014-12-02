@@ -100,47 +100,20 @@ public class SearchLayout extends LinearLayout implements CacheListener {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onEventListUpdate()
+     */
+    @Override
+    public void onEventListUpdate() {
+        this.updateCurrentPanel();
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
      */
     @Override
     public void onFriendListUpdate() {
         this.updateCurrentPanel();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onGoingEventListUpdate()
-     */
-    @Override
-    public void onGoingEventListUpdate() {
-        this.updateCurrentPanel();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onMyEventListUpdate()
-     */
-    @Override
-    public void onMyEventListUpdate() {
-        this.updateCurrentPanel();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onNearEventListUpdate()
-     */
-    @Override
-    public void onNearEventListUpdate() {
-        this.updateCurrentPanel();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onPendingFriendListUpdate()
-     */
-    @Override
-    public void onPendingFriendListUpdate() {
-        // Nothing
     }
 
     /**
@@ -252,14 +225,14 @@ public class SearchLayout extends LinearLayout implements CacheListener {
      */
     private void onSwipeLeft() {
         this.setSearchType(this.nextSearchType());
-    }
+    };
 
     /**
      * Go to previous View
      */
     private void onSwipeRight() {
         this.setSearchType(this.previousSearchType());
-    };
+    }
 
     private Type previousSearchType() {
         // Need to add mActiveSearchTypes.size() to avoid negative numbers with

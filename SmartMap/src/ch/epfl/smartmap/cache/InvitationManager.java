@@ -8,8 +8,10 @@ import java.util.Set;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.InvitationListener;
+import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
+import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
  * @author agpmilli
@@ -70,13 +72,13 @@ public final class InvitationManager {
 			mInvitingUserIds.add(userId);
 		}
 
-		for (long userId : notifBag.getInvitingUsers()) {
-			mInvitingUserIds.add(userId);
-		}
+		// findFriendsByIds and findStrangersByIds already puts them in the cache
+		CachedOnlineSearchEngine.getInstance().findFriendsByIds(notifBag.getNewFriends());
+		CachedOnlineSearchEngine.getInstance().findStrangersByIds(notifBag.getNewFriends());
 
 		// Notify listeners
 		for (InvitationListener l : mListeners) {
-			l.onPendingFriendListUpdate();
+			l.onInvitationListUpdate();
 		}
 	}
 
@@ -88,11 +90,10 @@ public final class InvitationManager {
 	 */
 	public void addPendingFriend(long id) {
 		mPendingFriendIds.add(id);
-		// TODO STATIC?
-		// Cache.getFriendById(id);
+		CachedOnlineSearchEngine.getInstance().findStrangerById(id);
 
 		for (InvitationListener listener : mListeners) {
-			listener.onPendingFriendListUpdate();
+			listener.onInvitationListUpdate();
 		}
 	}
 
@@ -104,61 +105,61 @@ public final class InvitationManager {
 	 */
 	public void addPendingEvent(long id) {
 		mPendingEventIds.add(id);
-		// TODO STATIC?
-		// Cache.getPublicEventById(id);
+		CachedOnlineSearchEngine.getInstance().findPublicEventById(id);
+
 		for (InvitationListener listener : mListeners) {
-			listener.onPendingEventListUpdate();
+			listener.onInvitationListUpdate();
 		}
 	}
 
 	/**
-	 * @return
+	 * @return the id of pending friends
 	 */
-	public Set<Long> getPendingFriends() {
-		Set<Long> pendingFriends = new HashSet<Long>();
-		for (Long id : mPendingFriendIds) {
-			User friend = mFriendInstances.get(id);
-			if (friend != null) {
-				pendingFriends.add(friend.getId());
-			}
-		}
-		return pendingFriends;
+	public Set<User> getPendingFriends() {
+		return Cache.getInstance().getStrangers(mPendingFriendIds);
 	}
 
 	/**
-	 * @return
+	 * @return the id of pending events
 	 */
-	public Set<Long> getPendingEvents() {
-		Set<Long> pendingEvent = new HashSet<Long>();
-		for (Long id : mPendingEventIds) {
-			Event event = mPublicEventInstances.get(id);
-			if (event != null) {
-				pendingEvent.add(event.getId());
-			}
-		}
-		return pendingEvent;
+	public Set<Event> getPendingEvents() {
+		return Cache.getInstance().getPublicEvents(mPendingEventIds);
 	}
 
 	/**
-	 * @return
+	 * @return the id of invited users
 	 */
-	public Set<Long> getInvitedUsers() {
-		return mInvitingUserIds;
+	public Set<User> getInvitedUsers() {
+		return Cache.getInstance().getStrangers(mInvitingUserIds);
 	}
 
 	/**
+	 * Return true if the invitation has been accepted (has to be called in an AsyncTask<>)
+	 * 
 	 * @param id
+	 *            the id of user
 	 * @return
+	 *         true whether it has been accepted and false in the other case
 	 */
-	public boolean acceptFriend(long id) {
-		return false;
-
+	public boolean acceptFriend(final long id) {
+		ImmutableUser result;
+		try {
+			result = NetworkSmartMapClient.getInstance().acceptInvitation(id);
+			if (result != null) {
+				Cache.getInstance().putFriend(result);
+			} else {
+				return false;
+			}
+			return true;
+		} catch (SmartMapClientException e) {
+			return false;
+		}
 	}
 
 	/**
-	 * @return
+	 * @return number of unread invitations
 	 */
-	public int getNumberOfUnreadNotifs() {
+	public int getNumberOfUnreadInvitations() {
 		return 0;
 	}
 }

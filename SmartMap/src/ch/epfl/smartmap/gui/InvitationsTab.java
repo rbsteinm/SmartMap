@@ -15,8 +15,11 @@ import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.FriendInvitation;
+import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
  * TODO listen to invitation list?
@@ -109,8 +112,15 @@ public class InvitationsTab extends ListFragment {
                 // new AcceptInvitation().execute(userId);
                 invitation.setStatus(Invitation.ACCEPTED);
                 mDBHelper.updateFriendInvitation(invitation);
-                Cache.getInstance().addFriend(invitation.getUserId());
-                mInvitationList = mDBHelper.getUnansweredFriendInvitations();
+                // TODO : Adding friend into cache should be done inside NotifcationManager
+                ImmutableUser friend;
+                try {
+                    friend = NetworkSmartMapClient.getInstance().getUserInfo(invitation.getUserId());
+                    Cache.getInstance().putFriend(friend);
+                    mInvitationList = mDBHelper.getUnansweredFriendInvitations();
+                } catch (SmartMapClientException e) {
+                    // TODO : Handle this case
+                }
                 InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
                     mInvitationList));
 

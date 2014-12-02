@@ -11,6 +11,7 @@ import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
 
 /**
  * This class creates different sort of notifications
@@ -125,12 +126,12 @@ public class Notifications {
 		    .setAutoCancel(true)
 		    .setContentTitle(context.getString(R.string.notification_inviteevent_title))
 		    .setContentText(
-		        Cache.getInstance().getUserById(event.getCreatorId()) + " "
+		        CachedOnlineSearchEngine.getInstance().findUserById(event.getCreatorId()) + " "
 		            + context.getString(R.string.notification_event_invitation) + event.getName() + "\n"
 		            + context.getString(R.string.notification_open_event_list))
 		    .setSmallIcon(R.drawable.ic_launcher)
 		    .setTicker(
-		        Cache.getInstance().getUserById(event.getCreatorId()) + " "
+		        CachedOnlineSearchEngine.getInstance().findUserById(event.getCreatorId()) + " "
 		            + context.getString(R.string.notification_event_invitation) + event.getName())
 		    .setVibrate(PATTERN).setContentIntent(pEventIntent);
 
