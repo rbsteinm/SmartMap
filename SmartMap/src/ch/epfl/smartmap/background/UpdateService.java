@@ -198,6 +198,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         mHandler.postDelayed(updateDatabase, HANDLER_DELAY);
         new AsyncLogin().execute();
 
+        mManager.setLocation(mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+
         Criteria criteria = new Criteria();
         criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
         mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), mPosUpdateDelay,
