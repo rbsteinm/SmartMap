@@ -8,9 +8,11 @@ import java.util.Set;
 
 import android.util.Log;
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
@@ -35,13 +37,8 @@ public class Cache {
 
     // List containing ids of all Friends
     private final Set<Long> mFriendIds;
-    private final Set<Long> mPendingFriendIds;
-    private final Set<Long> mInvitingUserIds;
-
-    // Lists containing ids of all pinned/going events
-    private final Set<Long> mNearEventIds;
-    private final Set<Long> mGoingEventIds;
-    private final Set<Long> mMyEventIds;
+    private final Set<Long> mStrangerIds;
+    private final Set<Long> mPublicEventIds;
 
     // SparseArrays containing instances
     private final LongSparseArray<Event> mPublicEventInstances;
@@ -58,84 +55,14 @@ public class Cache {
 
         // Init lists
         mFriendIds = new HashSet<Long>();
-        mPendingFriendIds = new HashSet<Long>();
-        mInvitingUserIds = new HashSet<Long>();
-
-        mNearEventIds = new HashSet<Long>();
-        mGoingEventIds = new HashSet<Long>();
-        mMyEventIds = new HashSet<Long>();
+        mStrangerIds = new HashSet<Long>();
+        mPublicEventIds = new HashSet<Long>();
 
         mPublicEventInstances = new LongSparseArray<Event>();
         mFriendInstances = new LongSparseArray<User>();
         mStrangerInstances = new LongSparseArray<User>();
 
         mListeners = new LinkedList<CacheListener>();
-    }
-
-    /**
-     * Add a Friend, and fill the cache with its informations.
-     * 
-     * @param id
-     */
-    public void addFriend(long id) {
-        mFriendIds.add(id);
-        mStrangerInstances.remove(id);
-        this.getFriendById(id);
-
-        for (CacheListener listener : mListeners) {
-            listener.onFriendListUpdate();
-        }
-    }
-
-    /**
-     * Mark an Event as Going and fill the cache with its informations.
-     * 
-     * @param id
-     */
-    public void addGoingEvent(long id) {
-        mGoingEventIds.add(id);
-        this.getPublicEventById(id);
-        for (CacheListener listener : mListeners) {
-            listener.onGoingEventListUpdate();
-        }
-    }
-
-    /**
-     * Mark an Event as Self-created event and fill the cache with its informations.
-     * 
-     * @param id
-     */
-    public void addMyEvent(long id) {
-        mMyEventIds.add(id);
-        this.getPublicEventById(id);
-    }
-
-    /**
-     * Mark an Event as Near and fill the cache with its informations. Call listeners
-     * 
-     * @param id
-     */
-    public void addNearEvent(long id) {
-        mNearEventIds.add(id);
-        this.getPublicEventById(id);
-        for (CacheListener listener : mListeners) {
-            listener.onNearEventListUpdate();
-        }
-    }
-
-    /**
-     * Mark several Events as Near and fill the cache with their informations. Call listeners
-     * 
-     * @param id
-     */
-    public void addNearEvents(List<Long> ids) {
-        mNearEventIds.addAll(ids);
-        for (long id : ids) {
-            this.getEventById(id);
-        }
-        for (CacheListener listener : mListeners) {
-            listener.onNearEventListUpdate();
-        }
     }
 
     /**
@@ -146,38 +73,14 @@ public class Cache {
         mListeners.add(listener);
     }
 
-    /**
-     * Mark Stranger as Pending and fill cache with its informations.
-     * 
-     * @param id
-     */
-    public void addPendingFriend(long id) {
-        mPendingFriendIds.add(id);
-        this.getStrangerById(id);
-        for (CacheListener listener : mListeners) {
-            listener.onPendingFriendListUpdate();
-        }
-    }
-
-    /**
-     * Fill Cache with an unknown User's informations.
-     * 
-     * @param user
-     */
-    public void addStranger(ImmutableUser user) {
-        mStrangerInstances.put(user.getId(), new Stranger(user));
-    }
-
     public List<Event> getAllEvents() {
-        Set<Long> allEventIds = new HashSet<Long>(mNearEventIds);
-        allEventIds.addAll(mGoingEventIds);
-        allEventIds.addAll(mMyEventIds);
-
         List<Event> result = new ArrayList<Event>();
-        for (long id : allEventIds) {
+        for (long id : mPublicEventIds) {
             Event event = mPublicEventInstances.get(id);
             if (event != null) {
                 result.add(event);
+            } else {
+                assert false;
             }
         }
 
@@ -193,6 +96,8 @@ public class Cache {
             User friend = mFriendInstances.get(id);
             if (friend != null) {
                 allFriends.add(friend);
+            } else {
+                assert false;
             }
         }
         return allFriends;
@@ -203,50 +108,22 @@ public class Cache {
      */
     public List<Event> getAllGoingEvents() {
         List<Event> allGoingEvents = new ArrayList<Event>();
-        for (Long id : mGoingEventIds) {
+        long myId = SettingsManager.getInstance().getUserID();
+        for (Long id : mPublicEventIds) {
             Event event = mPublicEventInstances.get(id);
-            if (event != null) {
+            if ((event != null) && event.getParticipants().contains(myId)) {
                 allGoingEvents.add(event);
+            } else {
+                assert false;
             }
         }
         return allGoingEvents;
     }
 
-    /**
-     * @return a list containing all the people who has invited the users
-     */
-    public List<User> getAllInvitingUsers() {
-        List<User> allInvitingUsers = new ArrayList<User>();
-        for (Long id : mInvitingUserIds) {
-            User invitingUser = this.getUserById(id);
-            if (invitingUser != null) {
-                allInvitingUsers.add(this.getStrangerById(id));
-            }
-        }
-        return allInvitingUsers;
-    }
-
-    /**
-     * @return a list containing all the near Events.
-     */
-    public List<Event> getAllNearEvents() {
-        List<Event> allNearEvents = new ArrayList<Event>();
-        for (Long id : mNearEventIds) {
-            Event event = mPublicEventInstances.get(id);
-            if (event != null) {
-                allNearEvents.add(event);
-            }
-        }
-        return allNearEvents;
-    }
-
     public List<Displayable> getAllVisibleEvents() {
-        List<Long> allEventIds = new ArrayList<Long>(mGoingEventIds);
-        allEventIds.addAll(mMyEventIds);
-        allEventIds.addAll(mNearEventIds);
 
         List<Displayable> allVisibleEvents = new ArrayList<Displayable>();
-        for (Long id : mGoingEventIds) {
+        for (Long id : mPublicEventIds) {
             Event event = mPublicEventInstances.get(id);
             if ((event != null) && event.isVisible()) {
                 allVisibleEvents.add(event);
@@ -267,150 +144,158 @@ public class Cache {
         return allVisibleUsers;
     }
 
-    public Event getEventById(long id) {
-        // For the moment only check in public events
-        return this.getPublicEventById(id);
+    public User getFriend(long id) {
+        return mStrangerInstances.get(id);
     }
 
-    /**
-     * Search for a {@code Friend} with this id. For performance concerns, this method should be called in an
-     * {@code AsyncTask}.
-     * 
-     * @param id
-     *            long id of {@code Friend}
-     * @return the {@code Friend} with given id, or {@code null} if there was no match.
-     */
-    public User getFriendById(long id) {
-        // Check for live instance
-        User friend = mFriendInstances.get(id);
-
-        if (friend == null) {
-            // If not found, check in database
-            ImmutableUser databaseResult = null;
-            if (mDatabaseHelper != null) {
-                databaseResult = mDatabaseHelper.getFriend(id);
-            }
-
-            if (databaseResult == null) {
-                // If not found, check on the server
-                ImmutableUser networkResult;
-                try {
-                    networkResult = mNetworkClient.getUserInfo(id);
-                } catch (SmartMapClientException e) {
-                    networkResult = null;
-                }
-                if (networkResult != null) {
-                    // Match on server
-                    friend = new Friend(networkResult);
-                } else {
-                    // No match anywhere
-                    return null;
-                }
-            } else {
-                // Match in database
-                friend = new Friend(databaseResult);
-            }
-        }
-        // At this point a friend was found either online or in the database, so we cache him
-        mFriendInstances.put(Long.valueOf(friend.getId()), friend);
-        return friend;
+    public Event getPublicEvent(long id) {
+        return mPublicEventInstances.get(id);
     }
 
-    public Event getPublicEventById(long id) {
-        // Check for live instance
-        Event publicEvent = mPublicEventInstances.get(id);
-
-        if (publicEvent == null) {
-            // If not found, check on the server
-            ImmutableEvent networkResult;
-            try {
-                networkResult = NetworkSmartMapClient.getInstance().getEventInfo(id);
-            } catch (SmartMapClientException e) {
-                networkResult = null;
-            }
-
-            if (networkResult != null) {
-                // Match on server
-                publicEvent = new PublicEvent(networkResult);
-            } else {
-                // No match anywhere
-                return null;
-            }
-        }
-        // At this point a friend was found either online or in the database, so we cache him
-        mPublicEventInstances.put(Long.valueOf(publicEvent.getId()), publicEvent);
-
-        return publicEvent;
+    public User getStranger(long id) {
+        return mStrangerInstances.get(id);
     }
 
-    /**
-     * Search for a {@code Friend} with this id. For performance concerns, this method should be called in an
-     * {@code AsyncTask}.
-     * 
-     * @param id
-     *            long id of {@code Friend}
-     * @return the {@code Friend} with given id, or {@code null} if there was no match.
-     */
-    public User getStrangerById(long id) {
-        // Check for live instance
-        User stranger = mStrangerInstances.get(id);
+    public void initFromDatabase(DatabaseHelper database) {
+        // Clear previous values
+        mPublicEventInstances.clear();
+        mFriendInstances.clear();
+        mStrangerInstances.clear();
 
-        if (stranger == null) {
-            // If not found, check on the server
-            ImmutableUser networkResult;
-            try {
-                networkResult = mNetworkClient.getUserInfo(id);
-            } catch (SmartMapClientException e) {
-                networkResult = null;
-            }
-
-            if (networkResult != null) {
-                // Match on server
-                stranger = new Stranger(networkResult);
-            } else {
-                // No match anywhere
-                return null;
-            }
-        }
-        // At this point a friend was found either online or in the database, so we cache him
-        mStrangerInstances.put(Long.valueOf(stranger.getId()), stranger);
-        return stranger;
-    }
-
-    /**
-     * Search for a {@code Friend} with this id. For performance concerns, this method should be called in an
-     * {@code AsyncTask}.
-     * 
-     * @param id
-     *            long id of {@code Friend}
-     * @return the {@code Friend} with given id, or {@code null} if there was no match.
-     */
-    public User getUserById(long id) {
-        // Search as Friend first
-        User friend = this.getFriendById(id);
-        if (friend == null) {
-            // Search as Stranger
-            User stranger = this.getStrangerById(id);
-            if (stranger != null) {
-                // Match as Stranger
-                return stranger;
-            } else {
-                // No match
-                return null;
-            }
-        } else {
-            // Match as Friend
-            return friend;
-        }
-    }
-
-    public void initFriendList(List<Long> newIds) {
+        // Clear lists
         mFriendIds.clear();
-        mFriendIds.addAll(newIds);
+        mPublicEventIds.clear();
+        mStrangerIds.clear();
 
-        // Gets all friends
-        for (Long id : newIds) {
-            this.getFriendById(id);
+        // Initialize id Lists
+        mFriendIds.addAll(database.getFriendIds());
+        // mPublicEventIds.addAll(DatabaseHelper.getInstance().getEventIds());
+
+        // Fill with database values
+        for (long id : mFriendIds) {
+            mFriendInstances.put(id, new Friend(database.getFriend(id)));
+        }
+        for (long id : mPublicEventIds) {
+            mPublicEventInstances.put(id, new PublicEvent(database.getEvent(id)));
+        }
+
+        // Notify listeners
+        for (CacheListener listener : mListeners) {
+            listener.onEventListUpdate();
+            listener.onFriendListUpdate();
+        }
+    }
+
+    // /**
+    // * @return a list containing all the people who has invited the users
+    // */
+    // public List<User> getAllInvitingUsers() {
+    // List<User> allInvitingUsers = new ArrayList<User>();
+    // for (Long id : mInvitingUserIds) {
+    // User invitingUser = this.getUserById(id);
+    // if (invitingUser != null) {
+    // allInvitingUsers.add(this.getStrangerById(id));
+    // }
+    // }
+    // return allInvitingUsers;
+    // }
+
+    /**
+     * Add a Friend, and fill the cache with its informations.
+     * 
+     * @param id
+     */
+    public void putFriend(ImmutableUser newFriend) {
+        Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
+        singleton.add(newFriend);
+        this.putFriends(singleton);
+    }
+
+    public void putFriends(Set<ImmutableUser> newFriends) {
+        boolean isListModified = false;
+
+        for (ImmutableUser newFriend : newFriends) {
+            if (mFriendInstances.get(newFriend.getId()) == null) {
+                // Need to add it
+                mFriendInstances.put(newFriend.getId(), new Friend(newFriend));
+                isListModified = true;
+            } else {
+                // Only update
+                mFriendInstances.get(newFriend.getId()).update(newFriend);
+            }
+        }
+
+        // Notify listeners if needed
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onFriendListUpdate();
+            }
+        }
+    }
+
+    /**
+     * Mark an Event as Going and fill the cache with its informations.
+     * 
+     * @param id
+     */
+    public void putPublicEvent(ImmutableEvent newEvent) {
+        Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
+        singleton.add(newEvent);
+        this.putPublicEvents(singleton);
+    }
+
+    public void putPublicEvents(Set<ImmutableEvent> newEvents) {
+        boolean isListModified = false;
+
+        for (ImmutableEvent newEvent : newEvents) {
+            if (mPublicEventInstances.get(newEvent.getID()) == null) {
+                // Need to add it
+                mPublicEventInstances.put(newEvent.getID(), new PublicEvent(newEvent));
+                isListModified = true;
+            } else {
+                // Only update
+                mPublicEventInstances.get(newEvent.getID()).update(newEvent);
+            }
+        }
+
+        // Notify listeners if needed
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onEventListUpdate();
+            }
+        }
+    }
+
+    /**
+     * Fill Cache with an unknown User's informations.
+     * 
+     * @param user
+     */
+    public void putStranger(ImmutableUser newStranger) {
+        Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
+        singleton.add(newStranger);
+        this.putStrangers(singleton);
+    }
+
+    public void putStrangers(Set<ImmutableUser> newStrangers) {
+        boolean isListModified = false;
+
+        for (ImmutableUser newStranger : newStrangers) {
+            if (mStrangerInstances.get(newStranger.getId()) == null) {
+                // Need to add it
+                mStrangerInstances.put(newStranger.getId(), new Friend(newStranger));
+                isListModified = true;
+            } else {
+                // Only update
+                mStrangerInstances.get(newStranger.getId()).update(newStranger);
+            }
+        }
+
+        // Notify listeners if needed
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onFriendListUpdate();
+            }
         }
     }
 
@@ -459,6 +344,39 @@ public class Cache {
         for (CacheListener l : mListeners) {
             l.onFriendListUpdate();
         }
+    }
+
+    public void updateFromNetwork(SmartMapClient networkClient) throws SmartMapClientException {
+        // Fetch friend ids
+        HashSet<Long> newFriendIds = new HashSet<Long>(networkClient.getFriendsIds());
+
+        // Remove friends that are no longer friends
+        for (long id : mFriendIds) {
+            if (!newFriendIds.contains(id)) {
+                this.removeFriend(id);
+            }
+        }
+
+        // Sets new friend ids
+        mFriendIds.clear();
+        mFriendIds.addAll(newFriendIds);
+
+        // Update each friends
+        for (long id : newFriendIds) {
+            User friend = this.getFriend(id);
+
+            // Get online values
+            ImmutableUser onlineValues = networkClient.getUserInfo(id);
+            if (friend != null) {
+                // Simply update
+                friend.update(onlineValues);
+            } else {
+                // Add friend
+                this.putFriend(onlineValues);
+            }
+        }
+
+        // TODO : Update Events
     }
 
     public void updateGoingEventList(List<ImmutableEvent> newEvents) {

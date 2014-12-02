@@ -2,18 +2,22 @@ package ch.epfl.smartmap.search;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import android.location.Location;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.History;
+import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -26,35 +30,219 @@ public final class CachedOnlineSearchEngine implements SearchEngine {
 
     private static final float LOCATION_DISTANCE_THRESHHOLD = 0;
 
-    private final Map<String, List<Long>> mPreviousOnlineStrangerSearches;
+    private final Map<String, Set<Long>> mPreviousOnlineStrangerSearches;
     private final List<Location> mPreviousOnlineEventSearchQueries;
-    private final List<List<Long>> mPreviousOnlineEventSearchResults;
+    private final List<Set<Long>> mPreviousOnlineEventSearchResults;
 
     private CachedOnlineSearchEngine() {
-        mPreviousOnlineStrangerSearches = new HashMap<String, List<Long>>();
+        mPreviousOnlineStrangerSearches = new HashMap<String, Set<Long>>();
 
         mPreviousOnlineEventSearchQueries = new LinkedList<Location>();
-        mPreviousOnlineEventSearchResults = new LinkedList<List<Long>>();
+        mPreviousOnlineEventSearchResults = new LinkedList<Set<Long>>();
     }
 
-    public List<User> findStrangerByQuery(String query) throws SmartMapClientException {
-        List<User> result = new ArrayList<User>();
+    /**
+     * Search for a {@code Friend} with this id. For performance concerns, this method should be called in an
+     * {@code AsyncTask}.
+     * 
+     * @param id
+     *            long id of {@code Friend}
+     * @return the {@code Friend} with given id, or {@code null} if there was no match.
+     */
+    public User findFriendById(long id) {
+        // Check for live instance
+        User friend = Cache.getInstance().getFriend(id);
+
+        if (friend != null) {
+            // Found in cache, return
+            return friend;
+        } else {
+            // If not found, check in database
+            ImmutableUser databaseResult = DatabaseHelper.getInstance().getFriend(id);
+
+            if (databaseResult != null) {
+                // Match in database, put it in cache
+                Cache.getInstance().putFriend(databaseResult);
+                return Cache.getInstance().getFriend(id);
+            } else {
+                // If not found, check on the server
+                ImmutableUser networkResult;
+                try {
+                    networkResult = NetworkSmartMapClient.getInstance().getUserInfo(id);
+                } catch (SmartMapClientException e) {
+                    networkResult = null;
+                }
+
+                if (networkResult != null) {
+                    // Match on server, put it in cache
+                    Cache.getInstance().putFriend(networkResult);
+                    return Cache.getInstance().getFriend(id);
+                } else {
+                    // No match anywhere
+                    return null;
+                }
+            }
+        }
+    }
+
+    /**
+     * Search for a {@code Friend} with this id. For performance concerns, this method should be called in an
+     * {@code AsyncTask}.
+     * 
+     * @param id
+     *            long id of {@code Friend}
+     * @return the {@code Friend} with given id, or {@code null} if there was no match.
+     */
+    public Event findPublicEventById(long id) {
+        // Check for live instance
+        Event event = Cache.getInstance().getPublicEvent(id);
+
+        if (event != null) {
+            // Found in cache, return
+            return event;
+        } else {
+            // If not found, check in database
+            ImmutableEvent databaseResult = DatabaseHelper.getInstance().getEvent(id);
+
+            if (databaseResult != null) {
+                // Match in database, put it in cache
+                Cache.getInstance().putPublicEvent((databaseResult));
+                return Cache.getInstance().getPublicEvent(id);
+            } else {
+                // If not found, check on the server
+                ImmutableEvent networkResult;
+                try {
+                    networkResult = NetworkSmartMapClient.getInstance().getEventInfo(id);
+                } catch (SmartMapClientException e) {
+                    networkResult = null;
+                }
+
+                if (networkResult != null) {
+                    // Match on server, put it in cache
+                    Cache.getInstance().putPublicEvent(networkResult);
+                    return Cache.getInstance().getPublicEvent(id);
+                } else {
+                    // No match anywhere
+                    return null;
+                }
+            }
+        }
+    }
+
+    /**
+     * Return an Event set containing a live instance for each id in the id set
+     * 
+     * @param ids
+     * @return
+     */
+    public Set<Event> findPublicEventByIds(Set<Long> ids) {
+        Set<ImmutableEvent> immutableResult = new HashSet<ImmutableEvent>();
+        Set<Event> result = new HashSet<Event>();
+
+        for (long id : ids) {
+            // Check for live instance
+            Event event = Cache.getInstance().getPublicEvent(id);
+
+            if (event != null) {
+                // Found in cache, add to set of live instances
+                result.add(event);
+            } else {
+                // If not found, check in database
+                ImmutableEvent databaseResult = DatabaseHelper.getInstance().getEvent(id);
+
+                if (databaseResult != null) {
+                    immutableResult.add(databaseResult);
+                } else {
+                    // If not found, check on the server
+                    ImmutableEvent networkResult;
+                    try {
+                        networkResult = NetworkSmartMapClient.getInstance().getEventInfo(id);
+                    } catch (SmartMapClientException e) {
+                        networkResult = null;
+                    }
+
+                    if (networkResult != null) {
+                        // Match on server, put it in cache
+                        immutableResult.add(networkResult);
+                    }
+                }
+            }
+        }
+
+        // Get all results that weren't in cache and add them all at once (Avoid to send multiple listener
+        // calls)
+        Cache.getInstance().putPublicEvents(immutableResult);
+        // Retrieve live instances from cache
+        for (ImmutableEvent event : immutableResult) {
+            result.add(Cache.getInstance().getPublicEvent(event.getID()));
+        }
+
+        return result;
+    }
+
+    /**
+     * Search for a {@code Friend} with this id. For performance concerns, this method should be called in an
+     * {@code AsyncTask}.
+     * 
+     * @param id
+     *            long id of {@code Friend}
+     * @return the {@code Friend} with given id, or {@code null} if there was no match.
+     */
+    public User findStrangerById(long id) {
+        // Check for live instance
+        User stranger = Cache.getInstance().getStranger(id);
+
+        if (stranger != null) {
+            // Found in cache, return
+            return stranger;
+        } else {
+            // If not found, check in database
+            ImmutableUser databaseResult = DatabaseHelper.getInstance().getFriend(id);
+
+            if (databaseResult != null) {
+                // Match in database, put it in cache
+                Cache.getInstance().putFriend(databaseResult);
+                return Cache.getInstance().getStranger(id);
+            } else {
+                // If not found, check on the server
+                ImmutableUser networkResult;
+                try {
+                    networkResult = NetworkSmartMapClient.getInstance().getUserInfo(id);
+                } catch (SmartMapClientException e) {
+                    networkResult = null;
+                }
+
+                if (networkResult != null) {
+                    // Match on server, put it in cache
+                    Cache.getInstance().putFriend(networkResult);
+                    return Cache.getInstance().getStranger(id);
+                } else {
+                    // No match anywhere
+                    return null;
+                }
+            }
+        }
+    }
+
+    public Set<User> findStrangerByQuery(String query) throws SmartMapClientException {
+        Set<User> result = new HashSet<User>();
 
         if (mPreviousOnlineStrangerSearches.get(query) != null) {
             // Fetch in cache
-            List<Long> localResult = mPreviousOnlineStrangerSearches.get(query);
+            Set<Long> localResult = mPreviousOnlineStrangerSearches.get(query);
             for (Long id : localResult) {
-                User cachedUser = Cache.getInstance().getStrangerById(id);
+                User cachedUser = Cache.getInstance().getStranger(id);
                 if (cachedUser != null) {
                     result.add(cachedUser);
                 }
             }
         } else {
             // Fetch online
-            List<ImmutableUser> networkResult = NetworkSmartMapClient.getInstance().findUsers(query);
+            Set<ImmutableUser> networkResult =
+                new HashSet<ImmutableUser>(NetworkSmartMapClient.getInstance().findUsers(query));
 
             for (ImmutableUser user : networkResult) {
-                User cachedUser = Cache.getInstance().getStrangerById(user.getId());
+                User cachedUser = Cache.getInstance().getStranger(user.getId());
                 if (cachedUser != null) {
                     result.add(cachedUser);
                 }
@@ -63,8 +251,49 @@ public final class CachedOnlineSearchEngine implements SearchEngine {
         return result;
     }
 
-    public List<Event> getAllNearEvents(Location location, double radius) throws SmartMapClientException {
-        List<Long> resultIds = new ArrayList<Long>();
+    public Set<User> findStrangersByIds(Set<Long> ids) {
+        Set<ImmutableUser> immutableResult = new HashSet<ImmutableUser>();
+        Set<User> result = new HashSet<User>();
+
+        for (long id : ids) {
+            // Check for live instance
+            User stranger = Cache.getInstance().getStranger(id);
+
+            if (stranger != null) {
+                // Found in cache, add to set of live instances
+                result.add(stranger);
+            } else {
+                // If not found, check on the server
+                ImmutableUser networkResult;
+                try {
+                    networkResult = NetworkSmartMapClient.getInstance().getUserInfo(id);
+                } catch (SmartMapClientException e) {
+                    networkResult = null;
+                }
+
+                if (networkResult != null) {
+                    // Match on server, put it in cache
+                    immutableResult.add(networkResult);
+                }
+            }
+        }
+
+        // Get all results that weren't in cache and add them all at once (Avoid to send multiple listener
+        // calls)
+        Cache.getInstance().putStrangers(immutableResult);
+        // Retrieve live instances from cache
+        for (ImmutableUser user : immutableResult) {
+            result.add(Cache.getInstance().getStranger(user.getId()));
+        }
+
+        return result;
+    }
+
+    public Set<Event> getAllNearEvents(Location location, double radius) throws SmartMapClientException {
+        // Search ids of nearby
+        Set<Long> resultIds = new HashSet<Long>();
+
+        // Look in cache
         boolean foundInCache = false;
         for (int i = 0; i < mPreviousOnlineEventSearchQueries.size(); i++) {
             if (mPreviousOnlineEventSearchQueries.get(i).distanceTo(location) < LOCATION_DISTANCE_THRESHHOLD) {
@@ -74,15 +303,13 @@ public final class CachedOnlineSearchEngine implements SearchEngine {
         }
 
         if (!foundInCache) {
+            // Search online
             resultIds =
-                NetworkSmartMapClient.getInstance().getPublicEvents(location.getLatitude(),
-                    location.getLongitude(), radius);
+                new HashSet<Long>(NetworkSmartMapClient.getInstance().getPublicEvents(location.getLatitude(),
+                    location.getLongitude(), radius));
         }
 
-        Cache.getInstance().addNearEvents(resultIds);
-        List<Event> result = Cache.getInstance().getAllNearEvents();
-
-        return result;
+        return this.findPublicEventByIds(resultIds);
     }
 
     /*
