@@ -165,6 +165,7 @@
     <string name="remove_friend_button_text">Remove</string>
     <string name="block_button_text">Block</string>
     <string name="follow_switch">Follow</string>
+    <string name="block_switch">Block</string>
 
     <!-- Settings -->
     <string name="settings_key_notifications_enabled">notifications_enabled</string>

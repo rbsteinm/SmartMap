@@ -10,13 +10,13 @@
     tools:context="ch.epfl.smartmap.activities.UserInformationActivity" >
 
     <RelativeLayout
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"
         android:id="@+id/user_info_header"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:background="@drawable/div_background" >
+        android:background="@drawable/div_background"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp" >
 
         <ImageView
             android:id="@+id/user_info_picture"
@@ -39,51 +39,71 @@
             android:textSize="24sp"/>
 
         <TextView
-            android:id="@+id/user_info_infos"
+            android:id="@+id/user_info_subtitles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/user_info_name"
             android:layout_toRightOf="@id/user_info_picture"
             android:textColor="@color/wallet_secondary_text_holo_dark" />
+        
+        <TextView
+            android:id="@+id/user_info_distance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/user_info_subtitles"
+            android:layout_toRightOf="@id/user_info_picture"
+            android:textColor="@color/wallet_secondary_text_holo_dark" />
 
         <Switch
             android:id="@+id/user_info_follow_switch"
+            android:textSize="20sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/user_info_picture"
-            android:layout_toRightOf="@+id/user_info_picture"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/user_info_picture"
+            android:layout_marginRight="25sp"
+            android:layout_marginBottom="10sp"
             android:onClick="followUnfollow"
-            android:text="@string/follow_switch" />
-
+            android:switchMinWidth="50dp"
+            android:text="@string/follow_switch"
+            android:textOff="NO"
+            android:textOn="YES" />
+        
+        <Switch
+            android:id="@+id/user_info_blocking_switch"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/user_info_follow_switch"
+            android:layout_marginRight="25sp"
+            android:switchMinWidth="50dp"
+            android:text="@string/block_switch"
+            android:textOff="NO"
+            android:textOn="YES" />
+        
     </RelativeLayout>
     
     <LinearLayout
-        android:padding="5dp"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true" 
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        style="android:attr/buttonBarButtonStyle"
-        android:weightSum="2" >
-        
-        <Button
-            android:id="@+id/user_info_remove_button"
-            style="android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:onClick="displayDeleteConfirmationDialog"
-            android:text="@string/remove_friend_button_text"
-            android:drawableLeft="@drawable/ic_action_discard"
-            android:layout_weight="1" />
+        android:layout_width="150sp"
+        android:layout_height="40sp"
+        android:weightSum="2"
+        android:layout_margin="10dp" >
 
         <Button
-            android:id="@+id/user_info_block_button"
-            style="android:attr/buttonBarButtonStyle"
-            android:layout_width="0dp"
+            android:id="@+id/user_info_remove_button"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/block_button_text"
-            android:drawableLeft="@drawable/ic_action_remove"
-            android:layout_weight="1" />
+            android:background="@drawable/remove_friend_button_shape"
+            android:onClick="displayDeleteConfirmationDialog"
+            android:text="@string/remove_friend_button_text"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:drawableLeft="@drawable/ic_action_discard_white" />
         
     </LinearLayout>
 </RelativeLayout>

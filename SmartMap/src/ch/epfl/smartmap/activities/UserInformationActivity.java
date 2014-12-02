@@ -16,9 +16,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -33,15 +33,15 @@ public class UserInformationActivity extends Activity {
     @SuppressWarnings("unused")
     private static final String TAG = UserInformationActivity.class.getSimpleName();
 
-    private DatabaseHelper mCacheDB;
+    private User mUser;
+    private int mDistanceToUser;
 
     private Switch mFollowSwitch;
     private TextView mInfosView;
     private TextView mNameView;
-
-    // Children Views
     private ImageView mPictureView;
-    private User mUser;
+    private TextView mDistanceView;
+
     // TODO replace this by mUser.isFollowing() when implemented
     private final boolean isFollowing = true;
 
@@ -52,8 +52,9 @@ public class UserInformationActivity extends Activity {
         // Get views
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
         mNameView = (TextView) this.findViewById(R.id.user_info_name);
-        mInfosView = (TextView) this.findViewById(R.id.user_info_infos);
+        mInfosView = (TextView) this.findViewById(R.id.user_info_subtitles);
         mFollowSwitch = (Switch) this.findViewById(R.id.user_info_follow_switch);
+        mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
@@ -64,12 +65,15 @@ public class UserInformationActivity extends Activity {
         super.onResume();
         // Get User & Database
         mUser = Cache.getInstance().getUserById(this.getIntent().getLongExtra("USER", User.NO_ID));
+        //TODO set a listener for that
+        mDistanceToUser = Math.round(SettingsManager.getInstance().getLocation().distanceTo(mUser.getLocation()));
 
         // Set Informations
         mNameView.setText(mUser.getName());
         mInfosView.setText(mUser.getSubtitle());
         mPictureView.setImageBitmap(mUser.getImage());
         mFollowSwitch.setChecked(isFollowing);
+        mDistanceView.setText(mDistanceToUser + " meters away from you");
     }
 
     public void displayDeleteConfirmationDialog(View view) {
