@@ -98,22 +98,22 @@ public final class SettingsManager {
     }
 
     /**
-     * @return the frequence in seconds at which we fetch and upload the datas. Used by the service.
+     * @return the frequence in milliseconds at which we fetch and upload the datas. Used by the service.
      * @author SpicyCH
      */
     public int getRefreshFrequency() {
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_refresh_frequency), "10"));
+                mContext.getString(R.string.settings_key_refresh_frequency), "10000"));
     }
 
     /**
-     * @return the time to wait in minutes before hiding inactive friends from the map. Or the int value -1 if the user
-     *         never wants to hide inactive friends.
+     * @return the time to wait in milliseconds before hiding inactive friends from the map. Or the int value -1 if the
+     *         user never wants to hide inactive friends.
      * @author SpicyCH
      */
     public int getTimeToWaitBeforeHidingFriends() {
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_last_seen_max), "30"));
+                mContext.getString(R.string.settings_key_last_seen_max), "3600000"));
     }
 
     /**
