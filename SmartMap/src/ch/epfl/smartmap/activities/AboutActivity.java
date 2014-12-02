@@ -73,7 +73,10 @@ public class AboutActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         this.setContentView(R.layout.activity_about);
-        // this.setupActionBar();
+
+        // Hide action bar for true full screen. Only way to leave this activity is to physically use the pressback
+        // button.
+        this.getActionBar().hide();
 
         final View controlsView = this.findViewById(R.id.fullscreen_content_controls);
         final View contentView = this.findViewById(R.id.fullscreen_content);
@@ -128,11 +131,6 @@ public class AboutActivity extends Activity {
                 }
             }
         });
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-        this.findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
     }
 
     @Override
