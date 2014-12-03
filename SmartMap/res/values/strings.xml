@@ -168,8 +168,7 @@
 
     <!-- ShowFiltersActivity -->
     <string name="title_activity_show_filters">Filters</string>
-    <string name="activity_show_filters_follow_switch">Follow</string>
-    <string name="activity_show_filters_unfollow_switch">Unfollow</string>
+    <string name="show_on_map">Show on map</string>
 
     <!-- Settings -->
     <string name="settings_key_notifications_enabled">notifications_enabled</string>

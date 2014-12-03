@@ -70,10 +70,11 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
         if (filter != null) {
             viewHolder.getFilterName().setText(filter.getListName());
 
-            viewHolder.getSubtitle().setText(filter.getList().size() + " people in this filter");
+            viewHolder.getSubtitle().setText(filter.getList().size() + " people inside this filter");
 
-            viewHolder.getFollowSwitch().setTextOn("Follow");
-            viewHolder.getFollowSwitch().setTextOff("Unfollow");
+            // viewHolder.getFollowSwitch().setText("Show on map");
+            viewHolder.getFollowSwitch().setTextOn("On");
+            viewHolder.getFollowSwitch().setTextOff("Off");
             // viewHolder.getFollowSwitch().setChecked(filter.isVisible());
 
             viewHolder.getFollowSwitch().setOnCheckedChangeListener(
