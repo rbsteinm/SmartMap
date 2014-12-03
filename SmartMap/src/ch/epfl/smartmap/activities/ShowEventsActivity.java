@@ -88,7 +88,19 @@ public class ShowEventsActivity extends ListActivity {
         this.displayInfoDialog(position);
     }
 
+    /**
+     * Triggered when a checkbox is clicked
+     * 
+     * @param v
+     *            the checkbox whose status changed
+     * 
+     * @author SpicyCH
+     */
     public void onCheckboxClicked(View v) {
+        if (!(v instanceof CheckBox)) {
+            throw new IllegalArgumentException("This method requires v to be a CheckBox");
+        }
+
         CheckBox checkBox = (CheckBox) v;
 
         switch (v.getId()) {
@@ -133,12 +145,10 @@ public class ShowEventsActivity extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
             case android.R.id.home:
                 this.finish();
                 break;
@@ -173,6 +183,7 @@ public class ShowEventsActivity extends ListActivity {
      * @author SpicyCH
      */
     private void displayInfoDialog(int position) {
+
         final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
         final Event event = eventViewHolder.getEvent();
         String message = EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "start")
