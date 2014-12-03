@@ -1,13 +1,23 @@
 package ch.epfl.smartmap.activities;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.Random;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.util.SystemUiHider;
 
@@ -40,6 +50,8 @@ public class AboutActivity extends Activity {
      */
     private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
 
+    private static final String TAG = AboutActivity.class.getSimpleName();
+
     /**
      * The instance of the {@link SystemUiHider} for this activity.
      */
@@ -68,6 +80,12 @@ public class AboutActivity extends Activity {
         }
     };
 
+    private TextView mVersion;
+
+    private TextView mCopyright;
+
+    private TextView mTeamMembers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +96,6 @@ public class AboutActivity extends Activity {
         // button.
         this.getActionBar().hide();
 
-        final View controlsView = this.findViewById(R.id.fullscreen_content_controls);
         final View contentView = this.findViewById(R.id.fullscreen_content);
 
         // Set up an instance of SystemUiHider to control the system UI for
@@ -87,7 +104,6 @@ public class AboutActivity extends Activity {
         mSystemUiHider.setup();
         mSystemUiHider.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
             // Cached values.
-            int mControlsHeight;
             int mShortAnimTime;
 
             @Override
@@ -98,19 +114,14 @@ public class AboutActivity extends Activity {
                     // (Honeycomb MR2 and later), use it to animate the
                     // in-layout UI controls at the bottom of the
                     // screen.
-                    if (mControlsHeight == 0) {
-                        mControlsHeight = controlsView.getHeight();
-                    }
                     if (mShortAnimTime == 0) {
                         mShortAnimTime = AboutActivity.this.getResources().getInteger(
                                 android.R.integer.config_shortAnimTime);
                     }
-                    controlsView.animate().translationY(visible ? 0 : mControlsHeight).setDuration(mShortAnimTime);
                 } else {
                     // If the ViewPropertyAnimator APIs aren't
                     // available, simply show or hide the in-layout UI
                     // controls.
-                    controlsView.setVisibility(visible ? View.VISIBLE : View.GONE);
                 }
 
                 if (visible && AUTO_HIDE) {
@@ -131,6 +142,8 @@ public class AboutActivity extends Activity {
                 }
             }
         });
+
+        this.initializeGUI();
     }
 
     @Override
@@ -154,5 +167,47 @@ public class AboutActivity extends Activity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    /**
+     * 
+     * 
+     * @author SpicyCH
+     */
+    private void initializeGUI() {
+        mVersion = (TextView) this.findViewById(R.id.about_version);
+        mCopyright = (TextView) this.findViewById(R.id.about_copyright);
+        mTeamMembers = (TextView) this.findViewById(R.id.about_team_members);
+
+        // Display version of this package (to change it, edit versionCode/versionName in the manifest
+        try {
+            PackageInfo manager = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+            mVersion.setText(this.getString(R.string.about_version) + " " + manager.versionName);
+
+        } catch (NameNotFoundException e) {
+            Log.d(TAG, "Couldn't retrieve package version: " + e);
+            mVersion.setText(this.getString(R.string.about_version) + " "
+                    + this.getString(R.string.about_unkown_version));
+        }
+
+        // Display the copyright
+        GregorianCalendar now = new GregorianCalendar();
+        int year = now.get(Calendar.YEAR);
+        mCopyright.setText("\u00a9 " + year);
+
+        // Display team members
+
+        ArrayList<String> teamMembers = new ArrayList<String>();
+        teamMembers.add("Robin Genolet");
+        teamMembers.add("Matthieu Girod");
+        teamMembers.add("Alain Milliet");
+        teamMembers.add("Nicolas Ritter");
+        teamMembers.add("Raphaël Stienmann");
+        teamMembers.add("Hugo Sbai");
+        teamMembers.add("Marion Sbai");
+
+        Collections.shuffle(teamMembers, new Random(System.nanoTime()));
+        mTeamMembers.setText("Developped by:\n" + teamMembers.toString());
+
     }
 }

@@ -179,7 +179,11 @@
     <string name="settings_key_last_seen_max">last_seen_max</string>
     <string name="settings_key_events_show_public">events_show_public</string>
     <string name="settings_key_events_show_private">events_show_private</string>
-
+    
+    <!-- AboutActivity -->
+    <string name="about_version">Version</string>
+    <string name="about_unkown_version">unkown</string>
+    
     <!-- Nothing below this line! -->
 
     <string name="title_activity_about">AboutActivity</string>

@@ -1,36 +1,79 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0099cc"
     tools:context="ch.epfl.smartmap.activities.AboutActivity" >
-
+    
     <TextView
         android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:keepScreenOn="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
         android:text="SmartMap"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <FrameLayout
+    <TextView
+        android:id="@+id/about_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fullscreen_content"
+        android:layout_centerHorizontal="true"
+        android:text="Version {VERSION}" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/about_copyright"
+        android:layout_centerHorizontal="true"
+        android:text="All rights reserved." />
+
+
+    <TextView
+        android:id="@+id/about_copyright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/about_team_members"
+        android:layout_centerHorizontal="true"
+        android:text="Copyright" />
+
+    <TextView
+        android:id="@+id/about_thanks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/fullscreen_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="176dp"
+        android:text="Special thanks to:" />
+
+    <TextView
+        android:id="@+id/about_thanks_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/about_thanks"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="37dp"
+        android:text="Prof. James Larus, Călin Iorgulescu, Lukas Kellenberger" />
+
+    <ImageView
+        android:id="@+id/logo_about"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true" >
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/logo_description"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_launcher" />
 
-        <LinearLayout
-            android:id="@+id/fullscreen_content_controls"
-            style="?metaButtonBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
-            android:orientation="horizontal"
-            tools:ignore="UselessParent" >
-        </LinearLayout>
-    </FrameLayout>
+    <TextView
+        android:id="@+id/about_team_members"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/about_version"
+        android:layout_centerHorizontal="true"
+        android:text="Team members" />
 
-</FrameLayout>
+</RelativeLayout>

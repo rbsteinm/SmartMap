@@ -146,7 +146,8 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_about"
             android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/FullscreenTheme" >
+            android:theme="@style/FullscreenTheme"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.smartmap.activities.MainActivity" />
