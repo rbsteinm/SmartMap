@@ -53,7 +53,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class AddEventActivity extends FragmentActivity {
 
-    @SuppressWarnings("unused")
     private static final String TAG = AddEventActivity.class.getSimpleName();
 
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
@@ -68,7 +67,6 @@ public class AddEventActivity extends FragmentActivity {
     private Activity mActivity;
     private EditText mDescription;
     private EditText mEventName;
-    private final int mNewEventId = 0;
     private EditText mPickEndDate;
     private EditText mPickEndTime;
     private EditText mPickStartDate;
