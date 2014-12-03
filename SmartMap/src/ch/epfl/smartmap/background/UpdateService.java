@@ -18,7 +18,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -50,11 +49,11 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     OnInvitationStatusUpdateListener {
 
     private static final int HANDLER_DELAY = 1000;
-    private static final int POS_UPDATE_DELAY = 10000;
+    private static final int GPS_UPDATE_DELAY = 5 * 60 * 1000;
     private static final int INVITE_UPDATE_DELAY = 30000;
 
-    private static final float MIN_DISTANCE = 0; // minimum distance to update
-                                                 // position
+    private static final float MIN_DISTANCE = 5; // minimum distance to update position
+    private static final float MIN_GPS_DISTANCE = 50; // minimum distance before gps updates are requested
 
     private static final int RESTART_DELAY = 2000;
     public static final int IMAGE_QUALITY = 100;
@@ -62,7 +61,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final Handler mHandler = new Handler();
     private LocationManager mLocManager;
     private boolean mFriendsPosEnabled = true;
-    private boolean mOwnPosEnabled = true;
+    private final boolean mOwnPosEnabled = true;
     private final boolean isFriendIDListRetrieved = true;
     private final boolean isDatabaseInitialized = false;
     private DatabaseHelper mHelper;
@@ -71,6 +70,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
     private Set<Long> mInviterIds = new HashSet<Long>();
     private Cache mCache;
+    private float mCurrentAccuracy = 0;
 
     // Settings
     private int mPosUpdateDelay;
@@ -83,9 +83,20 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         public void run() {
             if (!mManager.isOffline()) {
-                new AsyncFriendsPos().execute();
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... args0) {
+                        try {
+                            List<ImmutableUser> friendsWithNewLocations = mClient.listFriendsPos();
+                            Cache.getInstance().updateFriendList(friendsWithNewLocations);
+                        } catch (SmartMapClientException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                }.execute();
             }
-            mHandler.postDelayed(this, 10000);
+            mHandler.postDelayed(this, mPosUpdateDelay);
         }
     };
 
@@ -93,10 +104,20 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         public void run() {
             if (!mManager.isOffline()) {
-                new AsyncOwnPos().execute();
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... arg0) {
+                        try {
+                            mClient.updatePos(mManager.getLocation());
+                        } catch (SmartMapClientException e) {
+                            Log.e("UpdateService", "Position update failed!");
+                        }
+                        return null;
+                    }
+                }.execute();
                 Log.d("UpdateService", "OwnPos");
             }
-            mHandler.postDelayed(this, 10000);
+            mHandler.postDelayed(this, mPosUpdateDelay);
         }
     };
 
@@ -137,7 +158,114 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         public void run() {
             UpdateService.this.loadSettings();
-            new AsyncGetInvitations().execute();
+            new AsyncTask<Void, Void, NotificationBag>() {
+                @Override
+                protected NotificationBag doInBackground(Void... arg0) {
+                    NotificationBag nb = null;
+                    try {
+                        nb = mClient.getInvitations();
+                    } catch (SmartMapClientException e) {
+                        Log.e("UpdateService",
+                            "Couldn't retrieve invitations due to a server error: " + e.getMessage());
+                        // We set an empty notification bag as we couldn't retrieve data
+                        // from the server.
+                        nb =
+                            new NetworkNotificationBag(new ArrayList<Long>(), new ArrayList<Long>(),
+                                new ArrayList<Long>());
+                        // try to re-log
+                        new AsyncLogin().execute();
+                    }
+                    return nb;
+                }
+
+                @Override
+                protected void onPostExecute(NotificationBag result) {
+                    if (result != null) {
+                        List<Long> newFriends = result.getNewFriends();
+                        List<Long> removedFriends = result.getRemovedFriendsIds();
+
+                        for (long userId : newFriends) {
+
+                            new AsyncTask<Long, Void, Void>() {
+                                @Override
+                                protected Void doInBackground(Long... params) {
+                                    Cache.getInstance().addFriend(params[0]);
+                                    User newFriend = Cache.getInstance().getFriendById(params[0]);
+                                    Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
+                                    return null;
+                                }
+                            }.execute(userId);
+                        }
+
+                        for (long userId : result.getInvitingUsers()) {
+
+                            new AsyncTask<Long, Void, Void>() {
+
+                                @Override
+                                protected Void doInBackground(Long... params) {
+                                    User user = Cache.getInstance().getUserById(params[0]);
+
+                                    if (!mInviterIds.contains(user.getId())) {
+                                        mHelper.addFriendInvitation(new FriendInvitation(0, user.getId(),
+                                            user.getName(), Invitation.UNREAD));
+                                        mInviterIds.add(user.getId());
+                                        // get pictures
+                                        new AsyncTask<Long, Void, Void>() {
+                                            @Override
+                                            protected Void doInBackground(Long... ids) {
+                                                for (long id : ids) {
+                                                    UpdateService.this.downloadUserPicture(id);
+                                                }
+                                                return null;
+                                            }
+                                        }.execute(user.getId());
+                                        if (mNotificationsEnabled && mNotificationsForFriendRequests) {
+                                            Notifications.newFriendNotification(Utils.sContext, user);
+                                        }
+                                    }
+                                    return null;
+                                }
+                            }.execute(userId);
+                        }
+
+                        for (Long id : result.getRemovedFriendsIds()) {
+                            mHelper.deleteUser(id);
+                        }
+
+                        if (!newFriends.isEmpty()) {
+                            new AsyncTask<Long, Void, Void>() {
+                                @Override
+                                protected Void doInBackground(Long... users) {
+                                    try {
+                                        for (long user : users) {
+                                            mClient.ackAcceptedInvitation(user);
+                                        }
+                                    } catch (SmartMapClientException e) {
+                                        Log.e("UpdateService", "Couldn't send acks!");
+                                    }
+                                    return null;
+                                }
+                            }.execute(newFriends.toArray(new Long[newFriends.size()]));
+                        }
+
+                        if (!removedFriends.isEmpty()) {
+                            new AsyncTask<Long, Void, Void>() {
+                                @Override
+                                protected Void doInBackground(Long... ids) {
+                                    try {
+                                        for (long id : ids) {
+                                            mClient.ackRemovedFriend(id);
+                                        }
+                                    } catch (SmartMapClientException e) {
+                                        Log.e("UpdateService", "Couldn't send acks!");
+                                    }
+                                    return null;
+                                }
+                            }.execute(removedFriends.toArray(new Long[removedFriends.size()]));
+                        }
+                    }
+                }
+            }.execute();
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
         }
     };
@@ -190,9 +318,33 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         // if the updated notification is among the pending ones
         // if (mInviterIds.contains(userID)) {
         if (newStatus == Invitation.ACCEPTED) {
-            new AsyncAcceptFriends().execute(userID);
+            new AsyncTask<Long, Void, Void>() {
+                @Override
+                protected Void doInBackground(Long... ids) {
+                    try {
+                        for (long id : ids) {
+                            mClient.acceptInvitation(id);
+                        }
+                    } catch (SmartMapClientException e) {
+                        Log.e("UpdateService", "Couldn't accept request!");
+                    }
+                    return null;
+                }
+            }.execute(userID);
         } else if (newStatus == Invitation.REFUSED) {
-            new AsyncDeclineFriends().execute(userID);
+            new AsyncTask<Long, Void, Void>() {
+                @Override
+                protected Void doInBackground(Long... ids) {
+                    try {
+                        for (long id : ids) {
+                            mClient.declineInvitation(id);
+                        }
+                    } catch (SmartMapClientException e) {
+                        Log.e("UpdateService", "Couldn't decline request!");
+                    }
+                    return null;
+                }
+            }.execute(userID);
         }
     }
 
@@ -213,8 +365,15 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
         Criteria criteria = new Criteria();
         criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
-        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), mPosUpdateDelay,
-            MIN_DISTANCE, new MyLocationListener());
+        if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, mPosUpdateDelay,
+                MIN_DISTANCE, new MyLocationListener());
+        }
+
+        if (mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_DELAY,
+                MIN_GPS_DISTANCE, new MyLocationListener());
+        }
 
         new AsyncTask<Void, Void, Void>() {
 
@@ -329,121 +488,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     }
 
     /**
-     * AsyncTask to get invitations.
-     * 
-     * @author ritterni
-     */
-    private class AsyncGetInvitations extends AsyncTask<Void, Void, NotificationBag> {
-        @Override
-        protected NotificationBag doInBackground(Void... arg0) {
-            NotificationBag nb = null;
-            try {
-                nb = mClient.getInvitations();
-            } catch (SmartMapClientException e) {
-                Log.e("UpdateService",
-                    "Couldn't retrieve invitations due to a server error: " + e.getMessage());
-                // We set an empty notification bag as we couldn't retrieve data
-                // from the server.
-                nb =
-                    new NetworkNotificationBag(new ArrayList<Long>(), new ArrayList<Long>(),
-                        new ArrayList<Long>());
-                // try to re-log
-                new AsyncLogin().execute();
-            }
-            return nb;
-        }
-
-        @Override
-        protected void onPostExecute(NotificationBag result) {
-            if (result != null) {
-                List<Long> newFriends = result.getNewFriends();
-                List<Long> removedFriends = result.getRemovedFriendsIds();
-
-                for (long userId : newFriends) {
-
-                    new AsyncTask<Long, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Long... params) {
-                            Cache.getInstance().addFriend(params[0]);
-                            User newFriend = Cache.getInstance().getFriendById(params[0]);
-                            Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
-                            return null;
-                        }
-                    }.execute(userId);
-                }
-
-                for (long userId : result.getInvitingUsers()) {
-
-                    new AsyncTask<Long, Void, Void>() {
-
-                        @Override
-                        protected Void doInBackground(Long... params) {
-                            User user = Cache.getInstance().getUserById(params[0]);
-
-                            if (!mInviterIds.contains(user.getId())) {
-                                mHelper.addFriendInvitation(new FriendInvitation(0, user.getId(), user
-                                    .getName(), Invitation.UNREAD));
-                                mInviterIds.add(user.getId());
-                                new AsyncGetPictures().execute(user.getId());
-                                if (mNotificationsEnabled && mNotificationsForFriendRequests) {
-                                    Notifications.newFriendNotification(Utils.sContext, user);
-                                }
-                            }
-                            return null;
-                        }
-                    }.execute(userId);
-                }
-
-                for (Long id : result.getRemovedFriendsIds()) {
-                    mHelper.deleteUser(id);
-                }
-
-                if (!newFriends.isEmpty()) {
-                    new AsyncInvitationAck().execute(newFriends.toArray(new Long[newFriends.size()]));
-                }
-
-                if (!removedFriends.isEmpty()) {
-                    new AsyncRemovalAck().execute(removedFriends.toArray(new Long[removedFriends.size()]));
-                }
-            }
-        }
-    }
-
-    /**
-     * AsyncTask to download a user's picture
-     * 
-     * @author ritterni
-     */
-    private class AsyncGetPictures extends AsyncTask<Long, Void, Void> {
-        @Override
-        protected Void doInBackground(Long... ids) {
-            for (long id : ids) {
-                UpdateService.this.downloadUserPicture(id);
-            }
-            return null;
-        }
-    }
-
-    /**
-     * AsyncTask to ack accepted invitations
-     * 
-     * @author ritterni
-     */
-    private class AsyncInvitationAck extends AsyncTask<Long, Void, Void> {
-        @Override
-        protected Void doInBackground(Long... users) {
-            try {
-                for (long user : users) {
-                    mClient.ackAcceptedInvitation(user);
-                }
-            } catch (SmartMapClientException e) {
-                Log.e("UpdateService", "Couldn't send acks!");
-            }
-            return null;
-        }
-    }
-
-    /**
      * AsyncTask to log in
      * 
      * @author ritterni
@@ -461,42 +505,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     }
 
     /**
-     * AsyncTask to send the user's own position to the server
-     * 
-     * @author ritterni
-     */
-    private class AsyncOwnPos extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            try {
-                mClient.updatePos(mManager.getLocation());
-            } catch (SmartMapClientException e) {
-                Log.e("UpdateService", "Position update failed!");
-            }
-            return null;
-        }
-    }
-
-    /**
-     * AsyncTask to ack friend removals
-     * 
-     * @author ritterni
-     */
-    private class AsyncRemovalAck extends AsyncTask<Long, Void, Void> {
-        @Override
-        protected Void doInBackground(Long... ids) {
-            try {
-                for (long id : ids) {
-                    mClient.ackRemovedFriend(id);
-                }
-            } catch (SmartMapClientException e) {
-                Log.e("UpdateService", "Couldn't send acks!");
-            }
-            return null;
-        }
-    }
-
-    /**
      * A location listener
      * 
      * @author ritterni
@@ -504,46 +512,43 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final class MyLocationListener implements LocationListener {
 
         @Override
-        public void onLocationChanged(Location locFromGps) {
-            mManager.setLocation(locFromGps);
-            // if (mOwnPosEnabled) {
-            // new AsyncOwnPos().execute();
-            // }
-            // Sets the location name
-            try {
-                List<Address> addresses =
-                    mGeocoder.getFromLocation(locFromGps.getLatitude(), locFromGps.getLongitude(), 1);
+        public void onLocationChanged(Location fix) {
+            // do nothing if the new location is less accurate
+            if (mManager.getLocation().distanceTo(fix) >= fix.getAccuracy()
+                || fix.getAccuracy() <= mCurrentAccuracy) {
+                mManager.setLocation(fix);
+                mCurrentAccuracy = fix.getAccuracy();
 
-                String locName = SettingsManager.DEFAULT_LOC_NAME;
-                if (!addresses.isEmpty()) {
-                    locName = addresses.get(0).getLocality();
+                // Sets the location name
+                try {
+                    List<Address> addresses =
+                        mGeocoder.getFromLocation(fix.getLatitude(), fix.getLongitude(), 1);
+
+                    String locName = SettingsManager.DEFAULT_LOC_NAME;
+                    if (!addresses.isEmpty()) {
+                        locName = addresses.get(0).getLocality();
+                    }
+                    mManager.setLocationName(locName);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                mManager.setLocationName(locName);
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-            mOwnPosEnabled = false;
+
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-            mOwnPosEnabled = true;
+
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            // stop sending position if provider isn't available
-            if ((status == LocationProvider.OUT_OF_SERVICE)
-                || (status == LocationProvider.TEMPORARILY_UNAVAILABLE)) {
-                mOwnPosEnabled = false;
-            } else if (status == LocationProvider.AVAILABLE) {
-                mOwnPosEnabled = true;
-            }
+
         }
     }
 }
