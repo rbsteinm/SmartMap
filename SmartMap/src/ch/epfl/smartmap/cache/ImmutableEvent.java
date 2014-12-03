@@ -26,7 +26,8 @@ public class ImmutableEvent {
     private final List<Long> mParticipants;
 
     /**
-     * Constructor, put {@code null} (or {@code User.NO_ID} for id) if you dont want the value to be taken
+     * Constructor, put {@code null} (or {@code User.NO_ID} for id) if you dont
+     * want the value to be taken
      * into account.
      * 
      * @param id
@@ -85,5 +86,9 @@ public class ImmutableEvent {
 
     public GregorianCalendar getStartDate() {
         return mStartDate;
+    }
+
+    public List<Long> getParticipants() {
+        return new ArrayList<Long>(mParticipants);
     }
 }
