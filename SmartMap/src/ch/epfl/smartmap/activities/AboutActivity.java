@@ -20,8 +20,8 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.util.SystemUiHider;
@@ -228,32 +228,22 @@ public class AboutActivity extends Activity {
         teamMembers.add("Matthieu Girod");
         teamMembers.add("Alain Milliet");
         teamMembers.add("Nicolas Ritter");
-        teamMembers.add("Raphaël Stienmann");
+        teamMembers.add("Raphaël Steinmann");
         teamMembers.add("Hugo Sbai");
         teamMembers.add("Marion Sbai");
 
         Collections.shuffle(teamMembers, new Random(System.nanoTime()));
 
-        RelativeLayout relativeLayout = (RelativeLayout) this.findViewById(R.id.about_team_members_holder);
-        relativeLayout.setGravity(Gravity.CENTER);
-
-        int idCount = 0;
+        LinearLayout linearLayout = (LinearLayout) this.findViewById(R.id.about_team_members_holder);
+        linearLayout.setGravity(Gravity.CENTER);
 
         for (String s : teamMembers) {
             TextView textView = new TextView(this.getApplicationContext());
-            textView.setId(idCount);
             textView.setText(s);
 
-            if (idCount != 0) {
-                LayoutParams lp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-                lp.addRule(RelativeLayout.BELOW, idCount - 1);
+            LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
-                relativeLayout.addView(textView, lp);
-            } else {
-                relativeLayout.addView(textView);
-            }
-
-            idCount++;
+            linearLayout.addView(textView, lp);
         }
 
         // Display thanks list (in non-random order)
