@@ -2,15 +2,17 @@ package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -85,7 +87,7 @@ public class ShowEventsActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        // this.displayInfoDialog(position);
+        this.displayInfoDialog(position);
     }
 
     /**
@@ -182,48 +184,99 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void displayInfoDialog(int position) {
 
+        Toast.makeText(mContext, this.getString(R.string.show_event_loading_info), Toast.LENGTH_SHORT).show();
+
         final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
-        final Event event = Cache.getInstance().getEventById(eventViewHolder.getEventId());
 
-        String message = EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "start")
-                + " - " + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
-                + "\nCreated by " + event.getCreatorName() + "\n\n" + event.getDescription();
+        // Need an AsyncTask because getEventById searches on our server if event not stored in cache.
+        AsyncTask<Long, Void, Map<String, Object>> loadEvent = new AsyncTask<Long, Void, Map<String, Object>>() {
 
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            @Override
+            protected Map<String, Object> doInBackground(Long... params) {
 
-        alertDialog.setTitle(event.getName()
-                + " @ "
-                + event.getLocationString()
-                + "\n"
-                + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation().getLatitude(),
-                        event.getLocation().getLongitude()) + " km away");
-        alertDialog.setMessage(message);
-        final Activity activity = this;
+                Log.d(TAG, "Retrieving event...");
 
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, this.getString(R.string.show_event_on_the_map_button),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(activity,
-                                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                                Toast.LENGTH_SHORT).show();
-                        Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                        showEventIntent.putExtra("location", event.getLocation());
-                        ShowEventsActivity.this.startActivity(showEventIntent);
-                    }
-                });
+                long eventId = params[0];
 
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, this.getString(R.string.show_event_details_button),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
-                        showEventIntent.putExtra("EVENT", event.getId());
-                        ShowEventsActivity.this.startActivity(showEventIntent);
-                    }
-                });
+                Map<String, Object> output = new HashMap<String, Object>();
 
-        alertDialog.show();
+                Event event = Cache.getInstance().getEventById(eventId);
+                output.put("event", event);
+
+                String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
+                output.put("creatorName", creatorName);
+
+                return output;
+            }
+
+            @Override
+            protected void onPostExecute(Map<String, Object> result) {
+
+                Log.d(TAG, "Processing event...");
+
+                final Event event = (Event) result.get("event");
+                final String creatorName = (String) result.get("creatorName");
+
+                if ((event == null) || (creatorName == null)) {
+                    Log.e(TAG, "The server returned a null event or creatorName");
+
+                    Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
+                            .show();
+
+                } else {
+
+                    AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
+
+                    final String message = EventsListItemAdapter.getTextFromDate(event.getStartDate(),
+                            event.getEndDate(), "start")
+                            + " - "
+                            + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
+                            + "\nCreated by " + creatorName + "\n\n" + event.getDescription();
+
+                    alertDialog.setTitle(event.getName()
+                            + " @ "
+                            + event.getLocationString()
+                            + "\n"
+                            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
+                                    .getLatitude(), event.getLocation().getLongitude()) + " km away");
+                    alertDialog.setMessage(message);
+
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
+                            mContext.getString(R.string.show_event_on_the_map_button),
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Toast.makeText(mContext,
+                                            ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                                            Toast.LENGTH_SHORT).show();
+                                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                                    showEventIntent.putExtra("location", event.getLocation());
+                                    ShowEventsActivity.this.startActivity(showEventIntent);
+                                }
+                            });
+
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
+                            mContext.getString(R.string.show_event_details_button),
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
+                                    showEventIntent.putExtra("EVENT", event.getId());
+                                    ShowEventsActivity.this.startActivity(showEventIntent);
+                                }
+                            });
+
+                    alertDialog.show();
+                }
+
+            }
+
+        };
+
+        loadEvent.execute(eventViewHolder.getEventId());
+
     }
 
     private void initializeGUI() {
