@@ -85,11 +85,11 @@ public class ShowEventsActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        this.displayInfoDialog(position);
+        // this.displayInfoDialog(position);
     }
 
     /**
-     * Triggered when a checkbox is clicked
+     * Triggered when a checkbox is clicked.
      * 
      * @param v
      *            the checkbox whose status changed
@@ -155,9 +155,6 @@ public class ShowEventsActivity extends ListActivity {
             case R.id.showEventsMenuNewEvent:
                 Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
                 this.startActivity(showEventIntent);
-            default:
-                // No other menu items!
-                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -166,8 +163,9 @@ public class ShowEventsActivity extends ListActivity {
     @Override
     public void onResume() {
         super.onResume();
+
         // This is needed to show an update of the events' list after having
-        // created an event
+        // created one.
         this.updateCurrentList();
     }
 
@@ -185,11 +183,14 @@ public class ShowEventsActivity extends ListActivity {
     private void displayInfoDialog(int position) {
 
         final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
-        final Event event = eventViewHolder.getEvent();
+        final Event event = Cache.getInstance().getEventById(eventViewHolder.getEventId());
+
         String message = EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "start")
                 + " - " + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
                 + "\nCreated by " + event.getCreatorName() + "\n\n" + event.getDescription();
+
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+
         alertDialog.setTitle(event.getName()
                 + " @ "
                 + event.getLocationString()
@@ -198,6 +199,7 @@ public class ShowEventsActivity extends ListActivity {
                         event.getLocation().getLongitude()) + " km away");
         alertDialog.setMessage(message);
         final Activity activity = this;
+
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, this.getString(R.string.show_event_on_the_map_button),
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -210,6 +212,7 @@ public class ShowEventsActivity extends ListActivity {
                         ShowEventsActivity.this.startActivity(showEventIntent);
                     }
                 });
+
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, this.getString(R.string.show_event_details_button),
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -219,6 +222,7 @@ public class ShowEventsActivity extends ListActivity {
                         ShowEventsActivity.this.startActivity(showEventIntent);
                     }
                 });
+
         alertDialog.show();
     }
 
