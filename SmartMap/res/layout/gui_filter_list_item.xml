@@ -10,15 +10,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="5dp"
-        android:textColor="@color/black_overlay"
         android:textSize="20sp" />
 
     <Switch
         android:id="@+id/activity_show_filters_follow_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:textOff="@string/activity_show_filters_unfollow_switch"
-        android:textOn="@string/activity_show_filters_follow_switch" />
+        android:layout_alignParentRight="true" />
 
 </RelativeLayout>

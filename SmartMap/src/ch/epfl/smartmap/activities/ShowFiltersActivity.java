@@ -7,6 +7,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.MockDB;
@@ -36,11 +38,11 @@ public class ShowFiltersActivity extends ListActivity {
         this.setListAdapter(new FilterListItemAdapter(this.getApplicationContext(), mFilterList));
     }
 
-    // @Override
-    // public void onListItemClick(ListView listView, View view, int position, long id) {
-    // super.onListItemClick(listView, view, position, id);
-    // // TODO
-    // }
+    @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        super.onListItemClick(listView, view, position, id);
+        // TODO
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

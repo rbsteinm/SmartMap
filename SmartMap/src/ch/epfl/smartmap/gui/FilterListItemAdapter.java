@@ -15,6 +15,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
 
 /**
@@ -26,11 +27,13 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
     private final Context mContext;
     private final List<Filter> mItemsArrayList;
+    private final Cache cache;
 
     public FilterListItemAdapter(Context context, List<Filter> filtersList) {
         super(context, R.layout.gui_friend_list_item, filtersList);
         mContext = context;
         mItemsArrayList = new ArrayList<Filter>(filtersList);
+        cache = Cache.getInstance();
     }
 
     /*
@@ -44,7 +47,7 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
         // Create inflater,get item to construct
         FilterViewHolder viewHolder;
-        Filter filter = mItemsArrayList.get(position);
+        final Filter filter = mItemsArrayList.get(position);
 
         if (convertView == null) {
             LayoutInflater inflater =
@@ -56,8 +59,6 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
             viewHolder.setFilterId(filter.getId());
             viewHolder.setFollowSwitch((Switch) convertView
                 .findViewById(R.id.activity_show_filters_follow_switch));
-            // TODO field isFollowing in Filter?
-            viewHolder.setIsFollowing(true);
 
             convertView.setTag(viewHolder);
 
@@ -67,7 +68,9 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
         if (filter != null) {
             viewHolder.getFilterName().setText(filter.getListName());
-            viewHolder.getFollowSwitch().setChecked(viewHolder.getIsFollowing());
+
+            viewHolder.getFollowSwitch().setTextOn("Follow");
+            viewHolder.getFollowSwitch().setTextOff("Unfollow");
 
             viewHolder.getFollowSwitch().setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
@@ -75,8 +78,12 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
                             // TODO
+                            // set visible attribute of each friend at true
+                            // notify the server
                         } else {
                             // TODO
+                            // set visible attribute of each friend at true
+                            // notify the server
                         }
                     }
                 });
@@ -94,7 +101,6 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
         private TextView mFilterName;
         private long mFilterId;
         private Switch mFollowSwitch;
-        private boolean mIsFollowing = true;
 
         public TextView getFilterName() {
             return mFilterName;
@@ -106,10 +112,6 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
         public Switch getFollowSwitch() {
             return mFollowSwitch;
-        }
-
-        public boolean getIsFollowing() {
-            return mIsFollowing;
         }
 
         public void setFilterName(TextView filterName) {
@@ -124,9 +126,6 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
             mFollowSwitch = followSwitch;
         }
 
-        public void setIsFollowing(boolean isFollowing) {
-            mIsFollowing = isFollowing;
-        }
     }
 
 }
