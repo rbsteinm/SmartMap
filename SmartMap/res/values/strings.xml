@@ -182,6 +182,7 @@
     
     <!-- AboutActivity -->
     <string name="about_version">Version</string>
+    <string name="about_release">release</string>
     <string name="about_unkown_version">unknown</string>
     <string name="about_all_rights_reserved">All rights reserved</string>
     <string name="about_special_thanks_to">Special thanks to</string>

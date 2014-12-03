@@ -204,7 +204,8 @@ public class AboutActivity extends Activity {
         // Display version of this package (to change it, edit versionCode/versionName in the manifest
         try {
             PackageInfo manager = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
-            mVersion.setText(this.getString(R.string.about_version) + " " + manager.versionName);
+            mVersion.setText(this.getString(R.string.about_version) + " " + manager.versionName + ", "
+                    + this.getString(R.string.about_release) + " " + manager.versionCode);
 
         } catch (NameNotFoundException e) {
             Log.d(TAG, "Couldn't retrieve package version: " + e);

@@ -38,8 +38,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="26dp"
-        android:text="@string/app_name"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textSize="45sp"
+        android:text="@string/app_name" />
 
     <LinearLayout
         android:id="@+id/about_team_members_holder"
