@@ -3,6 +3,7 @@ package ch.epfl.smartmap.activities;
 import java.util.List;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
@@ -35,13 +36,16 @@ public class ShowFiltersActivity extends ListActivity {
         MockDB.fillFilters();
         mFilterList = MockDB.FILTER_LIST;
 
-        this.setListAdapter(new FilterListItemAdapter(this.getApplicationContext(), mFilterList));
+        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
+        Filter filter = mFilterList.get(position);
+        Intent intent = new Intent(this.getBaseContext(), ModifyFilterActivity.class);
+        intent.putExtra("FILTER", filter.getId());
+        ShowFiltersActivity.this.startActivity(intent);
         super.onListItemClick(listView, view, position, id);
-        // TODO
     }
 
     @Override

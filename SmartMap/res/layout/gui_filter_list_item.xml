@@ -9,13 +9,14 @@
         android:id="@+id/activity_show_filters_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="5dp"
         android:textSize="20sp" />
 
     <Switch
         android:id="@+id/activity_show_filters_follow_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:clickable="false"
+        android:focusable="false" />
 
 </RelativeLayout>

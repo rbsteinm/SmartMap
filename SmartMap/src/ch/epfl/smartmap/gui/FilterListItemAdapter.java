@@ -71,6 +71,7 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
             viewHolder.getFollowSwitch().setTextOn("Follow");
             viewHolder.getFollowSwitch().setTextOff("Unfollow");
+            // viewHolder.getFollowSwitch().setChecked(filter.isVisible());
 
             viewHolder.getFollowSwitch().setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
