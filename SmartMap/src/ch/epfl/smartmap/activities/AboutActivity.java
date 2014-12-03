@@ -74,6 +74,7 @@ public class AboutActivity extends Activity {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (AUTO_HIDE) {
                 AboutActivity.this.delayedHide(AUTO_HIDE_DELAY_MILLIS);
+                view.performClick();
             }
             return false;
         }
@@ -90,7 +91,6 @@ public class AboutActivity extends Activity {
 
     private TextView mVersion;
     private TextView mCopyright;
-    private TextView mThanksTo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
