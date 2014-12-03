@@ -1,10 +1,16 @@
 package ch.epfl.smartmap.activities;
 
+import java.util.List;
+
 import android.app.ListActivity;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.MockDB;
+import ch.epfl.smartmap.gui.FilterListItemAdapter;
 
 /**
  * An Activity that displays the different filters
@@ -13,11 +19,28 @@ import ch.epfl.smartmap.R;
  */
 public class ShowFiltersActivity extends ListActivity {
 
+    private List<Filter> mFilterList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_show_filters);
+
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+
+        // mock stuff, filter list should be taken from the cache (or database?)
+        MockDB.fillFilters();
+        mFilterList = MockDB.FILTER_LIST;
+
+        this.setListAdapter(new FilterListItemAdapter(this.getApplicationContext(), mFilterList));
     }
+
+    // @Override
+    // public void onListItemClick(ListView listView, View view, int position, long id) {
+    // super.onListItemClick(listView, view, position, id);
+    // // TODO
+    // }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

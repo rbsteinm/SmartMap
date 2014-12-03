@@ -55,6 +55,9 @@ public class MockDB {
     public static final Filter SWENG_TEAM = new DefaultFilter("Sweng Team");
     public static final Filter EPFL_FRIENDS = new DefaultFilter("EPFL Friends");
 
+    public static final ArrayList<Filter> FILTER_LIST = new ArrayList<Filter>(Arrays.asList(SWENG_TEAM,
+        EPFL_FRIENDS));
+
     public static void fillFilters() {
         SWENG_TEAM.addUser(RAPHAEL.getId());
         SWENG_TEAM.addUser(NICOLAS.getId());
