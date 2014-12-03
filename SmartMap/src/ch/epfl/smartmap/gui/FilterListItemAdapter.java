@@ -27,13 +27,13 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
     private final Context mContext;
     private final List<Filter> mItemsArrayList;
-    private final Cache cache;
+    private final Cache mCache;
 
     public FilterListItemAdapter(Context context, List<Filter> filtersList) {
         super(context, R.layout.gui_friend_list_item, filtersList);
         mContext = context;
         mItemsArrayList = new ArrayList<Filter>(filtersList);
-        cache = Cache.getInstance();
+        mCache = Cache.getInstance();
     }
 
     /*
@@ -59,6 +59,7 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
             viewHolder.setFilterId(filter.getId());
             viewHolder.setFollowSwitch((Switch) convertView
                 .findViewById(R.id.activity_show_filters_follow_switch));
+            viewHolder.setSubtitle((TextView) convertView.findViewById(R.id.activity_show_filters_subtitle));
 
             convertView.setTag(viewHolder);
 
@@ -68,6 +69,8 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
         if (filter != null) {
             viewHolder.getFilterName().setText(filter.getListName());
+
+            viewHolder.getSubtitle().setText(filter.getList().size() + " people in this filter");
 
             viewHolder.getFollowSwitch().setTextOn("Follow");
             viewHolder.getFollowSwitch().setTextOff("Unfollow");
@@ -102,9 +105,14 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
         private TextView mFilterName;
         private long mFilterId;
         private Switch mFollowSwitch;
+        private TextView mSubtitle;
 
         public TextView getFilterName() {
             return mFilterName;
+        }
+
+        public TextView getSubtitle() {
+            return mSubtitle;
         }
 
         public long getFilterId() {
@@ -125,6 +133,10 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
         public void setFollowSwitch(Switch followSwitch) {
             mFollowSwitch = followSwitch;
+        }
+
+        public void setSubtitle(TextView subtitle) {
+            mSubtitle = subtitle;
         }
 
     }
