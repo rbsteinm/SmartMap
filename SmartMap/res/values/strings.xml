@@ -182,7 +182,12 @@
     
     <!-- AboutActivity -->
     <string name="about_version">Version</string>
-    <string name="about_unkown_version">unkown</string>
+    <string name="about_unkown_version">unknown</string>
+    <string name="about_all_rights_reserved">All rights reserved</string>
+    <string name="about_special_thanks_to">Special thanks to</string>
+    <string name="about_dummy_names">Name 1\nName 2\nName 3</string>
+    <string name="about_dev_by">Developed by</string>
+    <string name="about_dummy_copyright">(c) 2014</string>
     
     <!-- Nothing below this line! -->
 

@@ -4,16 +4,6 @@
     android:layout_height="match_parent"
     android:background="@color/main_blue"
     tools:context="ch.epfl.smartmap.activities.AboutActivity" >
-    
-    <TextView
-        android:id="@+id/fullscreen_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:text="SmartMap"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/about_version"
@@ -21,33 +11,15 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/fullscreen_content"
         android:layout_centerHorizontal="true"
-        android:text="Version {VERSION}" />
+        android:text="@string/about_version" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/about_all_rights_reserved"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/about_copyright"
         android:layout_centerHorizontal="true"
-        android:text="All rights reserved" />
-
-
-    <TextView
-        android:id="@+id/about_copyright"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/about_team_members"
-        android:layout_centerHorizontal="true"
-        android:text="Copyright" />
-
-    <TextView
-        android:id="@+id/about_thanks"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/fullscreen_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="176dp"
-        android:text="Special thanks to:" />
+        android:text="@string/about_all_rights_reserved" />
 
     <TextView
         android:id="@+id/about_thanks_list"
@@ -55,35 +27,80 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/about_thanks"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_marginTop="37dp"
-        android:text="Prof. James Larus, Călin Iorgulescu, Lukas Kellenberger" />
+        android:text="@string/about_dummy_names" />
+
 
     <TextView
         android:id="@+id/about_dev_by"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/fullscreen_content"
         android:layout_below="@+id/about_version"
-        android:layout_marginTop="34dp"
-        android:text="Developped by:" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="14dp"
+        android:text="@string/about_dev_by" />
+
+    <TextView
+        android:id="@+id/fullscreen_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="26dp"
+        android:text="@string/app_name"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <RelativeLayout
+        android:id="@+id/about_team_members_holder"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/about_dev_by" >
+
+        <TextView
+            android:id="@+id/a"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="Name 1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/a"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="Name 2" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/about_copyright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/about_team_members_holder"
+        android:layout_marginTop="14dp"
+        android:text="@string/about_dummy_copyright" />
 
     <ImageView
-        android:id="@+id/logo_about"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:contentDescription="@string/logo_description"
-        android:scaleType="centerInside"
+        android:id="@+id/about_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/about_all_rights_reserved"
         android:src="@drawable/ic_launcher" />
 
     <TextView
-        android:id="@+id/about_team_members"
+        android:id="@+id/about_thanks"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/about_dev_by"
-        android:layout_marginTop="14dp"
-        android:text="Team membersssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss" />
+        android:layout_below="@+id/about_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:text="@string/about_special_thanks_to" />
 
 </RelativeLayout>

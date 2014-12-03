@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import android.annotation.TargetApi;
@@ -82,10 +83,8 @@ public class AboutActivity extends Activity {
     };
 
     private TextView mVersion;
-
     private TextView mCopyright;
-
-    private TextView mTeamMembers;
+    private TextView mThanksTo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,13 +171,35 @@ public class AboutActivity extends Activity {
 
     /**
      * 
+     * @param l
+     * @return a String of the form "elem 1, elem2, elem3"
+     * 
+     * @author SpicyCH
+     */
+    private String getStringFromList(List<String> l) {
+        StringBuilder stringBuilder = new StringBuilder();
+        Iterator<String> iterator = l.iterator();
+
+        while (iterator.hasNext()) {
+            stringBuilder.append(iterator.next());
+
+            if (iterator.hasNext()) {
+                stringBuilder.append("\n");
+            }
+        }
+        return stringBuilder.toString();
+
+    }
+
+    /**
+     * 
      * 
      * @author SpicyCH
      */
     private void initializeGUI() {
         mVersion = (TextView) this.findViewById(R.id.about_version);
         mCopyright = (TextView) this.findViewById(R.id.about_copyright);
-        mTeamMembers = (TextView) this.findViewById(R.id.about_team_members);
+        mThanksTo = (TextView) this.findViewById(R.id.about_thanks_list);
 
         // Display version of this package (to change it, edit versionCode/versionName in the manifest
         try {
@@ -203,25 +224,19 @@ public class AboutActivity extends Activity {
         teamMembers.add("Matthieu Girod");
         teamMembers.add("Alain Milliet");
         teamMembers.add("Nicolas Ritter");
-        teamMembers.add("Rapha�l Stienmann");
+        teamMembers.add("Raphaël Stienmann");
         teamMembers.add("Hugo Sbai");
         teamMembers.add("Marion Sbai");
 
         Collections.shuffle(teamMembers, new Random(System.nanoTime()));
 
-        StringBuilder stringBuilder = new StringBuilder();
-        Iterator<String> iterator = teamMembers.iterator();
+        // Display thanks list (in non-random order)
+        ArrayList<String> thanksTo = new ArrayList<String>();
+        thanksTo.add("Prof. James Larus");
+        thanksTo.add("Călin Iorgulescu");
+        thanksTo.add("Lukas Kellenberger");
 
-        while (iterator.hasNext()) {
-            stringBuilder.append(iterator.next());
-
-            if (iterator.hasNext()) {
-                stringBuilder.append(", ");
-            }
-        }
-
-        mTeamMembers.setText(stringBuilder.toString());
-        mTeamMembers.refreshDrawableState();
+        mThanksTo.setText(this.getStringFromList(thanksTo));
 
     }
 }
