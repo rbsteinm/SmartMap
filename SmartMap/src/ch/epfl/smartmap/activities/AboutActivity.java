@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
 import android.annotation.TargetApi;
@@ -178,25 +176,20 @@ public class AboutActivity extends Activity {
     }
 
     /**
-     * 
-     * @param l
-     * @return a String of the form "elem 1, elem2, elem3"
+     * @param teamMembers
+     * @param linearLayout
      * 
      * @author SpicyCH
      */
-    private String getStringFromList(List<String> l) {
-        StringBuilder stringBuilder = new StringBuilder();
-        Iterator<String> iterator = l.iterator();
+    private void displayListInLayout(ArrayList<String> teamMembers, LinearLayout linearLayout) {
+        for (String s : teamMembers) {
+            TextView textView = new TextView(this.getApplicationContext());
+            textView.setText(s);
 
-        while (iterator.hasNext()) {
-            stringBuilder.append(iterator.next());
+            LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
-            if (iterator.hasNext()) {
-                stringBuilder.append("\n");
-            }
+            linearLayout.addView(textView, lp);
         }
-        return stringBuilder.toString();
-
     }
 
     /**
@@ -207,7 +200,6 @@ public class AboutActivity extends Activity {
     private void initializeGUI() {
         mVersion = (TextView) this.findViewById(R.id.about_version);
         mCopyright = (TextView) this.findViewById(R.id.about_copyright);
-        mThanksTo = (TextView) this.findViewById(R.id.about_thanks_list);
 
         // Display version of this package (to change it, edit versionCode/versionName in the manifest
         try {
@@ -245,17 +237,10 @@ public class AboutActivity extends Activity {
 
         Collections.shuffle(teamMembers, new Random(System.nanoTime()));
 
-        LinearLayout linearLayout = (LinearLayout) this.findViewById(R.id.about_team_members_holder);
-        linearLayout.setGravity(Gravity.CENTER);
+        LinearLayout teamMembersHolder = (LinearLayout) this.findViewById(R.id.about_team_members_holder);
+        teamMembersHolder.setGravity(Gravity.CENTER);
 
-        for (String s : teamMembers) {
-            TextView textView = new TextView(this.getApplicationContext());
-            textView.setText(s);
-
-            LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-
-            linearLayout.addView(textView, lp);
-        }
+        this.displayListInLayout(teamMembers, teamMembersHolder);
 
         // Display thanks list (in non-random order)
         ArrayList<String> thanksTo = new ArrayList<String>();
@@ -263,7 +248,9 @@ public class AboutActivity extends Activity {
         thanksTo.add("Călin Iorgulescu");
         thanksTo.add("Lukas Kellenberger");
 
-        mThanksTo.setText(this.getStringFromList(thanksTo));
+        LinearLayout thanksHolder = (LinearLayout) this.findViewById(R.id.about_thanks_holder);
+        thanksHolder.setGravity(Gravity.CENTER);
 
+        this.displayListInLayout(thanksTo, thanksHolder);
     }
 }

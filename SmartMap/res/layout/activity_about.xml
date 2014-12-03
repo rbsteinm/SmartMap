@@ -22,24 +22,13 @@
         android:text="@string/about_all_rights_reserved" />
 
     <TextView
-        android:id="@+id/about_thanks_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/about_thanks"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="37dp"
-        android:text="@string/about_dummy_names" />
-
-    <TextView
         android:id="@+id/about_dev_by"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/about_version"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="14dp"
         android:layout_marginBottom="15dp"
+        android:layout_marginTop="14dp"
         android:text="@string/about_dev_by" />
 
     <TextView
@@ -57,6 +46,15 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/about_dev_by"
+        android:gravity="center"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/about_thanks_holder"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/about_thanks"
         android:gravity="center"
         android:orientation="vertical" >
     </LinearLayout>
@@ -86,6 +84,7 @@
         android:layout_below="@+id/about_logo"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="22dp"
+        android:layout_marginBottom="15dp"
         android:text="@string/about_special_thanks_to" />
 
 </RelativeLayout>
