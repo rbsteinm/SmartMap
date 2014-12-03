@@ -25,8 +25,8 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.util.SystemUiHider;
 
 /**
- * An example full-screen activity that shows and hides the system UI (i.e. status bar and navigation/system bar) with
- * user interaction.
+ * This full-screen activity displays the credits for SmartMap. The name of the developers are sorted in random order
+ * and it uses the version name and version code defined in the android manifest.
  * 
  * @see SystemUiHider
  */
@@ -116,18 +116,10 @@ public class AboutActivity extends Activity {
             @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
             public void onVisibilityChange(boolean visible) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                    // If the ViewPropertyAnimator API is available
-                    // (Honeycomb MR2 and later), use it to animate the
-                    // in-layout UI controls at the bottom of the
-                    // screen.
                     if (mShortAnimTime == 0) {
                         mShortAnimTime = AboutActivity.this.getResources().getInteger(
                                 android.R.integer.config_shortAnimTime);
                     }
-                } else {
-                    // If the ViewPropertyAnimator APIs aren't
-                    // available, simply show or hide the in-layout UI
-                    // controls.
                 }
 
                 if (visible && AUTO_HIDE) {
@@ -176,6 +168,8 @@ public class AboutActivity extends Activity {
     }
 
     /**
+     * Add each item of the list as a TextView children of the given LinearLayout.
+     * 
      * @param teamMembers
      * @param linearLayout
      * 
@@ -193,7 +187,7 @@ public class AboutActivity extends Activity {
     }
 
     /**
-     * 
+     * Initilizes the GUI.
      * 
      * @author SpicyCH
      */
@@ -218,7 +212,7 @@ public class AboutActivity extends Activity {
         String year = Integer.toString(now.get(Calendar.YEAR));
         String copyrightMsg = "\u00a9 " + year;
 
-        // Infine copyright ((c) 2014 - YYYY)
+        // Infinite copyright ((c) 2014 - YYYY)
         if (!year.equals(APP_BORN_YEAR)) {
             copyrightMsg = "\u00a9 " + this.APP_BORN_YEAR + " - " + year;
         }
