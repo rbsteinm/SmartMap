@@ -58,6 +58,11 @@ public class AboutActivity extends Activity {
     private static final String TAG = AboutActivity.class.getSimpleName();
 
     /**
+     * The year where the copyright begins.
+     */
+    private final String APP_BORN_YEAR = "2014";
+
+    /**
      * The instance of the {@link SystemUiHider} for this activity.
      */
     private SystemUiHider mSystemUiHider;
@@ -217,8 +222,14 @@ public class AboutActivity extends Activity {
 
         // Display the copyright
         GregorianCalendar now = new GregorianCalendar();
-        int year = now.get(Calendar.YEAR);
-        mCopyright.setText("\u00a9 " + year);
+        String year = Integer.toString(now.get(Calendar.YEAR));
+        String copyrightMsg = "\u00a9 " + year;
+
+        // Infine copyright ((c) 2014 - YYYY)
+        if (!year.equals(APP_BORN_YEAR)) {
+            copyrightMsg = "\u00a9 " + this.APP_BORN_YEAR + " - " + year;
+        }
+        mCopyright.setText(copyrightMsg);
 
         // Display team members in a random order
 
