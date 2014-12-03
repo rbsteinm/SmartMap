@@ -48,6 +48,7 @@ public class AddFriendActivity extends ListActivity {
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
+
     @Override
     protected void onListItemClick(ListView listView, View view, int position, long id) {
         long userId = ((FriendViewHolder) view.getTag()).getUserId();
@@ -64,6 +65,8 @@ public class AddFriendActivity extends ListActivity {
         this.getMenuInflater().inflate(R.menu.add_friend, menu);
         mSearchBar = (SearchView) menu.findItem(R.id.add_friend_activity_searchBar).getActionView();
         this.setSearchBarListener();
+        MenuItem searchMenuItem = menu.findItem(R.id.add_friend_activity_searchBar);
+        searchMenuItem.expandActionView();
         return true;
     }
 
@@ -175,7 +178,7 @@ public class AddFriendActivity extends ListActivity {
         @Override
         protected void onPostExecute(String confirmString) {
             Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG)
-                .show();
+            .show();
         }
     }
 }
