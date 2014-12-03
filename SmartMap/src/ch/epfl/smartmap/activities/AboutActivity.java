@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.Random;
 
 import android.annotation.TargetApi;
@@ -195,7 +196,7 @@ public class AboutActivity extends Activity {
         int year = now.get(Calendar.YEAR);
         mCopyright.setText("\u00a9 " + year);
 
-        // Display team members
+        // Display team members in a random order
 
         ArrayList<String> teamMembers = new ArrayList<String>();
         teamMembers.add("Robin Genolet");
@@ -207,7 +208,20 @@ public class AboutActivity extends Activity {
         teamMembers.add("Marion Sbai");
 
         Collections.shuffle(teamMembers, new Random(System.nanoTime()));
-        mTeamMembers.setText("Developped by:\n" + teamMembers.toString());
+
+        StringBuilder stringBuilder = new StringBuilder();
+        Iterator<String> iterator = teamMembers.iterator();
+
+        while (iterator.hasNext()) {
+            stringBuilder.append(iterator.next());
+
+            if (iterator.hasNext()) {
+                stringBuilder.append(", ");
+            }
+        }
+
+        mTeamMembers.setText(stringBuilder.toString());
+        mTeamMembers.refreshDrawableState();
 
     }
 }
