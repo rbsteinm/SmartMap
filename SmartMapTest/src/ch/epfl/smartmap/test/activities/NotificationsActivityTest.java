@@ -11,7 +11,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.NotificationsActivity;
 
 public class NotificationsActivityTest extends
-		ActivityInstrumentationTestCase2<NotificationsActivity> {
+ActivityInstrumentationTestCase2<NotificationsActivity> {
 	public NotificationsActivityTest() {
 		super(NotificationsActivity.class);
 	}

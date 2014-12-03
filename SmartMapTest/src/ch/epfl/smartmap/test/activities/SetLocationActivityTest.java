@@ -11,7 +11,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.SetLocationActivity;
 
 public class SetLocationActivityTest extends
-		ActivityInstrumentationTestCase2<SetLocationActivity> {
+ActivityInstrumentationTestCase2<SetLocationActivity> {
 	public SetLocationActivityTest() {
 		super(SetLocationActivity.class);
 	}
