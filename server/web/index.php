@@ -124,9 +124,9 @@ $app->post('/allowFriendList', 'authorization.controller:allowFriendList');
 
 $app->post('/disallowFriendList', 'authorization.controller:disallowFriendList');
 
-$app->post('/followFriend', 'authorization.controller:followFriend');
+$app->post('/blockFriend', 'authorization.controller:blockFriend');
 
-$app->post('/unfollowFriend', 'authorization.controller:unfollowFriend');
+$app->post('/unblockFriend', 'authorization.controller:unblockFriend');
 
 $app->post('/setVisibility', 'authorization.controller:setVisibility');
 

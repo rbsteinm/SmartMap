@@ -226,4 +226,48 @@ class AuthorizationController
 
         return new JsonResponse($response);
     }
+
+    public function blockFriend(Request $request)
+    {
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
+
+        try
+        {
+            $this->mRepo->setFriendshipStatus($userId, $friendId, 'DISALLOWED');
+
+            $this->mRepo->setFriendshipFollow($userId, $friendId, 'UNFOLLOWED');
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in blockFriend.', 2, $e);
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Blocked friend.');
+
+        return new JsonResponse($response);
+    }
+
+    public function unblockFriend(Request $request)
+    {
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
+
+        try
+        {
+            $this->mRepo->setFriendshipStatus($userId, $friendId, 'ALLOWED');
+
+            $this->mRepo->setFriendshipFollow($userId, $friendId, 'FOLLOWED');
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in unblockFriend.', 2, $e);
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Unblocked friend.');
+
+        return new JsonResponse($response);
+    }
 }
