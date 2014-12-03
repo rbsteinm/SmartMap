@@ -2,6 +2,7 @@ package ch.epfl.smartmap.activities;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -126,14 +127,15 @@ public class AddFriendActivity extends ListActivity {
 	 * 
 	 * @author rbsteinm
 	 */
-	private class RefreshUserList extends AsyncTask<String, Void, List<User>> {
+	private class RefreshUserList extends AsyncTask<String, Void, Set<User>> {
 
 		@Override
-		protected List<User> doInBackground(String... params) {
+		protected Set<User> doInBackground(String... params) {
 			try {
 				if (params[0].equals("")) {
 					return Collections.emptyList();
 				} else {
+					// TODO retourner une list?
 					return CachedOnlineSearchEngine.getInstance().findStrangerByQuery(params[0]);
 				}
 			} catch (SmartMapClientException e) {

@@ -587,25 +587,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 	}
 
 	@Override
-	public void onGoingEventListUpdate() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onMyEventListUpdate() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onNearEventListUpdate() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onPendingFriendListUpdate() {
+	public void onEventListUpdate() {
 		// TODO Auto-generated method stub
 
 	}

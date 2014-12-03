@@ -11,10 +11,10 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
 
 /**
  * This class creates different sort of notifications
@@ -119,8 +119,9 @@ public class Notifications {
 		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
 		String[] events = new String[2];
-		events[0] = new String(Cache.getInstance().getFriendById(event.getCreatorId()).getName() + " "
-		    + context.getString(R.string.notification_event_invitation) + " " + event.getName());
+		events[0] = new String(CachedOnlineSearchEngine.getInstance().findFriendById(event.getCreatorId())
+		    .getName()
+		    + " " + context.getString(R.string.notification_event_invitation) + " " + event.getName());
 		events[1] = context.getString(R.string.notification_open_event_list);
 
 		// Sets a title for the Inbox style big view
@@ -137,12 +138,12 @@ public class Notifications {
 		    .setAutoCancel(true)
 		    .setContentTitle(context.getString(R.string.notification_inviteevent_title))
 		    .setContentText(
-		        Cache.getInstance().getFriendById(event.getCreatorId()).getName() + " "
+		        CachedOnlineSearchEngine.getInstance().findFriendById(event.getCreatorId()).getName() + " "
 		            + context.getString(R.string.notification_event_invitation) + event.getName() + "\n"
 		            + context.getString(R.string.notification_open_event_list))
 		    .setSmallIcon(R.drawable.ic_launcher)
 		    .setTicker(
-		        Cache.getInstance().getFriendById(event.getCreatorId()).getName() + " "
+		        CachedOnlineSearchEngine.getInstance().findFriendById(event.getCreatorId()).getName() + " "
 		            + context.getString(R.string.notification_event_invitation) + event.getName())
 		    .setContentIntent(pEventIntent);
 		if (SettingsManager.getInstance().notificationsVibrate()) {

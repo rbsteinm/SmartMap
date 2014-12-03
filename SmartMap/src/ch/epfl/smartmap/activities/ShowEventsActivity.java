@@ -268,7 +268,7 @@ public class ShowEventsActivity extends ListActivity {
 
 		for (Event e : mEventsList) {
 			if (mMyEventsChecked) {
-				if (!Cache.getInstance().getFriendById(e.getCreatorId()).getName().equals(mMyName)) {
+				if (!Cache.getInstance().getFriend(e.getCreatorId()).getName().equals(mMyName)) {
 					mCurrentList.remove(e);
 				}
 			}

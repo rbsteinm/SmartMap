@@ -1,26 +1,40 @@
 package ch.epfl.smartmap.activities;
 
-import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
+import ch.epfl.smartmap.map.DefaultZoomManager;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
 
 /**
  * This activity shows an event in a complete screens.
  * 
  * @author SpicyCH
  */
-public class EventInformationActivity extends Activity {
+public class EventInformationActivity extends FragmentActivity {
 
 	private static final String TAG = EventInformationActivity.class.getSimpleName();
+
+	private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+	static final int PICK_LOCATION_REQUEST = 1;
+
+	private GoogleMap mGoogleMap;
+	private SupportMapFragment mFragmentMap;
 	private Event mEvent;
 	private TextView mEventTitle;
 	private TextView mEventCreator;
@@ -37,7 +51,7 @@ public class EventInformationActivity extends Activity {
 
 		if (this.getIntent().getParcelableExtra("event") != null) {
 			long eventId = this.getIntent().getParcelableExtra("EVENT");
-			mEvent = Cache.getInstance().getPublicEventById(eventId);
+			mEvent = Cache.getInstance().getPublicEvent(eventId);
 			Log.d(TAG, "City name: " + mEvent.getLocationString());
 			Log.d(TAG, "Country name: " + "UNIMPLEMENTED");
 		}
@@ -127,5 +141,38 @@ public class EventInformationActivity extends Activity {
 
 		mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
 		mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");
+
+		this.displayMap();
+	}
+
+	/**
+	 * Display the map with the current location
+	 */
+	public void displayMap() {
+		int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+		// Showing status
+		if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+			// not available
+			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+			dialog.show();
+		} else {
+			// Google Play Services are available.
+			// Getting reference to the SupportMapFragment of activity_main.xml
+			mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(
+			    R.id.show_event_map);
+			// Getting GoogleMap object from the fragment
+			mGoogleMap = mFragmentMap.getMap();
+			// Enabling MyLocation Layer of Google Map
+			mGoogleMap.setMyLocationEnabled(true);
+
+			mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+			mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+			Log.d("DEBUG_POSITION", "latitude : " + SettingsManager.getInstance().getLocation().getLatitude()
+			    + "\n longitude : " + SettingsManager.getInstance().getLocation().getLongitude());
+
+			new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEvent.getLatLng());
+
+		}
 	}
 }

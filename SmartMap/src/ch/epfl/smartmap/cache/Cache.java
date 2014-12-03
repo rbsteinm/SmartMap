@@ -144,7 +144,7 @@ public class Cache {
 	}
 
 	public User getFriend(long id) {
-		return mStrangerInstances.get(id);
+		return mFriendInstances.get(id);
 	}
 
 	public Set<User> getFriends(Set<Long> ids) {
@@ -373,7 +373,7 @@ public class Cache {
 		// TODO : Update Events
 	}
 
-	private boolean updatePublicEvent(ImmutableEvent event) {
+	public boolean updatePublicEvent(ImmutableEvent event) {
 		// Check in cache
 		Event cachedEvent = mPublicEventInstances.get(event.getID());
 
@@ -389,7 +389,7 @@ public class Cache {
 		}
 	}
 
-	boolean updateFriend(ImmutableUser user) {
+	public boolean updateFriend(ImmutableUser user) {
 		// Check in cache
 		User cachedFriend = mFriendInstances.get(user.getId());
 
