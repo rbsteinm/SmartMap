@@ -65,7 +65,6 @@ public class ShowEventsActivity extends ListActivity {
      */
     private List<Event> mCurrentList;
 
-    private static String mMyName;
     private Location mMyLocation;
 
     @Override
@@ -294,8 +293,7 @@ public class ShowEventsActivity extends ListActivity {
         SettingsManager.initialize(mContext);
         DatabaseHelper.initialize(mContext);
 
-        mMyName = SettingsManager.getInstance().getUserName();
-        Log.d(TAG, "mMyName: " + mMyName);
+        Log.d(TAG, "My id: " + SettingsManager.getInstance().getUserID());
 
         mMyLocation = SettingsManager.getInstance().getLocation();
         Log.d(TAG, "mMyLocation: " + mMyLocation.getLatitude() + "/" + mMyLocation.getLongitude());
@@ -356,7 +354,7 @@ public class ShowEventsActivity extends ListActivity {
 
         for (Event e : mEventsList) {
             if (mMyEventsChecked) {
-                if (!Cache.getInstance().getFriendById(e.getCreatorId()).getName().equals(mMyName)) {
+                if (!(e.getCreatorId() == SettingsManager.getInstance().getUserID())) {
                     mCurrentList.remove(e);
                 }
             }
