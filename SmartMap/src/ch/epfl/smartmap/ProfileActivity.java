@@ -10,8 +10,8 @@ import ch.epfl.smartmap.background.SettingsManager;
 
 /**
  * this Activity represents user's own profile
+ * 
  * @author rbsteinm
- *
  */
 public class ProfileActivity extends Activity {
 
@@ -33,7 +33,7 @@ public class ProfileActivity extends Activity {
     protected void onResume() {
         super.onResume();
         mNameView.setText(SettingsManager.getInstance().getUserName());
-        //TODO find a way to get user's own profile picture/subtitles, should be stored in the cache
+        // TODO find a way to get user's own profile picture/subtitles, should be stored in the cache
         mSubtitlesView.setText("mock subtitles");
     }
 

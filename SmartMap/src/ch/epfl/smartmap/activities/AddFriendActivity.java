@@ -48,7 +48,6 @@ public class AddFriendActivity extends ListActivity {
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
-
     @Override
     protected void onListItemClick(ListView listView, View view, int position, long id) {
         long userId = ((FriendViewHolder) view.getTag()).getUserId();
@@ -178,7 +177,7 @@ public class AddFriendActivity extends ListActivity {
         @Override
         protected void onPostExecute(String confirmString) {
             Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG)
-            .show();
+                .show();
         }
     }
 }

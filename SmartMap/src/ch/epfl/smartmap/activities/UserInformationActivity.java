@@ -67,7 +67,8 @@ public class UserInformationActivity extends Activity {
         super.onResume();
         // Get User & Database TODO set a listener on the user
         mUser = Cache.getInstance().getUserById(this.getIntent().getLongExtra("USER", User.NO_ID));
-        mDistanceToUser = Math.round(SettingsManager.getInstance().getLocation().distanceTo(mUser.getLocation()));
+        mDistanceToUser =
+            Math.round(SettingsManager.getInstance().getLocation().distanceTo(mUser.getLocation()));
 
         // Set Informations
         mNameView.setText(mUser.getName());
