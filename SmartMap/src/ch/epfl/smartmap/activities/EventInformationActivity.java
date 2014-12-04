@@ -194,7 +194,7 @@ public class EventInformationActivity extends Activity {
         mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));
 
         mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
-        mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ": "
+        mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ":\n"
                 + mEvent.getDescription());
 
         mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);

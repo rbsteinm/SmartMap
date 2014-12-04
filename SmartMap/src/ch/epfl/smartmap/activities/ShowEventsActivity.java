@@ -240,7 +240,12 @@ public class ShowEventsActivity extends ListActivity {
                             event.getEndDate(), "start")
                             + " - "
                             + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
-                            + "\nCreated by " + creatorName + "\n\n" + event.getDescription();
+                            + "\n"
+                            + mContext.getString(R.string.show_event_by)
+                            + " "
+                            + creatorName
+                            + "\n\n"
+                            + event.getDescription();
 
                     alertDialog.setTitle(event.getName()
                             + " @ "
