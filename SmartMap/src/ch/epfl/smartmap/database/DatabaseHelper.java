@@ -561,9 +561,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		FriendInvitation invitation = null;
 		if (cursor.moveToFirst()) {
 			do {
-				// invitation = new FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)),
-				// cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
-				// .getColumnIndex(KEY_NAME)), cursor.getInt(cursor.getColumnIndex(KEY_STATUS)));
+				invitation = new FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)),
+				    cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)), cursor.getString(cursor
+				        .getColumnIndex(KEY_NAME)), cursor.getInt(cursor.getColumnIndex(KEY_STATUS)), null);
 
 				invitations.add(invitation);
 			} while (cursor.moveToNext());

@@ -190,18 +190,30 @@ public class Notifications {
 	}
 
 	/**
-	 * Build the notification and notify it with notification manager.
+	 * Display notification in status bar using notification manager
 	 * 
-	 * @param activity
-	 *            current activity
+	 * @param context
+	 *            the current context
 	 * @param notification
-	 *            notification to notify
+	 *            th notification to display
 	 * @param notificationId
-	 *            id of current notification
+	 *            the notification id
 	 */
 	private static void displayNotification(Context context, Notification notification, long notificationId) {
 		NotificationManager notificationManager = (NotificationManager) context
 		    .getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify((int) notificationId, notification);
+	}
+
+	/**
+	 * Cancel (destroy) all notifications from the status bar
+	 * 
+	 * @param context
+	 *            the current context
+	 */
+	public static void cancelNotification(Context context) {
+		NotificationManager notificationManager = (NotificationManager) context
+		    .getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.cancelAll();
 	}
 }

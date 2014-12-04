@@ -59,9 +59,6 @@ public final class InvitationManager {
 	 * @param notifBag
 	 */
 	public void update(NotificationBag notifBag) {
-		notifBag.getInvitingUsers();
-		notifBag.getNewFriends();
-		notifBag.getRemovedFriendsIds();
 
 		// Delete previous lists
 		mPendingFriendIds.clear();

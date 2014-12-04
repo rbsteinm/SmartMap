@@ -401,7 +401,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 				break;
 			case R.id.action_notifications:
 				Utils.setBadgeCount(MainActivity.this, mIcon, 0);
-				Intent pNotifIntent = new Intent(this, NotificationsActivity.class);
+				Intent pNotifIntent = new Intent(this, InvitationPanelActivity.class);
 				this.startActivity(pNotifIntent);
 
 				return true;
