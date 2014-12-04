@@ -91,7 +91,7 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Triggered when a checkbox is clicked.
+     * Triggered when a checkbox is clicked. Updates the displayed list of events.
      * 
      * @param v
      *            the checkbox whose status changed
@@ -191,6 +191,9 @@ public class ShowEventsActivity extends ListActivity {
         // Need an AsyncTask because getEventById searches on our server if event not stored in cache.
         AsyncTask<Long, Void, Map<String, Object>> loadEvent = new AsyncTask<Long, Void, Map<String, Object>>() {
 
+            private final static String EVENT_KEY = "EVENT";
+            private final static String CREATOR_NAME_KEY = "CREATOR_NAME";
+
             @Override
             protected Map<String, Object> doInBackground(Long... params) {
 
@@ -201,10 +204,10 @@ public class ShowEventsActivity extends ListActivity {
                 Map<String, Object> output = new HashMap<String, Object>();
 
                 Event event = Cache.getInstance().getEventById(eventId);
-                output.put("event", event);
+                output.put(EVENT_KEY, event);
 
                 String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
-                output.put("creatorName", creatorName);
+                output.put(CREATOR_NAME_KEY, creatorName);
 
                 return output;
             }
@@ -214,8 +217,8 @@ public class ShowEventsActivity extends ListActivity {
 
                 Log.d(TAG, "Processing event...");
 
-                final Event event = (Event) result.get("event");
-                final String creatorName = (String) result.get("creatorName");
+                final Event event = (Event) result.get(EVENT_KEY);
+                final String creatorName = (String) result.get(CREATOR_NAME_KEY);
 
                 if ((event == null) || (creatorName == null)) {
                     Log.e(TAG, "The server returned a null event or creatorName");
@@ -224,6 +227,9 @@ public class ShowEventsActivity extends ListActivity {
                             .show();
 
                 } else {
+
+                    // Construct the dialog that display more detailed infos and offers to show event on the map or to
+                    // show more details.
 
                     AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
 
@@ -292,7 +298,7 @@ public class ShowEventsActivity extends ListActivity {
         Log.d(TAG, "mMyName: " + mMyName);
 
         mMyLocation = SettingsManager.getInstance().getLocation();
-        Log.d(TAG, "nMyLocation: " + mMyLocation.getLatitude() + "/" + mMyLocation.getLongitude());
+        Log.d(TAG, "mMyLocation: " + mMyLocation.getLatitude() + "/" + mMyLocation.getLongitude());
 
         mMyEventsChecked = false;
         mOngoingChecked = false;

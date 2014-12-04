@@ -95,6 +95,9 @@
     <string name="show_event_info_invite_friends_button">Invite friends</string>
     <string name="show_event_by">By</string>
     <string name="show_event_info_event_description">Description</string>
+    
+    <!-- Error Messages -->
+    <string name="error_client_side">An error occurred on our side, sorry :(</string>
 
     <!-- AddEventActivity -->
     <string name="add_event_title_text">Title</string>

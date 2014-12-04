@@ -20,7 +20,8 @@ import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 
 /**
- * This activity shows an event in a complete screens.
+ * This activity shows an event in a complete screens. It display in addition two buttons: one to invite friends, and
+ * one to see the event on the map.
  * 
  * @author SpicyCH
  */
@@ -37,6 +38,13 @@ public class EventInformationActivity extends Activity {
     private TextView mPlaceNameAndCountry;
     private Context mContext;
 
+    /**
+     * Used to get the event id the getExtra of the starting intent, and to pass the retrieved event from doInBackground
+     * to onPostExecute.
+     */
+    private final static String EVENT_KEY = "EVENT";
+    private final static String CREATOR_NAME_KEY = "CREATOR_NAME";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,9 +53,10 @@ public class EventInformationActivity extends Activity {
 
         mContext = this.getApplicationContext();
 
-        if (this.getIntent().getLongExtra("EVENT", -1) > 0) {
+        // This activity needs a (positive) event id to process. If none given, we finish it.
+        if (this.getIntent().getLongExtra(EVENT_KEY, -1) > 0) {
 
-            long eventId = this.getIntent().getLongExtra("EVENT", -1);
+            long eventId = this.getIntent().getLongExtra(EVENT_KEY, -1);
 
             Log.d(TAG, "Received event id " + eventId);
 
@@ -64,10 +73,10 @@ public class EventInformationActivity extends Activity {
                     Map<String, Object> output = new HashMap<String, Object>();
 
                     Event event = Cache.getInstance().getEventById(eventId);
-                    output.put("event", event);
+                    output.put(EVENT_KEY, event);
 
                     String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
-                    output.put("creatorName", creatorName);
+                    output.put(CREATOR_NAME_KEY, creatorName);
 
                     return output;
                 }
@@ -77,8 +86,8 @@ public class EventInformationActivity extends Activity {
 
                     Log.d(TAG, "Processing event...");
 
-                    final Event event = (Event) result.get("event");
-                    final String creatorName = (String) result.get("creatorName");
+                    final Event event = (Event) result.get(EVENT_KEY);
+                    final String creatorName = (String) result.get(CREATOR_NAME_KEY);
 
                     if ((event == null) || (creatorName == null)) {
                         Log.e(TAG, "The server returned a null event or creatorName");
@@ -98,6 +107,7 @@ public class EventInformationActivity extends Activity {
             loadEvent.execute(eventId);
         } else {
             Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
+            Toast.makeText(mContext, mContext.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
             this.finish();
         }
 
@@ -148,6 +158,14 @@ public class EventInformationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Triggered when the button 'Shop on the map' is pressed. Opens the map at the location of the event.
+     * 
+     * @param v
+     *            the button who has been clicked
+     * 
+     * @author SpicyCH
+     */
     public void openMapAtEventLocation(View v) {
         Intent showEventIntent = new Intent(this, MainActivity.class);
         showEventIntent.putExtra("location", mEvent.getLocation());

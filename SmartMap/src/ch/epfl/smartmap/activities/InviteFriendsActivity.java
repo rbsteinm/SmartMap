@@ -21,7 +21,7 @@ import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 
 /**
  * This activity lets the user invite friends to an event. Launched from
- * {@link ch.epfl.smartmap.activities.EventInformationActivity}
+ * {@link ch.epfl.smartmap.activities.EventInformationActivity} or the search panel.
  * 
  * @author SpicyCH
  */
@@ -41,7 +41,7 @@ public class InviteFriendsActivity extends ListActivity {
         DatabaseHelper.initialize(this.getApplicationContext());
         SettingsManager.initialize(this.getApplicationContext());
 
-        // Makes the logo clickable (clicking it returns to previous activity)
+        // Makes the logo clickable
         this.getActionBar().setHomeButtonEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
@@ -55,10 +55,12 @@ public class InviteFriendsActivity extends ListActivity {
 
         if (!mSelectedPositions.get(position)) {
             Log.d(TAG, "Friend at position " + position + " set to true");
+
             mSelectedPositions.set(position, true);
             v.setBackgroundColor(Color.parseColor("#dcdcdc"));
         } else {
             Log.d(TAG, "Friend at position " + position + " set to false");
+
             mSelectedPositions.set(position, false);
             v.setBackgroundColor(Color.TRANSPARENT);
         }
@@ -140,14 +142,14 @@ public class InviteFriendsActivity extends ListActivity {
     private void setAdapter() {
         mUserList = Cache.getInstance().getAllFriends();
 
-        // Create a new list of booleans with the size of the user list and and default value false
+        // Create a new list of booleans with the size of the user list and default value false.
         mSelectedPositions = new ArrayList<Boolean>();
-        for (@SuppressWarnings("unused")
-        User u : mUserList) {
+
+        for (int i = 0; i < mUserList.size(); i++) {
             mSelectedPositions.add(false);
         }
 
-        // Create custom Adapter and pass it to the Activity
+        // Create custom Adapter and pass it to the Activity.
         mAdapter = new FriendPickerListAdapter(this, mUserList);
         this.setListAdapter(mAdapter);
     }
