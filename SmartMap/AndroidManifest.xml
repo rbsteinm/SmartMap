@@ -142,7 +142,7 @@
                 android:value="ch.epfl.smartmap.activities.ShowEventsActivity" />
         </activity>
         <activity
-            android:name=".ProfileActivity"
+            android:name="ch.epfl.smartmap.activities.ProfileActivity"
             android:label="@string/title_activity_profile" >
         </activity>
     </application>
