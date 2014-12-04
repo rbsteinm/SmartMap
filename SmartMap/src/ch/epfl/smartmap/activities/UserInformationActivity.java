@@ -63,7 +63,7 @@ public class UserInformationActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		// Get User & Database
-		mUser = Cache.getInstance().getUserById(this.getIntent().getLongExtra("USER", User.NO_ID));
+		mUser = Cache.getInstance().getUser(this.getIntent().getLongExtra("USER", User.NO_ID));
 
 		// Set Informations
 		mNameView.setText(mUser.getName());

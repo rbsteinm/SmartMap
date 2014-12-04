@@ -126,7 +126,7 @@ public class EventInformationActivity extends FragmentActivity {
 
 		mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
 		mEventCreator.setText(this.getString(R.string.show_event_by) + " "
-		    + Cache.getInstance().getUserById(mEvent.getCreatorId()).getName());
+		    + Cache.getInstance().getFriend(mEvent.getCreatorId()).getName());
 
 		mStart = (TextView) this.findViewById(R.id.show_event_info_start);
 		mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(),

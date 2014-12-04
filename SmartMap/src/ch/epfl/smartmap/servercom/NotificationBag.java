@@ -24,6 +24,13 @@ public interface NotificationBag {
 	Set<Long> getInvitingUsers();
 
 	/**
+	 * Get a list of the event that sent an invitation request.
+	 * 
+	 * @return a list of the inviting event.
+	 */
+	Set<Long> getInvitingEvent();
+
+	/**
 	 * Get a list of the friends that accepted the user's friend requests.
 	 * 
 	 * @return a list of the new friends.

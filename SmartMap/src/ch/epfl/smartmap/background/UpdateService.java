@@ -29,14 +29,13 @@ import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
-import ch.epfl.smartmap.cache.Notifications;
+import ch.epfl.smartmap.cache.InvitationManager;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
 import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
 import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
-import ch.epfl.smartmap.servercom.NetworkNotificationBag;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -320,107 +319,15 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 	 */
 	private class AsyncGetInvitations extends AsyncTask<Void, Void, NotificationBag> {
 		@Override
-		protected NotificationBag doInBackground(Void... arg0) {
-			NotificationBag nb = null;
+		protected Void doInBackground(Void... arg0) {
+
 			try {
-				nb = mClient.getInvitations();
+				InvitationManager.getInstance().update(mClient.getInvitations());
 			} catch (SmartMapClientException e) {
 				Log.e("UpdateService",
 				    "Couldn't retrieve invitations due to a server error: " + e.getMessage());
-				// We set an empty notification bag as we couldn't retrieve data
-				// from the server.
-				nb = new NetworkNotificationBag(new ArrayList<Long>(), new ArrayList<Long>(),
-				    new ArrayList<Long>());
 				// try to re-log
 				new AsyncLogin().execute();
-			}
-			return nb;
-		}
-
-		@Override
-		protected void onPostExecute(NotificationBag result) {
-			if (result != null) {
-				List<Long> newFriends = result.getNewFriends();
-				List<Long> removedFriends = result.getRemovedFriendsIds();
-
-				for (long userId : newFriends) {
-
-					new AsyncTask<Long, Void, Void>() {
-						@Override
-						protected Void doInBackground(Long... params) {
-							User newFriend = CachedOnlineSearchEngine.getInstance().findFriendById(params[0]);
-							Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
-							return null;
-						}
-					}.execute(userId);
-				}
-
-				for (long userId : result.getInvitingUsers()) {
-
-					new AsyncTask<Long, Void, Void>() {
-
-						@Override
-						protected Void doInBackground(Long... params) {
-							User user = CachedOnlineSearchEngine.getInstance().findStrangerById(params[0]);
-
-							if (!mInviterIds.contains(user.getId())) {
-								mHelper.addFriendInvitation(new FriendInvitation(0, user.getId(), user
-								    .getName(), Invitation.UNREAD));
-								mInviterIds.add(user.getId());
-								new AsyncGetPictures().execute(user.getId());
-								if (mNotificationsEnabled && mNotificationsForFriendRequests) {
-									Notifications.newFriendNotification(Utils.sContext, user);
-								}
-							}
-							return null;
-						}
-					}.execute(userId);
-				}
-
-				for (Long id : result.getRemovedFriendsIds()) {
-					mHelper.deleteUser(id);
-				}
-
-				if (!newFriends.isEmpty()) {
-					new AsyncInvitationAck().execute(newFriends.toArray(new Long[newFriends.size()]));
-				}
-
-				if (!removedFriends.isEmpty()) {
-					new AsyncRemovalAck().execute(removedFriends.toArray(new Long[removedFriends.size()]));
-				}
-			}
-		}
-	}
-
-	/**
-	 * AsyncTask to download a user's picture
-	 * 
-	 * @author ritterni
-	 */
-	private class AsyncGetPictures extends AsyncTask<Long, Void, Void> {
-		@Override
-		protected Void doInBackground(Long... ids) {
-			for (long id : ids) {
-				UpdateService.this.downloadUserPicture(id);
-			}
-			return null;
-		}
-	}
-
-	/**
-	 * AsyncTask to ack accepted invitations
-	 * 
-	 * @author ritterni
-	 */
-	private class AsyncInvitationAck extends AsyncTask<Long, Void, Void> {
-		@Override
-		protected Void doInBackground(Long... users) {
-			try {
-				for (long user : users) {
-					mClient.ackAcceptedInvitation(user);
-				}
-			} catch (SmartMapClientException e) {
-				Log.e("UpdateService", "Couldn't send acks!");
 			}
 			return null;
 		}
@@ -455,25 +362,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 				mClient.updatePos(mManager.getLocation());
 			} catch (SmartMapClientException e) {
 				Log.e("UpdateService", "Position update failed!");
-			}
-			return null;
-		}
-	}
-
-	/**
-	 * AsyncTask to ack friend removals
-	 * 
-	 * @author ritterni
-	 */
-	private class AsyncRemovalAck extends AsyncTask<Long, Void, Void> {
-		@Override
-		protected Void doInBackground(Long... ids) {
-			try {
-				for (long id : ids) {
-					mClient.ackRemovedFriend(id);
-				}
-			} catch (SmartMapClientException e) {
-				Log.e("UpdateService", "Couldn't send acks!");
 			}
 			return null;
 		}
