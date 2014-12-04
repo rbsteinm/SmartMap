@@ -87,6 +87,8 @@
     <string name="show_event_on_the_map_loading">Opening event on the map...</string>
     <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
     <string name="show_event_details_button">See details</string>
+    <string name="show_event_server_error">Couldn\'t fetch wished content from our server, sorry :(</string>
+    <string name="show_event_loading_info">Loading informations...</string>
 
     <!-- ShowEventInformationActivity -->
     <string name="title_activity_show_event_information">Show event</string>

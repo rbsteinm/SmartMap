@@ -133,6 +133,15 @@
             android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
         <activity
+            android:name=".activities.InviteFriendsActivity"
+            android:label="@string/title_activity_show_event_information"
+            android:parentActivityName=".activities.EventInformationActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.smartmap.activities.EventInformationActivity" />
+        </activity>
+        <activity
             android:name=".activities.EventInformationActivity"
             android:label="@string/title_activity_show_event_information"
             android:parentActivityName=".activities.ShowEventsActivity"
