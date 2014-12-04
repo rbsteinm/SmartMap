@@ -27,6 +27,8 @@ public class ModifyFilterActivity extends Activity {
     private List<User> mFriendsInside;
     private List<User> mFriendsOutside;
 
+    private final MockDB mockDB = new MockDB();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,11 +54,11 @@ public class ModifyFilterActivity extends Activity {
         // TODO set the inside and outside list using the intent and the cache
         // For the moment,mock stuff
         mFriendsInside =
-            new ArrayList<User>(Arrays.asList(MockDB.JULIEN, MockDB.ALAIN, MockDB.ROBIN, MockDB.MATTHIEU,
-                MockDB.NICOLAS, MockDB.MARION, MockDB.RAPHAEL, MockDB.HUGO));
+            new ArrayList<User>(Arrays.asList(mockDB.JULIEN, mockDB.ALAIN, mockDB.ROBIN, mockDB.MATTHIEU,
+                mockDB.NICOLAS, mockDB.MARION, mockDB.RAPHAEL, mockDB.HUGO));
         mFriendsOutside =
-            new ArrayList<User>(Arrays.asList(MockDB.GUILLAUME, MockDB.SELINE, MockDB.CYRIL, MockDB.PIETRO,
-                MockDB.CHRISTIE, MockDB.MARIE));
+            new ArrayList<User>(Arrays.asList(mockDB.GUILLAUME, mockDB.SELINE, mockDB.CYRIL, mockDB.PIETRO,
+                mockDB.CHRISTIE, mockDB.MARIE));
 
         FriendListItemAdapter insideAdapter =
             new FriendListItemAdapter(this.getBaseContext(), mFriendsInside);

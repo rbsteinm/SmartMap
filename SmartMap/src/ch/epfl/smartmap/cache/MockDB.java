@@ -75,6 +75,14 @@ public class MockDB {
 
     }
 
+    public static User getUserById(long id) {
+        if (id == 1) {
+            return MARIE;
+        } else {
+            return ALAIN;
+        }
+    }
+
     // public static final ArrayList<Displayable> EVENTS_LIST = new ArrayList<Displayable>(Arrays.asList(
     // FOOTBALL_TOURNAMENT, CONFERENCE, MARION_BIRTHDAY));
     //
