@@ -64,6 +64,8 @@ public class AddFriendActivity extends ListActivity {
         this.getMenuInflater().inflate(R.menu.add_friend, menu);
         mSearchBar = (SearchView) menu.findItem(R.id.add_friend_activity_searchBar).getActionView();
         this.setSearchBarListener();
+        MenuItem searchMenuItem = menu.findItem(R.id.add_friend_activity_searchBar);
+        searchMenuItem.expandActionView();
         return true;
     }
 

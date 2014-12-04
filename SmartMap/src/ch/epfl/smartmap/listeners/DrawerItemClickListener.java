@@ -6,6 +6,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import ch.epfl.smartmap.activities.AboutActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
+import ch.epfl.smartmap.activities.ProfileActivity;
 import ch.epfl.smartmap.activities.SettingsActivity;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.background.LogoutManager;
@@ -32,12 +33,10 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         switch (position) {
             case INDEX_PROFILE:
+                view.getContext().startActivity(new Intent(view.getContext(), ProfileActivity.class));
                 break;
             case INDEX_FRIENDS:
-
-                Intent displayActivityIntent = new Intent(view.getContext(), FriendsPagerActivity.class);
-                view.getContext().startActivity(displayActivityIntent);
-
+                view.getContext().startActivity(new Intent(view.getContext(), FriendsPagerActivity.class));
                 break;
             case INDEX_EVENTS:
                 view.getContext().startActivity(new Intent(view.getContext(), ShowEventsActivity.class));

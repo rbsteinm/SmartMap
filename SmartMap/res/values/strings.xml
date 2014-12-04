@@ -170,7 +170,8 @@
     <!-- FriendInformationActivity -->
     <string name="remove_friend_button_text">Remove</string>
     <string name="block_button_text">Block</string>
-    <string name="follow_switch">Follow</string>
+    <string name="follow_switch">Show on map</string>
+    <string name="block_switch">Block</string>
 
     <!-- Settings -->
     <string name="settings_key_notifications_enabled">notifications_enabled</string>
@@ -200,5 +201,7 @@
     <string name="title_activity_about">AboutActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
