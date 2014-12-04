@@ -275,6 +275,7 @@ public class ShowEventsActivity extends ListActivity {
 
         };
 
+        Log.d(TAG, "Executing loadEvent task with event id " + eventViewHolder.getEventId());
         loadEvent.execute(eventViewHolder.getEventId());
 
     }
