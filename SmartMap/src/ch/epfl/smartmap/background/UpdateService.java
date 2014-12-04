@@ -48,14 +48,14 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 
 public class UpdateService extends Service implements OnInvitationListUpdateListener,
-    OnInvitationStatusUpdateListener {
+OnInvitationStatusUpdateListener {
 
     private static final int HANDLER_DELAY = 1000;
     private static final int POS_UPDATE_DELAY = 10000;
     private static final int INVITE_UPDATE_DELAY = 30000;
 
     private static final float MIN_DISTANCE = 0; // minimum distance to update
-                                                 // position
+    // position
 
     private static final int RESTART_DELAY = 2000;
     public static final int IMAGE_QUALITY = 100;
