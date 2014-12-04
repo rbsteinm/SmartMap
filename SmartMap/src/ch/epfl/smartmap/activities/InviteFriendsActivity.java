@@ -103,15 +103,19 @@ public class InviteFriendsActivity extends ListActivity {
      * @author SpicyCH
      */
     private void inviteFriends() {
-        // Get the friend ids to invite
+
+        // Get selected positions
         List<Integer> posSelected = new ArrayList<Integer>();
-        // TODO use iterator?
-        for (int i = 0; i < mSelectedPositions.size(); i++) {
-            if (mSelectedPositions.get(i)) {
-                posSelected.add(i);
+
+        int pos = 0;
+        for (Boolean b : mSelectedPositions) {
+            if (b) {
+                posSelected.add(pos);
             }
+            pos++;
         }
 
+        // Get corresponding friend ids
         List<Long> friendsIds = new ArrayList<Long>();
         for (Integer i : posSelected) {
             friendsIds.add(mUserList.get(i).getId());
@@ -120,13 +124,14 @@ public class InviteFriendsActivity extends ListActivity {
         Log.d(TAG, "Friends ids to invite: " + friendsIds);
 
         if (friendsIds.size() > 0) {
+            // Invite friends if at least one selected
             Toast.makeText(this, this.getString(R.string.invite_friends_success), Toast.LENGTH_LONG).show();
             // TODO invite friends
+            // TODO send invites via InvitationManager
         } else {
-            Toast
-                .makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG)
-                .show();
+            Toast.makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG).show();
         }
+
     }
 
     /**
