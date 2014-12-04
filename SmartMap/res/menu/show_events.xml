@@ -7,5 +7,9 @@
         android:id="@+id/showEventsMenuNewEvent"
         android:title="@string/showEventsMenuNewEvent">
     </item>
+    <item
+        android:id="@+id/show_events_menu_refresh"
+        android:title="@string/show_events_menu_refresh">
+    </item>
 
 </menu>

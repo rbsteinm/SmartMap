@@ -29,6 +29,7 @@ import ch.epfl.smartmap.util.SystemUiHider;
  * and it uses the version name and version code defined in the android manifest.
  * 
  * @see SystemUiHider
+ * @author SpicyCH
  */
 public class AboutActivity extends Activity {
     /**

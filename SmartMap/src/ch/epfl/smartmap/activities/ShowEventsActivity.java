@@ -156,6 +156,10 @@ public class ShowEventsActivity extends ListActivity {
             case R.id.showEventsMenuNewEvent:
                 Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
                 this.startActivity(showEventIntent);
+                break;
+            case R.id.show_events_menu_refresh:
+                this.updateCurrentList();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
