@@ -1,26 +1,77 @@
 package ch.epfl.smartmap.activities;
 
-import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.R.id;
-import ch.epfl.smartmap.R.layout;
-import ch.epfl.smartmap.R.menu;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.MockDB;
+import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.gui.FriendListItemAdapter;
 
+/**
+ * @author marion-S
+ */
 public class ModifyFilterActivity extends Activity {
+
+    private LinearLayout mInsideFilterLayout;
+    private LinearLayout mOutsideFilterLayout;
+    private ListView mListInside;
+    private ListView mListOutside;
+    private List<User> mFriendsInside;
+    private List<User> mFriendsOutside;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_change_filter);
+        this.setContentView(R.layout.activity_modify_filter);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        mInsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_inside_layout);
+        mOutsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_outside_layout);
+        mListInside = (ListView) this.findViewById(R.id.activity_modify_filter_inside_list);
+        mListOutside = (ListView) this.findViewById(R.id.activity_modify_filter_outside_list);
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        // TODO set the inside and outside list using the intent and the cache
+        // For the moment,mock stuff
+        mFriendsInside =
+            new ArrayList<User>(Arrays.asList(MockDB.JULIEN, MockDB.ALAIN, MockDB.ROBIN, MockDB.MATTHIEU,
+                MockDB.NICOLAS, MockDB.MARION, MockDB.RAPHAEL, MockDB.HUGO));
+        mFriendsOutside =
+            new ArrayList<User>(Arrays.asList(MockDB.GUILLAUME, MockDB.SELINE, MockDB.CYRIL, MockDB.PIETRO,
+                MockDB.CHRISTIE, MockDB.MARIE));
+
+        FriendListItemAdapter insideAdapter =
+            new FriendListItemAdapter(this.getBaseContext(), mFriendsInside);
+        mListInside.setAdapter(insideAdapter);
+
+        FriendListItemAdapter outsideAdapter =
+            new FriendListItemAdapter(this.getBaseContext(), mFriendsOutside);
+        mListOutside.setAdapter(outsideAdapter);
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.change_filter, menu);
+        this.getMenuInflater().inflate(R.menu.modify_filter, menu);
         return true;
     }
 
@@ -35,4 +86,5 @@ public class ModifyFilterActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

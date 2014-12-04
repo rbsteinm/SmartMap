@@ -162,12 +162,12 @@
         </activity>
         <activity
             android:name="ch.epfl.smartmap.activities.ModifyFilterActivity"
-            android:label="@string/title_activity_change_filter" 
+            android:label="@string/title_activity_modify_filter" 
             android:parentActivityName=".activities.MainActivity"
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.epfl.smartmap.activities.MainActivity" />
+                android:value="ch.epfl.smartmap.activities.ShowFiltersActivity" />
         </activity>
     </application>
 

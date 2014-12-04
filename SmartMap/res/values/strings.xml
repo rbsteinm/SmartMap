@@ -169,7 +169,12 @@
     <!-- ShowFiltersActivity -->
     <string name="title_activity_show_filters">Filters</string>
     <string name="show_on_map">Show on map</string>
-
+    
+    <!-- ModifyFilterActivity -->
+    <string name="title_activity_modify_filter">ChangeFilterActivity</string>
+    <string name="activity_modify_filter_inside_title">Inside filter</string>
+    <string name="activity_modify_filter_outside_title">Outside filter</string>
+    
     <!-- Settings -->
     <string name="settings_key_notifications_enabled">notifications_enabled</string>
     <string name="settings_key_notifications_friend_requests">notifications_friend_requests</string>
@@ -189,6 +194,6 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_change_filter">ChangeFilterActivity</string>
+    
 
 </resources>
