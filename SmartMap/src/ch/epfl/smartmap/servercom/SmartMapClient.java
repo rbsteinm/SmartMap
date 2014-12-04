@@ -52,25 +52,6 @@ public interface SmartMapClient {
     void ackRemovedFriend(long id) throws SmartMapClientException;
 
     /**
-     * Asks the server to allow the friend with id id to see the position
-     * 
-     * @param id
-     *            : the id of the friend to allow
-     * @throws SmartMapClientException
-     */
-    void allowFriend(long id) throws SmartMapClientException;
-
-    /**
-     * Asks the server to allow the friends with ids in the list ids to see the
-     * position
-     * 
-     * @param ids
-     *            : the ids of the friends to allow
-     * @throws SmartMapClientException
-     */
-    void allowFriendList(List<Long> ids) throws SmartMapClientException;
-
-    /**
      * Send to the server the user's name, id and token
      * 
      * @param name
@@ -81,6 +62,14 @@ public interface SmartMapClient {
      * @throws SmartMapClientException
      */
     void authServer(String name, long facebookId, String fbAccessToken) throws SmartMapClientException;
+
+    /**
+     * Asks the server to block the friend with the given id. It means that this friend will no longer receive
+     * our position, and we will no longer receive his position too
+     * 
+     * @param id
+     */
+    void blockFriend(long id) throws SmartMapClientException;
 
     /**
      * Creates an event to be sent to the server
@@ -101,25 +90,6 @@ public interface SmartMapClient {
     void declineInvitation(long id) throws SmartMapClientException;
 
     /**
-     * Asks the server to disallow the friend with id id to see the position
-     * 
-     * @param id
-     *            : the id of the friend to disallow
-     * @throws SmartMapClientException
-     */
-    void disallowFriend(long id) throws SmartMapClientException;
-
-    /**
-     * Asks the server to disallow the friends with ids in the list ids to see
-     * the position
-     * 
-     * @param ids
-     *            : the ids of the friends to disallow
-     * @throws SmartMapClientException
-     */
-    void disallowFriendList(List<Long> ids) throws SmartMapClientException;
-
-    /**
      * Asks the server for the friends whose name begin with the given text
      * 
      * @param text
@@ -127,15 +97,6 @@ public interface SmartMapClient {
      * @throws SmartMapClientException
      */
     List<ImmutableUser> findUsers(String text) throws SmartMapClientException;
-
-    /**
-     * Asks the server to follow the friend with id id
-     * 
-     * @param id
-     *            : the id of the friend to follow
-     * @throws SmartMapClientException
-     */
-    void followFriend(long id) throws SmartMapClientException;
 
     /**
      * @param eventId
@@ -236,13 +197,11 @@ public interface SmartMapClient {
     void removeFriend(long id) throws SmartMapClientException;
 
     /**
-     * Asks the server to unfollow the friend with id id
+     * Asks the server to unblock the friend with the given id, so we can see its position and he can see ours
      * 
      * @param id
-     *            : the id of the friend to unfollow
-     * @throws SmartMapClientException
      */
-    void unfollowFriend(long id) throws SmartMapClientException;
+    void unblockFriend(long id) throws SmartMapClientException;
 
     /**
      * Updates the given event in the server database
