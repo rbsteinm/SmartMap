@@ -12,7 +12,6 @@ import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.servercom.NetworkRequestCallback;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -78,7 +77,7 @@ public class Cache {
             protected Void doInBackground(Void... params) {
                 try {
                     long eventId;
-                    eventId = NetworkSmartMapClient.getInstance().createPublicEvent(createdEvent);
+                    eventId = ServiceContainer.getNetworkClient().createPublicEvent(createdEvent);
                     // Add ID to event
                     createdEvent.setId(eventId);
                     // Puts event in Cache
