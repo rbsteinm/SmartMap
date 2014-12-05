@@ -87,10 +87,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                     @Override
                     protected Void doInBackground(Void... args0) {
                         try {
-                            List<ImmutableUser> friendsWithNewLocations = mClient.listFriendsPos();
-                            mCache.updateFriendList(friendsWithNewLocations);
+                            mCache.updatePositions(ServiceContainer.getNetworkClient());
                         } catch (SmartMapClientException e) {
-                            e.printStackTrace();
+                            Log.e(TAG, "Error while retrieving friends positions: " + e.getMessage());
                         }
                         return null;
                     }
@@ -103,12 +102,13 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final Runnable ownPosUpdate = new Runnable() {
         @Override
         public void run() {
-            if (!mManager.isOffline()) {
+            if (!ServiceContainer.getSettingsManager().isOffline()) {
                 new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... arg0) {
                         try {
-                            mClient.updatePos(mManager.getLocation());
+                            ServiceContainer.getNetworkClient().updatePos(ServiceContainer.getSettingsManager()
+                                .getLocation());
                         } catch (SmartMapClientException e) {
                             Log.e("UpdateService", "Position update failed!");
                         }

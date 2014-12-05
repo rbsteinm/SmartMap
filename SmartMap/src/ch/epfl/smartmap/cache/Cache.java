@@ -463,6 +463,7 @@ public class Cache {
             protected Void doInBackground(ImmutableEvent... params) {
                 try {
                     ServiceContainer.getNetworkClient().updateEvent(params[0]);
+                    Cache.this.updateEvent(params[0]);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     callback.onFailure();
@@ -488,4 +489,19 @@ public class Cache {
             return false;
         }
     }
+
+    public void updatePositions(Set<ImmutableUser> friends) {
+        for (ImmutableUser friend : friends) {
+            this.updateFriend(friend);
+        }
+
+        for (CacheListener listener : mListeners) {
+            listener.onFriendListUpdate();
+        }
+    }
+
+    public void addEventInvitations(List<Long> events) {
+
+    }
+
 }
