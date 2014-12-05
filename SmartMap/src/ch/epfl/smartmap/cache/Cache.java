@@ -2,12 +2,12 @@ package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import android.os.AsyncTask;
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
@@ -17,9 +17,11 @@ import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
- * The Cache contains all instances of network objects that are used by the GUI. Therefore, every request to
+ * The Cache contains all instances of network objects that are used by the GUI.
+ * Therefore, every request to
  * find an
- * user or an event should go through it. It will automatically fill itself with the database on creation, and
+ * user or an event should go through it. It will automatically fill itself with
+ * the database on creation, and
  * then
  * updates the database as changes are made.
  * 
@@ -31,10 +33,6 @@ public class Cache {
 
     // Unique instance
     private static final Cache ONE_INSTANCE = new Cache();
-
-    // Other members of the data hierarchy
-    private final DatabaseHelper mDatabaseHelper;
-    private final NetworkSmartMapClient mNetworkClient;
 
     // Sets containing ids of all Friends and stored public events
     private final Set<Long> mFriendIds;
@@ -49,11 +47,7 @@ public class Cache {
     // Listeners
     private final List<CacheListener> mListeners;
 
-    private Cache() {
-        // Init data hierarchy
-        mDatabaseHelper = DatabaseHelper.getInstance();
-        mNetworkClient = NetworkSmartMapClient.getInstance();
-
+    public Cache() {
         // Init lists
         mFriendIds = new HashSet<Long>();
         mEventIds = new HashSet<Long>();
@@ -63,12 +57,19 @@ public class Cache {
         mUserInstances = new LongSparseArray<User>();
         mFilterInstances = new LongSparseArray<Filter>();
 
-        mListeners = new LinkedList<CacheListener>();
+        mListeners = new ArrayList<CacheListener>();
     }
 
-    // Removes all instances that are not used anymore
-    public void cleanInstances() {
+    /**
+     * @param listener
+     *            Listener to be added
+     */
+    public void addOnCacheListener(CacheListener listener) {
+        mListeners.add(listener);
+    }
 
+    public void cleanInstances() {
+        // Removes all instances that are not used anymore
     }
 
     public void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
@@ -95,6 +96,7 @@ public class Cache {
         List<Event> result = new ArrayList<Event>();
         for (long id : mEventIds) {
             Event event = mEventInstances.get(id);
+
             if (event != null) {
                 result.add(event);
             } else {
@@ -112,6 +114,7 @@ public class Cache {
         List<User> allFriends = new ArrayList<User>();
         for (Long id : mFriendIds) {
             User friend = mUserInstances.get(id);
+
             if (friend != null) {
                 allFriends.add(friend);
             } else {
@@ -129,6 +132,7 @@ public class Cache {
         long myId = SettingsManager.getInstance().getUserID();
         for (Long id : mEventIds) {
             Event event = mEventInstances.get(id);
+
             if ((event != null) && event.getParticipants().contains(myId)) {
                 allGoingEvents.add(event);
             } else {
@@ -228,7 +232,7 @@ public class Cache {
         return users;
     }
 
-    public void initFromDatabase(DatabaseHelper database) {
+    public void initFromDatabase() {
         // Clear previous values
         mEventInstances.clear();
         mUserInstances.clear();
@@ -237,6 +241,9 @@ public class Cache {
         // Clear lists
         mFriendIds.clear();
         mEventIds.clear();
+
+        // Get the database
+        DatabaseHelper database = ServiceContainer.getDatabase();
 
         // Initialize id Lists
         mFriendIds.addAll(database.getFriendIds());
@@ -410,12 +417,6 @@ public class Cache {
         }
     }
 
-    public void updateFriends(Set<ImmutableEvent> events) {
-        for (ImmutableEvent event : events) {
-            this.updateEvent(event);
-        }
-    }
-
     public void updateFromNetwork(SmartMapClient networkClient) throws SmartMapClientException {
         // TODO : Empty useless instances from Cache
 
@@ -469,9 +470,5 @@ public class Cache {
             cachedEvent.update(event);
             return false;
         }
-    }
-
-    public static Cache getInstance() {
-        return ONE_INSTANCE;
     }
 }

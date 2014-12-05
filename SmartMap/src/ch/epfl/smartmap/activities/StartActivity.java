@@ -18,13 +18,20 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.cache.InvitationManager;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 
 import com.facebook.Session;
 
 /**
- * This Activity displays the introduction to the app and the authentication if you are not already logged in,
+ * This Activity displays the introduction to the app and the authentication if
+ * you are not already logged in,
  * in the other case it just loads mainActivity
  * 
  * @author agpmilli
@@ -107,11 +114,21 @@ public class StartActivity extends FragmentActivity {
             mLogoImage.setVisibility(View.INVISIBLE);
 
             mFacebookFragment = new LoginFragment();
-            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment)
-                .commit();
+            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment).commit();
         }
 
         SettingsManager.initialize(this.getApplicationContext());
+
+        // Beware of the order in which services are created, Cache and
+        // InvitationManager depend on NetworkClient and DatabaseHelper in their
+        // constructors!
+        // TODO: This should be modified to allow complete switching or
+        // services, or be made explicit in their constructors.
+        ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
+        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplicationContext()));
+        ServiceContainer.setCache(new Cache());
+        ServiceContainer.setInvitationManager(new InvitationManager());
+        ServiceContainer.setSearchEngine(new CachedOnlineSearchEngine());
     }
 
     /**

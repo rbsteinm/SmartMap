@@ -41,7 +41,7 @@ public final class InvitationManager {
     // Listeners
     private final List<InvitationListener> mListeners;
 
-    private InvitationManager() {
+    public InvitationManager() {
         // Init data hierarchy
         mDatabaseHelper = DatabaseHelper.getInstance();
         mNetworkClient = NetworkSmartMapClient.getInstance();
@@ -237,6 +237,7 @@ public final class InvitationManager {
                         Cache.getInstance().addFriendInvitation(
                             new FriendInvitation(0, user.getId(), user.getName(), Invitation.UNREAD, user
                                 .getImage()));
+
                         mInvitedUserIds.add(user.getId());
                         if (SettingsManager.getInstance().notificationsEnabled()
                             && SettingsManager.getInstance().notificationsForFriendRequests()) {
@@ -304,6 +305,7 @@ public final class InvitationManager {
             public Void doInBackground(Void... params) {
                 // This method adds the event in the cache
                 CachedSearchEngine.getInstance().findPublicEventById(id);
+
                 return null;
             }
         }).execute();

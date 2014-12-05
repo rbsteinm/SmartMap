@@ -36,8 +36,6 @@ import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
 import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
 import ch.epfl.smartmap.search.CachedSearchEngine;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
@@ -48,9 +46,10 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 public class UpdateService extends Service implements OnInvitationListUpdateListener,
     OnInvitationStatusUpdateListener {
-
     private static final int HANDLER_DELAY = 1000;
+
     private static final int POS_UPDATE_DELAY = 10000;
+
     private static final int INVITE_UPDATE_DELAY = 30000;
 
     private static final float MIN_DISTANCE = 0; // minimum distance to update
@@ -58,26 +57,26 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
     private static final int RESTART_DELAY = 2000;
     public static final int IMAGE_QUALITY = 100;
-
     private final Handler mHandler = new Handler();
+
     private LocationManager mLocManager;
+
     private boolean mFriendsPosEnabled = true;
-    private final boolean mOwnPosEnabled = true;
+    private boolean mOwnPosEnabled = true;
+
     private final boolean isFriendIDListRetrieved = true;
     private final boolean isDatabaseInitialized = false;
     private DatabaseHelper mHelper;
     private SettingsManager mManager;
     private Geocoder mGeocoder;
-    private final NetworkSmartMapClient mClient = NetworkSmartMapClient.getInstance();
     private Set<Long> mInviterIds = new HashSet<Long>();
-
     // Settings
     private int mPosUpdateDelay;
     private boolean mNotificationsEnabled;
     private boolean mNotificationsForEventInvitations;
     private boolean mNotificationsForFriendRequests;
-    private boolean mNotificationsForFriendshipConfirmations;
 
+    private boolean mNotificationsForFriendshipConfirmations;
     private final Runnable friendsPosUpdate = new Runnable() {
         @Override
         public void run() {
@@ -133,7 +132,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
     public void downloadUserPicture(long id) {
         try {
-            mHelper.setUserPicture(mClient.getProfilePicture(id), id);
+            mHelper.setUserPicture(ServiceContainer.getNetworkClient().getProfilePicture(id), id);
         } catch (SmartMapClientException e) {
             Log.e("UpdateService", "Couldn't download picture #" + id + "!");
         }
@@ -207,7 +206,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                             mHelper.getPictureById(user.getId()));
                     immutables.add(immutable);
                 }
-                Cache.getInstance().updateFriendList(immutables);
+                ServiceContainer.getCache().updateFriends(immutables);
                 return null;
             }
         }.execute();
@@ -215,8 +214,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         return START_STICKY;
     }
 
-    // Ugly workaround because of KitKat stopping services when app gets closed
-    // (Android issue #63618)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
@@ -230,6 +227,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
             restartServicePending);
     }
 
+    // Ugly workaround because of KitKat stopping services when app gets closed
+    // (Android issue #63618)
     /**
      * Enables/disables friends position updates
      * 
@@ -268,7 +267,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         protected Void doInBackground(Long... ids) {
             try {
                 for (long id : ids) {
-                    mClient.acceptInvitation(id);
+                    ServiceContainer.getNetworkClient().acceptInvitation(id);
                 }
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't accept request!");
@@ -287,7 +286,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         protected Void doInBackground(Long... ids) {
             try {
                 for (long id : ids) {
-                    mClient.declineInvitation(id);
+                    ServiceContainer.getNetworkClient().declineInvitation(id);
                 }
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't decline request!");
@@ -305,8 +304,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         protected Void doInBackground(Void... args0) {
             try {
-                List<ImmutableUser> friendsWithNewLocations = mClient.listFriendsPos();
-                Cache.getInstance().updateFriends(friendsWithNewLocations);
+                List<ImmutableUser> friendsWithNewLocations =
+                    ServiceContainer.getNetworkClient().listFriendsPos();
+                ServiceContainer.getCache().updateFriendList(friendsWithNewLocations);
             } catch (SmartMapClientException e) {
                 e.printStackTrace();
             }
@@ -319,12 +319,12 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
      * 
      * @author ritterni
      */
-    private class AsyncGetInvitations extends AsyncTask<Void, Void, NotificationBag> {
+    private class AsyncGetInvitations extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... arg0) {
 
             try {
-                InvitationManager.getInstance().update(mClient.getInvitations());
+                InvitationManager.getInstance().update(ServiceContainer.getNetworkClient().getInvitations());
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService",
                     "Couldn't retrieve invitations due to a server error: " + e.getMessage());
@@ -344,7 +344,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         protected Void doInBackground(Void... arg0) {
             try {
-                mClient.authServer(mManager.getUserName(), mManager.getFacebookID(), mManager.getToken());
+                ServiceContainer.getNetworkClient().authServer(mManager.getUserName(),
+                    mManager.getFacebookID(), mManager.getToken());
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't log in!");
             }
@@ -361,7 +362,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         protected Void doInBackground(Void... arg0) {
             try {
-                mClient.updatePos(mManager.getLocation());
+                ServiceContainer.getNetworkClient().updatePos(mManager.getLocation());
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Position update failed!");
             }
