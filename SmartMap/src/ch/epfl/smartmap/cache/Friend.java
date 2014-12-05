@@ -33,7 +33,6 @@ public final class Friend implements User {
     private String mLocationString;
     private Location mLocation;
     private Bitmap mImage;
-    private Boolean mIsVisible;
     private Boolean mIsBlocked;
 
     protected Friend(ImmutableUser user) {

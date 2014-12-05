@@ -30,31 +30,55 @@ public class Cache {
 
     static final public String TAG = "Cache";
 
-    // Unique instance
-    private static final Cache ONE_INSTANCE = new Cache();
+    // SparseArrays containing live instances
+    private final LongSparseArray<User> mUserInstances;
+    private final LongSparseArray<Event> mEventInstances;
+    private final LongSparseArray<Filter> mFilterInstances;
+    private final LongSparseArray<Invitation> mInvitationInstances;
 
-    // Sets containing ids of all Friends and stored public events
-    private final Set<Long> mFriendIds;
+    // These Sets are the keys for the LongSparseArrays
+    private final Set<Long> mUserIds;
     private final Set<Long> mEventIds;
     private final Set<Long> mFilterIds;
+    private final Set<Long> mInvitationIds;
 
-    // SparseArrays containing live instances
-    private final LongSparseArray<Event> mEventInstances;
-    private final LongSparseArray<User> mUserInstances;
-    private final LongSparseArray<Filter> mFilterInstances;
+    // This Set contains the id of all our friends
+    private final Set<Long> mFriendIds;
+
+    // These sets contains different kind of Events
+    private final Set<Long> mOwnEventIds;
+    private final Set<Long> mNearEventIds;
+    private final Set<Long> mPinnedEventIds;
+
+    // These sets are for invitation managing
+    private final Set<Long> mInvitedUserIds;
+    private final Set<Long> mInvitingUserIds;
+    private final Set<Long> mInvitingEventIds;
 
     // Listeners
     private final List<CacheListener> mListeners;
 
     public Cache() {
-        // Init lists
+        // Init data structures
+        mUserInstances = new LongSparseArray<User>();
+        mEventInstances = new LongSparseArray<Event>();
+        mFilterInstances = new LongSparseArray<Filter>();
+        mInvitationInstances = new LongSparseArray<Invitation>();
+
         mFriendIds = new HashSet<Long>();
+
+        mUserIds = new HashSet<Long>();
         mEventIds = new HashSet<Long>();
         mFilterIds = new HashSet<Long>();
+        mInvitationIds = new HashSet<Long>();
 
-        mEventInstances = new LongSparseArray<Event>();
-        mUserInstances = new LongSparseArray<User>();
-        mFilterInstances = new LongSparseArray<Filter>();
+        mOwnEventIds = new HashSet<Long>();
+        mNearEventIds = new HashSet<Long>();
+        mPinnedEventIds = new HashSet<Long>();
+
+        mInvitedUserIds = new HashSet<Long>();
+        mInvitingUserIds = new HashSet<Long>();
+        mInvitingEventIds = new HashSet<Long>();
 
         mListeners = new ArrayList<CacheListener>();
     }
