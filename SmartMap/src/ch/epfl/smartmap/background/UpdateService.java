@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.background;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -25,12 +24,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.InvitationManager;
-import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
@@ -93,12 +90,10 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 public Void doInBackground(Void... params) {
-                    try {
-                        CachedSearchEngine.getInstance().getAllNearEvents(
-                            SettingsManager.getInstance().getLocation(), 100000);
-                    } catch (SmartMapClientException e) {
-                        Log.e("UPDATE SERVICE", "Can't retrieve nearby events");
-                    }
+
+                    CachedSearchEngine.getInstance().getAllNearEvents(
+                        SettingsManager.getInstance().getLocation(), 100000, null);
+
                     return null;
                 }
             }.execute();
@@ -192,24 +187,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
         mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), mPosUpdateDelay,
             MIN_DISTANCE, new MyLocationListener());
-
-        new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                List<User> friends = Cache.getInstance().getAllFriends();
-                List<ImmutableUser> immutables = new ArrayList<ImmutableUser>();
-                for (User user : friends) {
-                    UpdateService.this.downloadUserPicture(user.getId());
-                    ImmutableUser immutable =
-                        new ImmutableUser(user.getId(), null, null, null, null, null,
-                            mHelper.getPictureById(user.getId()));
-                    immutables.add(immutable);
-                }
-                ServiceContainer.getCache().updateFriends(immutables);
-                return null;
-            }
-        }.execute();
 
         return START_STICKY;
     }

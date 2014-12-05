@@ -49,103 +49,6 @@ public final class CachedSearchEngine implements SearchEngine {
      *            long id of {@code Friend}
      * @return the {@code Friend} with given id, or {@code null} if there was no match.
      */
-    public void findFriendById(final long id, final SearchRequestCallback<User> callback) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                // Check for live instance
-                User friend = ServiceContainer.getCache().getFriend(id);
-
-                if (friend != null) {
-                    // Found in cache, return
-                    callback.onResult(friend);
-                    return null;
-                } else {
-                    // If not found, check in database
-                    ImmutableUser databaseResult = DatabaseHelper.getInstance().getFriend(id);
-
-                    if (databaseResult != null) {
-                        // Match in database, put it in cache
-                        ServiceContainer.getCache().putFriend(databaseResult);
-                        callback.onResult(ServiceContainer.getCache().getFriend(id));
-                        return null;
-                    } else {
-                        // If not found, check on the server
-                        ImmutableUser networkResult;
-                        try {
-                            networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
-                        } catch (SmartMapClientException e) {
-                            networkResult = null;
-                        }
-
-                        if (networkResult != null) {
-                            // Match on server, put it in cache
-                            ServiceContainer.getCache().putFriend(networkResult);
-                            callback.onResult(ServiceContainer.getCache().getFriend(id));
-                            return null;
-                        } else {
-                            callback.onNotFound();
-                            return null;
-                        }
-                    }
-                }
-            }
-        }.execute();
-    }
-
-    public void findFriendsByIds(final Set<Long> ids, final SearchRequestCallback callback) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                Set<ImmutableUser> immutableResult = new HashSet<ImmutableUser>();
-                Set<User> result = new HashSet<User>();
-
-                for (long id : ids) {
-                    // Check for live instance
-                    User friend = ServiceContainer.getCache().getFriend(id);
-
-                    if (friend != null) {
-                        // Found in cache, add to set of live instances
-                        result.add(friend);
-                    } else {
-                        // If not found, check on the server
-                        ImmutableUser networkResult;
-                        try {
-                            networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
-                        } catch (SmartMapClientException e) {
-                            networkResult = null;
-                        }
-
-                        if (networkResult != null) {
-                            // Match on server, put it in cache
-                            immutableResult.add(networkResult);
-                        }
-                    }
-                }
-
-                // Get all results that weren't in cache and add them all at once (Avoid to send multiple
-                // listener
-                // calls)
-                ServiceContainer.getCache().putFriends(immutableResult);
-                // Retrieve live instances from cache
-                for (ImmutableUser user : immutableResult) {
-                    result.add(ServiceContainer.getCache().getFriend(user.getId()));
-                }
-
-                callback.onResult(result);
-                return null;
-            }
-        }.execute();
-    }
-
-    /**
-     * Search for a {@code Friend} with this id. For performance concerns, this method should be called in an
-     * {@code AsyncTask}.
-     * 
-     * @param id
-     *            long id of {@code Friend}
-     * @return the {@code Friend} with given id, or {@code null} if there was no match.
-     */
     public void findPublicEventById(final long id, final SearchRequestCallback<Event> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -155,7 +58,9 @@ public final class CachedSearchEngine implements SearchEngine {
 
                 if (event != null) {
                     // Found in cache, return
-                    callback.onResult(event);
+                    if (callback != null) {
+                        callback.onResult(event);
+                    }
                     return null;
                 } else {
                     // If not found, check in database
@@ -164,7 +69,9 @@ public final class CachedSearchEngine implements SearchEngine {
                     if (databaseResult != null) {
                         // Match in database, put it in cache
                         ServiceContainer.getCache().putPublicEvent((databaseResult));
-                        callback.onResult(ServiceContainer.getCache().getPublicEvent(id));
+                        if (callback != null) {
+                            callback.onResult(ServiceContainer.getCache().getPublicEvent(id));
+                        }
                         return null;
                     } else {
                         // If not found, check on the server
@@ -178,11 +85,15 @@ public final class CachedSearchEngine implements SearchEngine {
                         if (networkResult != null) {
                             // Match on server, put it in cache
                             ServiceContainer.getCache().putPublicEvent(networkResult);
-                            callback.onResult(ServiceContainer.getCache().getPublicEvent(id));
+                            if (callback != null) {
+                                callback.onResult(ServiceContainer.getCache().getPublicEvent(id));
+                            }
                             return null;
                         } else {
                             // No match anywhere
-                            callback.onNotFound();
+                            if (callback != null) {
+                                callback.onNotFound();
+                            }
                             return null;
                         }
                     }
@@ -242,8 +153,9 @@ public final class CachedSearchEngine implements SearchEngine {
                 for (ImmutableEvent event : immutableResult) {
                     result.add(ServiceContainer.getCache().getPublicEvent(event.getID()));
                 }
-
-                callback.onResult(result);
+                if (callback != null) {
+                    callback.onResult(result);
+                }
                 return null;
             }
         }.execute();
@@ -266,7 +178,9 @@ public final class CachedSearchEngine implements SearchEngine {
 
                 if (stranger != null) {
                     // Found in cache, return
-                    callback.onResult(stranger);
+                    if (callback != null) {
+                        callback.onResult(stranger);
+                    }
                     return null;
                 } else {
                     // If not found, check in database
@@ -275,7 +189,9 @@ public final class CachedSearchEngine implements SearchEngine {
                     if (databaseResult != null) {
                         // Match in database, put it in cache
                         ServiceContainer.getCache().putFriend(databaseResult);
-                        callback.onResult(ServiceContainer.getCache().getStranger(id));
+                        if (callback != null) {
+                            callback.onResult(ServiceContainer.getCache().getStranger(id));
+                        }
                         return null;
                     } else {
                         // If not found, check on the server
@@ -285,15 +201,22 @@ public final class CachedSearchEngine implements SearchEngine {
                             if (networkResult != null) {
                                 // Match on server, put it in cache
                                 ServiceContainer.getCache().putFriend(networkResult);
-                                callback.onResult(ServiceContainer.getCache().getStranger(id));
+                                if (callback != null) {
+
+                                    callback.onResult(ServiceContainer.getCache().getStranger(id));
+                                }
                                 return null;
                             } else {
                                 // No match anywhere
-                                callback.onNotFound();
+                                if (callback != null) {
+                                    callback.onNotFound();
+                                }
                                 return null;
                             }
                         } catch (SmartMapClientException e) {
-                            callback.onNetworkError();
+                            if (callback != null) {
+                                callback.onNetworkError();
+                            }
                             return null;
                         }
                     }
@@ -330,10 +253,14 @@ public final class CachedSearchEngine implements SearchEngine {
                             }
                         }
                     } catch (SmartMapClientException e) {
-                        callback.onNetworkError();
+                        if (callback != null) {
+                            callback.onNetworkError();
+                        }
                     }
                 }
-                callback.onResult(result);
+                if (callback != null) {
+                    callback.onResult(result);
+                }
                 return null;
             }
         }.execute();
@@ -352,7 +279,9 @@ public final class CachedSearchEngine implements SearchEngine {
         User user = ServiceContainer.getCache().getUser(id);
         if (user != null) {
             // Found
-            callback.onResult(user);
+            if (callback != null) {
+                callback.onResult(user);
+            }
         } else {
             this.findStrangerById(id, callback);
         }
@@ -395,7 +324,9 @@ public final class CachedSearchEngine implements SearchEngine {
                 }
 
                 // Give results to the caller
-                callback.onResult(result);
+                if (callback != null) {
+                    callback.onResult(result);
+                }
                 return null;
             }
         }.execute();
@@ -425,7 +356,11 @@ public final class CachedSearchEngine implements SearchEngine {
                             new HashSet<Long>(ServiceContainer.getNetworkClient().getPublicEvents(
                                 location.getLatitude(), location.getLongitude(), radius));
                     } catch (SmartMapClientException e) {
-                        callback.onNetworkError();
+                        if (callback != null) {
+                            if (callback != null) {
+                                callback.onNetworkError();
+                            }
+                        }
                     }
                 }
 
