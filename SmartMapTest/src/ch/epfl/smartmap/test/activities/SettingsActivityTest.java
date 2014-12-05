@@ -123,7 +123,7 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
             .perform(ViewActions.click());
         onView(ViewMatchers.withText("5 seconds")).perform(ViewActions.click());
 
-        assertEquals("Couldn't set the frequency to 5 seconds", 5, SettingsManager.getInstance()
+        assertEquals("Couldn't set the frequency to 5 seconds", 5000, SettingsManager.getInstance()
             .getRefreshFrequency());
 
         onView(
@@ -131,7 +131,7 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
             .perform(ViewActions.click());
         onView(ViewMatchers.withText("10 seconds (default)")).perform(ViewActions.click());
 
-        assertEquals("Couldn't set the frequency to 10 seconds", 10, SettingsManager.getInstance()
+        assertEquals("Couldn't set the frequency to 10 seconds", 10000, SettingsManager.getInstance()
             .getRefreshFrequency());
     }
 
@@ -141,14 +141,14 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
             .perform(ViewActions.click());
         onView(ViewMatchers.withText("10 minutes")).perform(ViewActions.click());
 
-        assertEquals("Couldn't set to 10", 10, SettingsManager.getInstance()
+        assertEquals("Couldn't set to 10 minutes", 600000, SettingsManager.getInstance()
             .getTimeToWaitBeforeHidingFriends());
 
         onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_last_seen_max)))
             .perform(ViewActions.click());
-        onView(ViewMatchers.withText("30 minutes (default)")).perform(ViewActions.click());
+        onView(ViewMatchers.withText("1 hour (default)")).perform(ViewActions.click());
 
-        assertEquals("Couldn't set to 30", 30, SettingsManager.getInstance()
+        assertEquals("Couldn't set to 1 hour", 3600000, SettingsManager.getInstance()
             .getTimeToWaitBeforeHidingFriends());
     }
 

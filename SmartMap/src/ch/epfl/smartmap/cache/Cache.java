@@ -425,7 +425,7 @@ public class Cache {
         // TODO : Empty useless instances from Cache
 
         // Fetch friend ids
-        HashSet<Long> newFriendIds = new HashSet<Long>(networkClient.getFriendsIds());
+        Set<Long> newFriendIds = new HashSet<Long>(networkClient.getFriendsIds());
 
         // Remove friends that are no longer friends
         for (long id : mFriendIds) {
@@ -457,7 +457,20 @@ public class Cache {
     }
 
     public void updateOwnEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
-        // TODO :
+        new AsyncTask<ImmutableEvent, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(ImmutableEvent... params) {
+                try {
+                    ServiceContainer.getNetworkClient().updateEvent(params[0]);
+                    callback.onSuccess();
+                } catch (SmartMapClientException e) {
+                    callback.onFailure();
+                }
+                return null;
+            }
+
+        }.execute(createdEvent);
     }
 
     public boolean updatePublicEvent(ImmutableEvent event) {

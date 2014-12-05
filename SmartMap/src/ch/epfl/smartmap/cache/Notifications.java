@@ -40,7 +40,7 @@ public class Notifications {
      * @param user
      *            The invited
      */
-    public static void acceptedFriendNotification(Context context, User user) {
+    public static void acceptedFriendNotification(Context context, ImmutableUser user) {
 
         // Get ID of notifications
         notificationID++;
@@ -55,8 +55,7 @@ public class Notifications {
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
         String[] events = new String[2];
-        events[0] =
-            new String(user.getName() + " " + context.getString(R.string.notification_invitation_accepted));
+        events[0] = new String(user.getName() + " " + context.getString(R.string.notification_invitation_accepted));
         events[1] = context.getString(R.string.notification_open_friend_list);
 
         // Sets a title for the Inbox style big view
@@ -74,11 +73,10 @@ public class Notifications {
                 .setAutoCancel(true)
                 .setContentTitle(context.getString(R.string.notification_acceptedfriend_title))
                 .setContentText(
-                    user.getName() + " " + context.getString(R.string.notification_invitation_accepted)
-                        + "\n" + context.getString(R.string.notification_open_friend_list))
+                    user.getName() + " " + context.getString(R.string.notification_invitation_accepted) + "\n"
+                        + context.getString(R.string.notification_open_friend_list))
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setTicker(
-                    user.getName() + " " + context.getString(R.string.notification_invitation_accepted))
+                .setTicker(user.getName() + " " + context.getString(R.string.notification_invitation_accepted))
                 .setVibrate(PATTERN).setContentIntent(pFriendIntent);
 
         displayNotification(context, noti.build(), notificationID);
@@ -164,7 +162,7 @@ public class Notifications {
      * @param user
      *            The inviter
      */
-    public static void newFriendNotification(Context context, User user) {
+    public static void newFriendNotification(Context context, ImmutableUser user) {
 
         // Get ID and the number of ongoing Friend notifications
         notificationID++;

@@ -13,12 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
@@ -58,8 +58,7 @@ public class InvitationsTab extends ListFragment {
         mInvitationList = mDBHelper.getUnansweredFriendInvitations();
 
         // Create custom Adapter and pass it to the Activity
-        FriendInvitationListItemAdapter adapter =
-            new FriendInvitationListItemAdapter(mContext, mInvitationList);
+        FriendInvitationListItemAdapter adapter = new FriendInvitationListItemAdapter(mContext, mInvitationList);
         this.setListAdapter(adapter);
 
         return view;
@@ -112,17 +111,17 @@ public class InvitationsTab extends ListFragment {
                 // new AcceptInvitation().execute(userId);
                 invitation.setStatus(Invitation.ACCEPTED);
                 mDBHelper.updateFriendInvitation(invitation);
-                // TODO : Adding friend into cache should be done inside NotifcationManager
+                // TODO : Adding friend into cache should be done inside
+                // NotifcationManager
                 ImmutableUser friend;
                 try {
-                    friend = NetworkSmartMapClient.getInstance().getUserInfo(invitation.getUserId());
+                    friend = ServiceContainer.getNetworkClient().getUserInfo(invitation.getUserId());
                     Cache.getInstance().putFriend(friend);
                     mInvitationList = mDBHelper.getUnansweredFriendInvitations();
                 } catch (SmartMapClientException e) {
                     // TODO : Handle this case
                 }
-                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
-                    mInvitationList));
+                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
 
             }
         });
@@ -135,8 +134,7 @@ public class InvitationsTab extends ListFragment {
                 invitation.setStatus(Invitation.REFUSED);
                 mDBHelper.updateFriendInvitation(invitation);
                 mInvitationList = mDBHelper.getUnansweredFriendInvitations();
-                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
-                    mInvitationList));
+                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
             }
         });
 

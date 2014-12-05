@@ -10,7 +10,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.search.CachedSearchEngine;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -35,6 +34,7 @@ public class PublicEvent implements Event {
     // Optional fields
     private String mDescription;
     private String mLocationString;
+
     private List<Long> mParticipants;
 
     public final static int DEFAULT_ICON = R.drawable.default_event;
@@ -85,8 +85,6 @@ public class PublicEvent implements Event {
         } else {
             mDescription = event.getDescription();
         }
-
-        // TODO : Gets username
     }
 
     /*
@@ -95,18 +93,12 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj != null) && (this.getClass() == obj.getClass())
-            && (this.getId() == ((PublicEvent) obj).getId());
+        return (obj != null) && (this.getClass() == obj.getClass()) && (this.getId() == ((PublicEvent) obj).getId());
     }
 
     @Override
     public long getCreatorId() {
         return mCreatorId;
-    }
-
-    @Override
-    public String getCreatorName() {
-        return CachedSearchEngine.getInstance().getUserById(mCreatorId).getName();
     }
 
     @Override
@@ -168,8 +160,7 @@ public class PublicEvent implements Event {
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
-            .title(this.getName())
+        markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude())).title(this.getName())
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
             .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
         return markerOptions;
