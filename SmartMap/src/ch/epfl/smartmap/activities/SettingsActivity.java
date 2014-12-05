@@ -22,9 +22,6 @@ import ch.epfl.smartmap.database.DatabaseHelper;
  */
 public class SettingsActivity extends PreferenceActivity {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = SettingsActivity.class.getSimpleName();
-
     /**
      * A preference value change listener that updates the preference's summary to reflect its new value.
      */
@@ -107,19 +104,6 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * This fragment shows data and sync preferences only. It is used when the activity is showing a two-pane settings
-     * UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class EventsPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            this.addPreferencesFromResource(R.xml.pref_events);
-        }
-    }
-
-    /**
      * This fragment shows general preferences only. It is used when the activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -129,23 +113,9 @@ public class SettingsActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             this.addPreferencesFromResource(R.xml.pref_general);
 
-            bindPreferenceSummaryToValue(this.findPreference("refresh_frequency"));
-            bindPreferenceSummaryToValue(this.findPreference("last_seen_max"));
+            bindPreferenceSummaryToValue(this.findPreference(this.getString(R.string.settings_key_refresh_frequency)));
+            bindPreferenceSummaryToValue(this.findPreference(this.getString(R.string.settings_key_last_seen_max)));
         }
     }
 
-    /**
-     * This fragment shows notification preferences only. It is used when the activity is showing a two-pane settings
-     * UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class NotificationPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            this.addPreferencesFromResource(R.xml.pref_notification);
-
-            bindPreferenceSummaryToValue(this.findPreference("notifications_enabled"));
-        }
-    }
 }
