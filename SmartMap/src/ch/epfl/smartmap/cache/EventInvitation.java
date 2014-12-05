@@ -12,7 +12,7 @@ import ch.epfl.smartmap.gui.Utils;
  * @author agpmilli
  */
 public class EventInvitation implements Invitation {
-    private final long mInvitationId;
+    private long mInvitationId;
     private final long mUserId;
     private final long mEventId;
     private final String mUserName;
@@ -23,8 +23,7 @@ public class EventInvitation implements Invitation {
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
 
-    public EventInvitation(long invitationId, long userId, String userName, long eventId, String eventName,
-        int status) {
+    public EventInvitation(long invitationId, long userId, String userName, long eventId, String eventName, int status) {
         mInvitationId = invitationId;
         mUserId = userId;
         mEventId = eventId;
@@ -46,6 +45,10 @@ public class EventInvitation implements Invitation {
         return mInvitationId;
     }
 
+    public void setId(long id) {
+        mInvitationId = id;
+    }
+
     @Override
     public Bitmap getImage() {
         return null;
@@ -58,7 +61,8 @@ public class EventInvitation implements Invitation {
             intent = new Intent(Utils.sContext, ShowEventsActivity.class);
             intent.putExtra("invitation", true);
         } else if (mStatus == ACCEPTED) {
-            // intent = new Intent(Utils.Context, ShowEventInformationActivity.class);
+            // intent = new Intent(Utils.Context,
+            // ShowEventInformationActivity.class);
         }
         return intent;
     }
@@ -75,8 +79,7 @@ public class EventInvitation implements Invitation {
 
     @Override
     public String getTitle() {
-        return Utils.sContext.getResources().getString(R.string.notification_event_request_title) + " "
-            + mUserName;
+        return Utils.sContext.getResources().getString(R.string.notification_event_request_title) + " " + mUserName;
     }
 
     @Override

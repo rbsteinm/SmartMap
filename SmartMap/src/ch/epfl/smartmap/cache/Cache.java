@@ -5,13 +5,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.servercom.NetworkRequestCallback;
+import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -34,13 +38,15 @@ public class Cache {
     private final LongSparseArray<User> mUserInstances;
     private final LongSparseArray<Event> mEventInstances;
     private final LongSparseArray<Filter> mFilterInstances;
-    private final LongSparseArray<Invitation> mInvitationInstances;
+    private final LongSparseArray<EventInvitation> mEventInvitationInstances;
+    private final LongSparseArray<FriendInvitation> mFriendInvitationInstances;
 
     // These Sets are the keys for the LongSparseArrays
     private final Set<Long> mUserIds;
     private final Set<Long> mEventIds;
     private final Set<Long> mFilterIds;
-    private final Set<Long> mInvitationIds;
+    private final Set<Long> mEventInvitationIds;
+    private final Set<Long> mFriendInvitationIds;
 
     // This Set contains the id of all our friends
     private final Set<Long> mFriendIds;
@@ -63,14 +69,16 @@ public class Cache {
         mUserInstances = new LongSparseArray<User>();
         mEventInstances = new LongSparseArray<Event>();
         mFilterInstances = new LongSparseArray<Filter>();
-        mInvitationInstances = new LongSparseArray<Invitation>();
+        mEventInvitationInstances = new LongSparseArray<EventInvitation>();
+        mFriendInvitationInstances = new LongSparseArray<FriendInvitation>();
 
         mFriendIds = new HashSet<Long>();
 
         mUserIds = new HashSet<Long>();
         mEventIds = new HashSet<Long>();
         mFilterIds = new HashSet<Long>();
-        mInvitationIds = new HashSet<Long>();
+        mEventInvitationIds = new HashSet<Long>();
+        mFriendInvitationIds = new HashSet<Long>();
 
         mOwnEventIds = new HashSet<Long>();
         mNearEventIds = new HashSet<Long>();
@@ -524,8 +532,128 @@ public class Cache {
         }
     }
 
-    public void addEventInvitations(List<Long> events) {
+    public void updateEventInvitations(List<Long> events) {
+        for (Long eventId : events) {
+            new AsyncTask<Long, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Long... params) {
+                    try {
+                        ServiceContainer.getNetworkClient().ackEventInvitation(params[0]);
+
+                        mEventInvitationIds.add(params[0]);
+                        Event e = Cache.this.getPublicEvent(params[0]);
+
+                        User fromCache = Cache.this.getUser(e.getCreatorId());
+                        ImmutableUser creator = null;
+                        if (fromCache == null) {
+                            creator = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
+                        } else {
+                            creator = fromCache.getImmutableCopy();
+                        }
+
+                        EventInvitation invitation =
+                            new EventInvitation(0, creator.getId(), creator.getName(), params[0], e.getName(),
+                                Invitation.UNREAD);
+
+                        invitation.setId(ServiceContainer.getDatabase().addEventInvitation(invitation));
+
+                        mEventInvitationInstances.put(invitation.getId(), invitation);
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Unable to ack event invitation !" + e.getMessage());
+                    }
+                    return null;
+                }
+            }.execute(eventId);
+
+        }
+    }
+
+    public void updateFriendInvitations(NotificationBag notifBag) {
+        this.updateFriendInvitations(notifBag.getInvitingUsers());
+        this.acceptNewFriends(notifBag.getNewFriends());
+        this.removeRemovedFriends(notifBag.getRemovedFriendsIds());
 
     }
 
+    private void updateFriendInvitations(Set<ImmutableUser> inviters) {
+        for (ImmutableUser inviter : inviters) {
+            if (!mInvitingUserIds.contains(inviter.getId())) {
+                mInvitingUserIds.add(inviter.getId());
+                new AsyncTask<ImmutableUser, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(ImmutableUser... params) {
+                        try {
+                            Bitmap image = Cache.this.getUser(params[0].getId()).getImage();
+                            if ((image == User.NO_IMAGE) || (image == null)) {
+                                image = ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
+                            }
+
+                            FriendInvitation invitation =
+                                new FriendInvitation(0, params[0].getId(), params[0].getName(), Invitation.UNREAD,
+                                    image);
+
+                            invitation.setId(ServiceContainer.getDatabase().addFriendInvitation(invitation));
+
+                            mFriendInvitationInstances.put(invitation.getId(), invitation);
+
+                        } catch (SmartMapClientException e) {
+                            Log.e(TAG, "Error retrieving profile picture of inviter: " + e.getMessage());
+                        }
+                        return null;
+                    }
+                }.execute(inviter);
+            }
+        }
+    }
+
+    private void acceptNewFriends(Set<ImmutableUser> friends) {
+        for (ImmutableUser friend : friends) {
+            this.putFriend(friend);
+
+            new AsyncTask<ImmutableUser, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(ImmutableUser... params) {
+                    try {
+                        ServiceContainer.getNetworkClient().ackAcceptedInvitation(params[0].getId());
+                        // Bitmap image =
+                        // ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
+
+                        // Set new friend profile picture ?
+
+                        Notifications.acceptedFriendNotification(Utils.sContext, params[0]);
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Couldn't ack new friend: " + e.getMessage());
+                    }
+                    return null;
+                }
+
+            }.execute(friend);
+        }
+
+        for (CacheListener listener : mListeners) {
+            listener.onFriendListUpdate();
+        }
+    }
+
+    private void removeRemovedFriends(Set<Long> removedFriendsIds) {
+        for (Long id : removedFriendsIds) {
+            this.removeFriend(id);
+
+            new AsyncTask<Long, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Long... params) {
+                    try {
+                        ServiceContainer.getNetworkClient().ackRemovedFriend(params[0]);
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Couldn't ack removed friend: " + e.getMessage());
+                    }
+                    return null;
+                }
+
+            }.execute(id);
+        }
+    }
 }
