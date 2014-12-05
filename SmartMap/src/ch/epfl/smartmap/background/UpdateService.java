@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
+import ch.epfl.smartmap.cache.AcceptedFriendInvitation;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
@@ -190,6 +191,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                                 protected Void doInBackground(Long... params) {
                                     mCache.addFriend(params[0]);
                                     User newFriend = mCache.getFriendById(params[0]);
+                                    mHelper.addAcceptedRequest(new AcceptedFriendInvitation(0, newFriend
+                                        .getId(), newFriend.getName()));
                                     if (mNotificationsEnabled && mNotificationsForFriendshipConfirmations) {
                                         Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
                                     }
@@ -290,7 +293,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                 protected void onPostExecute(List<Long> result) {
                     for (long eventId : result) {
                         new AsyncTask<Long, Void, Void>() {
-
                             @Override
                             protected Void doInBackground(Long... params) {
                                 try {
@@ -298,10 +300,11 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                                 } catch (SmartMapClientException e) {
                                     Log.e("UpdateService", "Couldn't ack event invitation!");
                                 }
-                                // Notifications.newEventNotification(this, event);
+                                if (mNotificationsEnabled && mNotificationsForEventInvitations) {
+                                    // TODO Notifications.newEventNotification(this, event);
+                                }
                                 return null;
                             }
-
                         }.execute(eventId);
                     }
                 }

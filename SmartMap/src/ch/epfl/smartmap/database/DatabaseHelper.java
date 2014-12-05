@@ -41,9 +41,9 @@ import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
  * 
  * @author ritterni
  */
-public class DatabaseHelper extends SQLiteOpenHelper {
+public final class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int mDatabase_VERSION = 7;
+    private static final int mDatabase_VERSION = 8;
     private static final String mDatabase_NAME = "SmartMapDB";
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
@@ -72,9 +72,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_LONGITUDE = "longitude";
     private static final String KEY_LATITUDE = "latitude";
     private static final String KEY_POSNAME = "posName";
-    private static final String KEY_COUNTRY_NAME = "countryName";
     private static final String KEY_LASTSEEN = "lastSeen";
-    private static final String KEY_VISIBLE = "isVisible";
+    private static final String KEY_BLOCKED = "isBlocked";
 
     private static final String KEY_ID = "id";
     private static final String KEY_FILTER_ID = "filterID";
@@ -88,7 +87,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Columns for the User table
     private static final String[] USER_COLUMNS = {KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL,
-        KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_LASTSEEN, KEY_VISIBLE};
+        KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_LASTSEEN, KEY_BLOCKED};
 
     // Columns for the Filter table
     private static final String[] FILTER_COLUMNS = {KEY_ID, KEY_NAME};
@@ -116,7 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_USER = "CREATE TABLE IF NOT EXISTS " + TABLE_USER + "("
         + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_NUMBER + " TEXT," + KEY_EMAIL
         + " TEXT," + KEY_LONGITUDE + " DOUBLE," + KEY_LATITUDE + " DOUBLE," + KEY_POSNAME + " TEXT,"
-        + KEY_LASTSEEN + " INTEGER," + KEY_VISIBLE + " INTEGER" + ")";
+        + KEY_LASTSEEN + " INTEGER," + KEY_BLOCKED + " INTEGER" + ")";
 
     // Table of filters
     private static final String CREATE_TABLE_FILTER = "CREATE TABLE IF NOT EXISTS " + TABLE_FILTER + "("
@@ -170,8 +169,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void addAcceptedRequest(AcceptedFriendInvitation invitation) {
+        long id =
+            getFriendInvitations().size() + getEventInvitations().size() + getAcceptedRequests().size() + 1;
+        // using getAllInvitations would cause unnecessary sorting
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, getFriendInvitations().size() + 1); // TODO
         values.put(KEY_USER_ID, invitation.getUserId());
         values.put(KEY_NAME, invitation.getUserName());
 
@@ -219,8 +220,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void addEventInvitation(EventInvitation invitation) {
+        long id =
+            getFriendInvitations().size() + getEventInvitations().size() + getAcceptedRequests().size() + 1;
+        // using getAllInvitations would cause unnecessary sorting
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, getFriendInvitations().size() + 1); // TODO
+        values.put(KEY_ID, id);
         values.put(KEY_USER_ID, invitation.getUserId());
         values.put(KEY_NAME, invitation.getUserName());
         values.put(KEY_EVENT_ID, invitation.getEventId());
@@ -267,8 +271,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *            The FriendInvitation to ad to the database
      */
     public void addFriendInvitation(FriendInvitation invitation) {
+        long id =
+            getFriendInvitations().size() + getEventInvitations().size() + getAcceptedRequests().size() + 1;
+        // using getAllInvitations would cause unnecessary sorting
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, getFriendInvitations().size() + 1); // TODO
+        values.put(KEY_ID, id);
         values.put(KEY_USER_ID, invitation.getUserId());
         values.put(KEY_NAME, invitation.getUserName());
         values.put(KEY_STATUS, invitation.getStatus());
@@ -966,6 +973,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Updates a {@code EventInvitation} in the database
+     * 
+     * @param invitation
+     *            The {@code EventInvitation} to update
+     * @return The number of rows that were updated
+     */
+    public int updateEventInvitation(EventInvitation invitation) {
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, invitation.getId());
+        values.put(KEY_USER_ID, invitation.getUserId());
+        values.put(KEY_NAME, invitation.getUserName());
+        values.put(KEY_EVENT_ID, invitation.getEventId());
+        values.put(KEY_EVENT_NAME, invitation.getEventName());
+
+        int rows =
+            mDatabase.update(TABLE_EVENT_INVITATIONS, values, KEY_ID + " = ?",
+                new String[]{String.valueOf(invitation.getId())});
+
+        if (rows > 0) {
+            this.notifyOnInvitationListUpdateListeners();
+        }
+
+        return rows;
+    }
+
+    /**
      * Updates a filter
      * 
      * @param filter
@@ -1004,7 +1038,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_LONGITUDE, friend.getLocation().getLongitude());
             values.put(KEY_LATITUDE, friend.getLocation().getLatitude());
         }
-        if (friend.getLocationString() != Friend.NO_LOCATION_STRING) {
+        if (!friend.getLocationString().equals(Friend.NO_LOCATION_STRING)) {
             values.put(KEY_POSNAME, friend.getLocationString());
         }
 
