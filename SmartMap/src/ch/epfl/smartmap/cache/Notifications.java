@@ -7,8 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
-import ch.epfl.smartmap.activities.ShowEventsActivity;
+import ch.epfl.smartmap.activities.UserInformationActivity;
+import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.search.CachedSearchEngine;
 
 /**
  * This class creates different sort of notifications
@@ -23,6 +26,9 @@ public class Notifications {
     private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME, SILENT_NOTIFICATION_TIME,
         VIBRATE_NOTIFICATION_TIME};
     private static long notificationID = 0;
+
+    private static final NotificationManager mNotificationManager = (NotificationManager) Utils.sContext
+        .getSystemService(Context.NOTIFICATION_SERVICE);
 
     /**
      * Create an accepted friend invitation notification and notify it
@@ -40,9 +46,10 @@ public class Notifications {
         notificationID++;
 
         // Prepare intent that redirects the user to FriendActivity
+        Intent showFriendInfoIntent = new Intent(context, UserInformationActivity.class);
+        showFriendInfoIntent.putExtra("FRIEND", user.getId());
         PendingIntent pFriendIntent =
-            PendingIntent.getActivity(context, 0, new Intent(context, FriendsPagerActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent.getActivity(context, 0, showFriendInfoIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Add Big View Specific Configuration
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -79,6 +86,18 @@ public class Notifications {
     }
 
     /**
+     * Cancel (destroy) all notifications from the status bar
+     * 
+     * @param context
+     *            the current context
+     */
+    public static void cancelNotification(Context context) {
+        NotificationManager notificationManager =
+            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+    }
+
+    /**
      * Create an event invitation notification and notify it
      * 
      * @param view
@@ -94,16 +113,17 @@ public class Notifications {
         notificationID++;
 
         // Prepare intent that redirect the user to EventActivity
+        Intent showEventInfoIntent = new Intent(context, EventInformationActivity.class);
+        showEventInfoIntent.putExtra("EVENT", event.getId());
         PendingIntent pEventIntent =
-            PendingIntent.getActivity(context, 0, new Intent(context, ShowEventsActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent.getActivity(context, 0, showEventInfoIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Add Big View Specific Configuration
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
         String[] events = new String[2];
         events[0] =
-            new String(Cache.getInstance().getUserById(event.getCreatorId()) + " "
+            new String(CachedSearchEngine.getInstance().findFriendById(event.getCreatorId()) + " "
                 + context.getString(R.string.notification_event_invitation) + " " + event.getName());
         events[1] = context.getString(R.string.notification_open_event_list);
 
@@ -122,12 +142,12 @@ public class Notifications {
                 .setAutoCancel(true)
                 .setContentTitle(context.getString(R.string.notification_inviteevent_title))
                 .setContentText(
-                    Cache.getInstance().getUserById(event.getCreatorId()) + " "
+                    CachedSearchEngine.getInstance().findFriendById(event.getCreatorId()) + " "
                         + context.getString(R.string.notification_event_invitation) + event.getName() + "\n"
                         + context.getString(R.string.notification_open_event_list))
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(
-                    Cache.getInstance().getUserById(event.getCreatorId()) + " "
+                    CachedSearchEngine.getInstance().findFriendById(event.getCreatorId()) + " "
                         + context.getString(R.string.notification_event_invitation) + event.getName())
                 .setVibrate(PATTERN).setContentIntent(pEventIntent);
 
@@ -151,7 +171,7 @@ public class Notifications {
 
         // Prepare intent that redirects the user to FriendActivity
         Intent showFriendIntent = new Intent(context, FriendsPagerActivity.class);
-        showFriendIntent.putExtra("invitation", true);
+        showFriendIntent.putExtra("INVITATION", true);
         PendingIntent pFriendIntent =
             PendingIntent.getActivity(context, 0, showFriendIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -187,14 +207,14 @@ public class Notifications {
     }
 
     /**
-     * Build the notification and notify it with notification manager.
+     * Display notification in status bar using notification manager
      * 
-     * @param activity
-     *            current activity
+     * @param context
+     *            the current context
      * @param notification
-     *            notification to notify
+     *            th notification to display
      * @param notificationId
-     *            id of current notification
+     *            the notification id
      */
     private static void displayNotification(Context context, Notification notification, long notificationId) {
         NotificationManager notificationManager =

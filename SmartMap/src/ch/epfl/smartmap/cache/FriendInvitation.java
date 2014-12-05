@@ -13,76 +13,77 @@ import ch.epfl.smartmap.gui.Utils;
  * @author agpmilli
  */
 public class FriendInvitation implements Invitation {
-    private final long mInvitationId;
-    private final long mUserId;
-    private final String mUserName;
-    private int mStatus;
-    private Bitmap mImage;
 
-    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
-    public static final int IMAGE_QUALITY = 100;
-    public static final String PROVIDER_NAME = "SmartMapServers";
+	private final long mInvitationId;
+	private final long mUserId;
+	private final String mUserName;
+	private int mStatus;
+	private final Bitmap mImage;
 
-    public FriendInvitation(long invitationId, long userId, String userName, int status, Bitmap image) {
-        mInvitationId = invitationId;
-        mUserId = userId;
-        mUserName = userName;
-        mStatus = status;
-        mImage = image;
-    }
+	public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
+	public static final int IMAGE_QUALITY = 100;
+	public static final String PROVIDER_NAME = "SmartMapServers";
 
-    @Override
-    public long getId() {
-        return mInvitationId;
-    }
+	public FriendInvitation(long invitationId, long userId, String userName, int status, Bitmap image) {
+		mInvitationId = invitationId;
+		mUserId = userId;
+		mUserName = userName;
+		mStatus = status;
+		mImage = image;
+	}
 
-    @Override
-    public Bitmap getImage() {
-        return mImage;
-    }
+	@Override
+	public long getId() {
+		return mInvitationId;
+	}
 
-    @Override
-    public Intent getIntent() {
-        Intent intent = null;
-        if ((mStatus == READ) || (mStatus == UNREAD)) {
-            intent = new Intent(Utils.sContext, FriendsPagerActivity.class);
-            intent.putExtra("INVITATION", true);
-        } else if (mStatus == ACCEPTED) {
-            intent = new Intent(Utils.sContext, UserInformationActivity.class);
-            intent.putExtra("USER", mUserId);
-        }
-        return intent;
-    }
+	@Override
+	public Bitmap getImage() {
+		return mImage;
+	}
 
-    @Override
-    public int getStatus() {
-        return mStatus;
-    }
+	@Override
+	public Intent getIntent() {
+		Intent intent = null;
+		if ((mStatus == READ) || (mStatus == UNREAD)) {
+			intent = new Intent(Utils.sContext, FriendsPagerActivity.class);
+			intent.putExtra("INVITATION", true);
+		} else if (mStatus == ACCEPTED) {
+			intent = new Intent(Utils.sContext, UserInformationActivity.class);
+			intent.putExtra("USER", mUserId);
+		}
+		return intent;
+	}
 
-    @Override
-    public String getText() {
-        return Utils.sContext.getResources().getString(R.string.notification_open_friend_list);
-    }
+	@Override
+	public int getStatus() {
+		return mStatus;
+	}
 
-    @Override
-    public String getTitle() {
-        return Utils.sContext.getResources().getString(R.string.notification_open_friend_list) + " "
-            + mUserName;
-    }
+	@Override
+	public String getText() {
+		return Utils.sContext.getResources().getString(R.string.notification_open_friend_list);
+	}
 
-    @Override
-    public long getUserId() {
-        return mUserId;
-    }
+	@Override
+	public String getTitle() {
+		return Utils.sContext.getResources().getString(R.string.notification_open_friend_list) + " "
+		    + mUserName;
+	}
 
-    @Override
-    public String getUserName() {
-        return mUserName;
-    }
+	@Override
+	public long getUserId() {
+		return mUserId;
+	}
 
-    @Override
-    public void setStatus(int newStatus) {
-        mStatus = newStatus;
-    }
+	@Override
+	public String getUserName() {
+		return mUserName;
+	}
+
+	@Override
+	public void setStatus(int newStatus) {
+		mStatus = newStatus;
+	}
 
 }

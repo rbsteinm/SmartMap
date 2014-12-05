@@ -11,10 +11,10 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.search.CachedSearchEngine;
 
 /**
  * This class creates different sort of notifications
@@ -119,8 +119,9 @@ public class Notifications {
 		NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
 		String[] events = new String[2];
-		events[0] = new String(Cache.getInstance().getFriendById(event.getCreatorId()).getName() + " "
-		    + context.getString(R.string.notification_event_invitation) + " " + event.getName());
+		events[0] = new String(CachedSearchEngine.getInstance().findFriendById(event.getCreatorId())
+		    .getName()
+		    + " " + context.getString(R.string.notification_event_invitation) + " " + event.getName());
 		events[1] = context.getString(R.string.notification_open_event_list);
 
 		// Sets a title for the Inbox style big view
@@ -137,12 +138,12 @@ public class Notifications {
 		    .setAutoCancel(true)
 		    .setContentTitle(context.getString(R.string.notification_inviteevent_title))
 		    .setContentText(
-		        Cache.getInstance().getFriendById(event.getCreatorId()).getName() + " "
+		        CachedSearchEngine.getInstance().findFriendById(event.getCreatorId()).getName() + " "
 		            + context.getString(R.string.notification_event_invitation) + event.getName() + "\n"
 		            + context.getString(R.string.notification_open_event_list))
 		    .setSmallIcon(R.drawable.ic_launcher)
 		    .setTicker(
-		        Cache.getInstance().getFriendById(event.getCreatorId()).getName() + " "
+		        CachedSearchEngine.getInstance().findFriendById(event.getCreatorId()).getName() + " "
 		            + context.getString(R.string.notification_event_invitation) + event.getName())
 		    .setContentIntent(pEventIntent);
 		if (SettingsManager.getInstance().notificationsVibrate()) {
@@ -219,7 +220,7 @@ public class Notifications {
 	/**
 	 * Build the notification and notify it with notification manager.
 	 * 
-	 * @param activity
+	 * @param context
 	 *            current activity
 	 * @param notification
 	 *            notification to notify
@@ -230,5 +231,19 @@ public class Notifications {
 		NotificationManager notificationManager = (NotificationManager) context
 		    .getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify((int) notificationId, notification);
+	}
+
+	/**
+	 * Cancel the notification in statusBar using notification manager.
+	 * 
+	 * @param context
+	 *            current context
+	 * @param notifyId
+	 *            id of current notification
+	 */
+	public static void cancelNotification(Context context, int notifyId) {
+		NotificationManager notificationManager = (NotificationManager) context
+		    .getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.cancel(notifyId);
 	}
 }

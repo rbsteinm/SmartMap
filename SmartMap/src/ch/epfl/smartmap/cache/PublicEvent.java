@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.search.CachedSearchEngine;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -24,14 +25,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class PublicEvent implements Event {
 
+    // Mandatory fields
     private long mId;
     private String mName;
     private long mCreatorId;
-    private String mDescription;
-    private Location mLocation;
-    private String mLocationString;
     private GregorianCalendar mStartDate;
     private GregorianCalendar mEndDate;
+    private Location mLocation;
+    // Optional fields
+    private String mDescription;
+    private String mLocationString;
     private List<Long> mParticipants;
 
     public final static int DEFAULT_ICON = R.drawable.default_event;
@@ -82,6 +85,8 @@ public class PublicEvent implements Event {
         } else {
             mDescription = event.getDescription();
         }
+
+        // TODO : Gets username
     }
 
     /*
@@ -101,7 +106,7 @@ public class PublicEvent implements Event {
 
     @Override
     public String getCreatorName() {
-        return Cache.getInstance().getUserById(mCreatorId).getName();
+        return CachedSearchEngine.getInstance().getUserById(mCreatorId).getName();
     }
 
     @Override

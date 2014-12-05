@@ -28,6 +28,9 @@ public interface User extends Displayable {
     User NOBODY = null;
 
     User NOT_FOUND = null;
+
+    Boolean DEFAULT_BLOCK_VALUE = false;
+
     int IMAGE_QUALITY = 100;
 
     long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
@@ -60,6 +63,8 @@ public interface User extends Displayable {
     String getPhoneNumber();
 
     Type getType();
+
+    boolean isBlocked();
 
     void update(ImmutableUser user);
 
