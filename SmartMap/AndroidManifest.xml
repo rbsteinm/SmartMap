@@ -143,7 +143,12 @@
         </activity>
         <activity
             android:name="ch.epfl.smartmap.activities.ProfileActivity"
-            android:label="@string/title_activity_profile" >
+            android:label="@string/title_activity_profile"
+            android:parentActivityName=".activities.MainActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.smartmap.activities.MainActivity" />
         </activity>
     </application>
 
