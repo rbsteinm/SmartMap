@@ -24,6 +24,11 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
+<<<<<<< HEAD
+import ch.epfl.smartmap.search.CachedSearchEngine;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+=======
+>>>>>>> 39ddd086a8423a070df6568c75b637365e685d20
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**

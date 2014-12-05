@@ -24,14 +24,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class PublicEvent implements Event {
 
+    // Mandatory fields
     private long mId;
     private String mName;
     private long mCreatorId;
-    private String mDescription;
-    private Location mLocation;
-    private String mLocationString;
     private GregorianCalendar mStartDate;
     private GregorianCalendar mEndDate;
+    private Location mLocation;
+    // Optional fields
+    private String mDescription;
+    private String mLocationString;
+
     private List<Long> mParticipants;
 
     public final static int DEFAULT_ICON = R.drawable.default_event;

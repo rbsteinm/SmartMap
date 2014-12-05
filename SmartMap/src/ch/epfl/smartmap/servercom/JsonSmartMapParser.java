@@ -228,8 +228,7 @@ public class JsonSmartMapParser implements SmartMapParser {
                 location.setLongitude(longitude);
                 String locationString = Utils.getCityFromLocation(location);
 
-                ImmutableUser user =
-                    new ImmutableUser(userId, null, null, null, location, locationString, null);
+                ImmutableUser user = new ImmutableUser(userId, null, null, null, location, locationString, null, false);
 
                 users.add(user);
             }
@@ -279,8 +278,8 @@ public class JsonSmartMapParser implements SmartMapParser {
     private void checkLastSeen(GregorianCalendar lastSeen) throws SmartMapParseException {
         GregorianCalendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
         if (Math.abs(now.getTimeInMillis() - lastSeen.getTimeInMillis()) > SERVER_TIME_DIFFERENCE_THRESHHOLD) {
-            throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString()
-                + " compared to " + now.toString());
+            throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString() + " compared to "
+                + now.toString());
         }
     }
 
@@ -447,8 +446,8 @@ public class JsonSmartMapParser implements SmartMapParser {
         location.setLatitude(latitude);
         location.setLongitude(longitude);
         ImmutableEvent event =
-            new ImmutableEvent(id, name, creatorId, description, startingDate, endDate, location,
-                positionName, new ArrayList<Long>());
+            new ImmutableEvent(id, name, creatorId, description, startingDate, endDate, location, positionName,
+                new ArrayList<Long>());
 
         return event;
     }
@@ -485,6 +484,6 @@ public class JsonSmartMapParser implements SmartMapParser {
             this.checkEmail(email);
         }
 
-        return new ImmutableUser(id, name, phoneNumber, email, null, null, null);
+        return new ImmutableUser(id, name, phoneNumber, email, null, null, null, false);
     }
 }

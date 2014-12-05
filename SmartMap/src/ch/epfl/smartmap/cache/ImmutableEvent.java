@@ -15,7 +15,7 @@ import android.location.Location;
  */
 public class ImmutableEvent {
 
-    private final long mId;
+    private long mId;
     private final String mName;
     private final Long mCreatorId;
     private final String mDescription;
@@ -85,5 +85,9 @@ public class ImmutableEvent {
 
     public GregorianCalendar getStartDate() {
         return mStartDate;
+    }
+
+    public void setId(long newId) {
+        mId = newId;
     }
 }

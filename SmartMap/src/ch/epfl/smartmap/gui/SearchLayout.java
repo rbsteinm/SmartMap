@@ -22,7 +22,7 @@ import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.search.CacheSearchEngine;
-import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
+import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.search.SearchEngine;
 import ch.epfl.smartmap.search.SearchEngine.Type;
 
@@ -272,7 +272,7 @@ public class SearchLayout extends LinearLayout implements CacheListener {
         new AsyncTask<Void, Void, List<Displayable>>() {
             @Override
             public List<Displayable> doInBackground(Void... params) {
-                return CachedOnlineSearchEngine.getInstance().sendQuery(mCurrentQuery, mCurrentSearchType);
+                return CachedSearchEngine.getInstance().sendQuery(mCurrentQuery, mCurrentSearchType);
             }
 
             @Override

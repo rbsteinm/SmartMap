@@ -33,6 +33,8 @@ public final class Friend implements User {
     private String mLocationString;
     private Location mLocation;
     private Bitmap mImage;
+    private Boolean mIsVisible;
+    private Boolean mIsBlocked;
 
     protected Friend(ImmutableUser user) {
         super();
@@ -71,6 +73,17 @@ public final class Friend implements User {
             mImage = User.NO_IMAGE;
         } else {
             mImage = user.getImage();
+        }
+        if (user.isVisible() == null) {
+            mIsVisible = User.DEFAULT_VISIBILITY;
+        } else {
+            mIsVisible = user.isVisible();
+        }
+
+        if (user.isBlocked() == null) {
+            mIsBlocked = User.DEFAULT_BLOCK_VALUE;
+        } else {
+            mIsBlocked = user.isBlocked();
         }
     }
 
@@ -233,6 +246,16 @@ public final class Friend implements User {
     @Override
     public int hashCode() {
         return (int) mID;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#isBlocked()
+     */
+    @Override
+    public boolean isBlocked() {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     /*

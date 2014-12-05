@@ -35,8 +35,7 @@ import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
 import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
-import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
-import ch.epfl.smartmap.servercom.NotificationBag;
+import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
@@ -45,10 +44,12 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * @author ritterni
  */
 
-public class UpdateService extends Service implements OnInvitationListUpdateListener, OnInvitationStatusUpdateListener {
-
+public class UpdateService extends Service implements OnInvitationListUpdateListener,
+    OnInvitationStatusUpdateListener {
     private static final int HANDLER_DELAY = 1000;
+
     private static final int POS_UPDATE_DELAY = 10000;
+
     private static final int INVITE_UPDATE_DELAY = 30000;
 
     private static final float MIN_DISTANCE = 0; // minimum distance to update
@@ -56,25 +57,26 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
     private static final int RESTART_DELAY = 2000;
     public static final int IMAGE_QUALITY = 100;
-
     private final Handler mHandler = new Handler();
+
     private LocationManager mLocManager;
+
     private boolean mFriendsPosEnabled = true;
     private boolean mOwnPosEnabled = true;
+
     private final boolean isFriendIDListRetrieved = true;
     private final boolean isDatabaseInitialized = false;
     private DatabaseHelper mHelper;
     private SettingsManager mManager;
     private Geocoder mGeocoder;
     private Set<Long> mInviterIds = new HashSet<Long>();
-
     // Settings
     private int mPosUpdateDelay;
     private boolean mNotificationsEnabled;
     private boolean mNotificationsForEventInvitations;
     private boolean mNotificationsForFriendRequests;
-    private boolean mNotificationsForFriendshipConfirmations;
 
+    private boolean mNotificationsForFriendshipConfirmations;
     private final Runnable friendsPosUpdate = new Runnable() {
         @Override
         public void run() {
@@ -92,7 +94,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                 @Override
                 public Void doInBackground(Void... params) {
                     try {
-                        CachedOnlineSearchEngine.getInstance().getAllNearEvents(
+                        CachedSearchEngine.getInstance().getAllNearEvents(
                             SettingsManager.getInstance().getLocation(), 100000);
                     } catch (SmartMapClientException e) {
                         Log.e("UPDATE SERVICE", "Can't retrieve nearby events");
@@ -188,8 +190,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
         Criteria criteria = new Criteria();
         criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
-        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), mPosUpdateDelay, MIN_DISTANCE,
-            new MyLocationListener());
+        mLocManager.requestLocationUpdates(mLocManager.getBestProvider(criteria, true), mPosUpdateDelay,
+            MIN_DISTANCE, new MyLocationListener());
 
         new AsyncTask<Void, Void, Void>() {
 
@@ -200,8 +202,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                 for (User user : friends) {
                     UpdateService.this.downloadUserPicture(user.getId());
                     ImmutableUser immutable =
-                        new ImmutableUser(user.getId(), null, null, null, null, null, mHelper.getPictureById(user
-                            .getId()));
+                        new ImmutableUser(user.getId(), null, null, null, null, null,
+                            mHelper.getPictureById(user.getId()));
                     immutables.add(immutable);
                 }
                 ServiceContainer.getCache().updateFriends(immutables);
@@ -212,19 +214,21 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         return START_STICKY;
     }
 
-    // Ugly workaround because of KitKat stopping services when app gets closed
-    // (Android issue #63618)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
         restartService.setPackage(this.getPackageName());
         PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
+                PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService =
+            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
     }
 
+    // Ugly workaround because of KitKat stopping services when app gets closed
+    // (Android issue #63618)
     /**
      * Enables/disables friends position updates
      * 
@@ -300,7 +304,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         protected Void doInBackground(Void... args0) {
             try {
-                List<ImmutableUser> friendsWithNewLocations = ServiceContainer.getNetworkClient().listFriendsPos();
+                List<ImmutableUser> friendsWithNewLocations =
+                    ServiceContainer.getNetworkClient().listFriendsPos();
                 ServiceContainer.getCache().updateFriendList(friendsWithNewLocations);
             } catch (SmartMapClientException e) {
                 e.printStackTrace();
@@ -314,14 +319,15 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
      * 
      * @author ritterni
      */
-    private class AsyncGetInvitations extends AsyncTask<Void, Void, NotificationBag> {
+    private class AsyncGetInvitations extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... arg0) {
 
             try {
                 InvitationManager.getInstance().update(ServiceContainer.getNetworkClient().getInvitations());
             } catch (SmartMapClientException e) {
-                Log.e("UpdateService", "Couldn't retrieve invitations due to a server error: " + e.getMessage());
+                Log.e("UpdateService",
+                    "Couldn't retrieve invitations due to a server error: " + e.getMessage());
                 // try to re-log
                 new AsyncLogin().execute();
             }
@@ -338,8 +344,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         protected Void doInBackground(Void... arg0) {
             try {
-                ServiceContainer.getNetworkClient().authServer(mManager.getUserName(), mManager.getFacebookID(),
-                    mManager.getToken());
+                ServiceContainer.getNetworkClient().authServer(mManager.getUserName(),
+                    mManager.getFacebookID(), mManager.getToken());
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't log in!");
             }
@@ -406,7 +412,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             // stop sending position if provider isn't available
-            if ((status == LocationProvider.OUT_OF_SERVICE) || (status == LocationProvider.TEMPORARILY_UNAVAILABLE)) {
+            if ((status == LocationProvider.OUT_OF_SERVICE)
+                || (status == LocationProvider.TEMPORARILY_UNAVAILABLE)) {
                 mOwnPosEnabled = false;
             } else if (status == LocationProvider.AVAILABLE) {
                 mOwnPosEnabled = true;

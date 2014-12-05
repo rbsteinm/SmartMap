@@ -12,7 +12,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.InvitationListener;
-import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
+import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkRequestCallback;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -46,6 +46,142 @@ public final class InvitationManager {
         mInvitationInstances = new LongSparseArray<Invitation>();
 
         mListeners = new LinkedList<InvitationListener>();
+    }
+
+    /**
+     * Return true if the invitation has been accepted (has to be called in an
+     * AsyncTask<>)
+     * 
+     * @param id
+     *            the id of user
+     * @return
+     *         true whether it has been accepted and false in the other case
+     */
+    public boolean acceptFriend(final long id) {
+        ImmutableUser result;
+        try {
+            result = ServiceContainer.getNetworkClient().acceptInvitation(id);
+            if (result != null) {
+                ServiceContainer.getCache().putFriend(result);
+            } else {
+                return false;
+            }
+            return true;
+        } catch (SmartMapClientException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Returns a list of all pending received invitations
+     * 
+     * @return A list of FriendInvitations
+     */
+    public List<Invitation> getFriendInvitations() {
+        return null;
+    }
+
+    /**
+     * @return the id of invited users
+     */
+    public Set<User> getInvitedUsers() {
+        return ServiceContainer.getCache().getStrangers(mInvitedUserIds);
+    }
+
+    /**
+     * @return number of unread invitations
+     */
+    public int getNumberOfUnreadInvitations() {
+        return 0;
+    }
+
+    /**
+     * @return the id of pending events
+     */
+    public Set<Event> getPendingEvents() {
+        return ServiceContainer.getCache().getPublicEvents(mInvitingEventIds);
+    }
+
+    /**
+     * @return the id of pending friends
+     */
+    public Set<User> getPendingFriends() {
+        return ServiceContainer.getCache().getStrangers(mInvitingFriendIds);
+    }
+
+    /**
+     * Sends accepted friend invitation to server
+     * 
+     * @param friendId
+     *            the id of friend that accepted the invitation
+     * @param callback
+     *            callback that says if it fails or it successes
+     */
+    public void sendAcceptedFriendInvitation(final long friendId, final NetworkRequestCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceContainer.getNetworkClient().acceptInvitation(friendId);
+                    callback.onSuccess();
+                } catch (SmartMapClientException e) {
+                    callback.onFailure();
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Sends event invitations to several users to server
+     * 
+     * @param eventId
+     *            the event id
+     * @param usersIds
+     *            the list of user we want to invite
+     * @param callback
+     *            callback that says if it fails or it successes
+     */
+    public void
+        sendEventInvitation(final long eventId, final List<Long> usersIds, final NetworkRequestCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, usersIds);
+                    callback.onSuccess();
+                } catch (SmartMapClientException e) {
+                    callback.onFailure();
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Sends friend invitation to server
+     * 
+     * @param friendId
+     *            the invited friend
+     * @param callback
+     *            callback that says if it fails or it successes
+     */
+    public void sendFriendInvitation(final long friendId, final NetworkRequestCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceContainer.getNetworkClient().inviteFriend(friendId);
+                    callback.onSuccess();
+                } catch (SmartMapClientException e) {
+                    callback.onFailure();
+                }
+                return null;
+            }
+        }.execute();
     }
 
     /**
@@ -142,18 +278,44 @@ public final class InvitationManager {
     }
 
     /**
+     * Add a pending Event, and fill the cache with its information
+     * 
+     * @param id
+     *            the id of event
+     */
+    private void addInvitingEvents(final long id) {
+        mInvitingEventIds.add(id);
+
+        (new AsyncTask<Void, Void, Void>() {
+            @Override
+            public Void doInBackground(Void... params) {
+                // This method adds the event in the cache
+                CachedSearchEngine.getInstance().findPublicEventById(id);
+
+                return null;
+            }
+        }).execute();
+
+        // Notify listeners
+        for (InvitationListener listener : mListeners) {
+            listener.onInvitationListUpdate();
+        }
+    }
+
+    /**
      * Add a pending Friend, and fill the cache with its informations.
      * 
      * @param id
      *            the id of user
      */
+
     private void addInvitingFriends(Set<Long> ids) {
         for (final long id : ids) {
             (new AsyncTask<Void, Void, Boolean>() {
                 @Override
                 public Boolean doInBackground(Void... params) {
                     // This method adds the user in the cache
-                    User user = CachedOnlineSearchEngine.getInstance().findStrangerById(id);
+                    User user = CachedSearchEngine.getInstance().findStrangerById(id);
                     return user != null;
                 }
 
@@ -173,163 +335,7 @@ public final class InvitationManager {
         }
     }
 
-    /**
-     * Add a pending Event, and fill the cache with its information
-     * 
-     * @param id
-     *            the id of event
-     */
-    private void addInvitingEvents(final long id) {
-        mInvitingEventIds.add(id);
-
-        (new AsyncTask<Void, Void, Void>() {
-            @Override
-            public Void doInBackground(Void... params) {
-                // This method adds the event in the cache
-                CachedOnlineSearchEngine.getInstance().findPublicEventById(id);
-                return null;
-            }
-        }).execute();
-
-        // Notify listeners
-        for (InvitationListener listener : mListeners) {
-            listener.onInvitationListUpdate();
-        }
-    }
-
-    /**
-     * @return the id of pending friends
-     */
-    public Set<User> getPendingFriends() {
-        return Cache.getInstance().getStrangers(mInvitingFriendIds);
-    }
-
-    /**
-     * @return the id of pending events
-     */
-    public Set<Event> getPendingEvents() {
-        return Cache.getInstance().getPublicEvents(mInvitingEventIds);
-    }
-
-    /**
-     * @return the id of invited users
-     */
-    public Set<User> getInvitedUsers() {
-        return Cache.getInstance().getStrangers(mInvitedUserIds);
-    }
-
-    /**
-     * Return true if the invitation has been accepted (has to be called in an
-     * AsyncTask<>)
-     * 
-     * @param id
-     *            the id of user
-     * @return
-     *         true whether it has been accepted and false in the other case
-     */
-    public boolean acceptFriend(final long id) {
-        ImmutableUser result;
-        try {
-            result = ServiceContainer.getNetworkClient().acceptInvitation(id);
-            if (result != null) {
-                Cache.getInstance().putFriend(result);
-            } else {
-                return false;
-            }
-            return true;
-        } catch (SmartMapClientException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Returns a list of all pending received invitations
-     * 
-     * @return A list of FriendInvitations
-     */
-    public List<Invitation> getFriendInvitations() {
-        return null;
-    }
-
-    /**
-     * @return number of unread invitations
-     */
-    public int getNumberOfUnreadInvitations() {
-        return 0;
-    }
-
-    /**
-     * Sends friend invitation to server
-     * 
-     * @param friendId
-     *            the invited friend
-     * @param callback
-     *            callback that says if it fails or it successes
-     */
-    public void sendFriendInvitation(final long friendId, final NetworkRequestCallback callback) {
-        new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    ServiceContainer.getNetworkClient().inviteFriend(friendId);
-                    callback.onSuccess();
-                } catch (SmartMapClientException e) {
-                    callback.onFailure();
-                }
-                return null;
-            }
-        }.execute();
-    }
-
-    /**
-     * Sends accepted friend invitation to server
-     * 
-     * @param friendId
-     *            the id of friend that accepted the invitation
-     * @param callback
-     *            callback that says if it fails or it successes
-     */
-    public void sendAcceptedFriendInvitation(final long friendId, final NetworkRequestCallback callback) {
-        new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    ServiceContainer.getNetworkClient().acceptInvitation(friendId);
-                    callback.onSuccess();
-                } catch (SmartMapClientException e) {
-                    callback.onFailure();
-                }
-                return null;
-            }
-        }.execute();
-    }
-
-    /**
-     * Sends event invitations to several users to server
-     * 
-     * @param eventId
-     *            the event id
-     * @param usersIds
-     *            the list of user we want to invite
-     * @param callback
-     *            callback that says if it fails or it successes
-     */
-    public void
-        sendEventInvitation(final long eventId, final List<Long> usersIds, final NetworkRequestCallback callback) {
-        new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, usersIds);
-                    callback.onSuccess();
-                } catch (SmartMapClientException e) {
-                    callback.onFailure();
-                }
-                return null;
-            }
-        }.execute();
+    public static InvitationManager getInstance() {
+        return ONE_INSTANCE;
     }
 }

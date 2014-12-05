@@ -7,6 +7,8 @@ public interface CacheListener {
 
     void onEventListUpdate();
 
+    void onFilterListUpdate();
+
     void onFriendListUpdate();
 
 }
