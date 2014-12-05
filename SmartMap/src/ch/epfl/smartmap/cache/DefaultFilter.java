@@ -9,8 +9,8 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.util.LongSparseArray;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Describes a clientside, custom friend list (e.g. friends, family, etc.)
@@ -101,8 +101,8 @@ public class DefaultFilter implements Filter {
      * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions()
      */
     @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        return NO_MARKER_OPTIONS;
+    public BitmapDescriptor getMarkerIcon(Context context) {
+        return NO_MARKER_ICON;
     }
 
     /*

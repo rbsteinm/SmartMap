@@ -23,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * A default implementation of {@link MarkerManager}
@@ -32,6 +33,9 @@ import com.google.android.gms.maps.model.Marker;
 public class DefaultMarkerManager implements MarkerManager {
 
     public static final String TAG = "MARKER MANAGER";
+    float MARKER_ANCHOR_X = (float) 0.5;
+
+    float MARKER_ANCHOR_Y = 1;
 
     public static final long HANDLER_DELAY = 16;
 
@@ -60,7 +64,10 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker addMarker(Displayable item, Context context) {
-        Marker marker = mGoogleMap.addMarker(item.getMarkerOptions(context));
+
+        Marker marker =
+            mGoogleMap.addMarker(new MarkerOptions().position(item.getLatLng()).title(item.getTitle())
+                .icon(item.getMarkerIcon(context)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
         mDisplayedItems.put(marker.getId(), item);
         mDictionnaryMarkers.put(marker.getId(), marker);
         return marker;
@@ -201,6 +208,7 @@ public class DefaultMarkerManager implements MarkerManager {
             } else {
                 marker = this.addMarker(item, context);
             }
+            marker.setIcon(item.getMarkerIcon(context));
             this.animateMarker(marker, item.getLatLng(), false);
         }
 

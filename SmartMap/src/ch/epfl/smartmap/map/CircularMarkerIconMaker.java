@@ -14,9 +14,10 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.User;
 
 /**
- * An implementation of {@link MarkerIconMaker}, that creates circular icons for markers
+ * An implementation of {@link MarkerIconMaker}, that creates a circular icon for a user
  * 
  * @author hugo-S
  */
@@ -24,16 +25,19 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
 
     private final Bitmap mMarkerShape;
     private final Context mContext;
+    private final User mUser;
     public static final float CIRCLE_CENTER_INCREMENT = 0.7f;
     public static final float CIRCLE_RADIUS_INCREMENT = 0.1f;
     public static final int SHAPE_BORDER_WIDTH = 230;
     public static final float SCALE_MARKER = 0.10f;
     public static final int SHAPE_TAIL_LENGTH = 73;
 
-    public CircularMarkerIconMaker(Context context) {
+    public CircularMarkerIconMaker(Context context, User user) {
         mContext = context;
+        mUser = user;
         int idForm = R.drawable.marker_forme;
         mMarkerShape = BitmapFactory.decodeResource(mContext.getResources(), idForm);
+
     }
 
     /*
@@ -41,11 +45,16 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @see ch.epfl.smartmap.map.MarkerIconMaker#getMarkerIcon(android.graphics.Bitmap)
      */
     @Override
-    public Bitmap getMarkerIcon(Bitmap profilePicture) {
+    public Bitmap getMarkerIcon() {
+        Bitmap profilePicture =
+            Bitmap.createScaledBitmap(mUser.getImage(), User.PICTURE_WIDTH, User.PICTURE_HEIGHT, false);
 
         profilePicture =
             Bitmap.createScaledBitmap(profilePicture, mMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
                 mMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
+
+        // TODO set the color of the marker shape, using mUser.getLastSeen
+
         Bitmap roundProfile = this.cropProfilePicture(profilePicture, profilePicture.getWidth());
         Bitmap finalMarker = overlay(mMarkerShape, roundProfile);
         finalMarker = scaleMarker(finalMarker, SCALE_MARKER);
