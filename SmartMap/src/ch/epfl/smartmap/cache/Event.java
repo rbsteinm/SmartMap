@@ -21,18 +21,12 @@ public interface Event extends Displayable {
     final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
     final String NO_DESCRIPTION = "This event currently has no description";
 
-    final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(),
-        R.drawable.default_event);
+    final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(), R.drawable.default_event);
 
     /**
      * @return The ID of the user who created the event
      */
     long getCreatorId();
-
-    /**
-     * @return The name of creator
-     */
-    String getCreatorName();
 
     /**
      * @return The event's description

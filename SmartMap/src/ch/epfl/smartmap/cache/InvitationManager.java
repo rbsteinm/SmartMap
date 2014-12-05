@@ -8,13 +8,12 @@ import java.util.Set;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.InvitationListener;
 import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkRequestCallback;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -27,10 +26,6 @@ public final class InvitationManager {
 
     private final static InvitationManager ONE_INSTANCE = new InvitationManager();
 
-    // Other members of the data hierarchy
-    private final DatabaseHelper mDatabaseHelper;
-    private final NetworkSmartMapClient mNetworkClient;
-
     // List containing ids of all Friends
     private final Set<Long> mInvitingEventIds;
     private final Set<Long> mInvitingFriendIds;
@@ -42,10 +37,6 @@ public final class InvitationManager {
     private final List<InvitationListener> mListeners;
 
     public InvitationManager() {
-        // Init data hierarchy
-        mDatabaseHelper = DatabaseHelper.getInstance();
-        mNetworkClient = NetworkSmartMapClient.getInstance();
-
         // Init sets
         mInvitingEventIds = new HashSet<Long>();
         mInvitingFriendIds = new HashSet<Long>();
@@ -71,10 +62,6 @@ public final class InvitationManager {
             mInvitingFriendIds.add(userId);
         }
 
-        for (long eventId : notifBag.getInvitingEvent()) {
-            mInvitingEventIds.add(eventId);
-        }
-
         Set<Long> newFriends = notifBag.getNewFriends();
         Set<Long> removedFriends = notifBag.getRemovedFriendsIds();
 
@@ -83,7 +70,7 @@ public final class InvitationManager {
             new AsyncTask<Long, Void, Void>() {
                 @Override
                 protected Void doInBackground(Long... params) {
-                    User newFriend = Cache.getInstance().putFriend(params[0]);
+                    User newFriend = ServiceContainer.getCache().putFriend(params[0]);
                     Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
                     return null;
                 }
@@ -96,10 +83,10 @@ public final class InvitationManager {
 
                 @Override
                 protected Void doInBackground(Long... params) {
-                    User user = Cache.getInstance().putStranger(params[0]);
+                    User user = ServiceContainer.getCache().putStranger(params[0]);
 
                     if (!mInvitedUserIds.contains(user.getId())) {
-                        Cache.getInstance().addFriendInvitation(
+                        ServiceContainer.getCache().addFriendInvitation(
                             new FriendInvitation(0, user.getId(), user.getName(), Invitation.UNREAD, user.getImage()));
                         mInvitedUserIds.add(user.getId());
                         if (SettingsManager.getInstance().notificationsEnabled()
@@ -122,7 +109,7 @@ public final class InvitationManager {
                 protected Void doInBackground(Long... users) {
                     try {
                         for (long user : users) {
-                            NetworkSmartMapClient.getInstance().ackAcceptedInvitation(user);
+                            ServiceContainer.getCache().ackAcceptedInvitation(user);
                         }
                     } catch (SmartMapClientException e) {
                         Log.e("UpdateService", "Couldn't send acks!");
@@ -138,7 +125,7 @@ public final class InvitationManager {
                 protected Void doInBackground(Long... ids) {
                     try {
                         for (long id : ids) {
-                            NetworkSmartMapClient.getInstance().ackRemovedFriend(id);
+                            ServiceContainer.getNetworkClient().ackRemovedFriend(id);
                         }
                     } catch (SmartMapClientException e) {
                         Log.e("UpdateService", "Couldn't send acks!");
@@ -243,7 +230,7 @@ public final class InvitationManager {
     public boolean acceptFriend(final long id) {
         ImmutableUser result;
         try {
-            result = NetworkSmartMapClient.getInstance().acceptInvitation(id);
+            result = ServiceContainer.getNetworkClient().acceptInvitation(id);
             if (result != null) {
                 Cache.getInstance().putFriend(result);
             } else {
@@ -285,7 +272,7 @@ public final class InvitationManager {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    NetworkSmartMapClient.getInstance().inviteFriend(friendId);
+                    ServiceContainer.getNetworkClient().inviteFriend(friendId);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     callback.onFailure();
@@ -309,7 +296,7 @@ public final class InvitationManager {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    NetworkSmartMapClient.getInstance().acceptInvitation(friendId);
+                    ServiceContainer.getNetworkClient().acceptInvitation(friendId);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     callback.onFailure();
@@ -336,7 +323,7 @@ public final class InvitationManager {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    NetworkSmartMapClient.getInstance().inviteUsersToEvent(eventId, usersIds);
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, usersIds);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     callback.onFailure();
