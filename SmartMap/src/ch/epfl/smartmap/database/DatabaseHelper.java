@@ -303,7 +303,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * @param user
      *            The user who was sent a request
      */
-    public void addPendingFriend(User user) {
+    public void addPendingFriend(ImmutableUser user) {
         Cursor cursor =
             mDatabase.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(user.getId())}, null, null, null, null);

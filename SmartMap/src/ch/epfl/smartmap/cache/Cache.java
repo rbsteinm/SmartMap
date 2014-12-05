@@ -576,6 +576,31 @@ public class Cache {
 
     }
 
+    public void inviteUser(long id, final NetworkRequestCallback callback) {
+        new AsyncTask<Long, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Long... params) {
+                try {
+                    ServiceContainer.getNetworkClient().inviteFriend(params[0]);
+                    mInvitedUserIds.add(params[0]);
+                    // Better to store only id in db ?
+                    // ServiceContainer.getDatabase().addPendingFriend(params[0]);
+                    callback.onSuccess();
+                } catch (SmartMapClientException e) {
+                    Log.e(TAG, "Error while inviting friend: " + e.getMessage());
+                    callback.onFailure();
+                }
+                return null;
+            }
+
+        }.execute(id);
+    }
+
+    public void acceptInvitation(long id) { // Callback ?
+
+    }
+
     private void updateFriendInvitations(Set<ImmutableUser> inviters) {
         for (ImmutableUser inviter : inviters) {
             if (!mInvitingUserIds.contains(inviter.getId())) {
@@ -588,7 +613,8 @@ public class Cache {
                             if ((image == User.NO_IMAGE) || (image == null)) {
                                 image = ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
                             }
-
+                            // Do we have to store received invitation or sent
+                            // invitations ?
                             FriendInvitation invitation =
                                 new FriendInvitation(0, params[0].getId(), params[0].getName(), Invitation.UNREAD,
                                     image);
