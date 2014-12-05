@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.gui;
 
 import android.widget.TextView;
-import ch.epfl.smartmap.cache.Event;
 
 /**
  * <p>
@@ -13,7 +12,7 @@ import ch.epfl.smartmap.cache.Event;
  * @author SpicyCH
  */
 public class EventViewHolder {
-    private Event mEvent;
+    private long mEvent;
     private TextView mNameTextView;
     private TextView mStartTextView;
     private TextView mEndTextView;
@@ -22,7 +21,7 @@ public class EventViewHolder {
         return mEndTextView;
     }
 
-    public Event getEvent() {
+    public long getEventId() {
         return mEvent;
     }
 
@@ -38,8 +37,8 @@ public class EventViewHolder {
         mEndTextView = v;
     }
 
-    public void setEvent(Event e) {
-        mEvent = e;
+    public void setEventId(Long id) {
+        mEvent = id;
     }
 
     public void setNameTextView(TextView v) {

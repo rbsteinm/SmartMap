@@ -1,7 +1,12 @@
 package ch.epfl.smartmap.activities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -9,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Event;
@@ -24,10 +30,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * This activity shows an event in a complete screens.
+ * This activity shows an event in a complete screens. It display in addition two buttons: one to invite
+ * friends, and
+ * one to see the event on the map.
  * 
  * @author SpicyCH
+ * @author agpmilli
  */
+
 public class EventInformationActivity extends FragmentActivity {
 
 	private static final String TAG = EventInformationActivity.class.getSimpleName();
@@ -36,6 +46,7 @@ public class EventInformationActivity extends FragmentActivity {
 
 	private GoogleMap mGoogleMap;
 	private SupportMapFragment mFragmentMap;
+	private Context mContext;
 	private Event mEvent;
 	private TextView mEventTitle;
 	private TextView mEventCreator;
@@ -44,35 +55,79 @@ public class EventInformationActivity extends FragmentActivity {
 	private TextView mEventDescription;
 	private TextView mPlaceNameAndCountry;
 
+	/**
+	 * Used to get the event id the getExtra of the starting intent, and to pass the retrieved event from
+	 * doInBackground
+	 * to onPostExecute.
+	 */
+	private final static String EVENT_KEY = "EVENT";
+	private final static String CREATOR_NAME_KEY = "CREATOR_NAME";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.activity_show_event_information);
 		this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-		Log.d(TAG, "OnCreate");
-		if (this.getIntent().getLongExtra("EVENT", 0) != 0) {
-			long eventId = this.getIntent().getLongExtra("EVENT", 0);
-			mEvent = Cache.getInstance().getEventById(eventId);
-			Log.d(TAG, "City name: " + mEvent.getLocationString());
-			Log.d(TAG, "Country name: " + "UNIMPLEMENTED");
-		}
+		mContext = this.getApplicationContext();
 
-		if (mEvent != null) {
-			this.initializeGUI();
+		// This activity needs a (positive) event id to process. If none given, we finish it.
+		if (this.getIntent().getLongExtra(EVENT_KEY, -1) > 0) {
 
-			mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
+			long eventId = this.getIntent().getLongExtra(EVENT_KEY, -1);
+
+			Log.d(TAG, "Received event id " + eventId);
+
+			// Need an AsyncTask because getEventById searches on our server if event not stored in cache.
+			AsyncTask<Long, Void, Map<String, Object>> loadEvent = new AsyncTask<Long, Void, Map<String, Object>>() {
+
 				@Override
-				public void onMapClick(LatLng position) {
-					if (mEvent.getLatLng() != null) {
-						mGoogleMap.clear();
-					}
-					Intent showOnMainIntent = new Intent(EventInformationActivity.this, MainActivity.class);
-					showOnMainIntent.putExtra("LatLng",
-					    new double[] {mEvent.getLatLng().latitude, mEvent.getLatLng().longitude});
-					EventInformationActivity.this.startActivity(showOnMainIntent);
+				protected Map<String, Object> doInBackground(Long... params) {
+
+					Log.d(TAG, "Retrieving event...");
+
+					long eventId = params[0];
+
+					Map<String, Object> output = new HashMap<String, Object>();
+
+					Event event = Cache.getInstance().getEventById(eventId);
+					output.put(EVENT_KEY, event);
+
+					String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
+					output.put(CREATOR_NAME_KEY, creatorName);
+
+					return output;
 				}
-			});
+
+				@Override
+				protected void onPostExecute(Map<String, Object> result) {
+
+					Log.d(TAG, "Processing event...");
+
+					final Event event = (Event) result.get(EVENT_KEY);
+					final String creatorName = (String) result.get(CREATOR_NAME_KEY);
+
+					if ((event == null) || (creatorName == null)) {
+						Log.e(TAG, "The server returned a null event or creatorName");
+
+						Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error),
+						    Toast.LENGTH_SHORT).show();
+
+					} else {
+						mEvent = event;
+						EventInformationActivity.this.initializeGUI(event, creatorName);
+					}
+
+				}
+
+			};
+
+			loadEvent.execute(eventId);
+		} else {
+			Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
+			Toast.makeText(mContext, mContext.getString(R.string.error_client_side), Toast.LENGTH_SHORT)
+			    .show();
+			this.finish();
 		}
 
 	}
@@ -122,47 +177,23 @@ public class EventInformationActivity extends FragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void openMapAtEventLocation(View v) {
+	/**
+	 * Triggered when the button 'Shop on the map' is pressed. Opens the map at the location of the event.
+	 * 
+	 * @param v
+	 *            the button who has been clicked
+	 * @author SpicyCH
+	 */
+	public void openMapAtEventLocation() {
 		Intent showEventIntent = new Intent(this, MainActivity.class);
 		showEventIntent.putExtra("location", mEvent.getLocation());
 		this.startActivity(showEventIntent);
 	}
 
 	/**
-	 * Initializes the different views of this activity.
-	 * 
-	 * @author SpicyCH
-	 */
-	private void initializeGUI() {
-
-		this.setTitle(mEvent.getName());
-
-		mEventTitle = (TextView) this.findViewById(R.id.show_event_info_event_name);
-		mEventTitle.setText(mEvent.getName());
-
-		mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
-		mEventCreator.setText(this.getString(R.string.show_event_by) + " "
-		    + Cache.getInstance().getUserById(mEvent.getCreatorId()).getName());
-
-		mStart = (TextView) this.findViewById(R.id.show_event_info_start);
-		mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(),
-		    "start"));
-
-		mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
-		mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));
-
-		mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
-		mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ": "
-		    + mEvent.getDescription());
-
-		mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
-		mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");
-
-		this.displayMap();
-	}
-
-	/**
 	 * Display the map with the current location
+	 * 
+	 * @author agpmilli
 	 */
 	public void displayMap() {
 		int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
@@ -172,7 +203,6 @@ public class EventInformationActivity extends FragmentActivity {
 			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
 			dialog.show();
 		} else {
-			Log.d(TAG, "DisplayMap1");
 			// Google Play Services are available.
 			// Getting reference to the SupportMapFragment of activity_main.xml
 			mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(
@@ -188,8 +218,48 @@ public class EventInformationActivity extends FragmentActivity {
 			mGoogleMap.addMarker(new MarkerOptions().position(mEvent.getLatLng()));
 
 			new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEvent.getLatLng());
-			Log.d(TAG, "DisplayMap2");
-
 		}
+	}
+
+	/**
+	 * Initializes the different views of this activity.
+	 * 
+	 * @author SpicyCH
+	 */
+	private void initializeGUI(final Event mEvent, String creatorName) {
+
+		this.setTitle(mEvent.getName());
+
+		mEventTitle = (TextView) this.findViewById(R.id.show_event_info_event_name);
+		mEventTitle.setText(mEvent.getName());
+
+		mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
+		mEventCreator.setText(this.getString(R.string.show_event_by) + " " + creatorName);
+
+		mStart = (TextView) this.findViewById(R.id.show_event_info_start);
+		mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(),
+		    "start"));
+
+		mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
+		mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));
+
+		mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
+		mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ":\n"
+		    + mEvent.getDescription());
+
+		mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
+		mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");
+
+		this.displayMap();
+
+		mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
+			@Override
+			public void onMapClick(LatLng position) {
+				if (mEvent.getLatLng() != null) {
+					mGoogleMap.clear();
+				}
+				EventInformationActivity.this.openMapAtEventLocation();
+			}
+		});
 	}
 }

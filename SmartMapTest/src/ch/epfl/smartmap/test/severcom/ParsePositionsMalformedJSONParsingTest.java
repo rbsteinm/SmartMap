@@ -1,12 +1,12 @@
 package ch.epfl.smartmap.test.severcom;
 
-import junit.framework.TestCase;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import android.test.AndroidTestCase;
+import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.servercom.JsonSmartMapParser;
 import ch.epfl.smartmap.servercom.SmartMapParseException;
 import ch.epfl.smartmap.servercom.SmartMapParser;
@@ -16,7 +16,7 @@ import ch.epfl.smartmap.servercom.SmartMapParser;
  * 
  * @author marion-S
  */
-public class ParsePositionsMalformedJSONParsingTest extends TestCase {
+public class ParsePositionsMalformedJSONParsingTest extends AndroidTestCase {
 
 	private static final String POSITIONS_LIST_JSON = "{\n"
 			+ " \"positions\" : [\n" + "{\n" + " \"id\" : \"13\", \n"
@@ -31,7 +31,7 @@ public class ParsePositionsMalformedJSONParsingTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-
+		Utils.sContext = getContext();
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class ParsePositionsMalformedJSONParsingTest extends TestCase {
 		JSONObject jsonObject = new JSONObject(POSITIONS_LIST_JSON);
 		JSONArray jsonArray = jsonObject.getJSONArray("positions");
 		JSONObject jsonPosition = (JSONObject) jsonArray.get(0);
-		jsonPosition.put("lastUpdate", "2500-11-23 23:23:34");
+		jsonPosition.put("lastUpdate", "2500-12-03 21:38:10");
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {

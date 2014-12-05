@@ -2,16 +2,19 @@ package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +39,6 @@ import ch.epfl.smartmap.gui.EventsListItemAdapter;
  */
 public class ShowEventsActivity extends ListActivity {
 
-    @SuppressWarnings("unused")
     private final static String TAG = ShowEventsActivity.class.getSimpleName();
 
     private final static double EARTH_RADIUS_KM = 6378.1;
@@ -53,9 +55,16 @@ public class ShowEventsActivity extends ListActivity {
     private boolean mOngoingChecked;
     private boolean mNearMeChecked;
 
+    /**
+     * Contains all events
+     */
     private List<Event> mEventsList;
+
+    /**
+     * Contains the displayed events
+     */
     private List<Event> mCurrentList;
-    private static String mMyName;
+
     private Location mMyLocation;
 
     @Override
@@ -66,6 +75,7 @@ public class ShowEventsActivity extends ListActivity {
         // Makes the logo clickable (clicking it returns to previous activity)
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
         this.initializeGUI();
 
         // Create custom Adapter and pass it to the Activity
@@ -79,7 +89,19 @@ public class ShowEventsActivity extends ListActivity {
         this.displayInfoDialog(position);
     }
 
+    /**
+     * Triggered when a checkbox is clicked. Updates the displayed list of events.
+     * 
+     * @param v
+     *            the checkbox whose status changed
+     * 
+     * @author SpicyCH
+     */
     public void onCheckboxClicked(View v) {
+        if (!(v instanceof CheckBox)) {
+            throw new IllegalArgumentException("This method requires v to be a CheckBox");
+        }
+
         CheckBox checkBox = (CheckBox) v;
 
         switch (v.getId()) {
@@ -124,20 +146,19 @@ public class ShowEventsActivity extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
             case android.R.id.home:
                 this.finish();
                 break;
             case R.id.showEventsMenuNewEvent:
                 Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
                 this.startActivity(showEventIntent);
-            default:
-                // No other menu items!
+                break;
+            case R.id.show_events_menu_refresh:
+                this.updateCurrentList();
                 break;
         }
 
@@ -147,8 +168,9 @@ public class ShowEventsActivity extends ListActivity {
     @Override
     public void onResume() {
         super.onResume();
+
         // This is needed to show an update of the events' list after having
-        // created an event
+        // created one.
         this.updateCurrentList();
     }
 
@@ -164,55 +186,126 @@ public class ShowEventsActivity extends ListActivity {
      * @author SpicyCH
      */
     private void displayInfoDialog(int position) {
+
+        Toast.makeText(mContext, this.getString(R.string.show_event_loading_info), Toast.LENGTH_SHORT).show();
+
         final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
-        final Event event = eventViewHolder.getEvent();
-        String message =
-            EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "start") + " - "
-                + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
-                + "\nCreated by " + event.getCreatorName() + "\n\n" + event.getDescription();
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle(event.getName()
-            + " @ "
-            + event.getLocationString()
-            + "\n"
-            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
-                .getLatitude(), event.getLocation().getLongitude()) + " km away");
-        alertDialog.setMessage(message);
-        final Activity activity = this;
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-            this.getString(R.string.show_event_on_the_map_button), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    Toast.makeText(activity,
-                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                        Toast.LENGTH_SHORT).show();
-                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                    showEventIntent.putExtra("location", event.getLocation());
-                    ShowEventsActivity.this.startActivity(showEventIntent);
+
+        // Need an AsyncTask because getEventById searches on our server if event not stored in cache.
+        AsyncTask<Long, Void, Map<String, Object>> loadEvent = new AsyncTask<Long, Void, Map<String, Object>>() {
+
+            private final static String EVENT_KEY = "EVENT";
+            private final static String CREATOR_NAME_KEY = "CREATOR_NAME";
+
+            @Override
+            protected Map<String, Object> doInBackground(Long... params) {
+
+                Log.d(TAG, "Retrieving event...");
+
+                long eventId = params[0];
+
+                Map<String, Object> output = new HashMap<String, Object>();
+
+                Event event = Cache.getInstance().getEventById(eventId);
+                output.put(EVENT_KEY, event);
+
+                String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
+                output.put(CREATOR_NAME_KEY, creatorName);
+
+                return output;
+            }
+
+            @Override
+            protected void onPostExecute(Map<String, Object> result) {
+
+                Log.d(TAG, "Processing event...");
+
+                final Event event = (Event) result.get(EVENT_KEY);
+                final String creatorName = (String) result.get(CREATOR_NAME_KEY);
+
+                if ((event == null) || (creatorName == null)) {
+                    Log.e(TAG, "The server returned a null event or creatorName");
+
+                    Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
+                            .show();
+
+                } else {
+
+                    // Construct the dialog that display more detailed infos and offers to show event on the map or to
+                    // show more details.
+
+                    AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
+
+                    final String message = EventsListItemAdapter.getTextFromDate(event.getStartDate(),
+                            event.getEndDate(), "start")
+                            + " - "
+                            + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
+                            + "\n"
+                            + mContext.getString(R.string.show_event_by)
+                            + " "
+                            + creatorName
+                            + "\n\n"
+                            + event.getDescription();
+
+                    alertDialog.setTitle(event.getName()
+                            + " @ "
+                            + event.getLocationString()
+                            + "\n"
+                            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
+                                    .getLatitude(), event.getLocation().getLongitude()) + " km away");
+                    alertDialog.setMessage(message);
+
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
+                            mContext.getString(R.string.show_event_on_the_map_button),
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Toast.makeText(mContext,
+                                            ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                                            Toast.LENGTH_SHORT).show();
+                                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                                    showEventIntent.putExtra("location", event.getLocation());
+                                    ShowEventsActivity.this.startActivity(showEventIntent);
+                                }
+                            });
+
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
+                            mContext.getString(R.string.show_event_details_button),
+                            new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
+                                    showEventIntent.putExtra("EVENT", event.getId());
+                                    ShowEventsActivity.this.startActivity(showEventIntent);
+                                }
+                            });
+
+                    alertDialog.show();
                 }
-            });
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, this.getString(R.string.show_event_details_button),
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
-                    showEventIntent.putExtra("EVENT", event.getId());
-                    ShowEventsActivity.this.startActivity(showEventIntent);
-                }
-            });
-        alertDialog.show();
+
+            }
+
+        };
+
+        Log.d(TAG, "Executing loadEvent task with event id " + eventViewHolder.getEventId());
+        loadEvent.execute(eventViewHolder.getEventId());
+
     }
 
     private void initializeGUI() {
+
         // We need to intialize the two following Singletons to let espresso
         // tests pass.
         mContext = this.getApplicationContext();
         SettingsManager.initialize(mContext);
         DatabaseHelper.initialize(mContext);
 
-        mMyName = SettingsManager.getInstance().getUserName();
+        Log.d(TAG, "My id: " + SettingsManager.getInstance().getUserID());
 
         mMyLocation = SettingsManager.getInstance().getLocation();
+        Log.d(TAG, "mMyLocation: " + mMyLocation.getLatitude() + "/" + mMyLocation.getLongitude());
 
         mMyEventsChecked = false;
         mOngoingChecked = false;
@@ -246,9 +339,8 @@ public class ShowEventsActivity extends ListActivity {
 
         });
 
-        DatabaseHelper.getInstance();
-
-        mEventsList = Cache.getInstance().getAllGoingEvents();
+        mEventsList = Cache.getInstance().getAllEvents();
+        Log.d(TAG, "mEventsList initialized: " + mEventsList);
     }
 
     /**
@@ -257,7 +349,11 @@ public class ShowEventsActivity extends ListActivity {
     private void updateCurrentList() {
 
         mMyLocation = SettingsManager.getInstance().getLocation();
-        mEventsList = Cache.getInstance().getAllGoingEvents();
+        Log.d(TAG, "mMyLocation updated: " + mMyLocation.getLatitude() + "/" + mMyLocation.getLongitude());
+
+        mEventsList = Cache.getInstance().getAllEvents();
+        Log.d(TAG, "mEventsList updated: " + mEventsList);
+
         mCurrentList = new ArrayList<Event>();
 
         // Copy complete list into current list
@@ -267,7 +363,7 @@ public class ShowEventsActivity extends ListActivity {
 
         for (Event e : mEventsList) {
             if (mMyEventsChecked) {
-                if (!Cache.getInstance().getFriendById(e.getCreatorId()).getName().equals(mMyName)) {
+                if (!(e.getCreatorId() == SettingsManager.getInstance().getUserID())) {
                     mCurrentList.remove(e);
                 }
             }
@@ -280,8 +376,7 @@ public class ShowEventsActivity extends ListActivity {
 
             if (mNearMeChecked) {
                 if (mMyLocation != null) {
-                    double distanceMeEvent =
-                        distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
+                    double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
                             mMyLocation.getLatitude(), mMyLocation.getLongitude());
                     String[] showKMContent = mShowKilometers.getText().toString().split(" ");
                     double distanceMax = Double.parseDouble(showKMContent[0]);
@@ -290,8 +385,8 @@ public class ShowEventsActivity extends ListActivity {
                     }
                 } else {
                     Toast.makeText(this.getApplicationContext(),
-                        this.getString(R.string.show_event_cannot_retrieve_current_location),
-                        Toast.LENGTH_SHORT).show();
+                            this.getString(R.string.show_event_cannot_retrieve_current_location), Toast.LENGTH_SHORT)
+                            .show();
                 }
             }
         }
@@ -301,8 +396,7 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired
-     * by
+     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired by
      * wikipedia. This is costly as there are several library calls to sin, cos, etc...
      * 
      * @param lat1

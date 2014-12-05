@@ -16,16 +16,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
  * Activity that shows full informations about a Displayable Object.
  * 
- * @author jfperren
  * @author rbsteinm
  */
 public class UserInformationActivity extends Activity {
@@ -33,17 +32,19 @@ public class UserInformationActivity extends Activity {
     @SuppressWarnings("unused")
     private static final String TAG = UserInformationActivity.class.getSimpleName();
 
-    private DatabaseHelper mCacheDB;
+    private User mUser;
+    private int mDistanceToUser;
 
     private Switch mFollowSwitch;
-    private TextView mInfosView;
+    private Switch mBlockSwitch;
+    private TextView mSubtitlesView;
     private TextView mNameView;
-
-    // Children Views
     private ImageView mPictureView;
-    private User mUser;
-    // TODO replace this by mUser.isFollowing() when implemented
+    private TextView mDistanceView;
+
+    // TODO replace this by mUser.isFollowing() and mUser.isBlocked() when implemented
     private final boolean isFollowing = true;
+    private final boolean isBlocked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +53,10 @@ public class UserInformationActivity extends Activity {
         // Get views
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
         mNameView = (TextView) this.findViewById(R.id.user_info_name);
-        mInfosView = (TextView) this.findViewById(R.id.user_info_infos);
+        mSubtitlesView = (TextView) this.findViewById(R.id.user_info_subtitles);
         mFollowSwitch = (Switch) this.findViewById(R.id.user_info_follow_switch);
+        mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
+        mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
@@ -62,14 +65,18 @@ public class UserInformationActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Get User & Database
+        // Get User & Database TODO set a listener on the user
         mUser = Cache.getInstance().getUserById(this.getIntent().getLongExtra("USER", User.NO_ID));
+        mDistanceToUser =
+            Math.round(SettingsManager.getInstance().getLocation().distanceTo(mUser.getLocation()));
 
         // Set Informations
         mNameView.setText(mUser.getName());
-        mInfosView.setText(mUser.getSubtitle());
+        mSubtitlesView.setText(mUser.getSubtitle());
         mPictureView.setImageBitmap(mUser.getImage());
         mFollowSwitch.setChecked(isFollowing);
+        mBlockSwitch.setChecked(isBlocked);
+        mDistanceView.setText(mDistanceToUser + " meters away from you");
     }
 
     public void displayDeleteConfirmationDialog(View view) {
@@ -183,7 +190,7 @@ public class UserInformationActivity extends Activity {
                 confirmString = "You're no longer friend with " + mUser.getName();
 
                 // remove friend from cache and update displayed list
-                // TODO should it be done in the removeFriend method ?
+                // TODO should not call network methods in the GUI
                 final long userId = params[0];
                 mHandler.post(new Runnable() {
                     @Override

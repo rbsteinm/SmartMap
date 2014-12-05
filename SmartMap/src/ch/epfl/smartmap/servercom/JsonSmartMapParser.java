@@ -30,7 +30,7 @@ public class JsonSmartMapParser implements SmartMapParser {
     private static final String ERROR_STATUS = "error";
     private static final String FEEDBACK_STATUS = "feedback";
 
-    private static final int SERVER_TIME_DIFFERENCE_THRESHHOLD = 60000;
+    private static final int SERVER_TIME_DIFFERENCE_THRESHHOLD = 10000;
 
     private static final int DATETIME_FORMAT_PARTS = 2;
     private static final int DATE_FORMAT_PARTS = 3;
@@ -221,6 +221,7 @@ public class JsonSmartMapParser implements SmartMapParser {
                 this.checkId(userId);
                 this.checkLatitude(latitude);
                 this.checkLongitude(longitude);
+                this.checkLastSeen(lastSeen);
 
                 Location location = new Location("SmartMapServers");
                 location.setTime(lastSeen.getTimeInMillis());
@@ -278,9 +279,10 @@ public class JsonSmartMapParser implements SmartMapParser {
      */
     private void checkLastSeen(GregorianCalendar lastSeen) throws SmartMapParseException {
         GregorianCalendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        if (Math.abs(now.getTimeInMillis() - lastSeen.getTimeInMillis()) > SERVER_TIME_DIFFERENCE_THRESHHOLD) {
+        if (lastSeen.getTimeInMillis() > (now.getTimeInMillis() + SERVER_TIME_DIFFERENCE_THRESHHOLD)) {
             throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString()
-                + " compared to " + now.toString());
+                + "\n compared to \n" + now.toString() + "\n Values: "
+                + Utils.getLastSeenStringFromCalendar(lastSeen));
         }
     }
 
@@ -448,7 +450,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         location.setLongitude(longitude);
         ImmutableEvent event =
             new ImmutableEvent(id, name, creatorId, description, startingDate, endDate, location,
-                positionName, new ArrayList<Long>());
+                positionName, participants);
 
         return event;
     }
@@ -465,12 +467,18 @@ public class JsonSmartMapParser implements SmartMapParser {
         String name = null;
         String phoneNumber = User.NO_PHONE_NUMBER;
         String email = User.NO_EMAIL;
+        double latitude = UNITIALIZED_LATITUDE;
+        double longitude = UNITIALIZED_LONGITUDE;
+        String lastSeenString = null;
 
         try {
             id = jsonObject.getLong("id");
             name = jsonObject.getString("name");
             phoneNumber = jsonObject.optString("phoneNumber", null);
             email = jsonObject.optString("email", null);
+            latitude = jsonObject.optDouble("latitude");
+            longitude = jsonObject.optDouble("longitude");
+            lastSeenString = jsonObject.optString("lastUpdate", null);
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
@@ -478,13 +486,23 @@ public class JsonSmartMapParser implements SmartMapParser {
         this.checkId(id);
         this.checkName(name);
 
+        Location lastSeen = null;
+
         if (phoneNumber != null) {
             this.checkPhoneNumber(phoneNumber);
         }
         if (email != null) {
             this.checkEmail(email);
         }
+        // We do not want a location if it has not a latitude, longitude and
+        // last seen date.
+        if ((latitude != Double.NaN) && (longitude != Double.NaN) && (lastSeenString != null)) {
+            lastSeen = new Location("SmartMapServers");
+            lastSeen.setLatitude(latitude);
+            lastSeen.setLongitude(longitude);
+            lastSeen.setTime(this.parseDate(lastSeenString).getTimeInMillis());
+        }
 
-        return new ImmutableUser(id, name, phoneNumber, email, null, null, null);
+        return new ImmutableUser(id, name, phoneNumber, email, lastSeen, null, null);
     }
 }

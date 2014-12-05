@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import ch.epfl.smartmap.activities.AboutActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
+import ch.epfl.smartmap.activities.ProfileActivity;
 import ch.epfl.smartmap.activities.SettingsActivity;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.background.LogoutManager;
@@ -16,6 +18,7 @@ import ch.epfl.smartmap.background.LogoutManager;
  */
 public class DrawerItemClickListener implements ListView.OnItemClickListener {
 
+    @SuppressWarnings("unused")
     private final static String TAG = DrawerItemClickListener.class.getSimpleName();
 
     private static final int INDEX_PROFILE = 0;
@@ -23,18 +26,17 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     private static final int INDEX_EVENTS = 2;
     private static final int INDEX_FILTERS = 3;
     private static final int INDEX_SETTINGS = 4;
-    private static final int INDEX_LOGOUT = 5;
+    private static final int INDEX_ABOUT = 5;
+    private static final int INDEX_LOGOUT = 6;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         switch (position) {
             case INDEX_PROFILE:
+                view.getContext().startActivity(new Intent(view.getContext(), ProfileActivity.class));
                 break;
             case INDEX_FRIENDS:
-
-                Intent displayActivityIntent = new Intent(view.getContext(), FriendsPagerActivity.class);
-                view.getContext().startActivity(displayActivityIntent);
-
+                view.getContext().startActivity(new Intent(view.getContext(), FriendsPagerActivity.class));
                 break;
             case INDEX_EVENTS:
                 view.getContext().startActivity(new Intent(view.getContext(), ShowEventsActivity.class));
@@ -43,6 +45,9 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
                 break;
             case INDEX_SETTINGS:
                 view.getContext().startActivity(new Intent(view.getContext(), SettingsActivity.class));
+                break;
+            case INDEX_ABOUT:
+                view.getContext().startActivity(new Intent(view.getContext(), AboutActivity.class));
                 break;
             case INDEX_LOGOUT:
                 LogoutManager.initialize(parent.getContext());
