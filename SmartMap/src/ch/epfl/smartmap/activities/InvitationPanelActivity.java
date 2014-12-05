@@ -11,10 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.Notifications;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.InvitationListItemAdapter;
 
 /**
@@ -24,62 +24,60 @@ import ch.epfl.smartmap.gui.InvitationListItemAdapter;
  */
 public class InvitationPanelActivity extends ListActivity {
 
-	@SuppressWarnings("unused")
-	private static final String TAG = InvitationPanelActivity.class.getSimpleName();
+    @SuppressWarnings("unused")
+    private static final String TAG = InvitationPanelActivity.class.getSimpleName();
 
-	private Context mContext;
+    private Context mContext;
 
-	private DatabaseHelper mDbHelper;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_notifications);
+        Notifications.cancelNotification(this);
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.activity_notifications);
-		Notifications.cancelNotification(this);
+        mContext = this.getBaseContext();
+    }
 
-		mContext = this.getBaseContext();
-		mDbHelper = DatabaseHelper.getInstance();
-	}
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Intent invitationIntent = ((FriendInvitation) l.getItemAtPosition(position)).getIntent();
+        InvitationPanelActivity.this.startActivity(invitationIntent);
 
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Intent invitationIntent = ((FriendInvitation) l.getItemAtPosition(position)).getIntent();
-		InvitationPanelActivity.this.startActivity(invitationIntent);
+        super.onListItemClick(l, v, position, id);
+    }
 
-		super.onListItemClick(l, v, position, id);
-	}
+    @Override
+    protected void onResume() {
+        super.onResume();
+        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, ServiceContainer
+            .getDatabase().getFriendInvitations()));
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, mDbHelper
-		    .getFriendInvitations()));
+        List<FriendInvitation> unreadInvitations =
+            ServiceContainer.getDatabase().getFriendInvitationsByStatus(Invitation.UNREAD);
+        for (int i = 0; i < unreadInvitations.size(); i++) {
+            unreadInvitations.get(i).setStatus(Invitation.READ);
+            ServiceContainer.getDatabase().updateFriendInvitation(unreadInvitations.get(i));
+        }
 
-		List<FriendInvitation> unreadInvitations = mDbHelper.getFriendInvitationsByStatus(Invitation.UNREAD);
-		for (int i = 0; i < unreadInvitations.size(); i++) {
-			unreadInvitations.get(i).setStatus(Invitation.READ);
-			mDbHelper.updateFriendInvitation(unreadInvitations.get(i));
-		}
+    }
 
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.show_events, menu);
+        return true;
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		this.getMenuInflater().inflate(R.menu.show_events, menu);
-		return true;
-	}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == android.R.id.home) {
+            this.finish();
+        }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		if (id == android.R.id.home) {
-			this.finish();
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
+        return super.onOptionsItemSelected(item);
+    }
 }
