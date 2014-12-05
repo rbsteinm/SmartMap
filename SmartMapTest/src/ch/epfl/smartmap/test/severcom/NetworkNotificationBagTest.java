@@ -6,6 +6,7 @@ package ch.epfl.smartmap.test.severcom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -105,7 +106,7 @@ public class NetworkNotificationBagTest extends TestCase {
 		assertTrue("The constructor does not make a defensive copy of inviting users list.",
 				invitersList.size() != nb.getInvitingUsers().size());
 
-		List<Long> getList = nb.getInvitingUsers();
+		Set<Long> getList = nb.getInvitingUsers();
 		getList.add(Long.valueOf(4));
 
 		assertTrue("The getter does not return a defensive copy of inviting users list.",
@@ -127,7 +128,7 @@ public class NetworkNotificationBagTest extends TestCase {
 		assertTrue("The constructor does not make a defensive copy of removed ids list.",
 				removedIds.size() != nb.getRemovedFriendsIds().size());
 
-		List<Long> getList = nb.getRemovedFriendsIds();
+		Set<Long> getList = nb.getRemovedFriendsIds();
 		getList.add((long) 10);
 
 		assertTrue("The getter does not return a defensive copy of removed ids list.", getList.size() != nb
@@ -148,7 +149,7 @@ public class NetworkNotificationBagTest extends TestCase {
 		assertTrue("The constructor does not make a defensive copy of new friends list.",
 				friendsList.size() != nb.getNewFriends().size());
 
-		List<Long> getList = nb.getNewFriends();
+		Set<Long> getList = nb.getNewFriends();
 		getList.add(Long.valueOf(4));
 
 		assertTrue("The getter does not return a defensive copy of new friends list.", getList.size() != nb
