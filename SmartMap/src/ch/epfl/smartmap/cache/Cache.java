@@ -12,7 +12,6 @@ import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.servercom.NetworkRequestCallback;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -78,7 +77,7 @@ public class Cache {
             protected Void doInBackground(Void... params) {
                 try {
                     long eventId;
-                    eventId = NetworkSmartMapClient.getInstance().createPublicEvent(createdEvent);
+                    eventId = ServiceContainer.getNetworkClient().createPublicEvent(createdEvent);
                     // Add ID to event
                     createdEvent.setId(eventId);
                     // Puts event in Cache
@@ -162,6 +161,10 @@ public class Cache {
             }
         }
         return allVisibleUsers;
+    }
+
+    public Filter getFilter(long id) {
+        return mFilterInstances.get(id);
     }
 
     public User getFriend(long id) {
@@ -268,14 +271,15 @@ public class Cache {
         boolean isListModified = false;
 
         for (ImmutableFilter newFilter : newFilters) {
-            if (mFilterInstances.get(newFilter.getId()) == null) {
+            Filter filter = this.getFilter(newFilter.getId());
+            if (filter == null) {
                 // Need to add it
                 mFilterIds.add(newFilter.getId());
-                mFilterInstances.put(newFilter.getId(), new Filter(newFilter));
+                mFilterInstances.put(newFilter.getId(), new DefaultFilter(newFilter));
                 isListModified = true;
             } else {
                 // Only update
-                this.updateFilter(newFilter);
+                filter.update(newFilter);
             }
         }
 

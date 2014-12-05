@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.InvitationManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
+import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 
 /**
@@ -26,28 +26,19 @@ public class ServiceContainer {
     private static DatabaseHelper mDBHelper;
     private static Cache mCache;
     private static InvitationManager mInvitationManager;
-    private static CachedOnlineSearchEngine mSearchEngine;
+    private static CachedSearchEngine mSearchEngine;
     private static SettingsManager mSettingsManager;
 
     /**
-     * Get the network client service.
+     * Get the cache service.
      * 
-     * @return SmartMapClient
+     * @return Cache
      */
-    public static SmartMapClient getNetworkClient() {
-        if (mNetworkClient == null) {
-            throw new NoSuchElementException("Network client is not set.");
+    public static Cache getCache() {
+        if (mCache == null) {
+            throw new NoSuchElementException("Cache is not set.");
         }
-        return mNetworkClient;
-    }
-
-    /**
-     * Set the network client service.
-     * 
-     * @param client
-     */
-    public static void setNetworkClient(SmartMapClient client) {
-        mNetworkClient = client;
+        return mCache;
     }
 
     /**
@@ -63,36 +54,6 @@ public class ServiceContainer {
     }
 
     /**
-     * Set the database helper service.
-     * 
-     * @param db
-     */
-    public static void setDatabaseHelper(DatabaseHelper db) {
-        mDBHelper = db;
-    }
-
-    /**
-     * Get the cache service.
-     * 
-     * @return Cache
-     */
-    public static Cache getCache() {
-        if (mCache == null) {
-            throw new NoSuchElementException("Cache is not set.");
-        }
-        return mCache;
-    }
-
-    /**
-     * Set the cache service.
-     * 
-     * @param cache
-     */
-    public static void setCache(Cache cache) {
-        mCache = cache;
-    }
-
-    /**
      * Get the invitation manager service.
      * 
      * @return InvitationManager
@@ -105,12 +66,15 @@ public class ServiceContainer {
     }
 
     /**
-     * Set the invitation manager service.
+     * Get the network client service.
      * 
-     * @param im
+     * @return SmartMapClient
      */
-    public static void setInvitationManager(InvitationManager im) {
-        mInvitationManager = im;
+    public static SmartMapClient getNetworkClient() {
+        if (mNetworkClient == null) {
+            throw new NoSuchElementException("Network client is not set.");
+        }
+        return mNetworkClient;
     }
 
     /**
@@ -118,20 +82,11 @@ public class ServiceContainer {
      * 
      * @return
      */
-    public static CachedOnlineSearchEngine getSearchEngine() {
+    public static CachedSearchEngine getSearchEngine() {
         if (mSearchEngine == null) {
             throw new NoSuchElementException("Search engine is not set.");
         }
         return mSearchEngine;
-    }
-
-    /**
-     * Set the search engine service.
-     * 
-     * @param se
-     */
-    public static void setSearchEngine(CachedOnlineSearchEngine se) {
-        mSearchEngine = se;
     }
 
     /**
@@ -144,6 +99,51 @@ public class ServiceContainer {
             throw new NoSuchElementException("Settings manager is not set.");
         }
         return mSettingsManager;
+    }
+
+    /**
+     * Set the cache service.
+     * 
+     * @param cache
+     */
+    public static void setCache(Cache cache) {
+        mCache = cache;
+    }
+
+    /**
+     * Set the database helper service.
+     * 
+     * @param db
+     */
+    public static void setDatabaseHelper(DatabaseHelper db) {
+        mDBHelper = db;
+    }
+
+    /**
+     * Set the invitation manager service.
+     * 
+     * @param im
+     */
+    public static void setInvitationManager(InvitationManager im) {
+        mInvitationManager = im;
+    }
+
+    /**
+     * Set the network client service.
+     * 
+     * @param client
+     */
+    public static void setNetworkClient(SmartMapClient client) {
+        mNetworkClient = client;
+    }
+
+    /**
+     * Set the search engine service.
+     * 
+     * @param se
+     */
+    public static void setSearchEngine(CachedSearchEngine se) {
+        mSearchEngine = se;
     }
 
     /**

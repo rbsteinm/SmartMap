@@ -11,7 +11,7 @@ import java.util.Set;
 
 import android.location.Location;
 import android.os.AsyncTask;
-import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.History;
@@ -19,7 +19,6 @@ import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
@@ -55,7 +54,7 @@ public final class CachedSearchEngine implements SearchEngine {
             @Override
             protected Void doInBackground(Void... params) {
                 // Check for live instance
-                User friend = Cache.getInstance().getFriend(id);
+                User friend = ServiceContainer.getCache().getFriend(id);
 
                 if (friend != null) {
                     // Found in cache, return
@@ -67,22 +66,22 @@ public final class CachedSearchEngine implements SearchEngine {
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache
-                        Cache.getInstance().putFriend(databaseResult);
-                        callback.onResult(Cache.getInstance().getFriend(id));
+                        ServiceContainer.getCache().putFriend(databaseResult);
+                        callback.onResult(ServiceContainer.getCache().getFriend(id));
                         return null;
                     } else {
                         // If not found, check on the server
                         ImmutableUser networkResult;
                         try {
-                            networkResult = NetworkSmartMapClient.getInstance().getUserInfo(id);
+                            networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
                         } catch (SmartMapClientException e) {
                             networkResult = null;
                         }
 
                         if (networkResult != null) {
                             // Match on server, put it in cache
-                            Cache.getInstance().putFriend(networkResult);
-                            callback.onResult(Cache.getInstance().getFriend(id));
+                            ServiceContainer.getCache().putFriend(networkResult);
+                            callback.onResult(ServiceContainer.getCache().getFriend(id));
                             return null;
                         } else {
                             callback.onNotFound();
@@ -103,7 +102,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                 for (long id : ids) {
                     // Check for live instance
-                    User friend = Cache.getInstance().getFriend(id);
+                    User friend = ServiceContainer.getCache().getFriend(id);
 
                     if (friend != null) {
                         // Found in cache, add to set of live instances
@@ -112,7 +111,7 @@ public final class CachedSearchEngine implements SearchEngine {
                         // If not found, check on the server
                         ImmutableUser networkResult;
                         try {
-                            networkResult = NetworkSmartMapClient.getInstance().getUserInfo(id);
+                            networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
                         } catch (SmartMapClientException e) {
                             networkResult = null;
                         }
@@ -127,10 +126,10 @@ public final class CachedSearchEngine implements SearchEngine {
                 // Get all results that weren't in cache and add them all at once (Avoid to send multiple
                 // listener
                 // calls)
-                Cache.getInstance().putFriends(immutableResult);
+                ServiceContainer.getCache().putFriends(immutableResult);
                 // Retrieve live instances from cache
                 for (ImmutableUser user : immutableResult) {
-                    result.add(Cache.getInstance().getFriend(user.getId()));
+                    result.add(ServiceContainer.getCache().getFriend(user.getId()));
                 }
 
                 callback.onResult(result);
@@ -152,7 +151,7 @@ public final class CachedSearchEngine implements SearchEngine {
             @Override
             protected Void doInBackground(Void... params) {
                 // Check for live instance
-                Event event = Cache.getInstance().getPublicEvent(id);
+                Event event = ServiceContainer.getCache().getPublicEvent(id);
 
                 if (event != null) {
                     // Found in cache, return
@@ -164,22 +163,22 @@ public final class CachedSearchEngine implements SearchEngine {
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache
-                        Cache.getInstance().putPublicEvent((databaseResult));
-                        callback.onResult(Cache.getInstance().getPublicEvent(id));
+                        ServiceContainer.getCache().putPublicEvent((databaseResult));
+                        callback.onResult(ServiceContainer.getCache().getPublicEvent(id));
                         return null;
                     } else {
                         // If not found, check on the server
                         ImmutableEvent networkResult;
                         try {
-                            networkResult = NetworkSmartMapClient.getInstance().getEventInfo(id);
+                            networkResult = ServiceContainer.getNetworkClient().getEventInfo(id);
                         } catch (SmartMapClientException e) {
                             networkResult = null;
                         }
 
                         if (networkResult != null) {
                             // Match on server, put it in cache
-                            Cache.getInstance().putPublicEvent(networkResult);
-                            callback.onResult(Cache.getInstance().getPublicEvent(id));
+                            ServiceContainer.getCache().putPublicEvent(networkResult);
+                            callback.onResult(ServiceContainer.getCache().getPublicEvent(id));
                             return null;
                         } else {
                             // No match anywhere
@@ -207,7 +206,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                 for (long id : ids) {
                     // Check for live instance
-                    Event event = Cache.getInstance().getPublicEvent(id);
+                    Event event = ServiceContainer.getCache().getPublicEvent(id);
 
                     if (event != null) {
                         // Found in cache, add to set of live instances
@@ -222,7 +221,7 @@ public final class CachedSearchEngine implements SearchEngine {
                             // If not found, check on the server
                             ImmutableEvent networkResult;
                             try {
-                                networkResult = NetworkSmartMapClient.getInstance().getEventInfo(id);
+                                networkResult = ServiceContainer.getNetworkClient().getEventInfo(id);
                             } catch (SmartMapClientException e) {
                                 networkResult = null;
                             }
@@ -238,10 +237,10 @@ public final class CachedSearchEngine implements SearchEngine {
                 // Get all results that weren't in cache and add them all at once (Avoid to send multiple
                 // listener
                 // calls)
-                Cache.getInstance().putPublicEvents(immutableResult);
+                ServiceContainer.getCache().putPublicEvents(immutableResult);
                 // Retrieve live instances from cache
                 for (ImmutableEvent event : immutableResult) {
-                    result.add(Cache.getInstance().getPublicEvent(event.getID()));
+                    result.add(ServiceContainer.getCache().getPublicEvent(event.getID()));
                 }
 
                 callback.onResult(result);
@@ -263,7 +262,7 @@ public final class CachedSearchEngine implements SearchEngine {
             @Override
             protected Void doInBackground(Void... params) {
                 // Check for live instance
-                User stranger = Cache.getInstance().getStranger(id);
+                User stranger = ServiceContainer.getCache().getStranger(id);
 
                 if (stranger != null) {
                     // Found in cache, return
@@ -275,18 +274,18 @@ public final class CachedSearchEngine implements SearchEngine {
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache
-                        Cache.getInstance().putFriend(databaseResult);
-                        callback.onResult(Cache.getInstance().getStranger(id));
+                        ServiceContainer.getCache().putFriend(databaseResult);
+                        callback.onResult(ServiceContainer.getCache().getStranger(id));
                         return null;
                     } else {
                         // If not found, check on the server
                         ImmutableUser networkResult;
                         try {
-                            networkResult = NetworkSmartMapClient.getInstance().getUserInfo(id);
+                            networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
                             if (networkResult != null) {
                                 // Match on server, put it in cache
-                                Cache.getInstance().putFriend(networkResult);
-                                callback.onResult(Cache.getInstance().getStranger(id));
+                                ServiceContainer.getCache().putFriend(networkResult);
+                                callback.onResult(ServiceContainer.getCache().getStranger(id));
                                 return null;
                             } else {
                                 // No match anywhere
@@ -313,7 +312,7 @@ public final class CachedSearchEngine implements SearchEngine {
                     // Fetch in cache
                     Set<Long> localResult = mPreviousOnlineStrangerSearches.get(query);
                     for (Long id : localResult) {
-                        User cachedUser = Cache.getInstance().getStranger(id);
+                        User cachedUser = ServiceContainer.getCache().getStranger(id);
                         if (cachedUser != null) {
                             result.add(cachedUser);
                         }
@@ -323,9 +322,9 @@ public final class CachedSearchEngine implements SearchEngine {
                     Set<ImmutableUser> networkResult;
                     try {
                         networkResult =
-                            new HashSet<ImmutableUser>(NetworkSmartMapClient.getInstance().findUsers(query));
+                            new HashSet<ImmutableUser>(ServiceContainer.getNetworkClient().findUsers(query));
                         for (ImmutableUser user : networkResult) {
-                            User cachedUser = Cache.getInstance().getStranger(user.getId());
+                            User cachedUser = ServiceContainer.getCache().getStranger(user.getId());
                             if (cachedUser != null) {
                                 result.add(cachedUser);
                             }
@@ -350,7 +349,7 @@ public final class CachedSearchEngine implements SearchEngine {
      */
     public void findUserById(final long id, final SearchRequestCallback<User> callback) {
         // Check in cache
-        User user = Cache.getInstance().getUser(id);
+        User user = ServiceContainer.getCache().getUser(id);
         if (user != null) {
             // Found
             callback.onResult(user);
@@ -368,7 +367,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                 for (long id : ids) {
                     // Check for live instance
-                    User stranger = Cache.getInstance().getStranger(id);
+                    User stranger = ServiceContainer.getCache().getStranger(id);
 
                     if (stranger != null) {
                         // Found in cache, add to set of live instances
@@ -377,7 +376,7 @@ public final class CachedSearchEngine implements SearchEngine {
                         // If not found, check on the server
                         ImmutableUser networkResult;
                         try {
-                            networkResult = NetworkSmartMapClient.getInstance().getUserInfo(id);
+                            networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
                         } catch (SmartMapClientException e) {
                             networkResult = null;
                         }
@@ -389,10 +388,10 @@ public final class CachedSearchEngine implements SearchEngine {
                     }
                 }
 
-                Cache.getInstance().putStrangers(immutableResult);
+                ServiceContainer.getCache().putStrangers(immutableResult);
                 // Retrieve live instances from cache
                 for (ImmutableUser user : immutableResult) {
-                    result.add(Cache.getInstance().getStranger(user.getId()));
+                    result.add(ServiceContainer.getCache().getStranger(user.getId()));
                 }
 
                 // Give results to the caller
@@ -423,7 +422,7 @@ public final class CachedSearchEngine implements SearchEngine {
                     // Search online
                     try {
                         resultIds =
-                            new HashSet<Long>(NetworkSmartMapClient.getInstance().getPublicEvents(
+                            new HashSet<Long>(ServiceContainer.getNetworkClient().getPublicEvents(
                                 location.getLatitude(), location.getLongitude(), radius));
                     } catch (SmartMapClientException e) {
                         callback.onNetworkError();
@@ -464,14 +463,14 @@ public final class CachedSearchEngine implements SearchEngine {
                 results.addAll(this.sendQuery(query, Type.TAGS));
                 break;
             case FRIENDS:
-                for (User f : Cache.getInstance().getAllFriends()) {
+                for (User f : ServiceContainer.getCache().getAllFriends()) {
                     if (f.getName().toLowerCase(Locale.US).contains(query)) {
                         results.add(f);
                     }
                 }
                 break;
             case EVENTS:
-                for (Event e : Cache.getInstance().getAllEvents()) {
+                for (Event e : ServiceContainer.getCache().getAllEvents()) {
                     if (e.getName().toLowerCase(Locale.US).contains(query)) {
                         results.add(e);
                     }

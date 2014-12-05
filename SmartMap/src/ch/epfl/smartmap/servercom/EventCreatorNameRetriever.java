@@ -37,7 +37,6 @@ public class EventCreatorNameRetriever {
      * @author marion-S
      */
     private class SetEventCreatorName extends AsyncTask<Long, Void, String> {
-
         @Override
         protected String doInBackground(Long... params) {
             ImmutableUser user = null;

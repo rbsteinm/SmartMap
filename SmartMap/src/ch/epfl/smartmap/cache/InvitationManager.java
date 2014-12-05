@@ -8,14 +8,15 @@ import java.util.Set;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.InvitationListener;
 import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkRequestCallback;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
+import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
@@ -29,7 +30,8 @@ public final class InvitationManager {
 
     // Other members of the data hierarchy
     private final DatabaseHelper mDatabaseHelper;
-    private final NetworkSmartMapClient mNetworkClient;
+    private final SmartMapClient mNetworkClient;
+    private final Cache mCache;
 
     // List containing ids of all Friends
     private final Set<Long> mInvitingEventIds;
@@ -43,8 +45,9 @@ public final class InvitationManager {
 
     public InvitationManager() {
         // Init data hierarchy
-        mDatabaseHelper = DatabaseHelper.getInstance();
-        mNetworkClient = NetworkSmartMapClient.getInstance();
+        mDatabaseHelper = ServiceContainer.getDatabase();
+        mNetworkClient = ServiceContainer.getNetworkClient();
+        mCache = ServiceContainer.getCache();
 
         // Init sets
         mInvitingEventIds = new HashSet<Long>();
@@ -68,9 +71,9 @@ public final class InvitationManager {
     public boolean acceptFriend(final long id) {
         ImmutableUser result;
         try {
-            result = NetworkSmartMapClient.getInstance().acceptInvitation(id);
+            result = mNetworkClient.acceptInvitation(id);
             if (result != null) {
-                Cache.getInstance().putFriend(result);
+                mCache.putFriend(result);
             } else {
                 return false;
             }
@@ -93,7 +96,7 @@ public final class InvitationManager {
      * @return the id of invited users
      */
     public Set<User> getInvitedUsers() {
-        return Cache.getInstance().getStrangers(mInvitedUserIds);
+        return mCache.getStrangers(mInvitedUserIds);
     }
 
     /**
@@ -107,14 +110,14 @@ public final class InvitationManager {
      * @return the id of pending events
      */
     public Set<Event> getPendingEvents() {
-        return Cache.getInstance().getPublicEvents(mInvitingEventIds);
+        return mCache.getPublicEvents(mInvitingEventIds);
     }
 
     /**
      * @return the id of pending friends
      */
     public Set<User> getPendingFriends() {
-        return Cache.getInstance().getStrangers(mInvitingFriendIds);
+        return mCache.getStrangers(mInvitingFriendIds);
     }
 
     /**
@@ -131,7 +134,7 @@ public final class InvitationManager {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    NetworkSmartMapClient.getInstance().acceptInvitation(friendId);
+                    mNetworkClient.acceptInvitation(friendId);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     callback.onFailure();
@@ -158,7 +161,7 @@ public final class InvitationManager {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    NetworkSmartMapClient.getInstance().inviteUsersToEvent(eventId, usersIds);
+                    mNetworkClient.inviteUsersToEvent(eventId, usersIds);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     callback.onFailure();
@@ -182,7 +185,7 @@ public final class InvitationManager {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    NetworkSmartMapClient.getInstance().inviteFriend(friendId);
+                    mNetworkClient.inviteFriend(friendId);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     callback.onFailure();
@@ -218,7 +221,7 @@ public final class InvitationManager {
             new AsyncTask<Long, Void, Void>() {
                 @Override
                 protected Void doInBackground(Long... params) {
-                    User newFriend = Cache.getInstance().putFriend(params[0]);
+                    User newFriend = mCache.putFriend(params[0]);
                     Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
                     return null;
                 }
@@ -231,12 +234,11 @@ public final class InvitationManager {
 
                 @Override
                 protected Void doInBackground(Long... params) {
-                    User user = Cache.getInstance().putStranger(params[0]);
+                    User user = mCache.putStranger(params[0]);
 
                     if (!mInvitedUserIds.contains(user.getId())) {
-                        Cache.getInstance().addFriendInvitation(
-                            new FriendInvitation(0, user.getId(), user.getName(), Invitation.UNREAD, user
-                                .getImage()));
+                        mCache.addFriendInvitation(new FriendInvitation(0, user.getId(), user.getName(),
+                            Invitation.UNREAD, user.getImage()));
 
                         mInvitedUserIds.add(user.getId());
                         if (SettingsManager.getInstance().notificationsEnabled()
@@ -250,7 +252,7 @@ public final class InvitationManager {
         }
 
         for (Long id : notifBag.getRemovedFriendsIds()) {
-            Cache.getInstance().removeFriend(id);
+            mCache.removeFriend(id);
         }
 
         if (!newFriends.isEmpty()) {
@@ -259,7 +261,7 @@ public final class InvitationManager {
                 protected Void doInBackground(Long... users) {
                     try {
                         for (long user : users) {
-                            NetworkSmartMapClient.getInstance().ackAcceptedInvitation(user);
+                            mNetworkClient.ackAcceptedInvitation(user);
                         }
                     } catch (SmartMapClientException e) {
                         Log.e("UpdateService", "Couldn't send acks!");
@@ -275,7 +277,7 @@ public final class InvitationManager {
                 protected Void doInBackground(Long... ids) {
                     try {
                         for (long id : ids) {
-                            NetworkSmartMapClient.getInstance().ackRemovedFriend(id);
+                            mNetworkClient.ackRemovedFriend(id);
                         }
                     } catch (SmartMapClientException e) {
                         Log.e("UpdateService", "Couldn't send acks!");
