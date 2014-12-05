@@ -169,6 +169,8 @@
     <!-- ShowFiltersActivity -->
     <string name="title_activity_show_filters">Filters</string>
     <string name="show_on_map">Show on map</string>
+    <string name="add_filter">Add new filter</string>
+    <string name="new_filter_alert_dialog_text">Name </string>
     
     <!-- ModifyFilterActivity -->
     <string name="title_activity_modify_filter">ChangeFilterActivity</string>

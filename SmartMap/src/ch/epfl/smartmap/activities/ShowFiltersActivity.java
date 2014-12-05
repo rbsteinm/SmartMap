@@ -2,10 +2,13 @@ package ch.epfl.smartmap.activities;
 
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +22,7 @@ import ch.epfl.smartmap.gui.FilterListItemAdapter;
  * An Activity that displays the different filters
  * 
  * @author hugo-S
+ * @author rbsteinm
  */
 public class ShowFiltersActivity extends ListActivity {
 
@@ -65,5 +69,33 @@ public class ShowFiltersActivity extends ListActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void addNewFilterDialog(MenuItem item) {
+        //inflate the alertDialog
+        LayoutInflater inflater  = this.getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.new_filter_alert_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("New filter");
+        builder.setView(alertLayout);
+
+        // Add positive button
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // TODO what is exectued when the user confirms the new filter's creation
+            }
+        });
+
+        // Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
     }
 }
