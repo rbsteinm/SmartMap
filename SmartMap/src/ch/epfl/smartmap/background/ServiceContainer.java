@@ -1,6 +1,3 @@
-/**
- * 
- */
 package ch.epfl.smartmap.background;
 
 import java.util.NoSuchElementException;
