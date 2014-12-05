@@ -43,7 +43,7 @@ public class UserInformationActivity extends Activity {
     private TextView mDistanceView;
 
     // TODO replace this by mUser.isFollowing() and mUser.isBlocked() when implemented
-    private final boolean isFollowing = true;
+    private boolean isFollowing;
     private final boolean isBlocked = false;
 
     @Override
@@ -77,6 +77,7 @@ public class UserInformationActivity extends Activity {
         mFollowSwitch.setChecked(isFollowing);
         mBlockSwitch.setChecked(isBlocked);
         mDistanceView.setText(mDistanceToUser + " meters away from you");
+        isFollowing = mUser.isVisible();
     }
 
     public void displayDeleteConfirmationDialog(View view) {
@@ -104,7 +105,8 @@ public class UserInformationActivity extends Activity {
     }
 
     public void followUnfollow(View view) {
-        new FollowFriend().execute(mUser.getId());
+        // TODO need methond setVisible
+        //new FollowFriend().execute(mUser.getId());
     }
 
     @Override
@@ -141,12 +143,14 @@ public class UserInformationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    //TODO remove this code
     /**
      * @author rbsteinm
      *         AsyncTask that follows/unfollows a friend when the user checks/unchecks
      *         the checkBox
      */
-    private class FollowFriend extends AsyncTask<Long, Void, String> {
+    /*private class FollowFriend extends AsyncTask<Long, Void, String> {
 
         @Override
         protected String doInBackground(Long... params) {
@@ -170,7 +174,7 @@ public class UserInformationActivity extends Activity {
             Toast.makeText(UserInformationActivity.this, confirmString, Toast.LENGTH_SHORT).show();
         }
 
-    }
+    }*/
 
     /**
      * Asynchronous task that removes a friend from the users friendList both
@@ -190,7 +194,7 @@ public class UserInformationActivity extends Activity {
                 confirmString = "You're no longer friend with " + mUser.getName();
 
                 // remove friend from cache and update displayed list
-                // TODO should not call network methods in the GUI
+                // TODO should not have to remove the friend from the cache too
                 final long userId = params[0];
                 mHandler.post(new Runnable() {
                     @Override
