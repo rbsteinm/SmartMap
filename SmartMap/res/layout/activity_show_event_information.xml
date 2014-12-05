@@ -92,6 +92,14 @@
             android:layout_below="@+id/show_event_info_end"
             android:text="By creator"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+        
+        <fragment
+            android:id="@+id/show_event_info_map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_below="@id/show_event_info_description"
+            android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 
 </RelativeLayout>
