@@ -106,29 +106,17 @@ public class ShowEventsActivity extends ListActivity {
 
         switch (v.getId()) {
             case R.id.ShowEventsCheckBoxNearMe:
-                if (checkBox.isChecked()) {
-                    mNearMeChecked = true;
-                    // Show the seek bar
-                    mSeekBar.setEnabled(true);
-                } else {
-                    mNearMeChecked = false;
-                    // Hide the seek bar
-                    mSeekBar.setEnabled(false);
-                }
+
+                mNearMeChecked = checkBox.isChecked();
+                mSeekBar.setEnabled(mNearMeChecked);
                 break;
             case R.id.ShowEventsCheckBoxMyEv:
-                if (checkBox.isChecked()) {
-                    mMyEventsChecked = true;
-                } else {
-                    mMyEventsChecked = false;
-                }
+
+                mMyEventsChecked = checkBox.isChecked();
                 break;
             case R.id.ShowEventscheckBoxStatus:
-                if (checkBox.isChecked()) {
-                    mOngoingChecked = true;
-                } else {
-                    mOngoingChecked = false;
-                }
+
+                mOngoingChecked = checkBox.isChecked();
                 break;
             default:
                 break;
@@ -159,6 +147,8 @@ public class ShowEventsActivity extends ListActivity {
                 break;
             case R.id.show_events_menu_refresh:
                 this.updateCurrentList();
+                break;
+            default:
                 break;
         }
 
