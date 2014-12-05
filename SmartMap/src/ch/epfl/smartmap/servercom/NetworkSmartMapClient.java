@@ -27,7 +27,8 @@ import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 
 /**
- * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider} to communicate with a SmartMap
+ * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider}
+ * to communicate with a SmartMap
  * server.
  * 
  * @author marion-S
@@ -60,7 +61,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     private static final NetworkSmartMapClient ONE_INSTANCE = new NetworkSmartMapClient();
 
-    private NetworkSmartMapClient() {
+    public NetworkSmartMapClient() {
 
         CookieHandler.setDefault(mCookieManager);
         if (ONE_INSTANCE != null) {
@@ -527,8 +528,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     }
 
     @Override
-    public List<Long> getPublicEvents(double latitude, double longitude, double radius)
-        throws SmartMapClientException {
+    public List<Long> getPublicEvents(double latitude, double longitude, double radius) throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("latitude", Double.toString(latitude));
@@ -912,8 +912,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      *             in case the response could not be retrieved for any reason
      *             external to the application (network failure etc.)
      */
-    private String sendViaPost(Map<String, String> params, HttpURLConnection connection)
-        throws SmartMapClientException {
+    private String sendViaPost(Map<String, String> params, HttpURLConnection connection) throws SmartMapClientException {
         String response = null;
         try {
             connection.setRequestMethod("POST");

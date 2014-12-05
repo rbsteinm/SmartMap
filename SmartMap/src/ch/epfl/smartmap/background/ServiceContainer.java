@@ -27,6 +27,7 @@ public class ServiceContainer {
     private static Cache mCache;
     private static InvitationManager mInvitationManager;
     private static SearchEngine mSearchEngine;
+    private static SettingsManager mSettingsManager;
 
     /**
      * Get the network client service.
@@ -131,5 +132,26 @@ public class ServiceContainer {
      */
     public static void setSearchEngine(SearchEngine se) {
         mSearchEngine = se;
+    }
+
+    /**
+     * Get the settings manager service.
+     * 
+     * @return
+     */
+    public static SettingsManager getSettingsManager() {
+        if (mSettingsManager == null) {
+            throw new NoSuchElementException("Settings manager is not set.");
+        }
+        return mSettingsManager;
+    }
+
+    /**
+     * Set the settings manager service.
+     * 
+     * @param sm
+     */
+    public static void setSettingsManager(SettingsManager sm) {
+        mSettingsManager = sm;
     }
 }

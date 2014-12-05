@@ -125,7 +125,7 @@ public class StartActivity extends FragmentActivity {
         // TODO: This should be modified to allow complete switching or
         // services, or be made explicit in their constructors.
         ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
-        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getBaseContext()));
+        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplicationContext()));
         ServiceContainer.setCache(new Cache());
         ServiceContainer.setInvitationManager(new InvitationManager());
         ServiceContainer.setSearchEngine(new CachedOnlineSearchEngine());
