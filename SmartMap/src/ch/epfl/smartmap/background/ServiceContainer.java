@@ -8,15 +8,16 @@ import java.util.NoSuchElementException;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.InvitationManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.search.SearchEngine;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 
 /**
  * This class is a container for the different services used by the SmartMap
  * app. It's member must be manually set at the starting of the app.
- * It provides a common interface to get services and thus improves
- * maintainability.
+ * It provides a common interface to get services and thus simplifies future
+ * changes.
  * It also allows to switch the returned instances for behavior modification and
- * to ease testing.
+ * testing.
  * 
  * @author Pamoi
  */
@@ -25,6 +26,7 @@ public class ServiceContainer {
     private static DatabaseHelper mDBHelper;
     private static Cache mCache;
     private static InvitationManager mInvitationManager;
+    private static SearchEngine mSearchEngine;
 
     /**
      * Get the network client service.
@@ -108,5 +110,26 @@ public class ServiceContainer {
      */
     public static void setInvitationManager(InvitationManager im) {
         mInvitationManager = im;
+    }
+
+    /**
+     * Get the search engine service.
+     * 
+     * @return
+     */
+    public static SearchEngine getSearchEngine() {
+        if (mSearchEngine == null) {
+            throw new NoSuchElementException("Search engine is not set.");
+        }
+        return mSearchEngine;
+    }
+
+    /**
+     * Set the search engine service.
+     * 
+     * @param se
+     */
+    public static void setSearchEngine(SearchEngine se) {
+        mSearchEngine = se;
     }
 }
