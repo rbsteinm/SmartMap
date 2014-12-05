@@ -483,16 +483,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-        List<Long> invitersIds = new ArrayList<Long>();
-        List<Long> newFriendsIds = new ArrayList<Long>();
-
-        for (ImmutableUser u : inviters) {
-            invitersIds.add(u.getId());
-        }
-        for (ImmutableUser u : newFriends) {
-            newFriendsIds.add(u.getId());
-        }
-        return new NetworkNotificationBag(invitersIds, newFriendsIds, removedFriends);
+        return new NetworkNotificationBag(inviters, newFriends, removedFriends);
 
     }
 

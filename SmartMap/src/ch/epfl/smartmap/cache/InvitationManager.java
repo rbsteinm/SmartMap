@@ -194,46 +194,47 @@ public final class InvitationManager {
         mInvitingEventIds.clear();
         mInvitedUserIds.clear();
 
-        for (long userId : notifBag.getInvitingUsers()) {
-            mInvitingFriendIds.add(userId);
+        for (ImmutableUser user : notifBag.getInvitingUsers()) {
+            mInvitingFriendIds.add(user.getId());
         }
 
-        Set<Long> newFriends = notifBag.getNewFriends();
+        Set<ImmutableUser> newFriends = notifBag.getNewFriends();
         Set<Long> removedFriends = notifBag.getRemovedFriendsIds();
 
-        for (long userId : newFriends) {
+        for (ImmutableUser user : newFriends) {
 
-            new AsyncTask<Long, Void, Void>() {
+            new AsyncTask<ImmutableUser, Void, Void>() {
                 @Override
-                protected Void doInBackground(Long... params) {
-                    User newFriend = ServiceContainer.getCache().putFriend(params[0]);
-                    Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
+                protected Void doInBackground(ImmutableUser... params) {
+                    ServiceContainer.getCache().putFriend(params[0]);
+                    Notifications.acceptedFriendNotification(Utils.sContext, params[0]);
                     return null;
                 }
-            }.execute(userId);
+            }.execute(user);
         }
 
-        for (long userId : notifBag.getInvitingUsers()) {
+        for (ImmutableUser user : notifBag.getInvitingUsers()) {
 
-            new AsyncTask<Long, Void, Void>() {
+            new AsyncTask<ImmutableUser, Void, Void>() {
 
                 @Override
-                protected Void doInBackground(Long... params) {
-                    User user = ServiceContainer.getCache().putStranger(params[0]);
+                protected Void doInBackground(ImmutableUser... params) {
+                    ServiceContainer.getCache().putStranger(params[0]);
 
-                    if (!mInvitedUserIds.contains(user.getId())) {
+                    if (!mInvitedUserIds.contains(params[0].getId())) {
                         ServiceContainer.getCache().addFriendInvitation(
-                            new FriendInvitation(0, user.getId(), user.getName(), Invitation.UNREAD, user.getImage()));
+                            new FriendInvitation(0, params[0].getId(), params[0].getName(), Invitation.UNREAD,
+                                params[0].getImage()));
 
-                        mInvitedUserIds.add(user.getId());
+                        mInvitedUserIds.add(params[0].getId());
                         if (SettingsManager.getInstance().notificationsEnabled()
                             && SettingsManager.getInstance().notificationsForFriendRequests()) {
-                            Notifications.newFriendNotification(Utils.sContext, user);
+                            Notifications.newFriendNotification(Utils.sContext, params[0]);
                         }
                     }
                     return null;
                 }
-            }.execute(userId);
+            }.execute(user);
         }
 
         for (Long id : notifBag.getRemovedFriendsIds()) {
