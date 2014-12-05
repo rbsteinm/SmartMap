@@ -163,6 +163,10 @@ public class Cache {
         return allVisibleUsers;
     }
 
+    public Filter getFilter(long id) {
+        return mFilterInstances.get(id);
+    }
+
     public User getFriend(long id) {
         return mUserInstances.get(id);
     }
@@ -267,14 +271,15 @@ public class Cache {
         boolean isListModified = false;
 
         for (ImmutableFilter newFilter : newFilters) {
-            if (mFilterInstances.get(newFilter.getId()) == null) {
+            Filter filter = this.getFilter(newFilter.getId());
+            if (filter == null) {
                 // Need to add it
                 mFilterIds.add(newFilter.getId());
-                mFilterInstances.put(newFilter.getId(), new Filter(newFilter));
+                mFilterInstances.put(newFilter.getId(), new DefaultFilter(newFilter));
                 isListModified = true;
             } else {
                 // Only update
-                this.updateFilter(newFilter);
+                filter.update(newFilter);
             }
         }
 

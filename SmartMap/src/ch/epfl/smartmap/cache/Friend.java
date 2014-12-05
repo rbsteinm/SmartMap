@@ -74,11 +74,6 @@ public final class Friend implements User {
         } else {
             mImage = user.getImage();
         }
-        if (user.isVisible() == null) {
-            mIsVisible = User.DEFAULT_VISIBILITY;
-        } else {
-            mIsVisible = user.isVisible();
-        }
 
         if (user.isBlocked() == null) {
             mIsBlocked = User.DEFAULT_BLOCK_VALUE;
@@ -125,7 +120,8 @@ public final class Friend implements User {
 
     @Override
     public ImmutableUser getImmutableCopy() {
-        return new ImmutableUser(mID, mName, mPhoneNumber, mEmail, mLocation, mLocationString, mImage);
+        return new ImmutableUser(mID, mName, mPhoneNumber, mEmail, mLocation, mLocationString, mImage,
+            mIsBlocked);
     }
 
     /*

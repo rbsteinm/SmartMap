@@ -1,13 +1,11 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.util.LongSparseArray;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -19,9 +17,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class DefaultFilter implements Filter {
 
-    private final List<Long> idList; // list of the friends' IDs
-    private String listName;
-    private long databaseID;
+    private Set<Long> mIds;
+    private String mName;
+    private long mId;
+    private boolean mIsActive;
 
     /**
      * @param name
@@ -29,23 +28,39 @@ public class DefaultFilter implements Filter {
      * @param friendsDatabase
      *            Whole database of friends referenced by the friendlist
      */
-    public DefaultFilter(String name) {
-        // The friendlist needs a reference to the whole friend database in
-        // order to find users from their ID
-        listName = name;
-        idList = new ArrayList<Long>();
+    public DefaultFilter(ImmutableFilter filter) {
+        mId = filter.getId();
+        mName = filter.getName();
+        mIds = new HashSet<Long>(filter.getIds());
+        mIsActive = filter.isActive();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Filter#addFriend(long)
+     */
     @Override
-    public void addUser(long id) {
-        if (!idList.contains(id)) {
-            idList.add(id);
-        }
+    public void addFriend(long newFriend) {
+        mIds.add(newFriend);
+
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Filter#getFriendIds()
+     */
+    @Override
+    public Set<Long> getFriendIds() {
+        return new HashSet<Long>(mIds);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Filter#getId()
+     */
     @Override
     public long getId() {
-        return databaseID;
+        return mId;
     }
 
     /*
@@ -54,8 +69,7 @@ public class DefaultFilter implements Filter {
      */
     @Override
     public Bitmap getImage() {
-        // TODO Auto-generated method stub
-        return null;
+        return Displayable.DEFAULT_IMAGE;
     }
 
     /*
@@ -64,18 +78,8 @@ public class DefaultFilter implements Filter {
      */
     @Override
     public LatLng getLatLng() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Long> getList() {
-        return new ArrayList<Long>(idList);
-    }
-
-    @Override
-    public String getListName() {
-        return listName;
+        // FIXME
+        return new LatLng(0, 0);
     }
 
     /*
@@ -84,7 +88,7 @@ public class DefaultFilter implements Filter {
      */
     @Override
     public Location getLocation() {
-        return NO_LOCATION;
+        return Displayable.NO_LOCATION;
     }
 
     /*
@@ -93,16 +97,25 @@ public class DefaultFilter implements Filter {
      */
     @Override
     public String getLocationString() {
-        return NO_LOCATION_STRING;
+        return Displayable.NO_LOCATION_STRING;
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions()
+     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
      */
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
-        return NO_MARKER_OPTIONS;
+        return Displayable.NO_MARKER_OPTIONS;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Filter#getName()
+     */
+    @Override
+    public String getName() {
+        return mName;
     }
 
     /*
@@ -111,7 +124,7 @@ public class DefaultFilter implements Filter {
      */
     @Override
     public String getSubtitle() {
-        return "this is a default filter";
+        return "This is a filter";
     }
 
     /*
@@ -120,19 +133,16 @@ public class DefaultFilter implements Filter {
      */
     @Override
     public String getTitle() {
-        return "Filter";
+        return mName;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Filter#isActive()
+     */
     @Override
-    public List<User> getUserList(LongSparseArray<User> friends) {
-        List<User> uList = new ArrayList<User>();
-        for (long id : idList) {
-            uList.add(friends.get(id));
-        }
-
-        Collections.sort(uList, new UserComparator());
-
-        return uList;
+    public boolean isActive() {
+        return mIsActive;
     }
 
     /*
@@ -144,19 +154,42 @@ public class DefaultFilter implements Filter {
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Filter#removeFriend(long)
+     */
     @Override
-    public void removeUser(long id) {
-        idList.remove(id);
+    public void removeFriend(long newFriend) {
+        mIds.remove(newFriend);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Filter#setActive(boolean)
+     */
     @Override
-    public void setID(long newID) {
-        databaseID = newID;
+    public void setActive(boolean isActive) {
+        mIsActive = isActive;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Filter#setName(java.lang.String)
+     */
     @Override
-    public void setListName(String newName) {
-        listName = newName;
+    public void setName(String newName) {
+        mName = newName;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Filter#update(ch.epfl.smartmap.cache.ImmutableFilter)
+     */
+    @Override
+    public void update(ImmutableFilter filter) {
+        mId = filter.getId();
+        mName = filter.getName();
+        mIds = new HashSet<Long>(filter.getIds());
+        mIsActive = filter.isActive();
+    }
 }

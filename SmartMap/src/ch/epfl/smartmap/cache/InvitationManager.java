@@ -224,6 +224,7 @@ public final class InvitationManager {
                     if (!mInvitedUserIds.contains(user.getId())) {
                         ServiceContainer.getCache().addFriendInvitation(
                             new FriendInvitation(0, user.getId(), user.getName(), Invitation.UNREAD, user.getImage()));
+
                         mInvitedUserIds.add(user.getId());
                         if (SettingsManager.getInstance().notificationsEnabled()
                             && SettingsManager.getInstance().notificationsForFriendRequests()) {
@@ -236,7 +237,7 @@ public final class InvitationManager {
         }
 
         for (Long id : notifBag.getRemovedFriendsIds()) {
-            Cache.getInstance().removeFriend(id);
+            ServiceContainer.getCache().removeFriend(id);
         }
 
         if (!newFriends.isEmpty()) {
@@ -245,6 +246,7 @@ public final class InvitationManager {
                 protected Void doInBackground(Long... users) {
                     try {
                         for (long user : users) {
+                            // Replace with network client ?
                             ServiceContainer.getCache().ackAcceptedInvitation(user);
                         }
                     } catch (SmartMapClientException e) {

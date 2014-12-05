@@ -74,7 +74,7 @@ public final class ImmutableUser {
         return mPhoneNumber;
     }
 
-    public boolean isBlocked() {
+    public Boolean isBlocked() {
         return mIsBlocked;
     }
 }

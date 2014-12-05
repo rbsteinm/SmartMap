@@ -1,8 +1,6 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.List;
-
-import android.util.LongSparseArray;
+import java.util.Set;
 
 /**
  * A list of user IDs
@@ -17,7 +15,12 @@ public interface Filter extends Displayable {
      * @param id
      *            The user's ID
      */
-    void addUser(long id);
+    void addFriend(long newFriend);
+
+    /**
+     * @return The whole list of IDs
+     */
+    Set<Long> getFriendIds();
 
     /**
      * Returns the list's ID for storing/loading purposes. Only gets a value
@@ -29,40 +32,15 @@ public interface Filter extends Displayable {
     long getId();
 
     /**
-     * @return The whole list of IDs
-     */
-    List<Long> getList();
-
-    /**
      * @return The name of the list
      */
-    String getListName();
+    String getName();
 
-    /**
-     * Given a SparseArray of Users (mapped to their ID), returns a filtered
-     * list of Users
-     * 
-     * @param friends
-     *            The array of Users
-     * @return The list of users sorted alphabetically
-     */
-    List<User> getUserList(LongSparseArray<User> friends);
+    boolean isActive();
 
-    /**
-     * Removes a user from the list
-     * 
-     * @param id
-     *            The user's ID
-     */
-    void removeUser(long id);
+    void removeFriend(long newFriend);
 
-    /**
-     * Sets the list's ID
-     * 
-     * @param id
-     *            The ID
-     */
-    void setID(long id);
+    void setActive(boolean isActive);
 
     /**
      * Renames the list
@@ -70,5 +48,7 @@ public interface Filter extends Displayable {
      * @param newName
      *            The new name of the list
      */
-    void setListName(String newName);
+    void setName(String newName);
+
+    void update(ImmutableFilter filter);
 }
