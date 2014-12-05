@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.InvitationManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.search.SearchEngine;
+import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 
 /**
@@ -26,7 +26,7 @@ public class ServiceContainer {
     private static DatabaseHelper mDBHelper;
     private static Cache mCache;
     private static InvitationManager mInvitationManager;
-    private static SearchEngine mSearchEngine;
+    private static CachedOnlineSearchEngine mSearchEngine;
     private static SettingsManager mSettingsManager;
 
     /**
@@ -118,7 +118,7 @@ public class ServiceContainer {
      * 
      * @return
      */
-    public static SearchEngine getSearchEngine() {
+    public static CachedOnlineSearchEngine getSearchEngine() {
         if (mSearchEngine == null) {
             throw new NoSuchElementException("Search engine is not set.");
         }
@@ -130,7 +130,7 @@ public class ServiceContainer {
      * 
      * @param se
      */
-    public static void setSearchEngine(SearchEngine se) {
+    public static void setSearchEngine(CachedOnlineSearchEngine se) {
         mSearchEngine = se;
     }
 

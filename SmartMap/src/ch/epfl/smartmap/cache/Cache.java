@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -32,10 +32,6 @@ public class Cache {
     // Unique instance
     private static final Cache ONE_INSTANCE = new Cache();
 
-    // Other members of the data hierarchy
-    private final DatabaseHelper mDatabaseHelper;
-    private final NetworkSmartMapClient mNetworkClient;
-
     // List containing ids of all Friends
     private final Set<Long> mFriendIds;
     private final Set<Long> mStrangerIds;
@@ -50,9 +46,6 @@ public class Cache {
     private final List<CacheListener> mListeners;
 
     public Cache() {
-        // Init data hierarchy
-        mDatabaseHelper = DatabaseHelper.getInstance();
-        mNetworkClient = NetworkSmartMapClient.getInstance();
 
         // Init lists
         mFriendIds = new HashSet<Long>();
@@ -190,7 +183,7 @@ public class Cache {
         return strangers;
     }
 
-    public void initFromDatabase(DatabaseHelper database) {
+    public void initFromDatabase() {
         // Clear previous values
         mPublicEventInstances.clear();
         mFriendInstances.clear();
@@ -200,6 +193,9 @@ public class Cache {
         mFriendIds.clear();
         mPublicEventIds.clear();
         mStrangerIds.clear();
+
+        // Get the database
+        DatabaseHelper database = ServiceContainer.getDatabase();
 
         // Initialize id Lists
         mFriendIds.addAll(database.getFriendIds());
@@ -399,7 +395,7 @@ public class Cache {
             // Not in cache
             cachedFriend = new Friend(user);
             mFriendInstances.put(user.getId(), cachedFriend);
-            mDatabaseHelper.addUser(user);
+            ServiceContainer.getDatabase().addUser(user);
             return true;
         } else {
             // In cache

@@ -147,7 +147,7 @@ public final class CachedOnlineSearchEngine implements SearchEngine {
 
             if (databaseResult != null) {
                 // Match in database, put it in cache
-                Cache.getInstance().putPublicEvent((databaseResult));
+                Cache.getInstance().putPublicEvent(databaseResult);
                 return Cache.getInstance().getPublicEvent(id);
             } else {
                 // If not found, check on the server

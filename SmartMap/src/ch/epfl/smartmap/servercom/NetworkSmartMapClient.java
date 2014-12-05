@@ -59,14 +59,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     private static final int SERVER_RESPONSE_OK = 200;
     private static CookieManager mCookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
 
-    private static final NetworkSmartMapClient ONE_INSTANCE = new NetworkSmartMapClient();
-
     public NetworkSmartMapClient() {
 
         CookieHandler.setDefault(mCookieManager);
-        if (ONE_INSTANCE != null) {
-            throw new IllegalStateException("Already instantiated");
-        }
     }
 
     /*
@@ -933,10 +928,4 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         }
         return response;
     }
-
-    public static NetworkSmartMapClient getInstance() {
-
-        return ONE_INSTANCE;
-    }
-
 }
