@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -37,11 +36,6 @@ public final class InvitationManager {
     private final List<InvitationListener> mListeners;
 
     public InvitationManager() {
-        // Init sets
-        mInvitingEventIds = new HashSet<Long>();
-        mInvitingFriendIds = new HashSet<Long>();
-        mInvitedUserIds = new HashSet<Long>();
-
         // Init sparseArray
         mInvitationInstances = new LongSparseArray<Invitation>();
 
@@ -143,8 +137,8 @@ public final class InvitationManager {
      * @param callback
      *            callback that says if it fails or it successes
      */
-    public void
-        sendEventInvitation(final long eventId, final List<Long> usersIds, final NetworkRequestCallback callback) {
+    public void sendEventInvitation(final long eventId, final List<Long> usersIds,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
 
             @Override
@@ -223,8 +217,8 @@ public final class InvitationManager {
 
                     if (!mInvitedUserIds.contains(params[0].getId())) {
                         ServiceContainer.getCache().addFriendInvitation(
-                            new FriendInvitation(0, params[0].getId(), params[0].getName(), Invitation.UNREAD,
-                                params[0].getImage()));
+                            new FriendInvitation(0, params[0].getId(), params[0].getName(),
+                                Invitation.UNREAD, params[0].getImage()));
 
                         mInvitedUserIds.add(params[0].getId());
                         if (SettingsManager.getInstance().notificationsEnabled()
