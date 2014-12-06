@@ -282,44 +282,13 @@ public class AddEventActivity extends FragmentActivity {
             location.setLongitude(mEventPosition.longitude);
             SettingsManager setMng = SettingsManager.getInstance();
 
-            ImmutableEvent ev = new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(),
+            ImmutableEvent event = new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(),
                     setMng.getUserID(), mDescription.getText().toString(), startDate, endDate, location, mPlaceName
                             .getText().toString(), PublicEvent.NO_PARTICIPANTS);
 
-            // TODO Create the event on our server and set the cache accordingly
-            AsyncTask<ImmutableEvent, Void, Boolean> createEventTask = new AsyncTask<ImmutableEvent, Void, Boolean>() {
+            CreateEventTask createEventTask = new CreateEventTask();
 
-                @Override
-                protected Boolean doInBackground(ImmutableEvent... params) {
-                    try {
-                        long id = NetworkSmartMapClient.getInstance().createPublicEvent(params[0]);
-                        Cache.getInstance().addMyEvent(id);
-                        return (id > 0);
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, e.getMessage());
-                        return false;
-                    }
-                }
-
-                @Override
-                protected void onPostExecute(Boolean b) {
-                    if (b) {
-
-                        Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
-                                Toast.LENGTH_SHORT).show();
-
-                        mActivity.finish();
-
-                    } else {
-                        Toast.makeText(mContext,
-                                "Couldn't not create your event. The error occurred on our server and we are sorry :(",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-            };
-
-            createEventTask.execute(ev);
+            createEventTask.execute(event);
         }
     }
 
@@ -451,6 +420,11 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
+     * 
+     * @param data
+     *            the intent containing the extras. The position (LatLgn) is retrieved from the
+     *            getParcelable(LOCATION_SERVICE).
+     * 
      * @author SpicyCH
      */
     private void updateLocation(Intent data) {
@@ -477,6 +451,37 @@ public class AddEventActivity extends FragmentActivity {
         }
         mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
         new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
+    }
+
+    class CreateEventTask extends AsyncTask<ImmutableEvent, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(ImmutableEvent... params) {
+            try {
+                long id = NetworkSmartMapClient.getInstance().createPublicEvent(params[0]);
+                Cache.getInstance().addMyEvent(id);
+                return (id > 0);
+            } catch (SmartMapClientException e) {
+                Log.e(TAG, e.getMessage());
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean b) {
+            if (b) {
+
+                Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created), Toast.LENGTH_SHORT)
+                        .show();
+
+                mActivity.finish();
+
+            } else {
+                Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_couldnt_create_event_server),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+
     }
 
 }
