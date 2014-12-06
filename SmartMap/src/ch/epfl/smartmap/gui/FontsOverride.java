@@ -21,14 +21,18 @@ public final class FontsOverride {
 			staticField.setAccessible(true);
 			staticField.set(null, newTypeface);
 		} catch (NoSuchFieldException e) {
-			Log.e(TAG, "Couldn't find fields");
+			Log.e(TAG, "Couldn't find fields : " + e);
 		} catch (IllegalAccessException e) {
-			Log.e(TAG, "Illegal Access Exception");
+			Log.e(TAG, "Illegal Access Exception : " + e);
 		}
 	}
 
 	public static void setDefaultFont(Context context, String staticTypefaceFieldName, String fontAssetName) {
 		final Typeface regular = Typeface.createFromAsset(context.getAssets(), fontAssetName);
 		replaceFont(staticTypefaceFieldName, regular);
+	}
+
+	private FontsOverride() {
+		// nothing to do
 	}
 }

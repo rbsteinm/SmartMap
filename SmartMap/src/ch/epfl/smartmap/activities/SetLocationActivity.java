@@ -10,6 +10,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -119,6 +120,34 @@ public class SetLocationActivity extends FragmentActivity {
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	/**
+	 * Behavior of "done" button
+	 */
+	private void onDoneCLicked() {
+		Intent addEventIntent = new Intent(this, AddEventActivity.class);
+		Bundle extras = new Bundle();
+		Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+		String cityName = "";
+		List<Address> addresses;
+
+		try {
+			addresses = geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
+			if (addresses.isEmpty()) {
+				// Makes sure that an address is associated to the coordinates, the user could
+				// have long
+				// clicked in the middle of the sea after all :)
+				cityName = addresses.get(0).getLocality();
+			}
+		} catch (IOException e) {
+			Log.e(TAG, "IOException : " + e);
+		}
+
+		extras.putString(CITY_NAME, cityName);
+		extras.putParcelable(LOCATION_SERVICE, mEventPosition);
+		addEventIntent.putExtras(extras);
+		this.setResult(RESULT_OK, addEventIntent);
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
@@ -128,28 +157,7 @@ public class SetLocationActivity extends FragmentActivity {
 		int id = item.getItemId();
 		switch (id) {
 			case R.id.set_location_done:
-				Intent addEventIntent = new Intent(this, AddEventActivity.class);
-				Bundle extras = new Bundle();
-				Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-				String cityName = "";
-				List<Address> addresses;
-
-				try {
-					addresses = geocoder
-					    .getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
-					if (addresses.size() > 0) {
-						// Makes sure that an address is associated to the coordinates, the user could
-						// have long
-						// clicked in the middle of the sea after all :)
-						cityName = addresses.get(0).getLocality();
-					}
-				} catch (IOException e) {
-				}
-
-				extras.putString(CITY_NAME, cityName);
-				extras.putParcelable(LOCATION_SERVICE, mEventPosition);
-				addEventIntent.putExtras(extras);
-				this.setResult(RESULT_OK, addEventIntent);
+				this.onDoneCLicked();
 				this.finish();
 				break;
 			case android.R.id.home:
