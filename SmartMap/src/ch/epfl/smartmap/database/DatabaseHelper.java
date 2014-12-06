@@ -45,8 +45,8 @@ import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
  */
 public final class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int mDatabase_VERSION = 8;
-    private static final String mDatabase_NAME = "SmartMapDB";
+    private static final int DATABASE_VERSION = 8;
+    private static final String DATABASE_NAME = "SmartMapDB";
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
@@ -165,8 +165,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The application's context, used to access the files
      */
     public DatabaseHelper(Context context) {
-        super(context, mDatabase_NAME + "_" + SettingsManager.initialize(context).getUserID(), null,
-            mDatabase_VERSION);
+        super(context, DATABASE_NAME + "_" + SettingsManager.initialize(context).getUserID(), null,
+            DATABASE_VERSION);
         mContext = context;
     }
 
