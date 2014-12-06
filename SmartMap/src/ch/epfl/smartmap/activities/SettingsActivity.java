@@ -104,7 +104,8 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * This fragment shows general preferences only. It is used when the activity is showing a two-pane settings UI.
+     * This fragment shows all the settings for simplicity's sake. We can add some other ones if we have many settings
+     * in the future and want them to be split by headers.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class GeneralPreferenceFragment extends PreferenceFragment {

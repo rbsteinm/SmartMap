@@ -115,8 +115,8 @@ public class AddEventActivity extends FragmentActivity {
     public void displayMap() {
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
         // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
+        if (status != ConnectionResult.SUCCESS) {
+            // Google Play Services are not available
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
         } else {
@@ -139,21 +139,17 @@ public class AddEventActivity extends FragmentActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case PICK_LOCATION_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    // All went smoothly, update location in this activity
-                    this.updateLocation(data);
+        if (requestCode == PICK_LOCATION_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                // All went smoothly, update location in this activity
+                this.updateLocation(data);
 
-                } else {
-                    // Google wasn't able to retrieve the location name associated to the coordinates
-                    Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location),
-                            Toast.LENGTH_LONG).show();
-                    mPlaceName.setText("");
-                }
-                break;
-            default:
-                break;
+            } else {
+                // Google wasn't able to retrieve the location name associated to the coordinates
+                Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location),
+                        Toast.LENGTH_LONG).show();
+                mPlaceName.setText("");
+            }
         }
     }
 
@@ -194,6 +190,19 @@ public class AddEventActivity extends FragmentActivity {
         pickLocationIntent.putExtra("pickLocationForEvent", true);
         pickLocationIntent.setType(Context.LOCATION_SERVICE);
         this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
+    }
+
+    /**
+     * @return <code>true</code> if all the fields (event name, event dates, etc...) are legally set and the event is
+     *         ready to be created.
+     * 
+     * @author SpicyCH
+     */
+    private boolean allFieldsSetByUser() {
+        return this.isValidDate(mPickEndDate.getText().toString())
+                && this.isValidTime(mPickEndTime.getText().toString()) && (mEventPosition.latitude != 0)
+                && (mEventPosition.longitude != 0)
+                && (!"".equals(mPlaceName.getText().toString()) && !"".equals(mEventName.getText().toString()));
     }
 
     /**
@@ -245,19 +254,18 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
+     * Creates an event from the user specified parameters.
+     * 
      * @author SpicyCH
      */
     private void createEvent() {
 
-        if (!this.isValidDate(mPickEndDate.getText().toString())
-                || !this.isValidTime(mPickEndTime.getText().toString()) || (mEventPosition.latitude == 0.0)
-                || (mEventPosition.longitude == 0.0)
-                || ("".equals(mPlaceName.getText().toString()) || "".equals(mEventName.getText().toString()))) {
+        if (!this.allFieldsSetByUser()) {
 
             Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set), Toast.LENGTH_SHORT)
                     .show();
 
-            Log.d(TAG, "Couldn't create a new event because not all fields have been set.\n" + "end date: "
+            Log.d(TAG, "Couldn't create a new event because not all fields were set.\n" + "end date: "
                     + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
                     + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
                     + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"

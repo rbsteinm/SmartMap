@@ -6,7 +6,7 @@
         android:key="@string/settings_key_general_offline"
         android:summary="@string/pref_description_offline"
         android:title="@string/pref_title_offline" />
-    
+
     <ListPreference
         android:defaultValue="10000"
         android:entries="@array/pref_sync_frequency_titles"
@@ -15,7 +15,6 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
         android:title="@string/pref_title_refresh_frequency" />
-    
     <ListPreference
         android:defaultValue="3600000"
         android:entries="@array/pref_last_seen_max_titles"
@@ -24,63 +23,58 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
         android:title="@string/pref_title_last_seen_max" />
-    
-    <PreferenceCategory android:title="@string/pref_header_notifications">
+
+    <PreferenceCategory android:title="@string/pref_header_notifications" >
+
         <!--
          A 'parent' preference, which enables/disables child preferences (below)
-         when checked/unchecked.
-    -->
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="@string/settings_key_notifications_enabled"
-        android:title="@string/pref_title_notifications_enabled" />
-
-    <!-- NOTE: The below preferences will be enabled only when the checkbox above is checked. -->
-    
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:dependency="notifications_enabled"
-        android:key="@string/settings_key_notifications_friend_requests"
-        android:title="@string/pref_title_friend_requests" />
-    
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:dependency="notifications_enabled"
-        android:key="@string/settings_key_notifications_friendship_confirmations"
-        android:title="@string/pref_title_friendship_confirmations" />
-    
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:dependency="notifications_enabled"
-        android:key="@string/settings_key_notifications_event_invitations"
-        android:title="@string/pref_title_event_invitations" />
-    
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:dependency="notifications_enabled"
-        android:key="@string/settings_key_notifications_event_proximity"
-        android:title="@string/pref_title_event_proximity" />
-
-    
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:dependency="notifications_enabled"
-        android:key="@string/settings_key_notifications_vibrate"
-        android:title="@string/pref_title_vibrate" />
-    </PreferenceCategory>
-    
-    <PreferenceCategory android:title="@string/pref_header_events">
+         when checked/unchecked.
+        -->
         <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="@string/settings_key_events_show_public"
-        android:title="@string/pref_title_show_public_events" />
+            android:defaultValue="true"
+            android:key="@string/settings_key_notifications_enabled"
+            android:title="@string/pref_title_notifications_enabled" />
 
-    <!--
+        <!-- NOTE: The below preferences will be enabled only when the checkbox above is checked. -->
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="notifications_enabled"
+            android:key="@string/settings_key_notifications_friend_requests"
+            android:title="@string/pref_title_friend_requests" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="notifications_enabled"
+            android:key="@string/settings_key_notifications_friendship_confirmations"
+            android:title="@string/pref_title_friendship_confirmations" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="notifications_enabled"
+            android:key="@string/settings_key_notifications_event_invitations"
+            android:title="@string/pref_title_event_invitations" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="notifications_enabled"
+            android:key="@string/settings_key_notifications_event_proximity"
+            android:title="@string/pref_title_event_proximity" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:dependency="notifications_enabled"
+            android:key="@string/settings_key_notifications_vibrate"
+            android:title="@string/pref_title_vibrate" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_header_events" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/settings_key_events_show_public"
+            android:title="@string/pref_title_show_public_events" />
+
+        <!--
          <CheckBoxPreference
         android:defaultValue="true"
         android:key="@string/settings_key_events_show_private"
-        android:title="@string/pref_title_show_private_events" />
-    -->
+        android:title="@string/pref_title_show_private_events" />
+        -->
     </PreferenceCategory>
 
 </PreferenceScreen>
