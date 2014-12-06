@@ -958,9 +958,9 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             picture.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
             out.close();
         } catch (FileNotFoundException e) {
-            Log.e("DatabaseHelper", e.getMessage());
+            Log.e("DatabaseHelper", "Exception in setUserPicture: " + e);
         } catch (IOException e) {
-            Log.e("DatabaseHelper", e.getMessage());
+            Log.e("DatabaseHelper", "Exception in setUserPicture: " + e);
         }
     }
 
