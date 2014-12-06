@@ -171,6 +171,15 @@ public class Stranger implements User {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#isFriend()
+     */
+    @Override
+    public boolean isFriend() {
+        return false;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Localisable#isVisible()
      */
     @Override

@@ -51,5 +51,11 @@ public interface Event extends Displayable {
      */
     Calendar getStartDate();
 
+    boolean isGoing();
+
+    boolean isNear();
+
+    boolean isOwn();
+
     void update(ImmutableEvent event);
 }

@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -93,7 +94,8 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj != null) && (this.getClass() == obj.getClass()) && (this.getId() == ((PublicEvent) obj).getId());
+        return (obj != null) && (this.getClass() == obj.getClass())
+            && (this.getId() == ((PublicEvent) obj).getId());
     }
 
     @Override
@@ -160,7 +162,8 @@ public class PublicEvent implements Event {
     @Override
     public MarkerOptions getMarkerOptions(Context context) {
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude())).title(this.getName())
+        markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
+            .title(this.getName())
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
             .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
         return markerOptions;
@@ -202,20 +205,40 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Event#getType()
-     */
-    @Override
-    public Type getType() {
-        return Type.PUBLIC;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
         return (int) mId;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#isGoing()
+     */
+    @Override
+    public boolean isGoing() {
+        return mParticipants.contains(ServiceContainer.getSettingsManager().getUserID());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#isNear()
+     */
+    @Override
+    public boolean isNear() {
+        Location ourLocation = ServiceContainer.getSettingsManager().getLocation();
+        return (ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager()
+            .getNearEventsMaxDistance());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#isOwn()
+     */
+    @Override
+    public boolean isOwn() {
+        return this.getCreatorId() == ServiceContainer.getSettingsManager().getUserID();
     }
 
     /*

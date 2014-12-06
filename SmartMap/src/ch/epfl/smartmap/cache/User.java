@@ -64,5 +64,7 @@ public interface User extends Displayable {
 
     boolean isBlocked();
 
+    boolean isFriend();
+
     void update(ImmutableUser user);
 }

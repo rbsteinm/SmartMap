@@ -246,6 +246,15 @@ public final class Friend implements User {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#isFriend()
+     */
+    @Override
+    public boolean isFriend() {
+        return true;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Localisable#isShown()
      */
     @Override

@@ -18,10 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.listeners.CacheListener;
-import ch.epfl.smartmap.search.CacheSearchEngine;
 import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.search.SearchEngine;
 import ch.epfl.smartmap.search.SearchEngine.Type;
@@ -83,7 +82,7 @@ public class SearchLayout extends LinearLayout implements CacheListener {
         // Set default search query (needs to be done addSearchTypes)
         mCurrentQuery = DEFAULT_SEARCH_QUERY;
         // Initialize data structures
-        mSearchEngine = new CacheSearchEngine();
+        mSearchEngine = ServiceContainer.getSearchEngine();
         mScrollViews = new HashMap<Type, ScrollView>();
         mSearchResultViewGroups = new HashMap<Type, SearchResultViewGroup>();
         mSearchTypeIndexes = new HashMap<Type, Integer>();
@@ -95,7 +94,7 @@ public class SearchLayout extends LinearLayout implements CacheListener {
         this.addSearchTypes(Type.ALL, Type.FRIENDS, Type.EVENTS, Type.TAGS, Type.GROUPS);
         // Set default search type
         this.setSearchType(DEFAULT_SEARCH_TYPE);
-        Cache.getInstance().addOnCacheListener(this);
+        ServiceContainer.getCache().addOnCacheListener(this);
     }
 
     /*
@@ -104,7 +103,17 @@ public class SearchLayout extends LinearLayout implements CacheListener {
      */
     @Override
     public void onEventListUpdate() {
-        this.updateCurrentPanel();
+        // TODO
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
+     */
+    @Override
+    public void onFilterListUpdate() {
+        // TODO Auto-generated method stub
+
     }
 
     /*
@@ -218,14 +227,14 @@ public class SearchLayout extends LinearLayout implements CacheListener {
             (mSearchTypeIndexes.get(mCurrentSearchType).intValue() + 1) % mActiveSearchTypes.size();
         Type nextSearchType = mActiveSearchTypes.get(nextSearchTypeIndex);
         return nextSearchType;
-    }
+    };
 
     /**
      * Go to next View
      */
     private void onSwipeLeft() {
         this.setSearchType(this.nextSearchType());
-    };
+    }
 
     /**
      * Go to previous View

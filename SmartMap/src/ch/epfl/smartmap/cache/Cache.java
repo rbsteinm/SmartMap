@@ -50,15 +50,13 @@ public class Cache {
     // This Set contains the id of all our friends
     private final Set<Long> mFriendIds;
 
-    // These sets contains different kind of Events
-    private final Set<Long> mOwnEventIds;
-    private final Set<Long> mNearEventIds;
-    private final Set<Long> mPinnedEventIds;
-
     // These sets are for invitation managing
     private final Set<Long> mInvitedUserIds;
     private final Set<Long> mInvitingUserIds;
     private final Set<Long> mInvitingEventIds;
+
+    // These values are used when needing to assign a new local id
+    private long nextFilterId;
 
     // Listeners
     private final List<CacheListener> mListeners;
@@ -79,19 +77,13 @@ public class Cache {
         mEventInvitationIds = new HashSet<Long>();
         mFriendInvitationIds = new HashSet<Long>();
 
-        mOwnEventIds = new HashSet<Long>();
-        mNearEventIds = new HashSet<Long>();
-        mPinnedEventIds = new HashSet<Long>();
-
         mInvitedUserIds = new HashSet<Long>();
         mInvitingUserIds = new HashSet<Long>();
         mInvitingEventIds = new HashSet<Long>();
 
+        nextFilterId = 1;
+
         mListeners = new ArrayList<CacheListener>();
-    }
-
-    public void acceptInvitation(long id) { // Callback ?
-
     }
 
     public void acceptInvitation(long id, final Context ctx, final NetworkRequestCallback callback) {
@@ -144,7 +136,7 @@ public class Cache {
                     // Add ID to event
                     createdEvent.setId(eventId);
                     // Puts event in Cache
-                    Cache.this.putPublicEvent(createdEvent);
+                    Cache.this.putEvent(createdEvent);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     callback.onFailure();
@@ -391,7 +383,13 @@ public class Cache {
         }.execute(id);
     }
 
-    public void modifyEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
+    /**
+     * OK
+     * 
+     * @param createdEvent
+     * @param callback
+     */
+    public void modifyOwnEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
         new AsyncTask<ImmutableEvent, Void, Void>() {
 
             @Override
@@ -409,27 +407,40 @@ public class Cache {
         }.execute(createdEvent);
     }
 
-    public void putFilters(Set<ImmutableFilter> newFilters) {
-        boolean isListModified = false;
+    /**
+     * OK
+     * 
+     * @param id
+     */
+    public void putEvent(ImmutableEvent newEvent) {
+        Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
+        singleton.add(newEvent);
+        this.putEvents(singleton);
+    }
 
-        for (ImmutableFilter newFilter : newFilters) {
-            Filter filter = this.getFilter(newFilter.getId());
-            if (filter == null) {
-                // Need to add it
-                mFilterIds.add(newFilter.getId());
-                mFilterInstances.put(newFilter.getId(), new DefaultFilter(newFilter));
-                isListModified = true;
-            } else {
-                // Only update
-                filter.update(newFilter);
-            }
+    public void putEvents(Set<ImmutableEvent> newEvents) {
+        for (ImmutableEvent newEvent : newEvents) {
+            mEventIds.add(newEvent.getID());
+            mEventInstances.put(newEvent.getID(), new PublicEvent(newEvent));
         }
 
-        // Notify listeners if needed
-        if (isListModified) {
-            for (CacheListener listener : mListeners) {
-                listener.onFilterListUpdate();
-            }
+        // Notify listeners
+        for (CacheListener listener : mListeners) {
+            listener.onEventListUpdate();
+        }
+    }
+
+    public void putFilters(Set<ImmutableFilter> newFilters) {
+        for (ImmutableFilter newFilter : newFilters) {
+            // Create new Unique Id
+            newFilter.setId(nextFilterId++);
+            mFilterIds.add(newFilter.getId());
+            mFilterInstances.put(newFilter.getId(), new DefaultFilter(newFilter));
+        }
+
+        // Notify listeners
+        for (CacheListener listener : mListeners) {
+            listener.onFilterListUpdate();
         }
     }
 
@@ -463,41 +474,6 @@ public class Cache {
         if (isListModified) {
             for (CacheListener listener : mListeners) {
                 listener.onFriendListUpdate();
-            }
-        }
-    }
-
-    /**
-     * Mark an Event as Going and fill the cache with its informations.
-     * 
-     * @param id
-     */
-    public void putPublicEvent(ImmutableEvent newEvent) {
-        Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
-        singleton.add(newEvent);
-        this.putPublicEvents(singleton);
-    }
-
-    public void putPublicEvents(Set<ImmutableEvent> newEvents) {
-        boolean isListModified = false;
-
-        for (ImmutableEvent newEvent : newEvents) {
-            if (mEventInstances.get(newEvent.getID()) == null) {
-                // Need to add it
-                Event event = new PublicEvent(newEvent);
-                mEventInstances.put(newEvent.getID(), event);
-
-                isListModified = true;
-            } else {
-                // Only update
-                this.updateEvent(newEvent);
-            }
-        }
-
-        // Notify listeners if needed
-        if (isListModified) {
-            for (CacheListener listener : mListeners) {
-                listener.onEventListUpdate();
             }
         }
     }
@@ -556,9 +532,6 @@ public class Cache {
             if (mEventIds.contains(id)) {
                 // Remove id from sets
                 mEventIds.remove(id);
-                mOwnEventIds.remove(id);
-                mPinnedEventIds.remove(id);
-                mNearEventIds.remove(id);
 
                 // Remove instance from array
                 mEventInstances.remove(id);

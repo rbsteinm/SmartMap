@@ -9,7 +9,8 @@ import java.util.Set;
  */
 public interface Filter extends Displayable {
 
-    public long DEFAULT_FILTER_ID = -1;
+    // Id of the Default filter
+    public long DEFAULT_FILTER_ID = 0;
 
     /**
      * Adds a user to the list
