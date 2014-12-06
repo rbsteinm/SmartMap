@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
@@ -108,15 +107,13 @@ public class InvitationsTab extends ListFragment {
         builder.setPositiveButton("Yes, accept", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                // new AcceptInvitation().execute(userId);
                 invitation.setStatus(Invitation.ACCEPTED);
+                // TODO add invitation in cache instead of db
                 mDBHelper.updateFriendInvitation(invitation);
-                // TODO : Adding friend into cache should be done inside
-                // NotifcationManager
                 ImmutableUser friend;
                 try {
                     friend = ServiceContainer.getNetworkClient().getUserInfo(invitation.getUserId());
-                    Cache.getInstance().putFriend(friend);
+                    ServiceContainer.getCache().putFriend(friend);
                     mInvitationList = mDBHelper.getUnansweredFriendInvitations();
                 } catch (SmartMapClientException e) {
                     // TODO : Handle this case

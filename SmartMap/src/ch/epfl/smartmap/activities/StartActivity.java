@@ -24,7 +24,7 @@ import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.InvitationManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
-import ch.epfl.smartmap.search.CachedOnlineSearchEngine;
+import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 
 import com.facebook.Session;
@@ -128,7 +128,7 @@ public class StartActivity extends FragmentActivity {
         ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplicationContext()));
         ServiceContainer.setCache(new Cache());
         ServiceContainer.setInvitationManager(new InvitationManager());
-        ServiceContainer.setSearchEngine(new CachedOnlineSearchEngine());
+        ServiceContainer.setSearchEngine(new CachedSearchEngine());
     }
 
     /**

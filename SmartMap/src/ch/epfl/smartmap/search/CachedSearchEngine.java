@@ -34,7 +34,7 @@ public final class CachedSearchEngine implements SearchEngine {
     private final List<Location> mPreviousOnlineEventSearchQueries;
     private final List<Set<Long>> mPreviousOnlineEventSearchResults;
 
-    private CachedSearchEngine() {
+    public CachedSearchEngine() {
         mPreviousOnlineStrangerSearches = new HashMap<String, Set<Long>>();
 
         mPreviousOnlineEventSearchQueries = new LinkedList<Location>();
@@ -42,12 +42,13 @@ public final class CachedSearchEngine implements SearchEngine {
     }
 
     /**
-     * Search for a {@code Friend} with this id. For performance concerns, this method should be called in an
-     * {@code AsyncTask}.
+     * Search for a {@code Friend} with this id. For performance concerns, this
+     * method should be called in an {@code AsyncTask}.
      * 
      * @param id
      *            long id of {@code Friend}
-     * @return the {@code Friend} with given id, or {@code null} if there was no match.
+     * @return the {@code Friend} with given id, or {@code null} if there was no
+     *         match.
      */
     public void findPublicEventById(final long id, final SearchRequestCallback<Event> callback) {
         new AsyncTask<Void, Void, Void>() {
@@ -68,7 +69,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache
-                        ServiceContainer.getCache().putPublicEvent((databaseResult));
+                        ServiceContainer.getCache().putEvent(databaseResult);
                         if (callback != null) {
                             callback.onResult(ServiceContainer.getCache().getPublicEvent(id));
                         }
@@ -84,7 +85,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                         if (networkResult != null) {
                             // Match on server, put it in cache
-                            ServiceContainer.getCache().putPublicEvent(networkResult);
+                            ServiceContainer.getCache().putEvent(networkResult);
                             if (callback != null) {
                                 callback.onResult(ServiceContainer.getCache().getPublicEvent(id));
                             }
@@ -145,10 +146,11 @@ public final class CachedSearchEngine implements SearchEngine {
                     }
                 }
 
-                // Get all results that weren't in cache and add them all at once (Avoid to send multiple
+                // Get all results that weren't in cache and add them all at
+                // once (Avoid to send multiple
                 // listener
                 // calls)
-                ServiceContainer.getCache().putPublicEvents(immutableResult);
+                ServiceContainer.getCache().putEvents(immutableResult);
                 // Retrieve live instances from cache
                 for (ImmutableEvent event : immutableResult) {
                     result.add(ServiceContainer.getCache().getPublicEvent(event.getID()));
@@ -162,12 +164,13 @@ public final class CachedSearchEngine implements SearchEngine {
     }
 
     /**
-     * Search for a {@code Friend} with this id. For performance concerns, this method should be called in an
-     * {@code AsyncTask}.
+     * Search for a {@code Friend} with this id. For performance concerns, this
+     * method should be called in an {@code AsyncTask}.
      * 
      * @param id
      *            long id of {@code Friend}
-     * @return the {@code Friend} with given id, or {@code null} if there was no match.
+     * @return the {@code Friend} with given id, or {@code null} if there was no
+     *         match.
      */
     public void findStrangerById(final long id, final SearchRequestCallback<User> callback) {
         new AsyncTask<Void, Void, Void>() {
@@ -267,12 +270,13 @@ public final class CachedSearchEngine implements SearchEngine {
     }
 
     /**
-     * Search for a {@code Friend} with this id. For performance concerns, this method should be called in an
-     * {@code AsyncTask}.
+     * Search for a {@code Friend} with this id. For performance concerns, this
+     * method should be called in an {@code AsyncTask}.
      * 
      * @param id
      *            long id of {@code Friend}
-     * @return the {@code Friend} with given id, or {@code null} if there was no match.
+     * @return the {@code Friend} with given id, or {@code null} if there was no
+     *         match.
      */
     public void findUserById(final long id, final SearchRequestCallback<User> callback) {
         // Check in cache
