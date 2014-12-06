@@ -34,12 +34,12 @@ import com.facebook.widget.LoginButton;
 
 /**
  * <p>
- * The fragment for the "Login with Facebook" button, used by
- * {@linkplain ch.epfl.smartmap.activities.StartActivity} for screen 1.
+ * The fragment for the "Login with Facebook" button, used by {@linkplain ch.epfl.smartmap.activities.StartActivity} for
+ * screen 1.
  * </p>
  * <p>
- * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name,
- * facebook id and facebook token.
+ * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name, facebook id and
+ * facebook token.
  * </p>
  * 
  * @author SpicyCH
@@ -59,7 +59,7 @@ public class LoginFragment extends Fragment {
     private final Session.StatusCallback callback = new Session.StatusCallback() {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
-            LoginFragment.this.onSessionStateChange(session, state, exception);
+            LoginFragment.this.onSessionStateChange(state);
         }
     };
 
@@ -69,46 +69,7 @@ public class LoginFragment extends Fragment {
     }
 
     protected void makeMeRequest() {
-        Request request = Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
-
-            @Override
-            public void onCompleted(GraphUser user, Response response) {
-
-                if (user != null) {
-
-                    // This portable token is used by the server
-                    String facebookToken = Session.getActiveSession().getAccessToken();
-
-                    // Send user's infos to SmartMap server
-                    Map<String, String> params = new LinkedHashMap<String, String>();
-                    params.put(FACEBOOK_ID_POST_NAME, user.getId());
-                    params.put(FACEBOOK_NAME_POST_NAME, user.getName());
-                    params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
-
-                    // Displays the name, facebookId and facebookToken. When we upload the app on google play,
-                    // we might
-                    // want to remove these logcats messages.
-                    Log.i(TAG, "user name: " + params.get(FACEBOOK_NAME_POST_NAME));
-                    Log.i(TAG, "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
-                    Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
-
-                    if (!LoginFragment.this.sendDataToServer(params)) {
-                        Toast.makeText(
-                            LoginFragment.this.getActivity(),
-                            LoginFragment.this
-                                .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
-                            Toast.LENGTH_LONG).show();
-                    } else {
-                        // If all is ok, start filling Cache
-                        new InitCache().execute();
-                    }
-
-                } else if (response.getError() != null) {
-                    Log.e(TAG, "The user is null (authentication aborted?)");
-                }
-            }
-        });
-
+        Request request = Request.newMeRequest(Session.getActiveSession(), new CustomGraphUserCallback());
         request.executeAsync();
     }
 
@@ -140,8 +101,7 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 
         // Start animation and set login button
-        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(),
-            R.anim.face_anim));
+        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(), R.anim.face_anim));
         authButton.setFragment(this);
 
         // Not logged in Facebook or permission to use Facebook in SmartMap not
@@ -173,7 +133,7 @@ public class LoginFragment extends Fragment {
         // may not be triggered. Trigger it if it's open/closed.
         Session session = Session.getActiveSession();
         if ((session != null) && (session.isOpened() || session.isClosed())) {
-            this.onSessionStateChange(session, session.getState(), null);
+            this.onSessionStateChange(session.getState());
         }
 
         mUiHelper.onResume();
@@ -185,7 +145,7 @@ public class LoginFragment extends Fragment {
         mUiHelper.onSaveInstanceState(outState);
     }
 
-    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
+    private void onSessionStateChange(SessionState state) {
         Log.i(TAG, "Checking FB log in status...");
         if (state.isOpened()) {
             Log.i(TAG, "Logged in...");
@@ -210,21 +170,20 @@ public class LoginFragment extends Fragment {
      * 
      * @param params
      *            a map with values for the keys name, facebookId and facebookToken
-     * @return <code>true</code> if the internet connection is up and the data is beeing processed by an
-     *         asynctask
+     * @return <code>true</code> if the internet connection is up and the data is beeing processed by an asynctask
      * @author SpicyCH
      */
     private boolean sendDataToServer(Map<String, String> params) {
 
-        assert params.get(FACEBOOK_TOKEN_POST_NAME) != null : "Facebook token is null";
-        assert !params.get(FACEBOOK_TOKEN_POST_NAME).equals("") : "Facebook token is empty";
-        assert params.get(FACEBOOK_ID_POST_NAME) != null : "Facebook id is null";
-        assert !params.get(FACEBOOK_ID_POST_NAME).equals("") : "Facebook id is empty";
-        assert params.get(FACEBOOK_NAME_POST_NAME) != null : "Facebook name is null";
-        assert !params.get(FACEBOOK_NAME_POST_NAME).equals("") : "Facebook name is empty";
+        assert null != params.get(FACEBOOK_TOKEN_POST_NAME) : "Facebook token is null";
+        assert !params.get(FACEBOOK_TOKEN_POST_NAME).isEmpty() : "Facebook token is empty";
+        assert null != params.get(FACEBOOK_ID_POST_NAME) : "Facebook id is null";
+        assert !params.get(FACEBOOK_ID_POST_NAME).isEmpty() : "Facebook id is empty";
+        assert null != params.get(FACEBOOK_NAME_POST_NAME) : "Facebook name is null";
+        assert !params.get(FACEBOOK_NAME_POST_NAME).isEmpty() : "Facebook name is empty";
 
-        ConnectivityManager connMgr =
-            (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr = (ConnectivityManager) this.getActivity().getSystemService(
+                Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if ((networkInfo != null) && networkInfo.isConnected()) {
             // Send data
@@ -234,9 +193,8 @@ public class LoginFragment extends Fragment {
         } else {
             // An error occured
             Log.e(TAG, "Could not send user's data to server. Net down?");
-            Toast.makeText(this.getActivity(),
-                this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet), Toast.LENGTH_LONG)
-                .show();
+            Toast.makeText(this.getActivity(), this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet),
+                    Toast.LENGTH_LONG).show();
             return false;
         }
 
@@ -250,8 +208,8 @@ public class LoginFragment extends Fragment {
     }
 
     /**
-     * The goal of this Task is to compute the location of the displayable multiple times on start so that
-     * they don't appear at false positions because of google locations.
+     * The goal of this Task is to compute the location of the displayable multiple times on start so that they don't
+     * appear at false positions because of google locations.
      * 
      * @author jfperren
      */
@@ -291,6 +249,7 @@ public class LoginFragment extends Fragment {
                 friendIds = NetworkSmartMapClient.getInstance().getFriendsIds();
             } catch (SmartMapClientException e) {
                 // If there is connection issues, get it in the database
+                Log.d(TAG, "Couldn't retrieve friendIds from the server: " + e);
                 friendIds = DatabaseHelper.getInstance().getFriendIds();
             }
             if (friendIds != null) {
@@ -315,7 +274,7 @@ public class LoginFragment extends Fragment {
      */
     private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final static int FACEBOOK_ID_RADIX = 10;
+        private static final int FACEBOOK_ID_RADIX = 10;
         private final Map<String, String> mParams;
 
         /**
@@ -327,6 +286,7 @@ public class LoginFragment extends Fragment {
 
         /*
          * (non-Javadoc)
+         * 
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
@@ -336,19 +296,56 @@ public class LoginFragment extends Fragment {
 
             try {
                 networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
-                    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
-                    mParams.get(FACEBOOK_TOKEN_POST_NAME));
+                        Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
+                        mParams.get(FACEBOOK_TOKEN_POST_NAME));
             } catch (NumberFormatException e1) {
-                Log.e(TAG, "Couldn't parse to Long: " + e1.getMessage());
+                Log.e(TAG, "Couldn't parse to Long: " + e1);
                 return false;
             } catch (SmartMapClientException e1) {
-                Log.e(TAG, "Couldn't authenticate : " + e1.getMessage());
+                Log.e(TAG, "Couldn't authenticate : " + e1);
                 return false;
             }
 
             Log.i(TAG, "User' infos sent to SmartMap server");
             return true;
 
+        }
+    }
+
+    class CustomGraphUserCallback implements Request.GraphUserCallback {
+        @Override
+        public void onCompleted(GraphUser user, Response response) {
+
+            if (user != null) {
+
+                // This portable token is used by the server
+                String facebookToken = Session.getActiveSession().getAccessToken();
+
+                // Send user's infos to SmartMap server
+                Map<String, String> params = new LinkedHashMap<String, String>();
+                params.put(FACEBOOK_ID_POST_NAME, user.getId());
+                params.put(FACEBOOK_NAME_POST_NAME, user.getName());
+                params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
+
+                // Displays the name, facebookId and facebookToken. When we upload the app on google play,
+                // we might
+                // want to remove these logcats messages.
+                Log.i(TAG, "user name: " + params.get(FACEBOOK_NAME_POST_NAME));
+                Log.i(TAG, "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
+                Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
+
+                if (!LoginFragment.this.sendDataToServer(params)) {
+                    Toast.makeText(LoginFragment.this.getActivity(),
+                            LoginFragment.this.getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    // If all is ok, start filling Cache
+                    new InitCache().execute();
+                }
+
+            } else if (response.getError() != null) {
+                Log.e(TAG, "The user is null (authentication aborted?)");
+            }
         }
     }
 }
