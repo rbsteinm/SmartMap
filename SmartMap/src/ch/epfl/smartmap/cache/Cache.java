@@ -202,6 +202,19 @@ public class Cache {
         return mFilterInstances.get(id);
     }
 
+    public Set<Filter> getFilters(Set<Long> ids) {
+        Set<Filter> filters = new HashSet<Filter>();
+
+        for (long id : ids) {
+            Filter filter = this.getFilter(id);
+            if (filter != null) {
+                filters.add(filter);
+            }
+        }
+
+        return filters;
+    }
+
     /**
      * OK
      * 
