@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Set;
 
 import android.app.AlertDialog;
@@ -24,12 +23,8 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
-<<<<<<< HEAD
-import ch.epfl.smartmap.search.CachedSearchEngine;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-=======
->>>>>>> 39ddd086a8423a070df6568c75b637365e685d20
-import ch.epfl.smartmap.servercom.SmartMapClientException;
+import ch.epfl.smartmap.search.SearchRequestCallback;
+import ch.epfl.smartmap.servercom.NetworkRequestCallback;
 
 /**
  * This Activity displays a list of users from the DB and lets you send them
@@ -112,44 +107,37 @@ public class AddFriendActivity extends ListActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                new RefreshUserList().execute(newText);
+                ServiceContainer.getSearchEngine().findStrangerByQuery(newText, new FindFriendsCallback());
                 return true;
             }
 
             @Override
             public boolean onQueryTextSubmit(String newText) {
-                new RefreshUserList().execute(newText);
+                ServiceContainer.getSearchEngine().findStrangerByQuery(newText, new FindFriendsCallback());
                 return true;
             }
         });
     }
 
-    /**
-     * Asynchronous task that refreshes the list of users displayed every time a
-     * new character is typed in the searchbar
-     * 
-     * @author rbsteinm
-     */
-    private class RefreshUserList extends AsyncTask<String, Void, Set<User>> {
+    private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
 
         @Override
-        protected Set<User> doInBackground(String... params) {
-            try {
-                if (params[0].equals("")) {
-                    return Collections.emptySet();
-                } else {
-                    // TODO retourner une list?
-                    return ServiceContainer.getSearchEngine().findStrangerByQuery(params[0]);
-                }
-            } catch (SmartMapClientException e) {
-                return Collections.emptySet();
-            }
+        public void onResult(Set<User> result) {
+            AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
+                new ArrayList<User>(result)));
+
         }
 
         @Override
-        protected void onPostExecute(Set<User> refreshedList) {
-            AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                new ArrayList<User>(refreshedList)));
+        public void onNotFound() {
+            Toast.makeText(AddFriendActivity.this.getBaseContext(), "No user found for this query.", Toast.LENGTH_LONG)
+                .show();
+        }
+
+        @Override
+        public void onNetworkError() {
+            Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                "Couldn't find friends due to a network error. Please try again later.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -159,26 +147,26 @@ public class AddFriendActivity extends ListActivity {
      * 
      * @author rbsteinm
      */
-    private class SendFriendRequest extends AsyncTask<Long, Void, String> {
+    private class SendFriendRequest extends AsyncTask<Long, Void, Void> {
 
         @Override
-        protected String doInBackground(Long... params) {
-            String confirmString = "";
-            try {
-                ServiceContainer.getNetworkClient().inviteFriend(params[0]);
-                confirmString =
-                    "You sent a friend request to "
-                        + ServiceContainer.getNetworkClient().getUserInfo(params[0]).getName();
-            } catch (SmartMapClientException e) {
-                // confirmString = "Error, friend request wasn't sent";
-                confirmString = e.getMessage();
-            }
-            return confirmString;
-        }
+        protected Void doInBackground(Long... params) {
+            ServiceContainer.getCache().inviteUser(params[0], new NetworkRequestCallback() {
 
-        @Override
-        protected void onPostExecute(String confirmString) {
-            Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG).show();
+                @Override
+                public void onSuccess() {
+                    Toast
+                        .makeText(AddFriendActivity.this.getBaseContext(), "Friend request sent !", Toast.LENGTH_SHORT)
+                        .show();
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(AddFriendActivity.this.getBaseContext(), "Friend request sent couldn't be sent.",
+                        Toast.LENGTH_SHORT).show();
+                }
+            });
+            return null;
         }
     }
 }

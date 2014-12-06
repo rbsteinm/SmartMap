@@ -121,7 +121,7 @@ public class Notifications {
 
         String[] events = new String[2];
         events[0] =
-            new String(CachedSearchEngine.getInstance().findFriendById(event.getCreatorId()) + " "
+            new String(CachedSearchEngine.getInstance().findUserById(event.getCreatorId()) + " "
                 + context.getString(R.string.notification_event_invitation) + " " + event.getName());
         events[1] = context.getString(R.string.notification_open_event_list);
 
