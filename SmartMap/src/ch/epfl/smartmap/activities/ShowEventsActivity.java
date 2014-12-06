@@ -39,11 +39,11 @@ import ch.epfl.smartmap.gui.EventsListItemAdapter;
  */
 public class ShowEventsActivity extends ListActivity {
 
-    private final static String TAG = ShowEventsActivity.class.getSimpleName();
+    private static final String TAG = ShowEventsActivity.class.getSimpleName();
 
-    private final static double EARTH_RADIUS_KM = 6378.1;
-    private final static int SEEK_BAR_MIN_VALUE = 2;
-    private final static int ONE_HUNDRED = 100;
+    private static final double EARTH_RADIUS_KM = 6378.1;
+    private static final int SEEK_BAR_MIN_VALUE = 2;
+    private static final int ONE_HUNDRED = 100;
 
     private SeekBar mSeekBar;
 
@@ -182,99 +182,7 @@ public class ShowEventsActivity extends ListActivity {
         final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
 
         // Need an AsyncTask because getEventById searches on our server if event not stored in cache.
-        AsyncTask<Long, Void, Map<String, Object>> loadEvent = new AsyncTask<Long, Void, Map<String, Object>>() {
-
-            private final static String EVENT_KEY = "EVENT";
-            private final static String CREATOR_NAME_KEY = "CREATOR_NAME";
-
-            @Override
-            protected Map<String, Object> doInBackground(Long... params) {
-
-                Log.d(TAG, "Retrieving event...");
-
-                long eventId = params[0];
-
-                Map<String, Object> output = new HashMap<String, Object>();
-
-                Event event = Cache.getInstance().getEventById(eventId);
-                output.put(EVENT_KEY, event);
-
-                String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
-                output.put(CREATOR_NAME_KEY, creatorName);
-
-                return output;
-            }
-
-            @Override
-            protected void onPostExecute(Map<String, Object> result) {
-
-                Log.d(TAG, "Processing event...");
-
-                final Event event = (Event) result.get(EVENT_KEY);
-                final String creatorName = (String) result.get(CREATOR_NAME_KEY);
-
-                if ((event == null) || (creatorName == null)) {
-                    Log.e(TAG, "The server returned a null event or creatorName");
-
-                    Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
-                            .show();
-
-                } else {
-
-                    // Construct the dialog that display more detailed infos and offers to show event on the map or to
-                    // show more details.
-
-                    AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
-
-                    String[] textForDates = EventsListItemAdapter.getTextFromDate(event.getStartDate(),
-                            event.getEndDate(), mContext);
-
-                    final String message = textForDates[0] + " " + textForDates[1] + "\n"
-                            + mContext.getString(R.string.show_event_by) + " " + creatorName + "\n\n"
-                            + event.getDescription();
-
-                    alertDialog.setTitle(event.getName()
-                            + " @ "
-                            + event.getLocationString()
-                            + "\n"
-                            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
-                                    .getLatitude(), event.getLocation().getLongitude()) + " km away");
-                    alertDialog.setMessage(message);
-
-                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-                            mContext.getString(R.string.show_event_on_the_map_button),
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int id) {
-                                    Toast.makeText(mContext,
-                                            ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                                            Toast.LENGTH_SHORT).show();
-                                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                                    showEventIntent.putExtra("location", event.getLocation());
-                                    ShowEventsActivity.this.startActivity(showEventIntent);
-                                }
-                            });
-
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
-                            mContext.getString(R.string.show_event_details_button),
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int id) {
-                                    Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
-                                    showEventIntent.putExtra("EVENT", event.getId());
-                                    ShowEventsActivity.this.startActivity(showEventIntent);
-                                }
-                            });
-
-                    alertDialog.show();
-                }
-
-            }
-
-        };
-
+        LoadEventTask loadEvent = new LoadEventTask();
         Log.d(TAG, "Executing loadEvent task with event id " + eventViewHolder.getEventId());
         loadEvent.execute(eventViewHolder.getEventId());
 
@@ -299,31 +207,9 @@ public class ShowEventsActivity extends ListActivity {
 
         mShowKilometers = (TextView) this.findViewById(R.id.showEventKilometers);
 
-        // By default, the seek bar is disabled. This is done programmatically
-        // as android:enabled="false" doesn't work
-        // out in xml
         mSeekBar = (SeekBar) this.findViewById(R.id.showEventSeekBar);
         mSeekBar.setEnabled(false);
-        mSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
-                    seekBar.setProgress(SEEK_BAR_MIN_VALUE);
-                }
-                mShowKilometers.setText(mSeekBar.getProgress() + " km");
-                ShowEventsActivity.this.updateCurrentList();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-
-        });
+        mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
 
         mEventsList = Cache.getInstance().getAllEvents();
         Log.d(TAG, "mEventsList initialized: " + mEventsList);
@@ -348,31 +234,23 @@ public class ShowEventsActivity extends ListActivity {
         }
 
         for (Event e : mEventsList) {
-            if (mMyEventsChecked) {
-                if (!(e.getCreatorId() == SettingsManager.getInstance().getUserID())) {
-                    mCurrentList.remove(e);
-                }
+            if (mMyEventsChecked && !(e.getCreatorId() == SettingsManager.getInstance().getUserID())) {
+                mCurrentList.remove(e);
             }
 
-            if (mOngoingChecked) {
-                if (!e.getStartDate().before(new GregorianCalendar())) {
-                    mCurrentList.remove(e);
-                }
+            if (mOngoingChecked && !e.getStartDate().before(new GregorianCalendar())) {
+                mCurrentList.remove(e);
             }
 
-            if (mNearMeChecked) {
-                if (mMyLocation != null) {
-                    double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
-                            mMyLocation.getLatitude(), mMyLocation.getLongitude());
-                    String[] showKMContent = mShowKilometers.getText().toString().split(" ");
-                    double distanceMax = Double.parseDouble(showKMContent[0]);
-                    if (!(distanceMeEvent < distanceMax)) {
-                        mCurrentList.remove(e);
-                    }
-                } else {
-                    Toast.makeText(this.getApplicationContext(),
-                            this.getString(R.string.show_event_cannot_retrieve_current_location), Toast.LENGTH_SHORT)
-                            .show();
+            if (mNearMeChecked && (mMyLocation != null)) {
+
+                double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
+                        mMyLocation.getLatitude(), mMyLocation.getLongitude());
+                String[] showKMContent = mShowKilometers.getText().toString().split(" ");
+                double distanceMax = Double.parseDouble(showKMContent[0]);
+
+                if (!(distanceMeEvent < distanceMax)) {
+                    mCurrentList.remove(e);
                 }
             }
         }
@@ -397,6 +275,9 @@ public class ShowEventsActivity extends ListActivity {
      * @author SpicyCH
      */
     public static double distance(double lat1, double lon1, double lat2, double lon2) {
+
+        // TODO use provided method by Google?
+
         double radLat1 = Math.toRadians(lat1);
         double radLong1 = Math.toRadians(lon1);
         double radLat2 = Math.toRadians(lat2);
@@ -410,4 +291,128 @@ public class ShowEventsActivity extends ListActivity {
 
         return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;
     }
+
+    /**
+     * Loads an event and displays its infos.
+     * 
+     * @author SpicyCH
+     */
+    class LoadEventTask extends AsyncTask<Long, Void, Map<String, Object>> {
+        private static final String EVENT_KEY = "EVENT";
+        private static final String CREATOR_NAME_KEY = "CREATOR_NAME";
+
+        @Override
+        protected Map<String, Object> doInBackground(Long... params) {
+
+            Log.d(TAG, "Retrieving event...");
+
+            long eventId = params[0];
+
+            Map<String, Object> output = new HashMap<String, Object>();
+
+            Event event = Cache.getInstance().getEventById(eventId);
+            output.put(EVENT_KEY, event);
+
+            String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
+            output.put(CREATOR_NAME_KEY, creatorName);
+
+            return output;
+        }
+
+        @Override
+        protected void onPostExecute(Map<String, Object> result) {
+
+            Log.d(TAG, "Processing event...");
+
+            final Event event = (Event) result.get(EVENT_KEY);
+            final String creatorName = (String) result.get(CREATOR_NAME_KEY);
+
+            if ((event == null) || (creatorName == null)) {
+                Log.e(TAG, "The server returned a null event or creatorName");
+
+                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
+                        .show();
+
+            } else {
+
+                // Construct the dialog that display more detailed infos and offers to show event on the map or to
+                // show more details.
+
+                AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
+
+                String[] textForDates = EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(),
+                        mContext);
+
+                final String message = textForDates[0] + " " + textForDates[1] + "\n"
+                        + mContext.getString(R.string.show_event_by) + " " + creatorName + "\n\n"
+                        + event.getDescription();
+
+                alertDialog.setTitle(event.getName()
+                        + " @ "
+                        + event.getLocationString()
+                        + "\n"
+                        + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
+                                .getLatitude(), event.getLocation().getLongitude()) + " km away");
+                alertDialog.setMessage(message);
+
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
+                        mContext.getString(R.string.show_event_on_the_map_button),
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                Toast.makeText(mContext,
+                                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                                        Toast.LENGTH_SHORT).show();
+                                Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                                showEventIntent.putExtra("location", event.getLocation());
+                                ShowEventsActivity.this.startActivity(showEventIntent);
+                            }
+                        });
+
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
+                        mContext.getString(R.string.show_event_details_button), new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
+                                showEventIntent.putExtra("EVENT", event.getId());
+                                ShowEventsActivity.this.startActivity(showEventIntent);
+                            }
+                        });
+
+                alertDialog.show();
+            }
+
+        }
+    }
+
+    /**
+     * Listens for the progress change of the Seekbar and updates the list accordingly.
+     * 
+     * 
+     * @author SpicyCH
+     */
+    class SeekBarChangeListener implements OnSeekBarChangeListener {
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
+                seekBar.setProgress(SEEK_BAR_MIN_VALUE);
+            }
+            mShowKilometers.setText(mSeekBar.getProgress() + " km");
+            ShowEventsActivity.this.updateCurrentList();
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            // Nothing
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            // Nothing
+        }
+    }
+
 }
