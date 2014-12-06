@@ -983,11 +983,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
         values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
 
-        int rows =
-            mDatabase.update(TABLE_EVENT, values, KEY_ID + " = ?",
-                new String[]{String.valueOf(event.getID())});
-
-        return rows;
+        return mDatabase.update(TABLE_EVENT, values, KEY_ID + " = ?",
+            new String[]{String.valueOf(event.getID())});
     }
 
     /**
@@ -1060,11 +1057,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_POSNAME, friend.getLocationString());
         }
 
-        int rows =
-            mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(friend.getId())});
-
-        return rows;
+        return mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",
+            new String[]{String.valueOf(friend.getId())});
     }
 
     /**
