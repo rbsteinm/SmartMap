@@ -93,8 +93,7 @@ public class Cache {
                 @Override
                 protected Void doInBackground(Long... params) {
                     try {
-                        ImmutableUser newFriend =
-                            ServiceContainer.getNetworkClient().acceptInvitation(params[0]);
+                        ImmutableUser newFriend = ServiceContainer.getNetworkClient().acceptInvitation(params[0]);
                         Cache.this.putFriend(newFriend);
                         mInvitingUserIds.remove(params[0]);
                         mFriendIds.add(params[0]);
@@ -166,7 +165,7 @@ public class Cache {
 
     public Set<Event> getAllVisibleEvents() {
 
-        // TODO : Implement Settings event filtering here
+        // TODO
 
         return this.getPublicEvents(mEventIds);
     }
@@ -672,8 +671,8 @@ public class Cache {
                         }
 
                         EventInvitation invitation =
-                            new EventInvitation(0, creator.getId(), creator.getName(), params[0],
-                                e.getName(), Invitation.UNREAD);
+                            new EventInvitation(0, creator.getId(), creator.getName(), params[0], e.getName(),
+                                Invitation.UNREAD);
 
                         invitation.setId(ServiceContainer.getDatabase().addEventInvitation(invitation));
 
@@ -709,8 +708,8 @@ public class Cache {
                         }
 
                         EventInvitation invitation =
-                            new EventInvitation(0, creator.getId(), creator.getName(), params[0],
-                                e.getName(), Invitation.UNREAD);
+                            new EventInvitation(0, creator.getId(), creator.getName(), params[0], e.getName(),
+                                Invitation.UNREAD);
 
                         invitation.setId(ServiceContainer.getDatabase().addEventInvitation(invitation));
 
@@ -779,7 +778,7 @@ public class Cache {
         }
 
         for (CacheListener listener : mListeners) {
-            listener.onEventListUpdate();
+            listener.onFriendListUpdate();
         }
     }
 
@@ -859,8 +858,7 @@ public class Cache {
 
                         // Set new friend profile picture ?
                         if (ServiceContainer.getSettingsManager().notificationsEnabled()
-                            && ServiceContainer.getSettingsManager()
-                                .notificationsForFriendshipConfirmations()) {
+                            && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations()) {
                             Notifications.acceptedFriendNotification(ctx, params[0]);
                         }
 
@@ -909,16 +907,15 @@ public class Cache {
                         try {
                             image = Cache.this.getUser(params[0].getId()).getImage();
                             if ((image == User.NO_IMAGE) || (image == null)) {
-                                image =
-                                    ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
+                                image = ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
                             }
                         } catch (SmartMapClientException e) {
                             Log.e(TAG, "Error retrieving profile picture of inviter: " + e.getMessage());
                             image = User.NO_IMAGE;
                         } finally {
                             FriendInvitation invitation =
-                                new FriendInvitation(0, params[0].getId(), params[0].getName(),
-                                    Invitation.UNREAD, image);
+                                new FriendInvitation(0, params[0].getId(), params[0].getName(), Invitation.UNREAD,
+                                    image);
 
                             invitation.setId(ServiceContainer.getDatabase().addFriendInvitation(invitation));
 
