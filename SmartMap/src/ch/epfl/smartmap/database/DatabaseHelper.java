@@ -269,7 +269,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * Adds a pending friend request to the database
      * 
      * @param invitation
-     *            The FriendInvitation to ad to the database
+     *            The FriendInvitation to add to the database
      */
     public long addFriendInvitation(FriendInvitation invitation) {
         long id =
@@ -303,15 +303,15 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * @param user
      *            The user who was sent a request
      */
-    public void addPendingFriend(ImmutableUser user) {
+    public void addPendingFriend(long id) {
         Cursor cursor =
-            mDatabase.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getId())}, null, null, null, null);
+            mDatabase.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)},
+                null, null, null, null);
 
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
-            values.put(KEY_USER_ID, user.getId());
-            values.put(KEY_NAME, user.getName());
+            values.put(KEY_USER_ID, id);
+            values.put(KEY_NAME, id);
 
             mDatabase.insert(TABLE_PENDING, null, values);
 

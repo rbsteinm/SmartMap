@@ -10,8 +10,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * Represents an online User which is not a Friend, therefore allowing less informations. Every instanc is
- * unique and store in a local cache that can be accessed via static methods on this class.
+ * Represents an online User which is not a Friend, therefore allowing less
+ * informations. Every instanc is
+ * unique and store in a local cache that can be accessed via static methods on
+ * this class.
  * 
  * @author jfperren
  */
@@ -74,8 +76,7 @@ public class Stranger implements User {
      */
     @Override
     public ImmutableUser getImmutableCopy() {
-        // TODO Auto-generated method stub
-        return new ImmutableUser(mId, mName, null, null, null, null, mImage);
+        return new ImmutableUser(mId, mName, null, null, null, null, mImage, false);
     }
 
     /*
@@ -185,5 +186,14 @@ public class Stranger implements User {
         if (user.getImage() != null) {
             mImage = user.getImage();
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#isBlocked()
+     */
+    @Override
+    public boolean isBlocked() {
+        return false;
     }
 }
