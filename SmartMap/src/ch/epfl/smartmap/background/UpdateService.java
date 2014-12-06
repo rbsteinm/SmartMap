@@ -93,7 +93,7 @@ public class UpdateService extends Service {
                             ServiceContainer.getNetworkClient().updatePos(
                                 ServiceContainer.getSettingsManager().getLocation());
                         } catch (SmartMapClientException e) {
-                            Log.e("UpdateService", "Position update failed:" + e);
+                            Log.e(UpdateService.class.getSimpleName(), "Position update failed:" + e);
                         }
                         return null;
                     }
@@ -151,8 +151,8 @@ public class UpdateService extends Service {
                             ServiceContainer.getCache().updateFriendInvitations(nb,
                                 UpdateService.this.getApplicationContext());
                         } catch (SmartMapClientException e) {
-                            Log.e("UpdateService", "Couldn't retrieve invitations due to a server error: "
-                                + e);
+                            Log.e(UpdateService.class.getSimpleName(),
+                                "Couldn't retrieve invitations due to a server error: " + e);
                         }
                         return nb;
                     }
@@ -174,7 +174,8 @@ public class UpdateService extends Service {
                         ServiceContainer.getCache().updateEventInvitations(invitations,
                             UpdateService.this.getApplicationContext());
                     } catch (SmartMapClientException e) {
-                        Log.e("UpdateService", "Couldn't retrieve event invitations: " + e);
+                        Log.e(UpdateService.class.getSimpleName(), "Couldn't retrieve event invitations: "
+                            + e);
                     }
                     return invitations;
                 }
@@ -274,7 +275,7 @@ public class UpdateService extends Service {
                 mClient.authServer(ServiceContainer.getSettingsManager().getUserName(), ServiceContainer
                     .getSettingsManager().getFacebookID(), ServiceContainer.getSettingsManager().getToken());
             } catch (SmartMapClientException e) {
-                Log.e("UpdateService", "Couldn't log in: " + e);
+                Log.e(UpdateService.class.getSimpleName(), "Couldn't log in: " + e);
             }
             return null;
         }
@@ -307,7 +308,7 @@ public class UpdateService extends Service {
                     ServiceContainer.getSettingsManager().setLocationName(locName);
 
                 } catch (IOException e) {
-                    Log.e("UpdateService", "Error in LocationListener: " + e);
+                    Log.e(UpdateService.class.getSimpleName(), "Error in LocationListener: " + e);
                 }
             }
         }
