@@ -4,9 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This class only acts as a container for all the informations you may want to pass to a filter. It doesn't
- * do any check for null/wrong values. You can use it to create a Filter (Beware to set the required fields
- * then), or only to update one (in which case you can put null to indicate you don't want to update the
+ * This class only acts as a container for all the informations you may want to
+ * pass to a filter. It doesn't
+ * do any check for null/wrong values. You can use it to create a Filter (Beware
+ * to set the required fields
+ * then), or only to update one (in which case you can put null to indicate you
+ * don't want to update the
  * corresponding value).
  * 
  * @author jfperren
@@ -18,7 +21,7 @@ public class ImmutableFilter {
     private long mId;
     private boolean mIsActive;
 
-    protected ImmutableFilter(long id, String name, Set<Long> ids, boolean isActive) {
+    public ImmutableFilter(long id, String name, Set<Long> ids, boolean isActive) {
         mId = id;
         mIds = new HashSet<Long>(ids);
         mName = name;

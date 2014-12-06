@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,17 +21,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.AcceptedFriendInvitation;
-import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.DefaultFilter;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.EventInvitation;
-import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.ImmutableEvent;
+import ch.epfl.smartmap.cache.ImmutableFilter;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.User;
@@ -244,23 +245,20 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The filter/list to add
      * @return The ID of the newly added filter in the filter database
      */
-    public long addFilter(Filter filter) {
+    public long addFilter(ImmutableFilter filter) {
         // First we insert the filter in the table of lists
         ContentValues filterValues = new ContentValues();
-        filterValues.put(KEY_NAME, filter.getListName());
+        filterValues.put(KEY_NAME, filter.getName());
         long filterID = mDatabase.insert(TABLE_FILTER, null, filterValues);
 
         // Then we add the filter-user pairs to another table
         ContentValues pairValues = null;
-        for (long id : filter.getList()) {
+        for (long id : filter.getIds()) {
             pairValues = new ContentValues();
             pairValues.put(KEY_FILTER_ID, filterID);
             pairValues.put(KEY_USER_ID, id);
             mDatabase.insert(TABLE_FILTER_USER, null, pairValues);
         }
-
-        filter.setID(filterID); // sets an ID so the filter can be easily
-                                // accessed
 
         return filterID;
     }
@@ -443,9 +441,10 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         AcceptedFriendInvitation invitation = null;
         if (cursor.moveToFirst()) {
             do {
+                long id = cursor.getLong(cursor.getColumnIndex(KEY_ID));
                 invitation =
-                    new AcceptedFriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)), cursor.getLong(cursor
-                        .getColumnIndex(KEY_USER_ID)), cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                    new AcceptedFriendInvitation(id, cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
+                        cursor.getString(cursor.getColumnIndex(KEY_NAME)), this.getPictureById(id));
 
                 invitations.add(invitation);
             } while (cursor.moveToNext());
@@ -477,9 +476,9 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * @return the {@code List} of all Filters
      */
-    public List<Filter> getAllFilters() {
+    public Set<ImmutableFilter> getAllFilters() {
 
-        ArrayList<Filter> filters = new ArrayList<Filter>();
+        HashSet<ImmutableFilter> filters = new HashSet<ImmutableFilter>();
 
         String query = "SELECT  * FROM " + TABLE_FILTER;
 
@@ -596,7 +595,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The filter's id
      * @return The filter as a FriendList object
      */
-    public Filter getFilter(long id) {
+    public ImmutableFilter getFilter(long id) {
 
         // SQLiteDatabase db = this.getWritableDatabase();
 
@@ -605,25 +604,30 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             mDatabase.query(TABLE_FILTER, FILTER_COLUMNS, KEY_ID + " = ?", new String[]{String.valueOf(id)}, null,
                 null, null, null);
 
+        String name = "";
+
         if (cursor != null) {
             cursor.moveToFirst();
+            name = cursor.getString(cursor.getColumnIndex(KEY_NAME));
         }
 
-        DefaultFilter filter = new DefaultFilter(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-        filter.setID(id);
-
         // Second query to get the associated list of IDs
+        Set<Long> ids = new HashSet<Long>();
+
         cursor =
             mDatabase.query(TABLE_FILTER_USER, FILTER_USER_COLUMNS, KEY_FILTER_ID + " = ?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
 
         if (cursor.moveToFirst()) {
             do {
-                filter.addUser(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
+                ids.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
             } while (cursor.moveToNext());
         }
 
+        ImmutableFilter filter = new ImmutableFilter(id, name, ids, true);
+
         cursor.close();
+
         return filter;
     }
 
@@ -763,7 +767,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 long id = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
                 friend =
                     new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)), User.NO_PHONE_NUMBER,
-                        User.NO_EMAIL, new Location(""), "", this.getPictureById(id));
+                        User.NO_EMAIL, new Location(""), "", this.getPictureById(id), false);
 
                 friends.add(friend);
             } while (cursor.moveToNext());
@@ -1010,7 +1014,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * @param filter
      *            The updated filter
      */
-    public void updateFilter(Filter filter) {
+    public void updateFilter(ImmutableFilter filter) {
 
         this.deleteFilter(filter.getId());
         this.addFilter(filter);
@@ -1086,8 +1090,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * Updates the database contents to be up-to-date with the cache
      */
     public void updateFromCache() {
-        List<User> friends = Cache.getInstance().getAllFriends();
-        List<Event> events = Cache.getInstance().getAllGoingEvents();
+        Set<User> friends = ServiceContainer.getCache().getAllFriends();
+        Set<Event> events = ServiceContainer.getCache().getAllVisibleEvents();
 
         for (User user : friends) {
             this.updateFriend(user.getImmutableCopy());

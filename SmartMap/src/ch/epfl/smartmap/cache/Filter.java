@@ -10,7 +10,7 @@ import java.util.Set;
 public interface Filter extends Displayable {
 
     // Id of the Default filter
-    public long DEFAULT_FILTER_ID = 0;
+    long DEFAULT_FILTER_ID = 0;
 
     /**
      * Adds a user to the list
@@ -33,4 +33,19 @@ public interface Filter extends Displayable {
     boolean isActive();
 
     void update(ImmutableFilter filter);
+
+    /**
+     * @param newName
+     */
+    void setName(String newName);
+
+    /**
+     * @param isActive
+     */
+    void setActive(boolean isActive);
+
+    /**
+     * @param newFriend
+     */
+    void removeFriend(long newFriend);
 }

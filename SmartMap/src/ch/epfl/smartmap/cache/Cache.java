@@ -391,8 +391,25 @@ public class Cache {
                 }
                 return null;
             }
-
         }.execute(id);
+    }
+
+    public void
+        inviteFriendsToEvent(final long eventId, final Set<Long> usersIds, final NetworkRequestCallback callback) {
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, new ArrayList<Long>(usersIds));
+                    callback.onSuccess();
+                } catch (SmartMapClientException e) {
+                    Log.e(TAG, "Couldn't invite friends to event:" + e.getMessage());
+                    callback.onFailure();
+                }
+                return null;
+            }
+        }.execute();
     }
 
     /**
