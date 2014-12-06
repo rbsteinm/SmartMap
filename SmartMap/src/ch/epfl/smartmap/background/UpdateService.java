@@ -70,7 +70,7 @@ public class UpdateService extends Service {
                             ServiceContainer.getCache().updatePositions(
                                 new HashSet<ImmutableUser>(ServiceContainer.getNetworkClient().listFriendsPos()));
                         } catch (SmartMapClientException e) {
-                            Log.e(TAG, "Error while retrieving friends positions: " + e.getMessage());
+                            e.printStackTrace();
                         }
                         return null;
                     }
