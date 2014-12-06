@@ -67,7 +67,7 @@ public class UpdateService extends Service {
                     @Override
                     protected Void doInBackground(Void... args0) {
                         try {
-                            ServiceContainer.getCache().updatePositions(
+                            ServiceContainer.getCache().updateFriends(
                                 new HashSet<ImmutableUser>(ServiceContainer.getNetworkClient().listFriendsPos()));
                         } catch (SmartMapClientException e) {
                             e.printStackTrace();

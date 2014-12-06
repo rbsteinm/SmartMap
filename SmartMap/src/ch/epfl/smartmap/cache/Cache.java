@@ -817,16 +817,6 @@ public class Cache {
         // TODO : Update Events
     }
 
-    public void updatePositions(Set<ImmutableUser> friends) {
-        for (ImmutableUser friend : friends) {
-            this.updateFriend(friend);
-        }
-
-        for (CacheListener listener : mListeners) {
-            listener.onFriendListUpdate();
-        }
-    }
-
     public boolean updatePublicEvent(ImmutableEvent event) {
         // Check in cache
         Event cachedEvent = mEventInstances.get(event.getID());
