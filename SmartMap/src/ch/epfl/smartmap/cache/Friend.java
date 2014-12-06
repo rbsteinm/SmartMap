@@ -227,15 +227,6 @@ public final class Friend implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getType()
-     */
-    @Override
-    public Type getType() {
-        return Type.FRIEND;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see java.lang.Object#hashcode
      */
     @Override

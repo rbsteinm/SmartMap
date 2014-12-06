@@ -62,14 +62,7 @@ public interface User extends Displayable {
 
     String getPhoneNumber();
 
-    Type getType();
-
     boolean isBlocked();
 
     void update(ImmutableUser user);
-
-    public enum Type {
-        FRIEND,
-        STRANGER;
-    }
 }

@@ -9,6 +9,8 @@ import java.util.Set;
  */
 public interface Filter extends Displayable {
 
+    public long DEFAULT_FILTER_ID = -1;
+
     /**
      * Adds a user to the list
      * 
@@ -23,32 +25,11 @@ public interface Filter extends Displayable {
     Set<Long> getFriendIds();
 
     /**
-     * Returns the list's ID for storing/loading purposes. Only gets a value
-     * when the UserList is stored.
-     * 
-     * @return The ID
-     */
-    @Override
-    long getId();
-
-    /**
      * @return The name of the list
      */
     String getName();
 
     boolean isActive();
-
-    void removeFriend(long newFriend);
-
-    void setActive(boolean isActive);
-
-    /**
-     * Renames the list
-     * 
-     * @param newName
-     *            The new name of the list
-     */
-    void setName(String newName);
 
     void update(ImmutableFilter filter);
 }

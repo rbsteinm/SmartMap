@@ -75,7 +75,7 @@ public class Stranger implements User {
     @Override
     public ImmutableUser getImmutableCopy() {
         // TODO Auto-generated method stub
-        return new ImmutableUser(mId, mName, null, null, null, null, mImage);
+        return new ImmutableUser(mId, mName, null, null, null, null, mImage, false);
     }
 
     /*
@@ -161,11 +161,11 @@ public class Stranger implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getType()
+     * @see ch.epfl.smartmap.cache.User#isBlocked()
      */
     @Override
-    public Type getType() {
-        return Type.STRANGER;
+    public boolean isBlocked() {
+        return false;
     }
 
     /*

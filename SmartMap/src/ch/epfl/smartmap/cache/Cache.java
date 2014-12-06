@@ -10,7 +10,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.CacheListener;
@@ -96,17 +95,18 @@ public class Cache {
     }
 
     /**
-     * @param listener
-     *            Listener to be added
+     * OK
      */
     public void addOnCacheListener(CacheListener listener) {
         mListeners.add(listener);
     }
 
-    public void clearOldInstances() {
-
-    }
-
+    /**
+     * OK
+     * 
+     * @param createdEvent
+     * @param callback
+     */
     public void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -127,90 +127,86 @@ public class Cache {
         }.execute();
     }
 
-    public List<Event> getAllEvents() {
-        List<Event> result = new ArrayList<Event>();
-        for (long id : mEventIds) {
-            Event event = mEventInstances.get(id);
-
-            if (event != null) {
-                result.add(event);
-            } else {
-                assert false;
-            }
-        }
-
-        return result;
+    /**
+     * OK
+     * 
+     * @return
+     */
+    public Set<Event> getAllEvents() {
+        return this.getPublicEvents(mEventIds);
     }
 
     /**
+     * OK
+     * 
      * @return a list containing all the user's Friends.
      */
-    public List<User> getAllFriends() {
-        List<User> allFriends = new ArrayList<User>();
-        for (Long id : mFriendIds) {
-            User friend = mUserInstances.get(id);
+    public Set<User> getAllFriends() {
+        return this.getFriends(mFriendIds);
+    }
 
-            if (friend != null) {
-                allFriends.add(friend);
-            } else {
-                assert false;
-            }
-        }
-        return allFriends;
+    public Set<Event> getAllVisibleEvents() {
+
+        // TODO : Implement Settings event filtering here
+
+        return this.getPublicEvents(mEventIds);
     }
 
     /**
-     * @return a list containing all the user's Going Events.
+     * OK
+     * 
+     * @return
      */
-    public List<Event> getAllGoingEvents() {
-        List<Event> allGoingEvents = new ArrayList<Event>();
-        long myId = SettingsManager.getInstance().getUserID();
-        for (Long id : mEventIds) {
-            Event event = mEventInstances.get(id);
+    public Set<User> getAllVisibleFriends() {
+        // Get all friends
+        Set<Long> allVisibleUsersId = new HashSet<Long>(mFriendIds);
 
-            if ((event != null) && event.getParticipants().contains(myId)) {
-                allGoingEvents.add(event);
-            } else {
-                assert false;
+        // For each active filter, keep friends in it
+        for (Long id : mFilterIds) {
+            Filter filter = this.getFilter(id);
+            if (filter.isActive()) {
+                allVisibleUsersId.retainAll(filter.getFriendIds());
             }
         }
-        return allGoingEvents;
+
+        // Return all friends that passed all filters
+        return this.getFriends(allVisibleUsersId);
     }
 
-    public List<Displayable> getAllVisibleEvents() {
-        List<Displayable> allVisibleEvents = new ArrayList<Displayable>();
-        for (Long id : mEventIds) {
-            Event event = mEventInstances.get(id);
-            if ((event != null) && event.isVisible()) {
-                allVisibleEvents.add(event);
-            }
-        }
-        return allVisibleEvents;
-    }
-
-    public List<Displayable> getAllVisibleFriends() {
-        List<Displayable> allVisibleUsers = new ArrayList<Displayable>();
-        for (Long id : mFriendIds) {
-            User user = mUserInstances.get(id);
-            if ((user != null) && user.isVisible()) {
-                allVisibleUsers.add(user);
-            }
-        }
-        return allVisibleUsers;
-    }
-
+    /**
+     * OK
+     * 
+     * @param id
+     * @return
+     */
     public Filter getFilter(long id) {
         return mFilterInstances.get(id);
     }
 
+    /**
+     * OK
+     * 
+     * @param id
+     * @return
+     */
     public User getFriend(long id) {
-        return mUserInstances.get(id);
+        if (mFriendIds.contains(id)) {
+            return mUserInstances.get(id);
+        } else {
+            return null;
+        }
     }
 
+    /**
+     * OK
+     * 
+     * @param ids
+     * @return
+     */
     public Set<User> getFriends(Set<Long> ids) {
         Set<User> friends = new HashSet<User>();
         for (long id : ids) {
-            User friend = this.getStranger(id);
+            User friend = this.getFriend(id);
             if (friend != null) {
                 friends.add(friend);
             }
@@ -218,10 +214,22 @@ public class Cache {
         return friends;
     }
 
+    /**
+     * OK
+     * 
+     * @param id
+     * @return
+     */
     public Event getPublicEvent(long id) {
         return mEventInstances.get(id);
     }
 
+    /**
+     * OK
+     * 
+     * @param ids
+     * @return
+     */
     public Set<Event> getPublicEvents(Set<Long> ids) {
         Set<Event> events = new HashSet<Event>();
         for (long id : ids) {
@@ -233,10 +241,26 @@ public class Cache {
         return events;
     }
 
+    /**
+     * OK
+     * 
+     * @param id
+     * @return
+     */
     public User getStranger(long id) {
-        return mUserInstances.get(id);
+        if (!mFriendIds.contains(id)) {
+            return mUserInstances.get(id);
+        } else {
+            return null;
+        }
     }
 
+    /**
+     * OK
+     * 
+     * @param ids
+     * @return
+     */
     public Set<User> getStrangers(Set<Long> ids) {
         Set<User> strangers = new HashSet<User>();
         for (long id : ids) {
@@ -248,6 +272,12 @@ public class Cache {
         return strangers;
     }
 
+    /**
+     * OK
+     * 
+     * @param id
+     * @return
+     */
     public User getUser(long id) {
         User user = this.getFriend(id);
         if (user == null) {
@@ -256,6 +286,12 @@ public class Cache {
         return user;
     }
 
+    /**
+     * OK
+     * 
+     * @param ids
+     * @return
+     */
     public Set<User> getUsers(Set<Long> ids) {
         Set<User> users = new HashSet<User>();
         for (long id : ids) {
@@ -267,7 +303,6 @@ public class Cache {
                 users.add(user);
             }
         }
-
         return users;
     }
 
@@ -310,7 +345,6 @@ public class Cache {
 
     public void inviteUser(long id, final NetworkRequestCallback callback) {
         new AsyncTask<Long, Void, Void>() {
-
             @Override
             protected Void doInBackground(Long... params) {
                 try {
@@ -440,32 +474,139 @@ public class Cache {
      */
     public void putStrangers(Set<ImmutableUser> newStrangers) {
         for (ImmutableUser newStranger : newStrangers) {
-            if (mUserInstances.get(newStranger.getId()) == null) {
-                // Need to add it
-                mUserInstances.put(newStranger.getId(), new Friend(newStranger));
-            } else {
-                // Only update
-                mUserInstances.get(newStranger.getId()).update(newStranger);
+            // Check that the Stranger is not a friend
+            if (mFriendIds.contains(newStranger.getId())) {
+                if (mUserInstances.get(newStranger.getId()) == null) {
+                    // Need to add it
+                    mUserInstances.put(newStranger.getId(), new Friend(newStranger));
+                } else {
+                    // Only update
+                    mUserInstances.get(newStranger.getId()).update(newStranger);
+                }
             }
         }
     }
 
-    public void removeFriend(long id) {
-        mFriendIds.remove(id);
+    public void removeEvent(long id) {
+        Set<Long> singleton = new HashSet<Long>();
+        singleton.add(id);
+        this.removeEvents(singleton);
+    }
 
-        // Notify listeners
-        for (CacheListener l : mListeners) {
-            l.onFriendListUpdate();
+    public void removeEvents(Set<Long> ids) {
+        boolean isListModified = false;
+
+        for (long id : ids) {
+            if (mEventIds.contains(id)) {
+                // Remove id from sets
+                mEventIds.remove(id);
+                mOwnEventIds.remove(id);
+                mPinnedEventIds.remove(id);
+                mNearEventIds.remove(id);
+
+                // Remove instance from array
+                mEventInstances.remove(id);
+
+                isListModified = true;
+            }
+        }
+
+        // Notify listeners if needed
+        if (isListModified) {
+            for (CacheListener l : mListeners) {
+                l.onEventListUpdate();
+            }
         }
     }
 
-    public void updateEvent(ImmutableEvent event) {
-        // Check in cache
-        Event cachedEvent = mEventInstances.get(event.getID());
-        if (cachedEvent != null) {
-            // In cache
-            cachedEvent.update(event);
+    /**
+     * OK
+     * 
+     * @param id
+     */
+    public void removeFilter(long id) {
+        Set<Long> singleton = new HashSet<Long>();
+        singleton.add(id);
+        this.removeFilters(singleton);
+    }
+
+    /**
+     * OK
+     * 
+     * @param ids
+     */
+    public void removeFilters(Set<Long> ids) {
+        boolean isListModified = false;
+
+        for (long id : ids) {
+            // Check that we are not trying to remove the default filter
+            if (mFilterIds.contains(id) && (id != Filter.DEFAULT_FILTER_ID)) {
+                // Remove id from sets
+                mFilterIds.remove(id);
+
+                // Remove instance from array
+                mFilterInstances.remove(id);
+
+                isListModified = true;
+            }
         }
+
+        // Notify listeners if needed
+        if (isListModified) {
+            for (CacheListener l : mListeners) {
+                l.onFilterListUpdate();
+            }
+        }
+    }
+
+    /**
+     * OK
+     * 
+     * @param id
+     */
+    public void removeFriend(long id) {
+        Set<Long> singleton = new HashSet<Long>();
+        singleton.add(id);
+        this.removeFriends(singleton);
+    }
+
+    /**
+     * OK
+     * 
+     * @param ids
+     */
+    public void removeFriends(Set<Long> ids) {
+        boolean isListModified = false;
+
+        for (long id : ids) {
+            if (mFriendIds.contains(id)) {
+                // Remove id from sets
+                mFriendIds.remove(id);
+                mUserInstances.remove(id);
+                // Remove instance from array
+                mUserInstances.remove(id);
+
+                isListModified = true;
+            }
+        }
+
+        // Notify listeners if needed
+        if (isListModified) {
+            for (CacheListener l : mListeners) {
+                l.onFriendListUpdate();
+            }
+        }
+    }
+
+    /**
+     * OK
+     * 
+     * @param updatedEvent
+     */
+    public void updateEvent(ImmutableEvent updatedEvent) {
+        Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
+        singleton.add(updatedEvent);
+        this.updateEvents(singleton);
     }
 
     public void updateEventInvitations(List<Long> events) {
@@ -505,19 +646,33 @@ public class Cache {
         }
     }
 
-    public void updateEvents(Set<ImmutableUser> users) {
-        for (ImmutableUser user : users) {
-            this.updateFriend(user);
+    /**
+     * OK
+     * 
+     * @param updatedEvents
+     */
+    public void updateEvents(Set<ImmutableEvent> updatedEvents) {
+        for (ImmutableEvent updatedEvent : updatedEvents) {
+            Event cachedEvent = this.getPublicEvent(updatedEvent.getID());
+            if (cachedEvent != null) {
+                cachedEvent.update(updatedEvent);
+            }
+        }
+
+        for (CacheListener listener : mListeners) {
+            listener.onEventListUpdate();
         }
     }
 
-    public void updateFriend(ImmutableUser user) {
-        // Check in cache
-        User cachedFriend = mUserInstances.get(user.getId());
-        if (cachedFriend != null) {
-            // In cache
-            cachedFriend.update(user);
-        }
+    /**
+     * OK
+     * 
+     * @param updatedFriend
+     */
+    public void updateFriend(ImmutableUser updatedFriend) {
+        Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
+        singleton.add(updatedFriend);
+        this.updateFriends(singleton);
     }
 
     public void updateFriendInvitations(NotificationBag notifBag) {
@@ -525,6 +680,24 @@ public class Cache {
         this.acceptNewFriends(notifBag.getNewFriends());
         this.removeRemovedFriends(notifBag.getRemovedFriendsIds());
 
+    }
+
+    /**
+     * OK
+     * 
+     * @param updatedFriends
+     */
+    public void updateFriends(Set<ImmutableUser> updatedFriends) {
+        for (ImmutableUser updatedFriend : updatedFriends) {
+            User cachedFriend = this.getFriend(updatedFriend.getId());
+            if (cachedFriend != null) {
+                cachedFriend.update(updatedFriend);
+            }
+        }
+
+        for (CacheListener listener : mListeners) {
+            listener.onEventListUpdate();
+        }
     }
 
     public void updateFromNetwork(SmartMapClient networkClient) throws SmartMapClientException {

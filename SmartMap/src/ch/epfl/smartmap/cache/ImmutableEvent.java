@@ -9,25 +9,27 @@ import java.util.TimeZone;
 import android.location.Location;
 
 /**
- * An event that can be seen on the map
+ * This class only acts as a container of all the informations we may want to pass to an event. It doesn't do
+ * any check for null/wrong values. You can use this class to create an Event (Beware having set all the
+ * required fields then), or just to update the infotmations on an Event (you can then use null values if you
+ * don't want to update a field).
  * 
  * @author jfperren
  */
 public class ImmutableEvent {
 
     private long mId;
-    private final String mName;
-    private final Long mCreatorId;
-    private final String mDescription;
-    private final Location mLocation;
-    private final String mLocationString;
-    private final GregorianCalendar mStartDate;
-    private final GregorianCalendar mEndDate;
-    private final List<Long> mParticipants;
+    private String mName;
+    private Long mCreatorId;
+    private String mDescription;
+    private Location mLocation;
+    private String mLocationString;
+    private GregorianCalendar mStartDate;
+    private GregorianCalendar mEndDate;
+    private List<Long> mParticipants;
 
     /**
-     * Constructor, put {@code null} (or {@code User.NO_ID} for id) if you dont want the value to be taken
-     * into account.
+     * Constructor
      * 
      * @param id
      * @param name
@@ -87,7 +89,43 @@ public class ImmutableEvent {
         return mStartDate;
     }
 
-    public void setId(long newId) {
+    public ImmutableEvent setCreatorId(long creatorId) {
+        mCreatorId = creatorId;
+        return this;
+    }
+
+    public ImmutableEvent setDescription(String newDescription) {
+        mDescription = newDescription;
+        return this;
+    }
+
+    public ImmutableEvent setEndDate(GregorianCalendar newEndDate) {
+        mEndDate.setTime(newEndDate.getTime());
+        return this;
+    }
+
+    public ImmutableEvent setId(long newId) {
         mId = newId;
+        return this;
+    }
+
+    public ImmutableEvent setLocation(Location newLocation) {
+        mLocation.set(newLocation);
+        return this;
+    }
+
+    public ImmutableEvent setLocationString(String newLocationString) {
+        mLocationString = newLocationString;
+        return this;
+    }
+
+    public ImmutableEvent setName(String newName) {
+        mName = newName;
+        return this;
+    }
+
+    public ImmutableEvent setStartDate(GregorianCalendar newStartDate) {
+        mStartDate.setTime(newStartDate.getTime());
+        return this;
     }
 }
