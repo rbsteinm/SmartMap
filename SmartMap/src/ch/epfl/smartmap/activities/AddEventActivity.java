@@ -60,6 +60,10 @@ public class AddEventActivity extends FragmentActivity {
     private static final int ELEMENTS_HH_MM = 2;
     private static final int ELEMENTS_JJ_DD_YYYY = 3;
 
+    private static final int yearIndex = 2;
+    private static final int monthIndex = 1;
+    private static final int dayIndex = 0;
+
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
     private LatLng mEventPosition;
@@ -199,9 +203,12 @@ public class AddEventActivity extends FragmentActivity {
      * @author SpicyCH
      */
     private boolean allFieldsSetByUser() {
-        return this.isValidDate(mPickEndDate.getText().toString())
-                && this.isValidTime(mPickEndTime.getText().toString()) && (mEventPosition.latitude != 0)
-                && (mEventPosition.longitude != 0)
+        boolean validEndDateTime = this.isValidDate(mPickEndDate.getText().toString())
+                && this.isValidTime(mPickEndTime.getText().toString());
+
+        boolean validPosition = (mEventPosition.latitude != 0) && (mEventPosition.longitude != 0);
+
+        return validEndDateTime && validPosition
                 && (!"".equals(mPlaceName.getText().toString()) && !"".equals(mEventName.getText().toString()));
     }
 
@@ -306,11 +313,12 @@ public class AddEventActivity extends FragmentActivity {
 
         String[] s1 = dayMonthYear.split("/");
         String[] s2 = hourMinute.split(":");
-        // Don't forget to substract 1 to the month in text format
-        GregorianCalendar date = new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1,
-                Integer.parseInt(s1[0]), Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
 
-        return date;
+        final int month = Integer.parseInt(s1[monthIndex]) - 1;
+
+        return new GregorianCalendar(Integer.parseInt(s1[yearIndex]), month, Integer.parseInt(s1[dayIndex]),
+                Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
+
     }
 
     /**
@@ -332,30 +340,7 @@ public class AddEventActivity extends FragmentActivity {
         mEventPosition = new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
                 .getInstance().getLocation().getLongitude());
 
-        mTextChangedListener = new TextWatcher() {
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // Remove the TextChangedListener to avoid useless calls
-                // triggered by the following code
-                mPickEndDate.removeTextChangedListener(mTextChangedListener);
-                mPickStartDate.removeTextChangedListener(mTextChangedListener);
-
-                AddEventActivity.this.checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
-
-                // Reset the TextChangedListener
-                mPickEndDate.addTextChangedListener(mTextChangedListener);
-                mPickStartDate.addTextChangedListener(mTextChangedListener);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-        };
+        mTextChangedListener = new DateChangedListener();
 
         mPickStartDate.addTextChangedListener(mTextChangedListener);
         mPickStartTime.addTextChangedListener(mTextChangedListener);
@@ -437,9 +422,9 @@ public class AddEventActivity extends FragmentActivity {
         try {
             addresses = geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
         } catch (IOException e) {
-            Log.d(TAG, "Google couldn't retrieve any adresses fromt he coordinates");
+            Log.d(TAG, "Google couldn't retrieve any adresses fromt he coordinates: " + e);
         }
-        if ((!addresses.isEmpty()) || ((cityName != null) && !cityName.equals(""))) {
+        if ((!addresses.isEmpty()) || ((cityName != null) && !cityName.isEmpty())) {
             cityName = addresses.get(0).getLocality();
             mPlaceName.setText(cityName);
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
@@ -460,10 +445,9 @@ public class AddEventActivity extends FragmentActivity {
             try {
                 long id = NetworkSmartMapClient.getInstance().createPublicEvent(params[0]);
                 Cache.getInstance().addMyEvent(id);
-
                 return id > 0;
             } catch (SmartMapClientException e) {
-                Log.e(TAG, e.getMessage());
+                Log.e(TAG, "Couldn't create event on the server: " + e);
                 return false;
             }
         }
@@ -483,6 +467,32 @@ public class AddEventActivity extends FragmentActivity {
             }
         }
 
+    }
+
+    class DateChangedListener implements TextWatcher {
+        @Override
+        public void afterTextChanged(Editable s) {
+            // Remove the TextChangedListener to avoid useless calls
+            // triggered by the following code
+            mPickEndDate.removeTextChangedListener(mTextChangedListener);
+            mPickStartDate.removeTextChangedListener(mTextChangedListener);
+
+            AddEventActivity.this.checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
+
+            // Reset the TextChangedListener
+            mPickEndDate.addTextChangedListener(mTextChangedListener);
+            mPickStartDate.addTextChangedListener(mTextChangedListener);
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // Nothing
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // Nothing
+        }
     }
 
 }
