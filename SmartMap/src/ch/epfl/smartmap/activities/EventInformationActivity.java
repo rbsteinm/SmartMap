@@ -198,6 +198,7 @@ public class EventInformationActivity extends FragmentActivity {
                     this.startActivity(new Intent(this, MainActivity.class));
                 }
                 this.finish();
+                break;
             default:
                 break;
         }

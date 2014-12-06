@@ -455,7 +455,7 @@ public class AddEventActivity extends FragmentActivity {
         try {
             addresses = geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d(TAG, "Google couldn't retrieve any adresses fromt he coordinates");
         }
         if ((!addresses.isEmpty()) || ((cityName != null) && !cityName.equals(""))) {
             cityName = addresses.get(0).getLocality();

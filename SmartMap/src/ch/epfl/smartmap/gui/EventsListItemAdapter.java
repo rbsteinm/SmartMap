@@ -1,10 +1,8 @@
 package ch.epfl.smartmap.gui;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.location.Location;
@@ -30,9 +28,6 @@ import ch.epfl.smartmap.cache.Event;
  * @author SpicyCH
  */
 public class EventsListItemAdapter extends ArrayAdapter<Event> {
-
-    @SuppressWarnings("unused")
-    private final static String TAG = EventsListItemAdapter.class.getSimpleName();
 
     private final static int HUNDRED_PERCENT = 100;
     private final static int MIDNIGHT_HOUR = 23;
@@ -197,12 +192,4 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         return dateTextContent;
     }
 
-    /**
-     * Might be useful later
-     */
-    @SuppressWarnings("unused")
-    private static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
-        long diffInMillies = date2.getTime() - date1.getTime();
-        return Math.abs(timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS));
-    }
 }
