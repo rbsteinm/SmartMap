@@ -30,7 +30,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * This activity shows an event in a complete screens. It display in addition two buttons: one to invite friends, and
+ * This activity shows an event in a complete screens. It display in addition two buttons: one to invite
+ * friends, and
  * one to see the event on the map.
  * 
  * @author SpicyCH
@@ -39,235 +40,236 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class EventInformationActivity extends FragmentActivity {
 
-    private static final String TAG = EventInformationActivity.class.getSimpleName();
+	class LoadEventTask extends AsyncTask<Long, Void, Map<String, Object>> {
+		@Override
+		protected Map<String, Object> doInBackground(Long... params) {
 
-    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+			Log.d(TAG, "Retrieving event...");
 
-    private GoogleMap mGoogleMap;
-    private SupportMapFragment mFragmentMap;
-    private Context mContext;
-    private Event mEvent;
-    private TextView mEventTitle;
-    private TextView mEventCreator;
-    private TextView mStart;
-    private TextView mEnd;
-    private TextView mEventDescription;
-    private TextView mPlaceNameAndCountry;
+			long eventId = params[0];
 
-    /**
-     * Used to get the event id the getExtra of the starting intent, and to pass the retrieved event from doInBackground
-     * to onPostExecute.
-     */
-    private static final String EVENT_KEY = "EVENT";
-    private static final String CREATOR_NAME_KEY = "CREATOR_NAME";
+			Map<String, Object> output = new HashMap<String, Object>();
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_show_event_information);
-        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+			Event event = Cache.getInstance().getEventById(eventId);
+			output.put(EVENT_KEY, event);
 
-        mContext = this.getApplicationContext();
+			String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
+			output.put(CREATOR_NAME_KEY, creatorName);
 
-        // This activity needs a (positive) event id to process. If none given, we finish it.
-        if (this.getIntent().getLongExtra(EVENT_KEY, -1) > 0) {
+			return output;
+		}
 
-            long eventId = this.getIntent().getLongExtra(EVENT_KEY, -1);
+		@Override
+		protected void onPostExecute(Map<String, Object> result) {
 
-            Log.d(TAG, "Received event id " + eventId);
+			Log.d(TAG, "Processing event...");
 
-            // Need an AsyncTask because getEventById searches on our server if event not stored in cache.
-            LoadEventTask loadEvent = new LoadEventTask();
-            loadEvent.execute(eventId);
-        } else {
-            Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
-            Toast.makeText(mContext, mContext.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
-            this.finish();
-        }
+			final Event event = (Event) result.get(EVENT_KEY);
+			final String creatorName = (String) result.get(CREATOR_NAME_KEY);
 
-    }
+			if ((event == null) || (creatorName == null)) {
+				Log.e(TAG, "The server returned a null event or creatorName");
 
-    /**
-     * Display the map with the current location
-     * 
-     * @author agpmilli
-     */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) {
-            // Google Play Services are not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(
-                    R.id.show_event_info_map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            // Enabling MyLocation Layer of Google Map
-            mGoogleMap.setMyLocationEnabled(true);
+				Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error),
+				    Toast.LENGTH_SHORT).show();
 
-            mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
-            mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
+			} else {
+				mEvent = event;
+				EventInformationActivity.this.initializeGUI(event, creatorName);
+			}
 
-            mGoogleMap.addMarker(new MarkerOptions().position(mEvent.getLatLng()));
+		}
+	}
 
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEvent.getLatLng());
-        }
-    }
+	private static final String TAG = EventInformationActivity.class.getSimpleName();
 
-    /**
-     * Triggered when the user clicks the "Invite friends" button.<br />
-     * It launches InviteFriendsActivity for a result.
-     * 
-     * @param v
-     * @author SpicyCH
-     */
-    public void inviteFriendsToEvent(View v) {
+	private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+	private GoogleMap mGoogleMap;
+	private SupportMapFragment mFragmentMap;
+	private Context mContext;
+	private Event mEvent;
+	private TextView mEventTitle;
+	private TextView mEventCreator;
+	private TextView mStart;
+	private TextView mEnd;
+	private TextView mEventDescription;
 
-        // Hack so that SonarQube doesn't complain that v is not used
-        Log.d(TAG, "View with id " + v.getId() + " clicked");
-        Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
-        this.startActivityForResult(inviteFriends, 1);
-    }
+	private TextView mPlaceNameAndCountry;
+	/**
+	 * Used to get the event id the getExtra of the starting intent, and to pass the retrieved event from
+	 * doInBackground
+	 * to onPostExecute.
+	 */
+	private static final String EVENT_KEY = "EVENT";
 
-    @Override
-    public void onBackPressed() {
-        this.finish();
-        this.onNotificationOpen();
-    }
+	private static final String CREATOR_NAME_KEY = "CREATOR_NAME";
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.show_event_information, menu);
-        return true;
-    }
+	/**
+	 * Display the map with the current location
+	 * 
+	 * @author agpmilli
+	 */
+	public void displayMap() {
+		int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+		// Showing status
+		if (status != ConnectionResult.SUCCESS) {
+			// Google Play Services are not available
+			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+			dialog.show();
+		} else {
+			// Google Play Services are available.
+			// Getting reference to the SupportMapFragment of activity_main.xml
+			mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(
+			    R.id.show_event_info_map);
+			// Getting GoogleMap object from the fragment
+			mGoogleMap = mFragmentMap.getMap();
+			// Enabling MyLocation Layer of Google Map
+			mGoogleMap.setMyLocationEnabled(true);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+			mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+			mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                return true;
-            case android.R.id.home:
-                this.onNotificationOpen();
-                this.finish();
-                break;
-            default:
-                break;
-        }
+			mGoogleMap.addMarker(new MarkerOptions().position(mEvent.getLatLng()));
 
-        return super.onOptionsItemSelected(item);
-    }
+			new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEvent.getLatLng());
+		}
+	}
 
-    /**
-     * Triggered when the button 'Shop on the map' is pressed. Opens the map at the location of the event.
-     * 
-     * @param v
-     *            the button who has been clicked
-     * @author SpicyCH
-     */
-    public void openMapAtEventLocation() {
-        Intent showEventIntent = new Intent(this, MainActivity.class);
-        showEventIntent.putExtra("location", mEvent.getLocation());
-        this.startActivity(showEventIntent);
-    }
+	/**
+	 * Initializes the different views of this activity.
+	 * 
+	 * @author SpicyCH
+	 */
+	private void initializeGUI(final Event mEvent, String creatorName) {
 
-    /**
-     * Initializes the different views of this activity.
-     * 
-     * @author SpicyCH
-     */
-    private void initializeGUI(final Event mEvent, String creatorName) {
+		this.setTitle(mEvent.getName());
 
-        this.setTitle(mEvent.getName());
+		mEventTitle = (TextView) this.findViewById(R.id.show_event_info_event_name);
+		mEventTitle.setText(mEvent.getName());
 
-        mEventTitle = (TextView) this.findViewById(R.id.show_event_info_event_name);
-        mEventTitle.setText(mEvent.getName());
+		mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
+		mEventCreator.setText(this.getString(R.string.show_event_by) + " " + creatorName);
 
-        mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
-        mEventCreator.setText(this.getString(R.string.show_event_by) + " " + creatorName);
+		mStart = (TextView) this.findViewById(R.id.show_event_info_start);
+		mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
 
-        mStart = (TextView) this.findViewById(R.id.show_event_info_start);
-        mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
+		String[] result = EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(),
+		    mContext);
 
-        String[] result = EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), mContext);
+		mStart.setText(result[0]);
+		mEnd.setText(result[1]);
 
-        mStart.setText(result[0]);
-        mEnd.setText(result[1]);
+		mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
+		mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ":\n"
+		    + mEvent.getDescription());
 
-        mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
-        mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ":\n"
-                + mEvent.getDescription());
+		mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
+		mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");
 
-        mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
-        mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");
+		this.displayMap();
 
-        this.displayMap();
+		mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
+			@Override
+			public void onMapClick(LatLng position) {
+				if (mEvent.getLatLng() != null) {
+					mGoogleMap.clear();
+				}
+				EventInformationActivity.this.openMapAtEventLocation();
+			}
+		});
+	}
 
-        mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng position) {
-                if (mEvent.getLatLng() != null) {
-                    mGoogleMap.clear();
-                }
-                EventInformationActivity.this.openMapAtEventLocation();
-            }
-        });
-    }
+	/**
+	 * Triggered when the user clicks the "Invite friends" button.<br />
+	 * It launches InviteFriendsActivity for a result.
+	 * 
+	 * @param v
+	 * @author SpicyCH
+	 */
+	public void inviteFriendsToEvent(View v) {
 
-    /**
-     * 
-     * 
-     * @author SpicyCH
-     */
-    private void onNotificationOpen() {
-        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
-            this.startActivity(new Intent(this, MainActivity.class));
-        }
-    }
+		// Hack so that SonarQube doesn't complain that v is not used
+		Log.d(TAG, "View with id " + v.getId() + " clicked");
+		Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
+		this.startActivityForResult(inviteFriends, 1);
+	}
 
-    class LoadEventTask extends AsyncTask<Long, Void, Map<String, Object>> {
-        @Override
-        protected Map<String, Object> doInBackground(Long... params) {
+	@Override
+	public void onBackPressed() {
+		this.onNotificationOpen();
+		this.finish();
+	}
 
-            Log.d(TAG, "Retrieving event...");
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		this.setContentView(R.layout.activity_show_event_information);
+		this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-            long eventId = params[0];
+		mContext = this.getApplicationContext();
 
-            Map<String, Object> output = new HashMap<String, Object>();
+		// This activity needs a (positive) event id to process. If none given, we finish it.
+		if (this.getIntent().getLongExtra(EVENT_KEY, -1) > 0) {
 
-            Event event = Cache.getInstance().getEventById(eventId);
-            output.put(EVENT_KEY, event);
+			long eventId = this.getIntent().getLongExtra(EVENT_KEY, -1);
 
-            String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
-            output.put(CREATOR_NAME_KEY, creatorName);
+			Log.d(TAG, "Received event id " + eventId);
 
-            return output;
-        }
+			// Need an AsyncTask because getEventById searches on our server if event not stored in cache.
+			LoadEventTask loadEvent = new LoadEventTask();
+			loadEvent.execute(eventId);
+		} else {
+			Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
+			Toast.makeText(mContext, mContext.getString(R.string.error_client_side), Toast.LENGTH_SHORT)
+			    .show();
+			this.finish();
+		}
 
-        @Override
-        protected void onPostExecute(Map<String, Object> result) {
+	}
 
-            Log.d(TAG, "Processing event...");
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		this.getMenuInflater().inflate(R.menu.show_event_information, menu);
+		return true;
+	}
 
-            final Event event = (Event) result.get(EVENT_KEY);
-            final String creatorName = (String) result.get(CREATOR_NAME_KEY);
+	/**
+	 * When this tab is open by a notification
+	 */
+	private void onNotificationOpen() {
+		if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
+			this.startActivity(new Intent(this, MainActivity.class));
+		}
+	}
 
-            if ((event == null) || (creatorName == null)) {
-                Log.e(TAG, "The server returned a null event or creatorName");
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
 
-                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
-                        .show();
+		switch (item.getItemId()) {
+			case R.id.action_settings:
+				return true;
+			case android.R.id.home:
+				this.onNotificationOpen();
+				this.finish();
+				break;
+			default:
+				break;
+		}
 
-            } else {
-                mEvent = event;
-                EventInformationActivity.this.initializeGUI(event, creatorName);
-            }
+		return super.onOptionsItemSelected(item);
+	}
 
-        }
-    }
+	/**
+	 * Triggered when the button 'Shop on the map' is pressed. Opens the map at the location of the event.
+	 * 
+	 * @param v
+	 *            the button who has been clicked
+	 * @author SpicyCH
+	 */
+	public void openMapAtEventLocation() {
+		Intent showEventIntent = new Intent(this, MainActivity.class);
+		showEventIntent.putExtra("location", mEvent.getLocation());
+		this.startActivity(showEventIntent);
+	}
 }
