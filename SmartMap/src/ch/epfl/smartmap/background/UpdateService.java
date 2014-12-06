@@ -87,10 +87,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                     @Override
                     protected Void doInBackground(Void... args0) {
                         try {
-                            List<ImmutableUser> friendsWithNewLocations = mClient.listFriendsPos();
-                            mCache.updateFriendList(friendsWithNewLocations);
+                            mCache.updatePositions(ServiceContainer.getNetworkClient());
                         } catch (SmartMapClientException e) {
-                            e.printStackTrace();
+                            Log.e(TAG, "Error while retrieving friends positions: " + e.getMessage());
                         }
                         return null;
                     }
@@ -103,12 +102,13 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
     private final Runnable ownPosUpdate = new Runnable() {
         @Override
         public void run() {
-            if (!mManager.isOffline()) {
+            if (!ServiceContainer.getSettingsManager().isOffline()) {
                 new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... arg0) {
                         try {
-                            mClient.updatePos(mManager.getLocation());
+                            ServiceContainer.getNetworkClient().updatePos(ServiceContainer.getSettingsManager()
+                                .getLocation());
                         } catch (SmartMapClientException e) {
                             Log.e("UpdateService", "Position update failed!");
                         }
@@ -159,6 +159,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                     NotificationBag nb = null;
                     try {
                         nb = mClient.getInvitations();
+                        ServiceContainer.getCache().updateFriendInvitations(nb);
                     } catch (SmartMapClientException e) {
                         Log.e("UpdateService",
                             "Couldn't retrieve invitations due to a server error: " + e.getMessage());
@@ -173,97 +174,97 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                     return nb;
                 }
 
-                @Override
-                protected void onPostExecute(NotificationBag result) {
-                    if (result != null) {
-                        Set<Long> newFriends = result.getNewFriends();
-                        Set<Long> removedFriends = result.getRemovedFriendsIds();
-
-                        for (long userId : newFriends) {
-
-                            new AsyncTask<Long, Void, Void>() {
-                                @Override
-                                protected Void doInBackground(Long... params) {
-                                    mCache.putFriend(params[0]);
-                                    User newFriend = mCache.getFriendById(params[0]);
-                                    mHelper.addAcceptedRequest(new AcceptedFriendInvitation(0, newFriend
-                                        .getId(), newFriend.getName(), null));
-                                    if (mNotificationsEnabled && mNotificationsForFriendshipConfirmations) {
-                                        Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
-                                    }
-                                    return null;
-                                }
-                            }.execute(userId);
-                        }
-
-                        for (long userId : result.getInvitingUsers()) {
-
-                            new AsyncTask<Long, Void, Void>() {
-
-                                @Override
-                                protected Void doInBackground(Long... params) {
-                                    User user = mCache.getUser(params[0]);
-
-                                    if (!mInviterIds.contains(user.getId())) {
-                                        mHelper.addFriendInvitation(new FriendInvitation(0, user.getId(),
-                                            user.getName(), Invitation.UNREAD, null));
-                                        mInviterIds.add(user.getId());
-                                        // get pictures
-                                        new AsyncTask<Long, Void, Void>() {
-                                            @Override
-                                            protected Void doInBackground(Long... ids) {
-                                                for (long id : ids) {
-                                                    UpdateService.this.downloadUserPicture(id);
-                                                }
-                                                return null;
-                                            }
-                                        }.execute(user.getId());
-                                        if (mNotificationsEnabled && mNotificationsForFriendRequests) {
-                                            Notifications.newFriendNotification(Utils.sContext, user);
-                                        }
-                                    }
-                                    return null;
-                                }
-                            }.execute(userId);
-                        }
-
-                        for (Long id : result.getRemovedFriendsIds()) {
-                            mHelper.deleteUser(id);
-                        }
-
-                        if (!newFriends.isEmpty()) {
-                            new AsyncTask<Long, Void, Void>() {
-                                @Override
-                                protected Void doInBackground(Long... users) {
-                                    try {
-                                        for (long user : users) {
-                                            mClient.ackAcceptedInvitation(user);
-                                        }
-                                    } catch (SmartMapClientException e) {
-                                        Log.e("UpdateService", "Couldn't send acks!");
-                                    }
-                                    return null;
-                                }
-                            }.execute(newFriends.toArray(new Long[newFriends.size()]));
-                        }
-
-                        if (!removedFriends.isEmpty()) {
-                            new AsyncTask<Long, Void, Void>() {
-                                @Override
-                                protected Void doInBackground(Long... ids) {
-                                    try {
-                                        for (long id : ids) {
-                                            mClient.ackRemovedFriend(id);
-                                        }
-                                    } catch (SmartMapClientException e) {
-                                        Log.e("UpdateService", "Couldn't send acks!");
-                                    }
-                                    return null;
-                                }
-                            }.execute(removedFriends.toArray(new Long[removedFriends.size()]));
-                        }
-                    }
-                }
+//                @Override
+//                protected void onPostExecute(NotificationBag result) {
+//                    if (result != null) {
+//                        Set<Long> newFriends = result.getNewFriends();
+//                        Set<Long> removedFriends = result.getRemovedFriendsIds();
+//
+//                        for (long userId : newFriends) {
+//
+//                            new AsyncTask<Long, Void, Void>() {
+//                                @Override
+//                                protected Void doInBackground(Long... params) {
+//                                    mCache.putFriend(params[0]);
+//                                    User newFriend = mCache.getFriendById(params[0]);
+//                                    mHelper.addAcceptedRequest(new AcceptedFriendInvitation(0, newFriend
+//                                        .getId(), newFriend.getName(), null));
+//                                    if (mNotificationsEnabled && mNotificationsForFriendshipConfirmations) {
+//                                        Notifications.acceptedFriendNotification(Utils.sContext, newFriend);
+//                                    }
+//                                    return null;
+//                                }
+//                            }.execute(userId);
+//                        }
+//
+//                        for (long userId : result.getInvitingUsers()) {
+//
+//                            new AsyncTask<Long, Void, Void>() {
+//
+//                                @Override
+//                                protected Void doInBackground(Long... params) {
+//                                    User user = mCache.getUser(params[0]);
+//
+//                                    if (!mInviterIds.contains(user.getId())) {
+//                                        mHelper.addFriendInvitation(new FriendInvitation(0, user.getId(),
+//                                            user.getName(), Invitation.UNREAD, null));
+//                                        mInviterIds.add(user.getId());
+//                                        // get pictures
+//                                        new AsyncTask<Long, Void, Void>() {
+//                                            @Override
+//                                            protected Void doInBackground(Long... ids) {
+//                                                for (long id : ids) {
+//                                                    UpdateService.this.downloadUserPicture(id);
+//                                                }
+//                                                return null;
+//                                            }
+//                                        }.execute(user.getId());
+//                                        if (mNotificationsEnabled && mNotificationsForFriendRequests) {
+//                                            Notifications.newFriendNotification(Utils.sContext, user);
+//                                        }
+//                                    }
+//                                    return null;
+//                                }
+//                            }.execute(userId);
+//                        }
+//
+//                        for (Long id : result.getRemovedFriendsIds()) {
+//                            mHelper.deleteUser(id);
+//                        }
+//
+//                        if (!newFriends.isEmpty()) {
+//                            new AsyncTask<Long, Void, Void>() {
+//                                @Override
+//                                protected Void doInBackground(Long... users) {
+//                                    try {
+//                                        for (long user : users) {
+//                                            mClient.ackAcceptedInvitation(user);
+//                                        }
+//                                    } catch (SmartMapClientException e) {
+//                                        Log.e("UpdateService", "Couldn't send acks!");
+//                                    }
+//                                    return null;
+//                                }
+//                            }.execute(newFriends.toArray(new Long[newFriends.size()]));
+//                        }
+//
+//                        if (!removedFriends.isEmpty()) {
+//                            new AsyncTask<Long, Void, Void>() {
+//                                @Override
+//                                protected Void doInBackground(Long... ids) {
+//                                    try {
+//                                        for (long id : ids) {
+//                                            mClient.ackRemovedFriend(id);
+//                                        }
+//                                    } catch (SmartMapClientException e) {
+//                                        Log.e("UpdateService", "Couldn't send acks!");
+//                                    }
+//                                    return null;
+//                                }
+//                            }.execute(removedFriends.toArray(new Long[removedFriends.size()]));
+//                        }
+//                    }
+//                }
             }.execute();
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
         }
