@@ -60,9 +60,9 @@ public class AddEventActivity extends FragmentActivity {
     private static final int ELEMENTS_HH_MM = 2;
     private static final int ELEMENTS_JJ_DD_YYYY = 3;
 
-    private static final int yearIndex = 2;
-    private static final int monthIndex = 1;
-    private static final int dayIndex = 0;
+    private static final int INDEX_YEAR = 2;
+    private static final int INDEX_MONTH = 1;
+    private static final int INDEX_DAY = 0;
 
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
@@ -187,6 +187,9 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     public void pickLocation(View v) {
+
+        // Hack to remove warning from SonarQube, use view for log.
+        Log.d(TAG, "View " + v.getId() + " clicked");
         Toast.makeText(mContext, this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
                 Toast.LENGTH_LONG).show();
 
@@ -314,9 +317,9 @@ public class AddEventActivity extends FragmentActivity {
         String[] s1 = dayMonthYear.split("/");
         String[] s2 = hourMinute.split(":");
 
-        final int month = Integer.parseInt(s1[monthIndex]) - 1;
+        final int month = Integer.parseInt(s1[INDEX_MONTH]) - 1;
 
-        return new GregorianCalendar(Integer.parseInt(s1[yearIndex]), month, Integer.parseInt(s1[dayIndex]),
+        return new GregorianCalendar(Integer.parseInt(s1[INDEX_YEAR]), month, Integer.parseInt(s1[INDEX_DAY]),
                 Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
 
     }
