@@ -58,8 +58,8 @@ public class EventInformationActivity extends FragmentActivity {
      * Used to get the event id the getExtra of the starting intent, and to pass the retrieved event from doInBackground
      * to onPostExecute.
      */
-    private final static String EVENT_KEY = "EVENT";
-    private final static String CREATOR_NAME_KEY = "CREATOR_NAME";
+    private static final String EVENT_KEY = "EVENT";
+    private static final String CREATOR_NAME_KEY = "CREATOR_NAME";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,49 +77,7 @@ public class EventInformationActivity extends FragmentActivity {
             Log.d(TAG, "Received event id " + eventId);
 
             // Need an AsyncTask because getEventById searches on our server if event not stored in cache.
-            AsyncTask<Long, Void, Map<String, Object>> loadEvent = new AsyncTask<Long, Void, Map<String, Object>>() {
-
-                @Override
-                protected Map<String, Object> doInBackground(Long... params) {
-
-                    Log.d(TAG, "Retrieving event...");
-
-                    long eventId = params[0];
-
-                    Map<String, Object> output = new HashMap<String, Object>();
-
-                    Event event = Cache.getInstance().getEventById(eventId);
-                    output.put(EVENT_KEY, event);
-
-                    String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
-                    output.put(CREATOR_NAME_KEY, creatorName);
-
-                    return output;
-                }
-
-                @Override
-                protected void onPostExecute(Map<String, Object> result) {
-
-                    Log.d(TAG, "Processing event...");
-
-                    final Event event = (Event) result.get(EVENT_KEY);
-                    final String creatorName = (String) result.get(CREATOR_NAME_KEY);
-
-                    if ((event == null) || (creatorName == null)) {
-                        Log.e(TAG, "The server returned a null event or creatorName");
-
-                        Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error),
-                                Toast.LENGTH_SHORT).show();
-
-                    } else {
-                        mEvent = event;
-                        EventInformationActivity.this.initializeGUI(event, creatorName);
-                    }
-
-                }
-
-            };
-
+            LoadEventTask loadEvent = new LoadEventTask();
             loadEvent.execute(eventId);
         } else {
             Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
@@ -137,8 +95,8 @@ public class EventInformationActivity extends FragmentActivity {
     public void displayMap() {
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
         // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
+        if (status != ConnectionResult.SUCCESS) {
+            // Google Play Services are not available
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
         } else {
@@ -168,16 +126,17 @@ public class EventInformationActivity extends FragmentActivity {
      * @author SpicyCH
      */
     public void inviteFriendsToEvent(View v) {
+
+        // Hack so that SonarQube doesn't complain that v is not used
+        Log.d(TAG, "View with id " + v.getId() + " clicked");
         Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
         this.startActivityForResult(inviteFriends, 1);
     }
 
     @Override
     public void onBackPressed() {
-        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
-            this.startActivity(new Intent(this, MainActivity.class));
-        }
         this.finish();
+        this.onNotificationOpen();
     }
 
     @Override
@@ -194,9 +153,7 @@ public class EventInformationActivity extends FragmentActivity {
             case R.id.action_settings:
                 return true;
             case android.R.id.home:
-                if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
-                    this.startActivity(new Intent(this, MainActivity.class));
-                }
+                this.onNotificationOpen();
                 this.finish();
                 break;
             default:
@@ -260,5 +217,57 @@ public class EventInformationActivity extends FragmentActivity {
                 EventInformationActivity.this.openMapAtEventLocation();
             }
         });
+    }
+
+    /**
+     * 
+     * 
+     * @author SpicyCH
+     */
+    private void onNotificationOpen() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+    }
+
+    class LoadEventTask extends AsyncTask<Long, Void, Map<String, Object>> {
+        @Override
+        protected Map<String, Object> doInBackground(Long... params) {
+
+            Log.d(TAG, "Retrieving event...");
+
+            long eventId = params[0];
+
+            Map<String, Object> output = new HashMap<String, Object>();
+
+            Event event = Cache.getInstance().getEventById(eventId);
+            output.put(EVENT_KEY, event);
+
+            String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
+            output.put(CREATOR_NAME_KEY, creatorName);
+
+            return output;
+        }
+
+        @Override
+        protected void onPostExecute(Map<String, Object> result) {
+
+            Log.d(TAG, "Processing event...");
+
+            final Event event = (Event) result.get(EVENT_KEY);
+            final String creatorName = (String) result.get(CREATOR_NAME_KEY);
+
+            if ((event == null) || (creatorName == null)) {
+                Log.e(TAG, "The server returned a null event or creatorName");
+
+                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
+                        .show();
+
+            } else {
+                mEvent = event;
+                EventInformationActivity.this.initializeGUI(event, creatorName);
+            }
+
+        }
     }
 }
