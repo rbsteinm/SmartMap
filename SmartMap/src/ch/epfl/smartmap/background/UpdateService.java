@@ -71,7 +71,7 @@ public class UpdateService extends Service {
                                 new HashSet<ImmutableUser>(ServiceContainer.getNetworkClient()
                                     .listFriendsPos()));
                         } catch (SmartMapClientException e) {
-                            e.printStackTrace();
+                            Log.e(UpdateService.class.getSimpleName(), "Network error: " + e);
                         }
                         return null;
                     }
