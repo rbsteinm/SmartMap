@@ -113,9 +113,11 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 		switch (id) {
 			case R.id.activity_friends_add_button:
 				this.startAddFriendActivity(null);
+				break;
 			case android.R.id.home:
 				this.onNotificationOpen();
 				this.finish();
+				break;
 			default:
 				break;
 		}

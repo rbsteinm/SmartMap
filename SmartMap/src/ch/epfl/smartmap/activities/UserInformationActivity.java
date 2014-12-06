@@ -163,6 +163,7 @@ public class UserInformationActivity extends Activity {
 			case android.R.id.home:
 				this.onNotificationOpen();
 				this.finish();
+				break;
 			default:
 				break;
 		}
