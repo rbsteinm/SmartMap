@@ -68,7 +68,8 @@ public class UpdateService extends Service {
                     protected Void doInBackground(Void... args0) {
                         try {
                             ServiceContainer.getCache().updateFriends(
-                                new HashSet<ImmutableUser>(ServiceContainer.getNetworkClient().listFriendsPos()));
+                                new HashSet<ImmutableUser>(ServiceContainer.getNetworkClient()
+                                    .listFriendsPos()));
                         } catch (SmartMapClientException e) {
                             e.printStackTrace();
                         }
@@ -109,7 +110,8 @@ public class UpdateService extends Service {
                 public Void doInBackground(Void... params) {
                     Location pos = ServiceContainer.getSettingsManager().getLocation();
                     try {
-                        ServiceContainer.getNetworkClient().getPublicEvents(pos.getLongitude(), pos.getLatitude(), 100);
+                        ServiceContainer.getNetworkClient().getPublicEvents(pos.getLongitude(),
+                            pos.getLatitude(), 100);
                     } catch (SmartMapClientException e) {
                         Log.e(TAG, "Couldn't retrieve public events: " + e.getMessage());
                     }
@@ -147,7 +149,8 @@ public class UpdateService extends Service {
                         ServiceContainer.getCache().updateFriendInvitations(nb,
                             UpdateService.this.getApplicationContext());
                     } catch (SmartMapClientException e) {
-                        Log.e("UpdateService", "Couldn't retrieve invitations due to a server error: " + e.getMessage());
+                        Log.e("UpdateService",
+                            "Couldn't retrieve invitations due to a server error: " + e.getMessage());
                     }
                     return nb;
                 }
@@ -176,6 +179,10 @@ public class UpdateService extends Service {
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
         }
     };
+
+    private void loadSettings() {
+        mPosUpdateDelay = ServiceContainer.getSettingsManager().getRefreshFrequency();
+    }
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -214,13 +221,13 @@ public class UpdateService extends Service {
         criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
         mLocManager.requestSingleUpdate(criteria, new MyLocationListener(), null);
         if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, mPosUpdateDelay, MIN_DISTANCE,
-                new MyLocationListener());
+            mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, mPosUpdateDelay,
+                MIN_DISTANCE, new MyLocationListener());
         }
 
         if (mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_DELAY, MIN_GPS_DISTANCE,
-                new MyLocationListener());
+            mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_DELAY,
+                MIN_GPS_DISTANCE, new MyLocationListener());
         }
         return START_STICKY;
     }
@@ -232,8 +239,10 @@ public class UpdateService extends Service {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
         restartService.setPackage(this.getPackageName());
         PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
+                PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService =
+            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
     }
@@ -248,10 +257,6 @@ public class UpdateService extends Service {
         if (isEnabled) {
             mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
         }
-    }
-
-    private void loadSettings() {
-        mPosUpdateDelay = ServiceContainer.getSettingsManager().getRefreshFrequency();
     }
 
     /**
@@ -289,7 +294,8 @@ public class UpdateService extends Service {
 
                 // Sets the location name
                 try {
-                    List<Address> addresses = mGeocoder.getFromLocation(fix.getLatitude(), fix.getLongitude(), 1);
+                    List<Address> addresses =
+                        mGeocoder.getFromLocation(fix.getLatitude(), fix.getLongitude(), 1);
 
                     String locName = SettingsManager.DEFAULT_LOC_NAME;
                     if (!addresses.isEmpty()) {
@@ -298,7 +304,7 @@ public class UpdateService extends Service {
                     ServiceContainer.getSettingsManager().setLocationName(locName);
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e("UpdateService", e.getMessage());
                 }
             }
         }
