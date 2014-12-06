@@ -91,8 +91,8 @@ public class Cache {
         mListeners.add(listener);
     }
 
-    public void cleanInstances() {
-        // Removes all instances that are not used anymore
+    public void clearOldInstances() {
+
     }
 
     public void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
