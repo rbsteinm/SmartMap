@@ -3,12 +3,17 @@
  */
 package ch.epfl.smartmap.map;
 
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
@@ -23,21 +28,27 @@ import ch.epfl.smartmap.cache.User;
  */
 public class CircularMarkerIconMaker implements MarkerIconMaker {
 
-    private final Bitmap mMarkerShape;
+    private Bitmap mMarkerShape;
     private final Context mContext;
     private final User mUser;
     public static final float CIRCLE_CENTER_INCREMENT = 0.7f;
     public static final float CIRCLE_RADIUS_INCREMENT = 0.1f;
-    public static final int SHAPE_BORDER_WIDTH = 230;
-    public static final float SCALE_MARKER = 0.10f;
+    public static final int SHAPE_BORDER_WIDTH = 230; // 230
+    public static final float SCALE_MARKER = 0.15f;
     public static final int SHAPE_TAIL_LENGTH = 73;
+    public static final float SATURATION_BEGIN = 2f;
+    public static final float SATURATION_END = -0.08f;
+    public static final long TIMEOUT_COLOR = 30; // minutes
+    public static final int SECONDS_IN_MINUTE = 60;
+    public static final int MILLISECONDS_IN_SECOND = 1000;
 
     public CircularMarkerIconMaker(Context context, User user) {
         mContext = context;
         mUser = user;
         int idForm = R.drawable.marker_forme;
         mMarkerShape = BitmapFactory.decodeResource(mContext.getResources(), idForm);
-
+        mMarkerShape = mMarkerShape.copy(Bitmap.Config.ARGB_8888, true); // make the Bitmap mMarkerShape
+                                                                         // mutable to be changed by canvas
     }
 
     /*
@@ -53,11 +64,14 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
             Bitmap.createScaledBitmap(profilePicture, mMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
                 mMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
 
-        // TODO set the color of the marker shape, using mUser.getLastSeen
+        long timeElapsed =
+            GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
+                - mUser.getLastSeen().getTimeInMillis();
+        this.setColorOfMarkerShape(timeElapsed);
 
         Bitmap roundProfile = this.cropProfilePicture(profilePicture, profilePicture.getWidth());
-        Bitmap finalMarker = overlay(mMarkerShape, roundProfile);
-        finalMarker = scaleMarker(finalMarker, SCALE_MARKER);
+        Bitmap finalMarker = this.overlay(mMarkerShape, roundProfile);
+        finalMarker = this.scaleMarker(finalMarker, SCALE_MARKER);
         return finalMarker;
     }
 
@@ -108,7 +122,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @param bmp2
      * @return the combined bitmap
      */
-    public static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
 
         int maxWidth = bmp1.getWidth() > bmp2.getWidth() ? bmp1.getWidth() : bmp2.getWidth();
         int maxHeight = bmp1.getHeight() > bmp2.getHeight() ? bmp1.getHeight() : bmp2.getHeight();
@@ -129,11 +143,38 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @param coeff
      * @return the scaled image
      */
-    public static Bitmap scaleMarker(Bitmap img, float coeff) {
+    private Bitmap scaleMarker(Bitmap img, float coeff) {
         int newWidth = Math.round(coeff * img.getWidth());
         int newHeight = Math.round(coeff * img.getHeight());
         return Bitmap.createScaledBitmap(img, newWidth, newHeight, true);
 
+    }
+
+    private long minutesToMilliseconds(long minutes) {
+        return minutes * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND;
+    }
+
+    /**
+     * Set the marker's color in terms of the elapsed time
+     * 
+     * @param elapsedTime
+     */
+    private void setColorOfMarkerShape(long elapsedTime) {
+
+        long timeoutInMillis = this.minutesToMilliseconds(TIMEOUT_COLOR);
+        Canvas canvas = new Canvas(mMarkerShape);
+        ColorMatrix cm = new ColorMatrix();
+        if (elapsedTime < timeoutInMillis) {
+            cm.setSaturation((((SATURATION_BEGIN * timeoutInMillis) - elapsedTime) + (SATURATION_END * elapsedTime))
+                / timeoutInMillis);
+        } else {
+            cm.setSaturation(SATURATION_END);
+        }
+
+        ColorMatrixColorFilter lightingColorFilter = new ColorMatrixColorFilter(cm);
+        Paint paintLightening = new Paint();
+        paintLightening.setColorFilter(lightingColorFilter);
+        canvas.drawBitmap(mMarkerShape, 0, 0, paintLightening);
     }
 
 }
