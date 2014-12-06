@@ -176,6 +176,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 + this.getAcceptedRequests().size() + 1;
         // using getAllInvitations would cause unnecessary sorting
         ContentValues values = new ContentValues();
+        values.put(KEY_ID, id);
         values.put(KEY_USER_ID, invitation.getUserId());
         values.put(KEY_NAME, invitation.getUserName());
 
