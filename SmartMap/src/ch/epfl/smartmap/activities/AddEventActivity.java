@@ -460,7 +460,8 @@ public class AddEventActivity extends FragmentActivity {
             try {
                 long id = NetworkSmartMapClient.getInstance().createPublicEvent(params[0]);
                 Cache.getInstance().addMyEvent(id);
-                return (id > 0);
+
+                return id > 0;
             } catch (SmartMapClientException e) {
                 Log.e(TAG, e.getMessage());
                 return false;

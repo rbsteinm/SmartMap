@@ -5,7 +5,7 @@
     <!-- Strings related to Settings -->
 
 
-    <!-- Example General settings -->
+    <!-- General settings -->
     <string name="pref_header_general">General</string>
     <string name="pref_title_offline">Offline mode</string>
     <string name="pref_description_offline">In offline mode you don\'t send nor receive any positions.</string>
@@ -47,6 +47,7 @@
     <string name="pref_header_events">Events</string>
     <string name="pref_title_show_public_events">Show public events</string>
     <string name="pref_title_show_private_events">Show private events</string>
+    <string name="pref_title_fetch_events_distance">Max distance to fetch events</string>
     <string name="pref_header_data_sync">Data &amp; sync</string>
     <string name="pref_title_sync_frequency">Sync frequency</string>
     <string name="pref_title_refresh_frequency">Refresh data frequency</string>
@@ -59,11 +60,32 @@
         <item>2 minutes</item>
     </string-array>
     <string-array name="pref_sync_frequency_values">
+        <!-- NOTE: the time is in ms -->
         <item>5000</item>
         <item>10000</item>
         <item>30000</item>
         <item>60000</item>
         <item>120000</item>
+    </string-array>
+    
+    <string-array name="pref_events_max_distance_titles">
+        <item>None</item>
+        <item>10 km</item>
+        <item>50 km</item>
+        <item>100 km (default)</item>
+        <item>500 km</item>
+        <item>1000 km</item>
+        <item>All</item>
+    </string-array>
+    <string-array name="pref_events_max_distance_values">
+        <!-- NOTE: the distances are in km -->
+        <item>0</item>
+        <item>10</item>
+        <item>50</item>
+        <item>100</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>41000</item>
     </string-array>
 
     <!-- Notifications -->

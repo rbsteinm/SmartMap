@@ -75,6 +75,16 @@
         android:key="@string/settings_key_events_show_private"
         android:title="@string/pref_title_show_private_events" />
         -->
+        
+        <ListPreference
+        android:defaultValue="100"
+        android:entries="@array/pref_events_max_distance_titles"
+        android:entryValues="@array/pref_events_max_distance_values"
+        android:key="@string/settings_key_max_distance_fetch_events"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_fetch_events_distance" />
+        
     </PreferenceCategory>
 
 </PreferenceScreen>

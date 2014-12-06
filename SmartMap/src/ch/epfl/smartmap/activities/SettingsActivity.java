@@ -116,6 +116,8 @@ public class SettingsActivity extends PreferenceActivity {
 
             bindPreferenceSummaryToValue(this.findPreference(this.getString(R.string.settings_key_refresh_frequency)));
             bindPreferenceSummaryToValue(this.findPreference(this.getString(R.string.settings_key_last_seen_max)));
+            bindPreferenceSummaryToValue(this.findPreference(this
+                    .getString(R.string.settings_key_max_distance_fetch_events)));
         }
     }
 
