@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 
 /**
  * Override existing typefaces
@@ -18,9 +19,9 @@ public final class FontsOverride {
             staticField.setAccessible(true);
             staticField.set(null, newTypeface);
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            Log.e("FontsOverride", e.getMessage());
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Log.e("FontsOverride", e.getMessage());
         }
     }
 
