@@ -90,6 +90,17 @@
     <string name="show_event_server_error">Couldn\'t fetch wished content from our server, sorry :(</string>
     <string name="show_event_loading_info">Loading informations...</string>
     <string name="show_events_menu_refresh">Refresh</string>
+    
+    <!-- EventsListItemAdapter -->
+    <string name="events_list_item_adapter_event_live">Event is live!</string>
+    <string name="events_list_item_adapter_today">Today</string>
+    <string name="events_list_item_adapter_tomorrow">Tomorrow</string>
+    <string name="events_list_item_adapter_ends_today_at">Ends today at</string>
+    <string name="events_list_item_adapter_ends_tomorrow_at">Ends tomorrow at</string>
+    <string name="events_list_item_adapter_starts">Starts</string>
+    <string name="events_list_item_adapter_ends">Ends</string>
+    <string name="events_list_item_adapter_from">from</string>
+    <string name="events_list_item_adapter_to">to</string>
 
     <!-- ShowEventInformationActivity -->
     <string name="title_activity_show_event_information">Show event</string>

@@ -29,9 +29,12 @@ import ch.epfl.smartmap.cache.Event;
  */
 public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
-    private final static int HUNDRED_PERCENT = 100;
-    private final static int MIDNIGHT_HOUR = 23;
-    private final static int MIDNIGHT_MINUTES = 59;
+    private static final int HUNDRED_PERCENT = 100;
+    private static final int MIDNIGHT_HOUR = 23;
+    private static final int MIDNIGHT_MINUTES = 59;
+
+    private static final String START = "start";
+    private static final String END = "end";
 
     private final Context mContext;
 
@@ -89,8 +92,8 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         Calendar start = event.getStartDate();
         Calendar end = event.getEndDate();
 
-        viewHolder.getStartTextView().setText(getTextFromDate(start, end, "start"));
-        viewHolder.getEndTextView().setText(getTextFromDate(start, end, "end"));
+        viewHolder.getStartTextView().setText(getTextFromDate(start, end, START, mContext));
+        viewHolder.getEndTextView().setText(getTextFromDate(start, end, END, mContext));
 
         double distanceMeEvent = ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
                 mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position).getLocation()
@@ -115,13 +118,18 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
      * @param date1
      * @param date2
      * @param s
+     *            <code>true</code> if you want to get the text for the
      * @return a String of the form "Today at 04:01"
      * @author SpicyCH
      */
-    public static String getTextFromDate(Calendar date1, Calendar date2, String s) {
+    public static String getTextFromDate(Calendar date1, Calendar date2, String s, Context context) {
 
         if (date1.after(date2)) {
             throw new IllegalArgumentException("date1 must be before date2");
+        }
+
+        if (!s.equals(START) && !s.equals(END)) {
+            throw new IllegalArgumentException("String s must be either 'start' or 'end'");
         }
 
         GregorianCalendar now = new GregorianCalendar();
@@ -140,53 +148,92 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
         String endHourOfDayString = TimePickerFragment.formatForClock(date2.get(GregorianCalendar.HOUR_OF_DAY));
         String endMinuteString = TimePickerFragment.formatForClock(date2.get(GregorianCalendar.MINUTE));
+
         String dateTextContent = "";
 
-        if (date1.before(midnight) && date2.before(midnight)) {
-            // ends and starts the same day
-            if (s.equals("start")) {
-                dateTextContent = "Today";
-            } else {
-                dateTextContent = "from " + startHourOfDayString + ":" + startMinuteString + " to "
-                        + endHourOfDayString + ":" + endMinuteString;
-            }
-        } else if (date1.before(tomorrowMidnight) && date2.before(tomorrowMidnight)) {
-            // ends and starts the same day
-            if (s.equals("start")) {
-                dateTextContent = "Tomorrow";
-            } else {
-                dateTextContent = "from " + startHourOfDayString + ":" + startMinuteString + " to "
-                        + endHourOfDayString + ":" + endMinuteString;
-            }
-        } else {
-            // Upcoming event
-            if (date1.before(midnight) && s.equals("start")) {
-                dateTextContent = "Today at " + startHourOfDayString + ":" + startMinuteString;
-            } else if (date2.before(midnight) && s.equals("end")) {
-                dateTextContent = "Ends today at " + endHourOfDayString + ":" + endMinuteString;
-            } else if (date1.before(tomorrowMidnight) && s.equals("start")) {
-                dateTextContent = "Tomorrow at " + startHourOfDayString + ":" + startMinuteString;
-            } else if (date2.before(tomorrowMidnight) && s.equals("end")) {
-                dateTextContent = "Ends tomorrow at " + startHourOfDayString + ":" + startMinuteString;
-            } else {
-                if (s.equals("start")) {
-                    dateTextContent = "Starts: " + date1.get(GregorianCalendar.DAY_OF_MONTH) + "/"
-                            + (date1.get(GregorianCalendar.MONTH) + 1) + "/" + date1.get(GregorianCalendar.YEAR)
-                            + " at " + startHourOfDayString + ":" + startMinuteString;
-                } else {
-                    dateTextContent = "Ends: " + date2.get(GregorianCalendar.DAY_OF_MONTH) + "/"
-                            + (date2.get(GregorianCalendar.MONTH) + 1) + "/" + date2.get(GregorianCalendar.YEAR)
-                            + " at " + endHourOfDayString + ":" + endMinuteString;
-                }
+        if (date1.before(now) && s.equals(START)) {
 
+            dateTextContent = context.getString(R.string.events_list_item_adapter_event_live);
+
+        } else if (date1.before(midnight) && date2.before(midnight)) {
+
+            // ends and starts today
+            if (s.equals(START)) {
+                dateTextContent = context.getString(R.string.events_list_item_adapter_today);
+            } else {
+                dateTextContent = context.getString(R.string.events_list_item_adapter_from) + " "
+                        + startHourOfDayString + ":" + startMinuteString + " "
+                        + context.getString(R.string.events_list_item_adapter_to) + " " + endHourOfDayString + ":"
+                        + endMinuteString;
             }
+
+        } else if (date1.before(tomorrowMidnight) && date2.before(tomorrowMidnight)) {
+
+            // ends and starts tomorrow
+            if (s.equals(START)) {
+                dateTextContent = context.getString(R.string.events_list_item_adapter_tomorrow);
+            } else {
+                dateTextContent = context.getString(R.string.events_list_item_adapter_from) + " "
+                        + startHourOfDayString + ":" + startMinuteString + " "
+                        + context.getString(R.string.events_list_item_adapter_to) + " " + endHourOfDayString + ":"
+                        + endMinuteString;
+            }
+
+        } else {
+
+            // Upcoming event
+
+            dateTextContent = getUpcomingEventText(date1, date2, midnight, tomorrowMidnight, startHourOfDayString,
+                    startMinuteString, endHourOfDayString, endMinuteString, s, context);
         }
 
-        if (date1.before(now)) {
-            // Ongoing event
-            if (s.equals("start")) {
-                dateTextContent = "Event is live!";
+        return dateTextContent;
+    }
+
+    /**
+     * @return
+     * 
+     * @author SpicyCH
+     */
+    private static String getUpcomingEventText(Calendar date1, Calendar date2, Calendar midnight,
+            Calendar tomorrowMidnight, String startHourOfDayString, String startMinuteString,
+            String endHourOfDayString, String endMinuteString, String s, Context context) {
+
+        String dateTextContent = "";
+
+        if (date1.before(midnight) && s.equals(START)) {
+
+            dateTextContent = context.getString(R.string.events_list_item_adapter_today) + " - " + startHourOfDayString
+                    + ":" + startMinuteString;
+
+        } else if (date2.before(midnight) && s.equals(END)) {
+
+            dateTextContent = context.getString(R.string.events_list_item_adapter_ends_today_at) + " "
+                    + endHourOfDayString + ":" + endMinuteString;
+
+        } else if (date1.before(tomorrowMidnight) && s.equals(START)) {
+
+            dateTextContent = context.getString(R.string.events_list_item_adapter_tomorrow) + " - "
+                    + startHourOfDayString + ":" + startMinuteString;
+
+        } else if (date2.before(tomorrowMidnight) && s.equals(END)) {
+
+            dateTextContent = context.getString(R.string.events_list_item_adapter_ends_tomorrow_at) + " "
+                    + startHourOfDayString + ":" + startMinuteString;
+
+        } else {
+
+            if (s.equals(START)) {
+                dateTextContent = context.getString(R.string.events_list_item_adapter_starts) + " "
+                        + date1.get(GregorianCalendar.DAY_OF_MONTH) + "/" + (date1.get(GregorianCalendar.MONTH) + 1)
+                        + "/" + date1.get(GregorianCalendar.YEAR) + " - " + startHourOfDayString + ":"
+                        + startMinuteString;
+            } else {
+                dateTextContent = context.getString(R.string.events_list_item_adapter_ends) + " "
+                        + date2.get(GregorianCalendar.DAY_OF_MONTH) + "/" + (date2.get(GregorianCalendar.MONTH) + 1)
+                        + "/" + date2.get(GregorianCalendar.YEAR) + " - " + endHourOfDayString + ":" + endMinuteString;
             }
+
         }
 
         return dateTextContent;

@@ -227,15 +227,15 @@ public class ShowEventsActivity extends ListActivity {
                     AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
 
                     final String message = EventsListItemAdapter.getTextFromDate(event.getStartDate(),
-                            event.getEndDate(), "start")
+                            event.getEndDate(), "start", mContext)
                             + " - "
-                            + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
+                            + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end",
+                                    mContext)
                             + "\n"
                             + mContext.getString(R.string.show_event_by)
                             + " "
                             + creatorName
-                            + "\n\n"
-                            + event.getDescription();
+                            + "\n\n" + event.getDescription();
 
                     alertDialog.setTitle(event.getName()
                             + " @ "

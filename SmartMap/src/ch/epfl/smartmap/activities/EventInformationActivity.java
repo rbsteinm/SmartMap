@@ -235,10 +235,11 @@ public class EventInformationActivity extends FragmentActivity {
         mEventCreator.setText(this.getString(R.string.show_event_by) + " " + creatorName);
 
         mStart = (TextView) this.findViewById(R.id.show_event_info_start);
-        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "start"));
+        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "start",
+                mContext));
 
         mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
-        mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));
+        mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end", mContext));
 
         mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
         mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ":\n"
