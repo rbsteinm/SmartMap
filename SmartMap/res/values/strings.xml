@@ -167,6 +167,7 @@
     <string name="follow_switch">Follow</string>
 
     <!-- Settings -->
+    <!-- NOTE: Each string value must be unique, as it is a key for one specific preference. -->
     <string name="settings_key_notifications_enabled">notifications_enabled</string>
     <string name="settings_key_notifications_friend_requests">notifications_friend_requests</string>
     <string name="settings_key_notifications_friendship_confirmations">notifications_friendship_confirmations</string>
@@ -178,6 +179,7 @@
     <string name="settings_key_last_seen_max">last_seen_max</string>
     <string name="settings_key_events_show_public">events_show_public</string>
     <string name="settings_key_events_show_private">events_show_private</string>
+    <string name="settings_key_max_distance_fetch_events">events_fetch_distance</string>
 
     <!-- Nothing below this line! -->
 

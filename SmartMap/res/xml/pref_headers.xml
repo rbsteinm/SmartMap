@@ -1,15 +1,9 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <!-- These settings headers are only used on tablets. -->
+    <!-- Shown if we build our settings from the headers. There is only one fragment for the moment. -->
 
     <header
-        android:fragment="ch.epfl.smartmap.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="ch.epfl.smartmap.activities.SettingsActivity$GeneralPreferenceFragment"
         android:title="@string/pref_header_general" />
-    <header
-        android:fragment="ch.epfl.smartmap.SettingsActivity$NotificationPreferenceFragment"
-        android:title="@string/pref_header_notifications" />
-    <header
-        android:fragment="ch.epfl.smartmap.SettingsActivity$EventsPreferenceFragment"
-        android:title="@string/pref_header_events" />
 
 </preference-headers>
