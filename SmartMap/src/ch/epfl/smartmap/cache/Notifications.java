@@ -11,7 +11,6 @@ import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.gui.Utils;
-import ch.epfl.smartmap.search.CachedSearchEngine;
 
 /**
  * This class creates different sort of notifications
@@ -121,8 +120,12 @@ public class Notifications {
 
         String[] events = new String[2];
         events[0] =
-            new String(CachedSearchEngine.getInstance().findUserById(event.getCreatorId()) + " "
-                + context.getString(R.string.notification_event_invitation) + " " + event.getName());
+            new String(/*
+                        * CachedSearchEngine.getInstance().findUserById(
+                        * event.
+                        * getCreatorId())
+                        * +
+                        */" " + context.getString(R.string.notification_event_invitation) + " " + event.getName());
         events[1] = context.getString(R.string.notification_open_event_list);
 
         // Sets a title for the Inbox style big view
@@ -140,13 +143,16 @@ public class Notifications {
                 .setAutoCancel(true)
                 .setContentTitle(context.getString(R.string.notification_inviteevent_title))
                 .setContentText(
-                    CachedSearchEngine.getInstance().findFriendById(event.getCreatorId()) + " "
-                        + context.getString(R.string.notification_event_invitation) + event.getName() + "\n"
+                    /*
+                     * CachedSearchEngine.getInstance().findFriendById(event.
+                     * getCreatorId()) +
+                     */" " + context.getString(R.string.notification_event_invitation) + event.getName() + "\n"
                         + context.getString(R.string.notification_open_event_list))
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setTicker(
-                    CachedSearchEngine.getInstance().findFriendById(event.getCreatorId()) + " "
-                        + context.getString(R.string.notification_event_invitation) + event.getName())
+                .setSmallIcon(R.drawable.ic_launcher).setTicker(
+                /*
+                 * CachedSearchEngine.getInstance().findFriendById(event.
+                 * getCreatorId()) +
+                 */" " + context.getString(R.string.notification_event_invitation) + event.getName())
                 .setVibrate(PATTERN).setContentIntent(pEventIntent);
 
         displayNotification(context, noti.build(), notificationID);

@@ -21,7 +21,6 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.InvitationManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.search.CachedSearchEngine;
@@ -127,7 +126,6 @@ public class StartActivity extends FragmentActivity {
         ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
         ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplicationContext()));
         ServiceContainer.setCache(new Cache());
-        ServiceContainer.setInvitationManager(new InvitationManager());
         ServiceContainer.setSearchEngine(new CachedSearchEngine());
     }
 

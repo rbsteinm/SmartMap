@@ -3,7 +3,6 @@ package ch.epfl.smartmap.background;
 import java.util.NoSuchElementException;
 
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.InvitationManager;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.servercom.SmartMapClient;
@@ -22,7 +21,6 @@ public class ServiceContainer {
     private static SmartMapClient mNetworkClient;
     private static DatabaseHelper mDBHelper;
     private static Cache mCache;
-    private static InvitationManager mInvitationManager;
     private static CachedSearchEngine mSearchEngine;
     private static SettingsManager mSettingsManager;
 
@@ -48,18 +46,6 @@ public class ServiceContainer {
             throw new NoSuchElementException("Database Helper is not set.");
         }
         return mDBHelper;
-    }
-
-    /**
-     * Get the invitation manager service.
-     * 
-     * @return InvitationManager
-     */
-    public static InvitationManager getInvitationManager() {
-        if (mInvitationManager == null) {
-            throw new NoSuchElementException("InvitationManager is not set.");
-        }
-        return mInvitationManager;
     }
 
     /**
@@ -114,15 +100,6 @@ public class ServiceContainer {
      */
     public static void setDatabaseHelper(DatabaseHelper db) {
         mDBHelper = db;
-    }
-
-    /**
-     * Set the invitation manager service.
-     * 
-     * @param im
-     */
-    public static void setInvitationManager(InvitationManager im) {
-        mInvitationManager = im;
     }
 
     /**
