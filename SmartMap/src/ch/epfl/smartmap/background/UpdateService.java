@@ -63,7 +63,7 @@ public class UpdateService extends Service {
         @Override
         public void run() {
             if (!ServiceContainer.getSettingsManager().isOffline()) {
-                new AsyncTask<Void, Void, Void>() {
+                AsyncTask<Void, Void, Void> asyncFriendsPos = new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... args0) {
                         try {
@@ -75,7 +75,8 @@ public class UpdateService extends Service {
                         }
                         return null;
                     }
-                }.execute();
+                };
+                asyncFriendsPos.execute();
             }
             mHandler.postDelayed(this, ServiceContainer.getSettingsManager().getRefreshFrequency());
         }
@@ -140,21 +141,23 @@ public class UpdateService extends Service {
         @Override
         public void run() {
             UpdateService.this.loadSettings();
-            new AsyncTask<Void, Void, NotificationBag>() {
-                @Override
-                protected NotificationBag doInBackground(Void... arg0) {
-                    NotificationBag nb = null;
-                    try {
-                        nb = mClient.getInvitations();
-                        ServiceContainer.getCache().updateFriendInvitations(nb,
-                            UpdateService.this.getApplicationContext());
-                    } catch (SmartMapClientException e) {
-                        Log.e("UpdateService",
-                            "Couldn't retrieve invitations due to a server error: " + e.getMessage());
+            AsyncTask<Void, Void, NotificationBag> asyncInvitations =
+                new AsyncTask<Void, Void, NotificationBag>() {
+                    @Override
+                    protected NotificationBag doInBackground(Void... arg0) {
+                        NotificationBag nb = null;
+                        try {
+                            nb = mClient.getInvitations();
+                            ServiceContainer.getCache().updateFriendInvitations(nb,
+                                UpdateService.this.getApplicationContext());
+                        } catch (SmartMapClientException e) {
+                            Log.e("UpdateService", "Couldn't retrieve invitations due to a server error: "
+                                + e.getMessage());
+                        }
+                        return nb;
                     }
-                    return nb;
-                }
-            }.execute();
+                };
+            asyncInvitations.execute();
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
         }
     };
