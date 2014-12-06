@@ -2,15 +2,21 @@ package ch.epfl.smartmap.test.activities;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onData;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 import android.content.Context;
+import android.preference.Preference;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.activities.SettingsActivity;
 import ch.epfl.smartmap.background.SettingsManager;
 
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
+import com.google.android.apps.common.testing.ui.espresso.matcher.BoundedMatcher;
 import com.google.android.apps.common.testing.ui.espresso.matcher.PreferenceMatchers;
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
@@ -215,11 +221,9 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
 
     @SuppressWarnings("unchecked")
     public void testCanSetPublicAndPrivateEvents() {
-        onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("events_show_public"))).perform(
-            ViewActions.click());
+        onData(Matchers.<Object> allOf(withPreferenceKey("events_show_public"))).perform(ViewActions.click());
         boolean initValue = SettingsManager.getInstance().showPublicEvents();
-        onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("events_show_public"))).perform(
-            ViewActions.click());
+        onData(Matchers.<Object> allOf(withPreferenceKey("events_show_public"))).perform(ViewActions.click());
 
         assertTrue("Couldn't change boolean status of public events", initValue != SettingsManager
             .getInstance().showPublicEvents());
@@ -282,6 +286,28 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
                     .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
                 ViewActions.click());
         }
+    }
+
+    public static Matcher<Object> withPreferenceKey(final Matcher<Preference> preferenceMatcher) {
+        checkNotNull(preferenceMatcher);
+        return new BoundedMatcher<Object, Preference>(Preference.class) {
+            @Override
+            protected boolean matchesSafely(Preference pref) {
+                return preferenceMatcher.matches(pref);
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("with preference key:");
+                preferenceMatcher.describeTo(description);
+            }
+        };
+    }
+
+    public static Matcher<Object> withPreferenceKey(String expectedKeyText) {
+        checkNotNull(expectedKeyText);
+        checkArgument(!expectedKeyText.isEmpty());
+        return withPreferenceKey(PreferenceMatchers.withKey(expectedKeyText));
     }
 
 }
