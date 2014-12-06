@@ -42,7 +42,7 @@ public class UpdateService extends Service {
     private static final int GPS_UPDATE_DELAY = 5 * 60 * 1000;
     private static final int INVITE_UPDATE_DELAY = 30000;
 
-    private static final float MIN_DISTANCE = 5; // minimum distance to update
+    private static final float MIN_DISTANCE = 0; // minimum distance to update
                                                  // position
     private static final float MIN_GPS_DISTANCE = 50; // minimum distance before
                                                       // gps updates are
@@ -311,17 +311,17 @@ public class UpdateService extends Service {
 
         @Override
         public void onProviderDisabled(String provider) {
-
+            Log.w(UpdateService.class.getSimpleName(), provider + " was disabled.");
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-
+            Log.d(UpdateService.class.getSimpleName(), provider + " was enabled.");
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-
+            Log.d(UpdateService.class.getSimpleName(), provider + " status: " + status);
         }
     }
 }
