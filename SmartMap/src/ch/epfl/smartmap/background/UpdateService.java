@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -23,14 +22,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
-import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
-import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
-import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
-import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -40,7 +34,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * 
  * @author ritterni
  */
-public class UpdateService extends Service implements OnInvitationListUpdateListener, OnInvitationStatusUpdateListener {
+public class UpdateService extends Service {
 
     private static final String TAG = "UPDATE_SERVICE";
 
@@ -59,29 +53,16 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
 
     private final Handler mHandler = new Handler();
     private LocationManager mLocManager;
-    private boolean mFriendsPosEnabled = true;
-    private final boolean mOwnPosEnabled = true;
-    private final boolean isFriendIDListRetrieved = true;
-    private final boolean isDatabaseInitialized = false;
-    private DatabaseHelper mHelper;
-    private SettingsManager mManager;
     private Geocoder mGeocoder;
     private final SmartMapClient mClient = ServiceContainer.getNetworkClient();
-    private Set<Long> mInviterIds = new HashSet<Long>();
-    private Cache mCache;
     private float mCurrentAccuracy = 0;
 
     // Settings
     private int mPosUpdateDelay;
-    private boolean mNotificationsEnabled;
-    private boolean mNotificationsForEventInvitations;
-    private boolean mNotificationsForFriendRequests;
-    private boolean mNotificationsForFriendshipConfirmations;
-
     private final Runnable friendsPosUpdate = new Runnable() {
         @Override
         public void run() {
-            if (!mManager.isOffline()) {
+            if (!ServiceContainer.getSettingsManager().isOffline()) {
                 new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... args0) {
@@ -95,7 +76,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                     }
                 }.execute();
             }
-            mHandler.postDelayed(this, mManager.getRefreshFrequency());
+            mHandler.postDelayed(this, ServiceContainer.getSettingsManager().getRefreshFrequency());
         }
     };
 
@@ -116,7 +97,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                     }
                 }.execute();
             }
-            mHandler.postDelayed(this, mManager.getRefreshFrequency());
+            mHandler.postDelayed(this, ServiceContainer.getSettingsManager().getRefreshFrequency());
         }
     };
 
@@ -196,14 +177,6 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         }
     };
 
-    public void downloadUserPicture(long id) {
-        try {
-            mHelper.setUserPicture(mClient.getProfilePicture(id), id);
-        } catch (SmartMapClientException e) {
-            Log.e("UpdateService", "Couldn't download picture #" + id + "!");
-        }
-    }
-
     @Override
     public IBinder onBind(Intent arg0) {
         return null;
@@ -215,50 +188,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         if (Utils.sContext == null) {
             Utils.sContext = this;
         }
-        mManager = SettingsManager.initialize(this.getApplicationContext());
-        mHelper = DatabaseHelper.initialize(this.getApplicationContext());
-        mCache = ServiceContainer.getCache();
-        mHelper.addOnInvitationListUpdateListener(this);
-        mHelper.addOnInvitationStatusUpdateListener(this);
         mGeocoder = new Geocoder(this.getBaseContext(), Locale.US);
         mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-        this.updateInvitationSet();
-    }
-
-    @Override
-    public void onInvitationStatusUpdate(long userID, int newStatus) {
-        // if the updated notification is among the pending ones
-        // if (mInviterIds.contains(userID)) {
-        if (newStatus == Invitation.ACCEPTED) {
-            new AsyncTask<Long, Void, Void>() {
-                @Override
-                protected Void doInBackground(Long... ids) {
-                    try {
-                        for (long id : ids) {
-                            mClient.acceptInvitation(id);
-                        }
-                    } catch (SmartMapClientException e) {
-                        Log.e("UpdateService", "Couldn't accept request!");
-                    }
-                    return null;
-                }
-            }.execute(userID);
-        } else if (newStatus == Invitation.REFUSED) {
-            new AsyncTask<Long, Void, Void>() {
-                @Override
-                protected Void doInBackground(Long... ids) {
-                    try {
-                        for (long id : ids) {
-                            mClient.declineInvitation(id);
-                        }
-                    } catch (SmartMapClientException e) {
-                        Log.e("UpdateService", "Couldn't decline request!");
-                    }
-                    return null;
-                }
-            }.execute(userID);
-        }
     }
 
     @Override
@@ -314,25 +245,13 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
      *            True if updates should be enabled
      */
     public void setFriendsPosUpdateEnabled(boolean isEnabled) {
-        mFriendsPosEnabled = isEnabled;
         if (isEnabled) {
             mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
         }
     }
 
-    public void updateInvitationSet() {
-        mInviterIds = new HashSet<Long>();
-        for (FriendInvitation invitation : mHelper.getUnansweredFriendInvitations()) {
-            mInviterIds.add(invitation.getUserId());
-        }
-    }
-
     private void loadSettings() {
-        mPosUpdateDelay = mManager.getRefreshFrequency();
-        mNotificationsEnabled = mManager.notificationsEnabled();
-        mNotificationsForEventInvitations = mManager.notificationsForEventInvitations();
-        mNotificationsForFriendRequests = mManager.notificationsForFriendRequests();
-        mNotificationsForFriendshipConfirmations = mManager.notificationsForFriendshipConfirmations();
+        mPosUpdateDelay = ServiceContainer.getSettingsManager().getRefreshFrequency();
     }
 
     /**
@@ -344,7 +263,8 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         protected Void doInBackground(Void... arg0) {
             try {
-                mClient.authServer(mManager.getUserName(), mManager.getFacebookID(), mManager.getToken());
+                mClient.authServer(ServiceContainer.getSettingsManager().getUserName(), ServiceContainer
+                    .getSettingsManager().getFacebookID(), ServiceContainer.getSettingsManager().getToken());
             } catch (SmartMapClientException e) {
                 Log.e("UpdateService", "Couldn't log in!");
             }
@@ -362,9 +282,9 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
         @Override
         public void onLocationChanged(Location fix) {
             // do nothing if the new location is less accurate
-            if ((mManager.getLocation().distanceTo(fix) >= fix.getAccuracy())
+            if ((ServiceContainer.getSettingsManager().getLocation().distanceTo(fix) >= fix.getAccuracy())
                 || (fix.getAccuracy() <= mCurrentAccuracy)) {
-                mManager.setLocation(fix);
+                ServiceContainer.getSettingsManager().setLocation(fix);
                 mCurrentAccuracy = fix.getAccuracy();
 
                 // Sets the location name
@@ -375,7 +295,7 @@ public class UpdateService extends Service implements OnInvitationListUpdateList
                     if (!addresses.isEmpty()) {
                         locName = addresses.get(0).getLocality();
                     }
-                    mManager.setLocationName(locName);
+                    ServiceContainer.getSettingsManager().setLocationName(locName);
 
                 } catch (IOException e) {
                     e.printStackTrace();
