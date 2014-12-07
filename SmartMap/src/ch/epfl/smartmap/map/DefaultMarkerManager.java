@@ -214,7 +214,7 @@ public class DefaultMarkerManager implements MarkerManager {
                 marker = this.addMarker(item, context);
                 // Log.d("Markers", "not found marker for " + item.getTitle());
             }
-            marker.setIcon(item.getMarkerIcon(context));
+
             Log.d("markers", "marker's position for " + item.getTitle() + " is " + marker.getPosition());
             if ((marker.getPosition().latitude != item.getLatLng().latitude)
                 || (marker.getPosition().longitude != item.getLatLng().longitude)) {
@@ -224,7 +224,7 @@ public class DefaultMarkerManager implements MarkerManager {
             }
             Log.d("markers", "final position of marker of " + item.getTitle() + " before setIcon is "
                 + marker.getPosition());
-            // marker.setIcon(item.getMarkerIcon(context));
+            marker.setIcon(item.getMarkerIcon(context));
             Log.d(
                 "markers",
                 "final position of marker of " + item.getTitle() + " after setIcon is "
@@ -257,7 +257,7 @@ public class DefaultMarkerManager implements MarkerManager {
         Projection proj = mGoogleMap.getProjection();
         Point startPoint = proj.toScreenLocation(marker.getPosition());
         final LatLng startLatLng = proj.fromScreenLocation(startPoint);
-        final long duration = 500;
+        final long duration = 1000;
 
         final Interpolator interpolator = new LinearInterpolator();
 

@@ -28,7 +28,8 @@ import ch.epfl.smartmap.cache.User;
  */
 public class CircularMarkerIconMaker implements MarkerIconMaker {
 
-    private Bitmap mMarkerShape;
+    private Bitmap mBaseMarkerShape;
+    private Bitmap mCurrentMarkerShape;
     // private final Context mContext;
     private final User mUser;
     private Bitmap mProfilePicture;
@@ -40,7 +41,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     public static final int SHAPE_TAIL_LENGTH = 83;
     public static final float SATURATION_BEGIN = 2f;
     public static final float SATURATION_END = -0.08f;
-    public static final long TIMEOUT_COLOR = 30; // minutes
+    public static final long TIMEOUT_COLOR = 5; // minutes
     public static final int SECONDS_IN_MINUTE = 60;
     public static final int MILLISECONDS_IN_SECOND = 1000;
 
@@ -56,7 +57,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      */
     @Override
     public Bitmap getMarkerIcon(Context context) {
-        if (mMarkerShape == null) {
+        if ((mBaseMarkerShape == null) || (mCurrentMarkerShape == null)) {
             this.setMarkerShape(context);
         }
         if (mProfilePicture == null) {
@@ -65,7 +66,8 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         if (mMarkerIcon == null) {
             this.setMarkerIcon();
         }
-
+        mCurrentMarkerShape = mBaseMarkerShape.copy(Bitmap.Config.ARGB_8888, true); // make the Bitmap
+        // mMarkerShape
         long timeElapsed =
             GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
                 - mUser.getLastSeen().getTimeInMillis();
@@ -163,7 +165,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     private void setColorOfMarkerShape(long elapsedTime) {
 
         long timeoutInMillis = this.minutesToMilliseconds(TIMEOUT_COLOR);
-        Canvas canvas = new Canvas(mMarkerShape);
+        Canvas canvas = new Canvas(mCurrentMarkerShape);
         ColorMatrix cm = new ColorMatrix();
         if (elapsedTime < timeoutInMillis) {
             cm.setSaturation((((SATURATION_BEGIN * timeoutInMillis) - elapsedTime) + (SATURATION_END * elapsedTime))
@@ -175,14 +177,15 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         ColorMatrixColorFilter lightingColorFilter = new ColorMatrixColorFilter(cm);
         Paint paintLightening = new Paint();
         paintLightening.setColorFilter(lightingColorFilter);
-        canvas.drawBitmap(mMarkerShape, 0, 0, paintLightening);
+        canvas.drawBitmap(mCurrentMarkerShape, 0, 0, paintLightening);
     }
 
     private void setMarkerShape(Context context) {
         int idForm = R.drawable.marker_forme;
-        mMarkerShape = BitmapFactory.decodeResource(context.getResources(), idForm);
-        mMarkerShape = mMarkerShape.copy(Bitmap.Config.ARGB_8888, true); // make the Bitmap mMarkerShape
-                                                                         // mutable to be changed by canvas
+        mBaseMarkerShape = BitmapFactory.decodeResource(context.getResources(), idForm);
+        mCurrentMarkerShape = mBaseMarkerShape.copy(Bitmap.Config.ARGB_8888, true); // make the Bitmap
+                                                                                    // mMarkerShape
+        // mutable to be changed by canvas
     }
 
     private void setProfilePicture() {
@@ -190,8 +193,8 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
             Bitmap.createScaledBitmap(mUser.getImage(), User.PICTURE_WIDTH, User.PICTURE_HEIGHT, false);
 
         mProfilePicture =
-            Bitmap.createScaledBitmap(mProfilePicture, mMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
-                mMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
+            Bitmap.createScaledBitmap(mProfilePicture, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
+                mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
 
         mProfilePicture = this.cropProfilePicture(mProfilePicture, mProfilePicture.getWidth());
 
@@ -199,7 +202,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
 
     private void setMarkerIcon() {
 
-        mMarkerIcon = this.overlay(mMarkerShape, mProfilePicture);
+        mMarkerIcon = this.overlay(mCurrentMarkerShape, mProfilePicture);
         mMarkerIcon = this.scaleMarker(mMarkerIcon, SCALE_MARKER);
     }
 }
