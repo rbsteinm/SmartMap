@@ -33,9 +33,9 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     private final User mUser;
     public static final float CIRCLE_CENTER_INCREMENT = 0.7f;
     public static final float CIRCLE_RADIUS_INCREMENT = 0.1f;
-    public static final int SHAPE_BORDER_WIDTH = 230; // 230
-    public static final float SCALE_MARKER = 0.15f;
-    public static final int SHAPE_TAIL_LENGTH = 73;
+    public static final int SHAPE_BORDER_WIDTH = 230;
+    public static final float SCALE_MARKER = 0.11f;
+    public static final int SHAPE_TAIL_LENGTH = 83;
     public static final float SATURATION_BEGIN = 2f;
     public static final float SATURATION_END = -0.08f;
     public static final long TIMEOUT_COLOR = 30; // minutes

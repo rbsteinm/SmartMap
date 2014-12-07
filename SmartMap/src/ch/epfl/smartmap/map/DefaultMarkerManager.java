@@ -197,16 +197,22 @@ public class DefaultMarkerManager implements MarkerManager {
         // In the list friendsToDisplay, search if each friend s already
         // displayed
         for (Displayable item : itemsToDisplay) {
+            Log.d("Markers", "search for markers");
             if (item instanceof Event) {
                 Log.d("Markers", "Display event !");
             }
             Marker marker;
+            Log.d("Markers", "search marker for " + item.getTitle());
+            Log.d("Markers", "location of " + item.getTitle() + "is " + item.getLocation());
+            Log.d("Markers", "latlng of " + item.getTitle() + "is " + item.getLatLng());
             // if the item is already displayed, get the marker for this
             // item, else add a new marker
             if (this.isDisplayedItem(item)) {
+                Log.d("Markers", "found marker for " + item.getTitle());
                 marker = this.getMarkerForItem(item);
             } else {
                 marker = this.addMarker(item, context);
+                Log.d("Markers", "not found marker for " + item.getTitle());
             }
             marker.setIcon(item.getMarkerIcon(context));
             this.animateMarker(marker, item.getLatLng(), false);
@@ -262,6 +268,7 @@ public class DefaultMarkerManager implements MarkerManager {
                 }
             }
         });
+
     }
 
 }
