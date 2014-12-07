@@ -20,8 +20,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -39,8 +38,8 @@ import com.facebook.widget.LoginButton;
  * {@linkplain ch.epfl.smartmap.activities.StartActivity} for screen 1.
  * </p>
  * <p>
- * On successful facebook login, we attempt to authenticate to the smartmap
- * server by sending the name, facebook id and facebook token.
+ * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name,
+ * facebook id and facebook token.
  * </p>
  * 
  * @author SpicyCH
@@ -95,15 +94,28 @@ public class LoginFragment extends Fragment {
                     Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
 
                     if (!LoginFragment.this.sendDataToServer(params)) {
-                        Toast.makeText(LoginFragment.this.getActivity(),
-                            LoginFragment.this.getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
+                        Toast.makeText(
+                            LoginFragment.this.getActivity(),
+                            LoginFragment.this
+                                .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
                             Toast.LENGTH_LONG).show();
                     } else {
-                        // If all is ok, start filling Cache
                         ServiceContainer.getCache().initFromDatabase(ServiceContainer.getDatabase());
-                        new updateCacheFromNetwork().execute();
-                    }
+                        ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient(),
+                            new NetworkRequestCallback() {
+                                @Override
+                                public void onFailure() {
+                                    Log.e(TAG, "Cannot update Cache from Network");
+                                    LoginFragment.this.startMainActivity();
+                                }
 
+                                @Override
+                                public void onSuccess() {
+                                    Log.d(TAG, "Successfully updated Cache from Network");
+                                    LoginFragment.this.startMainActivity();
+                                }
+                            });
+                    }
                 } else if (response.getError() != null) {
                     Log.e(TAG, "The user is null (authentication aborted?)");
                 }
@@ -141,7 +153,8 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 
         // Start animation and set login button
-        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(), R.anim.face_anim));
+        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(),
+            R.anim.face_anim));
         authButton.setFragment(this);
 
         // Not logged in Facebook or permission to use Facebook in SmartMap not
@@ -231,8 +244,9 @@ public class LoginFragment extends Fragment {
         } else {
             // An error occured
             Log.e(TAG, "Could not send user's data to server. Net down?");
-            Toast.makeText(this.getActivity(), this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet),
-                Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getActivity(),
+                this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet), Toast.LENGTH_LONG)
+                .show();
             return false;
         }
 
@@ -243,34 +257,6 @@ public class LoginFragment extends Fragment {
         Context currentActivity = this.getActivity().getBaseContext();
         Intent intent = new Intent(currentActivity, MainActivity.class);
         this.startActivity(intent);
-    }
-
-    /**
-     * The goal of this Task is to compute the location of the displayable
-     * multiple times on start so that
-     * they don't appear at false positions because of google locations.
-     * 
-     * @author jfperren
-     */
-    private class ComputeLocations extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            // TODO : Handle bug with markers at wrong place
-            for (User user : ServiceContainer.getCache().getAllFriends()) {
-                user.update(user.getImmutableCopy());
-            }
-            for (Event event : ServiceContainer.getCache().getAllEvents()) {
-                event.update(event.getImmutableCopy());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            // Create and start the next activity
-            LoginFragment.this.startMainActivity();
-        }
     }
 
     /**
@@ -322,23 +308,5 @@ public class LoginFragment extends Fragment {
             // Create and start the next activity
             LoginFragment.this.startMainActivity();
         }
-    }
-
-    private class updateCacheFromNetwork extends AsyncTask<Void, Void, Void> {
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            try {
-                ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient());
-            } catch (SmartMapClientException e) {
-                Log.e(TAG, "Just logged in but cannot update cache from network: " + e);
-            }
-            return null;
-        }
-
     }
 }

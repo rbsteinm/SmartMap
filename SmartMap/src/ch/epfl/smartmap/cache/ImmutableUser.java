@@ -12,14 +12,14 @@ import android.location.Location;
 public final class ImmutableUser {
 
     // User informations
-    private final long mId;
-    private final String mName;
-    private final String mPhoneNumber;
-    private final String mEmail;
-    private final String mLocationString;
-    private final Location mLocation;
-    private final Bitmap mImage;
-    private final boolean mIsBlocked;
+    private long mId;
+    private String mName;
+    private String mPhoneNumber;
+    private String mEmail;
+    private String mLocationString;
+    private Location mLocation;
+    private Bitmap mImage;
+    private boolean mIsBlocked;
 
     /**
      * Constructor, put {@code null} (or {@code User.NO_ID} for id) if you dont want the value to be taken
@@ -76,5 +76,10 @@ public final class ImmutableUser {
 
     public Boolean isBlocked() {
         return mIsBlocked;
+    }
+
+    public ImmutableUser setImage(Bitmap newImage) {
+        mImage = newImage;
+        return this;
     }
 }

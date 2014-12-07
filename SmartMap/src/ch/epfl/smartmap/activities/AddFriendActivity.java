@@ -21,10 +21,10 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
+import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
-import ch.epfl.smartmap.search.SearchRequestCallback;
-import ch.epfl.smartmap.servercom.NetworkRequestCallback;
 
 /**
  * This Activity displays a list of users from the DB and lets you send them
@@ -44,7 +44,8 @@ public class AddFriendActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_add_friend);
         // Set action bar color to main color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
@@ -122,6 +123,19 @@ public class AddFriendActivity extends ListActivity {
     private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
 
         @Override
+        public void onNetworkError() {
+            Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                "Couldn't find friends due to a network error. Please try again later.", Toast.LENGTH_LONG)
+                .show();
+        }
+
+        @Override
+        public void onNotFound() {
+            Toast.makeText(AddFriendActivity.this.getBaseContext(), "No user found for this query.",
+                Toast.LENGTH_LONG).show();
+        }
+
+        @Override
         public void onResult(final Set<User> result) {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
@@ -130,18 +144,6 @@ public class AddFriendActivity extends ListActivity {
                         new ArrayList<User>(result)));
                 }
             });
-        }
-
-        @Override
-        public void onNotFound() {
-            Toast.makeText(AddFriendActivity.this.getBaseContext(), "No user found for this query.", Toast.LENGTH_LONG)
-                .show();
-        }
-
-        @Override
-        public void onNetworkError() {
-            Toast.makeText(AddFriendActivity.this.getBaseContext(),
-                "Couldn't find friends due to a network error. Please try again later.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -158,15 +160,14 @@ public class AddFriendActivity extends ListActivity {
             ServiceContainer.getCache().inviteUser(params[0], new NetworkRequestCallback() {
 
                 @Override
-                public void onSuccess() {
-                    Toast
-                        .makeText(AddFriendActivity.this.getBaseContext(), "Friend request sent !", Toast.LENGTH_SHORT)
-                        .show();
+                public void onFailure() {
+                    Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                        "Friend request sent couldn't be sent.", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
-                public void onFailure() {
-                    Toast.makeText(AddFriendActivity.this.getBaseContext(), "Friend request sent couldn't be sent.",
+                public void onSuccess() {
+                    Toast.makeText(AddFriendActivity.this.getBaseContext(), "Friend request sent !",
                         Toast.LENGTH_SHORT).show();
                 }
             });

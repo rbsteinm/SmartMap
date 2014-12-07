@@ -11,9 +11,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
-import ch.epfl.smartmap.servercom.NetworkRequestCallback;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -93,7 +93,8 @@ public class Cache {
                 @Override
                 protected Void doInBackground(Long... params) {
                     try {
-                        ImmutableUser newFriend = ServiceContainer.getNetworkClient().acceptInvitation(params[0]);
+                        ImmutableUser newFriend =
+                            ServiceContainer.getNetworkClient().acceptInvitation(params[0]);
                         Cache.this.putFriend(newFriend);
                         mInvitingUserIds.remove(params[0]);
                         mFriendIds.add(params[0]);
@@ -351,13 +352,16 @@ public class Cache {
 
         // Initialize id Lists
         mFriendIds.addAll(database.getFriendIds());
+        Log.d(TAG, "Friend ids : " + mFriendIds);
         // mPublicEventIds.addAll(DatabaseHelper.getInstance().getEventIds());
 
         // Fill with database values
         for (long id : mFriendIds) {
+            Log.d(TAG, "Added friend : " + id);
             mUserInstances.put(id, new Friend(database.getFriend(id)));
         }
         for (long id : mEventIds) {
+            Log.d(TAG, "Added event : " + id);
             mEventInstances.put(id, new PublicEvent(database.getEvent(id)));
         }
 
@@ -368,14 +372,15 @@ public class Cache {
         }
     }
 
-    public void
-        inviteFriendsToEvent(final long eventId, final Set<Long> usersIds, final NetworkRequestCallback callback) {
+    public void inviteFriendsToEvent(final long eventId, final Set<Long> usersIds,
+        final NetworkRequestCallback callback) {
 
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, new ArrayList<Long>(usersIds));
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId,
+                        new ArrayList<Long>(usersIds));
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Couldn't invite friends to event:" + e.getMessage());
@@ -676,8 +681,8 @@ public class Cache {
                         }
 
                         EventInvitation invitation =
-                            new EventInvitation(0, creator.getId(), creator.getName(), params[0], e.getName(),
-                                Invitation.UNREAD);
+                            new EventInvitation(0, creator.getId(), creator.getName(), params[0],
+                                e.getName(), Invitation.UNREAD);
 
                         invitation.setId(ServiceContainer.getDatabase().addEventInvitation(invitation));
 
@@ -713,8 +718,8 @@ public class Cache {
                         }
 
                         EventInvitation invitation =
-                            new EventInvitation(0, creator.getId(), creator.getName(), params[0], e.getName(),
-                                Invitation.UNREAD);
+                            new EventInvitation(0, creator.getId(), creator.getName(), params[0],
+                                e.getName(), Invitation.UNREAD);
 
                         invitation.setId(ServiceContainer.getDatabase().addEventInvitation(invitation));
 
@@ -787,46 +792,54 @@ public class Cache {
         }
     }
 
-    public void updateFromNetwork(SmartMapClient networkClient) throws SmartMapClientException {
-        // TODO : Empty useless instances from Cache
+    public void updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                // TODO : Empty useless instances from Cache
+                try {
+                    // Fetch friend ids
+                    Set<Long> newFriendIds = new HashSet<Long>(networkClient.getFriendsIds());
 
-        // Fetch friend ids
-        Set<Long> newFriendIds = new HashSet<Long>(networkClient.getFriendsIds());
+                    // Remove friends that are no longer friends
+                    for (long id : mFriendIds) {
+                        if (!newFriendIds.contains(id)) {
+                            Cache.this.removeFriend(id);
+                        }
+                    }
 
-        // Remove friends that are no longer friends
-        for (long id : mFriendIds) {
-            if (!newFriendIds.contains(id)) {
-                this.removeFriend(id);
+                    // Sets new friend ids
+                    mFriendIds.clear();
+                    mFriendIds.addAll(newFriendIds);
+
+                    // Update each friends
+                    for (long id : newFriendIds) {
+                        User friend = Cache.this.getFriend(id);
+
+                        // Get online values
+                        ImmutableUser onlineValues = networkClient.getUserInfo(id);
+                        // Fetch Image
+                        Bitmap image = ServiceContainer.getNetworkClient().getProfilePicture(id);
+
+                        if (friend != null) {
+                            // Simply update
+                            friend.update(onlineValues.setImage(image));
+                        } else {
+                            // Add friend
+                            Cache.this.putFriend(onlineValues);
+                        }
+
+                    }
+
+                    // TODO : Update Events
+                    callback.onSuccess();
+                } catch (SmartMapClientException e) {
+                    Log.e(TAG, "SmartMapClientException : " + e);
+                    callback.onFailure();
+                }
+                return null;
             }
-        }
-
-        // Sets new friend ids
-        mFriendIds.clear();
-        mFriendIds.addAll(newFriendIds);
-
-        // Update each friends
-        for (long id : newFriendIds) {
-            User friend = this.getFriend(id);
-
-            // Get online values
-            ImmutableUser onlineValues = networkClient.getUserInfo(id);
-            if (friend != null) {
-                // Simply update
-                friend.update(onlineValues);
-            } else {
-                // Add friend
-                this.putFriend(onlineValues);
-                friend = this.getFriend(id);
-            }
-
-            if ((friend.getImage() == User.NO_IMAGE) || (friend.getImage() == null)) {
-                Bitmap image = networkClient.getProfilePicture(id);
-                // TODO set profile picture to the live instance (missing easy
-                // way to do it...)
-            }
-        }
-
-        // TODO : Update Events
+        }.execute();
     }
 
     public boolean updatePublicEvent(ImmutableEvent event) {
@@ -862,7 +875,8 @@ public class Cache {
 
                         // Set new friend profile picture ?
                         if (ServiceContainer.getSettingsManager().notificationsEnabled()
-                            && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations()) {
+                            && ServiceContainer.getSettingsManager()
+                                .notificationsForFriendshipConfirmations()) {
                             Notifications.acceptedFriendNotification(ctx, params[0]);
                         }
 
@@ -915,15 +929,16 @@ public class Cache {
                         try {
                             image = Cache.this.getUser(params[0].getId()).getImage();
                             if ((image == User.NO_IMAGE) || (image == null)) {
-                                image = ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
+                                image =
+                                    ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
                             }
                         } catch (SmartMapClientException e) {
                             Log.e(TAG, "Error retrieving profile picture of inviter: " + e.getMessage());
                             image = User.NO_IMAGE;
                         } finally {
                             FriendInvitation invitation =
-                                new FriendInvitation(0, params[0].getId(), params[0].getName(), Invitation.UNREAD,
-                                    image);
+                                new FriendInvitation(0, params[0].getId(), params[0].getName(),
+                                    Invitation.UNREAD, image);
 
                             invitation.setId(ServiceContainer.getDatabase().addFriendInvitation(invitation));
 

@@ -11,8 +11,8 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
+import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.search.CachedSearchEngine;
-import ch.epfl.smartmap.search.SearchRequestCallback;
 
 /**
  * This class creates different sort of notifications

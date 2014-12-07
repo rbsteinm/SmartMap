@@ -81,12 +81,12 @@ public class SetLocationActivity extends FragmentActivity {
 
             // Get my position from SettingsManager
             mMyPosition =
-                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
-                    .getSettingsManager().getLocation().getLongitude());
+                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(),
+                    ServiceContainer.getSettingsManager().getLocation().getLongitude());
 
             mEventPosition =
-                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
-                    .getSettingsManager().getLocation().getLongitude());
+                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(),
+                    ServiceContainer.getSettingsManager().getLocation().getLongitude());
 
             // Enabling MyLocation Layer of Google Map
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mMyPosition);
@@ -137,7 +137,8 @@ public class SetLocationActivity extends FragmentActivity {
                 List<Address> addresses;
 
                 try {
-                    addresses = geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
+                    addresses =
+                        geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
                     if (addresses.size() > 0) {
                         // Makes sure that an address is associated to the
                         // coordinates, the user could

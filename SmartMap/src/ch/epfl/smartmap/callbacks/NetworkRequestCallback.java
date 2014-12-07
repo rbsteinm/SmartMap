@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.servercom;
+package ch.epfl.smartmap.callbacks;
 
 /**
  * This interface must be implemented by objects interested by the
