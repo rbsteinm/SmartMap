@@ -10,7 +10,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
 public class NearEventsThread extends Thread {
 
     private static final String TAG = NearEventsThread.class.getSimpleName();
-    private final static int REFRESH_DELAY = 20000;
+    private static final int REFRESH_DELAY = 20000;
 
     @Override
     public void run() {
