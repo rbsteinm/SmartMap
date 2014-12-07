@@ -100,7 +100,8 @@ public class LoginFragment extends Fragment {
                             Toast.LENGTH_LONG).show();
                     } else {
                         // If all is ok, start filling Cache
-                        ServiceContainer.getCache().initFromDatabase();
+                        ServiceContainer.getCache().initFromDatabase(ServiceContainer.getDatabase());
+                        new updateCacheFromNetwork().execute();
                     }
 
                 } else if (response.getError() != null) {
@@ -321,5 +322,23 @@ public class LoginFragment extends Fragment {
             // Create and start the next activity
             LoginFragment.this.startMainActivity();
         }
+    }
+
+    private class updateCacheFromNetwork extends AsyncTask<Void, Void, Void> {
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            try {
+                ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient());
+            } catch (SmartMapClientException e) {
+                Log.e(TAG, "Just logged in but cannot update cache from network: " + e);
+            }
+            return null;
+        }
+
     }
 }

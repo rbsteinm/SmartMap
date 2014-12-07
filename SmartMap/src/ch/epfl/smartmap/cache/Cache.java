@@ -337,7 +337,7 @@ public class Cache {
         return users;
     }
 
-    public void initFromDatabase() {
+    public void initFromDatabase(DatabaseHelper database) {
         // Clear previous values
         mEventInstances.clear();
         mUserInstances.clear();
@@ -348,9 +348,6 @@ public class Cache {
         // Clear all sets
         mFriendIds.clear();
         mEventIds.clear();
-
-        // Get the database
-        DatabaseHelper database = ServiceContainer.getDatabase();
 
         // Initialize id Lists
         mFriendIds.addAll(database.getFriendIds());
