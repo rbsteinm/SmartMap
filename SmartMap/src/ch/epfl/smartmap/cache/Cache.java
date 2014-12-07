@@ -891,7 +891,7 @@ public class Cache {
                     try {
                         ServiceContainer.getNetworkClient().ackRemovedFriend(params[0]);
                     } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Couldn't ack removed friend: " + e.getMessage());
+                        Log.e(TAG, "Couldn't ack removed friend: " + e);
                     }
                     return null;
                 }
