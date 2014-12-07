@@ -28,8 +28,7 @@ public class FriendsPositionsThread extends Thread {
             try {
                 sleep(ServiceContainer.getSettingsManager().getRefreshFrequency());
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.e(TAG, "Can't sleep: " + e);
             }
         }
     }
