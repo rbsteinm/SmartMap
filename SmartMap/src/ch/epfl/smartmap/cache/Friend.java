@@ -240,8 +240,7 @@ public final class Friend implements User {
      */
     @Override
     public boolean isBlocked() {
-        // TODO Auto-generated method stub
-        return false;
+        return mIsBlocked;
     }
 
     /*
