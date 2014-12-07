@@ -38,7 +38,7 @@ public class PublicEvent implements Event {
 
     private List<Long> mParticipants;
 
-    public final static int DEFAULT_ICON = R.drawable.default_event;
+    public static final int DEFAULT_ICON = R.drawable.default_event;
 
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
