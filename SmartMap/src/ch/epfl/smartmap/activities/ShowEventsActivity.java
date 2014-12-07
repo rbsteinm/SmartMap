@@ -25,7 +25,6 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.EventViewHolder;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 
@@ -208,8 +207,6 @@ public class ShowEventsActivity extends ListActivity {
         // We need to intialize the two following Singletons to let espresso
         // tests pass.
         mContext = this.getApplicationContext();
-        SettingsManager.initialize(mContext);
-        DatabaseHelper.initialize(mContext);
 
         mMyName = SettingsManager.getInstance().getUserName();
 

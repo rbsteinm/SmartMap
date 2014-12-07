@@ -23,7 +23,6 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 import ch.epfl.smartmap.cache.ImmutableUser;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClient;
@@ -129,7 +128,7 @@ public class UpdateService extends Service {
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 public Void doInBackground(Void... params) {
-                    DatabaseHelper.getInstance().updateFromCache();
+                    ServiceContainer.getDatabase().updateFromCache();
                     return null;
                 }
             }.execute();
@@ -183,10 +182,6 @@ public class UpdateService extends Service {
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
         }
     };
-
-    private void loadSettings() {
-        mPosUpdateDelay = ServiceContainer.getSettingsManager().getRefreshFrequency();
-    }
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -261,6 +256,10 @@ public class UpdateService extends Service {
         if (isEnabled) {
             mHandler.postDelayed(friendsPosUpdate, HANDLER_DELAY);
         }
+    }
+
+    private void loadSettings() {
+        mPosUpdateDelay = ServiceContainer.getSettingsManager().getRefreshFrequency();
     }
 
     /**

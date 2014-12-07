@@ -14,9 +14,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 
 /**
@@ -37,9 +35,6 @@ public class InviteFriendsActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_invite_friends);
-
-        DatabaseHelper.initialize(this.getApplicationContext());
-        SettingsManager.initialize(this.getApplicationContext());
 
         // Makes the logo clickable (clicking it returns to previous activity)
         this.getActionBar().setHomeButtonEnabled(true);

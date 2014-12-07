@@ -18,7 +18,6 @@ import ch.epfl.smartmap.cache.History;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
@@ -65,7 +64,7 @@ public final class CachedSearchEngine implements SearchEngine {
                     return null;
                 } else {
                     // If not found, check in database
-                    ImmutableEvent databaseResult = DatabaseHelper.getInstance().getEvent(id);
+                    ImmutableEvent databaseResult = ServiceContainer.getDatabase().getEvent(id);
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache
@@ -125,7 +124,7 @@ public final class CachedSearchEngine implements SearchEngine {
                         result.add(event);
                     } else {
                         // If not found, check in database
-                        ImmutableEvent databaseResult = DatabaseHelper.getInstance().getEvent(id);
+                        ImmutableEvent databaseResult = ServiceContainer.getDatabase().getEvent(id);
 
                         if (databaseResult != null) {
                             immutableResult.add(databaseResult);
@@ -187,7 +186,7 @@ public final class CachedSearchEngine implements SearchEngine {
                     return null;
                 } else {
                     // If not found, check in database
-                    ImmutableUser databaseResult = DatabaseHelper.getInstance().getFriend(id);
+                    ImmutableUser databaseResult = ServiceContainer.getDatabase().getFriend(id);
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache

@@ -153,7 +153,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_PENDING = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING + "("
         + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
 
-    private static DatabaseHelper mInstance;
     private static SQLiteDatabase mDatabase;
     private final Context mContext;
 
@@ -836,18 +835,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return invitations;
     }
 
-    private void notifyOnInvitationListUpdateListeners() {
-        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
-            listener.onInvitationListUpdate();
-        }
-    }
-
-    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
-        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
-            listener.onInvitationStatusUpdate(id, status);
-        }
-    }
-
     /**
      * Fills the friend database with server data
      */
@@ -874,21 +861,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_ACCEPTED);
         db.execSQL(CREATE_TABLE_EVENT_INVITATIONS);
     }
-
-    // /**
-    // * Fully updates the friends database (not only positions)
-    // */
-    // public void refreshFriendsInfo() {
-    // List<User> friends = this.getAllFriends();
-    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-    // for (User f : friends) {
-    // try {
-    // this.updateUser(client.getUserInfo(f.getID()));
-    // } catch (SmartMapClientException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // }
 
     /**
      * Uses listFriendsPos() to update the entire friends database with updated
@@ -937,6 +909,21 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
         this.onCreate(db);
     }
+
+    // /**
+    // * Fully updates the friends database (not only positions)
+    // */
+    // public void refreshFriendsInfo() {
+    // List<User> friends = this.getAllFriends();
+    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+    // for (User f : friends) {
+    // try {
+    // this.updateUser(client.getUserInfo(f.getID()));
+    // } catch (SmartMapClientException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // }
 
     /**
      * Stores a profile picture
@@ -1105,27 +1092,15 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * @return The instance of DatabaseHelper
-     */
-    public static DatabaseHelper getInstance() {
-        return mInstance;
+    private void notifyOnInvitationListUpdateListeners() {
+        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
+            listener.onInvitationListUpdate();
+        }
     }
 
-    /**
-     * Initializes the database helper (should be called once when starting the
-     * app)
-     * 
-     * @param context
-     *            The app's context, needed to access the files
-     * @return The DatabaseHelper instance
-     */
-    public static DatabaseHelper initialize(Context context) {
-        if (mInstance == null) {
-            mInstance = new DatabaseHelper(context);
-            mDatabase = mInstance.getWritableDatabase();
+    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
+        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
+            listener.onInvitationStatusUpdate(id, status);
         }
-
-        return mInstance;
     }
 }

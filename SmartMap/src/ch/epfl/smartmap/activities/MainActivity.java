@@ -29,7 +29,6 @@ import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
@@ -239,22 +238,23 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         MenuItem item = mMenu.findItem(R.id.action_notifications);
         mIcon = (LayerDrawable) item.getIcon();
 
-        Utils.setBadgeCount(MainActivity.this, mIcon, DatabaseHelper.getInstance()
+        Utils.setBadgeCount(MainActivity.this, mIcon, ServiceContainer.getDatabase()
             .getFriendInvitationsByStatus(Invitation.UNREAD).size());
         // And set a Listener on InvitationList
-        DatabaseHelper.getInstance().addOnInvitationListUpdateListener(new OnInvitationListUpdateListener() {
-            @Override
-            public void onInvitationListUpdate() {
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Update LayerDrawable's BadgeDrawable
-                        Utils.setBadgeCount(MainActivity.this, mIcon, DatabaseHelper.getInstance()
-                            .getFriendInvitationsByStatus(Invitation.UNREAD).size());
-                    }
-                });
-            }
-        });
+        ServiceContainer.getDatabase().addOnInvitationListUpdateListener(
+            new OnInvitationListUpdateListener() {
+                @Override
+                public void onInvitationListUpdate() {
+                    MainActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Update LayerDrawable's BadgeDrawable
+                            Utils.setBadgeCount(MainActivity.this, mIcon, ServiceContainer.getDatabase()
+                                .getFriendInvitationsByStatus(Invitation.UNREAD).size());
+                        }
+                    });
+                }
+            });
 
         // Get Views
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -338,7 +338,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     @Override
     public void onInvitationListUpdate() {
         // Update LayerDrawable's BadgeDrawable
-        Utils.setBadgeCount(MainActivity.this, mIcon, DatabaseHelper.getInstance()
+        Utils.setBadgeCount(MainActivity.this, mIcon, ServiceContainer.getDatabase()
             .getFriendInvitationsByStatus(Invitation.UNREAD).size());
     }
 

@@ -37,7 +37,7 @@ public class InvitationsTab extends ListFragment {
 
     public InvitationsTab(Context context) {
         mContext = context;
-        mDBHelper = DatabaseHelper.initialize(mContext);
+
         // mNetworkClient = NetworkSmartMapClient.getInstance();
         // mDataBaseHelper = DatabaseHelper.initialize(mContext);
     }
@@ -52,12 +52,13 @@ public class InvitationsTab extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mDBHelper = DatabaseHelper.getInstance();
+        mDBHelper = ServiceContainer.getDatabase();
         mInvitationList = new ArrayList<FriendInvitation>();
         mInvitationList = mDBHelper.getUnansweredFriendInvitations();
 
         // Create custom Adapter and pass it to the Activity
-        FriendInvitationListItemAdapter adapter = new FriendInvitationListItemAdapter(mContext, mInvitationList);
+        FriendInvitationListItemAdapter adapter =
+            new FriendInvitationListItemAdapter(mContext, mInvitationList);
         this.setListAdapter(adapter);
 
         return view;
@@ -118,7 +119,8 @@ public class InvitationsTab extends ListFragment {
                 } catch (SmartMapClientException e) {
                     // TODO : Handle this case
                 }
-                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
+                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
+                    mInvitationList));
 
             }
         });
@@ -131,7 +133,8 @@ public class InvitationsTab extends ListFragment {
                 invitation.setStatus(Invitation.REFUSED);
                 mDBHelper.updateFriendInvitation(invitation);
                 mInvitationList = mDBHelper.getUnansweredFriendInvitations();
-                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
+                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
+                    mInvitationList));
             }
         });
 

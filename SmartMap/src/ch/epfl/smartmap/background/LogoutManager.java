@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.widget.Toast;
 import ch.epfl.smartmap.activities.StartActivity;
-import ch.epfl.smartmap.database.DatabaseHelper;
 
 import com.facebook.Session;
 
@@ -78,7 +77,7 @@ public final class LogoutManager {
         // Clear cache and database. Note: the preferences set in the SettingsActivity will be kept since they
         // are local
         // to the device.
-        DatabaseHelper.getInstance().clearAll();
+        ServiceContainer.getDatabase().clearAll();
         SettingsManager.getInstance().clearAll();
 
         // Close the FB session to avoid re-logging in automatically
