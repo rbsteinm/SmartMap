@@ -31,9 +31,9 @@ public class OwnPositionService extends Service {
     // minimum distance before gps updates are requested
     private static final float MIN_GPS_DISTANCE = 50;
     // Time between position updates on GPS
-    private int mGPSRefreshFrequency;
+    private static final int GPS_UPDATE_TIME = 5 * 60 * 1000;
     // Time between position updates on Network
-    private int mNetworkRefreshFrequency;
+    private static final int NETWORK_UPDATE_TIME = 10 * 1000;
 
     // Time before restart
     private static final int RESTART_DELAY = 2000;
@@ -154,13 +154,13 @@ public class OwnPositionService extends Service {
 
                 // Try to run LocationManager with Network Provider
                 if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                    mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                        mNetworkRefreshFrequency, MIN_NETWORK_DISTANCE, new MyLocationListener());
+                    mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_TIME,
+                        MIN_NETWORK_DISTANCE, new MyLocationListener());
                 }
 
                 // And try to run LocationManager with GPS Provider
                 if (mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, mGPSRefreshFrequency,
+                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME,
                         MIN_GPS_DISTANCE, new MyLocationListener());
                 }
             } else {
