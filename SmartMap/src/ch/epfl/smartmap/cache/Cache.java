@@ -338,7 +338,7 @@ public class Cache {
         return users;
     }
 
-    public void initFromDatabase() {
+    public void initFromDatabase(DatabaseHelper database) {
         // Clear previous values
         mEventInstances.clear();
         mUserInstances.clear();
@@ -349,9 +349,6 @@ public class Cache {
         // Clear all sets
         mFriendIds.clear();
         mEventIds.clear();
-
-        // Get the database
-        DatabaseHelper database = ServiceContainer.getDatabase();
 
         // Initialize id Lists
         mFriendIds.addAll(database.getFriendIds());
@@ -821,13 +818,17 @@ public class Cache {
 
                         // Get online values
                         ImmutableUser onlineValues = networkClient.getUserInfo(id);
+                        // Fetch Image
+                        Bitmap image = ServiceContainer.getNetworkClient().getProfilePicture(id);
+
                         if (friend != null) {
                             // Simply update
-                            friend.update(onlineValues);
+                            friend.update(onlineValues.setImage(image));
                         } else {
                             // Add friend
                             Cache.this.putFriend(onlineValues);
                         }
+
                     }
 
                     // TODO : Update Events
@@ -870,6 +871,8 @@ public class Cache {
                         // Bitmap image =
                         // ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
 
+                        Cache.this.putFriend(params[0]);
+
                         // Set new friend profile picture ?
                         if (ServiceContainer.getSettingsManager().notificationsEnabled()
                             && ServiceContainer.getSettingsManager()
@@ -902,7 +905,7 @@ public class Cache {
                     try {
                         ServiceContainer.getNetworkClient().ackRemovedFriend(params[0]);
                     } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Couldn't ack removed friend: " + e.getMessage());
+                        Log.e(TAG, "Couldn't ack removed friend: " + e);
                     }
                     return null;
                 }

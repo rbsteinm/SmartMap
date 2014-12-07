@@ -136,10 +136,14 @@ public class AddFriendActivity extends ListActivity {
         }
 
         @Override
-        public void onResult(Set<User> result) {
-            AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                new ArrayList<User>(result)));
-
+        public void onResult(final Set<User> result) {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
+                        new ArrayList<User>(result)));
+                }
+            });
         }
     }
 

@@ -20,8 +20,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -102,7 +100,7 @@ public class LoginFragment extends Fragment {
                                 .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
                             Toast.LENGTH_LONG).show();
                     } else {
-                        ServiceContainer.getCache().initFromDatabase();
+                        ServiceContainer.getCache().initFromDatabase(ServiceContainer.getDatabase());
                         ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient(),
                             new NetworkRequestCallback() {
                                 @Override
@@ -262,34 +260,6 @@ public class LoginFragment extends Fragment {
     }
 
     /**
-     * The goal of this Task is to compute the location of the displayable
-     * multiple times on start so that
-     * they don't appear at false positions because of google locations.
-     * 
-     * @author jfperren
-     */
-    private class ComputeLocations extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            // TODO : Handle bug with markers at wrong place
-            for (User user : ServiceContainer.getCache().getAllFriends()) {
-                user.update(user.getImmutableCopy());
-            }
-            for (Event event : ServiceContainer.getCache().getAllEvents()) {
-                event.update(event.getImmutableCopy());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            // Create and start the next activity
-            LoginFragment.this.startMainActivity();
-        }
-    }
-
-    /**
      * An AsyncTask to send the facebook user data to the SmartMap server
      * asynchronously
      * 
@@ -331,6 +301,12 @@ public class LoginFragment extends Fragment {
             Log.i(TAG, "User' infos sent to SmartMap server");
             return true;
 
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            // Create and start the next activity
+            LoginFragment.this.startMainActivity();
         }
     }
 }

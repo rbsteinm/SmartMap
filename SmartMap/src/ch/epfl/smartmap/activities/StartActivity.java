@@ -49,6 +49,18 @@ public class StartActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // Beware of the order in which services are created, Cache and
+        // InvitationManager depend on NetworkClient and DatabaseHelper in their
+        // constructors!
+        // TODO: This should be modified to allow complete switching or
+        // services, or be made explicit in their constructors.
+        ServiceContainer.setSettingsManager(new SettingsManager(this.getApplicationContext()));
+        ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
+        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplicationContext()));
+        ServiceContainer.setCache(new Cache());
+        ServiceContainer.setSearchEngine(new CachedSearchEngine());
+
         // Displays the facebook app hash in LOG.d
         try {
             Log.d(TAG, "Retrieving sha1 app hash...");

@@ -167,23 +167,22 @@ public class ShowEventsActivity extends ListActivity {
         String message =
             EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "start") + " - "
                 + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
-                + "\nCreated by " + ServiceContainer.getCache().getUser(event.getCreatorId()).getName()
-                + "\n\n" + event.getDescription();
+                + "\nCreated by " + ServiceContainer.getCache().getUser(event.getCreatorId()).getName() + "\n\n"
+                + event.getDescription();
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(event.getName()
             + " @ "
             + event.getLocationString()
             + "\n"
-            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
-                .getLatitude(), event.getLocation().getLongitude()) + " km away");
+            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation().getLatitude(), event
+                .getLocation().getLongitude()) + " km away");
         alertDialog.setMessage(message);
         final Activity activity = this;
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-            this.getString(R.string.show_event_on_the_map_button), new DialogInterface.OnClickListener() {
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, this.getString(R.string.show_event_on_the_map_button),
+            new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
-                    Toast.makeText(activity,
-                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                    Toast.makeText(activity, ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
                         Toast.LENGTH_SHORT).show();
                     Intent showEventIntent = new Intent(mContext, MainActivity.class);
                     showEventIntent.putExtra("location", event.getLocation());
@@ -285,8 +284,8 @@ public class ShowEventsActivity extends ListActivity {
                     }
                 } else {
                     Toast.makeText(this.getApplicationContext(),
-                        this.getString(R.string.show_event_cannot_retrieve_current_location),
-                        Toast.LENGTH_SHORT).show();
+                        this.getString(R.string.show_event_cannot_retrieve_current_location), Toast.LENGTH_SHORT)
+                        .show();
                 }
             }
         }

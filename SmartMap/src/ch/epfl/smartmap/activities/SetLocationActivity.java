@@ -140,7 +140,8 @@ public class SetLocationActivity extends FragmentActivity {
                     addresses =
                         geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
                     if (addresses.size() > 0) {
-                        // Makes sure that an address is associated to the coordinates, the user could
+                        // Makes sure that an address is associated to the
+                        // coordinates, the user could
                         // have long
                         // clicked in the middle of the sea after all :)
                         cityName = addresses.get(0).getLocality();

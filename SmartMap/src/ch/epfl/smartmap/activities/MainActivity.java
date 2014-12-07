@@ -54,7 +54,8 @@ import com.google.android.gms.maps.model.Marker;
 /**
  * This Activity displays the core features of the App. It displays the map and
  * the whole menu.
- * It is a FriendsLocationListener to update the markers on the map when friends positions
+ * It is a FriendsLocationListener to update the markers on the map when friends
+ * positions
  * change
  * 
  * @author jfperren
@@ -152,7 +153,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     @Override
     protected void onPause() {
         super.onPause();
-        // TODO A method to unregister to the service when the map is not opened?
+        // TODO A method to unregister to the service when the map is not
+        // opened?
         // this.unregisterReceiver(mBroadcastReceiver);
         // stopService(mUpdateServiceIntent);
     }
@@ -161,7 +163,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     protected void onResume() {
         super.onResume();
         // startService(mUpdateServiceIntent);
-        // this.registerReceiver(mBroadcastReceiver, new IntentFilter(UpdateService.BROADCAST_POS));
+        // this.registerReceiver(mBroadcastReceiver, new
+        // IntentFilter(UpdateService.BROADCAST_POS));
         if (mGoogleMap != null) {
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
         }

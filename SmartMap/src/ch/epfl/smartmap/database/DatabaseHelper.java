@@ -168,7 +168,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME + "_" + ServiceContainer.getSettingsManager().getUserID(), null,
             DATABASE_VERSION);
         mContext = context;
-        mDatabase = this.getReadableDatabase();
+        mDatabase = this.getWritableDatabase();
         this.onCreate(mDatabase);
     }
 
