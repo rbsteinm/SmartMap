@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 import ch.epfl.smartmap.map.DefaultZoomManager;
@@ -74,8 +73,7 @@ public class EventInformationActivity extends FragmentActivity {
         } else {
             // Google Play Services are available.
             // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap =
-                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.show_event_map);
+            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.show_event_map);
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
@@ -84,8 +82,9 @@ public class EventInformationActivity extends FragmentActivity {
             mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
             mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-            Log.d("DEBUG_POSITION", "latitude : " + SettingsManager.getInstance().getLocation().getLatitude()
-                + "\n longitude : " + SettingsManager.getInstance().getLocation().getLongitude());
+            // Good position ??
+            Log.d("DEBUG_POSITION", "latitude : " + ServiceContainer.getSettingsManager().getLocation().getLatitude()
+                + "\n longitude : " + ServiceContainer.getSettingsManager().getLocation().getLongitude());
 
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEvent.getLatLng());
 
@@ -160,8 +159,7 @@ public class EventInformationActivity extends FragmentActivity {
             + ServiceContainer.getCache().getFriend(mEvent.getCreatorId()).getName());
 
         mStart = (TextView) this.findViewById(R.id.show_event_info_start);
-        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(),
-            "start"));
+        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "start"));
 
         mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
         mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));

@@ -23,12 +23,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.util.Log;
-import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 
 /**
- * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider} to communicate with a SmartMap
+ * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider}
+ * to communicate with a SmartMap
  * server.
  * 
  * @author marion-S
@@ -222,16 +223,16 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         HttpURLConnection conn = this.getHttpURLConnection("/auth");
         String response = this.sendViaPost(params, conn);
 
-        SettingsManager.getInstance().setUserName(name);
-        SettingsManager.getInstance().setFacebookID(facebookId);
-        SettingsManager.getInstance().setToken(fbAccessToken);
+        ServiceContainer.getSettingsManager().setUserName(name);
+        ServiceContainer.getSettingsManager().setFacebookID(facebookId);
+        ServiceContainer.getSettingsManager().setToken(fbAccessToken);
 
         SmartMapParser parser = null;
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
             long id = parser.parseId(response);
-            SettingsManager.getInstance().setUserID(id);
+            ServiceContainer.getSettingsManager().setUserID(id);
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
         } catch (SmartMapParseException e) {
@@ -559,8 +560,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     }
 
     @Override
-    public List<Long> getPublicEvents(double latitude, double longitude, double radius)
-        throws SmartMapClientException {
+    public List<Long> getPublicEvents(double latitude, double longitude, double radius) throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("latitude", Double.toString(latitude));
@@ -826,8 +826,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      *             in case the response could not be retrieved for any reason
      *             external to the application (network failure etc.)
      */
-    private String sendViaPost(Map<String, String> params, HttpURLConnection connection)
-        throws SmartMapClientException {
+    private String sendViaPost(Map<String, String> params, HttpURLConnection connection) throws SmartMapClientException {
         String response = null;
         try {
             connection.setRequestMethod("POST");

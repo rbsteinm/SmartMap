@@ -39,8 +39,8 @@ import com.facebook.widget.LoginButton;
  * {@linkplain ch.epfl.smartmap.activities.StartActivity} for screen 1.
  * </p>
  * <p>
- * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name,
- * facebook id and facebook token.
+ * On successful facebook login, we attempt to authenticate to the smartmap
+ * server by sending the name, facebook id and facebook token.
  * </p>
  * 
  * @author SpicyCH
@@ -95,10 +95,8 @@ public class LoginFragment extends Fragment {
                     Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
 
                     if (!LoginFragment.this.sendDataToServer(params)) {
-                        Toast.makeText(
-                            LoginFragment.this.getActivity(),
-                            LoginFragment.this
-                                .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
+                        Toast.makeText(LoginFragment.this.getActivity(),
+                            LoginFragment.this.getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
                             Toast.LENGTH_LONG).show();
                     } else {
                         // If all is ok, start filling Cache
@@ -142,8 +140,7 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 
         // Start animation and set login button
-        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(),
-            R.anim.face_anim));
+        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(), R.anim.face_anim));
         authButton.setFragment(this);
 
         // Not logged in Facebook or permission to use Facebook in SmartMap not
@@ -233,9 +230,8 @@ public class LoginFragment extends Fragment {
         } else {
             // An error occured
             Log.e(TAG, "Could not send user's data to server. Net down?");
-            Toast.makeText(this.getActivity(),
-                this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet), Toast.LENGTH_LONG)
-                .show();
+            Toast.makeText(this.getActivity(), this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet),
+                Toast.LENGTH_LONG).show();
             return false;
         }
 
@@ -318,6 +314,12 @@ public class LoginFragment extends Fragment {
             Log.i(TAG, "User' infos sent to SmartMap server");
             return true;
 
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            // Create and start the next activity
+            LoginFragment.this.startMainActivity();
         }
     }
 }
