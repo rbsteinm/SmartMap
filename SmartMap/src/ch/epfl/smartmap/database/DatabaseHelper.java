@@ -31,6 +31,7 @@ import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableFilter;
+import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.User;
@@ -446,6 +447,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 long id = cursor.getLong(cursor.getColumnIndex(KEY_ID));
+
                 invitation =
                     new AcceptedFriendInvitation(id, cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
                         cursor.getString(cursor.getColumnIndex(KEY_NAME)), this.getPictureById(id));
@@ -578,11 +580,17 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         EventInvitation invitation = null;
         if (cursor.moveToFirst()) {
             do {
-                invitation =
-                    new EventInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)), cursor.getLong(cursor
-                        .getColumnIndex(KEY_USER_ID)), cursor.getString(cursor.getColumnIndex(KEY_NAME)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_EVENT_ID)), cursor.getString(cursor
-                            .getColumnIndex(KEY_EVENT_NAME)), cursor.getInt(cursor.getColumnIndex(KEY_STATUS)));
+                long creatorId = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
+                int status = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
+                String eventName = cursor.getString(cursor.getColumnIndex(KEY_EVENT_NAME));
+                long eventId = cursor.getInt(cursor.getColumnIndex(KEY_EVENT_ID));
+
+                ImmutableInvitation immInvit = new ImmutableInvitation(creatorId, status);
+
+                ImmutableEvent event =
+                    new ImmutableEvent(eventId, eventName, creatorId, "", null, null, null, "", null);
+
+                invitation = new EventInvitation(immInvit, event);
 
                 invitations.add(invitation);
             } while (cursor.moveToNext());

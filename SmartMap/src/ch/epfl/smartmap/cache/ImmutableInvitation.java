@@ -11,7 +11,7 @@ package ch.epfl.smartmap.cache;
 public final class ImmutableInvitation {
 
     // Invitation informations
-    private final ImmutableUser mUser;
+    private final long mUserId;
     private int mStatus;
 
     /**
@@ -19,8 +19,8 @@ public final class ImmutableInvitation {
      * want the value to be taken
      * into account.
      */
-    public ImmutableInvitation(ImmutableUser user, int status) {
-        mUser = user;
+    public ImmutableInvitation(long userId, int status) {
+        mUserId = userId;
         mStatus = status;
     }
 
@@ -28,8 +28,8 @@ public final class ImmutableInvitation {
         return mStatus;
     }
 
-    public ImmutableUser getUser() {
-        return mUser;
+    public long getUser() {
+        return mUserId;
     }
 
     public void setStatus(int newStatus) {
