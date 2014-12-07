@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
-import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
@@ -21,7 +20,6 @@ public class FriendInvitation implements Invitation {
     private int mStatus;
 
     public FriendInvitation(ImmutableInvitation invitation) {
-        super();
         mUserId = invitation.getUser();
         mStatus = invitation.getStatus();
     }
@@ -62,8 +60,12 @@ public class FriendInvitation implements Invitation {
 
     @Override
     public ImmutableUser getUser() {
-        Log.d(TAG, "User id :" + mUserId + "\n All users : " + ServiceContainer.getCache().getAllFriends());
-        return ServiceContainer.getCache().getUser(mUserId).getImmutableCopy();
+        if (ServiceContainer.getCache().getUser(mUserId) != null) {
+            return ServiceContainer.getCache().getUser(mUserId).getImmutableCopy();
+        } else {
+            // FIXME : what to do when not in cache
+            return new ImmutableUser(mUserId, null, null, null, null, null, null, false);
+        }
     }
 
     @Override

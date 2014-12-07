@@ -50,7 +50,12 @@ public class AcceptedFriendInvitation implements Invitation {
 
     @Override
     public ImmutableUser getUser() {
-        return ServiceContainer.getCache().getUser(mUserId).getImmutableCopy();
+        if (ServiceContainer.getCache().getUser(mUserId) != null) {
+            return ServiceContainer.getCache().getUser(mUserId).getImmutableCopy();
+        } else {
+            // FIXME : what to do when not in cache
+            return new ImmutableUser(mUserId, null, null, null, null, null, null, false);
+        }
     }
 
     @Override
