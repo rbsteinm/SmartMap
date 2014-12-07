@@ -34,18 +34,4 @@ public interface Filter extends Displayable {
 
     void update(ImmutableFilter filter);
 
-    /**
-     * @param newName
-     */
-    void setName(String newName);
-
-    /**
-     * @param isActive
-     */
-    void setActive(boolean isActive);
-
-    /**
-     * @param newFriend
-     */
-    void removeFriend(long newFriend);
 }

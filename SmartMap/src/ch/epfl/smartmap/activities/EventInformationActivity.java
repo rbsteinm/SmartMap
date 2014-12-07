@@ -10,8 +10,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 import ch.epfl.smartmap.map.DefaultZoomManager;
@@ -28,151 +28,151 @@ import com.google.android.gms.maps.SupportMapFragment;
  */
 public class EventInformationActivity extends FragmentActivity {
 
-	private static final String TAG = EventInformationActivity.class.getSimpleName();
+    private static final String TAG = EventInformationActivity.class.getSimpleName();
 
-	private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-	static final int PICK_LOCATION_REQUEST = 1;
+    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+    static final int PICK_LOCATION_REQUEST = 1;
 
-	private GoogleMap mGoogleMap;
-	private SupportMapFragment mFragmentMap;
-	private Event mEvent;
-	private TextView mEventTitle;
-	private TextView mEventCreator;
-	private TextView mStart;
-	private TextView mEnd;
-	private TextView mEventDescription;
-	private TextView mPlaceNameAndCountry;
+    private GoogleMap mGoogleMap;
+    private SupportMapFragment mFragmentMap;
+    private Event mEvent;
+    private TextView mEventTitle;
+    private TextView mEventCreator;
+    private TextView mStart;
+    private TextView mEnd;
+    private TextView mEventDescription;
+    private TextView mPlaceNameAndCountry;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.activity_show_event_information);
-		this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_show_event_information);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-		if (this.getIntent().getParcelableExtra("event") != null) {
-			long eventId = this.getIntent().getParcelableExtra("EVENT");
-			mEvent = Cache.getInstance().getPublicEvent(eventId);
-			Log.d(TAG, "City name: " + mEvent.getLocationString());
-			Log.d(TAG, "Country name: " + "UNIMPLEMENTED");
-		}
+        if (this.getIntent().getParcelableExtra("event") != null) {
+            long eventId = this.getIntent().getParcelableExtra("EVENT");
+            mEvent = ServiceContainer.getCache().getPublicEvent(eventId);
+            Log.d(TAG, "City name: " + mEvent.getLocationString());
+            Log.d(TAG, "Country name: " + "UNIMPLEMENTED");
+        }
 
-		if (mEvent != null) {
-			this.initializeGUI();
-		}
-	}
+        if (mEvent != null) {
+            this.initializeGUI();
+        }
+    }
 
-	/**
-	 * Triggered when the user clicks the "Invite friends" button.<br />
-	 * It launches InviteFriendsActivity for a result.
-	 * 
-	 * @param v
-	 * @author SpicyCH
-	 */
-	public void inviteFriendsToEvent(View v) {
-		Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
-		this.startActivityForResult(inviteFriends, 1);
-	}
+    /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+            // not available
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+            dialog.show();
+        } else {
+            // Google Play Services are available.
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            mFragmentMap =
+                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.show_event_map);
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = mFragmentMap.getMap();
+            // Enabling MyLocation Layer of Google Map
+            mGoogleMap.setMyLocationEnabled(true);
 
-	@Override
-	public void onBackPressed() {
-		if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
-			this.startActivity(new Intent(this, MainActivity.class));
-		}
-		this.finish();
-	}
+            mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+            mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		this.getMenuInflater().inflate(R.menu.show_event_information, menu);
-		return true;
-	}
+            Log.d("DEBUG_POSITION", "latitude : " + SettingsManager.getInstance().getLocation().getLatitude()
+                + "\n longitude : " + SettingsManager.getInstance().getLocation().getLongitude());
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEvent.getLatLng());
 
-		switch (item.getItemId()) {
-			case R.id.action_settings:
-				return true;
-			case android.R.id.home:
-				if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
-					this.startActivity(new Intent(this, MainActivity.class));
-				}
-				this.finish();
-			default:
-				break;
-		}
+        }
+    }
 
-		return super.onOptionsItemSelected(item);
-	}
+    /**
+     * Triggered when the user clicks the "Invite friends" button.<br />
+     * It launches InviteFriendsActivity for a result.
+     * 
+     * @param v
+     * @author SpicyCH
+     */
+    public void inviteFriendsToEvent(View v) {
+        Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
+        this.startActivityForResult(inviteFriends, 1);
+    }
 
-	public void openMapAtEventLocation(View v) {
-		Intent showEventIntent = new Intent(this, MainActivity.class);
-		showEventIntent.putExtra("location", mEvent.getLocation());
-		this.startActivity(showEventIntent);
-	}
+    @Override
+    public void onBackPressed() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+        this.finish();
+    }
 
-	/**
-	 * Initializes the different views of this activity.
-	 * 
-	 * @author SpicyCH
-	 */
-	private void initializeGUI() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.show_event_information, menu);
+        return true;
+    }
 
-		this.setTitle(mEvent.getName());
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-		mEventTitle = (TextView) this.findViewById(R.id.show_event_info_event_name);
-		mEventTitle.setText(mEvent.getName());
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case android.R.id.home:
+                if (this.getIntent().getBooleanExtra("NOTIFICATION", false) == true) {
+                    this.startActivity(new Intent(this, MainActivity.class));
+                }
+                this.finish();
+            default:
+                break;
+        }
 
-		mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
-		mEventCreator.setText(this.getString(R.string.show_event_by) + " "
-		    + Cache.getInstance().getFriend(mEvent.getCreatorId()).getName());
+        return super.onOptionsItemSelected(item);
+    }
 
-		mStart = (TextView) this.findViewById(R.id.show_event_info_start);
-		mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(),
-		    "start"));
+    public void openMapAtEventLocation(View v) {
+        Intent showEventIntent = new Intent(this, MainActivity.class);
+        showEventIntent.putExtra("location", mEvent.getLocation());
+        this.startActivity(showEventIntent);
+    }
 
-		mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
-		mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));
+    /**
+     * Initializes the different views of this activity.
+     * 
+     * @author SpicyCH
+     */
+    private void initializeGUI() {
 
-		mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
-		mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ": "
-		    + mEvent.getDescription());
+        this.setTitle(mEvent.getName());
 
-		mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
-		mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");
+        mEventTitle = (TextView) this.findViewById(R.id.show_event_info_event_name);
+        mEventTitle.setText(mEvent.getName());
 
-		this.displayMap();
-	}
+        mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
+        mEventCreator.setText(this.getString(R.string.show_event_by) + " "
+            + ServiceContainer.getCache().getFriend(mEvent.getCreatorId()).getName());
 
-	/**
-	 * Display the map with the current location
-	 */
-	public void displayMap() {
-		int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-		// Showing status
-		if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-			// not available
-			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-			dialog.show();
-		} else {
-			// Google Play Services are available.
-			// Getting reference to the SupportMapFragment of activity_main.xml
-			mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(
-			    R.id.show_event_map);
-			// Getting GoogleMap object from the fragment
-			mGoogleMap = mFragmentMap.getMap();
-			// Enabling MyLocation Layer of Google Map
-			mGoogleMap.setMyLocationEnabled(true);
+        mStart = (TextView) this.findViewById(R.id.show_event_info_start);
+        mStart.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(),
+            "start"));
 
-			mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
-			mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
+        mEnd.setText(EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), "end"));
 
-			Log.d("DEBUG_POSITION", "latitude : " + SettingsManager.getInstance().getLocation().getLatitude()
-			    + "\n longitude : " + SettingsManager.getInstance().getLocation().getLongitude());
+        mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
+        mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ": "
+            + mEvent.getDescription());
 
-			new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEvent.getLatLng());
+        mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
+        mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");
 
-		}
-	}
+        this.displayMap();
+    }
 }

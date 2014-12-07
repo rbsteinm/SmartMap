@@ -301,8 +301,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mEventMarkerManager.updateMarkers(MainActivity.this, ServiceContainer.getCache()
-                    .getAllVisibleEvents());
+                mEventMarkerManager.updateMarkers(MainActivity.this, new ArrayList<Displayable>(
+                    ServiceContainer.getCache().getAllVisibleEvents()));
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -327,8 +327,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mFriendMarkerManager.updateMarkers(MainActivity.this, ServiceContainer.getCache()
-                    .getAllVisibleFriends());
+                mFriendMarkerManager.updateMarkers(MainActivity.this, new ArrayList<Displayable>(
+                    ServiceContainer.getCache().getAllVisibleFriends()));
                 // MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
             }

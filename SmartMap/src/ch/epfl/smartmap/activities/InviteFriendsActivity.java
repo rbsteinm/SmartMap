@@ -13,8 +13,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
@@ -133,12 +133,11 @@ public class InviteFriendsActivity extends ListActivity {
      * @author SpicyCH
      */
     private void setAdapter() {
-        mUserList = Cache.getInstance().getAllFriends();
+        mUserList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
 
         // Create a new list of booleans with the size of the user list and and default value false
         mSelectedPositions = new ArrayList<Boolean>();
-        for (@SuppressWarnings("unused")
-        User u : mUserList) {
+        for (int i = 0; i < mUserList.size(); i++) {
             mSelectedPositions.add(false);
         }
 

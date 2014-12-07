@@ -156,33 +156,6 @@ public class DefaultFilter implements Filter {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Filter#removeFriend(long)
-     */
-    @Override
-    public void removeFriend(long newFriend) {
-        mIds.remove(newFriend);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Filter#setActive(boolean)
-     */
-    @Override
-    public void setActive(boolean isActive) {
-        mIsActive = isActive;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Filter#setName(java.lang.String)
-     */
-    @Override
-    public void setName(String newName) {
-        mName = newName;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Filter#update(ch.epfl.smartmap.cache.ImmutableFilter)
      */
     @Override

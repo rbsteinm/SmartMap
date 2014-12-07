@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -34,7 +33,7 @@ import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
 import ch.epfl.smartmap.map.DefaultZoomManager;
-import ch.epfl.smartmap.servercom.SmartMapClientException;
+import ch.epfl.smartmap.servercom.NetworkRequestCallback;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -76,6 +75,135 @@ public class AddEventActivity extends FragmentActivity {
 
     private TextWatcher mTextChangedListener;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_add_event);
+
+        // Makes the logo clickable (clicking it returns to previous activity)
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        this.initializeGUIComponents();
+
+        mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
+
+            @Override
+            public void onMapClick(LatLng position) {
+                if (mEventPosition != null) {
+                    mGoogleMap.clear();
+                }
+                Intent setLocationIntent = new Intent(AddEventActivity.this, SetLocationActivity.class);
+                AddEventActivity.this.startActivityForResult(setLocationIntent, PICK_LOCATION_REQUEST);
+            }
+        });
+
+        Bundle extras = this.getIntent().getExtras();
+        if (extras != null) {
+            LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
+            if ((latLng != null) && (Math.abs(latLng.latitude) > 0)) {
+                // The user long clicked the map in MainActivity and wants to
+                // create an event
+                this.updateLocation(this.getIntent());
+            }
+        }
+    }
+
+    /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+            // not available
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+            dialog.show();
+        } else {
+            // Google Play Services are available.
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            mFragmentMap =
+                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = mFragmentMap.getMap();
+            // Enabling MyLocation Layer of Google Map
+            mGoogleMap.setMyLocationEnabled(true);
+
+            mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
+            mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+            Log.d("DEBUG_POSITION", "latitude : " + SettingsManager.getInstance().getLocation().getLatitude()
+                + "\n longitude : " + SettingsManager.getInstance().getLocation().getLongitude());
+
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(SettingsManager.getInstance()
+                .getLocation().getLatitude(), SettingsManager.getInstance().getLocation().getLongitude()));
+
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case PICK_LOCATION_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    // All went smoothly, update location in this activity
+                    this.updateLocation(data);
+
+                } else {
+                    // Google wasn't able to retrieve the location name
+                    // associated to the coordinates
+                    Toast
+                        .makeText(mContext,
+                            this.getString(R.string.add_event_toast_couldnt_retrieve_location),
+                            Toast.LENGTH_LONG).show();
+                    mPlaceName.setText("");
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.add_event, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                break;
+            case R.id.addEventButtonCreateEvent:
+                this.createEvent();
+                break;
+            default:
+                // No other menu items!
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void pickLocation(View v) {
+        Toast.makeText(mContext,
+            this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
+            Toast.LENGTH_LONG).show();
+
+        Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
+        pickLocationIntent.putExtra("pickLocationForEvent", true);
+        pickLocationIntent.setType(Context.LOCATION_SERVICE);
+        this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
+    }
+
     /**
      * Ensures the end of the event is after its start and end of the event is
      * not in the past. Displays a
@@ -88,7 +216,8 @@ public class AddEventActivity extends FragmentActivity {
      * @param endTime
      * @author SpicyCH
      */
-    private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
+    private void
+        checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
 
         if (this.isValidDate(endDate.getText().toString()) && this.isValidTime(endTime.getText().toString())) {
             // The end of the event has been set by the user
@@ -111,7 +240,8 @@ public class AddEventActivity extends FragmentActivity {
                 endDate.setText("");
                 endTime.setText("");
 
-                Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
+                Toast.makeText(mContext,
+                    this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
                     Toast.LENGTH_LONG).show();
             } else if (end.before(now)) {
                 // The user is trying to create an event in the past
@@ -119,8 +249,9 @@ public class AddEventActivity extends FragmentActivity {
                 endDate.setText("");
                 endTime.setText("");
 
-                Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_end_cannot_be_in_past),
-                    Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext,
+                    this.getString(R.string.add_event_toast_event_end_cannot_be_in_past), Toast.LENGTH_LONG)
+                    .show();
             }
         }
 
@@ -136,20 +267,22 @@ public class AddEventActivity extends FragmentActivity {
             || (mEventPosition.longitude == 0.0)
             || ("".equals(mPlaceName.getText().toString()) || "".equals(mEventName.getText().toString()))) {
 
-            Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set), Toast.LENGTH_SHORT)
-                .show();
+            Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set),
+                Toast.LENGTH_SHORT).show();
 
             Log.d(TAG, "Couldn't create a new event because not all fields have been set.\n" + "end date: "
-                + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString() + "\n"
-                + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
+                + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
+                + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
                 + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
                 + mEventPosition.longitude);
         } else {
 
             GregorianCalendar startDate =
-                this.getDateFromTextFormat(mPickStartDate.getText().toString(), mPickStartTime.getText().toString());
+                this.getDateFromTextFormat(mPickStartDate.getText().toString(), mPickStartTime.getText()
+                    .toString());
             GregorianCalendar endDate =
-                this.getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime.getText().toString());
+                this.getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime.getText()
+                    .toString());
 
             Location location = new Location("Location set by user");
             location.setLatitude(mEventPosition.latitude);
@@ -157,75 +290,29 @@ public class AddEventActivity extends FragmentActivity {
             SettingsManager setMng = SettingsManager.getInstance();
 
             ImmutableEvent ev =
-                new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), setMng.getUserID(), mDescription
-                    .getText().toString(), startDate, endDate, location, mPlaceName.getText().toString(),
-                    PublicEvent.NO_PARTICIPANTS);
+                new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), setMng.getUserID(),
+                    mDescription.getText().toString(), startDate, endDate, location, mPlaceName.getText()
+                        .toString(), PublicEvent.NO_PARTICIPANTS);
 
             // Create the event on our server and set the cache accordingly
-            AsyncTask<ImmutableEvent, Void, Boolean> createEventTask = new AsyncTask<ImmutableEvent, Void, Boolean>() {
-
+            ServiceContainer.getCache().createEvent(ev, new NetworkRequestCallback() {
                 @Override
-                protected Boolean doInBackground(ImmutableEvent... params) {
-                    try {
-                        // TODO call createEvent in cache
-                        ServiceContainer.getCache().addMyEvent(id);
-                        return (id > 0);
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, e.getMessage());
-                        return false;
-                    }
-                }
-
-                @Override
-                protected void onPostExecute(Boolean b) {
-                    if (b) {
-
-                        Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
-                            Toast.LENGTH_SHORT).show();
-
-                        mActivity.finish();
-
-                    } else {
-                        Toast.makeText(mContext,
+                public void onFailure() {
+                    Toast
+                        .makeText(
+                            mContext,
                             "Couldn't not create your event. The error occurred on our server and we are sorry :(",
                             Toast.LENGTH_SHORT).show();
-                    }
                 }
 
-            };
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
+                        Toast.LENGTH_SHORT).show();
 
-            createEventTask.execute(ev);
-        }
-    }
-
-    /**
-     * Display the map with the current location
-     */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            // Enabling MyLocation Layer of Google Map
-            mGoogleMap.setMyLocationEnabled(true);
-
-            mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
-            mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
-
-            Log.d("DEBUG_POSITION", "latitude : " + SettingsManager.getInstance().getLocation().getLatitude()
-                + "\n longitude : " + SettingsManager.getInstance().getLocation().getLongitude());
-
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(SettingsManager.getInstance()
-                .getLocation().getLatitude(), SettingsManager.getInstance().getLocation().getLongitude()));
-
+                    mActivity.finish();
+                }
+            });
         }
     }
 
@@ -245,8 +332,8 @@ public class AddEventActivity extends FragmentActivity {
         String[] s2 = hourMinute.split(":");
         // Don't forget to substract 1 to the month in text format
         GregorianCalendar date =
-            new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1, Integer.parseInt(s1[0]),
-                Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
+            new GregorianCalendar(Integer.parseInt(s1[2]), Integer.parseInt(s1[1]) - 1,
+                Integer.parseInt(s1[0]), Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
 
         return date;
     }
@@ -268,8 +355,8 @@ public class AddEventActivity extends FragmentActivity {
         mPlaceName.setFocusable(true);
         // Initialize mEventPosition to position of user
         mEventPosition =
-            new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager.getInstance()
-                .getLocation().getLongitude());
+            new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
+                .getInstance().getLocation().getLongitude());
 
         mTextChangedListener = new TextWatcher() {
 
@@ -280,7 +367,8 @@ public class AddEventActivity extends FragmentActivity {
                 mPickEndDate.removeTextChangedListener(mTextChangedListener);
                 mPickStartDate.removeTextChangedListener(mTextChangedListener);
 
-                AddEventActivity.this.checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
+                AddEventActivity.this.checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate,
+                    mPickEndTime);
 
                 // Reset the TextChangedListener
                 mPickEndDate.addTextChangedListener(mTextChangedListener);
@@ -356,100 +444,6 @@ public class AddEventActivity extends FragmentActivity {
     private boolean isValidTime(String s) {
         String[] sArray = s.split(":");
         return sArray.length == ELEMENTS_HH_MM;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case PICK_LOCATION_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    // All went smoothly, update location in this activity
-                    this.updateLocation(data);
-
-                } else {
-                    // Google wasn't able to retrieve the location name
-                    // associated to the coordinates
-                    Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location),
-                        Toast.LENGTH_LONG).show();
-                    mPlaceName.setText("");
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_add_event);
-
-        // Makes the logo clickable (clicking it returns to previous activity)
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
-        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        this.initializeGUIComponents();
-
-        mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
-
-            @Override
-            public void onMapClick(LatLng position) {
-                if (mEventPosition != null) {
-                    mGoogleMap.clear();
-                }
-                Intent setLocationIntent = new Intent(AddEventActivity.this, SetLocationActivity.class);
-                AddEventActivity.this.startActivityForResult(setLocationIntent, PICK_LOCATION_REQUEST);
-            }
-        });
-
-        Bundle extras = this.getIntent().getExtras();
-        if (extras != null) {
-            LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
-            if ((latLng != null) && (Math.abs(latLng.latitude) > 0)) {
-                // The user long clicked the map in MainActivity and wants to
-                // create an event
-                this.updateLocation(this.getIntent());
-            }
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.add_event, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
-                break;
-            case R.id.addEventButtonCreateEvent:
-                this.createEvent();
-                break;
-            default:
-                // No other menu items!
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void pickLocation(View v) {
-        Toast.makeText(mContext, this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
-            Toast.LENGTH_LONG).show();
-
-        Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
-        pickLocationIntent.putExtra("pickLocationForEvent", true);
-        pickLocationIntent.setType(Context.LOCATION_SERVICE);
-        this.startActivityForResult(pickLocationIntent, PICK_LOCATION_REQUEST);
     }
 
     /**
