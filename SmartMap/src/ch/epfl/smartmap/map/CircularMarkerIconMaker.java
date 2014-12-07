@@ -34,6 +34,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     private final User mUser;
     private Bitmap mProfilePicture;
     private Bitmap mMarkerIcon;
+    private Canvas mCanvasCurrentShape;
     public static final float CIRCLE_CENTER_INCREMENT = 0.7f;
     public static final float CIRCLE_RADIUS_INCREMENT = 0.1f;
     public static final int SHAPE_BORDER_WIDTH = 230;
@@ -66,8 +67,9 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         if (mMarkerIcon == null) {
             this.setMarkerIcon();
         }
-        mCurrentMarkerShape = mBaseMarkerShape.copy(Bitmap.Config.ARGB_8888, true); // make the Bitmap
+        // mCurrentMarkerShape = mBaseMarkerShape.copy(mBaseMarkerShape.getConfig(), true); // make the Bitmap
         // mMarkerShape
+        mCanvasCurrentShape.drawBitmap(mBaseMarkerShape, 0, 0, null);
         long timeElapsed =
             GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
                 - mUser.getLastSeen().getTimeInMillis();
@@ -183,8 +185,10 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     private void setMarkerShape(Context context) {
         int idForm = R.drawable.marker_forme;
         mBaseMarkerShape = BitmapFactory.decodeResource(context.getResources(), idForm);
-        mCurrentMarkerShape = mBaseMarkerShape.copy(Bitmap.Config.ARGB_8888, true); // make the Bitmap
-                                                                                    // mMarkerShape
+        mCurrentMarkerShape = mBaseMarkerShape.copy(mBaseMarkerShape.getConfig(), true);
+        mCanvasCurrentShape = new Canvas(mCurrentMarkerShape);
+        // make the Bitmap
+        // mMarkerShape
         // mutable to be changed by canvas
     }
 
