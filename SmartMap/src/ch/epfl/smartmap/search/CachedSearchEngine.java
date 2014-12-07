@@ -18,6 +18,7 @@ import ch.epfl.smartmap.cache.History;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**

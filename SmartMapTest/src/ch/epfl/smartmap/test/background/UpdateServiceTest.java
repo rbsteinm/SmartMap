@@ -4,12 +4,12 @@ import org.junit.Test;
 
 import android.content.Intent;
 import android.test.ServiceTestCase;
-import ch.epfl.smartmap.background.UpdateService;
+import ch.epfl.smartmap.background.InvitationsService;
 
-public class UpdateServiceTest extends ServiceTestCase<UpdateService> {
+public class UpdateServiceTest extends ServiceTestCase<InvitationsService> {
 	private Intent testIntent;
 
-	public UpdateServiceTest(Class<UpdateService> serviceClass) {
+	public UpdateServiceTest(Class<InvitationsService> serviceClass) {
 		super(serviceClass);
 		// TODO Auto-generated constructor stub
 	}
@@ -17,12 +17,12 @@ public class UpdateServiceTest extends ServiceTestCase<UpdateService> {
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		testIntent = new Intent(this.getContext(), UpdateService.class);
+		testIntent = new Intent(this.getContext(), InvitationsService.class);
 	}
 
 	@Test
 	public void testOnStartIntentInt() {
-		testIntent = new Intent(this.getContext(), UpdateService.class);
+		testIntent = new Intent(this.getContext(), InvitationsService.class);
 		this.getContext().startService(testIntent);
 	}
 }

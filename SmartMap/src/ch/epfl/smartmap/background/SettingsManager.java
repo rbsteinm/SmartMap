@@ -48,7 +48,7 @@ public final class SettingsManager {
      * @param context
      *            The app's context, needed to access the shared preferences
      */
-    private SettingsManager(Context context) {
+    public SettingsManager(Context context) {
         mContext = context;
         mSharedPref = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         mEditor = mSharedPref.edit();
@@ -380,26 +380,5 @@ public final class SettingsManager {
     public boolean showPublicEvents() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
             mContext.getString(R.string.settings_key_events_show_public), true);
-    }
-
-    /**
-     * @return The SettingsManager instance
-     */
-    public static SettingsManager getInstance() {
-        return mInstance;
-    }
-
-    /**
-     * Initializes the settings manager (should be called once when starting the app)
-     * 
-     * @param context
-     *            The app's context, needed to access the shared preferences
-     * @return The SettingsManager instance
-     */
-    public static SettingsManager initialize(Context context) {
-        if (mInstance == null) {
-            mInstance = new SettingsManager(context);
-        }
-        return mInstance;
     }
 }

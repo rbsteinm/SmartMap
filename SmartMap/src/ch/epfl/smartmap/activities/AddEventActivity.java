@@ -30,10 +30,10 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.PublicEvent;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
 import ch.epfl.smartmap.map.DefaultZoomManager;
-import ch.epfl.smartmap.servercom.NetworkRequestCallback;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -132,11 +132,13 @@ public class AddEventActivity extends FragmentActivity {
             mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
             mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-            Log.d("DEBUG_POSITION", "latitude : " + SettingsManager.getInstance().getLocation().getLatitude()
-                + "\n longitude : " + SettingsManager.getInstance().getLocation().getLongitude());
+            Log.d("DEBUG_POSITION", "latitude : "
+                + ServiceContainer.getSettingsManager().getLocation().getLatitude() + "\n longitude : "
+                + ServiceContainer.getSettingsManager().getLocation().getLongitude());
 
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(SettingsManager.getInstance()
-                .getLocation().getLatitude(), SettingsManager.getInstance().getLocation().getLongitude()));
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer
+                .getSettingsManager().getLocation().getLatitude(), ServiceContainer.getSettingsManager()
+                .getLocation().getLongitude()));
 
         }
     }
@@ -287,7 +289,7 @@ public class AddEventActivity extends FragmentActivity {
             Location location = new Location("Location set by user");
             location.setLatitude(mEventPosition.latitude);
             location.setLongitude(mEventPosition.longitude);
-            SettingsManager setMng = SettingsManager.getInstance();
+            SettingsManager setMng = ServiceContainer.getSettingsManager();
 
             ImmutableEvent ev =
                 new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), setMng.getUserID(),
@@ -355,8 +357,8 @@ public class AddEventActivity extends FragmentActivity {
         mPlaceName.setFocusable(true);
         // Initialize mEventPosition to position of user
         mEventPosition =
-            new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
-                .getInstance().getLocation().getLongitude());
+            new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
+                .getSettingsManager().getLocation().getLongitude());
 
         mTextChangedListener = new TextWatcher() {
 

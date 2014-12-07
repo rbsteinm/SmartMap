@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.search;
+package ch.epfl.smartmap.callbacks;
 
 /**
  * @author jfperren

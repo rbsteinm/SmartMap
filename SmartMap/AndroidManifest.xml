@@ -58,7 +58,12 @@
         </activity>
 
         <service
-            android:name=".background.UpdateService"
+            android:name=".background.InvitationsService"
+            android:enabled="true" >
+        </service>
+        
+        <service
+            android:name=".background.OwnPositionService"
             android:enabled="true" >
         </service>
 

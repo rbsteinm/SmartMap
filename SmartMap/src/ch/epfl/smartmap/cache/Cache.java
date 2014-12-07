@@ -11,9 +11,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
-import ch.epfl.smartmap.servercom.NetworkRequestCallback;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -355,13 +355,16 @@ public class Cache {
 
         // Initialize id Lists
         mFriendIds.addAll(database.getFriendIds());
+        Log.d(TAG, "Friend ids : " + mFriendIds);
         // mPublicEventIds.addAll(DatabaseHelper.getInstance().getEventIds());
 
         // Fill with database values
         for (long id : mFriendIds) {
+            Log.d(TAG, "Added friend : " + id);
             mUserInstances.put(id, new Friend(database.getFriend(id)));
         }
         for (long id : mEventIds) {
+            Log.d(TAG, "Added event : " + id);
             mEventInstances.put(id, new PublicEvent(database.getEvent(id)));
         }
 
@@ -792,39 +795,50 @@ public class Cache {
         }
     }
 
-    public void updateFromNetwork(SmartMapClient networkClient) throws SmartMapClientException {
-        // TODO : Empty useless instances from Cache
+    public void updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                // TODO : Empty useless instances from Cache
+                try {
+                    // Fetch friend ids
+                    Set<Long> newFriendIds = new HashSet<Long>(networkClient.getFriendsIds());
 
-        // Fetch friend ids
-        Set<Long> newFriendIds = new HashSet<Long>(networkClient.getFriendsIds());
+                    // Remove friends that are no longer friends
+                    for (long id : mFriendIds) {
+                        if (!newFriendIds.contains(id)) {
+                            Cache.this.removeFriend(id);
+                        }
+                    }
 
-        // Remove friends that are no longer friends
-        for (long id : mFriendIds) {
-            if (!newFriendIds.contains(id)) {
-                this.removeFriend(id);
+                    // Sets new friend ids
+                    mFriendIds.clear();
+                    mFriendIds.addAll(newFriendIds);
+
+                    // Update each friends
+                    for (long id : newFriendIds) {
+                        User friend = Cache.this.getFriend(id);
+
+                        // Get online values
+                        ImmutableUser onlineValues = networkClient.getUserInfo(id);
+                        if (friend != null) {
+                            // Simply update
+                            friend.update(onlineValues);
+                        } else {
+                            // Add friend
+                            Cache.this.putFriend(onlineValues);
+                        }
+                    }
+
+                    // TODO : Update Events
+                    callback.onSuccess();
+                } catch (SmartMapClientException e) {
+                    Log.e(TAG, "SmartMapClientException : " + e);
+                    callback.onFailure();
+                }
+                return null;
             }
-        }
-
-        // Sets new friend ids
-        mFriendIds.clear();
-        mFriendIds.addAll(newFriendIds);
-
-        // Update each friends
-        for (long id : newFriendIds) {
-            User friend = this.getFriend(id);
-
-            // Get online values
-            ImmutableUser onlineValues = networkClient.getUserInfo(id);
-            if (friend != null) {
-                // Simply update
-                friend.update(onlineValues);
-            } else {
-                // Add friend
-                this.putFriend(onlineValues);
-            }
-        }
-
-        // TODO : Update Events
+        }.execute();
     }
 
     public boolean updatePublicEvent(ImmutableEvent event) {

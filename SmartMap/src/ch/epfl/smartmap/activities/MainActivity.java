@@ -14,6 +14,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
@@ -21,9 +22,12 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.FriendsPositionsThread;
+import ch.epfl.smartmap.background.InvitationsService;
+import ch.epfl.smartmap.background.NearEventsThread;
+import ch.epfl.smartmap.background.OwnPositionService;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.background.UpdateService;
+import ch.epfl.smartmap.background.UpdateDatabaseThread;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
@@ -95,8 +99,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.setContentView(R.layout.activity_main);
 
         // starting the background service
-        this.startService(new Intent(this, UpdateService.class));
-
+        this.startService(new Intent(this, InvitationsService.class));
+        this.startService(new Intent(this, OwnPositionService.class));
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
@@ -133,6 +137,16 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
         ServiceContainer.getCache().addOnCacheListener(this);
 
+        new FriendsPositionsThread().start();
+        new UpdateDatabaseThread().start();
+        new NearEventsThread().start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        ServiceContainer.getDatabase().updateFromCache();
+        Log.d(TAG, "Updated Database");
+        super.onDestroy();
     }
 
     @Override
@@ -343,7 +357,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     public void onLocationChanged(Location location) {
-        SettingsManager.getInstance().setLocation(location);
+        ServiceContainer.getSettingsManager().setLocation(location);
     }
 
     @Override

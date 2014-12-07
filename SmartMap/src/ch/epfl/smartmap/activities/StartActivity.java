@@ -113,10 +113,9 @@ public class StartActivity extends FragmentActivity {
             mLogoImage.setVisibility(View.INVISIBLE);
 
             mFacebookFragment = new LoginFragment();
-            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment).commit();
+            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment)
+                .commit();
         }
-
-        SettingsManager.initialize(this.getApplicationContext());
 
         // Beware of the order in which services are created, Cache and
         // InvitationManager depend on NetworkClient and DatabaseHelper in their
@@ -124,7 +123,8 @@ public class StartActivity extends FragmentActivity {
         // TODO: This should be modified to allow complete switching or
         // services, or be made explicit in their constructors.
         ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
-        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplicationContext()));
+        ServiceContainer.setSettingsManager(new SettingsManager(this.getApplication()));
+        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplication()));
         ServiceContainer.setCache(new Cache());
         ServiceContainer.setSearchEngine(new CachedSearchEngine());
     }

@@ -14,7 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -81,12 +81,12 @@ public class SetLocationActivity extends FragmentActivity {
 
             // Get my position from SettingsManager
             mMyPosition =
-                new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
-                    .getInstance().getLocation().getLongitude());
+                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(),
+                    ServiceContainer.getSettingsManager().getLocation().getLongitude());
 
             mEventPosition =
-                new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
-                    .getInstance().getLocation().getLongitude());
+                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(),
+                    ServiceContainer.getSettingsManager().getLocation().getLongitude());
 
             // Enabling MyLocation Layer of Google Map
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mMyPosition);

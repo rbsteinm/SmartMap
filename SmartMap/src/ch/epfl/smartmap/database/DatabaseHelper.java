@@ -23,7 +23,6 @@ import android.location.Location;
 import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.AcceptedFriendInvitation;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
@@ -44,6 +43,8 @@ import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
  * @author ritterni
  */
 public final class DatabaseHelper extends SQLiteOpenHelper {
+
+    private static final String TAG = DatabaseHelper.class.getSimpleName();
 
     private static final int DATABASE_VERSION = 8;
     private static final String DATABASE_NAME = "SmartMapDB";
@@ -153,7 +154,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_PENDING = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING + "("
         + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
 
-    private static SQLiteDatabase mDatabase;
+    private final SQLiteDatabase mDatabase;
     private final Context mContext;
 
     /**
@@ -164,9 +165,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The application's context, used to access the files
      */
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME + "_" + SettingsManager.initialize(context).getUserID(), null,
+        super(context, DATABASE_NAME + "_" + ServiceContainer.getSettingsManager().getUserID(), null,
             DATABASE_VERSION);
         mContext = context;
+        mDatabase = this.getReadableDatabase();
+        this.onCreate(mDatabase);
     }
 
     public void addAcceptedRequest(AcceptedFriendInvitation invitation) {
@@ -852,6 +855,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.d(TAG, "onCreate");
         db.execSQL(CREATE_TABLE_USER);
         db.execSQL(CREATE_TABLE_FILTER);
         db.execSQL(CREATE_TABLE_FILTER_USER);
@@ -1081,14 +1085,16 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * Updates the database contents to be up-to-date with the cache
      */
     public void updateFromCache() {
+        Log.d(TAG, "Update Database from Cache");
+        // FIXME : Need to store only our events, filters, friends, and settings.
         Set<User> friends = ServiceContainer.getCache().getAllFriends();
         Set<Event> events = ServiceContainer.getCache().getAllVisibleEvents();
 
         for (User user : friends) {
-            this.updateFriend(user.getImmutableCopy());
+            this.addUser(user.getImmutableCopy());
         }
         for (Event event : events) {
-            this.updateEvent(event.getImmutableCopy());
+            this.addEvent(event.getImmutableCopy());
         }
     }
 

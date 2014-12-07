@@ -22,6 +22,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -101,10 +102,22 @@ public class LoginFragment extends Fragment {
                                 .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
                             Toast.LENGTH_LONG).show();
                     } else {
-                        // If all is ok, start filling Cache
                         ServiceContainer.getCache().initFromDatabase();
-                    }
+                        ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient(),
+                            new NetworkRequestCallback() {
+                                @Override
+                                public void onFailure() {
+                                    Log.e(TAG, "Cannot update Cache from Network");
+                                    LoginFragment.this.startMainActivity();
+                                }
 
+                                @Override
+                                public void onSuccess() {
+                                    Log.d(TAG, "Successfully updated Cache from Network");
+                                    LoginFragment.this.startMainActivity();
+                                }
+                            });
+                    }
                 } else if (response.getError() != null) {
                     Log.e(TAG, "The user is null (authentication aborted?)");
                 }

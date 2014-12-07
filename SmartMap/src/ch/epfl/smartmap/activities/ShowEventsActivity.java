@@ -23,7 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventViewHolder;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
@@ -208,9 +207,9 @@ public class ShowEventsActivity extends ListActivity {
         // tests pass.
         mContext = this.getApplicationContext();
 
-        mMyName = SettingsManager.getInstance().getUserName();
+        mMyName = ServiceContainer.getSettingsManager().getUserName();
 
-        mMyLocation = SettingsManager.getInstance().getLocation();
+        mMyLocation = ServiceContainer.getSettingsManager().getLocation();
 
         mMyEventsChecked = false;
         mOngoingChecked = false;
@@ -252,7 +251,7 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
-        mMyLocation = SettingsManager.getInstance().getLocation();
+        mMyLocation = ServiceContainer.getSettingsManager().getLocation();
         mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllVisibleEvents());
         mCurrentList = new ArrayList<Event>();
 

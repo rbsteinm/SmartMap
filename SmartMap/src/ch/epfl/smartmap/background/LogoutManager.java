@@ -78,7 +78,7 @@ public final class LogoutManager {
         // are local
         // to the device.
         ServiceContainer.getDatabase().clearAll();
-        SettingsManager.getInstance().clearAll();
+        ServiceContainer.getSettingsManager().clearAll();
 
         // Close the FB session to avoid re-logging in automatically
         if (Session.getActiveSession() != null) {

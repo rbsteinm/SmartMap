@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 import ch.epfl.smartmap.map.DefaultZoomManager;
@@ -84,8 +83,9 @@ public class EventInformationActivity extends FragmentActivity {
             mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
             mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-            Log.d("DEBUG_POSITION", "latitude : " + SettingsManager.getInstance().getLocation().getLatitude()
-                + "\n longitude : " + SettingsManager.getInstance().getLocation().getLongitude());
+            Log.d("DEBUG_POSITION", "latitude : "
+                + ServiceContainer.getSettingsManager().getLocation().getLatitude() + "\n longitude : "
+                + ServiceContainer.getSettingsManager().getLocation().getLongitude());
 
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEvent.getLatLng());
 
