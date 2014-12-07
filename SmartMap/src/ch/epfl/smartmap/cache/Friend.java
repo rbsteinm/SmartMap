@@ -34,6 +34,8 @@ public final class Friend implements User {
     private Location mLocation;
     private Bitmap mImage;
 
+    private final MarkerIconMaker mMarkerIconMaker;
+
     protected Friend(ImmutableUser user) {
         super();
 
@@ -72,6 +74,8 @@ public final class Friend implements User {
         } else {
             mImage = user.getImage();
         }
+
+        mMarkerIconMaker = new CircularMarkerIconMaker(this);
     }
 
     /*
@@ -158,9 +162,8 @@ public final class Friend implements User {
 
     @Override
     public BitmapDescriptor getMarkerIcon(Context context) {
-        MarkerIconMaker iconMaker = new CircularMarkerIconMaker(context, this);
 
-        return BitmapDescriptorFactory.fromBitmap(iconMaker.getMarkerIcon());
+        return BitmapDescriptorFactory.fromBitmap(mMarkerIconMaker.getMarkerIcon(context));
 
     }
 

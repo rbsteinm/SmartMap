@@ -58,4 +58,5 @@ public interface Displayable extends Stockable {
     boolean isVisible();
 
     BitmapDescriptor getMarkerIcon(Context context);
+
 }

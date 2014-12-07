@@ -3,6 +3,7 @@
  */
 package ch.epfl.smartmap.map;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 /**
@@ -12,6 +13,6 @@ import android.graphics.Bitmap;
  */
 public interface MarkerIconMaker {
 
-    Bitmap getMarkerIcon();
+    Bitmap getMarkerIcon(Context context);
 
 }

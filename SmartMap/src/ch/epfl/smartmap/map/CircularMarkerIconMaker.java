@@ -29,8 +29,10 @@ import ch.epfl.smartmap.cache.User;
 public class CircularMarkerIconMaker implements MarkerIconMaker {
 
     private Bitmap mMarkerShape;
-    private final Context mContext;
+    // private final Context mContext;
     private final User mUser;
+    private Bitmap mProfilePicture;
+    private Bitmap mMarkerIcon;
     public static final float CIRCLE_CENTER_INCREMENT = 0.7f;
     public static final float CIRCLE_RADIUS_INCREMENT = 0.1f;
     public static final int SHAPE_BORDER_WIDTH = 230;
@@ -42,13 +44,10 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     public static final int SECONDS_IN_MINUTE = 60;
     public static final int MILLISECONDS_IN_SECOND = 1000;
 
-    public CircularMarkerIconMaker(Context context, User user) {
-        mContext = context;
+    public CircularMarkerIconMaker(User user) {
+        // mContext = context;
         mUser = user;
-        int idForm = R.drawable.marker_forme;
-        mMarkerShape = BitmapFactory.decodeResource(mContext.getResources(), idForm);
-        mMarkerShape = mMarkerShape.copy(Bitmap.Config.ARGB_8888, true); // make the Bitmap mMarkerShape
-                                                                         // mutable to be changed by canvas
+
     }
 
     /*
@@ -56,23 +55,25 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @see ch.epfl.smartmap.map.MarkerIconMaker#getMarkerIcon(android.graphics.Bitmap)
      */
     @Override
-    public Bitmap getMarkerIcon() {
-        Bitmap profilePicture =
-            Bitmap.createScaledBitmap(mUser.getImage(), User.PICTURE_WIDTH, User.PICTURE_HEIGHT, false);
-
-        profilePicture =
-            Bitmap.createScaledBitmap(profilePicture, mMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
-                mMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
+    public Bitmap getMarkerIcon(Context context) {
+        if (mMarkerShape == null) {
+            this.setMarkerShape(context);
+        }
+        if (mProfilePicture == null) {
+            this.setProfilePicture();
+        }
+        if (mMarkerIcon == null) {
+            this.setMarkerIcon();
+        }
 
         long timeElapsed =
             GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
                 - mUser.getLastSeen().getTimeInMillis();
         this.setColorOfMarkerShape(timeElapsed);
 
-        Bitmap roundProfile = this.cropProfilePicture(profilePicture, profilePicture.getWidth());
-        Bitmap finalMarker = this.overlay(mMarkerShape, roundProfile);
-        finalMarker = this.scaleMarker(finalMarker, SCALE_MARKER);
-        return finalMarker;
+        this.setMarkerIcon();
+
+        return mMarkerIcon;
     }
 
     /**
@@ -177,4 +178,28 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         canvas.drawBitmap(mMarkerShape, 0, 0, paintLightening);
     }
 
+    private void setMarkerShape(Context context) {
+        int idForm = R.drawable.marker_forme;
+        mMarkerShape = BitmapFactory.decodeResource(context.getResources(), idForm);
+        mMarkerShape = mMarkerShape.copy(Bitmap.Config.ARGB_8888, true); // make the Bitmap mMarkerShape
+                                                                         // mutable to be changed by canvas
+    }
+
+    private void setProfilePicture() {
+        mProfilePicture =
+            Bitmap.createScaledBitmap(mUser.getImage(), User.PICTURE_WIDTH, User.PICTURE_HEIGHT, false);
+
+        mProfilePicture =
+            Bitmap.createScaledBitmap(mProfilePicture, mMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
+                mMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
+
+        mProfilePicture = this.cropProfilePicture(mProfilePicture, mProfilePicture.getWidth());
+
+    }
+
+    private void setMarkerIcon() {
+
+        mMarkerIcon = this.overlay(mMarkerShape, mProfilePicture);
+        mMarkerIcon = this.scaleMarker(mMarkerIcon, SCALE_MARKER);
+    }
 }
