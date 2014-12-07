@@ -28,7 +28,6 @@ import ch.epfl.smartmap.background.NearEventsThread;
 import ch.epfl.smartmap.background.OwnPositionService;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.UpdateDatabaseThread;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Invitation;
@@ -66,138 +65,66 @@ import com.google.android.gms.maps.model.Marker;
 
 public class MainActivity extends FragmentActivity implements CacheListener, OnInvitationListUpdateListener {
 
+    /**
+     * Types of Menu that can be displayed on this activity
+     * 
+     * @author jfperren
+     */
+    private enum MenuTheme {
+        MAP,
+        SEARCH,
+        ITEM;
+    }
+
+    /**
+     * A listener that shows info in action bar when a marker is clicked on
+     * 
+     * @author hugo-S
+     */
+    private class ShowInfoOnMarkerClick implements OnMarkerClickListener {
+
+        @Override
+        public boolean onMarkerClick(Marker arg0) {
+
+            if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
+                Displayable itemClicked = mFriendMarkerManager.getItemForMarker(arg0);
+                mMapZoomer.centerOnLocation(arg0.getPosition());
+                MainActivity.this.setItemMenu(itemClicked);
+                return true;
+            } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
+                Displayable itemClicked = mEventMarkerManager.getItemForMarker(arg0);
+                mMapZoomer.centerOnLocation(arg0.getPosition());
+                MainActivity.this.setItemMenu(itemClicked);
+                return true;
+            }
+            return false;
+        }
+    }
+
     @SuppressWarnings("unused")
     private static final String TAG = MainActivity.class.getSimpleName();
-
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-
     private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
     private static final int MENU_ITEM_NOTIFICATION_INDEX = 1;
+
     private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
     private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
-
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
-    private Cache mCache;
     private SideMenu mSideMenu;
     private GoogleMap mGoogleMap;
     private DefaultMarkerManager mFriendMarkerManager;
     private DefaultMarkerManager mEventMarkerManager;
+
     private DefaultZoomManager mMapZoomer;
     private SupportMapFragment mFragmentMap;
-
     private Menu mMenu;
+
     private MenuTheme mMenuTheme;
+
     private Displayable mCurrentItem;
 
     private LayerDrawable mIcon;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Utils.sContext = this;
-        mCache = ServiceContainer.getCache();
-        this.setContentView(R.layout.activity_main);
-
-        // starting the background service
-        this.startService(new Intent(this, InvitationsService.class));
-        this.startService(new Intent(this, OwnPositionService.class));
-        // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-        this.getActionBar().setHomeButtonEnabled(true);
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
-        mMenuTheme = MenuTheme.MAP;
-
-        // Get needed Views
-        mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) this.findViewById(R.id.left_drawer_listView);
-
-        mSideMenu = new SideMenu(this.getContext());
-        mSideMenu.initializeDrawerLayout();
-
-        final SearchLayout mSearchLayout = (SearchLayout) this.findViewById(R.id.search_layout);
-        mSearchLayout.setSearchEngine(ServiceContainer.getSearchEngine());
-
-        if (savedInstanceState == null) {
-            this.displayMap();
-        }
-
-        if (mGoogleMap != null) {
-            // Set different tools for the GoogleMap
-            mFriendMarkerManager = new DefaultMarkerManager(mGoogleMap);
-            mEventMarkerManager = new DefaultMarkerManager(mGoogleMap);
-            mMapZoomer = new DefaultZoomManager(mFragmentMap);
-
-            // this.zoomAccordingToAllMarkers();
-
-            // Add listeners to the GoogleMap
-            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
-            mGoogleMap.setOnMarkerClickListener(new ShowInfoOnMarkerClick());
-        }
-
-        ServiceContainer.getCache().addOnCacheListener(this);
-
-        new FriendsPositionsThread().start();
-        new UpdateDatabaseThread().start();
-        new NearEventsThread().start();
-    }
-
-    @Override
-    protected void onDestroy() {
-        ServiceContainer.getDatabase().updateFromCache();
-        Log.d(TAG, "Updated Database");
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // TODO A method to unregister to the service when the map is not
-        // opened?
-        // this.unregisterReceiver(mBroadcastReceiver);
-        // stopService(mUpdateServiceIntent);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // startService(mUpdateServiceIntent);
-        // this.registerReceiver(mBroadcastReceiver, new
-        // IntentFilter(UpdateService.BROADCAST_POS));
-        if (mGoogleMap != null) {
-            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
-        }
-        // get Intent that started this Activity
-        Intent startingIntent = this.getIntent();
-        // get the value of the user string
-        Location eventLocation = startingIntent.getParcelableExtra("location");
-        if (eventLocation != null) {
-            mMapZoomer
-                .zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
-            eventLocation = null;
-        }
-
-        // Set menu Style
-        switch (mMenuTheme) {
-            case SEARCH:
-                this.setSearchMenu();
-                break;
-            case ITEM:
-                this.setItemMenu(mCurrentItem);
-                break;
-            case MAP:
-                break;
-            default:
-                assert false;
-        }
-
-        if (mGoogleMap != null) {
-            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
-        }
-
-        this.zoomAccordingToAllMarkers();
-    }
 
     /**
      * Display the map with the current location
@@ -244,6 +171,55 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Utils.sContext = this;
+        this.setContentView(R.layout.activity_main);
+
+        // starting the background service
+        this.startService(new Intent(this, InvitationsService.class));
+        this.startService(new Intent(this, OwnPositionService.class));
+        // Set actionbar color
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setHomeButtonEnabled(true);
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        mMenuTheme = MenuTheme.MAP;
+
+        // Get needed Views
+        mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) this.findViewById(R.id.left_drawer_listView);
+
+        mSideMenu = new SideMenu(this.getContext());
+        mSideMenu.initializeDrawerLayout();
+
+        final SearchLayout mSearchLayout = (SearchLayout) this.findViewById(R.id.search_layout);
+        mSearchLayout.setSearchEngine(ServiceContainer.getSearchEngine());
+
+        if (savedInstanceState == null) {
+            this.displayMap();
+        }
+
+        if (mGoogleMap != null) {
+            // Set different tools for the GoogleMap
+            mFriendMarkerManager = new DefaultMarkerManager(mGoogleMap);
+            mEventMarkerManager = new DefaultMarkerManager(mGoogleMap);
+            mMapZoomer = new DefaultZoomManager(mFragmentMap);
+
+            // this.zoomAccordingToAllMarkers();
+
+            // Add listeners to the GoogleMap
+            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
+            mGoogleMap.setOnMarkerClickListener(new ShowInfoOnMarkerClick());
+        }
+
+        ServiceContainer.getCache().addOnCacheListener(this);
+
+        new FriendsPositionsThread().start();
+        new UpdateDatabaseThread().start();
+        new NearEventsThread().start();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.main, menu);
@@ -255,23 +231,29 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         MenuItem item = mMenu.findItem(R.id.action_notifications);
         mIcon = (LayerDrawable) item.getIcon();
 
-        Utils.setBadgeCount(MainActivity.this, mIcon, ServiceContainer.getDatabase()
-            .getFriendInvitationsByStatus(Invitation.UNREAD).size());
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Update LayerDrawable's BadgeDrawable
+                Utils.setBadgeCount(MainActivity.this, mIcon, ServiceContainer.getDatabase()
+                    .getFriendInvitationsByStatus(Invitation.UNREAD).size());
+            }
+        });
+
         // And set a Listener on InvitationList
-        ServiceContainer.getDatabase().addOnInvitationListUpdateListener(
-            new OnInvitationListUpdateListener() {
-                @Override
-                public void onInvitationListUpdate() {
-                    MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Update LayerDrawable's BadgeDrawable
-                            Utils.setBadgeCount(MainActivity.this, mIcon, ServiceContainer.getDatabase()
-                                .getFriendInvitationsByStatus(Invitation.UNREAD).size());
-                        }
-                    });
-                }
-            });
+        ServiceContainer.getDatabase().addOnInvitationListUpdateListener(new OnInvitationListUpdateListener() {
+            @Override
+            public void onInvitationListUpdate() {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Update LayerDrawable's BadgeDrawable
+                        Utils.setBadgeCount(MainActivity.this, mIcon, ServiceContainer.getDatabase()
+                            .getFriendInvitationsByStatus(Invitation.UNREAD).size());
+                    }
+                });
+            }
+        });
 
         // Get Views
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -314,12 +296,19 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     @Override
+    protected void onDestroy() {
+        ServiceContainer.getDatabase().updateFromCache();
+        Log.d(TAG, "Updated Database");
+        super.onDestroy();
+    }
+
+    @Override
     public void onEventListUpdate() {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mEventMarkerManager.updateMarkers(MainActivity.this, new ArrayList<Displayable>(
-                    ServiceContainer.getCache().getAllVisibleEvents()));
+                mEventMarkerManager.updateMarkers(MainActivity.this, new ArrayList<Displayable>(ServiceContainer
+                    .getCache().getAllVisibleEvents()));
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -344,8 +333,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mFriendMarkerManager.updateMarkers(MainActivity.this, new ArrayList<Displayable>(
-                    ServiceContainer.getCache().getAllVisibleFriends()));
+                mFriendMarkerManager.updateMarkers(MainActivity.this, new ArrayList<Displayable>(ServiceContainer
+                    .getCache().getAllVisibleFriends()));
                 // MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
             }
@@ -355,8 +344,14 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     @Override
     public void onInvitationListUpdate() {
         // Update LayerDrawable's BadgeDrawable
-        Utils.setBadgeCount(MainActivity.this, mIcon, ServiceContainer.getDatabase()
-            .getFriendInvitationsByStatus(Invitation.UNREAD).size());
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Update LayerDrawable's BadgeDrawable
+                Utils.setBadgeCount(MainActivity.this, mIcon, ServiceContainer.getDatabase()
+                    .getFriendInvitationsByStatus(Invitation.UNREAD).size());
+            }
+        });
     }
 
     public void onLocationChanged(Location location) {
@@ -391,7 +386,13 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                 }
                 break;
             case R.id.action_notifications:
-                Utils.setBadgeCount(MainActivity.this, mIcon, 0);
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Update LayerDrawable's BadgeDrawable
+                        Utils.setBadgeCount(MainActivity.this, mIcon, 0);
+                    }
+                });
                 Intent pNotifIntent = new Intent(this, InvitationPanelActivity.class);
                 this.startActivity(pNotifIntent);
 
@@ -406,6 +407,54 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                 assert false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // TODO A method to unregister to the service when the map is not
+        // opened?
+        // this.unregisterReceiver(mBroadcastReceiver);
+        // stopService(mUpdateServiceIntent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // startService(mUpdateServiceIntent);
+        // this.registerReceiver(mBroadcastReceiver, new
+        // IntentFilter(UpdateService.BROADCAST_POS));
+        if (mGoogleMap != null) {
+            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
+        }
+        // get Intent that started this Activity
+        Intent startingIntent = this.getIntent();
+        // get the value of the user string
+        Location eventLocation = startingIntent.getParcelableExtra("location");
+        if (eventLocation != null) {
+            mMapZoomer.zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
+            eventLocation = null;
+        }
+
+        // Set menu Style
+        switch (mMenuTheme) {
+            case SEARCH:
+                this.setSearchMenu();
+                break;
+            case ITEM:
+                this.setItemMenu(mCurrentItem);
+                break;
+            case MAP:
+                break;
+            default:
+                assert false;
+        }
+
+        if (mGoogleMap != null) {
+            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
+        }
+
+        this.zoomAccordingToAllMarkers();
     }
 
     /**
@@ -531,42 +580,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         Intent startingIntent = this.getIntent();
         if (startingIntent.getParcelableExtra("location") == null) {
             mMapZoomer.zoomAccordingToMarkers(allMarkers);
-        }
-    }
-
-    /**
-     * Types of Menu that can be displayed on this activity
-     * 
-     * @author jfperren
-     */
-    private enum MenuTheme {
-        MAP,
-        SEARCH,
-        ITEM;
-    }
-
-    /**
-     * A listener that shows info in action bar when a marker is clicked on
-     * 
-     * @author hugo-S
-     */
-    private class ShowInfoOnMarkerClick implements OnMarkerClickListener {
-
-        @Override
-        public boolean onMarkerClick(Marker arg0) {
-
-            if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
-                Displayable itemClicked = mFriendMarkerManager.getItemForMarker(arg0);
-                mMapZoomer.centerOnLocation(arg0.getPosition());
-                MainActivity.this.setItemMenu(itemClicked);
-                return true;
-            } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
-                Displayable itemClicked = mEventMarkerManager.getItemForMarker(arg0);
-                mMapZoomer.centerOnLocation(arg0.getPosition());
-                MainActivity.this.setItemMenu(itemClicked);
-                return true;
-            }
-            return false;
         }
     }
 }

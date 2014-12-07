@@ -3,6 +3,7 @@ package ch.epfl.smartmap.cache;
 import android.content.Intent;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.gui.Utils;
 
 /**
@@ -11,7 +12,7 @@ import ch.epfl.smartmap.gui.Utils;
  * @author agpmilli
  */
 public class EventInvitation implements Invitation {
-    private final ImmutableUser mUser;
+    private final long mUserId;
     private final ImmutableEvent mEvent;
     private int mStatus;
 
@@ -20,7 +21,7 @@ public class EventInvitation implements Invitation {
     public static final String PROVIDER_NAME = "SmartMapServers";
 
     public EventInvitation(ImmutableInvitation invitation, ImmutableEvent event) {
-        mUser = invitation.getUser();
+        mUserId = invitation.getUser();
         mEvent = event;
         mStatus = invitation.getStatus();
     }
@@ -60,12 +61,12 @@ public class EventInvitation implements Invitation {
     @Override
     public String getTitle() {
         return Utils.sContext.getResources().getString(R.string.notification_event_request_title) + " "
-            + mUser.getName();
+            + ServiceContainer.getCache().getUser(mUserId).getName();
     }
 
     @Override
     public ImmutableUser getUser() {
-        return mUser;
+        return ServiceContainer.getCache().getUser(mUserId).getImmutableCopy();
     }
 
     public void setId(long id) {

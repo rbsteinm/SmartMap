@@ -132,7 +132,7 @@
                 android:value="MainActivity" />
         </activity>
         <activity
-            android:name=".activities.NotificationsActivity"
+            android:name=".activities.InvitationPanelActivity"
             android:label="@string/title_activity_notifications"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Dialog" >
