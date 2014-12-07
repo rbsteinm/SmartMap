@@ -557,8 +557,7 @@ public class Cache {
 
         // Create Invitation corresponding
         for (long id : realNewInvitingUserIds) {
-            FriendInvitation newInvitation =
-                new FriendInvitation(new ImmutableInvitation(this.getUser(id).getImmutableCopy(), Invitation.UNREAD));
+            FriendInvitation newInvitation = new FriendInvitation(new ImmutableInvitation(id, Invitation.UNREAD));
 
             mFriendInvitationIds.add(newInvitation.getId());
             mFriendInvitationInstances.put(newInvitation.getId(), newInvitation);
@@ -773,7 +772,7 @@ public class Cache {
                         }
 
                         EventInvitation invitation =
-                            new EventInvitation(new ImmutableInvitation(creator, Invitation.UNREAD),
+                            new EventInvitation(new ImmutableInvitation(creator.getId(), Invitation.UNREAD),
                                 e.getImmutableCopy());
 
                         invitation.setId(ServiceContainer.getDatabase().addEventInvitation(invitation));

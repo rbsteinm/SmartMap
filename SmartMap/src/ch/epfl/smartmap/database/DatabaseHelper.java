@@ -446,11 +446,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         AcceptedFriendInvitation invitation = null;
         if (cursor.moveToFirst()) {
             do {
-                long id = cursor.getLong(cursor.getColumnIndex(KEY_ID));
+                long userId = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
+                int status = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
 
-                invitation =
-                    new AcceptedFriendInvitation(id, cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
-                        cursor.getString(cursor.getColumnIndex(KEY_NAME)), this.getPictureById(id));
+                ImmutableInvitation immInvit = new ImmutableInvitation(userId, status);
+
+                invitation = new AcceptedFriendInvitation(immInvit);
 
                 invitations.add(invitation);
             } while (cursor.moveToNext());
@@ -714,10 +715,13 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         FriendInvitation invitation = null;
         if (cursor.moveToFirst()) {
             do {
-                invitation =
-                    new FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)), cursor.getLong(cursor
-                        .getColumnIndex(KEY_USER_ID)), cursor.getString(cursor.getColumnIndex(KEY_NAME)),
-                        cursor.getInt(cursor.getColumnIndex(KEY_STATUS)), null);
+
+                long userId = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
+                int status = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
+
+                ImmutableInvitation immInvit = new ImmutableInvitation(userId, status);
+
+                invitation = new FriendInvitation(immInvit);
 
                 invitations.add(invitation);
             } while (cursor.moveToNext());
@@ -746,11 +750,10 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 int currentStatus = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
                 if (currentStatus == status) {
-                    // invitation = new
-                    // FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)),
-                    // cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
-                    // cursor.getString(cursor
-                    // .getColumnIndex(KEY_NAME)), currentStatus);
+                    long userId = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
+
+                    ImmutableInvitation immInvit = new ImmutableInvitation(userId, currentStatus);
+                    invitation = new FriendInvitation(immInvit);
 
                     invitations.add(invitation);
                 }
@@ -826,11 +829,10 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 int status = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
                 if ((status == Invitation.READ) || (status == Invitation.UNREAD)) {
-                    // invitation = new
-                    // FriendInvitation(cursor.getLong(cursor.getColumnIndex(KEY_ID)),
-                    // cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)),
-                    // cursor.getString(cursor
-                    // .getColumnIndex(KEY_NAME)), status);
+                    long userId = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
+
+                    ImmutableInvitation immInvit = new ImmutableInvitation(userId, status);
+                    invitation = new FriendInvitation(immInvit);
 
                     invitations.add(invitation);
                 }
