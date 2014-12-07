@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.gui.Utils;
@@ -12,46 +11,27 @@ import ch.epfl.smartmap.gui.Utils;
  * @author agpmilli
  */
 public class EventInvitation implements Invitation {
-    private long mInvitationId;
-    private final long mUserId;
-    private final long mEventId;
-    private final String mUserName;
-    private final String mEventName;
+    private final ImmutableUser mUser;
+    private final ImmutableEvent mEvent;
     private int mStatus;
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
 
-    public EventInvitation(long invitationId, long userId, String userName, long eventId, String eventName, int status) {
-        mInvitationId = invitationId;
-        mUserId = userId;
-        mEventId = eventId;
-        mUserName = userName;
-        mEventName = eventName;
-        mStatus = status;
+    public EventInvitation(ImmutableInvitation invitation, ImmutableEvent event) {
+        mUser = invitation.getUser();
+        mEvent = event;
+        mStatus = invitation.getStatus();
     }
 
-    public long getEventId() {
-        return mEventId;
-    }
-
-    public String getEventName() {
-        return mEventName;
+    public ImmutableEvent getEvent() {
+        return mEvent;
     }
 
     @Override
     public long getId() {
-        return mInvitationId;
-    }
-
-    public void setId(long id) {
-        mInvitationId = id;
-    }
-
-    @Override
-    public Bitmap getImage() {
-        return null;
+        return mEvent.getId();
     }
 
     @Override
@@ -79,17 +59,17 @@ public class EventInvitation implements Invitation {
 
     @Override
     public String getTitle() {
-        return Utils.sContext.getResources().getString(R.string.notification_event_request_title) + " " + mUserName;
+        return Utils.sContext.getResources().getString(R.string.notification_event_request_title) + " "
+            + mUser.getName();
     }
 
     @Override
-    public long getUserId() {
-        return mUserId;
+    public ImmutableUser getUser() {
+        return mUser;
     }
 
-    @Override
-    public String getUserName() {
-        return mUserName;
+    public void setId(long id) {
+        mEvent.setId(id);
     }
 
     @Override

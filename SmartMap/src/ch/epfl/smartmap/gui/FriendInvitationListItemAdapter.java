@@ -18,56 +18,6 @@ import ch.epfl.smartmap.cache.Invitation;
  */
 public class FriendInvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
 
-    private final Context mContext;
-    private final List<FriendInvitation> mItemsArrayList;
-
-    /**
-     * @param context
-     *            Context of the Activity where we want to display the user list
-     * @param userList
-     *            list of users to display
-     */
-    public FriendInvitationListItemAdapter(Context context, List<FriendInvitation> itemsArrayList) {
-
-        super(context, R.layout.gui_friend_invitation_list_item, itemsArrayList);
-
-        mContext = context;
-        mItemsArrayList = itemsArrayList;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        // Create inflater,get item to construct
-        FriendInvitationViewHolder viewHolder;
-        Invitation invitation = mItemsArrayList.get(position);
-
-        if (convertView == null) {
-            LayoutInflater inflater =
-                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.gui_friend_invitation_list_item, parent, false);
-            viewHolder = new FriendInvitationViewHolder();
-
-            viewHolder.setUserName((TextView) convertView.findViewById(R.id.activity_friends_inviter_name));
-            viewHolder
-                .setPicture((ImageView) convertView.findViewById(R.id.activity_friends_inviter_picture));
-            viewHolder.setUserId(invitation.getId());
-            viewHolder.setInvitationId(invitation.getId());
-
-            convertView.setTag(viewHolder);
-
-        } else {
-            viewHolder = (FriendInvitationViewHolder) convertView.getTag();
-        }
-
-        if (invitation != null) {
-            viewHolder.getUserName().setText(invitation.getUserName());
-            // viewHolder.getPicture().setImageBitmap(user.getPicture(mContext));
-        }
-
-        return convertView;
-    }
-
     static class FriendInvitationViewHolder {
         private TextView mUserName;
         private ImageView mPicture;
@@ -108,4 +58,52 @@ public class FriendInvitationListItemAdapter extends ArrayAdapter<FriendInvitati
 
     }
 
+    private final Context mContext;
+
+    private final List<FriendInvitation> mItemsArrayList;
+
+    /**
+     * @param context
+     *            Context of the Activity where we want to display the user list
+     * @param userList
+     *            list of users to display
+     */
+    public FriendInvitationListItemAdapter(Context context, List<FriendInvitation> itemsArrayList) {
+
+        super(context, R.layout.gui_friend_invitation_list_item, itemsArrayList);
+
+        mContext = context;
+        mItemsArrayList = itemsArrayList;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        // Create inflater,get item to construct
+        FriendInvitationViewHolder viewHolder;
+        Invitation invitation = mItemsArrayList.get(position);
+
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.gui_friend_invitation_list_item, parent, false);
+            viewHolder = new FriendInvitationViewHolder();
+
+            viewHolder.setUserName((TextView) convertView.findViewById(R.id.activity_friends_inviter_name));
+            viewHolder.setPicture((ImageView) convertView.findViewById(R.id.activity_friends_inviter_picture));
+            viewHolder.setUserId(invitation.getUser().getId());
+            viewHolder.setInvitationId(invitation.getUser().getId());
+
+            convertView.setTag(viewHolder);
+
+        } else {
+            viewHolder = (FriendInvitationViewHolder) convertView.getTag();
+        }
+
+        if (invitation != null) {
+            viewHolder.getUserName().setText(invitation.getUser().getName());
+            // viewHolder.getPicture().setImageBitmap(user.getPicture(mContext));
+        }
+
+        return convertView;
+    }
 }

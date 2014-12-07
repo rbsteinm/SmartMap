@@ -44,10 +44,10 @@ public class PublicEvent implements Event {
     public static final float MARKER_ANCHOR_Y = 1;
 
     protected PublicEvent(ImmutableEvent event) {
-        if (event.getID() < -1) {
+        if (event.getId() < -1) {
             throw new IllegalArgumentException();
         } else {
-            mId = event.getID();
+            mId = event.getId();
         }
 
         if ((event.getName() == null) || event.getName().equals("")) {

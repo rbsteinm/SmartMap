@@ -34,4 +34,10 @@ public class OnCacheListener implements CacheListener {
         // TODO Auto-generated method stub
 
     }
+
+    @Override
+    public void onInvitationListUpdate() {
+        // TODO Auto-generated method stub
+
+    }
 }

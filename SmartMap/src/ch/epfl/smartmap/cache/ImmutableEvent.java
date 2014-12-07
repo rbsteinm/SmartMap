@@ -69,7 +69,7 @@ public class ImmutableEvent {
         return (Calendar) mEndDate.clone();
     }
 
-    public long getID() {
+    public long getId() {
         return mId;
     }
 

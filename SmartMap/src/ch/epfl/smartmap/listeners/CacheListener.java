@@ -11,4 +11,5 @@ public interface CacheListener {
 
     void onFriendListUpdate();
 
+    void onInvitationListUpdate();
 }
