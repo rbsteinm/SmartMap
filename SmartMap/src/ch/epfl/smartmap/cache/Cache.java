@@ -816,6 +816,13 @@ public class Cache {
             } else {
                 // Add friend
                 this.putFriend(onlineValues);
+                friend = this.getFriend(id);
+            }
+
+            if ((friend.getImage() == User.NO_IMAGE) || (friend.getImage() == null)) {
+                Bitmap image = networkClient.getProfilePicture(id);
+                // TODO set profile picture to the live instance (missing easy
+                // way to do it...)
             }
         }
 
