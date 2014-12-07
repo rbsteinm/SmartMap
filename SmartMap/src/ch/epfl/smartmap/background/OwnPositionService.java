@@ -31,9 +31,9 @@ public class OwnPositionService extends Service {
     // minimum distance before gps updates are requested
     private static final float MIN_GPS_DISTANCE = 50;
     // Time between position updates on GPS
-    private int mGPSRefreshFrequency;
+    private static final int GPS_UPDATE_TIME = 5 * 60 * 1000;
     // Time between position updates on Network
-    private int mNetworkRefreshFrequency;
+    private static final int NETWORK_UPDATE_TIME = 10 * 1000;
 
     // Time before restart
     private static final int RESTART_DELAY = 2000;
@@ -56,49 +56,7 @@ public class OwnPositionService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... arg0) {
-                try {
-                    // Authentify in order to communicate with NetworkClient
-                    ServiceContainer.getNetworkClient().authServer(
-                        ServiceContainer.getSettingsManager().getUserName(),
-                        ServiceContainer.getSettingsManager().getFacebookID(),
-                        ServiceContainer.getSettingsManager().getToken());
-                    return true;
-                } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Couldn't log in: " + e);
-                    return false;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result) {
-                if (result) {
-                    // Creates a Criteria, used to chose LocationManager settings
-                    Criteria criteria = new Criteria();
-                    criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                    criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
-
-                    mLocManager.requestSingleUpdate(criteria, new MyLocationListener(), null);
-
-                    // Try to run LocationManager with Network Provider
-                    if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                        mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                            mNetworkRefreshFrequency, MIN_NETWORK_DISTANCE, new MyLocationListener());
-                    }
-
-                    // Otherwise try to run LocationManager with GPS Provider
-                    if (mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                        mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                            mGPSRefreshFrequency, MIN_GPS_DISTANCE, new MyLocationListener());
-                    }
-                } else {
-                    // FIXME : Handle this case
-                    // Shouldn't the service always be authentified when launched ?
-                }
-            }
-        }.execute();
+        new StartUp().execute();
 
         return START_STICKY;
     }
@@ -117,12 +75,6 @@ public class OwnPositionService extends Service {
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
     }
-
-    /**
-     * AsyncTask to log in
-     * 
-     * @author ritterni
-     */
 
     /**
      * A location listener
@@ -166,6 +118,55 @@ public class OwnPositionService extends Service {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             Log.d(TAG, provider + " status: " + status);
+        }
+    }
+
+    /**
+     * Performs tasks that are needed when the service starts
+     * 
+     * @author ritterni
+     */
+    private class StartUp extends AsyncTask<Void, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(Void... arg0) {
+            try {
+                // Authentify in order to communicate with NetworkClient
+                ServiceContainer.getNetworkClient().authServer(
+                    ServiceContainer.getSettingsManager().getUserName(),
+                    ServiceContainer.getSettingsManager().getFacebookID(),
+                    ServiceContainer.getSettingsManager().getToken());
+                return true;
+            } catch (SmartMapClientException e) {
+                Log.e(TAG, "Couldn't log in: " + e);
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                // Creates a Criteria, used to chose LocationManager settings
+                Criteria criteria = new Criteria();
+                criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
+
+                mLocManager.requestSingleUpdate(criteria, new MyLocationListener(), null);
+
+                // Try to run LocationManager with Network Provider
+                if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                    mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_TIME,
+                        MIN_NETWORK_DISTANCE, new MyLocationListener());
+                }
+
+                // And try to run LocationManager with GPS Provider
+                if (mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME,
+                        MIN_GPS_DISTANCE, new MyLocationListener());
+                }
+            } else {
+                // FIXME : Handle this case
+                // Shouldn't the service always be authentified when launched ?
+            }
         }
     }
 }

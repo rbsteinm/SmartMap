@@ -10,6 +10,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
 public class NearEventsThread extends Thread {
 
     private static final String TAG = NearEventsThread.class.getSimpleName();
+    private static final int REFRESH_DELAY = 20000;
 
     @Override
     public void run() {
@@ -23,7 +24,7 @@ public class NearEventsThread extends Thread {
                 Log.e(TAG, "Couldn't retrieve public events: " + e);
             }
             try {
-                sleep(20000);
+                sleep(REFRESH_DELAY);
             } catch (InterruptedException e) {
                 Log.e(TAG, "Can't sleep");
             }
