@@ -903,7 +903,11 @@ public class Cache {
     private void updateFriendInvitations(Set<ImmutableUser> inviters, final Context ctx) {
         for (final ImmutableUser inviter : inviters) {
             if (!mInvitingUserIds.contains(inviter.getId())) {
+                // Put inviter in cache
                 mInvitingUserIds.add(inviter.getId());
+                this.putStranger(inviter);
+
+                // Acknowledge invitation and display notification
                 new AsyncTask<ImmutableUser, Void, Void>() {
                     @Override
                     protected Void doInBackground(ImmutableUser... params) {
