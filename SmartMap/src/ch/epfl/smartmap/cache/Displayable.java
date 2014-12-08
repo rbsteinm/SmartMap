@@ -44,6 +44,8 @@ public interface Displayable extends Stockable {
 
     String getLocationString();
 
+    BitmapDescriptor getMarkerIcon(Context context);
+
     /**
      * @return Text containing various information (description, last seen,
      *         etc.)
@@ -56,7 +58,5 @@ public interface Displayable extends Stockable {
     String getTitle();
 
     boolean isVisible();
-
-    BitmapDescriptor getMarkerIcon(Context context);
 
 }
