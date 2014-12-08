@@ -554,8 +554,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
             cursor.close();
 
-            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image,
-                User.DEFAULT_BLOCK_VALUE);
+            // TODO : Store block values
+            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image, false);
         }
 
         return null;

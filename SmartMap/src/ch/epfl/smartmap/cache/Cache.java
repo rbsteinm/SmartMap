@@ -76,8 +76,7 @@ public class Cache {
         mListeners = new ArrayList<CacheListener>();
     }
 
-    public synchronized void acceptInvitation(final Invitation invitation,
-        final NetworkRequestCallback callback) {
+    public void acceptInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -115,7 +114,7 @@ public class Cache {
     /**
      * OK
      */
-    public synchronized void addOnCacheListener(CacheListener listener) {
+    public void addOnCacheListener(CacheListener listener) {
         mListeners.add(listener);
     }
 
@@ -125,8 +124,7 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void createEvent(final ImmutableEvent createdEvent,
-        final NetworkRequestCallback callback) {
+    public void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -146,8 +144,7 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void declineInvitation(final Invitation invitation,
-        final NetworkRequestCallback callback) {
+    public void declineInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -175,29 +172,32 @@ public class Cache {
         }.execute();
     }
 
-    /**
-     * OK
-     * 
-     * @return
-     */
-    public synchronized Set<Event> getAllEvents() {
-        return this.getPublicEvents(mEventIds);
+    public Set<Filter> getAllActiveFilters() {
+        return this.getFilters(new SearchFilter<Filter>() {
+            @Override
+            public boolean filter(Filter filter) {
+                return filter.isActive();
+            }
+        });
     }
 
-    /**
-     * OK
-     * 
-     * @return a list containing all the user's Friends.
-     */
-    public synchronized Set<User> getAllFriends() {
+    public Set<Event> getAllEvents() {
+        return this.getEvents(mEventIds);
+    }
+
+    public Set<Filter> getAllFilters() {
+        return this.getFilters(mFilterIds);
+    }
+
+    public Set<User> getAllFriends() {
         return this.getFriends(mFriendIds);
     }
 
-    public synchronized SortedSet<Invitation> getAllInvitations() {
+    public SortedSet<Invitation> getAllInvitations() {
         return this.getInvitations(mInvitationIds);
     }
 
-    public synchronized Set<Event> getAllVisibleEvents() {
+    public Set<Event> getAllVisibleEvents() {
         Set<Event> allVisibleEvents = new HashSet<Event>();
         for (Event event : this.getAllEvents()) {
             if (event.isVisible()) {
@@ -205,7 +205,7 @@ public class Cache {
             }
         }
 
-        return this.getPublicEvents(mEventIds);
+        return this.getEvents(mEventIds);
     }
 
     /**
@@ -213,7 +213,7 @@ public class Cache {
      * 
      * @return
      */
-    public synchronized Set<User> getAllVisibleFriends() {
+    public Set<User> getAllVisibleFriends() {
         // Get all friends
         Set<Long> allVisibleUsersId = new HashSet<Long>(mFriendIds);
 
@@ -235,11 +235,62 @@ public class Cache {
      * @param id
      * @return
      */
-    public synchronized Filter getFilter(long id) {
+    public Event getEvent(long id) {
+        return mEventInstances.get(id);
+    }
+
+    public Set<Event> getEvents(SearchFilter<Event> filter) {
+        Set<Event> events = new HashSet<Event>();
+        for (long id : mEventIds) {
+            Event event = this.getEvent(id);
+            if (filter.filter(event)) {
+                events.add(event);
+            }
+        }
+        return events;
+    }
+
+    /**
+     * OK
+     * 
+     * @param ids
+     * @return
+     */
+    public Set<Event> getEvents(Set<Long> ids) {
+        Set<Event> events = new HashSet<Event>();
+        for (long id : ids) {
+            Event event = this.getEvent(id);
+            if (event != null) {
+                events.add(event);
+            }
+        }
+        return events;
+    }
+
+    /**
+     * OK
+     * 
+     * @param id
+     * @return
+     */
+    public Filter getFilter(long id) {
         return mFilterInstances.get(id);
     }
 
-    public synchronized Set<Filter> getFilters(Set<Long> ids) {
+    public Set<Filter> getFilters(SearchFilter<Filter> searchFilter) {
+        Set<Filter> filters = new HashSet<Filter>();
+
+        for (long id : mFilterIds) {
+            Filter filter = this.getFilter(id);
+            if ((filter != null) && searchFilter.filter(filter)) {
+                filters.add(filter);
+            }
+        }
+
+        return filters;
+    }
+
+    public Set<Filter> getFilters(Set<Long> ids) {
         Set<Filter> filters = new HashSet<Filter>();
 
         for (long id : ids) {
@@ -258,7 +309,7 @@ public class Cache {
      * @param id
      * @return
      */
-    public synchronized User getFriend(long id) {
+    public User getFriend(long id) {
         if (mFriendIds.contains(id)) {
             return mUserInstances.get(id);
         } else {
@@ -266,19 +317,19 @@ public class Cache {
         }
     }
 
-    public synchronized SortedSet<Invitation> getFriendInvitations() {
+    public SortedSet<Invitation> getFriendInvitations() {
         return this.getInvitations(mInvitationIds, new SearchFilter<Invitation>() {
             @Override
-            public synchronized boolean filter(Invitation invitation) {
+            public boolean filter(Invitation invitation) {
                 return invitation.getType() == Invitation.FRIEND_INVITATION;
             }
         });
     }
 
-    public synchronized SortedSet<Invitation> getFriendInvitationsByStatus(final int status) {
+    public SortedSet<Invitation> getFriendInvitationsByStatus(final int status) {
         return this.getInvitations(mInvitationIds, new SearchFilter<Invitation>() {
             @Override
-            public synchronized boolean filter(Invitation invitation) {
+            public boolean filter(Invitation invitation) {
                 return invitation.getStatus() == status;
             }
         });
@@ -290,7 +341,7 @@ public class Cache {
      * @param ids
      * @return
      */
-    public synchronized Set<User> getFriends(Set<Long> ids) {
+    public Set<User> getFriends(Set<Long> ids) {
         Set<User> friends = new HashSet<User>();
         for (long id : ids) {
             User friend = this.getFriend(id);
@@ -301,15 +352,15 @@ public class Cache {
         return friends;
     }
 
-    public synchronized Invitation getInvitation(long id) {
+    public Invitation getInvitation(long id) {
         return mInvitationInstances.get(id);
     }
 
-    public synchronized SortedSet<Invitation> getInvitations(Set<Long> ids) {
+    public SortedSet<Invitation> getInvitations(Set<Long> ids) {
         return this.getInvitations(mInvitationIds, null);
     }
 
-    public synchronized SortedSet<Invitation> getInvitations(Set<Long> ids, SearchFilter<Invitation> filter) {
+    public SortedSet<Invitation> getInvitations(Set<Long> ids, SearchFilter<Invitation> filter) {
         SortedSet<Invitation> invitations = new TreeSet<Invitation>();
 
         for (long id : ids) {
@@ -322,7 +373,7 @@ public class Cache {
         return invitations;
     }
 
-    public synchronized Set<Event> getLiveEvents() {
+    public Set<Event> getLiveEvents() {
         Set<Event> onLiveEvents = this.getAllEvents();
         for (Event event : onLiveEvents) {
             if (!event.isLive()) {
@@ -332,7 +383,7 @@ public class Cache {
         return onLiveEvents;
     }
 
-    public synchronized Set<Event> getMyEvents() {
+    public Set<Event> getMyEvents() {
         Set<Event> myEvents = this.getAllEvents();
         for (Event event : myEvents) {
             if (!event.isOwn()) {
@@ -342,7 +393,7 @@ public class Cache {
         return myEvents;
     }
 
-    public synchronized Set<Event> getNearEvents() {
+    public Set<Event> getNearEvents() {
         Set<Event> nearEvents = this.getAllEvents();
         for (Event event : nearEvents) {
             if (!event.isNear()) {
@@ -358,34 +409,7 @@ public class Cache {
      * @param id
      * @return
      */
-    public synchronized Event getPublicEvent(long id) {
-        return mEventInstances.get(id);
-    }
-
-    /**
-     * OK
-     * 
-     * @param ids
-     * @return
-     */
-    public synchronized Set<Event> getPublicEvents(Set<Long> ids) {
-        Set<Event> events = new HashSet<Event>();
-        for (long id : ids) {
-            Event event = this.getPublicEvent(id);
-            if (event != null) {
-                events.add(event);
-            }
-        }
-        return events;
-    }
-
-    /**
-     * OK
-     * 
-     * @param id
-     * @return
-     */
-    public synchronized User getStranger(long id) {
+    public User getStranger(long id) {
         if (!mFriendIds.contains(id)) {
             return mUserInstances.get(id);
         } else {
@@ -399,7 +423,7 @@ public class Cache {
      * @param ids
      * @return
      */
-    public synchronized Set<User> getStrangers(Set<Long> ids) {
+    public Set<User> getStrangers(Set<Long> ids) {
         Set<User> strangers = new HashSet<User>();
         for (long id : ids) {
             User stranger = this.getStranger(id);
@@ -410,7 +434,7 @@ public class Cache {
         return strangers;
     }
 
-    public synchronized SortedSet<Invitation> getUnansweredFriendInvitations() {
+    public SortedSet<Invitation> getUnansweredFriendInvitations() {
         SortedSet<Invitation> unansweredFriendInvitations = this.getAllInvitations();
         for (Invitation invitation : unansweredFriendInvitations) {
             if ((invitation.getStatus() == Invitation.ACCEPTED)
@@ -427,7 +451,7 @@ public class Cache {
      * @param id
      * @return
      */
-    public synchronized User getUser(long id) {
+    public User getUser(long id) {
         User user = this.getFriend(id);
         if (user == null) {
             user = this.getStranger(id);
@@ -441,7 +465,7 @@ public class Cache {
      * @param ids
      * @return
      */
-    public synchronized Set<User> getUsers(Set<Long> ids) {
+    public Set<User> getUsers(Set<Long> ids) {
         Set<User> users = new HashSet<User>();
         for (long id : ids) {
             User user = this.getFriend(id);
@@ -455,7 +479,7 @@ public class Cache {
         return users;
     }
 
-    public synchronized void initFromDatabase(DatabaseHelper database) {
+    public void initFromDatabase(DatabaseHelper database) {
         // Clear previous values
         mEventInstances.clear();
         mUserInstances.clear();
@@ -488,7 +512,7 @@ public class Cache {
         }
     }
 
-    public synchronized void inviteFriendsToEvent(final long eventId, final Set<Long> usersIds,
+    public void inviteFriendsToEvent(final long eventId, final Set<Long> usersIds,
         final NetworkRequestCallback callback) {
 
         new AsyncTask<Void, Void, Void>() {
@@ -507,7 +531,7 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void inviteUser(long id, final NetworkRequestCallback callback) {
+    public void inviteUser(long id, final NetworkRequestCallback callback) {
         new AsyncTask<Long, Void, Void>() {
             @Override
             protected Void doInBackground(Long... params) {
@@ -529,8 +553,7 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent,
-        final NetworkRequestCallback callback) {
+    public void modifyOwnEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
         new AsyncTask<ImmutableEvent, Void, Void>() {
 
             @Override
@@ -553,29 +576,29 @@ public class Cache {
      * 
      * @param id
      */
-    public synchronized void putEvent(ImmutableEvent newEvent) {
+    public void putEvent(ImmutableEvent newEvent) {
         Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
         singleton.add(newEvent);
         this.putEvents(singleton);
     }
 
-    public synchronized void putEvents(Set<ImmutableEvent> newEvents) {
+    public void putEvents(Set<ImmutableEvent> newEvents) {
         for (final ImmutableEvent newEvent : newEvents) {
             // Fetch Creator
             ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(),
                 new SearchRequestCallback<User>() {
                     @Override
-                    public synchronized void onNetworkError() {
+                    public void onNetworkError() {
                         // Don't add
                     }
 
                     @Override
-                    public synchronized void onNotFound() {
+                    public void onNotFound() {
                         // Don't add
                     }
 
                     @Override
-                    public synchronized void onResult(User result) {
+                    public void onResult(User result) {
                         mEventIds.add(newEvent.getId());
                         mEventInstances.put(newEvent.getId(), new PublicEvent(newEvent.setCreator(result)));
 
@@ -588,7 +611,14 @@ public class Cache {
         }
     }
 
-    public synchronized void putFilters(Set<ImmutableFilter> newFilters) {
+    public long putFilter(ImmutableFilter newFilter) {
+        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
+        singleton.add(newFilter);
+        this.putFilters(singleton);
+        return nextFilterId - 1;
+    }
+
+    public void putFilters(Set<ImmutableFilter> newFilters) {
         for (ImmutableFilter newFilter : newFilters) {
             // Create new Unique Id
             newFilter.setId(nextFilterId++);
@@ -602,13 +632,13 @@ public class Cache {
         }
     }
 
-    public synchronized void putFriend(ImmutableUser newFriend) {
+    public void putFriend(ImmutableUser newFriend) {
         Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
         singleton.add(newFriend);
         this.putFriends(singleton);
     }
 
-    public synchronized void putFriends(Set<ImmutableUser> newFriends) {
+    public void putFriends(Set<ImmutableUser> newFriends) {
         boolean isListModified = false;
 
         for (ImmutableUser newFriend : newFriends) {
@@ -631,13 +661,13 @@ public class Cache {
         }
     }
 
-    public synchronized void putInvitation(ImmutableInvitation newInvitation) {
+    public void putInvitation(ImmutableInvitation newInvitation) {
         Set<ImmutableInvitation> singleton = new HashSet<ImmutableInvitation>();
         singleton.add(newInvitation);
         this.putInvitations(singleton);
     }
 
-    public synchronized void putInvitations(Set<ImmutableInvitation> newInvitations) {
+    public void putInvitations(Set<ImmutableInvitation> newInvitations) {
         // for (ImmutableInvitation newInvitation : newInvitations) {
         // if (mInvitationInstances.get(newInvitation.getId() == null)) {
         // // Need to add it, give it to the database to get the id
@@ -657,7 +687,7 @@ public class Cache {
      * 
      * @param user
      */
-    public synchronized void putStranger(ImmutableUser newStranger) {
+    public void putStranger(ImmutableUser newStranger) {
         Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
         singleton.add(newStranger);
         this.putStrangers(singleton);
@@ -668,7 +698,7 @@ public class Cache {
      * 
      * @param newStrangers
      */
-    public synchronized void putStrangers(Set<ImmutableUser> newStrangers) {
+    public void putStrangers(Set<ImmutableUser> newStrangers) {
         for (ImmutableUser newStranger : newStrangers) {
             // Check that the Stranger is not a friend
             if (!mFriendIds.contains(newStranger.getId())) {
@@ -683,7 +713,7 @@ public class Cache {
         }
     }
 
-    public synchronized void readAllInvitations() {
+    public void readAllInvitations() {
         // Set<Invitation> unreadInvitations = this.getIn
     }
 
@@ -692,7 +722,7 @@ public class Cache {
      * 
      * @param id
      */
-    public synchronized void removeEvent(long id) {
+    public void removeEvent(long id) {
         Set<Long> singleton = new HashSet<Long>();
         singleton.add(id);
         this.removeEvents(singleton);
@@ -703,7 +733,7 @@ public class Cache {
      * 
      * @param ids
      */
-    public synchronized void removeEvents(Set<Long> ids) {
+    public void removeEvents(Set<Long> ids) {
         boolean isListModified = false;
 
         for (long id : ids) {
@@ -731,7 +761,7 @@ public class Cache {
      * 
      * @param id
      */
-    public synchronized void removeFilter(long id) {
+    public void removeFilter(long id) {
         Set<Long> singleton = new HashSet<Long>();
         singleton.add(id);
         this.removeFilters(singleton);
@@ -742,7 +772,7 @@ public class Cache {
      * 
      * @param ids
      */
-    public synchronized void removeFilters(Set<Long> ids) {
+    public void removeFilters(Set<Long> ids) {
         boolean isListModified = false;
 
         for (long id : ids) {
@@ -771,7 +801,7 @@ public class Cache {
      * 
      * @param id
      */
-    public synchronized void removeFriend(long id) {
+    public void removeFriend(long id) {
         Set<Long> singleton = new HashSet<Long>();
         singleton.add(id);
         this.removeFriends(singleton);
@@ -782,7 +812,7 @@ public class Cache {
      * 
      * @param ids
      */
-    public synchronized void removeFriends(Set<Long> ids) {
+    public void removeFriends(Set<Long> ids) {
         boolean isListModified = false;
 
         for (long id : ids) {
@@ -810,14 +840,14 @@ public class Cache {
      * 
      * @param updatedEvent
      */
-    public synchronized void updateEvent(ImmutableEvent updatedEvent) {
+    public void updateEvent(ImmutableEvent updatedEvent) {
         Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
         singleton.add(updatedEvent);
         this.updateEvents(singleton);
     }
 
     // TODO
-    public synchronized void updateEventInvitations(List<Long> events) {
+    public void updateEventInvitations(List<Long> events) {
         // for (Long eventId : events) {
         // new AsyncTask<Long, Void, Void>() {
         //
@@ -860,9 +890,9 @@ public class Cache {
      * 
      * @param updatedEvents
      */
-    public synchronized void updateEvents(Set<ImmutableEvent> updatedEvents) {
+    public void updateEvents(Set<ImmutableEvent> updatedEvents) {
         for (ImmutableEvent updatedEvent : updatedEvents) {
-            Event cachedEvent = this.getPublicEvent(updatedEvent.getId());
+            Event cachedEvent = this.getEvent(updatedEvent.getId());
             if (cachedEvent != null) {
                 cachedEvent.update(updatedEvent);
             }
@@ -873,19 +903,38 @@ public class Cache {
         }
     }
 
+    public void updateFilter(ImmutableFilter updatedFilter) {
+        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
+        singleton.add(updatedFilter);
+        this.updateFilters(singleton);
+    }
+
+    public void updateFilters(Set<ImmutableFilter> updatedFilters) {
+        for (ImmutableFilter updatedFilter : updatedFilters) {
+            Filter cachedFilter = this.getFilter(updatedFilter.getId());
+            if (cachedFilter != null) {
+                cachedFilter.update(updatedFilter);
+            }
+        }
+
+        for (CacheListener listener : mListeners) {
+            listener.onFilterListUpdate();
+        }
+    }
+
     /**
      * OK
      * 
      * @param updatedFriend
      */
-    public synchronized void updateFriend(ImmutableUser updatedFriend) {
+    public void updateFriend(ImmutableUser updatedFriend) {
         Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
         singleton.add(updatedFriend);
         this.updateFriends(singleton);
     }
 
     // TODO
-    public synchronized void updateFriendInvitations(NotificationBag notifBag, Context ctx) {
+    public void updateFriendInvitations(NotificationBag notifBag, Context ctx) {
 
         // for (long id : this.putInvitingUsers(notifBag.getInvitingUsers())) {
         // Notifications.newFriendNotification(ctx,
@@ -902,7 +951,7 @@ public class Cache {
      * 
      * @param updatedFriends
      */
-    public synchronized void updateFriends(Set<ImmutableUser> updatedFriends) {
+    public void updateFriends(Set<ImmutableUser> updatedFriends) {
         for (ImmutableUser updatedFriend : updatedFriends) {
             User cachedFriend = this.getFriend(updatedFriend.getId());
             if (cachedFriend != null) {
@@ -915,8 +964,7 @@ public class Cache {
         }
     }
 
-    public synchronized void updateFromNetwork(final SmartMapClient networkClient,
-        final NetworkRequestCallback callback) {
+    public void updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -967,11 +1015,11 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void updateInvitation(ImmutableInvitation invitation) {
+    public void updateInvitation(ImmutableInvitation invitation) {
         // TODO
     }
 
-    public synchronized boolean updatePublicEvent(ImmutableEvent event) {
+    public boolean updatePublicEvent(ImmutableEvent event) {
         // Check in cache
         Event cachedEvent = mEventInstances.get(event.getId());
 

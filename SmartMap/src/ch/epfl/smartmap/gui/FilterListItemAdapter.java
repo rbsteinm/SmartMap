@@ -15,7 +15,10 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.ImmutableFilter;
 
 /**
  * Customized adapter that displays a list of filters in a target activity
@@ -26,14 +29,13 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
     private final Context mContext;
     private final List<Filter> mItemsArrayList;
-
-    // private final Cache mCache;
+    private final Cache mCache;
 
     public FilterListItemAdapter(Context context, List<Filter> filtersList) {
         super(context, R.layout.gui_friend_list_item, filtersList);
         mContext = context;
         mItemsArrayList = new ArrayList<Filter>(filtersList);
-        // mCache = Cache.getInstance();
+        mCache = ServiceContainer.getCache();
     }
 
     /*
@@ -72,23 +74,20 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
             viewHolder.getSubtitle().setText(filter.getFriendIds().size() + " people inside this filter");
 
-            // viewHolder.getFollowSwitch().setText("Show on map");
-            viewHolder.getFollowSwitch().setTextOn("On");
-            viewHolder.getFollowSwitch().setTextOff("Off");
-            // viewHolder.getFollowSwitch().setChecked(filter.isVisible());
+            viewHolder.getFollowSwitch().setTextOn("YES");
+            viewHolder.getFollowSwitch().setTextOff("NO");
+            viewHolder.getFollowSwitch().setChecked(filter.isActive());
 
             viewHolder.getFollowSwitch().setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            // TODO
-                            // set visible attribute of each friend at true
-                            // notify the server
+                            mCache.updateFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter
+                                .getFriendIds(), true));
                         } else {
-                            // TODO
-                            // set visible attribute of each friend at true
-                            // notify the server
+                            mCache.updateFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter
+                                .getFriendIds(), false));
                         }
                     }
                 });

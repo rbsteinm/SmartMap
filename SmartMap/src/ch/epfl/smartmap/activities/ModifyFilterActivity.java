@@ -1,8 +1,9 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,9 +22,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.MockDB;
+import ch.epfl.smartmap.cache.ImmutableFilter;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 
@@ -42,7 +44,7 @@ public class ModifyFilterActivity extends Activity {
     private Filter mFilter;
     private Cache mCache;
 
-    private final MockDB mockDB = new MockDB();
+    // private final MockDB mockDB = new MockDB();
 
     private OnItemLongClickListener mOnInsideItemLongClickListener;
     private OnItemLongClickListener mOnOutsideItemLongClickListener;
@@ -56,7 +58,7 @@ public class ModifyFilterActivity extends Activity {
         this.setContentView(R.layout.activity_modify_filter);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-        // mCache=ServiceContainer.getCache();
+        mCache = ServiceContainer.getCache();
 
         mInsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_inside_layout);
         mOutsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_outside_layout);
@@ -80,6 +82,8 @@ public class ModifyFilterActivity extends Activity {
 
         mListViewOutside.setOnDragListener(mFromOutsideDragListener);
         mInsideFilterLayout.setOnDragListener(mFromOutsideDragListener);
+
+        this.setFilter();
     }
 
     /*
@@ -90,27 +94,18 @@ public class ModifyFilterActivity extends Activity {
     protected void onResume() {
 
         super.onResume();
+        this.setFilter();
 
-        // TODO set the inside and outside list using the intent and the cache
-        // mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
-        // for (long id :mFilter.getFriendIds()){
-        // mFriendsInside.addFriend(mCache.getFrien(id));
-        // }
-        // for(User friend:mCache.getAllFriends()){
-        // if(!mFriendsInside.contains(friend)){
-        // mFriendsOutside.add(friend);
-        // }
-        // }
-        // this.setTitle(mFilter.getName());
+        this.setTitle(mFilter.getName());
         // For the moment,mock stuff
-        this.setTitle("Sweng Team");
-
-        mFriendsInside =
-            new ArrayList<User>(Arrays.asList(mockDB.JULIEN, mockDB.ALAIN, mockDB.ROBIN, mockDB.MATTHIEU,
-                mockDB.NICOLAS, mockDB.MARION, mockDB.RAPHAEL, mockDB.HUGO));
-        mFriendsOutside =
-            new ArrayList<User>(Arrays.asList(mockDB.GUILLAUME, mockDB.SELINE, mockDB.CYRIL, mockDB.PIETRO,
-                mockDB.CHRISTIE, mockDB.MARIE));
+        // this.setTitle("Sweng Team");
+        //
+        // mFriendsInside =
+        // new ArrayList<User>(Arrays.asList(mockDB.JULIEN, mockDB.ALAIN, mockDB.ROBIN, mockDB.MATTHIEU,
+        // mockDB.NICOLAS, mockDB.MARION, mockDB.RAPHAEL, mockDB.HUGO));
+        // mFriendsOutside =
+        // new ArrayList<User>(Arrays.asList(mockDB.GUILLAUME, mockDB.SELINE, mockDB.CYRIL, mockDB.PIETRO,
+        // mockDB.CHRISTIE, mockDB.MARIE));
 
         FriendListItemAdapter insideAdapter =
             new FriendListItemAdapter(this.getBaseContext(), mFriendsInside);
@@ -146,8 +141,7 @@ public class ModifyFilterActivity extends Activity {
                 this.saveFilterDialog();
                 break;
             case R.id.action_rename_filter:
-                // TODO : dialog asking the name, rename filter, update cache?
-                this.saveFilterDialog();
+                // TODO : dialog asking for the name, rename filter, update cache?
                 break;
             default:
                 // No other menu items!
@@ -157,28 +151,20 @@ public class ModifyFilterActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveFilter() {
-        // TODO
-        // for(User friend:mFriendsInside){
-        // mFilter.addUser(friend.getId());
-        // }
-        // for(User friend:mFriendsOutside){
-        // if(mFilter.getList().contains(friend.getId())){
-        // mFilter.removeUser(friend.getId());
-        // }
-        // }
-        // //Update in cache?
+    private Set<Long> friendListToIdSet(List<User> friendList) {
+        Set<Long> idSet = new HashSet<Long>();
+        for (User friend : friendList) {
+            idSet.add(friend.getId());
+        }
+        return idSet;
     }
 
-    /**
-     * A dialog to ask whether to accept or decline the invitation of the given
-     * user
-     * 
-     * @param name
-     *            the user's name
-     * @param userId
-     *            the user's id
-     */
+    private void saveFilter() {
+        mCache.updateFilter(new ImmutableFilter(mFilter.getId(), mFilter.getName(), this
+            .friendListToIdSet(mFriendsInside), mFilter.isActive()));
+
+    }
+
     private void saveFilterDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Save changes?");
@@ -188,7 +174,9 @@ public class ModifyFilterActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 ModifyFilterActivity.this.saveFilter();
-                Toast.makeText(ModifyFilterActivity.this.getBaseContext(), "Changes saved", Toast.LENGTH_LONG);
+                Toast
+                    .makeText(ModifyFilterActivity.this.getBaseContext(), "Changes saved", Toast.LENGTH_LONG)
+                    .show();
 
             }
         });
@@ -203,6 +191,18 @@ public class ModifyFilterActivity extends Activity {
 
         // display the AlertDialog
         builder.create().show();
+    }
+
+    private void setFilter() {
+        mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
+        for (long id : mFilter.getFriendIds()) {
+            mFriendsInside.add(mCache.getFriend(id));
+        }
+        for (User friend : mCache.getAllFriends()) {
+            if (!mFriendsInside.contains(friend)) {
+                mFriendsOutside.add(friend);
+            }
+        }
     }
 
     protected class ListInsideDragEventListener implements View.OnDragListener {
@@ -236,7 +236,7 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mOutsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mockDB.getFriend(droppedItemId);
+                        User droppedItem = mCache.getFriend(droppedItemId);
 
                         mFriendsInside.remove(droppedItem);
                         mFriendsOutside.add(droppedItem);
@@ -244,8 +244,6 @@ public class ModifyFilterActivity extends Activity {
                             .getBaseContext(), mFriendsInside));
                         mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
                             .getBaseContext(), mFriendsOutside));
-
-                        // mFilter.removeUser(droppedItemId);
 
                         return true;
                     } else {
@@ -294,7 +292,7 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mInsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mockDB.getFriend(droppedItemId);
+                        User droppedItem = mCache.getFriend(droppedItemId);
 
                         mFriendsInside.add(droppedItem);
                         mFriendsOutside.remove(droppedItem);
@@ -302,8 +300,6 @@ public class ModifyFilterActivity extends Activity {
                             .getBaseContext(), mFriendsInside));
                         mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
                             .getBaseContext(), mFriendsOutside));
-
-                        // mFilter.addUser(droppedItemId);
 
                         return true;
                     } else {

@@ -1,9 +1,12 @@
 package ch.epfl.smartmap.activities;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -12,10 +15,13 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.MockDB;
+import ch.epfl.smartmap.cache.ImmutableFilter;
 import ch.epfl.smartmap.gui.FilterListItemAdapter;
 
 /**
@@ -27,6 +33,8 @@ import ch.epfl.smartmap.gui.FilterListItemAdapter;
 public class ShowFiltersActivity extends ListActivity {
 
     private List<Filter> mFilterList;
+    private Cache mCache;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +43,13 @@ public class ShowFiltersActivity extends ListActivity {
 
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        mCache = ServiceContainer.getCache();
+        mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
+        mContext = this;
 
         // mock stuff, filter list should be taken from the cache (or database?)
-        MockDB.fillFilters();
-        mFilterList = MockDB.FILTER_LIST;
+        // MockDB.fillFilters();
+        // mFilterList = MockDB.FILTER_LIST;
 
         this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
@@ -46,7 +57,7 @@ public class ShowFiltersActivity extends ListActivity {
     public void addNewFilterDialog(MenuItem item) {
         // inflate the alertDialog
         LayoutInflater inflater = this.getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.new_filter_alert_dialog, null);
+        final View alertLayout = inflater.inflate(R.layout.new_filter_alert_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("New filter");
         builder.setView(alertLayout);
@@ -55,7 +66,16 @@ public class ShowFiltersActivity extends ListActivity {
         builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                // TODO what is exectued when the user confirms the new filter's creation
+                EditText editText =
+                    (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
+                String filterName = editText.getText().toString();
+                Long newFilterId =
+                    mCache
+                        .putFilter(new ImmutableFilter(Filter.NO_ID, filterName, new HashSet<Long>(), true));
+                // Start a new instance of ModifyFilterActivity passing it the new filter's name
+                Intent intent = new Intent(mContext, ModifyFilterActivity.class);
+                intent.putExtra("FILTER", newFilterId);
+                mContext.startActivity(intent);
             }
         });
 
@@ -98,4 +118,5 @@ public class ShowFiltersActivity extends ListActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

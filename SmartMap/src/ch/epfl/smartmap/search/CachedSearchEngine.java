@@ -55,7 +55,7 @@ public final class CachedSearchEngine implements SearchEngine {
             @Override
             protected Void doInBackground(Void... params) {
                 // Check for live instance
-                Event event = ServiceContainer.getCache().getPublicEvent(id);
+                Event event = ServiceContainer.getCache().getEvent(id);
 
                 if (event != null) {
                     // Found in cache, return
@@ -71,7 +71,7 @@ public final class CachedSearchEngine implements SearchEngine {
                         // Match in database, put it in cache
                         ServiceContainer.getCache().putEvent(databaseResult);
                         if (callback != null) {
-                            callback.onResult(ServiceContainer.getCache().getPublicEvent(id));
+                            callback.onResult(ServiceContainer.getCache().getEvent(id));
                         }
                         return null;
                     } else {
@@ -87,7 +87,7 @@ public final class CachedSearchEngine implements SearchEngine {
                             // Match on server, put it in cache
                             ServiceContainer.getCache().putEvent(networkResult);
                             if (callback != null) {
-                                callback.onResult(ServiceContainer.getCache().getPublicEvent(id));
+                                callback.onResult(ServiceContainer.getCache().getEvent(id));
                             }
                             return null;
                         } else {
@@ -118,7 +118,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                 for (long id : ids) {
                     // Check for live instance
-                    Event event = ServiceContainer.getCache().getPublicEvent(id);
+                    Event event = ServiceContainer.getCache().getEvent(id);
 
                     if (event != null) {
                         // Found in cache, add to set of live instances
@@ -153,7 +153,7 @@ public final class CachedSearchEngine implements SearchEngine {
                 ServiceContainer.getCache().putEvents(immutableResult);
                 // Retrieve live instances from cache
                 for (ImmutableEvent event : immutableResult) {
-                    result.add(ServiceContainer.getCache().getPublicEvent(event.getId()));
+                    result.add(ServiceContainer.getCache().getEvent(event.getId()));
                 }
                 if (callback != null) {
                     callback.onResult(result);

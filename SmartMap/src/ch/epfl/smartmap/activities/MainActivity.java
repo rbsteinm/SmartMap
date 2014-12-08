@@ -52,11 +52,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 /**
- * This Activity displays the core features of the App. It displays the map and
- * the whole menu.
- * It is a FriendsLocationListener to update the markers on the map when friends
- * positions
- * change
+ * This Activity displays the core features of the App. It displays the map and the whole menu. It is a
+ * FriendsLocationListener to update the markers on the map when friends positions change
  * 
  * @author jfperren
  * @author hugo-S
@@ -66,7 +63,8 @@ import com.google.android.gms.maps.model.Marker;
 
 public class MainActivity extends FragmentActivity implements CacheListener, OnInvitationListUpdateListener {
 
-    @SuppressWarnings("unused")
+    public static final String LOCATION_EXTRA = "LOCATION";
+
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
@@ -173,7 +171,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         // get Intent that started this Activity
         Intent startingIntent = this.getIntent();
         // get the value of the user string
-        Location eventLocation = startingIntent.getParcelableExtra("location");
+        Location eventLocation = startingIntent.getParcelableExtra(LOCATION_EXTRA);
         if (eventLocation != null) {
             mMapZoomer
                 .zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
@@ -460,8 +458,9 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     /**
-     * Sets the view for Item Focus, this means - Write name / Display photo on
-     * ActionBar - Sets ActionMenu for Item Focus
+     * Sets the view for Item Focus, this means - Write name / Display photo on ActionBar - Sets ActionMenu
+     * for Item
+     * Focus
      * 
      * @param item
      *            Item to be displayed

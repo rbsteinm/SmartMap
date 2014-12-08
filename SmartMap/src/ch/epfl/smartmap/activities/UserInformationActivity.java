@@ -72,10 +72,9 @@ public class UserInformationActivity extends Activity {
         mNameView.setText(mUser.getName());
         mSubtitlesView.setText(mUser.getSubtitle());
         mPictureView.setImageBitmap(mUser.getImage());
-        mFollowSwitch.setChecked(isFollowing);
+        mFollowSwitch.setChecked(mUser.isVisible());
         mBlockSwitch.setChecked(isBlocked);
         mDistanceView.setText(mDistanceToUser + " meters away from you");
-        isFollowing = mUser.isVisible();
     }
 
     public void displayDeleteConfirmationDialog(View view) {

@@ -312,17 +312,28 @@ public class AddEventActivity extends FragmentActivity {
 
                 @Override
                 public void onFailure() {
-                    Toast.makeText(mContext,
-                        mContext.getString(R.string.add_event_toast_couldnt_create_event_server),
-                        Toast.LENGTH_SHORT).show();
+                    AddEventActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(mContext,
+                                mContext.getString(R.string.add_event_toast_couldnt_create_event_server),
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
 
                 @Override
                 public void onSuccess() {
-                    Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
-                        Toast.LENGTH_SHORT).show();
+                    AddEventActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(mContext,
+                                mContext.getString(R.string.add_event_toast_event_created),
+                                Toast.LENGTH_SHORT).show();
 
-                    mActivity.finish();
+                            mActivity.finish();
+                        }
+                    });
                 }
             });
         }

@@ -30,8 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * This activity shows an event in a complete screens. It display in addition two buttons: one to invite
- * friends, and
+ * This activity shows an event in a complete screens. It display in addition two buttons: one to invite friends, and
  * one to see the event on the map.
  * 
  * @author SpicyCH
@@ -55,8 +54,7 @@ public class EventInformationActivity extends FragmentActivity {
     private TextView mPlaceNameAndCountry;
 
     /**
-     * Used to get the event id the getExtra of the starting intent, and to pass the retrieved event from
-     * doInBackground
+     * Used to get the event id the getExtra of the starting intent, and to pass the retrieved event from doInBackground
      * to onPostExecute.
      */
     private static final String EVENT_KEY = "EVENT";
@@ -82,8 +80,7 @@ public class EventInformationActivity extends FragmentActivity {
             loadEvent.execute(eventId);
         } else {
             Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
-            Toast.makeText(mContext, mContext.getString(R.string.error_client_side), Toast.LENGTH_SHORT)
-                .show();
+            Toast.makeText(mContext, mContext.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
             this.finish();
         }
 
@@ -104,8 +101,7 @@ public class EventInformationActivity extends FragmentActivity {
         } else {
             // Google Play Services are available.
             // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap =
-                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(
+            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(
                     R.id.show_event_info_map);
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
@@ -169,13 +165,11 @@ public class EventInformationActivity extends FragmentActivity {
     /**
      * Triggered when the button 'Shop on the map' is pressed. Opens the map at the location of the event.
      * 
-     * @param v
-     *            the button who has been clicked
      * @author SpicyCH
      */
     public void openMapAtEventLocation() {
         Intent showEventIntent = new Intent(this, MainActivity.class);
-        showEventIntent.putExtra("location", mEvent.getLocation());
+        showEventIntent.putExtra(MainActivity.LOCATION_EXTRA, mEvent.getLocation());
         this.startActivity(showEventIntent);
     }
 
@@ -197,15 +191,14 @@ public class EventInformationActivity extends FragmentActivity {
         mStart = (TextView) this.findViewById(R.id.show_event_info_start);
         mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
 
-        String[] result =
-            EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), mContext);
+        String[] result = EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), mContext);
 
         mStart.setText(result[0]);
         mEnd.setText(result[1]);
 
         mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
         mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ":\n"
-            + mEvent.getDescription());
+                + mEvent.getDescription());
 
         mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
         mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", " + "Country");
@@ -242,7 +235,7 @@ public class EventInformationActivity extends FragmentActivity {
 
             Map<String, Object> output = new HashMap<String, Object>();
 
-            Event event = ServiceContainer.getCache().getPublicEvent(eventId);
+            Event event = ServiceContainer.getCache().getEvent(eventId);
             output.put(EVENT_KEY, event);
 
             output.put(CREATOR_NAME_KEY, event.getCreator().getName());
@@ -261,8 +254,8 @@ public class EventInformationActivity extends FragmentActivity {
             if ((event == null) || (creatorName == null)) {
                 Log.e(TAG, "The server returned a null event or creatorName");
 
-                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error),
-                    Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
+                        .show();
 
             } else {
                 mEvent = event;
