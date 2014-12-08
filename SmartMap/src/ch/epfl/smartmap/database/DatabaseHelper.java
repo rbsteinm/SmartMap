@@ -457,30 +457,29 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             mDatabase.query(TABLE_EVENT, EVENT_COLUMNS, KEY_ID + " = ?", new String[]{String.valueOf(id)},
                 null, null, null, null);
 
-        if (cursor != null) {
-            cursor.moveToFirst();
+        ImmutableEvent event = null;
+        if ((cursor != null) && cursor.moveToFirst()) {
+
+            GregorianCalendar startDate = new GregorianCalendar();
+            GregorianCalendar endDate = new GregorianCalendar();
+            startDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_DATE)));
+            endDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_ENDDATE)));
+
+            Location location = new Location(Displayable.PROVIDER_NAME);
+            location.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
+            location.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
+            String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
+
+            String name = cursor.getString(cursor.getColumnIndex(KEY_NAME));
+            String description = cursor.getString(cursor.getColumnIndex(KEY_EVTDESC));
+            long creatorId = cursor.getColumnIndex(KEY_USER_ID);
+
+            event =
+                new ImmutableEvent(id, name, creatorId, description, startDate, endDate, location,
+                    locationString, new ArrayList<Long>());
         }
 
-        GregorianCalendar startDate = new GregorianCalendar();
-        GregorianCalendar endDate = new GregorianCalendar();
-        startDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_DATE)));
-        endDate.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(KEY_ENDDATE)));
-
-        Location location = new Location(Displayable.PROVIDER_NAME);
-        location.setLongitude(cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE)));
-        location.setLatitude(cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)));
-        String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
-
-        String name = cursor.getString(cursor.getColumnIndex(KEY_NAME));
-        String description = cursor.getString(cursor.getColumnIndex(KEY_EVTDESC));
-        long creatorId = cursor.getColumnIndex(KEY_USER_ID);
-
-        ImmutableEvent event =
-            new ImmutableEvent(id, name, creatorId, description, startDate, endDate, location,
-                locationString, new ArrayList<Long>());
-
         cursor.close();
-
         return event;
     }
 
