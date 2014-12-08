@@ -33,6 +33,11 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
     private static final int MIDNIGHT_HOUR = 23;
     private static final int MIDNIGHT_MINUTES = 59;
 
+    private static GregorianCalendar MIDNIGHT;
+    private static GregorianCalendar TOMORROW_MIDNIGHT;
+
+    private static final int NUMBER_OF_DATES_RETURNED = 2;
+
     private final Context mContext;
 
     private final List<Event> mItemsArrayList;
@@ -126,18 +131,16 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         }
 
         // First entry holds text for start date, second holds text for end date
-        String[] output = new String[2];
+        String[] output = new String[NUMBER_OF_DATES_RETURNED];
 
         GregorianCalendar now = new GregorianCalendar();
 
-        GregorianCalendar midnight = new GregorianCalendar(now.get(GregorianCalendar.YEAR),
-                now.get(GregorianCalendar.MONTH), now.get(GregorianCalendar.DAY_OF_MONTH), MIDNIGHT_HOUR,
-                MIDNIGHT_MINUTES);
+        MIDNIGHT = new GregorianCalendar(now.get(GregorianCalendar.YEAR), now.get(GregorianCalendar.MONTH),
+                now.get(GregorianCalendar.DAY_OF_MONTH), MIDNIGHT_HOUR, MIDNIGHT_MINUTES);
 
-        GregorianCalendar tomorrowMidnight = new GregorianCalendar(now.get(GregorianCalendar.YEAR),
-                now.get(GregorianCalendar.MONTH), now.get(GregorianCalendar.DAY_OF_MONTH), MIDNIGHT_HOUR,
-                MIDNIGHT_MINUTES);
-        tomorrowMidnight.add(GregorianCalendar.DAY_OF_YEAR, 1);
+        TOMORROW_MIDNIGHT = new GregorianCalendar(now.get(GregorianCalendar.YEAR), now.get(GregorianCalendar.MONTH),
+                now.get(GregorianCalendar.DAY_OF_MONTH), MIDNIGHT_HOUR, MIDNIGHT_MINUTES);
+        TOMORROW_MIDNIGHT.add(GregorianCalendar.DAY_OF_YEAR, 1);
 
         String startHourOfDayString = TimePickerFragment.formatForClock(date1.get(GregorianCalendar.HOUR_OF_DAY));
         String startMinuteString = TimePickerFragment.formatForClock(date1.get(GregorianCalendar.MINUTE));
@@ -145,7 +148,7 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         String endHourOfDayString = TimePickerFragment.formatForClock(date2.get(GregorianCalendar.HOUR_OF_DAY));
         String endMinuteString = TimePickerFragment.formatForClock(date2.get(GregorianCalendar.MINUTE));
 
-        if (date1.before(midnight) && date2.before(midnight)) {
+        if (date1.before(MIDNIGHT) && date2.before(MIDNIGHT)) {
 
             // ends and starts today
 
@@ -160,7 +163,7 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
                     + startMinuteString + " " + context.getString(R.string.events_list_item_adapter_to) + " "
                     + endHourOfDayString + ":" + endMinuteString;
 
-        } else if (date1.before(tomorrowMidnight) && date2.before(tomorrowMidnight)) {
+        } else if (date1.before(TOMORROW_MIDNIGHT) && date2.before(TOMORROW_MIDNIGHT)) {
 
             // ends and starts tomorrow
 
@@ -173,8 +176,8 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
             // Upcoming event
 
-            output = getUpcomingEventText(date1, date2, midnight, tomorrowMidnight, startHourOfDayString,
-                    startMinuteString, endHourOfDayString, endMinuteString, context);
+            output = getUpcomingEventText(date1, date2, startHourOfDayString, startMinuteString, endHourOfDayString,
+                    endMinuteString, context);
         }
 
         return output;
@@ -184,28 +187,27 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
      * @return
      * @author SpicyCH
      */
-    private static String[] getUpcomingEventText(Calendar date1, Calendar date2, Calendar midnight,
-            Calendar tomorrowMidnight, String startHourOfDayString, String startMinuteString,
-            String endHourOfDayString, String endMinuteString, Context context) {
+    private static String[] getUpcomingEventText(Calendar date1, Calendar date2, String startHourOfDayString,
+            String startMinuteString, String endHourOfDayString, String endMinuteString, Context context) {
 
-        String[] output = new String[2];
+        String[] output = new String[NUMBER_OF_DATES_RETURNED];
 
-        if (date1.before(midnight)) {
+        if (date1.before(MIDNIGHT)) {
 
             output[0] = context.getString(R.string.events_list_item_adapter_today) + " - " + startHourOfDayString + ":"
                     + startMinuteString;
 
-        } else if (date2.before(midnight)) {
+        } else if (date2.before(MIDNIGHT)) {
 
             output[1] = context.getString(R.string.events_list_item_adapter_ends_today_at) + " " + endHourOfDayString
                     + ":" + endMinuteString;
 
-        } else if (date1.before(tomorrowMidnight)) {
+        } else if (date1.before(TOMORROW_MIDNIGHT)) {
 
             output[0] = context.getString(R.string.events_list_item_adapter_tomorrow) + " - " + startHourOfDayString
                     + ":" + startMinuteString;
 
-        } else if (date2.before(tomorrowMidnight)) {
+        } else if (date2.before(TOMORROW_MIDNIGHT)) {
 
             output[1] = context.getString(R.string.events_list_item_adapter_ends_tomorrow_at) + " "
                     + startHourOfDayString + ":" + startMinuteString;
