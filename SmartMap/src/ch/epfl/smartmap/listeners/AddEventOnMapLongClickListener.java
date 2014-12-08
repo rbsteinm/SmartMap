@@ -16,7 +16,8 @@ import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Listener that loads AddEventActivity with the location, city name and country name when the map is long clicked.
+ * Listener that loads AddEventActivity with the location, city name and country name when the map is long
+ * clicked.
  * 
  * @author SpicyCH
  */

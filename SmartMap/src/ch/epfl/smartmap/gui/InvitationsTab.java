@@ -34,6 +34,62 @@ public class InvitationsTab extends ListFragment {
         mContext = context;
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
+        mInvitationList =
+            new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
+
+        // Create custom Adapter and pass it to the Activity
+        this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
+
+        // Initialize the listener
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onInvitationListUpdate() {
+                mInvitationList =
+                    new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
+                ((Activity) mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
+                            mInvitationList));
+                    }
+                });
+
+            }
+        });
+        return view;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView
+     * , android.view.View, int, long) When a list item is clicked, display a
+     * dialog to ask whether to accept or decline the invitation
+     */
+    @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        Invitation invitation = mInvitationList.get(position);
+
+        this.displayAcceptFriendDialog(invitation);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onResume()
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mInvitationList =
+            new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
+        this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
+    }
+
     /*
      * (non-Javadoc)
      * @see
@@ -93,59 +149,5 @@ public class InvitationsTab extends ListFragment {
 
         // display the AlertDialog
         builder.create().show();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mInvitationList = new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
-
-        // Create custom Adapter and pass it to the Activity
-        this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
-
-        // Initialize the listener
-        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
-            @Override
-            public void onInvitationListUpdate() {
-                mInvitationList =
-                    new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
-                ((Activity) mContext).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
-                            mInvitationList));
-                    }
-                });
-
-            }
-        });
-        return view;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView
-     * , android.view.View, int, long) When a list item is clicked, display a
-     * dialog to ask whether to accept or decline the invitation
-     */
-    @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-        Invitation invitation = mInvitationList.get(position);
-
-        this.displayAcceptFriendDialog(invitation);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onResume()
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        mInvitationList = new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
-        this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
     }
 }

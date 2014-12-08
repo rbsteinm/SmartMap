@@ -39,18 +39,28 @@ public class InvitationPanelActivity extends ListActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.show_events, menu);
-        return true;
-    }
-
-    @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Intent invitationIntent = ((GenericInvitation) l.getItemAtPosition(position)).getIntent();
         InvitationPanelActivity.this.startActivity(invitationIntent);
 
         super.onListItemClick(l, v, position, id);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext,
+            new ArrayList<Invitation>(ServiceContainer.getCache().getFriendInvitations())));
+
+        ServiceContainer.getCache().readAllInvitations();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.show_events, menu);
+        return true;
     }
 
     @Override
@@ -64,15 +74,5 @@ public class InvitationPanelActivity extends ListActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, new ArrayList<Invitation>(
-            ServiceContainer.getCache().getFriendInvitations())));
-
-        ServiceContainer.getCache().readAllInvitations();
-
     }
 }

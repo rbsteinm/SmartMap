@@ -7,7 +7,7 @@ package ch.epfl.smartmap.callbacks;
  * @author Pamoi
  */
 public interface NetworkRequestCallback {
-    void onSuccess();
-
     void onFailure();
+
+    void onSuccess();
 }

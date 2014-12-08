@@ -25,7 +25,8 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.util.SystemUiHider;
 
 /**
- * This full-screen activity displays the credits for SmartMap. The name of the developers are sorted in random order
+ * This full-screen activity displays the credits for SmartMap. The name of the developers are sorted in
+ * random order
  * and it uses the version name and version code defined in the android manifest.
  * 
  * @see SystemUiHider
@@ -38,13 +39,15 @@ public class AboutActivity extends Activity {
     private static final boolean AUTO_HIDE = true;
 
     /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after user interaction before hiding the system
+     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after user interaction before hiding
+     * the system
      * UI.
      */
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
 
     /**
-     * If set, will toggle the system UI visibility upon interaction. Otherwise, will show the system UI visibility upon
+     * If set, will toggle the system UI visibility upon interaction. Otherwise, will show the system UI
+     * visibility upon
      * interaction.
      */
     private static final boolean TOGGLE_ON_CLICK = true;
@@ -67,7 +70,8 @@ public class AboutActivity extends Activity {
     private SystemUiHider mSystemUiHider;
 
     /**
-     * Touch listener to use for in-layout UI controls to delay hiding the system UI. This is to prevent the jarring
+     * Touch listener to use for in-layout UI controls to delay hiding the system UI. This is to prevent the
+     * jarring
      * behavior of controls going away while interacting with activity UI.
      */
     View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
@@ -99,7 +103,8 @@ public class AboutActivity extends Activity {
 
         this.setContentView(R.layout.activity_about);
 
-        // Hide action bar for true full screen. Only way to leave this activity is to physically use the pressback
+        // Hide action bar for true full screen. Only way to leave this activity is to physically use the
+        // pressback
         // button.
         this.getActionBar().hide();
 
@@ -118,7 +123,8 @@ public class AboutActivity extends Activity {
             public void onVisibilityChange(boolean visible) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
                     if (mShortAnimTime == 0) {
-                        mShortAnimTime = AboutActivity.this.getResources().getInteger(
+                        mShortAnimTime =
+                            AboutActivity.this.getResources().getInteger(
                                 android.R.integer.config_shortAnimTime);
                     }
                 }
@@ -173,7 +179,6 @@ public class AboutActivity extends Activity {
      * 
      * @param teamMembers
      * @param linearLayout
-     * 
      * @author SpicyCH
      */
     private void displayListInLayout(ArrayList<String> teamMembers, LinearLayout linearLayout) {
@@ -181,7 +186,8 @@ public class AboutActivity extends Activity {
             TextView textView = new TextView(this.getApplicationContext());
             textView.setText(s);
 
-            LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            LayoutParams lp =
+                new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
             linearLayout.addView(textView, lp);
         }
@@ -200,12 +206,12 @@ public class AboutActivity extends Activity {
         try {
             PackageInfo manager = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
             mVersion.setText(this.getString(R.string.about_version) + " " + manager.versionName + ", "
-                    + this.getString(R.string.about_release) + " " + manager.versionCode);
+                + this.getString(R.string.about_release) + " " + manager.versionCode);
 
         } catch (NameNotFoundException e) {
             Log.d(TAG, "Couldn't retrieve package version: " + e);
             mVersion.setText(this.getString(R.string.about_version) + " "
-                    + this.getString(R.string.about_unkown_version));
+                + this.getString(R.string.about_unkown_version));
         }
 
         // Display the copyright
@@ -215,7 +221,7 @@ public class AboutActivity extends Activity {
 
         // Infinite copyright ((c) 2014 - YYYY)
         if (!year.equals(APP_BORN_YEAR)) {
-            copyrightMsg = "\u00a9 " + this.APP_BORN_YEAR + " - " + year;
+            copyrightMsg = "\u00a9 " + APP_BORN_YEAR + " - " + year;
         }
         mCopyright.setText(copyrightMsg);
 

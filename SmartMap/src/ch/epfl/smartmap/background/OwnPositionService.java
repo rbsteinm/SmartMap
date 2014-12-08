@@ -106,8 +106,8 @@ public class OwnPositionService extends Service {
         @Override
         public void onLocationChanged(final Location newLocation) {
             // check if new location is accurate enough
-            if (ServiceContainer.getSettingsManager().getLocation().distanceTo(newLocation) >= newLocation
-                .getAccuracy() || newLocation.getAccuracy() <= mCurrentAccuracy) {
+            if ((ServiceContainer.getSettingsManager().getLocation().distanceTo(newLocation) >= newLocation
+                .getAccuracy()) || (newLocation.getAccuracy() <= mCurrentAccuracy)) {
                 mCurrentAccuracy = newLocation.getAccuracy();
                 // Name of our location
                 String locName = Utils.getCityFromLocation(newLocation);

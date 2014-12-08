@@ -29,16 +29,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     private final String[] mTabs = {"Friends", "Invitations"};
     private static final int INVITATION_INDEX = 1;
 
-    public ViewPager getViewPager() {
-        return mPager;
-    }
-
-    @Override
-    public void onBackPressed() {
-        this.onNotificationOpen();
-        this.finish();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -52,7 +42,8 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
         // Set action bar and tab color to main color
         mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-        mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this.getResources().getColor(
+            R.color.main_blue)));
 
         mPager.setAdapter(pageAdapter);
         mActionBar.setHomeButtonEnabled(true);
@@ -87,19 +78,28 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (this.getIntent().getBooleanExtra("INVITATION", false) == true) {
+            mPager.setCurrentItem(INVITATION_INDEX);
+        }
+    }
+
+    public ViewPager getViewPager() {
+        return mPager;
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.onNotificationOpen();
+        this.finish();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.pager, menu);
         return true;
-    }
-
-    /**
-     * When this tab is open by a notification
-     */
-    private void onNotificationOpen() {
-        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
-            this.startActivity(new Intent(this, MainActivity.class));
-        }
     }
 
     @Override
@@ -125,14 +125,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (this.getIntent().getBooleanExtra("INVITATION", false) == true) {
-            mPager.setCurrentItem(INVITATION_INDEX);
-        }
-    }
-
-    @Override
     public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
         // nothing
     }
@@ -154,6 +146,15 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     public void startAddFriendActivity(MenuItem menu) {
         Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
         this.startActivity(displayActivityIntent);
+    }
+
+    /**
+     * When this tab is open by a notification
+     */
+    private void onNotificationOpen() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
     }
 
 }

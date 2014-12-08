@@ -44,8 +44,8 @@ public class GenericInvitation implements Invitation {
             mEvent = invitation.getEvent();
         }
         if ((invitation.getStatus() != Invitation.UNREAD)
-            || ((invitation.getStatus() != Invitation.READ) || (invitation.getStatus() != Invitation.DECLINED) || (invitation
-                .getStatus() != Invitation.ACCEPTED))) {
+            || ((invitation.getStatus() != Invitation.READ)
+                || (invitation.getStatus() != Invitation.DECLINED) || (invitation.getStatus() != Invitation.ACCEPTED))) {
             throw new IllegalArgumentException();
         } else {
             mStatus = invitation.getStatus();
