@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipDescription;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.Menu;
@@ -17,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
@@ -132,7 +135,67 @@ public class ModifyFilterActivity extends Activity {
         if (id == R.id.action_settings) {
             return true;
         }
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                break;
+            case R.id.action_save_filter:
+                this.saveFilterDialog();
+                break;
+            default:
+                // No other menu items!
+                break;
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    private void saveFilter() {
+        // TODO
+        // for(User friend:mFriendsInside){
+        // mFilter.addUser(friend.getId());
+        // }
+        // for(User friend:mFriendsOutside){
+        // if(mFilter.getList().contains(friend.getId())){
+        // mFilter.removeUser(friend.getId());
+        // }
+        // }
+        // //Update in cache?
+    }
+
+    /**
+     * A dialog to ask whether to accept or decline the invitation of the given
+     * user
+     * 
+     * @param name
+     *            the user's name
+     * @param userId
+     *            the user's id
+     */
+    private void saveFilterDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Save changes?");
+
+        // Add positive button
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                ModifyFilterActivity.this.saveFilter();
+                Toast.makeText(ModifyFilterActivity.this.getBaseContext(), "Changes saved", Toast.LENGTH_LONG);
+
+            }
+        });
+
+        // Add negative button
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
     }
 
     protected class ListInsideDragEventListener implements View.OnDragListener {

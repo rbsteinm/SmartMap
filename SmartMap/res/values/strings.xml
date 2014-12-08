@@ -176,6 +176,8 @@
     <string name="title_activity_modify_filter">ChangeFilterActivity</string>
     <string name="activity_modify_filter_inside_title">Inside filter</string>
     <string name="activity_modify_filter_outside_title">Outside filter</string>
+    <string name="action_save_filter_button">Save</string>
+    
     
     <!-- Settings -->
     <string name="settings_key_notifications_enabled">notifications_enabled</string>
