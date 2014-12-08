@@ -145,6 +145,10 @@ public class ModifyFilterActivity extends Activity {
             case R.id.action_save_filter:
                 this.saveFilterDialog();
                 break;
+            case R.id.action_rename_filter:
+                // TODO : dialog asking the name, rename filter, update cache?
+                this.saveFilterDialog();
+                break;
             default:
                 // No other menu items!
                 break;

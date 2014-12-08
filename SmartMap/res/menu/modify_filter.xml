@@ -2,10 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="ch.epfl.smartmap.ChangeFilterActivity" >
 
-   <item
+    <item
         android:id="@+id/action_save_filter"
         android:orderInCategory="100"
         android:showAsAction="always"
         android:title="@string/action_save_filter_button"/>
+    <item
+        android:id="@+id/action_rename_filter"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/action_rename_filter_button"/>
 
 </menu>
