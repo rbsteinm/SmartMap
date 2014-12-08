@@ -97,6 +97,7 @@ public class AddEventActivity extends FragmentActivity {
                     mGoogleMap.clear();
                 }
                 Intent setLocationIntent = new Intent(AddEventActivity.this, SetLocationActivity.class);
+                setLocationIntent.putExtra("eventPosition", mEventPosition);
                 AddEventActivity.this.startActivityForResult(setLocationIntent, PICK_LOCATION_REQUEST);
             }
         });
@@ -152,7 +153,8 @@ public class AddEventActivity extends FragmentActivity {
                 this.updateLocation(data);
 
             } else {
-                // Google wasn't able to retrieve the location name associated to the coordinates
+                // Google wasn't able to retrieve the location name associated
+                // to the coordinates
                 Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location),
                     Toast.LENGTH_LONG).show();
                 mPlaceName.setText("");

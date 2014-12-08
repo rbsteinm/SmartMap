@@ -25,6 +25,8 @@ public interface Filter extends Displayable {
      */
     Set<Long> getFriendIds();
 
+    ImmutableFilter getImmutableCopy();
+
     /**
      * @return The name of the list
      */

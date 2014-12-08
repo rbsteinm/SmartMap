@@ -23,6 +23,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableFilter;
@@ -287,6 +288,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_LATITUDE, user.getLocation().getLatitude());
             values.put(KEY_POSNAME, user.getLocationString());
             values.put(KEY_LASTSEEN, user.getLocation().getTime());
+            values.put(KEY_BLOCKED, user.isBlocked() ? 1 : 0);
 
             mDatabase.insert(TABLE_USER, null, values);
         } else {
@@ -525,6 +527,23 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return filter;
     }
 
+    public List<Long> getFilterIds() {
+        List<Long> filterIds = new ArrayList<Long>();
+        String query = "SELECT  * FROM " + TABLE_FILTER;
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                filterIds.add(cursor.getLong(cursor.getColumnIndex(KEY_FILTER_ID)));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return filterIds;
+
+    }
+
     /**
      * Gets a user from the database
      * 
@@ -551,11 +570,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             location.setTime(lastSeen);
             String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
             Bitmap image = this.getPictureById(id);
+            boolean isBlocked = cursor.getInt(cursor.getColumnIndex(KEY_BLOCKED)) == 1;
 
             cursor.close();
 
-            // TODO : Store block values
-            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image, false);
+            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image, isBlocked);
         }
 
         return null;
@@ -792,6 +811,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_POSNAME, friend.getLocationString());
         }
 
+        values.put(KEY_BLOCKED, friend.isBlocked() ? 1 : 0);
+
         return mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",
             new String[]{String.valueOf(friend.getId())});
     }
@@ -804,13 +825,17 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         // FIXME : Need to store only our events, filters, friends, and
         // settings.
         Set<User> friends = ServiceContainer.getCache().getAllFriends();
-        Set<Event> events = ServiceContainer.getCache().getAllVisibleEvents();
+        Set<Event> events = ServiceContainer.getCache().getMyEvents();
+        Set<Filter> filters = ServiceContainer.getCache().getAllFilters();
 
         for (User user : friends) {
             this.addUser(user.getImmutableCopy());
         }
         for (Event event : events) {
             this.addEvent(event.getImmutableCopy());
+        }
+        for (Filter filter : filters) {
+            this.addFilter(filter.getImmutableCopy());
         }
     }
 
