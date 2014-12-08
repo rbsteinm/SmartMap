@@ -72,6 +72,11 @@ public class DefaultFilter implements Filter {
         return Displayable.DEFAULT_IMAGE;
     }
 
+    @Override
+    public ImmutableFilter getImmutableCopy() {
+        return new ImmutableFilter(mId, mName, mIds, mIsActive);
+    }
+
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Displayable#getLatLng()

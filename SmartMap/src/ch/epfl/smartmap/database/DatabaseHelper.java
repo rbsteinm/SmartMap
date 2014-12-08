@@ -23,6 +23,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableFilter;
@@ -647,6 +648,18 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return pic;
     }
 
+    private void notifyOnInvitationListUpdateListeners() {
+        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
+            listener.onInvitationListUpdate();
+        }
+    }
+
+    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
+        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
+            listener.onInvitationStatusUpdate(id, status);
+        }
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d(TAG, "onCreate");
@@ -657,6 +670,21 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_INVITATIONS);
         db.execSQL(CREATE_TABLE_PENDING);
     }
+
+    // /**
+    // * Fully updates the friends database (not only positions)
+    // */
+    // public void refreshFriendsInfo() {
+    // List<User> friends = this.getAllFriends();
+    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+    // for (User f : friends) {
+    // try {
+    // this.updateUser(client.getUserInfo(f.getID()));
+    // } catch (SmartMapClientException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // }
 
     /**
      * Uses listFriendsPos() to update the entire friends database with updated
@@ -701,21 +729,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
         this.onCreate(db);
     }
-
-    // /**
-    // * Fully updates the friends database (not only positions)
-    // */
-    // public void refreshFriendsInfo() {
-    // List<User> friends = this.getAllFriends();
-    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-    // for (User f : friends) {
-    // try {
-    // this.updateUser(client.getUserInfo(f.getID()));
-    // } catch (SmartMapClientException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // }
 
     /**
      * Stores a profile picture
@@ -821,13 +834,17 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         // FIXME : Need to store only our events, filters, friends, and
         // settings.
         Set<User> friends = ServiceContainer.getCache().getAllFriends();
-        Set<Event> events = ServiceContainer.getCache().getAllVisibleEvents();
+        Set<Event> events = ServiceContainer.getCache().getMyEvents();
+        Set<Filter> filters = ServiceContainer.getCache().getAllFilters();
 
         for (User user : friends) {
             this.addUser(user.getImmutableCopy());
         }
         for (Event event : events) {
             this.addEvent(event.getImmutableCopy());
+        }
+        for (Filter filter : filters) {
+            this.addFilter(filter.getImmutableCopy());
         }
     }
 
@@ -861,17 +878,5 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return rows;
-    }
-
-    private void notifyOnInvitationListUpdateListeners() {
-        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
-            listener.onInvitationListUpdate();
-        }
-    }
-
-    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
-        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
-            listener.onInvitationStatusUpdate(id, status);
-        }
     }
 }

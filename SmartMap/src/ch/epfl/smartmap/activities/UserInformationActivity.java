@@ -40,9 +40,6 @@ public class UserInformationActivity extends Activity {
     private ImageView mPictureView;
     private TextView mDistanceView;
 
-    // TODO replace this by mUser.isFollowing() and mUser.isBlocked() when implemented
-    private boolean isFollowing;
-    private final boolean isBlocked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +70,7 @@ public class UserInformationActivity extends Activity {
         mSubtitlesView.setText(mUser.getSubtitle());
         mPictureView.setImageBitmap(mUser.getImage());
         mFollowSwitch.setChecked(mUser.isVisible());
-        mBlockSwitch.setChecked(isBlocked);
+        mBlockSwitch.setChecked(mUser.isBlocked());
         mDistanceView.setText(mDistanceToUser + " meters away from you");
     }
 
