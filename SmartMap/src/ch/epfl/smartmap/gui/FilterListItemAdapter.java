@@ -108,28 +108,28 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
         private Switch mFollowSwitch;
         private TextView mSubtitle;
 
-        public TextView getFilterName() {
-            return mFilterName;
-        }
-
-        public TextView getSubtitle() {
-            return mSubtitle;
-        }
-
         public long getFilterId() {
             return mFilterId;
+        }
+
+        public TextView getFilterName() {
+            return mFilterName;
         }
 
         public Switch getFollowSwitch() {
             return mFollowSwitch;
         }
 
-        public void setFilterName(TextView filterName) {
-            mFilterName = filterName;
+        public TextView getSubtitle() {
+            return mSubtitle;
         }
 
         public void setFilterId(long filterId) {
             mFilterId = filterId;
+        }
+
+        public void setFilterName(TextView filterName) {
+            mFilterName = filterName;
         }
 
         public void setFollowSwitch(Switch followSwitch) {

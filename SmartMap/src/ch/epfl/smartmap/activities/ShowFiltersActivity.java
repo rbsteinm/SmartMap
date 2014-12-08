@@ -43,37 +43,9 @@ public class ShowFiltersActivity extends ListActivity {
         this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
 
-    @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-        Filter filter = mFilterList.get(position);
-        Intent intent = new Intent(this.getBaseContext(), ModifyFilterActivity.class);
-        intent.putExtra("FILTER", filter.getId());
-        ShowFiltersActivity.this.startActivity(intent);
-        super.onListItemClick(listView, view, position, id);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.show_filters, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     public void addNewFilterDialog(MenuItem item) {
-        //inflate the alertDialog
-        LayoutInflater inflater  = this.getLayoutInflater();
+        // inflate the alertDialog
+        LayoutInflater inflater = this.getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.new_filter_alert_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("New filter");
@@ -97,5 +69,33 @@ public class ShowFiltersActivity extends ListActivity {
 
         // display the AlertDialog
         builder.create().show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.show_filters, menu);
+        return true;
+    }
+
+    @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        Filter filter = mFilterList.get(position);
+        Intent intent = new Intent(this.getBaseContext(), ModifyFilterActivity.class);
+        intent.putExtra("FILTER", filter.getId());
+        ShowFiltersActivity.this.startActivity(intent);
+        super.onListItemClick(listView, view, position, id);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
