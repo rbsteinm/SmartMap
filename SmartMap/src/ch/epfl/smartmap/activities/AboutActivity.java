@@ -216,7 +216,7 @@ public class AboutActivity extends Activity {
         }
         mCopyright.setText(copyrightMsg);
 
-        // Display team members in a random order
+        // Display team members in a random order.
 
         List<String> teamMembers = new ArrayList<String>();
         teamMembers.add("Robin Genolet");
