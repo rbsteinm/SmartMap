@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.gui.Utils;
@@ -12,42 +11,47 @@ import ch.epfl.smartmap.gui.Utils;
  * @author agpmilli
  */
 public class EventInvitation implements Invitation {
-    private final long mInvitationId;
-    private final long mUserId;
-    private final long mEventId;
-    private final String mUserName;
-    private final String mEventName;
+
+    private static final String TAG = EventInvitation.class.getSimpleName();
+    private static final int ID_MASK = 1;
+
+    private final User mUser;
+    private final Event mEvent;
     private int mStatus;
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
 
-    public EventInvitation(long invitationId, long userId, String userName, long eventId, String eventName,
-        int status) {
-        mInvitationId = invitationId;
-        mUserId = userId;
-        mEventId = eventId;
-        mUserName = userName;
-        mEventName = eventName;
-        mStatus = status;
+    public EventInvitation(ImmutableInvitation invitation) {
+        assert invitation.getType() == ImmutableInvitation.EVENT_INVITATION;
+        mUser = invitation.getUser();
+        mEvent = invitation.getEvent();
+        mStatus = invitation.getStatus();
     }
 
-    public long getEventId() {
-        return mEventId;
+    @Override
+    public boolean equals(Object that) {
+        return ((that != null) && (that instanceof EventInvitation) && (this.getId() == ((EventInvitation) that)
+            .getId()));
     }
 
-    public String getEventName() {
-        return mEventName;
+    public Event getEvent() {
+        return mEvent;
     }
 
     @Override
     public long getId() {
-        return mInvitationId;
+        return (mEvent.getId() << 2) | ID_MASK;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#getImmutableCopy()
+     */
     @Override
-    public Bitmap getImage() {
+    public ImmutableInvitation getImmutableCopy() {
+        // TODO Auto-generated method stub
         return null;
     }
 
@@ -58,7 +62,8 @@ public class EventInvitation implements Invitation {
             intent = new Intent(Utils.sContext, ShowEventsActivity.class);
             intent.putExtra("invitation", true);
         } else if (mStatus == ACCEPTED) {
-            // intent = new Intent(Utils.Context, ShowEventInformationActivity.class);
+            // intent = new Intent(Utils.Context,
+            // ShowEventInformationActivity.class);
         }
         return intent;
     }
@@ -76,22 +81,26 @@ public class EventInvitation implements Invitation {
     @Override
     public String getTitle() {
         return Utils.sContext.getResources().getString(R.string.notification_event_request_title) + " "
-            + mUserName;
+            + mUser.getName();
     }
 
     @Override
-    public long getUserId() {
-        return mUserId;
+    public User getUser() {
+        return mUser;
     }
 
     @Override
-    public String getUserName() {
-        return mUserName;
+    public int hashCode() {
+        return (int) this.getId();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#update(ch.epfl.smartmap.cache.ImmutableInvitation)
+     */
     @Override
-    public void setStatus(int newStatus) {
-        mStatus = newStatus;
-
+    public void update(ImmutableInvitation invitation) {
+        // TODO
     }
+
 }

@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.gui;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -13,10 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.FriendInvitation;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Invitation;
-import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
+import ch.epfl.smartmap.listeners.CacheListener;
 
 /**
  * TODO listen to invitation list?
@@ -24,20 +23,14 @@ import ch.epfl.smartmap.database.DatabaseHelper;
  * 
  * @author marion-S
  */
-public class InvitationsTab extends ListFragment {
+public class InvitationsTab extends ListFragment implements CacheListener {
 
     private final Context mContext;
-    private List<FriendInvitation> mInvitationList;
-
-    // private final NetworkSmartMapClient mNetworkClient;
-
-    private DatabaseHelper mDBHelper;
+    private List<Invitation> mInvitationList;
 
     public InvitationsTab(Context context) {
         mContext = context;
-        mDBHelper = DatabaseHelper.initialize(mContext);
-        // mNetworkClient = NetworkSmartMapClient.getInstance();
-        // mDataBaseHelper = DatabaseHelper.initialize(mContext);
+        ServiceContainer.getCache().addOnCacheListener(this);
     }
 
     /*
@@ -50,9 +43,7 @@ public class InvitationsTab extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mDBHelper = DatabaseHelper.getInstance();
-        mInvitationList = new ArrayList<FriendInvitation>();
-        mInvitationList = mDBHelper.getUnansweredFriendInvitations();
+        mInvitationList = ServiceContainer.getCache().getUnansweredFriendInvitations();
 
         // Create custom Adapter and pass it to the Activity
         FriendInvitationListItemAdapter adapter =
@@ -60,6 +51,43 @@ public class InvitationsTab extends ListFragment {
         this.setListAdapter(adapter);
 
         return view;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onEventListUpdate()
+     */
+    @Override
+    public void onEventListUpdate() {
+        // Nothing
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
+     */
+    @Override
+    public void onFilterListUpdate() {
+        // Nothing
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
+     */
+    @Override
+    public void onFriendListUpdate() {
+        // Nothing
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onInvitationListUpdate()
+     */
+    @Override
+    public void onInvitationListUpdate() {
+        mInvitationList = ServiceContainer.getCache().getUnansweredFriendInvitations();
+        InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
     }
 
     /*
@@ -72,7 +100,7 @@ public class InvitationsTab extends ListFragment {
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
 
-        FriendInvitation invitation = mInvitationList.get(position);
+        Invitation invitation = mInvitationList.get(position);
 
         this.displayAcceptFriendDialog(invitation);
     }
@@ -85,7 +113,7 @@ public class InvitationsTab extends ListFragment {
     public void onResume() {
         super.onResume();
         // new RefreshInvitationsList().execute();
-        mInvitationList = mDBHelper.getUnansweredFriendInvitations();
+        mInvitationList = ServiceContainer.getCache().getUnansweredFriendInvitations();
         this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
     }
 
@@ -98,22 +126,26 @@ public class InvitationsTab extends ListFragment {
      * @param userId
      *            the user's id
      */
-    private void displayAcceptFriendDialog(final FriendInvitation invitation) {
+    private void displayAcceptFriendDialog(final Invitation invitation) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-        builder.setMessage("Accept " + invitation.getUserName() + " to become your friend?");
+        builder.setMessage("Accept " + invitation.getUser().getName() + " to become your friend?");
 
         // Add positive button
         builder.setPositiveButton("Yes, accept", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                // new AcceptInvitation().execute(userId);
-                invitation.setStatus(Invitation.ACCEPTED);
-                mDBHelper.updateFriendInvitation(invitation);
-                Cache.getInstance().addFriend(invitation.getUserId());
-                mInvitationList = mDBHelper.getUnansweredFriendInvitations();
-                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
-                    mInvitationList));
+                // Accept invitation in Cache
+                ServiceContainer.getCache().acceptInvitation(invitation, new NetworkRequestCallback() {
+                    @Override
+                    public void onFailure() {
+                        // TODO Toast network error
+                    }
 
+                    @Override
+                    public void onSuccess() {
+                        // TODO Toast success
+                    }
+                });
             }
         });
 
@@ -121,12 +153,18 @@ public class InvitationsTab extends ListFragment {
         builder.setNegativeButton("No, decline", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                // new DeclineInvitation().execute(userId);
-                invitation.setStatus(Invitation.REFUSED);
-                mDBHelper.updateFriendInvitation(invitation);
-                mInvitationList = mDBHelper.getUnansweredFriendInvitations();
-                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
-                    mInvitationList));
+                // Decline invitation in Cache
+                ServiceContainer.getCache().declineInvitation(invitation, new NetworkRequestCallback() {
+                    @Override
+                    public void onFailure() {
+                        // TODO Toast network error
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        // TODO Toast success
+                    }
+                });
             }
         });
 

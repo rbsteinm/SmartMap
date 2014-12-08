@@ -209,8 +209,8 @@
     <string name="about_special_thanks_to">Special thanks to</string>
     <string name="about_dummy_names">Name 1\nName 2\nName 3</string>
     <string name="about_dev_by">Developed by</string>
-    <string name="about_dummy_copyright">(c) 2014</string>
-    
+    <string name="about_dummy_copyright">© 2014</string>
+
     <!-- Nothing below this line! -->
 
     <string name="title_activity_about">AboutActivity</string>

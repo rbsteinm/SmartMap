@@ -48,21 +48,22 @@ public class InvitationListItemAdapter extends ArrayAdapter<Invitation> {
         // Get FriendItem fields
         TextView title = (TextView) convertView.findViewById(R.id.activity_notification_title);
         TextView text = (TextView) convertView.findViewById(R.id.activity_notification_text);
-        // ImageView image = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
+        // ImageView image = (ImageView)
+        // convertView.findViewById(R.id.activity_notification_picture);
 
         // Set the User's ID to the tag of its View
         convertView.setTag(mItemsArrayList.get(position).getId());
         if (mItemsArrayList.get(position).getClass() == FriendInvitation.class) {
             // Set fields with friend attributes
-            title.setText(mItemsArrayList.get(position).getUserName() + " "
+            title.setText(mItemsArrayList.get(position).getUser().getName() + " "
                 + mContext.getString(R.string.notification_friend_invitation));
             text.setText(mContext.getString(R.string.notification_open_friend_list));
             // picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
         } else if (mItemsArrayList.get(position).getClass() == EventInvitation.class) {
             // Set fields with friend attributes
-            title.setText(mItemsArrayList.get(position).getUserName() + " "
+            title.setText(mItemsArrayList.get(position).getUser().getName() + " "
                 + mContext.getString(R.string.notification_event_invitation) + " "
-                + ((EventInvitation) mItemsArrayList.get(position)).getEventName());
+                + ((EventInvitation) mItemsArrayList.get(position)).getEvent().getName());
             text.setText(mContext.getString(R.string.notification_open_event_list));
             // picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
         }

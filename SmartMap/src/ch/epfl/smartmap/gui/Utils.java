@@ -58,17 +58,9 @@ public class Utils {
             GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
                 - calendar.getTimeInMillis();
 
-        if (diff < 10) {
-            return "Now";
-        }
         if (diff < ONE_MINUTE) {
             // Give time in seconds
-            int seconds = (int) (diff / ONE_SECOND);
-            if (seconds == 1) {
-                return "1 second ago";
-            } else {
-                return "" + seconds + " seconds ago";
-            }
+            return "Now";
         } else if (diff < ONE_HOUR) {
             // Give time in minutes
             int minutes = (int) (diff / ONE_MINUTE);

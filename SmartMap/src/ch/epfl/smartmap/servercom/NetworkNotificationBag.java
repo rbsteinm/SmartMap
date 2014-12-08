@@ -1,22 +1,28 @@
-/**
- * 
- */
 package ch.epfl.smartmap.servercom;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import ch.epfl.smartmap.cache.ImmutableUser;
 
 /**
  * @author Pamoi
  */
 public class NetworkNotificationBag implements NotificationBag {
+    private Set<ImmutableUser> mInvitingUsers;
+    private Set<ImmutableUser> mNewFriends;
+    private Set<Long> mRemovedFriends;
 
-    private final List<Long> mInvitingUsers;
-
-    private final List<Long> mNewFriends;
-    private final List<Long> mRemovedFriends;
-
-    public NetworkNotificationBag(List<Long> invitingUsers, List<Long> newFriends,
+    /**
+     * The constructor takes List arguments for compliance with server
+     * communication code.
+     * 
+     * @param invitingUsers
+     * @param newFriends
+     * @param removedFriendsIds
+     */
+    public NetworkNotificationBag(List<ImmutableUser> invitingUsers, List<ImmutableUser> newFriends,
         List<Long> removedFriendsIds) {
         if (invitingUsers == null) {
             throw new IllegalArgumentException("invitingUsers list is null.");
@@ -27,10 +33,9 @@ public class NetworkNotificationBag implements NotificationBag {
         if (removedFriendsIds == null) {
             throw new IllegalArgumentException("removedFriendsIds list is null.");
         }
-
-        mInvitingUsers = new ArrayList<Long>(invitingUsers);
-        mNewFriends = new ArrayList<Long>(newFriends);
-        mRemovedFriends = new ArrayList<Long>(removedFriendsIds);
+        mInvitingUsers = new HashSet<ImmutableUser>(invitingUsers);
+        mNewFriends = new HashSet<ImmutableUser>(newFriends);
+        mRemovedFriends = new HashSet<Long>(removedFriendsIds);
     }
 
     /*
@@ -38,8 +43,8 @@ public class NetworkNotificationBag implements NotificationBag {
      * @see ch.epfl.smartmap.servercom.NotificationBag#getInvitingUsers()
      */
     @Override
-    public List<Long> getInvitingUsers() {
-        return new ArrayList<Long>(mInvitingUsers);
+    public Set<ImmutableUser> getInvitingUsers() {
+        return new HashSet<ImmutableUser>(mInvitingUsers);
     }
 
     /*
@@ -47,8 +52,8 @@ public class NetworkNotificationBag implements NotificationBag {
      * @see ch.epfl.smartmap.servercom.NotificationBag#getNewFriends()
      */
     @Override
-    public List<Long> getNewFriends() {
-        return new ArrayList<Long>(mNewFriends);
+    public Set<ImmutableUser> getNewFriends() {
+        return new HashSet<ImmutableUser>(mNewFriends);
     }
 
     /*
@@ -56,7 +61,7 @@ public class NetworkNotificationBag implements NotificationBag {
      * @see ch.epfl.smartmap.servercom.NotificationBag#getRemovedFriendsIds()
      */
     @Override
-    public List<Long> getRemovedFriendsIds() {
-        return new ArrayList<Long>(mRemovedFriends);
+    public Set<Long> getRemovedFriendsIds() {
+        return new HashSet<Long>(mRemovedFriends);
     }
 }

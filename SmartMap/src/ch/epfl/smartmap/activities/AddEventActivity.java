@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -27,15 +26,14 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.PublicEvent;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
 import ch.epfl.smartmap.map.DefaultZoomManager;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -138,8 +136,8 @@ public class AddEventActivity extends FragmentActivity {
 
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
 
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(SettingsManager.getInstance()
-                    .getLocation().getLatitude(), SettingsManager.getInstance().getLocation().getLongitude()));
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer.getSettingsManager()
+                    .getLocation().getLatitude(), ServiceContainer.getSettingsManager().getLocation().getLongitude()));
 
         }
     }
@@ -292,15 +290,28 @@ public class AddEventActivity extends FragmentActivity {
             Location location = new Location("Location set by user");
             location.setLatitude(mEventPosition.latitude);
             location.setLongitude(mEventPosition.longitude);
-            SettingsManager setMng = SettingsManager.getInstance();
+            SettingsManager setMng = ServiceContainer.getSettingsManager();
 
             ImmutableEvent event = new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(),
                     setMng.getUserID(), mDescription.getText().toString(), startDate, endDate, location, mPlaceName
                             .getText().toString(), PublicEvent.NO_PARTICIPANTS);
 
-            CreateEventTask createEventTask = new CreateEventTask();
+            ServiceContainer.getCache().createEvent(event, new NetworkRequestCallback() {
 
-            createEventTask.execute(event);
+                @Override
+                public void onFailure() {
+                    Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_couldnt_create_event_server),
+                            Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
+                            Toast.LENGTH_SHORT).show();
+
+                    mActivity.finish();
+                }
+            });
         }
     }
 
@@ -342,8 +353,8 @@ public class AddEventActivity extends FragmentActivity {
 
         mPlaceName.setFocusable(true);
         // Initialize mEventPosition to position of user
-        mEventPosition = new LatLng(SettingsManager.getInstance().getLocation().getLatitude(), SettingsManager
-                .getInstance().getLocation().getLongitude());
+        mEventPosition = new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
+                .getSettingsManager().getLocation().getLongitude());
 
         mTextChangedListener = new DateChangedListener();
 
@@ -427,7 +438,7 @@ public class AddEventActivity extends FragmentActivity {
         } catch (IOException e) {
             Log.d(TAG, "Google couldn't retrieve any adresses fromt he coordinates: " + e);
         }
-        if ((addresses == null) || (!addresses.isEmpty()) || ((cityName != null) && !cityName.isEmpty())) {
+        if ((!addresses.isEmpty()) || ((cityName != null) && !cityName.isEmpty())) {
             cityName = addresses.get(0).getLocality();
             mPlaceName.setText(cityName);
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
@@ -437,37 +448,6 @@ public class AddEventActivity extends FragmentActivity {
                     Toast.LENGTH_LONG).show();
             mPlaceName.setText("");
         }
-    }
-
-    class CreateEventTask extends AsyncTask<ImmutableEvent, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(ImmutableEvent... params) {
-            try {
-                long id = NetworkSmartMapClient.getInstance().createPublicEvent(params[0]);
-                Cache.getInstance().addMyEvent(id);
-                return id > 0;
-            } catch (SmartMapClientException e) {
-                Log.e(TAG, "Couldn't create event on the server: " + e);
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean b) {
-            if (b) {
-
-                Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created), Toast.LENGTH_SHORT)
-                        .show();
-
-                mActivity.finish();
-
-            } else {
-                Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_couldnt_create_event_server),
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-
     }
 
     class DateChangedListener implements TextWatcher {
@@ -495,5 +475,4 @@ public class AddEventActivity extends FragmentActivity {
             // Nothing
         }
     }
-
 }

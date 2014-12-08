@@ -5,7 +5,7 @@
     android:layout_height="@dimen/notification_activity_height"
     android:layout_gravity="bottom"
     android:color="@color/main_blue"
-    tools:context="ch.epfl.smartmap.activities.NotificationsActivity" >
+    tools:context="ch.epfl.smartmap.activities.InvitationPanelActivity" >
     
     <ListView
         android:id="@android:id/list"

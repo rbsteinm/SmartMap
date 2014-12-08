@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.gui.Utils;
@@ -12,34 +11,41 @@ import ch.epfl.smartmap.gui.Utils;
  * @author agpmilli
  */
 public class AcceptedFriendInvitation implements Invitation {
-    private final long mInvitationId;
-    private final long mUserId;
-    private final String mUserName;
 
-    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
-    public static final int IMAGE_QUALITY = 100;
-    public static final String PROVIDER_NAME = "SmartMapServers";
+    private final static String TAG = AcceptedFriendInvitation.class.getSimpleName();
+    private static final int ID_MASK = 2;
+    private User mUser;
 
-    public AcceptedFriendInvitation(long invitationId, long userId, String userName) {
-        mInvitationId = invitationId;
-        mUserId = userId;
-        mUserName = userName;
+    public AcceptedFriendInvitation(ImmutableInvitation invitation) {
+        assert invitation.getType() == ImmutableInvitation.ACCEPTED_FRIEND_INVITATION;
+        mUser = invitation.getUser();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        return ((that != null) && (that instanceof AcceptedFriendInvitation) && (this.getId() == ((AcceptedFriendInvitation) that)
+            .getId()));
     }
 
     @Override
     public long getId() {
-        return mInvitationId;
+        return (mUser.getId() << 2) | ID_MASK;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#getImmutableCopy()
+     */
     @Override
-    public Bitmap getImage() {
-        return Cache.getInstance().getUserById(mUserId).getImage();
+    public ImmutableInvitation getImmutableCopy() {
+        // TODO
+        return null;
     }
 
     @Override
     public Intent getIntent() {
         Intent intent = new Intent(Utils.sContext, UserInformationActivity.class);
-        intent.putExtra("USER", mUserId);
+        intent.putExtra("USER", mUser.getId());
         return intent;
     }
 
@@ -51,29 +57,32 @@ public class AcceptedFriendInvitation implements Invitation {
     @Override
     public String getText() {
         return Utils.sContext.getResources().getString(R.string.notification_open_friend_info1) + " "
-            + mUserName + " "
+            + mUser.getName() + " "
             + Utils.sContext.getResources().getString(R.string.notification_open_friend_info2);
     }
 
     @Override
     public String getTitle() {
-        return mUserName + " "
+        return mUser.getName() + " "
             + Utils.sContext.getResources().getString(R.string.notification_accepted_friend_title);
     }
 
     @Override
-    public long getUserId() {
-        return mUserId;
+    public User getUser() {
+        return mUser;
     }
 
     @Override
-    public String getUserName() {
-        return mUserName;
+    public int hashCode() {
+        return (int) this.getId();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#update(ch.epfl.smartmap.cache.ImmutableInvitation)
+     */
     @Override
-    public void setStatus(int newStatus) {
-        // nothing to do
+    public void update(ImmutableInvitation invitation) {
+        // TODO
     }
-
 }

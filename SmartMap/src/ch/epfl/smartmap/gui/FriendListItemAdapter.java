@@ -52,8 +52,7 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         User user = mItemsArrayList.get(position);
 
         if (convertView == null) {
-            LayoutInflater inflater =
-                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
             viewHolder = new FriendViewHolder();
 
@@ -81,7 +80,8 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
     /**
      * @author rbsteinm
      *         ViewHolder pattern implementation for smoother scrolling
-     *         in lists populated by {@link ch.epfl.smartmap.gui.FriendListItemAdapter}
+     *         in lists populated by
+     *         {@link ch.epfl.smartmap.gui.FriendListItemAdapter}
      */
     public static class FriendViewHolder {
         private TextView mName;

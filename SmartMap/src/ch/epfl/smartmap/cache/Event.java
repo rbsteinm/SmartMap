@@ -18,21 +18,16 @@ import ch.epfl.smartmap.gui.Utils;
 
 public interface Event extends Displayable {
 
-    final List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
-    final String NO_DESCRIPTION = "This event currently has no description";
+    List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
+    String NO_DESCRIPTION = "This event currently has no description";
 
-    final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(),
+    Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(),
         R.drawable.default_event);
 
     /**
      * @return The ID of the user who created the event
      */
-    long getCreatorId();
-
-    /**
-     * @return The name of creator
-     */
-    String getCreatorName();
+    User getCreator();
 
     /**
      * @return The event's description
@@ -48,7 +43,7 @@ public interface Event extends Displayable {
 
     String getName();
 
-    List<Long> getParticipants();
+    List<User> getParticipants();
 
     /**
      * @return The date (year, month, day, hour, minute) at which the event
@@ -56,12 +51,11 @@ public interface Event extends Displayable {
      */
     Calendar getStartDate();
 
-    Type getType();
+    boolean isGoing();
+
+    boolean isNear();
+
+    boolean isOwn();
 
     void update(ImmutableEvent event);
-
-    enum Type {
-        PUBLIC,
-        PRIVATE;
-    }
 }

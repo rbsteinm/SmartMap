@@ -13,10 +13,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 
 /**
@@ -38,10 +36,6 @@ public class InviteFriendsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_invite_friends);
 
-        DatabaseHelper.initialize(this.getApplicationContext());
-        SettingsManager.initialize(this.getApplicationContext());
-
-        // Makes the logo clickable
         this.getActionBar().setHomeButtonEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
@@ -131,7 +125,9 @@ public class InviteFriendsActivity extends ListActivity {
             // TODO invite friends
             // TODO send invites via InvitationManager
         } else {
-            Toast.makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG).show();
+            Toast
+                .makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG)
+                .show();
         }
 
     }
@@ -140,7 +136,7 @@ public class InviteFriendsActivity extends ListActivity {
      * @author SpicyCH
      */
     private void setAdapter() {
-        mUserList = Cache.getInstance().getAllFriends();
+        mUserList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
 
         // Create a new list of booleans with the size of the user list and default value false.
         mSelectedPositions = new ArrayList<Boolean>();
