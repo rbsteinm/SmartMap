@@ -28,6 +28,7 @@
         android:layout_marginLeft="30dp"
         android:layout_toRightOf="@id/add_event_title_text"
         android:hint="@string/addEventEventName"
+        android:inputType="textMultiLine|textCapSentences"
         android:lines="1"
         android:maxLines="1"
         android:singleLine="true" />
@@ -138,6 +139,7 @@
             android:layout_marginTop="10dp"
             android:focusable="true"
             android:hint="@string/addEventPlaceName"
+            android:inputType="textCapSentences"
             android:lines="1"
             android:maxLines="1"
             android:singleLine="true" />
@@ -165,7 +167,7 @@
         android:layout_below="@id/add_event_internal_relative"
         android:layout_toRightOf="@id/add_event_what_text"
         android:hint="@string/addEventDescription"
-        android:inputType="textMultiLine"
+        android:inputType="textMultiLine|textCapSentences"
         android:lines="5" />
 
   

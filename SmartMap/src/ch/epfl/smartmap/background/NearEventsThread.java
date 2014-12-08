@@ -1,5 +1,8 @@
 package ch.epfl.smartmap.background;
 
+import java.util.HashSet;
+import java.util.List;
+
 import android.location.Location;
 import android.util.Log;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -17,8 +20,11 @@ public class NearEventsThread extends Thread {
         while (true) {
             Location pos = ServiceContainer.getSettingsManager().getLocation();
             try {
-                ServiceContainer.getNetworkClient().getPublicEvents(pos.getLongitude(), pos.getLatitude(),
-                    ServiceContainer.getSettingsManager().getNearEventsMaxDistance());
+                List<Long> nearEventIds =
+                    ServiceContainer.getNetworkClient().getPublicEvents(pos.getLongitude(),
+                        pos.getLatitude(), ServiceContainer.getSettingsManager().getNearEventsMaxDistance());
+                ServiceContainer.getSearchEngine()
+                    .findPublicEventByIds(new HashSet<Long>(nearEventIds), null);
                 Log.d(TAG, "Fetch Near Events");
             } catch (SmartMapClientException e) {
                 Log.e(TAG, "Couldn't retrieve public events: " + e);

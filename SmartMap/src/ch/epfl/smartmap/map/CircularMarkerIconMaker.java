@@ -19,6 +19,7 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -31,7 +32,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     /**
      * the user that the icon represents
      */
-    private final User mUser;
+    private final Friend mFriend;
 
     /**
      * Several composants of the marker icon saved in fields for performance purposes
@@ -54,8 +55,8 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     public static final int SECONDS_IN_MINUTE = 60;
     public static final int MILLISECONDS_IN_SECOND = 1000;
 
-    public CircularMarkerIconMaker(User user) {
-        mUser = user;
+    public CircularMarkerIconMaker(Friend friend) {
+        mFriend = friend;
     }
 
     /*
@@ -76,7 +77,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
 
         long timeElapsed =
             GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
-                - mUser.getLastSeen().getTimeInMillis();
+                - mFriend.getLastSeen().getTimeInMillis();
         this.setColorOfMarkerShape(timeElapsed);
 
         return mMarkerIcon;
@@ -164,7 +165,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      */
     private void initializeProfilePicture() {
         mProfilePicture =
-            Bitmap.createScaledBitmap(mUser.getImage(), User.PICTURE_WIDTH, User.PICTURE_HEIGHT, false);
+            Bitmap.createScaledBitmap(mFriend.getImage(), User.PICTURE_WIDTH, User.PICTURE_HEIGHT, false);
 
         mProfilePicture =
             Bitmap.createScaledBitmap(mProfilePicture, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,

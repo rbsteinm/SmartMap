@@ -59,5 +59,7 @@ public interface Event extends Displayable {
 
     boolean isOwn();
 
+    boolean isVisible();
+
     void update(ImmutableEvent event);
 }

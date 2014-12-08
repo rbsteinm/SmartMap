@@ -1,9 +1,6 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.Calendar;
-
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -17,75 +14,10 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author jfperren
  */
-public class Stranger implements User {
-
-    private long mId;
-    private String mName;
-    private Bitmap mImage;
+public class Stranger extends AbstractUser {
 
     protected Stranger(ImmutableUser user) {
-        if (user.getId() < 0) {
-            throw new IllegalArgumentException();
-        } else {
-            mId = user.getId();
-        }
-
-        if ((user.getName() == null) || user.getName().equals("")) {
-            throw new IllegalArgumentException();
-        } else {
-            mName = user.getName();
-        }
-
-        if (user.getImage() == null) {
-            mImage = User.NO_IMAGE;
-        } else {
-            mImage = Bitmap.createBitmap(user.getImage());
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getEmail()
-     */
-    @Override
-    public String getEmail() {
-        return NO_EMAIL;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getID()
-     */
-    @Override
-    public long getId() {
-        return mId;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getImage()
-     */
-    @Override
-    public Bitmap getImage() {
-        return mImage;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getImmutableCopy()
-     */
-    @Override
-    public ImmutableUser getImmutableCopy() {
-        return new ImmutableUser(mId, mName, null, null, null, null, mImage, false);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getLastSeen()
-     */
-    @Override
-    public Calendar getLastSeen() {
-        return NO_LAST_SEEN;
+        super(user);
     }
 
     /*
@@ -121,25 +53,7 @@ public class Stranger implements User {
      */
     @Override
     public BitmapDescriptor getMarkerIcon(Context context) {
-        return NO_MARKER_ICON;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getName()
-     */
-    @Override
-    public String getName() {
-        return mName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getNumber()
-     */
-    @Override
-    public String getPhoneNumber() {
-        return NO_PHONE_NUMBER;
+        throw new UnsupportedOperationException();
     }
 
     /*
@@ -153,24 +67,6 @@ public class Stranger implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
-     */
-    @Override
-    public String getTitle() {
-        return mName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#isBlocked()
-     */
-    @Override
-    public boolean isBlocked() {
-        return false;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.User#isFriend()
      */
     @Override
@@ -180,20 +76,10 @@ public class Stranger implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Localisable#isVisible()
+     * @see ch.epfl.smartmap.cache.User#isVisible()
      */
     @Override
     public boolean isVisible() {
         return false;
-    }
-
-    @Override
-    public void update(ImmutableUser user) {
-        if (user.getName() != null) {
-            mName = user.getName();
-        }
-        if (user.getImage() != null) {
-            mImage = user.getImage();
-        }
     }
 }

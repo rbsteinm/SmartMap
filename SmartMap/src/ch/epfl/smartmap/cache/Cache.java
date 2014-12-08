@@ -172,24 +172,23 @@ public class Cache {
         }.execute();
     }
 
-    /**
-     * OK
-     * 
-     * @return
-     */
+    public Set<Filter> getAllActiveFilters() {
+        return this.getFilters(new SearchFilter<Filter>() {
+            @Override
+            public boolean filter(Filter filter) {
+                return filter.isActive();
+            }
+        });
+    }
+
     public Set<Event> getAllEvents() {
-        return this.getPublicEvents(mEventIds);
+        return this.getEvents(mEventIds);
     }
 
     public Set<Filter> getAllFilters() {
         return this.getFilters(mFilterIds);
     }
 
-    /**
-     * OK
-     * 
-     * @return a list containing all the user's Friends.
-     */
     public Set<User> getAllFriends() {
         return this.getFriends(mFriendIds);
     }
@@ -206,7 +205,7 @@ public class Cache {
             }
         }
 
-        return this.getPublicEvents(mEventIds);
+        return this.getEvents(mEventIds);
     }
 
     /**
@@ -236,8 +235,59 @@ public class Cache {
      * @param id
      * @return
      */
+    public Event getEvent(long id) {
+        return mEventInstances.get(id);
+    }
+
+    public Set<Event> getEvents(SearchFilter<Event> filter) {
+        Set<Event> events = new HashSet<Event>();
+        for (long id : mEventIds) {
+            Event event = this.getEvent(id);
+            if (filter.filter(event)) {
+                events.add(event);
+            }
+        }
+        return events;
+    }
+
+    /**
+     * OK
+     * 
+     * @param ids
+     * @return
+     */
+    public Set<Event> getEvents(Set<Long> ids) {
+        Set<Event> events = new HashSet<Event>();
+        for (long id : ids) {
+            Event event = this.getEvent(id);
+            if (event != null) {
+                events.add(event);
+            }
+        }
+        return events;
+    }
+
+    /**
+     * OK
+     * 
+     * @param id
+     * @return
+     */
     public Filter getFilter(long id) {
         return mFilterInstances.get(id);
+    }
+
+    public Set<Filter> getFilters(SearchFilter<Filter> searchFilter) {
+        Set<Filter> filters = new HashSet<Filter>();
+
+        for (long id : mFilterIds) {
+            Filter filter = this.getFilter(id);
+            if ((filter != null) && searchFilter.filter(filter)) {
+                filters.add(filter);
+            }
+        }
+
+        return filters;
     }
 
     public Set<Filter> getFilters(Set<Long> ids) {
@@ -268,7 +318,7 @@ public class Cache {
     }
 
     public SortedSet<Invitation> getFriendInvitations() {
-        return this.getInvitations(mInvitationIds, new InvitationFilter() {
+        return this.getInvitations(mInvitationIds, new SearchFilter<Invitation>() {
             @Override
             public boolean filter(Invitation invitation) {
                 return invitation.getType() == Invitation.FRIEND_INVITATION;
@@ -277,7 +327,7 @@ public class Cache {
     }
 
     public SortedSet<Invitation> getFriendInvitationsByStatus(final int status) {
-        return this.getInvitations(mInvitationIds, new InvitationFilter() {
+        return this.getInvitations(mInvitationIds, new SearchFilter<Invitation>() {
             @Override
             public boolean filter(Invitation invitation) {
                 return invitation.getStatus() == status;
@@ -310,7 +360,7 @@ public class Cache {
         return this.getInvitations(mInvitationIds, null);
     }
 
-    public SortedSet<Invitation> getInvitations(Set<Long> ids, InvitationFilter filter) {
+    public SortedSet<Invitation> getInvitations(Set<Long> ids, SearchFilter<Invitation> filter) {
         SortedSet<Invitation> invitations = new TreeSet<Invitation>();
 
         for (long id : ids) {
@@ -351,33 +401,6 @@ public class Cache {
             }
         }
         return nearEvents;
-    }
-
-    /**
-     * OK
-     * 
-     * @param id
-     * @return
-     */
-    public Event getPublicEvent(long id) {
-        return mEventInstances.get(id);
-    }
-
-    /**
-     * OK
-     * 
-     * @param ids
-     * @return
-     */
-    public Set<Event> getPublicEvents(Set<Long> ids) {
-        Set<Event> events = new HashSet<Event>();
-        for (long id : ids) {
-            Event event = this.getPublicEvent(id);
-            if (event != null) {
-                events.add(event);
-            }
-        }
-        return events;
     }
 
     /**
@@ -876,7 +899,7 @@ public class Cache {
      */
     public void updateEvents(Set<ImmutableEvent> updatedEvents) {
         for (ImmutableEvent updatedEvent : updatedEvents) {
-            Event cachedEvent = this.getPublicEvent(updatedEvent.getId());
+            Event cachedEvent = this.getEvent(updatedEvent.getId());
             if (cachedEvent != null) {
                 cachedEvent.update(updatedEvent);
             }
@@ -1075,7 +1098,7 @@ public class Cache {
         }
     }
 
-    private interface InvitationFilter {
-        boolean filter(Invitation invitation);
+    private interface SearchFilter<T> {
+        boolean filter(T item);
     }
 }

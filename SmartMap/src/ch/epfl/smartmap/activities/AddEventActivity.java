@@ -126,7 +126,8 @@ public class AddEventActivity extends FragmentActivity {
         } else {
             // Google Play Services are available.
             // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
+            mFragmentMap =
+                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
@@ -137,8 +138,9 @@ public class AddEventActivity extends FragmentActivity {
 
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
 
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer.getSettingsManager()
-                    .getLocation().getLatitude(), ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer
+                .getSettingsManager().getLocation().getLatitude(), ServiceContainer.getSettingsManager()
+                .getLocation().getLongitude()));
 
         }
     }
@@ -154,7 +156,7 @@ public class AddEventActivity extends FragmentActivity {
                 // Google wasn't able to retrieve the location name associated
                 // to the coordinates
                 Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location),
-                        Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_LONG).show();
                 mPlaceName.setText("");
             }
         }
@@ -193,8 +195,9 @@ public class AddEventActivity extends FragmentActivity {
 
         // Hack to remove warning from SonarQube, use view for log.
         Log.d(TAG, "View " + v.getId() + " clicked");
-        Toast.makeText(mContext, this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
-                Toast.LENGTH_LONG).show();
+        Toast.makeText(mContext,
+            this.getString(R.string.add_event_toast_indication_long_click_map_to_create_event),
+            Toast.LENGTH_LONG).show();
 
         Intent pickLocationIntent = new Intent(mContext, MainActivity.class);
         pickLocationIntent.putExtra("pickLocationForEvent", true);
@@ -203,22 +206,25 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * @return <code>true</code> if all the fields (event name, event dates, etc...) are legally set and the event is
+     * @return <code>true</code> if all the fields (event name, event dates, etc...) are legally set and the
+     *         event is
      *         ready to be created.
      * @author SpicyCH
      */
     private boolean allFieldsSetByUser() {
-        boolean validEndDateTime = this.isValidDate(mPickEndDate.getText().toString())
+        boolean validEndDateTime =
+            this.isValidDate(mPickEndDate.getText().toString())
                 && this.isValidTime(mPickEndTime.getText().toString());
 
         boolean validPosition = (mEventPosition.latitude != 0) && (mEventPosition.longitude != 0);
 
         return validEndDateTime && validPosition
-                && (!"".equals(mPlaceName.getText().toString()) && !"".equals(mEventName.getText().toString()));
+            && (!"".equals(mPlaceName.getText().toString()) && !"".equals(mEventName.getText().toString()));
     }
 
     /**
-     * Ensures the end of the event is after its start and end of the event is not in the past. Displays a toast and
+     * Ensures the end of the event is after its start and end of the event is not in the past. Displays a
+     * toast and
      * reset the bad field set by the user if necessary.
      * 
      * @param startDate
@@ -227,16 +233,17 @@ public class AddEventActivity extends FragmentActivity {
      * @param endTime
      * @author SpicyCH
      */
-    private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
+    private void
+        checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
 
         if (this.isValidDate(endDate.getText().toString()) && this.isValidTime(endTime.getText().toString())) {
             // The end of the event has been set by the user
 
-            GregorianCalendar start = this.getDateFromTextFormat(startDate.getText().toString(), startTime.getText()
-                    .toString());
+            GregorianCalendar start =
+                this.getDateFromTextFormat(startDate.getText().toString(), startTime.getText().toString());
 
-            GregorianCalendar end = this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText()
-                    .toString());
+            GregorianCalendar end =
+                this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText().toString());
 
             GregorianCalendar now = new GregorianCalendar();
 
@@ -250,16 +257,18 @@ public class AddEventActivity extends FragmentActivity {
                 endDate.setText("");
                 endTime.setText("");
 
-                Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext,
+                    this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
+                    Toast.LENGTH_LONG).show();
             } else if (end.before(now)) {
                 // The user is trying to create an event in the past
 
                 endDate.setText("");
                 endTime.setText("");
 
-                Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_end_cannot_be_in_past),
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext,
+                    this.getString(R.string.add_event_toast_event_end_cannot_be_in_past), Toast.LENGTH_LONG)
+                    .show();
             }
         }
 
@@ -274,57 +283,58 @@ public class AddEventActivity extends FragmentActivity {
 
         if (!this.allFieldsSetByUser()) {
 
-            Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set), Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(mContext, this.getString(R.string.add_event_toast_not_all_fields_set),
+                Toast.LENGTH_SHORT).show();
 
             Log.d(TAG, "Couldn't create a new event because not all fields were set.\n" + "end date: "
-                    + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
-                    + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
-                    + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
-                    + mEventPosition.longitude);
+                + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
+                + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
+                + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
+                + mEventPosition.longitude);
         } else {
 
-            GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
-                    mPickStartTime.getText().toString());
-            GregorianCalendar endDate = this.getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime
-                    .getText().toString());
+            GregorianCalendar startDate =
+                this.getDateFromTextFormat(mPickStartDate.getText().toString(), mPickStartTime.getText()
+                    .toString());
+            GregorianCalendar endDate =
+                this.getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime.getText()
+                    .toString());
 
             Location location = new Location("Location set by user");
             location.setLatitude(mEventPosition.latitude);
             location.setLongitude(mEventPosition.longitude);
             SettingsManager setMng = ServiceContainer.getSettingsManager();
 
-            ImmutableEvent event = new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(),
-                    setMng.getUserID(), mDescription.getText().toString(), startDate, endDate, location, mPlaceName
-                            .getText().toString(), PublicEvent.NO_PARTICIPANTS);
+            ImmutableEvent event =
+                new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), setMng.getUserID(),
+                    mDescription.getText().toString(), startDate, endDate, location, mPlaceName.getText()
+                        .toString(), PublicEvent.NO_PARTICIPANTS);
 
             ServiceContainer.getCache().createEvent(event, new NetworkRequestCallback() {
 
                 @Override
                 public void onFailure() {
                     AddEventActivity.this.runOnUiThread(new Runnable() {
-
                         @Override
                         public void run() {
                             Toast.makeText(mContext,
-                                    mContext.getString(R.string.add_event_toast_couldnt_create_event_server),
-                                    Toast.LENGTH_SHORT).show();
+                                mContext.getString(R.string.add_event_toast_couldnt_create_event_server),
+                                Toast.LENGTH_SHORT).show();
                         }
-
                     });
                 }
 
                 @Override
                 public void onSuccess() {
                     AddEventActivity.this.runOnUiThread(new Runnable() {
-
                         @Override
                         public void run() {
-                            Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext,
+                                mContext.getString(R.string.add_event_toast_event_created),
+                                Toast.LENGTH_SHORT).show();
+
                             mActivity.finish();
                         }
-
                     });
                 }
             });
@@ -348,8 +358,8 @@ public class AddEventActivity extends FragmentActivity {
 
         final int month = Integer.parseInt(s1[INDEX_MONTH]) - 1;
 
-        return new GregorianCalendar(Integer.parseInt(s1[INDEX_YEAR]), month, Integer.parseInt(s1[INDEX_DAY]),
-                Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
+        return new GregorianCalendar(Integer.parseInt(s1[INDEX_YEAR]), month,
+            Integer.parseInt(s1[INDEX_DAY]), Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
 
     }
 
@@ -369,7 +379,8 @@ public class AddEventActivity extends FragmentActivity {
 
         mPlaceName.setFocusable(true);
         // Initialize mEventPosition to position of user
-        mEventPosition = new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
+        mEventPosition =
+            new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
                 .getSettingsManager().getLocation().getLongitude());
 
         mTextChangedListener = new DateChangedListener();
@@ -382,7 +393,7 @@ public class AddEventActivity extends FragmentActivity {
         GregorianCalendar now = new GregorianCalendar();
 
         mPickStartTime.setText(TimePickerFragment.formatForClock(now.get(Calendar.HOUR_OF_DAY)) + ":"
-                + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));
+            + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));
 
         mPickStartTime.setOnClickListener(new OnClickListener() {
 
@@ -395,7 +406,7 @@ public class AddEventActivity extends FragmentActivity {
         });
 
         mPickStartDate.setText(now.get(Calendar.DAY_OF_MONTH) + "/" + (now.get(Calendar.MONTH) + 1) + "/"
-                + now.get(Calendar.YEAR));
+            + now.get(Calendar.YEAR));
 
         mPickStartDate.setOnClickListener(new OnClickListener() {
 
@@ -461,7 +472,7 @@ public class AddEventActivity extends FragmentActivity {
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
         } else {
             Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location_name),
-                    Toast.LENGTH_LONG).show();
+                Toast.LENGTH_LONG).show();
             mPlaceName.setText("");
         }
     }
@@ -474,7 +485,8 @@ public class AddEventActivity extends FragmentActivity {
             mPickEndDate.removeTextChangedListener(mTextChangedListener);
             mPickStartDate.removeTextChangedListener(mTextChangedListener);
 
-            AddEventActivity.this.checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
+            AddEventActivity.this.checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate,
+                mPickEndTime);
 
             // Reset the TextChangedListener
             mPickEndDate.addTextChangedListener(mTextChangedListener);

@@ -78,14 +78,14 @@
         <item>All</item>
     </string-array>
     <string-array name="pref_events_max_distance_values">
-        <!-- NOTE: the distances are in km -->
+        <!-- NOTE: the distances are in meters -->
         <item>0</item>
-        <item>10</item>
-        <item>50</item>
-        <item>100</item>
-        <item>500</item>
-        <item>1000</item>
-        <item>41000</item>
+        <item>10000</item>
+        <item>50000</item>
+        <item>100000</item>
+        <item>500000</item>
+        <item>1000000</item>
+        <item>41000000</item>
     </string-array>
 
     <!-- Notifications -->
