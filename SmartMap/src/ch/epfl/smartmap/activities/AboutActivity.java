@@ -224,7 +224,7 @@ public class AboutActivity extends Activity {
         teamMembers.add("Matthieu Girod");
         teamMembers.add("Alain Milliet");
         teamMembers.add("Nicolas Ritter");
-        teamMembers.add("Raphaël Steinmann");
+        teamMembers.add("Raphael Steinmann");
         teamMembers.add("Hugo Sbai");
         teamMembers.add("Marion Sbai");
 
@@ -238,7 +238,7 @@ public class AboutActivity extends Activity {
         // Display thanks list (in non-random order)
         List<String> thanksTo = new ArrayList<String>();
         thanksTo.add("Prof. James Larus");
-        thanksTo.add("Călin Iorgulescu");
+        thanksTo.add("Calin Iorgulescu");
         thanksTo.add("Lukas Kellenberger");
 
         LinearLayout thanksHolder = (LinearLayout) this.findViewById(R.id.about_thanks_holder);
