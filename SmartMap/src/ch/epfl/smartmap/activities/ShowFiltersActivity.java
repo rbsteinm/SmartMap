@@ -62,6 +62,19 @@ public class ShowFiltersActivity extends ListActivity {
     protected void onResume() {
 
         super.onResume();
+        mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
+        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onStart()
+     */
+    @Override
+    protected void onStart() {
+
+        super.onStart();
+        mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
         this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
 
