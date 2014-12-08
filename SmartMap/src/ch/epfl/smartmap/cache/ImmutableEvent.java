@@ -1,10 +1,8 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import android.location.Location;
 
@@ -24,8 +22,8 @@ public class ImmutableEvent {
     private String mDescription;
     private Location mLocation;
     private String mLocationString;
-    private GregorianCalendar mStartDate;
-    private GregorianCalendar mEndDate;
+    private Calendar mStartDate;
+    private Calendar mEndDate;
     private List<Long> mParticipantIds;
 
     // These will be set by the cache
@@ -52,12 +50,10 @@ public class ImmutableEvent {
         mName = name;
         mCreatorId = creatorId;
         mDescription = description;
-        mStartDate = new GregorianCalendar(TimeZone.getDefault());
-        mEndDate = new GregorianCalendar(TimeZone.getDefault());
-        mStartDate.setTime(startDate.getTime());
-        mEndDate.setTime(endDate.getTime());
-        mParticipantIds = new ArrayList<Long>(participantIds);
-        mLocation = new Location(location);
+        mStartDate = startDate;
+        mEndDate = endDate;
+        mParticipantIds = participantIds;
+        mLocation = location;
         mLocationString = locationString;
     }
 
@@ -74,7 +70,7 @@ public class ImmutableEvent {
     }
 
     public Calendar getEndDate() {
-        return (Calendar) mEndDate.clone();
+        return mEndDate;
     }
 
     public long getId() {
@@ -82,7 +78,7 @@ public class ImmutableEvent {
     }
 
     public Location getLocation() {
-        return new Location(mLocation);
+        return mLocation;
     }
 
     public String getLocationString() {
@@ -94,14 +90,14 @@ public class ImmutableEvent {
     }
 
     public List<Long> getParticipantIds() {
-        return new ArrayList<Long>(mParticipantIds);
+        return mParticipantIds;
     }
 
     public List<User> getParticipants() {
-        return new ArrayList<User>(mParticipants);
+        return mParticipants;
     }
 
-    public GregorianCalendar getStartDate() {
+    public Calendar getStartDate() {
         return mStartDate;
     }
 
@@ -121,7 +117,7 @@ public class ImmutableEvent {
     }
 
     public ImmutableEvent setEndDate(GregorianCalendar newEndDate) {
-        mEndDate.setTime(newEndDate.getTime());
+        mEndDate = newEndDate;
         return this;
     }
 
@@ -131,7 +127,7 @@ public class ImmutableEvent {
     }
 
     public ImmutableEvent setLocation(Location newLocation) {
-        mLocation.set(newLocation);
+        mLocation = newLocation;
         return this;
     }
 
@@ -146,12 +142,12 @@ public class ImmutableEvent {
     }
 
     public ImmutableEvent setParticipants(List<User> newParticipants) {
-        mParticipants = new ArrayList<User>(mParticipants);
+        mParticipants = newParticipants;
         return this;
     }
 
     public ImmutableEvent setStartDate(GregorianCalendar newStartDate) {
-        mStartDate.setTime(newStartDate.getTime());
+        mStartDate = newStartDate;
         return this;
     }
 }

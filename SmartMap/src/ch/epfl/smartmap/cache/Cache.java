@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -208,24 +209,23 @@ public class Cache {
         }.execute();
     }
 
-    /**
-     * OK
-     * 
-     * @return
-     */
+    public Set<Filter> getAllActiveFilters() {
+        return this.getFilters(new SearchFilter<Filter>() {
+            @Override
+            public boolean filter(Filter filter) {
+                return filter.isActive();
+            }
+        });
+    }
+
     public Set<Event> getAllEvents() {
-        return this.getPublicEvents(mEventIds);
+        return this.getEvents(mEventIds);
     }
 
     public Set<Filter> getAllFilters() {
         return this.getFilters(mFilterIds);
     }
 
-    /**
-     * OK
-     * 
-     * @return a list containing all the user's Friends.
-     */
     public Set<User> getAllFriends() {
         return this.getFriends(mFriendIds);
     }
@@ -242,7 +242,7 @@ public class Cache {
             }
         }
 
-        return this.getPublicEvents(mEventIds);
+        return this.getEvents(mEventIds);
     }
 
     /**
@@ -272,8 +272,59 @@ public class Cache {
      * @param id
      * @return
      */
+    public Event getEvent(long id) {
+        return mEventInstances.get(id);
+    }
+
+    public Set<Event> getEvents(SearchFilter<Event> filter) {
+        Set<Event> events = new HashSet<Event>();
+        for (long id : mEventIds) {
+            Event event = this.getEvent(id);
+            if (filter.filter(event)) {
+                events.add(event);
+            }
+        }
+        return events;
+    }
+
+    /**
+     * OK
+     * 
+     * @param ids
+     * @return
+     */
+    public Set<Event> getEvents(Set<Long> ids) {
+        Set<Event> events = new HashSet<Event>();
+        for (long id : ids) {
+            Event event = this.getEvent(id);
+            if (event != null) {
+                events.add(event);
+            }
+        }
+        return events;
+    }
+
+    /**
+     * OK
+     * 
+     * @param id
+     * @return
+     */
     public Filter getFilter(long id) {
         return mFilterInstances.get(id);
+    }
+
+    public Set<Filter> getFilters(SearchFilter<Filter> searchFilter) {
+        Set<Filter> filters = new HashSet<Filter>();
+
+        for (long id : mFilterIds) {
+            Filter filter = this.getFilter(id);
+            if ((filter != null) && searchFilter.filter(filter)) {
+                filters.add(filter);
+            }
+        }
+
+        return filters;
     }
 
     public Set<Filter> getFilters(Set<Long> ids) {
@@ -304,7 +355,7 @@ public class Cache {
     }
 
     public SortedSet<Invitation> getFriendInvitations() {
-        return this.getInvitations(mInvitationIds, new InvitationFilter() {
+        return this.getInvitations(mInvitationIds, new SearchFilter<Invitation>() {
             @Override
             public boolean filter(Invitation invitation) {
                 return invitation.getType() == Invitation.FRIEND_INVITATION;
@@ -313,7 +364,7 @@ public class Cache {
     }
 
     public SortedSet<Invitation> getFriendInvitationsByStatus(final int status) {
-        return this.getInvitations(mInvitationIds, new InvitationFilter() {
+        return this.getInvitations(mInvitationIds, new SearchFilter<Invitation>() {
             @Override
             public boolean filter(Invitation invitation) {
                 return invitation.getStatus() == status;
@@ -346,7 +397,7 @@ public class Cache {
         return this.getInvitations(mInvitationIds, null);
     }
 
-    public SortedSet<Invitation> getInvitations(Set<Long> ids, InvitationFilter filter) {
+    public SortedSet<Invitation> getInvitations(Set<Long> ids, SearchFilter<Invitation> filter) {
         SortedSet<Invitation> invitations = new TreeSet<Invitation>();
 
         for (long id : ids) {
@@ -360,60 +411,30 @@ public class Cache {
     }
 
     public Set<Event> getLiveEvents() {
-        Set<Event> onLiveEvents = this.getAllEvents();
-        for (Event event : onLiveEvents) {
-            if (!event.isLive()) {
-                onLiveEvents.remove(event);
+        return this.getEvents(new SearchFilter<Event>() {
+            @Override
+            public boolean filter(Event item) {
+                return item.isLive();
             }
-        }
-        return onLiveEvents;
+        });
     }
 
     public Set<Event> getMyEvents() {
-        Set<Event> myEvents = this.getAllEvents();
-        for (Event event : myEvents) {
-            if (!event.isOwn()) {
-                myEvents.remove(event);
+        return this.getEvents(new SearchFilter<Event>() {
+            @Override
+            public boolean filter(Event item) {
+                return item.isOwn();
             }
-        }
-        return myEvents;
+        });
     }
 
     public Set<Event> getNearEvents() {
-        Set<Event> nearEvents = this.getAllEvents();
-        for (Event event : nearEvents) {
-            if (!event.isNear()) {
-                nearEvents.remove(event);
+        return this.getEvents(new SearchFilter<Event>() {
+            @Override
+            public boolean filter(Event item) {
+                return item.isNear();
             }
-        }
-        return nearEvents;
-    }
-
-    /**
-     * OK
-     * 
-     * @param id
-     * @return
-     */
-    public Event getPublicEvent(long id) {
-        return mEventInstances.get(id);
-    }
-
-    /**
-     * OK
-     * 
-     * @param ids
-     * @return
-     */
-    public Set<Event> getPublicEvents(Set<Long> ids) {
-        Set<Event> events = new HashSet<Event>();
-        for (long id : ids) {
-            Event event = this.getPublicEvent(id);
-            if (event != null) {
-                events.add(event);
-            }
-        }
-        return events;
+        });
     }
 
     /**
@@ -887,42 +908,44 @@ public class Cache {
     }
 
     // TODO
-    // public void updateEventInvitations(List<Long> events) {
-    // for (Long eventId : events) {
-    // new AsyncTask<Long, Void, Void>() {
-    //
-    // @Override
-    // protected Void doInBackground(Long... params) {
-    // try {
-    // ServiceContainer.getNetworkClient().ackEventInvitation(params[0]);
-    //
-    // mEventInvitationIds.add(params[0]);
-    // Event e = Cache.this.getPublicEvent(params[0]);
-    //
-    // User fromCache = Cache.this.getUser(e.getCreatorId());
-    // ImmutableUser creator = null;
-    // if (fromCache == null) {
-    // creator = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
-    // } else {
-    // creator = fromCache.getImmutableCopy();
-    // }
-    //
-    // EventInvitation invitation =
-    // new EventInvitation(new ImmutableInvitation(creator.getId(), Invitation.UNREAD),
-    // e.getImmutableCopy());
-    //
-    // invitation.setId(ServiceContainer.getDatabase().addEventInvitation(invitation));
-    //
-    // mEventInvitationInstances.put(invitation.getId(), invitation);
-    // } catch (SmartMapClientException e) {
-    // Log.e(TAG, "Unable to ack event invitation !" + e.getMessage());
-    // }
-    // return null;
-    // }
-    // }.execute(eventId);
-    //
-    // }
-    // }
+    public void updateEventInvitations(List<Long> events) {
+        for (Long eventId : events) {
+            new AsyncTask<Long, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Long... params) {
+                    try {
+                        ServiceContainer.getNetworkClient().ackEventInvitation(params[0]);
+
+                        // mEventInvitationIds.add(params[0]);
+                        Event e = Cache.this.getEvent(params[0]);
+
+                        User fromCache = Cache.this.getUser(e.getCreator().getId());
+                        ImmutableUser creator = null;
+                        if (fromCache == null) {
+                            creator = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
+                        } else {
+                            creator = fromCache.getImmutableCopy();
+                        }
+
+                        ImmutableInvitation invitation =
+                            new ImmutableInvitation(0, e.getCreator().getId(), e.getId(), Invitation.UNREAD,
+                                new GregorianCalendar().getTimeInMillis(), Invitation.UNREAD);
+
+                        invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
+                        GenericInvitation generic = new GenericInvitation(invitation);
+
+                        mInvitationIds.add(generic.getId());
+                        mInvitationInstances.put(generic.getId(), generic);
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Unable to ack event invitation !" + e.getMessage());
+                    }
+                    return null;
+                }
+            }.execute(eventId);
+
+        }
+    }
 
     /**
      * OK
@@ -931,7 +954,7 @@ public class Cache {
      */
     public void updateEvents(Set<ImmutableEvent> updatedEvents) {
         for (ImmutableEvent updatedEvent : updatedEvents) {
-            Event cachedEvent = this.getPublicEvent(updatedEvent.getId());
+            Event cachedEvent = this.getEvent(updatedEvent.getId());
             if (cachedEvent != null) {
                 cachedEvent.update(updatedEvent);
             }
@@ -974,7 +997,6 @@ public class Cache {
 
     // TODO
     public void updateFriendInvitations(NotificationBag notifBag, Context ctx) {
-
         this.putInvitations(notifBag.getInvitations());
 
         for (ImmutableUser user : notifBag.getInvitingUsers()) {
@@ -1078,7 +1100,7 @@ public class Cache {
         }
     }
 
-    private interface InvitationFilter {
-        boolean filter(Invitation invitation);
+    private interface SearchFilter<T> {
+        boolean filter(T item);
     }
 }

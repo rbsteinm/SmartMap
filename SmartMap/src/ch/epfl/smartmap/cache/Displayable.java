@@ -15,7 +15,6 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public interface Displayable extends Stockable {
 
-    // final Bitmap NO_IMAGE = Bitmap.createBitmap(R.drawable.default_event);
     String NO_TITLE = "";
     String NO_SUBTITLE = "";
     Bitmap DEFAULT_IMAGE = null;
@@ -56,7 +55,4 @@ public interface Displayable extends Stockable {
      * @return A name for the panel (e.g. the username, event name, etc.)
      */
     String getTitle();
-
-    boolean isVisible();
-
 }

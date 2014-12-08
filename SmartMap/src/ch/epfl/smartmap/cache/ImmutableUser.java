@@ -78,8 +78,28 @@ public final class ImmutableUser {
         return mIsBlocked;
     }
 
+    public ImmutableUser setEmail(String newEmail) {
+        mEmail = newEmail;
+        return this;
+    }
+
     public ImmutableUser setImage(Bitmap newImage) {
         mImage = newImage;
+        return this;
+    }
+
+    public ImmutableUser setLocation(Location newLocation) {
+        mLocation = new Location(newLocation);
+        return this;
+    }
+
+    public ImmutableUser setLocationString(String newLocationString) {
+        mLocationString = newLocationString;
+        return this;
+    }
+
+    public ImmutableUser setPhoneNumber(String newPhoneNumber) {
+        mPhoneNumber = newPhoneNumber;
         return this;
     }
 }

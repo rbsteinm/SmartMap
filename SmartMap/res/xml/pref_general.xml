@@ -77,7 +77,7 @@
         -->
         
         <ListPreference
-        android:defaultValue="100"
+        android:defaultValue="100000"
         android:entries="@array/pref_events_max_distance_titles"
         android:entryValues="@array/pref_events_max_distance_values"
         android:key="@string/settings_key_max_distance_fetch_events"

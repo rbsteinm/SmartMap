@@ -18,6 +18,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.ImmutableFilter;
 
 /**
  * Customized adapter that displays a list of filters in a target activity
@@ -82,13 +83,11 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            // mCache.updateFilter(new ImmutableFilter(filter.getId(), filter.getName(),
-                            // filter
-                            // .getFriendIds(), true));
+                            mCache.updateFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter
+                                .getFriendIds(), true));
                         } else {
-                            // mCache.updateFilter(new ImmutableFilter(filter.getId(), filter.getName(),
-                            // filter
-                            // .getFriendIds(), false));
+                            mCache.updateFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter
+                                .getFriendIds(), false));
                         }
                     }
                 });

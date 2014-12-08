@@ -1,5 +1,7 @@
 package ch.epfl.smartmap.background;
 
+import java.util.List;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -57,7 +59,6 @@ public class InvitationsService extends Service {
             ServiceContainer.setCache(new Cache());
         }
 
-        Log.d(TAG, "StartCommand");
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... arg0) {
@@ -77,6 +78,7 @@ public class InvitationsService extends Service {
 
         mHandler.removeCallbacks(getInvitations);
         mHandler.post(getInvitations);
+        Log.d(TAG, "Service started");
 
         return START_STICKY;
     }
@@ -114,8 +116,8 @@ public class InvitationsService extends Service {
                         ServiceContainer.getCache().updateFriendInvitations(nb,
                             InvitationsService.this.getApplicationContext());
                         // Get event invitations
-                        // List<Long> invitations = ServiceContainer.getNetworkClient().getEventInvitations();
-                        // ServiceContainer.getCache().updateEventInvitations(invitations);
+                        List<Long> invitations = ServiceContainer.getNetworkClient().getEventInvitations();
+                        ServiceContainer.getCache().updateEventInvitations(invitations);
                         Log.d(TAG, "Successfully fetched invitations");
                     } catch (SmartMapClientException e) {
                         Log.e(TAG, "Couldn't retrieve invitations due to a server error: " + e);
