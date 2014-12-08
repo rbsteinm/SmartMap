@@ -16,8 +16,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Listener that loads AddEventActivity with the location, city name and country name when the map is long
- * clicked.
+ * Listener that loads AddEventActivity with the location, city name and country name when the map is long clicked.
  * 
  * @author SpicyCH
  */
@@ -44,6 +43,7 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
         String cityName = "";
         String countryName = "";
         List<Address> addresses;
+
         try {
             addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
             if (addresses.size() > 0) {
@@ -62,11 +62,14 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
                 }
             }
         } catch (IOException e) {
+            Log.d(TAG, "Connection error" + e);
         }
+
         extras.putString(CITY_NAME, cityName);
         extras.putString(COUNTRY_NAME, countryName);
         extras.putParcelable(Activity.LOCATION_SERVICE, latLng);
         result.putExtras(extras);
+
         if (mActivity.getIntent().getBooleanExtra("pickLocationForEvent", false)) {
             // Return the result to the calling activity (AddEventActivity)
             mActivity.setResult(Activity.RESULT_OK, result);
@@ -74,6 +77,7 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
             // The user was in MainActivity and long clicked to create an event
             mActivity.startActivity(result);
         }
+
     }
 
 }
