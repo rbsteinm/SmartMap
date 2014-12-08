@@ -114,18 +114,20 @@ public class OwnPositionService extends Service {
                 // Give new location to SettingsManager
                 ServiceContainer.getSettingsManager().setLocationName(locName);
                 // Sends new Position to server
-                new AsyncTask<Void, Void, Void>() {
-                    @Override
-                    public Void doInBackground(Void... params) {
-                        try {
-                            ServiceContainer.getNetworkClient().updatePos(newLocation);
-                            Log.d(TAG, "Location Update");
-                        } catch (SmartMapClientException e) {
-                            Log.e(TAG, "Error in LocationListener : " + e);
+                if (!ServiceContainer.getSettingsManager().isOffline()) {
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        public Void doInBackground(Void... params) {
+                            try {
+                                ServiceContainer.getNetworkClient().updatePos(newLocation);
+                                Log.d(TAG, "Location Update");
+                            } catch (SmartMapClientException e) {
+                                Log.e(TAG, "Error in LocationListener : " + e);
+                            }
+                            return null;
                         }
-                        return null;
-                    }
-                }.execute();
+                    }.execute();
+                }
             }
         }
 
