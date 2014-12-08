@@ -122,12 +122,11 @@ public class Cache {
                 protected Void doInBackground(ImmutableUser... params) {
                     try {
                         ServiceContainer.getNetworkClient().ackAcceptedInvitation(params[0].getId());
-                        // Bitmap image =
-                        // ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
+                        Bitmap image = ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
+                        params[0].setImage(image);
 
-                        Cache.this.putFriend(params[0]);
+                        Cache.this.updateFriend(params[0]);
 
-                        // Set new friend profile picture ?
                         if (ServiceContainer.getSettingsManager().notificationsEnabled()
                             && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations()) {
                             Notifications.acceptedFriendNotification(ctx, params[0]);
@@ -432,7 +431,7 @@ public class Cache {
                     ServiceContainer.getNetworkClient().inviteFriend(params[0]);
                     mInvitedUserIds.add(params[0]);
                     // Better to store only id in db ?
-                    // ServiceContainer.getDatabase().addPendingFriend(params[0]);
+                    ServiceContainer.getDatabase().addPendingFriend(params[0]);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Error while inviting friend: " + e.getMessage());
@@ -590,7 +589,7 @@ public class Cache {
     public void putStrangers(Set<ImmutableUser> newStrangers) {
         for (ImmutableUser newStranger : newStrangers) {
             // Check that the Stranger is not a friend
-            if (mFriendIds.contains(newStranger.getId())) {
+            if (!mFriendIds.contains(newStranger.getId())) {
                 if (mUserInstances.get(newStranger.getId()) == null) {
                     // Need to add it
                     mUserInstances.put(newStranger.getId(), new Friend(newStranger));
@@ -874,6 +873,7 @@ public class Cache {
                         ImmutableUser onlineValues = networkClient.getUserInfo(id);
                         // Fetch Image
                         Bitmap image = ServiceContainer.getNetworkClient().getProfilePicture(id);
+                        onlineValues.setImage(image);
 
                         if (friend != null) {
                             // Simply update
