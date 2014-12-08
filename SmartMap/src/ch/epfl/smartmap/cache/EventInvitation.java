@@ -84,6 +84,15 @@ public class EventInvitation implements Invitation {
             + mUser.getName();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#getType()
+     */
+    @Override
+    public int getType() {
+        return Invitation.EVENT_INVITATION;
+    }
+
     @Override
     public User getUser() {
         return mUser;

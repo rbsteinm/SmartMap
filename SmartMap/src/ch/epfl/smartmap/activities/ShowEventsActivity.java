@@ -251,7 +251,7 @@ public class ShowEventsActivity extends ListActivity {
         // TODO
 
         ServiceContainer.getCache().getNearEvents();
-        ServiceContainer.getCache().getOnGoingEvents();
+        ServiceContainer.getCache().getLiveEvents();
         ServiceContainer.getCache().getMyEvents();
 
         EventsListItemAdapter adapter = new EventsListItemAdapter(this, mCurrentList, mMyLocation);

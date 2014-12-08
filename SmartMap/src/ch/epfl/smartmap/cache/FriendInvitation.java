@@ -75,6 +75,15 @@ public class FriendInvitation implements Invitation {
             + mUser.getName();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#getType()
+     */
+    @Override
+    public int getType() {
+        return Invitation.FRIEND_INVITATION;
+    }
+
     @Override
     public User getUser() {
         return mUser;

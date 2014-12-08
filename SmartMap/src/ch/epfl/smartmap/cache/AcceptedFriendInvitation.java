@@ -67,6 +67,15 @@ public class AcceptedFriendInvitation implements Invitation {
             + Utils.sContext.getResources().getString(R.string.notification_accepted_friend_title);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#getType()
+     */
+    @Override
+    public int getType() {
+        return Invitation.ACCEPTED_FRIEND_INVITATION;
+    }
+
     @Override
     public User getUser() {
         return mUser;
