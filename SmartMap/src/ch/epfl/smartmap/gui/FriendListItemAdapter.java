@@ -21,7 +21,53 @@ import ch.epfl.smartmap.cache.User;
  */
 public class FriendListItemAdapter extends ArrayAdapter<User> {
 
+    /**
+     * @author rbsteinm
+     *         ViewHolder pattern implementation for smoother scrolling
+     *         in lists populated by
+     *         {@link ch.epfl.smartmap.gui.FriendListItemAdapter}
+     */
+    public static class FriendViewHolder {
+        private TextView mName;
+        private TextView mLastSeen;
+        private ImageView mPicture;
+        private long mUserId;
+
+        public TextView getLastSeen() {
+            return mLastSeen;
+        }
+
+        public TextView getName() {
+            return mName;
+        }
+
+        public ImageView getPicture() {
+            return mPicture;
+        }
+
+        public long getUserId() {
+            return mUserId;
+        }
+
+        public void setLastSeen(TextView lastSeen) {
+            mLastSeen = lastSeen;
+        }
+
+        public void setName(TextView name) {
+            mName = name;
+        }
+
+        public void setPicture(ImageView picture) {
+            mPicture = picture;
+        }
+
+        public void setUserId(long userId) {
+            mUserId = userId;
+        }
+    }
+
     private final Context mContext;
+
     private final List<User> mItemsArrayList;
 
     /**
@@ -75,50 +121,5 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         }
 
         return convertView;
-    }
-
-    /**
-     * @author rbsteinm
-     *         ViewHolder pattern implementation for smoother scrolling
-     *         in lists populated by
-     *         {@link ch.epfl.smartmap.gui.FriendListItemAdapter}
-     */
-    public static class FriendViewHolder {
-        private TextView mName;
-        private TextView mLastSeen;
-        private ImageView mPicture;
-        private long mUserId;
-
-        public TextView getLastSeen() {
-            return mLastSeen;
-        }
-
-        public TextView getName() {
-            return mName;
-        }
-
-        public ImageView getPicture() {
-            return mPicture;
-        }
-
-        public long getUserId() {
-            return mUserId;
-        }
-
-        public void setLastSeen(TextView lastSeen) {
-            mLastSeen = lastSeen;
-        }
-
-        public void setName(TextView name) {
-            mName = name;
-        }
-
-        public void setPicture(ImageView picture) {
-            mPicture = picture;
-        }
-
-        public void setUserId(long userId) {
-            mUserId = userId;
-        }
     }
 }

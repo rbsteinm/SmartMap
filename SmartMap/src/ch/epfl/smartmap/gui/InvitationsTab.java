@@ -1,7 +1,9 @@
 package ch.epfl.smartmap.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,7 +17,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
-import ch.epfl.smartmap.listeners.CacheListener;
+import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
  * TODO listen to invitation list?
@@ -23,14 +25,13 @@ import ch.epfl.smartmap.listeners.CacheListener;
  * 
  * @author marion-S
  */
-public class InvitationsTab extends ListFragment implements CacheListener {
+public class InvitationsTab extends ListFragment {
 
     private final Context mContext;
     private List<Invitation> mInvitationList;
 
     public InvitationsTab(Context context) {
         mContext = context;
-        ServiceContainer.getCache().addOnCacheListener(this);
     }
 
     /*
@@ -39,84 +40,6 @@ public class InvitationsTab extends ListFragment implements CacheListener {
      * android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater
      * , android.view.ViewGroup, android.os.Bundle)
      */
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mInvitationList = ServiceContainer.getCache().getUnansweredFriendInvitations();
-
-        // Create custom Adapter and pass it to the Activity
-        FriendInvitationListItemAdapter adapter =
-            new FriendInvitationListItemAdapter(mContext, mInvitationList);
-        this.setListAdapter(adapter);
-
-        return view;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onEventListUpdate()
-     */
-    @Override
-    public void onEventListUpdate() {
-        // Nothing
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
-     */
-    @Override
-    public void onFilterListUpdate() {
-        // Nothing
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
-     */
-    @Override
-    public void onFriendListUpdate() {
-        // Nothing
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onInvitationListUpdate()
-     */
-    @Override
-    public void onInvitationListUpdate() {
-        mInvitationList = ServiceContainer.getCache().getUnansweredFriendInvitations();
-        InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView
-     * , android.view.View, int, long) When a list item is clicked, display a
-     * dialog to ask whether to accept or decline the invitation
-     */
-    @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-
-        Invitation invitation = mInvitationList.get(position);
-
-        this.displayAcceptFriendDialog(invitation);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onResume()
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-        // new RefreshInvitationsList().execute();
-        mInvitationList = ServiceContainer.getCache().getUnansweredFriendInvitations();
-        this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
-    }
-
     /**
      * A dialog to ask whether to accept or decline the invitation of the given
      * user
@@ -170,5 +93,59 @@ public class InvitationsTab extends ListFragment implements CacheListener {
 
         // display the AlertDialog
         builder.create().show();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
+        mInvitationList = ServiceContainer.getCache().getUnansweredFriendInvitations();
+
+        // Create custom Adapter and pass it to the Activity
+        this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
+
+        // Initialize the listener
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onInvitationListUpdate() {
+                mInvitationList =
+                    new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
+                ((Activity) mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
+                            mInvitationList));
+                    }
+                });
+
+            }
+        });
+        return view;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView
+     * , android.view.View, int, long) When a list item is clicked, display a
+     * dialog to ask whether to accept or decline the invitation
+     */
+    @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        Invitation invitation = mInvitationList.get(position);
+
+        this.displayAcceptFriendDialog(invitation);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onResume()
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mInvitationList = ServiceContainer.getCache().getUnansweredFriendInvitations();
+        this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
     }
 }

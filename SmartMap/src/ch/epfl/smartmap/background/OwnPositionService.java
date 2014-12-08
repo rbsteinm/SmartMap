@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
+import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -149,9 +151,19 @@ public class OwnPositionService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // FIXME Exception quand on ferme l'app
+        Utils.sContext = this.getApplicationContext();
+        // Recreating services if they are not set
+        if (ServiceContainer.getSettingsManager() == null) {
+            ServiceContainer.setSettingsManager(new SettingsManager(this.getApplicationContext()));
+        }
         if (ServiceContainer.getNetworkClient() == null) {
             ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
+        }
+        if (ServiceContainer.getDatabase() == null) {
+            ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplicationContext()));
+        }
+        if (ServiceContainer.getCache() == null) {
+            ServiceContainer.setCache(new Cache());
         }
 
         new StartUp().execute();
