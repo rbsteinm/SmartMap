@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.gui.Utils;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -193,7 +194,8 @@ public class PublicEvent implements Event {
      */
     @Override
     public String getSubtitle() {
-        return mDescription;
+        return Utils.getDateString(mStartDate) + " at " + Utils.getTimeString(mStartDate) + ", near "
+            + Utils.getCityFromLocation(mLocation);
     }
 
     /*

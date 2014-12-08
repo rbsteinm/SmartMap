@@ -64,6 +64,36 @@ public class Utils {
         }
     }
 
+    public static String getDateString(Calendar calendar) {
+
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        int yearsDiff = calendar.get(Calendar.YEAR) - now.get(Calendar.YEAR);
+        int daysDiff = calendar.get(Calendar.DAY_OF_YEAR) - now.get(Calendar.DAY_OF_YEAR);
+
+        if (yearsDiff == 0) {
+            if (daysDiff > 7) {
+                return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
+                    + calendar.get(Calendar.YEAR);
+            } else if (daysDiff > 1) {
+                return "Next " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+            } else if (daysDiff == 1) {
+                return "Tomorrow";
+            } else if (daysDiff == 0) {
+                return "Today";
+            } else if (daysDiff == -1) {
+                return "Yesterday";
+            } else if (daysDiff > -7) {
+                return "Last " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+            } else {
+                return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
+                    + calendar.get(Calendar.YEAR);
+            }
+        } else {
+            return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
+                + calendar.get(Calendar.YEAR);
+        }
+    }
+
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
         long diff =
@@ -100,6 +130,10 @@ public class Utils {
         } else {
             return "Never seen on SmartMap";
         }
+    }
+
+    public static String getTimeString(Calendar calendar) {
+        return calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE);
     }
 
     public static void setBadgeCount(Context context, LayerDrawable icon, int count) {
