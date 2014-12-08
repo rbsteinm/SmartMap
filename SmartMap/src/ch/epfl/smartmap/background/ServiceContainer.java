@@ -1,7 +1,5 @@
 package ch.epfl.smartmap.background;
 
-import java.util.NoSuchElementException;
-
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.search.CachedSearchEngine;
@@ -30,9 +28,6 @@ public class ServiceContainer {
      * @return Cache
      */
     public static Cache getCache() {
-        if (mCache == null) {
-            throw new NoSuchElementException("Cache is not set.");
-        }
         return mCache;
     }
 
@@ -42,9 +37,6 @@ public class ServiceContainer {
      * @return DatabaseHelper
      */
     public static DatabaseHelper getDatabase() {
-        if (mDBHelper == null) {
-            throw new NoSuchElementException("Database Helper is not set.");
-        }
         return mDBHelper;
     }
 
@@ -54,9 +46,6 @@ public class ServiceContainer {
      * @return SmartMapClient
      */
     public static SmartMapClient getNetworkClient() {
-        if (mNetworkClient == null) {
-            throw new NoSuchElementException("Network client is not set.");
-        }
         return mNetworkClient;
     }
 
@@ -66,9 +55,6 @@ public class ServiceContainer {
      * @return
      */
     public static CachedSearchEngine getSearchEngine() {
-        if (mSearchEngine == null) {
-            throw new NoSuchElementException("Search engine is not set.");
-        }
         return mSearchEngine;
     }
 
@@ -78,9 +64,6 @@ public class ServiceContainer {
      * @return
      */
     public static SettingsManager getSettingsManager() {
-        if (mSettingsManager == null) {
-            throw new NoSuchElementException("Settings manager is not set.");
-        }
         return mSettingsManager;
     }
 

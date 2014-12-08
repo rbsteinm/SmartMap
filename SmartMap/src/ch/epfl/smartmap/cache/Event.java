@@ -53,6 +53,8 @@ public interface Event extends Displayable {
 
     boolean isGoing();
 
+    boolean isLive();
+
     boolean isNear();
 
     boolean isOwn();

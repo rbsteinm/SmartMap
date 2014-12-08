@@ -27,6 +27,9 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
  */
 
 public class FriendsTab extends ListFragment {
+
+    private static final String TAG = FriendsTab.class.getSimpleName();
+
     private List<User> mFriendList;
 
     private final Context mContext;
@@ -42,8 +45,7 @@ public class FriendsTab extends ListFragment {
         mFriendList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
 
         // Create custom Adapter and pass it to the Activity
-        FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
-        this.setListAdapter(adapter);
+        this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
 
         // Initialize the listener
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
@@ -75,7 +77,7 @@ public class FriendsTab extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        this.setListAdapter(new FriendListItemAdapter(mContext, new ArrayList<User>(ServiceContainer.getCache()
-            .getAllFriends())));
+        mFriendList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
+        this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
     }
 }

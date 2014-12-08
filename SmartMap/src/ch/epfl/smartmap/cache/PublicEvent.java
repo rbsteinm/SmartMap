@@ -238,6 +238,17 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#isLive()
+     */
+    @Override
+    public boolean isLive() {
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        // Maybe it is the other way around
+        return (mStartDate.compareTo(now) <= 0) && (mEndDate.compareTo(now) >= 0);
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Event#isNear()
      */
     @Override

@@ -17,6 +17,10 @@ public interface Invitation {
     int ACCEPTED = 2;
     int REFUSED = 3;
 
+    int FRIEND_INVITATION = 0;
+    int EVENT_INVITATION = 1;
+    int ACCEPTED_FRIEND_INVITATION = 2;
+
     /**
      * @return invitation's id
      */
@@ -43,6 +47,8 @@ public interface Invitation {
      * @return invitation's title
      */
     String getTitle();
+
+    int getType();
 
     /**
      * @return user
