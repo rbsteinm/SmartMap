@@ -3,6 +3,7 @@ package ch.epfl.smartmap.activities;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -308,7 +309,7 @@ public class AddEventActivity extends FragmentActivity {
             ImmutableEvent event =
                 new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), setMng.getUserID(),
                     mDescription.getText().toString(), startDate, endDate, location, mPlaceName.getText()
-                        .toString(), PublicEvent.NO_PARTICIPANTS);
+                        .toString(), new HashSet<Long>());
 
             ServiceContainer.getCache().createEvent(event, new NetworkRequestCallback() {
 

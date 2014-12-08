@@ -2,6 +2,7 @@ package ch.epfl.smartmap.servercom;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -449,7 +450,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         location.setLongitude(longitude);
         ImmutableEvent event =
             new ImmutableEvent(id, name, creatorId, description, startingDate, endDate, location,
-                positionName, new ArrayList<Long>());
+                positionName, new HashSet<Long>());
 
         return event;
     }

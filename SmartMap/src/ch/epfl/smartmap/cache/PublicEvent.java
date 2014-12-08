@@ -3,7 +3,9 @@ package ch.epfl.smartmap.cache;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import android.content.Context;
@@ -30,16 +32,16 @@ public class PublicEvent implements Event {
     private long mId;
     private String mName;
     private long mCreatorId;
-    private List<Long> mParticipantIds;
-    private GregorianCalendar mStartDate;
-    private GregorianCalendar mEndDate;
+    private Set<Long> mParticipantIds;
+    private Calendar mStartDate;
+    private Calendar mEndDate;
     private Location mLocation;
     // Optional fields
     private String mDescription;
     private String mLocationString;
 
     private User mCreator;
-    private List<User> mParticipants;
+    private Set<User> mParticipants;
 
     public static final int DEFAULT_ICON = R.drawable.default_event;
 
@@ -47,53 +49,17 @@ public class PublicEvent implements Event {
     public static final float MARKER_ANCHOR_Y = 1;
 
     protected PublicEvent(ImmutableEvent event) {
-        if (event.getId() < -1) {
-            throw new IllegalArgumentException();
-        } else {
-            mId = event.getId();
-        }
-
-        if ((event.getName() == null) || "".equals(event.getName())) {
-            throw new IllegalArgumentException();
-        } else {
-            mName = event.getName();
-        }
-
-        if (event.getCreatorId() < 0) {
-            throw new IllegalArgumentException();
-        } else {
-            mCreatorId = event.getCreatorId();
-            mCreator = event.getCreator();
-        }
-
-        if ((event.getStartDate() == null) || (event.getEndDate() == null)) {
-            throw new IllegalArgumentException();
-        } else {
-            mStartDate = new GregorianCalendar(TimeZone.getDefault());
-            mEndDate = new GregorianCalendar(TimeZone.getDefault());
-        }
-
-        if (event.getLocation() == null) {
-            throw new IllegalArgumentException();
-        } else {
-            mLocation = new Location(event.getLocation());
-        }
-
-        if (event.getLocationString() == null) {
-            mLocationString = Displayable.NO_LOCATION_STRING;
-        } else {
-            mLocationString = event.getLocationString();
-        }
-
-        if (event.getDescription() == null) {
-            mDescription = Event.NO_DESCRIPTION;
-        } else {
-            mDescription = event.getDescription();
-        }
-
-        // TODO Participants
-        mParticipantIds = event.getParticipantIds();
-        mParticipants = event.getParticipants();
+        mId = (event.getId() >= 0) ? event.getId() : NO_ID;
+        mName = (event.getName() != null) ? event.getName() : NO_NAME;
+        mCreator = (event.getCreator() != null) ? event.getCreator() : User.NOBODY;
+        mStartDate = (event.getStartDate() != null) ? (Calendar) event.getStartDate().clone() : NO_START_DATE;
+        mEndDate = (event.getEndDate() != null) ? (Calendar) event.getEndDate().clone() : NO_END_DATE;
+        mLocation = (event.getLocation() != null) ? new Location(event.getLocation()) : NO_LOCATION;
+        mLocationString =
+            (event.getLocationString() != null) ? event.getLocationString() : NO_LOCATION_STRING;
+        mDescription = (event.getDescription() != null) ? event.getDescription() : NO_DESCRIPTION;
+        mParticipants =
+            (event.getParticipants() != null) ? new HashSet<User>(event.getParticipants()) : NO_PARTICIPANTS;
     }
 
     /*
@@ -184,7 +150,7 @@ public class PublicEvent implements Event {
     }
 
     @Override
-    public GregorianCalendar getStartDate() {
+    public Calendar getStartDate() {
         return mStartDate;
     }
 
@@ -243,8 +209,8 @@ public class PublicEvent implements Event {
     @Override
     public boolean isNear() {
         Location ourLocation = ServiceContainer.getSettingsManager().getLocation();
-        return (ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager()
-            .getNearEventsMaxDistance());
+        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager()
+            .getNearEventsMaxDistance();
     }
 
     /*

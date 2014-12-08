@@ -1,8 +1,11 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,8 +21,12 @@ import ch.epfl.smartmap.gui.Utils;
 
 public interface Event extends Displayable {
 
-    List<Long> NO_PARTICIPANTS = new ArrayList<Long>();
+    long NO_ID = -1;
+    Set<User> NO_PARTICIPANTS = new HashSet<User>();
     String NO_DESCRIPTION = "This event currently has no description";
+    String NO_NAME = "Anonymous Event";
+    Calendar NO_START_DATE = GregorianCalendar.getInstance(TimeZone.getDefault());
+    Calendar NO_END_DATE = GregorianCalendar.getInstance(TimeZone.getDefault());
 
     Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(),
         R.drawable.default_event);

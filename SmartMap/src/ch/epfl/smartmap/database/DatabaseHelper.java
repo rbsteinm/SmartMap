@@ -476,7 +476,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
             event =
                 new ImmutableEvent(id, name, creatorId, description, startDate, endDate, location,
-                    locationString, new ArrayList<Long>());
+                    locationString, new HashSet<Long>());
         }
 
         cursor.close();
