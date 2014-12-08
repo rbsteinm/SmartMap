@@ -172,7 +172,7 @@ public class EventInformationActivity extends FragmentActivity {
                 if (mEvent.getLatLng() != null) {
                     mGoogleMap.clear();
                 }
-                EventInformationActivity.this.openMapAtEventLocation();
+                EventInformationActivity.this.openMapAtEventLocation(null);
             }
         });
     }
@@ -265,7 +265,7 @@ public class EventInformationActivity extends FragmentActivity {
      * 
      * @author SpicyCH
      */
-    public void openMapAtEventLocation() {
+    public void openMapAtEventLocation(View v) {
         Intent showEventIntent = new Intent(this, MainActivity.class);
         showEventIntent.putExtra(MainActivity.LOCATION_EXTRA, mEvent.getLocation());
         this.startActivity(showEventIntent);

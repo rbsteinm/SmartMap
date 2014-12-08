@@ -146,6 +146,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
             mGoogleMap.setMyLocationEnabled(true);
+
         }
     }
 

@@ -9,6 +9,7 @@ import java.util.TimeZone;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 
@@ -25,11 +26,13 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class PublicEvent implements Event {
 
+    static final public String TAG = PublicEvent.class.getSimpleName();
+
     // Mandatory fields
     private long mId;
     private String mName;
     private long mCreatorId;
-    private List<Long> mParticipantIds;
+    private final List<Long> mParticipantIds;
     private GregorianCalendar mStartDate;
     private GregorianCalendar mEndDate;
     private Location mLocation;
@@ -38,7 +41,7 @@ public class PublicEvent implements Event {
     private String mLocationString;
 
     private User mCreator;
-    private List<User> mParticipants;
+    private final List<User> mParticipants;
 
     public static final int DEFAULT_ICON = R.drawable.default_event;
 
@@ -101,8 +104,7 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj != null) && (this.getClass() == obj.getClass())
-            && (this.getId() == ((PublicEvent) obj).getId());
+        return (obj != null) && (this.getClass() == obj.getClass()) && (this.getId() == ((PublicEvent) obj).getId());
     }
 
     /*
@@ -241,8 +243,7 @@ public class PublicEvent implements Event {
     @Override
     public boolean isNear() {
         Location ourLocation = ServiceContainer.getSettingsManager().getLocation();
-        return (ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager()
-            .getNearEventsMaxDistance());
+        return (ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager().getNearEventsMaxDistance());
     }
 
     /*
@@ -251,6 +252,8 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean isOwn() {
+        Log.d(TAG, "creator id : " + mCreator.getId() + "  my id : "
+            + ServiceContainer.getSettingsManager().getUserId());
         return mCreator.getId() == ServiceContainer.getSettingsManager().getUserId();
     }
 
