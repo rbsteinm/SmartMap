@@ -99,7 +99,7 @@ public class InvitationsTab extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mInvitationList = ServiceContainer.getCache().getUnansweredFriendInvitations();
+        mInvitationList = new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
 
         // Create custom Adapter and pass it to the Activity
         this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
@@ -145,7 +145,7 @@ public class InvitationsTab extends ListFragment {
     public void onResume() {
         super.onResume();
 
-        mInvitationList = ServiceContainer.getCache().getUnansweredFriendInvitations();
+        mInvitationList = new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
         this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
     }
 }

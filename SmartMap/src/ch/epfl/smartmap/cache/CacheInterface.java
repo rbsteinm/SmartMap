@@ -16,7 +16,7 @@ public interface CacheInterface {
     /**
      * @return all EventInvitations contained in the Cache
      */
-    Set<EventInvitation> getAllEventInvitations();
+    Set<GenericInvitation> getAllEventInvitations();
 
     /**
      * @return all Events contained in the Cache
@@ -31,7 +31,7 @@ public interface CacheInterface {
     /**
      * @return all FriendInvitations contained in the Cache
      */
-    Set<FriendInvitation> getAllFriendInvitations();
+    Set<GenericInvitation> getAllFriendInvitations();
 
     /**
      * @return all Friends contained in the Cache
@@ -81,7 +81,8 @@ public interface CacheInterface {
     /**
      * @param id
      *            Filter's id
-     * @return the Filter with corresponding id, {@code null} if it is not in Cache
+     * @return the Filter with corresponding id, {@code null} if it is not in
+     *         Cache
      */
     Filter getFilter(long id);
 
@@ -95,7 +96,8 @@ public interface CacheInterface {
     /**
      * @param id
      *            Friend's id
-     * @return the Friend with corresponding id, {@code null} if it is not in Cache
+     * @return the Friend with corresponding id, {@code null} if it is not in
+     *         Cache
      */
     User getFriend(long id);
 
@@ -109,7 +111,8 @@ public interface CacheInterface {
     /**
      * @param id
      *            Stranger's id
-     * @return the Stranger with corresponding id, {@code null} if it is not in Cache
+     * @return the Stranger with corresponding id, {@code null} if it is not in
+     *         Cache
      */
     User getStranger(long id);
 
@@ -123,7 +126,8 @@ public interface CacheInterface {
     /**
      * @param id
      *            Stranger's id
-     * @return the Stranger with corresponding id, {@code null} if it is not in Cache
+     * @return the Stranger with corresponding id, {@code null} if it is not in
+     *         Cache
      */
     User getUser(long id);
 
@@ -135,12 +139,14 @@ public interface CacheInterface {
     User getUsers(Set<Long> ids);
 
     /**
-     * Completely wipes values and fill the Cache with what is contained in the database
+     * Completely wipes values and fill the Cache with what is contained in the
+     * database
      */
     void initFromDatabase();
 
     /**
-     * Creates a live instance with values from the EventContainer. Update previous instance if it was already
+     * Creates a live instance with values from the EventContainer. Update
+     * previous instance if it was already
      * in the Cache.
      * 
      * @param newEvent
@@ -149,7 +155,8 @@ public interface CacheInterface {
     void putEvent(ImmutableEvent newEvent);
 
     /**
-     * Creates for each EventContainer a new live Event instance with corresponding values. Update those that
+     * Creates for each EventContainer a new live Event instance with
+     * corresponding values. Update those that
      * were already in the Cache.
      * 
      * @param newEvents
@@ -158,7 +165,8 @@ public interface CacheInterface {
     void putEvents(Set<ImmutableEvent> newEvents);
 
     /**
-     * Creates a live instance with values from the FilterContainer. Update previous instance if it was
+     * Creates a live instance with values from the FilterContainer. Update
+     * previous instance if it was
      * already
      * in the Cache. Assigns a new unique Id.
      * 
@@ -168,7 +176,8 @@ public interface CacheInterface {
     void putFilter(ImmutableFilter newFilter);
 
     /**
-     * Creates for each FilterContainer a new live Filter instance with corresponding values. Update those
+     * Creates for each FilterContainer a new live Filter instance with
+     * corresponding values. Update those
      * that
      * were already in the Cache. Assigns a new unique Id for each filter.
      * 
@@ -178,7 +187,8 @@ public interface CacheInterface {
     void putFilters(Set<ImmutableFilter> newFilters);
 
     /**
-     * Creates a live instance with values from the UserContainer. Update previous instance if it was already
+     * Creates a live instance with values from the UserContainer. Update
+     * previous instance if it was already
      * in the Cache.
      * 
      * @param newFriend
@@ -187,7 +197,8 @@ public interface CacheInterface {
     void putFriend(ImmutableUser newFriend);
 
     /**
-     * Creates for each UserContainer a new live Friend instance with corresponding values. Update those
+     * Creates for each UserContainer a new live Friend instance with
+     * corresponding values. Update those
      * that were already in the Cache.
      * 
      * @param newFriends
@@ -196,7 +207,8 @@ public interface CacheInterface {
     void putFriends(Set<ImmutableUser> newFriend);
 
     /**
-     * Creates a live instance with values from the UserContainer. Update previous instance if it was already
+     * Creates a live instance with values from the UserContainer. Update
+     * previous instance if it was already
      * in the Cache.
      * 
      * @param newStranger
@@ -205,7 +217,8 @@ public interface CacheInterface {
     void putStranger(ImmutableUser newStranger);
 
     /**
-     * Creates for each UserContainer a new live Stranger instance with corresponding values. Update those
+     * Creates for each UserContainer a new live Stranger instance with
+     * corresponding values. Update those
      * that were already in the Cache.
      * 
      * @param newFilters

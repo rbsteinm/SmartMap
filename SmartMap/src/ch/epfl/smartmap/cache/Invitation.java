@@ -17,6 +17,10 @@ public interface Invitation {
     int ACCEPTED = 2;
     int DECLINED = 3;
 
+    int FRIEND_INVITATION = 0;
+    int EVENT_INVITATION = 1;
+    int ACCEPTED_FRIEND_INVITATION = 2;
+
     /**
      * @return invitation's id
      */

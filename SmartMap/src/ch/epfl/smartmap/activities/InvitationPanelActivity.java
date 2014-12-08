@@ -1,5 +1,7 @@
 package ch.epfl.smartmap.activities;
 
+import java.util.ArrayList;
+
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +13,7 @@ import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.GenericInvitation;
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.Notifications;
 import ch.epfl.smartmap.gui.InvitationListItemAdapter;
 
@@ -66,8 +69,8 @@ public class InvitationPanelActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, ServiceContainer.getCache()
-            .getFriendInvitations()));
+        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, new ArrayList<Invitation>(
+            ServiceContainer.getCache().getFriendInvitations())));
 
         ServiceContainer.getCache().readAllInvitations();
 
