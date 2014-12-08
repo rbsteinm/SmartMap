@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.activities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -14,8 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.gui.FilterListItemAdapter;
 
 /**
@@ -27,6 +29,7 @@ import ch.epfl.smartmap.gui.FilterListItemAdapter;
 public class ShowFiltersActivity extends ListActivity {
 
     private List<Filter> mFilterList;
+    private Cache mCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +38,12 @@ public class ShowFiltersActivity extends ListActivity {
 
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        mCache = ServiceContainer.getCache();
+        mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
 
         // mock stuff, filter list should be taken from the cache (or database?)
-        MockDB.fillFilters();
-        mFilterList = MockDB.FILTER_LIST;
+        // MockDB.fillFilters();
+        // mFilterList = MockDB.FILTER_LIST;
 
         this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
@@ -98,4 +103,5 @@ public class ShowFiltersActivity extends ListActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

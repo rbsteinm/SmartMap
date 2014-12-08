@@ -190,6 +190,10 @@ public class Cache {
         return this.getFriends(mFriendIds);
     }
 
+    public Set<Filter> getAllFilters() {
+        return this.getFilters(mFilterIds);
+    }
+
     public SortedSet<Invitation> getAllInvitations() {
         return this.getInvitations(mInvitationIds);
     }
@@ -598,6 +602,12 @@ public class Cache {
         }
     }
 
+    public void putFilter(ImmutableFilter newFilter) {
+        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
+        singleton.add(newFilter);
+        this.putFilters(singleton);
+    }
+
     public void putFriend(ImmutableUser newFriend) {
         Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
         singleton.add(newFriend);
@@ -880,6 +890,12 @@ public class Cache {
         this.updateFriends(singleton);
     }
 
+    public void updateFilter(ImmutableFilter updatedFilter) {
+        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
+        singleton.add(updatedFilter);
+        this.updateFilters(singleton);
+    }
+
     // TODO
     public void updateFriendInvitations(NotificationBag notifBag, Context ctx) {
 
@@ -908,6 +924,19 @@ public class Cache {
 
         for (CacheListener listener : mListeners) {
             listener.onFriendListUpdate();
+        }
+    }
+
+    public void updateFilters(Set<ImmutableFilter> updatedFilters) {
+        for (ImmutableFilter updatedFilter : updatedFilters) {
+            Filter cachedFilter = this.getFilter(updatedFilter.getId());
+            if (cachedFilter != null) {
+                cachedFilter.update(updatedFilter);
+            }
+        }
+
+        for (CacheListener listener : mListeners) {
+            listener.onFilterListUpdate();
         }
     }
 
