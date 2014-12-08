@@ -38,18 +38,63 @@ import com.facebook.widget.LoginButton;
  * {@linkplain ch.epfl.smartmap.activities.StartActivity} for screen 1.
  * </p>
  * <p>
- * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name,
- * facebook id and facebook token.
+ * On successful facebook login, we attempt to authenticate to the smartmap
+ * server by sending the name, facebook id and facebook token.
  * </p>
  * 
  * @author SpicyCH
  */
 public class LoginFragment extends Fragment {
 
-    private static final String TAG = LoginFragment.class.getSimpleName();
+    /**
+     * An AsyncTask to send the facebook user data to the SmartMap server
+     * asynchronously
+     * 
+     * @author SpicyCH
+     */
+    private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
 
+        private final static int FACEBOOK_ID_RADIX = 10;
+        private final Map<String, String> mParams;
+
+        /**
+         * @param params
+         */
+        public SendDataTask(Map<String, String> params) {
+            mParams = params;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            SmartMapClient networkClient = ServiceContainer.getNetworkClient();
+
+            try {
+                networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
+                    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
+                    mParams.get(FACEBOOK_TOKEN_POST_NAME));
+            } catch (NumberFormatException e1) {
+                Log.e(TAG, "Couldn't parse to Long: " + e1.getMessage());
+                return false;
+            } catch (SmartMapClientException e1) {
+                Log.e(TAG, "Couldn't authenticate : " + e1.getMessage());
+                return false;
+            }
+
+            Log.i(TAG, "User' infos sent to SmartMap server");
+            return true;
+
+        }
+    }
+
+    private static final String TAG = LoginFragment.class.getSimpleName();
     private static final String FACEBOOK_ID_POST_NAME = "facebookId";
     private static final String FACEBOOK_TOKEN_POST_NAME = "facebookToken";
+
     private static final String FACEBOOK_NAME_POST_NAME = "name";
 
     private UiLifecycleHelper mUiHelper;
@@ -94,10 +139,8 @@ public class LoginFragment extends Fragment {
                     Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
 
                     if (!LoginFragment.this.sendDataToServer(params)) {
-                        Toast.makeText(
-                            LoginFragment.this.getActivity(),
-                            LoginFragment.this
-                                .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
+                        Toast.makeText(LoginFragment.this.getActivity(),
+                            LoginFragment.this.getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
                             Toast.LENGTH_LONG).show();
                     } else {
                         ServiceContainer.getCache().initFromDatabase(ServiceContainer.getDatabase());
@@ -153,8 +196,7 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 
         // Start animation and set login button
-        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(),
-            R.anim.face_anim));
+        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(), R.anim.face_anim));
         authButton.setFragment(this);
 
         // Not logged in Facebook or permission to use Facebook in SmartMap not
@@ -244,9 +286,8 @@ public class LoginFragment extends Fragment {
         } else {
             // An error occured
             Log.e(TAG, "Could not send user's data to server. Net down?");
-            Toast.makeText(this.getActivity(),
-                this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet), Toast.LENGTH_LONG)
-                .show();
+            Toast.makeText(this.getActivity(), this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet),
+                Toast.LENGTH_LONG).show();
             return false;
         }
 
@@ -257,56 +298,5 @@ public class LoginFragment extends Fragment {
         Context currentActivity = this.getActivity().getBaseContext();
         Intent intent = new Intent(currentActivity, MainActivity.class);
         this.startActivity(intent);
-    }
-
-    /**
-     * An AsyncTask to send the facebook user data to the SmartMap server
-     * asynchronously
-     * 
-     * @author SpicyCH
-     */
-    private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final static int FACEBOOK_ID_RADIX = 10;
-        private final Map<String, String> mParams;
-
-        /**
-         * @param params
-         */
-        public SendDataTask(Map<String, String> params) {
-            mParams = params;
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Boolean doInBackground(Void... params) {
-
-            SmartMapClient networkClient = ServiceContainer.getNetworkClient();
-
-            try {
-                networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
-                    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
-                    mParams.get(FACEBOOK_TOKEN_POST_NAME));
-            } catch (NumberFormatException e1) {
-                Log.e(TAG, "Couldn't parse to Long: " + e1.getMessage());
-                return false;
-            } catch (SmartMapClientException e1) {
-                Log.e(TAG, "Couldn't authenticate : " + e1.getMessage());
-                return false;
-            }
-
-            Log.i(TAG, "User' infos sent to SmartMap server");
-            return true;
-
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            // Create and start the next activity
-            LoginFragment.this.startMainActivity();
-        }
     }
 }

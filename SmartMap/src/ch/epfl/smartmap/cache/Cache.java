@@ -31,7 +31,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class Cache {
 
-    static final public String TAG = "Cache";
+    static final public String TAG = Cache.class.getSimpleName();
 
     // SparseArrays containing live instances
     private final LongSparseArray<User> mUserInstances;
@@ -590,7 +590,7 @@ public class Cache {
     public void putStrangers(Set<ImmutableUser> newStrangers) {
         for (ImmutableUser newStranger : newStrangers) {
             // Check that the Stranger is not a friend
-            if (mFriendIds.contains(newStranger.getId())) {
+            if (!mFriendIds.contains(newStranger.getId())) {
                 if (mUserInstances.get(newStranger.getId()) == null) {
                     // Need to add it
                     mUserInstances.put(newStranger.getId(), new Friend(newStranger));

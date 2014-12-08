@@ -15,66 +15,13 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
  * @author jfperren
  */
 public class OwnPositionService extends Service {
-
-    private static final String TAG = OwnPositionService.class.getSimpleName();
-
-    private LocationManager mLocManager;
-
-    // minimum distance to update position
-    private static final float MIN_NETWORK_DISTANCE = 0;
-    // minimum distance before gps updates are requested
-    private static final float MIN_GPS_DISTANCE = 50;
-    // Time between position updates on GPS
-    private static final int GPS_UPDATE_TIME = 5 * 60 * 1000;
-    // Time between position updates on Network
-    private static final int NETWORK_UPDATE_TIME = 10 * 1000;
-
-    // Time before restart
-    private static final int RESTART_DELAY = 2000;
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Service#onBind(android.content.Intent)
-     */
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        new StartUp().execute();
-
-        return START_STICKY;
-    }
-
-    // Ugly workaround because of KitKat stopping services when app gets closed
-    // (Android issue #63618)
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
-        restartService.setPackage(this.getPackageName());
-        PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
-                PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService =
-            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
-            restartServicePending);
-    }
 
     /**
      * A location listener
@@ -131,8 +78,7 @@ public class OwnPositionService extends Service {
         protected Boolean doInBackground(Void... arg0) {
             try {
                 // Authentify in order to communicate with NetworkClient
-                ServiceContainer.getNetworkClient().authServer(
-                    ServiceContainer.getSettingsManager().getUserName(),
+                ServiceContainer.getNetworkClient().authServer(ServiceContainer.getSettingsManager().getUserName(),
                     ServiceContainer.getSettingsManager().getFacebookID(),
                     ServiceContainer.getSettingsManager().getToken());
                 return true;
@@ -160,13 +106,69 @@ public class OwnPositionService extends Service {
 
                 // And try to run LocationManager with GPS Provider
                 if (mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME,
-                        MIN_GPS_DISTANCE, new MyLocationListener());
+                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME, MIN_GPS_DISTANCE,
+                        new MyLocationListener());
                 }
             } else {
                 // FIXME : Handle this case
                 // Shouldn't the service always be authentified when launched ?
             }
         }
+    }
+
+    private static final String TAG = OwnPositionService.class.getSimpleName();
+    private LocationManager mLocManager;
+    // minimum distance to update position
+    private static final float MIN_NETWORK_DISTANCE = 0;
+    // minimum distance before gps updates are requested
+    private static final float MIN_GPS_DISTANCE = 50;
+
+    // Time between position updates on GPS
+    private static final int GPS_UPDATE_TIME = 5 * 60 * 1000;
+
+    // Time between position updates on Network
+    private static final int NETWORK_UPDATE_TIME = 10 * 1000;
+
+    // Time before restart
+    private static final int RESTART_DELAY = 2000;
+
+    /*
+     * (non-Javadoc)
+     * @see android.app.Service#onBind(android.content.Intent)
+     */
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mLocManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // FIXME Exception quand on ferme l'app
+        if (ServiceContainer.getNetworkClient() == null) {
+            ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
+        }
+
+        new StartUp().execute();
+
+        return START_STICKY;
+    }
+
+    // Ugly workaround because of KitKat stopping services when app gets closed
+    // (Android issue #63618)
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
+        restartService.setPackage(this.getPackageName());
+        PendingIntent restartServicePending =
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
+            restartServicePending);
     }
 }

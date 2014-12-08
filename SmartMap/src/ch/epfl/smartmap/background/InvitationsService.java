@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -21,64 +22,6 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * @author ritterni
  */
 public class InvitationsService extends Service {
-
-    private static final String TAG = InvitationsService.class.getSimpleName();
-
-    // Time between each invitation fetch
-    private static final int INVITE_UPDATE_DELAY = 5000;
-    // Time before restarting
-    private static final int RESTART_DELAY = 2000;
-    // Handler for Runnables
-    private final Handler mHandler = new Handler();
-
-    private final Runnable getInvitations = new InvitationsRunnable();
-
-    @Override
-    public IBinder onBind(Intent arg0) {
-        return null;
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        Log.d(TAG, "StartCommand");
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... arg0) {
-                try {
-                    // Authentify in order to communicate with NetworkClient
-                    ServiceContainer.getNetworkClient().authServer(
-                        ServiceContainer.getSettingsManager().getUserName(),
-                        ServiceContainer.getSettingsManager().getFacebookID(),
-                        ServiceContainer.getSettingsManager().getToken());
-                    return true;
-                } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Couldn't log in: " + e);
-                    return false;
-                }
-            }
-        }.execute();
-
-        mHandler.removeCallbacks(getInvitations);
-        mHandler.post(getInvitations);
-
-        return START_STICKY;
-    }
-
-    // Ugly workaround because of KitKat stopping services when app gets closed
-    // (Android issue #63618)
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
-        restartService.setPackage(this.getPackageName());
-        PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
-                PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService =
-            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
-            restartServicePending);
-    }
 
     /**
      * Retrieves and handles invitations
@@ -109,5 +52,63 @@ public class InvitationsService extends Service {
             }.execute();
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
         }
+    }
+
+    private static final String TAG = InvitationsService.class.getSimpleName();
+    // Time between each invitation fetch
+    private static final int INVITE_UPDATE_DELAY = 5000;
+    // Time before restarting
+    private static final int RESTART_DELAY = 2000;
+
+    // Handler for Runnables
+    private final Handler mHandler = new Handler();
+
+    private final Runnable getInvitations = new InvitationsRunnable();
+
+    @Override
+    public IBinder onBind(Intent arg0) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // FIXME Exception quand on ferme l'app
+        if (ServiceContainer.getNetworkClient() == null) {
+            ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
+        }
+        Log.d(TAG, "StartCommand");
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... arg0) {
+                try {
+                    // Authentify in order to communicate with NetworkClient
+                    ServiceContainer.getNetworkClient().authServer(ServiceContainer.getSettingsManager().getUserName(),
+                        ServiceContainer.getSettingsManager().getFacebookID(),
+                        ServiceContainer.getSettingsManager().getToken());
+                    return true;
+                } catch (SmartMapClientException e) {
+                    Log.e(TAG, "Couldn't log in: " + e);
+                    return false;
+                }
+            }
+        }.execute();
+
+        mHandler.removeCallbacks(getInvitations);
+        mHandler.post(getInvitations);
+
+        return START_STICKY;
+    }
+
+    // Ugly workaround because of KitKat stopping services when app gets closed
+    // (Android issue #63618)
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
+        restartService.setPackage(this.getPackageName());
+        PendingIntent restartServicePending =
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
+            restartServicePending);
     }
 }
