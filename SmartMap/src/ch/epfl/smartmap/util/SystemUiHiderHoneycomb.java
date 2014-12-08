@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.WindowManager;
 
 /**
- * An API 11+ implementation of {@link SystemUiHider}. Uses APIs available in Honeycomb and later
- * (specifically {@link View#setSystemUiVisibility(int)}) to show and hide the system UI.
+ * An API 11+ implementation of {@link SystemUiHider}. Uses APIs available in Honeycomb and later (specifically
+ * {@link View#setSystemUiVisibility(int)}) to show and hide the system UI.
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
@@ -24,8 +24,7 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
 
     /**
      * Flags to test against the first parameter in
-     * {@link android.view.View.OnSystemUiVisibilityChangeListener#onSystemUiVisibilityChange(int)} to
-     * determine the
+     * {@link android.view.View.OnSystemUiVisibilityChangeListener#onSystemUiVisibilityChange(int)} to determine the
      * system UI visibility state.
      */
     private int mTestFlags;
@@ -36,45 +35,10 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
      */
     private boolean mVisible = true;
 
-    private View.OnSystemUiVisibilityChangeListener mSystemUiVisibilityChangeListener =
-        new View.OnSystemUiVisibilityChangeListener() {
-            @Override
-            public void onSystemUiVisibilityChange(int vis) {
-                // Test against mTestFlags to see if the system UI is visible.
-                if ((vis & mTestFlags) != 0) {
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                        // Pre-Jelly Bean, we must manually hide the action bar
-                        // and use the old window flags API.
-                        mActivity.getActionBar().hide();
-                        mActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                            WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                    }
-
-                    // Trigger the registered listener and cache the visibility
-                    // state.
-                    mOnVisibilityChangeListener.onVisibilityChange(false);
-                    mVisible = false;
-
-                } else {
-                    mAnchorView.setSystemUiVisibility(mShowFlags);
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                        // Pre-Jelly Bean, we must manually show the action bar
-                        // and use the old window flags API.
-                        mActivity.getActionBar().show();
-                        mActivity.getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                    }
-
-                    // Trigger the registered listener and cache the visibility
-                    // state.
-                    mOnVisibilityChangeListener.onVisibilityChange(true);
-                    mVisible = true;
-                }
-            }
-        };
+    private final View.OnSystemUiVisibilityChangeListener mSystemUiVisibilityChangeListener = new VisibilityChangeListener();
 
     /**
-     * Constructor not intended to be called by clients. Use {@link SystemUiHider#getInstance} to obtain an
-     * instance.
+     * Constructor not intended to be called by clients. Use {@link SystemUiHider#getInstance} to obtain an instance.
      */
     protected SystemUiHiderHoneycomb(Activity activity, View anchorView, int flags) {
         super(activity, anchorView, flags);
@@ -122,5 +86,40 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
     @Override
     public void show() {
         mAnchorView.setSystemUiVisibility(mShowFlags);
+    }
+
+    class VisibilityChangeListener implements View.OnSystemUiVisibilityChangeListener {
+        @Override
+        public void onSystemUiVisibilityChange(int vis) {
+            // Test against mTestFlags to see if the system UI is visible.
+            if ((vis & mTestFlags) != 0) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                    // Pre-Jelly Bean, we must manually hide the action bar
+                    // and use the old window flags API.
+                    mActivity.getActionBar().hide();
+                    mActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                }
+
+                // Trigger the registered listener and cache the visibility
+                // state.
+                mOnVisibilityChangeListener.onVisibilityChange(false);
+                mVisible = false;
+
+            } else {
+                mAnchorView.setSystemUiVisibility(mShowFlags);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                    // Pre-Jelly Bean, we must manually show the action bar
+                    // and use the old window flags API.
+                    mActivity.getActionBar().show();
+                    mActivity.getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                }
+
+                // Trigger the registered listener and cache the visibility
+                // state.
+                mOnVisibilityChangeListener.onVisibilityChange(true);
+                mVisible = true;
+            }
+        }
     }
 }
