@@ -260,7 +260,6 @@ public class Cache {
         for (Long id : mFriendIds) {
             User user = mFriendInstances.get(id);
             if ((user != null) && user.isVisible()) {
-                Log.d("cache", user.getName() + " is visible");
                 allVisibleUsers.add(user);
             }
         }

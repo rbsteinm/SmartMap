@@ -33,10 +33,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class DefaultMarkerManager implements MarkerManager {
 
     public static final String TAG = "MARKER MANAGER";
-    float MARKER_ANCHOR_X = (float) 0.5;
-
-    float MARKER_ANCHOR_Y = 1;
-
+    public static final float MARKER_ANCHOR_X = (float) 0.5;
+    public static final float MARKER_ANCHOR_Y = 1;
     public static final long HANDLER_DELAY = 16;
 
     private final GoogleMap mGoogleMap;
@@ -208,35 +206,34 @@ public class DefaultMarkerManager implements MarkerManager {
             // if the item is already displayed, get the marker for this
             // item, else add a new marker
             if (this.isDisplayedItem(item)) {
-                // Log.d("Markers", "found marker for " + item.getTitle());
+
                 marker = this.getMarkerForItem(item);
             } else {
                 marker = this.addMarker(item, context);
-                // Log.d("Markers", "not found marker for " + item.getTitle());
+
             }
 
-            Log.d("markers", "marker's position for " + item.getTitle() + " is " + marker.getPosition());
+            // Log.d("markers", "marker's position for " + item.getTitle() + " is " + marker.getPosition());
             if ((marker.getPosition().latitude != item.getLatLng().latitude)
                 || (marker.getPosition().longitude != item.getLatLng().longitude)) {
-                // Log.d("markers", "before updating, marker's position for " + item.getTitle() + " is "
-                // + marker.getPosition());
+
                 this.animateMarker(marker, item.getLatLng(), false, item, context);
             }
-            Log.d("markers", "final position of marker of " + item.getTitle() + " before setIcon is "
-                + marker.getPosition());
+            // Log.d("markers", "final position of marker of " + item.getTitle() + " before setIcon is "
+            // + marker.getPosition());
             marker.setIcon(item.getMarkerIcon(context));
-            Log.d(
-                "markers",
-                "final position of marker of " + item.getTitle() + " after setIcon is "
-                    + marker.getPosition());
+            // Log.d(
+            // "markers",
+            // "final position of marker of " + item.getTitle() + " after setIcon is "
+            // + marker.getPosition());
         }
 
         // remove the markers that are not longer in the list to display
         for (Displayable item : this.getDisplayedItems()) {
             if (!itemsToDisplay.contains(item)) {
-                // && (!getMarkerForItem(item).isInfoWindowShown())) {
+
                 this.removeMarker(item);
-                // this.animateMarker(marker, item.getLatLng(), true, item, context);
+
             }
         }
 
@@ -283,6 +280,5 @@ public class DefaultMarkerManager implements MarkerManager {
             }
         });
 
-        // marker.setIcon(item.getMarkerIcon(context));
     }
 }
