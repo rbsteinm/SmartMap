@@ -161,7 +161,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     public void onBackPressed() {
         switch (mMenuTheme) {
             case MAP:
-                super.onBackPressed();
                 break;
             case SEARCH:
                 break;

@@ -242,7 +242,6 @@ public class DefaultMarkerManager implements MarkerManager {
             // if the item is already displayed, get the marker for this
             // item, else add a new marker
             if (this.isDisplayedItem(item)) {
-
                 marker = this.getMarkerForItem(item);
             } else {
                 marker = this.addMarker(item, context);
