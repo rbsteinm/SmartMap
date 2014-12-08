@@ -67,7 +67,7 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
 
         extras.putString(CITY_NAME, cityName);
         extras.putString(COUNTRY_NAME, countryName);
-        extras.putParcelable(Activity.LOCATION_SERVICE, latLng);
+        extras.putParcelable(AddEventActivity.LOCATION_EXTRA, latLng);
         result.putExtras(extras);
 
         if (mActivity.getIntent().getBooleanExtra("pickLocationForEvent", false)) {
