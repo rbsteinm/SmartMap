@@ -101,7 +101,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         }
     }
 
-    public static final String LOCATION_EXTRA = "LOCATION";
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
 
@@ -146,7 +145,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
             mGoogleMap.setMyLocationEnabled(true);
-
         }
     }
 
@@ -438,7 +436,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         // get Intent that started this Activity
         Intent startingIntent = this.getIntent();
         // get the value of the user string
-        Location eventLocation = startingIntent.getParcelableExtra(LOCATION_EXTRA);
+        Location eventLocation = startingIntent.getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
         if (eventLocation != null) {
             mMapZoomer.zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
             eventLocation = null;
@@ -496,14 +494,11 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     /**
-     * <<<<<<< HEAD
-     * Sets the view for Item Focus, this means - Write name / Display photo on
-     * ActionBar - Sets ActionMenu for Item
-     * =======
-     * Sets the view for Item Focus, this means - Write name / Display photo on
-     * ActionBar - Sets ActionMenu
-     * for Item
-     * >>>>>>> a52284645a7fdabf92fc5582f572f8a918a484d2
+     * <<<<<<< HEAD Sets the view for Item Focus, this means - Write name /
+     * Display photo on ActionBar - Sets ActionMenu
+     * for Item ======= Sets the view for Item Focus, this means - Write name /
+     * Display photo on ActionBar - Sets
+     * ActionMenu for Item >>>>>>> a52284645a7fdabf92fc5582f572f8a918a484d2
      * Focus
      * 
      * @param item
@@ -593,7 +588,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
 
         Intent startingIntent = this.getIntent();
-        if (startingIntent.getParcelableExtra("location") == null) {
+        if (startingIntent.getParcelableExtra(AddEventActivity.LOCATION_EXTRA) == null) {
             mMapZoomer.zoomAccordingToMarkers(allMarkers);
         }
     }

@@ -19,7 +19,6 @@ import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -77,16 +76,17 @@ public class AddEventActivity extends FragmentActivity {
         }
     }
 
-    private static final String TAG = AddEventActivity.class.getSimpleName();
+    public static final String LOCATION_EXTRA = "LOCATION";
 
+    private static final String TAG = AddEventActivity.class.getSimpleName();
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
     static final int PICK_LOCATION_REQUEST = 1;
-    private static final int ELEMENTS_HH_MM = 2;
 
+    private static final int ELEMENTS_HH_MM = 2;
     private static final int ELEMENTS_JJ_DD_YYYY = 3;
     private static final int INDEX_YEAR = 2;
-    private static final int INDEX_MONTH = 1;
 
+    private static final int INDEX_MONTH = 1;
     private static final int INDEX_DAY = 0;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
@@ -98,6 +98,7 @@ public class AddEventActivity extends FragmentActivity {
     private EditText mPickEndDate;
     private EditText mPickEndTime;
     private EditText mPickStartDate;
+
     private EditText mPickStartTime;
 
     private EditText mPlaceName;
@@ -106,8 +107,8 @@ public class AddEventActivity extends FragmentActivity {
 
     /**
      * @return <code>true</code> if all the fields (event name, event dates,
-     *         etc...) are legally set and the
-     *         event is
+     *         etc...) are legally set and the event is
+     *         >>>>>>> 37a2897acef7793d0468efc07a3193cfc299807f
      *         ready to be created.
      * @author SpicyCH
      */
@@ -122,9 +123,14 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
+     * <<<<<<< HEAD
      * Ensures the end of the event is after its start and end of the event is
      * not in the past. Displays a
      * toast and
+     * =======
+     * Ensures the end of the event is after its start and end of the event is
+     * not in the past. Displays a toast and
+     * >>>>>>> 37a2897acef7793d0468efc07a3193cfc299807f
      * reset the bad field set by the user if necessary.
      * 
      * @param startDate
@@ -158,6 +164,7 @@ public class AddEventActivity extends FragmentActivity {
 
                 Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
                     Toast.LENGTH_LONG).show();
+
             } else if (end.before(now)) {
                 // The user is trying to create an event in the past
 
@@ -236,7 +243,45 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * Display the map with the current location
+     * @return <code>true</code> if all the fields (event name, event dates,
+     *         etc...) are legally set and the
+     *         event is
+     *         =======
+     * @Override
+     *           protected void onCreate(Bundle savedInstanceState) {
+     *           super.onCreate(savedInstanceState);
+     *           this.setContentView(R.layout.activity_add_event);
+     *           // Makes the logo clickable (clicking it returns to previous
+     *           activity)
+     *           this.getActionBar().setDisplayHomeAsUpEnabled(true);
+     *           this.getActionBar().setBackgroundDrawable(this.getResources().
+     *           getDrawable(R.color.main_blue));
+     *           this.initializeGUIComponents();
+     *           mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
+     * @Override
+     *           public void onMapClick(LatLng position) {
+     *           if (mEventPosition != null) {
+     *           mGoogleMap.clear();
+     *           }
+     *           Intent setLocationIntent = new Intent(AddEventActivity.this,
+     *           SetLocationActivity.class);
+     *           setLocationIntent.putExtra("eventPosition", mEventPosition);
+     *           AddEventActivity.this.startActivityForResult(setLocationIntent,
+     *           PICK_LOCATION_REQUEST);
+     *           }
+     *           });
+     *           Bundle extras = this.getIntent().getExtras();
+     *           if (extras != null) {
+     *           LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
+     *           if ((latLng != null) && (Math.abs(latLng.latitude) > 0)) {
+     *           // The user long clicked the map in MainActivity and wants to
+     *           // create an event
+     *           this.updateLocation(this.getIntent());
+     *           }
+     *           }
+     *           }
+     *           /**
+     *           Display the map with the current location
      */
     public void displayMap() {
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
@@ -428,13 +473,6 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.add_event, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
@@ -472,14 +510,13 @@ public class AddEventActivity extends FragmentActivity {
     /**
      * @param data
      *            the intent containing the extras. The position (LatLgn) is
-     *            retrieved from the
-     *            getParcelable(LOCATION_SERVICE).
+     *            retrieved from the getParcelable().
      * @author SpicyCH
      */
     private void updateLocation(Intent data) {
         Bundle extras = data.getExtras();
 
-        mEventPosition = extras.getParcelable(LOCATION_SERVICE);
+        mEventPosition = extras.getParcelable(LOCATION_EXTRA);
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         String cityName = "";
         List<Address> addresses = null;

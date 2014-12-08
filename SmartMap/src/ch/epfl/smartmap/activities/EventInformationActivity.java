@@ -267,7 +267,7 @@ public class EventInformationActivity extends FragmentActivity {
      */
     public void openMapAtEventLocation(View v) {
         Intent showEventIntent = new Intent(this, MainActivity.class);
-        showEventIntent.putExtra(MainActivity.LOCATION_EXTRA, mEvent.getLocation());
+        showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, mEvent.getLocation());
         this.startActivity(showEventIntent);
     }
 }
