@@ -69,7 +69,7 @@ public class ShowEventsActivity extends ListActivity {
         this.initializeGUI();
 
         // Create custom Adapter and pass it to the Activity
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList);
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
         this.setListAdapter(adapter);
     }
 
@@ -204,10 +204,12 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
-        Log.d(TAG, "Updating event's list to match user's choice");
+        Log.d(TAG, "Updating event's list to match user choices");
 
         mMyLocation = ServiceContainer.getSettingsManager().getLocation();
         mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllEvents());
+
+        Log.d(TAG, "mEventsList: " + mEventsList);
 
         if (mNearMeChecked) {
             mEventsList.retainAll(ServiceContainer.getCache().getNearEvents());
@@ -221,7 +223,7 @@ public class ShowEventsActivity extends ListActivity {
             mEventsList.retainAll(ServiceContainer.getCache().getLiveEvents());
         }
 
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList);
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
         this.setListAdapter(adapter);
     }
 
@@ -242,8 +244,6 @@ public class ShowEventsActivity extends ListActivity {
      */
     public static double distance(double lat1, double lon1, double lat2, double lon2) {
 
-        // TODO use provided method by Google?
-
         double radLat1 = Math.toRadians(lat1);
         double radLong1 = Math.toRadians(lon1);
         double radLat2 = Math.toRadians(lat2);
@@ -254,6 +254,11 @@ public class ShowEventsActivity extends ListActivity {
         double sec2 = Math.cos(radLat1) * Math.cos(radLat2);
         double centralAngle = Math.acos(sec1 + (sec2 * Math.cos(dl)));
         double distance = centralAngle * EARTH_RADIUS_KM;
+
+        float[] dist = new float[10];
+        Location.distanceBetween(lat1, lon1, lat2, lon2, dist);
+        // TODO use this api method instead of wikipedia's one
+        Log.d(TAG, "dist: " + dist);
 
         return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;
     }
