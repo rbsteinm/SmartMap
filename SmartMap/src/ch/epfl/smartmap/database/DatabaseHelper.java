@@ -1060,7 +1060,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         if (rows > 0) {
             this.notifyOnInvitationListUpdateListeners();
         }
-        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.REFUSED)) {
+        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)) {
             this.notifyOnInvitationStatusUpdateListeners(invitation.getUser().getId(), invitation.getStatus());
         }
 

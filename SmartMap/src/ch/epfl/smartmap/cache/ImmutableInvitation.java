@@ -15,8 +15,9 @@ public final class ImmutableInvitation {
     public static final int ACCEPTED_FRIEND_INVITATION = 2;
 
     // Invitation informations
-    private long mUserId;
-    private long mEventId;
+    private long mId;
+    private final long mUserId;
+    private final long mEventId;
     private int mStatus;
     private long mTimeStamp;
     private int mType;
@@ -30,7 +31,8 @@ public final class ImmutableInvitation {
      * want the value to be taken
      * into account.
      */
-    public ImmutableInvitation(long userId, long eventId, int status, long timeStamp, int type) {
+    public ImmutableInvitation(long id, long userId, long eventId, int status, long timeStamp, int type) {
+        mId = id;
         mUserId = userId;
         mEventId = eventId;
         mStatus = status;
@@ -44,6 +46,10 @@ public final class ImmutableInvitation {
 
     public long getEventId() {
         return mEventId;
+    }
+
+    public long getId() {
+        return mId;
     }
 
     public int getStatus() {
@@ -68,6 +74,11 @@ public final class ImmutableInvitation {
 
     public ImmutableInvitation setEvent(Event newEvent) {
         mEvent = newEvent;
+        return this;
+    }
+
+    public ImmutableInvitation setId(long newId) {
+        mId = newId;
         return this;
     }
 

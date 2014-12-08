@@ -11,35 +11,32 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.InvitationPanelActivity;
 
 public class NotificationsActivityTest extends
-<<<<<<< HEAD
-ActivityInstrumentationTestCase2<NotificationsActivity> {
-=======
-		ActivityInstrumentationTestCase2<InvitationPanelActivity> {
->>>>>>> javatar-team-backend
-	public NotificationsActivityTest() {
-		super(InvitationPanelActivity.class);
-	}
 
-	// The standard JUnit 3 setUp method run for for every test
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.getActivity(); // prevent error
-		// "No activities found. Did you forget to launch the activity by calling getActivity()"
-		// TODO UNCOMMENT WHEN CACHE IS READY
-		// DatabaseHelper.initialize(this.getActivity());
-		// DatabaseHelper.getInstance().addFriendInvitation(
-		// new FriendInvitation(1, 3, "Smart Map", Invitation.UNREAD));
-	}
+ActivityInstrumentationTestCase2<InvitationPanelActivity> {
 
-	public void testClickOnNotification() {
-		// TODO
-	}
+    public NotificationsActivityTest() {
+        super(InvitationPanelActivity.class);
+    }
 
-	public void testPressBackGoesToAddEvent() {
-		onView(withId(R.id.notification_activity)).check(matches(hasFocus()));
-		pressBack();
-		onView(withId(R.id.notification_activity)).check(
-				matches(not(hasFocus())));
-	}
+    // The standard JUnit 3 setUp method run for for every test
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        this.getActivity(); // prevent error
+        // "No activities found. Did you forget to launch the activity by calling getActivity()"
+        // TODO UNCOMMENT WHEN CACHE IS READY
+        // DatabaseHelper.initialize(this.getActivity());
+        // DatabaseHelper.getInstance().addFriendInvitation(
+        // new FriendInvitation(1, 3, "Smart Map", Invitation.UNREAD));
+    }
+
+    public void testClickOnNotification() {
+        // TODO
+    }
+
+    public void testPressBackGoesToAddEvent() {
+        onView(withId(R.id.notification_activity)).check(matches(hasFocus()));
+        pressBack();
+        onView(withId(R.id.notification_activity)).check(matches(not(hasFocus())));
+    }
 }
