@@ -2,6 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
@@ -14,14 +15,15 @@ import ch.epfl.smartmap.gui.Utils;
  */
 public class GenericInvitation implements Invitation {
 
+    @SuppressWarnings("unused")
     private static final String TAG = GenericInvitation.class.getSimpleName();
 
-    private final User mUser;
-    private final Event mEvent;
-    private final int mStatus;
+    private User mUser;
+    private Event mEvent;
+    private int mStatus;
     private final long mId;
-    private final long mTimeStamp;
-    private final int mType;
+    private long mTimeStamp;
+    private int mType;
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
@@ -105,8 +107,8 @@ public class GenericInvitation implements Invitation {
                 intent = new Intent(Utils.sContext, ShowEventsActivity.class);
                 intent.putExtra("invitation", true);
             } else if (mStatus == ACCEPTED) {
-                // intent = new Intent(Utils.Context,
-                // ShowEventInformationActivity.class);
+                intent = new Intent(Utils.sContext, EventInformationActivity.class);
+                intent.putExtra("EVENT", mEvent.getId());
             }
         } else {
             intent = new Intent(Utils.sContext, UserInformationActivity.class);
@@ -169,7 +171,23 @@ public class GenericInvitation implements Invitation {
      */
     @Override
     public void update(ImmutableInvitation invitation) {
-        // TODO
+        if (invitation.getUser() != null) {
+            mUser = invitation.getUser();
+        }
+        if (invitation.getEvent() != null) {
+            mEvent = invitation.getEvent();
+        }
+        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)
+            || (invitation.getStatus() == Invitation.READ) || (invitation.getStatus() == Invitation.UNREAD)) {
+            mStatus = invitation.getStatus();
+        }
+        if (invitation.getTimeStamp() >= 0) {
+            mTimeStamp = invitation.getTimeStamp();
+        }
+        if ((invitation.getType() == ImmutableInvitation.ACCEPTED_FRIEND_INVITATION)
+            || (invitation.getType() == ImmutableInvitation.EVENT_INVITATION)
+            || (invitation.getType() == ImmutableInvitation.FRIEND_INVITATION)) {
+            mType = invitation.getType();
+        }
     }
-
 }
