@@ -8,12 +8,16 @@ import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMat
 import static org.hamcrest.Matchers.not;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.activities.NotificationsActivity;
+import ch.epfl.smartmap.activities.InvitationPanelActivity;
 
 public class NotificationsActivityTest extends
+<<<<<<< HEAD
 ActivityInstrumentationTestCase2<NotificationsActivity> {
+=======
+		ActivityInstrumentationTestCase2<InvitationPanelActivity> {
+>>>>>>> javatar-team-backend
 	public NotificationsActivityTest() {
-		super(NotificationsActivity.class);
+		super(InvitationPanelActivity.class);
 	}
 
 	// The standard JUnit 3 setUp method run for for every test

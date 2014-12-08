@@ -10,7 +10,8 @@ import ch.epfl.smartmap.R;
  * Used to get and set settings and local info using SharedPreferences
  * 
  * @author ritterni
- * @author SpicyCH (add support for the user settings - we might want to change the design if my methods are
+ * @author SpicyCH (add support for the user settings - we might want to change
+ *         the design if my methods are
  *         bottlenecks)
  */
 
@@ -21,7 +22,7 @@ public final class SettingsManager {
     public static final String PHONE_NUMBER = "PhoneNumber";
     public static final String EMAIL = "Email";
     public static final String TOKEN = "Token";
-    public final static String FB_ID = "FacebookID";
+    public static final String FB_ID = "FacebookID";
     public static final String COOKIE = "Cookie";
     public static final String HIDDEN = "Hidden";
     public static final String LONGITUDE = "Longitude";
@@ -40,7 +41,6 @@ public final class SettingsManager {
     private final Context mContext;
     private final SharedPreferences mSharedPref;
     private final SharedPreferences.Editor mEditor;
-    private static SettingsManager mInstance;
 
     /**
      * SettingsManager constructor
@@ -48,7 +48,7 @@ public final class SettingsManager {
      * @param context
      *            The app's context, needed to access the shared preferences
      */
-    private SettingsManager(Context context) {
+    public SettingsManager(Context context) {
         mContext = context;
         mSharedPref = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         mEditor = mSharedPref.edit();
@@ -72,14 +72,16 @@ public final class SettingsManager {
     }
 
     /**
-     * @return The local user's email if it is found, DEFAULT_EMAIL value otherwise
+     * @return The local user's email if it is found, DEFAULT_EMAIL value
+     *         otherwise
      */
     public String getEmail() {
         return mSharedPref.getString(EMAIL, DEFAULT_EMAIL);
     }
 
     /**
-     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value otherwise
+     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
+     *         otherwise
      * @author SpicyCH
      */
     public long getFacebookID() {
@@ -98,7 +100,20 @@ public final class SettingsManager {
     }
 
     /**
-     * @return the frequence in milliseconds at which we fetch and upload the datas. Used by the service.
+     * @return the maximum distance from the user, in km, for which we can fetch
+     *         events.<br />
+     *         Special cases: 0 if the user selected 'None' and 41000 if the
+     *         user selected 'All'.
+     * @author SpicyCH
+     */
+    public int getNearEventsMaxDistance() {
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
+            mContext.getString(R.string.settings_key_max_distance_fetch_events), "100"));
+    }
+
+    /**
+     * @return the frequence in milliseconds at which we fetch and upload the
+     *         datas. Used by the service.
      * @author SpicyCH
      */
     public int getRefreshFrequency() {
@@ -118,14 +133,16 @@ public final class SettingsManager {
     }
 
     /**
-     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN value otherwise
+     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN
+     *         value otherwise
      */
     public String getToken() {
         return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);
     }
 
     /**
-     * @return The local user's phone number if it is found, DEFAULT_NUMBER value otherwise
+     * @return The local user's phone number if it is found, DEFAULT_NUMBER
+     *         value otherwise
      */
     public String getUPhoneNumber() {
         return mSharedPref.getString(PHONE_NUMBER, DEFAULT_NUMBER);
@@ -139,7 +156,8 @@ public final class SettingsManager {
     }
 
     /**
-     * @return The local user's name if it is found, DEFAULT_NAME value otherwise
+     * @return The local user's name if it is found, DEFAULT_NAME value
+     *         otherwise
      */
     public String getUserName() {
         return mSharedPref.getString(USER_NAME, DEFAULT_NAME);
@@ -207,7 +225,8 @@ public final class SettingsManager {
     }
 
     /**
-     * A friendship confirmation happens when another user accepts your friend request.
+     * A friendship confirmation happens when another user accepts your friend
+     * request.
      * 
      * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
      *         user
@@ -221,7 +240,8 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications vibrations and the user activated the
+     * @return <code>true</code> if the user enabled the notifications
+     *         vibrations and the user activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
@@ -369,26 +389,5 @@ public final class SettingsManager {
     public boolean showPublicEvents() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
             mContext.getString(R.string.settings_key_events_show_public), true);
-    }
-
-    /**
-     * @return The SettingsManager instance
-     */
-    public static SettingsManager getInstance() {
-        return mInstance;
-    }
-
-    /**
-     * Initializes the settings manager (should be called once when starting the app)
-     * 
-     * @param context
-     *            The app's context, needed to access the shared preferences
-     * @return The SettingsManager instance
-     */
-    public static SettingsManager initialize(Context context) {
-        if (mInstance == null) {
-            mInstance = new SettingsManager(context);
-        }
-        return mInstance;
     }
 }

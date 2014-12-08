@@ -10,16 +10,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.Invitation;
 
 /**
  * @author marion
  */
-public class FriendInvitationListItemAdapter extends ArrayAdapter<FriendInvitation> {
+public class FriendInvitationListItemAdapter extends ArrayAdapter<Invitation> {
 
     private final Context mContext;
-    private final List<FriendInvitation> mItemsArrayList;
+    private final List<Invitation> mItemsArrayList;
 
     /**
      * @param context
@@ -27,7 +26,7 @@ public class FriendInvitationListItemAdapter extends ArrayAdapter<FriendInvitati
      * @param userList
      *            list of users to display
      */
-    public FriendInvitationListItemAdapter(Context context, List<FriendInvitation> itemsArrayList) {
+    public FriendInvitationListItemAdapter(Context context, List<Invitation> itemsArrayList) {
 
         super(context, R.layout.gui_friend_invitation_list_item, itemsArrayList);
 
@@ -51,8 +50,8 @@ public class FriendInvitationListItemAdapter extends ArrayAdapter<FriendInvitati
             viewHolder.setUserName((TextView) convertView.findViewById(R.id.activity_friends_inviter_name));
             viewHolder
                 .setPicture((ImageView) convertView.findViewById(R.id.activity_friends_inviter_picture));
-            viewHolder.setUserId(invitation.getId());
-            viewHolder.setInvitationId(invitation.getId());
+            viewHolder.setUserId(invitation.getUser().getId());
+            viewHolder.setInvitationId(invitation.getUser().getId());
 
             convertView.setTag(viewHolder);
 
@@ -61,7 +60,7 @@ public class FriendInvitationListItemAdapter extends ArrayAdapter<FriendInvitati
         }
 
         if (invitation != null) {
-            viewHolder.getUserName().setText(invitation.getUserName());
+            viewHolder.getUserName().setText(invitation.getUser().getName());
             // viewHolder.getPicture().setImageBitmap(user.getPicture(mContext));
         }
 
@@ -107,5 +106,4 @@ public class FriendInvitationListItemAdapter extends ArrayAdapter<FriendInvitati
         }
 
     }
-
 }

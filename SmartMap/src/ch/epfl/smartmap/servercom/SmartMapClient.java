@@ -106,7 +106,8 @@ public interface SmartMapClient {
 
     /**
      * @return the events to which the user is invited.
-     *         For each retrieved invitation, must call {@code ackEventInvitation}
+     *         For each retrieved invitation, must call
+     *         {@code ackEventInvitation}
      */
     List<Long> getEventInvitations() throws SmartMapClientException;
 
@@ -143,8 +144,7 @@ public interface SmartMapClient {
      * @param radius
      * @return the public events in the given radius centered at the given point
      */
-    List<Long> getPublicEvents(double latitude, double longitude, double radius)
-        throws SmartMapClientException;
+    List<Long> getPublicEvents(double latitude, double longitude, double radius) throws SmartMapClientException;
 
     ImmutableUser getUserInfo(long id) throws SmartMapClientException;
 

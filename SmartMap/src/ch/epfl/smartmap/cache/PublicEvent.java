@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -24,29 +25,34 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class PublicEvent implements Event {
 
+    // Mandatory fields
     private long mId;
     private String mName;
     private long mCreatorId;
-    private String mDescription;
-    private Location mLocation;
-    private String mLocationString;
+    private List<Long> mParticipantIds;
     private GregorianCalendar mStartDate;
     private GregorianCalendar mEndDate;
-    private List<Long> mParticipants;
+    private Location mLocation;
+    // Optional fields
+    private String mDescription;
+    private String mLocationString;
 
-    public final static int DEFAULT_ICON = R.drawable.default_event;
+    private User mCreator;
+    private List<User> mParticipants;
+
+    public static final int DEFAULT_ICON = R.drawable.default_event;
 
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
 
     protected PublicEvent(ImmutableEvent event) {
-        if (event.getID() < -1) {
+        if (event.getId() < -1) {
             throw new IllegalArgumentException();
         } else {
-            mId = event.getID();
+            mId = event.getId();
         }
 
-        if ((event.getName() == null) || event.getName().equals("")) {
+        if ((event.getName() == null) || "".equals(event.getName())) {
             throw new IllegalArgumentException();
         } else {
             mName = event.getName();
@@ -56,6 +62,7 @@ public class PublicEvent implements Event {
             throw new IllegalArgumentException();
         } else {
             mCreatorId = event.getCreatorId();
+            mCreator = event.getCreator();
         }
 
         if ((event.getStartDate() == null) || (event.getEndDate() == null)) {
@@ -82,6 +89,10 @@ public class PublicEvent implements Event {
         } else {
             mDescription = event.getDescription();
         }
+
+        // TODO Participants
+        mParticipantIds = event.getParticipantIds();
+        mParticipants = event.getParticipants();
     }
 
     /*
@@ -94,14 +105,13 @@ public class PublicEvent implements Event {
             && (this.getId() == ((PublicEvent) obj).getId());
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#getCreator()
+     */
     @Override
-    public long getCreatorId() {
-        return mCreatorId;
-    }
-
-    @Override
-    public String getCreatorName() {
-        return Cache.getInstance().getUserById(mCreatorId).getName();
+    public User getCreator() {
+        return mCreator;
     }
 
     @Override
@@ -127,7 +137,7 @@ public class PublicEvent implements Event {
     @Override
     public ImmutableEvent getImmutableCopy() {
         return new ImmutableEvent(mId, mName, mCreatorId, mDescription, mStartDate, mEndDate, mLocation,
-            mLocationString, mParticipants);
+            mLocationString, mParticipantIds);
     }
 
     /*
@@ -176,9 +186,13 @@ public class PublicEvent implements Event {
         return mName;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#getParticipants()
+     */
     @Override
-    public List<Long> getParticipants() {
-        return new ArrayList<Long>(mParticipants);
+    public List<User> getParticipants() {
+        return new ArrayList<User>(mParticipants);
     }
 
     @Override
@@ -206,20 +220,40 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Event#getType()
-     */
-    @Override
-    public Type getType() {
-        return Type.PUBLIC;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
         return (int) mId;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#isGoing()
+     */
+    @Override
+    public boolean isGoing() {
+        return mParticipants.contains(ServiceContainer.getSettingsManager().getUserID());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#isNear()
+     */
+    @Override
+    public boolean isNear() {
+        Location ourLocation = ServiceContainer.getSettingsManager().getLocation();
+        return (ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager()
+            .getNearEventsMaxDistance());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Event#isOwn()
+     */
+    @Override
+    public boolean isOwn() {
+        return mCreator.getId() == ServiceContainer.getSettingsManager().getUserID();
     }
 
     /*

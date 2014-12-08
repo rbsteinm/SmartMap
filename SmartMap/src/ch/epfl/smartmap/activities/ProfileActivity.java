@@ -7,10 +7,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.R.id;
-import ch.epfl.smartmap.R.layout;
-import ch.epfl.smartmap.R.menu;
-import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
  * this Activity represents user's own profile
@@ -36,7 +33,7 @@ public class ProfileActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        mNameView.setText(SettingsManager.getInstance().getUserName());
+        mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
         // TODO find a way to get user's own profile picture/subtitles, should be stored in the cache
         mSubtitlesView.setText("mock subtitles");
     }

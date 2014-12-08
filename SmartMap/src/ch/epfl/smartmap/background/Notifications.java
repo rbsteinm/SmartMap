@@ -11,9 +11,8 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
-import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.AcceptedFriendInvitation;
+import ch.epfl.smartmap.cache.EventInvitation;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -40,7 +39,7 @@ public class Notifications {
      * @param user
      *            The invited
      */
-    public static void acceptedFriendNotification(Context context, ImmutableUser user) {
+    public static void acceptedFriendNotification(Context context, AcceptedFriendInvitation invitation) {
 
         // Get ID of notifications
         notificationID++;
@@ -48,7 +47,7 @@ public class Notifications {
         // Prepare intent that redirects the user to FriendActivity
         Intent friendsInfoIntent = new Intent(context, UserInformationActivity.class);
         friendsInfoIntent.putExtra("NOTIFICATION", true);
-        friendsInfoIntent.putExtra("USER", user.getId());
+        friendsInfoIntent.putExtra("USER", invitation.getUser().getId());
         PendingIntent pFriendIntent =
             PendingIntent.getActivity(context, 0, friendsInfoIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -57,7 +56,8 @@ public class Notifications {
 
         String[] events = new String[2];
         events[0] =
-            new String(user.getName() + " " + context.getString(R.string.notification_invitation_accepted));
+            new String(invitation.getUser().getName() + " "
+                + context.getString(R.string.notification_invitation_accepted));
         events[1] = context.getString(R.string.notification_open_friend_list);
 
         // Sets a title for the Inbox style big view
@@ -75,16 +75,18 @@ public class Notifications {
                 .setAutoCancel(true)
                 .setContentTitle(context.getString(R.string.notification_acceptedfriend_title))
                 .setContentText(
-                    user.getName() + " " + context.getString(R.string.notification_invitation_accepted)
-                        + "\n" + context.getString(R.string.notification_open_friend_list))
+                    invitation.getUser().getName() + " "
+                        + context.getString(R.string.notification_invitation_accepted) + "\n"
+                        + context.getString(R.string.notification_open_friend_list))
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(
-                    user.getName() + " " + context.getString(R.string.notification_invitation_accepted))
+                    invitation.getUser().getName() + " "
+                        + context.getString(R.string.notification_invitation_accepted))
                 .setContentIntent(pFriendIntent);
 
         Log.d("DEBUG-NOTIFICATION", "notificationVibrate : "
-            + SettingsManager.getInstance().notificationsVibrate());
-        if (SettingsManager.getInstance().notificationsVibrate()) {
+            + ServiceContainer.getSettingsManager().notificationsVibrate());
+        if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
             noti.setVibrate(PATTERN);
         } else {
             noti.setVibrate(null);
@@ -104,7 +106,7 @@ public class Notifications {
      * @param event
      *            the Event
      */
-    public static void newEventNotification(Context context, Event event) {
+    public static void newEventNotification(Context context, EventInvitation invitation) {
 
         // Get ID and the number of ongoing Event notifications
         notificationID++;
@@ -112,7 +114,7 @@ public class Notifications {
         // Prepare intent that redirect the user to EventActivity
         Intent showEventIntent = new Intent(context, EventInformationActivity.class);
         showEventIntent.putExtra("NOTIFICATION", true);
-        showEventIntent.putExtra("EVENT", event.getId());
+        showEventIntent.putExtra("EVENT", invitation.getEvent().getId());
         // TODO mettre l'id de l'event
         PendingIntent pEventIntent =
             PendingIntent.getActivity(context, 0, showEventIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -122,8 +124,9 @@ public class Notifications {
 
         String[] events = new String[2];
         events[0] =
-            new String(Cache.getInstance().getFriendById(event.getCreatorId()).getName() + " "
-                + context.getString(R.string.notification_event_invitation) + " " + event.getName());
+            new String(invitation.getUser().getName() + " "
+                + context.getString(R.string.notification_event_invitation) + " "
+                + invitation.getEvent().getName());
         events[1] = context.getString(R.string.notification_open_event_list);
 
         // Sets a title for the Inbox style big view
@@ -141,15 +144,16 @@ public class Notifications {
                 .setAutoCancel(true)
                 .setContentTitle(context.getString(R.string.notification_inviteevent_title))
                 .setContentText(
-                    Cache.getInstance().getFriendById(event.getCreatorId()).getName() + " "
-                        + context.getString(R.string.notification_event_invitation) + event.getName() + "\n"
+                    invitation.getUser().getName() + " "
+                        + context.getString(R.string.notification_event_invitation)
+                        + invitation.getEvent().getName() + "\n"
                         + context.getString(R.string.notification_open_event_list))
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(
-                    Cache.getInstance().getFriendById(event.getCreatorId()).getName() + " "
-                        + context.getString(R.string.notification_event_invitation) + event.getName())
-                .setContentIntent(pEventIntent);
-        if (SettingsManager.getInstance().notificationsVibrate()) {
+                    invitation.getUser().getName() + " "
+                        + context.getString(R.string.notification_event_invitation)
+                        + invitation.getEvent().getName()).setContentIntent(pEventIntent);
+        if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
             noti.setVibrate(PATTERN);
         } else {
             noti.setVibrate(null);
@@ -210,8 +214,8 @@ public class Notifications {
 
         // TODO A FIX
         Log.d("DEBUG-NOTIFICATION", "notificationVibrate : "
-            + SettingsManager.getInstance().notificationsVibrate());
-        if (SettingsManager.getInstance().notificationsVibrate()) {
+            + ServiceContainer.getSettingsManager().notificationsVibrate());
+        if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
             noti.setVibrate(PATTERN);
         } else {
             noti.setVibrate(null);

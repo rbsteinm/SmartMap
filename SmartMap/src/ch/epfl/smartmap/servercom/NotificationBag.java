@@ -3,14 +3,13 @@
  */
 package ch.epfl.smartmap.servercom;
 
-import java.util.List;
+import java.util.Set;
+
+import ch.epfl.smartmap.cache.ImmutableUser;
 
 /**
  * An interface to encapsulate the informations given by the request
  * getInvitations of {@link SmartMapClient}.
- * It also offers a method to acknowledge the server that the list of new
- * friends was retrieved and one to
- * acknowledge that the list of removed friends was retrieved.
  * 
  * @author Pamoi
  */
@@ -21,19 +20,19 @@ public interface NotificationBag {
      * 
      * @return a list of the inviting users.
      */
-    List<Long> getInvitingUsers();
+    Set<ImmutableUser> getInvitingUsers();
 
     /**
      * Get a list of the friends that accepted the user's friend requests.
      * 
      * @return a list of the new friends.
      */
-    List<Long> getNewFriends();
+    Set<ImmutableUser> getNewFriends();
 
     /**
      * Get a list of the ids of friends that removed the user.
      * 
      * @return a list of ids.
      */
-    List<Long> getRemovedFriendsIds();
+    Set<Long> getRemovedFriendsIds();
 }

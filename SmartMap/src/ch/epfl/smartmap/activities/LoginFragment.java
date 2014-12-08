@@ -19,9 +19,9 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
+import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 import com.facebook.Request;
@@ -34,12 +34,12 @@ import com.facebook.widget.LoginButton;
 
 /**
  * <p>
- * The fragment for the "Login with Facebook" button, used by {@linkplain ch.epfl.smartmap.activities.StartActivity} for
- * screen 1.
+ * The fragment for the "Login with Facebook" button, used by
+ * {@linkplain ch.epfl.smartmap.activities.StartActivity} for screen 1.
  * </p>
  * <p>
- * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name, facebook id and
- * facebook token.
+ * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name,
+ * facebook id and facebook token.
  * </p>
  * 
  * @author SpicyCH
@@ -101,7 +101,8 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.loadingTextView).setVisibility(View.INVISIBLE);
 
         // Start animation and set login button
-        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(), R.anim.face_anim));
+        authButton.startAnimation(AnimationUtils.loadAnimation(this.getActivity().getBaseContext(),
+            R.anim.face_anim));
         authButton.setFragment(this);
 
         // Not logged in Facebook or permission to use Facebook in SmartMap not
@@ -127,14 +128,9 @@ public class LoginFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         // For scenarios where the main activity is launched and user
         // session is not null, the session state change notification
         // may not be triggered. Trigger it if it's open/closed.
-        Session session = Session.getActiveSession();
-        if ((session != null) && (session.isOpened() || session.isClosed())) {
-            this.onSessionStateChange(session.getState());
-        }
 
         mUiHelper.onResume();
     }
@@ -170,7 +166,8 @@ public class LoginFragment extends Fragment {
      * 
      * @param params
      *            a map with values for the keys name, facebookId and facebookToken
-     * @return <code>true</code> if the internet connection is up and the data is beeing processed by an asynctask
+     * @return <code>true</code> if the internet connection is up and the data is beeing processed by an
+     *         asynctask
      * @author SpicyCH
      */
     private boolean sendDataToServer(Map<String, String> params) {
@@ -182,8 +179,8 @@ public class LoginFragment extends Fragment {
         assert null != params.get(FACEBOOK_NAME_POST_NAME) : "Facebook name is null";
         assert !params.get(FACEBOOK_NAME_POST_NAME).isEmpty() : "Facebook name is empty";
 
-        ConnectivityManager connMgr = (ConnectivityManager) this.getActivity().getSystemService(
-                Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr =
+            (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if ((networkInfo != null) && networkInfo.isConnected()) {
             // Send data
@@ -193,8 +190,9 @@ public class LoginFragment extends Fragment {
         } else {
             // An error occured
             Log.e(TAG, "Could not send user's data to server. Net down?");
-            Toast.makeText(this.getActivity(), this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet),
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getActivity(),
+                this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet), Toast.LENGTH_LONG)
+                .show();
             return false;
         }
 
@@ -205,66 +203,6 @@ public class LoginFragment extends Fragment {
         Context currentActivity = this.getActivity().getBaseContext();
         Intent intent = new Intent(currentActivity, MainActivity.class);
         this.startActivity(intent);
-    }
-
-    /**
-     * The goal of this Task is to compute the location of the displayable multiple times on start so that they don't
-     * appear at false positions because of google locations.
-     * 
-     * @author jfperren
-     */
-    private class ComputeLocations extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            // TODO : Handle bug with markers at wrong place
-
-            // for (User user : Cache.getInstance().getAllFriends()) {
-            // user.update(user.getImmutableCopy());
-            // }
-            // for (Event event : Cache.getInstance().getAllEvents()) {
-            // event.update(event.getImmutableCopy());
-            // }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            // Create and start the next activity
-            LoginFragment.this.startMainActivity();
-        }
-    }
-
-    /**
-     * Initialize Cache with NetworkClient, or with Database if connection issues.
-     * 
-     * @author jfperren
-     */
-    private class InitCache extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            List<Long> friendIds;
-            try {
-                // Try to get the list of friend ids online
-                friendIds = NetworkSmartMapClient.getInstance().getFriendsIds();
-            } catch (SmartMapClientException e) {
-                // If there is connection issues, get it in the database
-                Log.d(TAG, "Couldn't retrieve friendIds from the server: " + e);
-                friendIds = DatabaseHelper.getInstance().getFriendIds();
-            }
-            if (friendIds != null) {
-                Cache.getInstance().initFriendList(friendIds);
-            } else {
-                // TODO : Handle this case
-                this.doInBackground(params);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            new ComputeLocations().execute();
-        }
     }
 
     /**
@@ -286,18 +224,17 @@ public class LoginFragment extends Fragment {
 
         /*
          * (non-Javadoc)
-         * 
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+            SmartMapClient networkClient = ServiceContainer.getNetworkClient();
 
             try {
                 networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
-                        Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
-                        mParams.get(FACEBOOK_TOKEN_POST_NAME));
+                    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
+                    mParams.get(FACEBOOK_TOKEN_POST_NAME));
             } catch (NumberFormatException e1) {
                 Log.e(TAG, "Couldn't parse to Long: " + e1);
                 return false;
@@ -335,12 +272,28 @@ public class LoginFragment extends Fragment {
                 Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
 
                 if (!LoginFragment.this.sendDataToServer(params)) {
-                    Toast.makeText(LoginFragment.this.getActivity(),
-                            LoginFragment.this.getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(
+                        LoginFragment.this.getActivity(),
+                        LoginFragment.this
+                            .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
+                        Toast.LENGTH_LONG).show();
                 } else {
                     // If all is ok, start filling Cache
-                    new InitCache().execute();
+                    ServiceContainer.getCache().initFromDatabase(ServiceContainer.getDatabase());
+                    ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient(),
+                        new NetworkRequestCallback() {
+                            @Override
+                            public void onFailure() {
+                                Log.e(TAG, "Cannot update Cache from Network");
+                                LoginFragment.this.startMainActivity();
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                Log.d(TAG, "Successfully updated Cache from Network");
+                                LoginFragment.this.startMainActivity();
+                            }
+                        });
                 }
 
             } else if (response.getError() != null) {

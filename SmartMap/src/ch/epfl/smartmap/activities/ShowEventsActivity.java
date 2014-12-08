@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +24,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.gui.EventViewHolder;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
 
@@ -94,7 +91,6 @@ public class ShowEventsActivity extends ListActivity {
      * 
      * @param v
      *            the checkbox whose status changed
-     * 
      * @author SpicyCH
      */
     public void onCheckboxClicked(View v) {
@@ -193,13 +189,8 @@ public class ShowEventsActivity extends ListActivity {
         // We need to intialize the two following Singletons to let espresso
         // tests pass.
         mContext = this.getApplicationContext();
-        SettingsManager.initialize(mContext);
-        DatabaseHelper.initialize(mContext);
 
-        Log.d(TAG, "My id: " + SettingsManager.getInstance().getUserID());
-
-        mMyLocation = SettingsManager.getInstance().getLocation();
-        Log.d(TAG, "mMyLocation: " + mMyLocation.getLatitude() + "/" + mMyLocation.getLongitude());
+        mMyLocation = ServiceContainer.getSettingsManager().getLocation();
 
         mMyEventsChecked = false;
         mOngoingChecked = false;
@@ -211,8 +202,7 @@ public class ShowEventsActivity extends ListActivity {
         mSeekBar.setEnabled(false);
         mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
 
-        mEventsList = Cache.getInstance().getAllEvents();
-        Log.d(TAG, "mEventsList initialized: " + mEventsList);
+        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllVisibleEvents());
     }
 
     /**
@@ -220,48 +210,66 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
-        mMyLocation = SettingsManager.getInstance().getLocation();
-        Log.d(TAG, "mMyLocation updated: " + mMyLocation.getLatitude() + "/" + mMyLocation.getLongitude());
-
-        mEventsList = Cache.getInstance().getAllEvents();
-        Log.d(TAG, "mEventsList updated: " + mEventsList);
-
+        mMyLocation = ServiceContainer.getSettingsManager().getLocation();
+        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllVisibleEvents());
         mCurrentList = new ArrayList<Event>();
 
-        // Copy complete list into current list
-        for (Event e : mEventsList) {
-            mCurrentList.add(e);
-        }
+        // // Copy complete list into current list
+        // for (Event e : mEventsList) {
+        // mCurrentList.add(e);
+        // }
+        //
+        // for (Event e : mEventsList) {
+        // if (mMyEventsChecked) {
+        // if (!ServiceContainer.getCache().getFriend(e.getCreatorId()).getName().equals(mMyName)) {
+        // mCurrentList.remove(e);
+        // }
+        // }
+        //
+        // if (mOngoingChecked && !e.getStartDate().before(new GregorianCalendar())) {
+        // mCurrentList.remove(e);
+        // }
+        //
+        // if (mNearMeChecked) {
+        // if (mMyLocation != null) {
+        // double distanceMeEvent =
+        // distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
+        // mMyLocation.getLatitude(), mMyLocation.getLongitude());
+        // String[] showKMContent = mShowKilometers.getText().toString().split(" ");
+        // double distanceMax = Double.parseDouble(showKMContent[0]);
+        // if (!(distanceMeEvent < distanceMax)) {
+        // mCurrentList.remove(e);
+        // }
+        // } else {
+        // Toast.makeText(this.getApplicationContext(),
+        // this.getString(R.string.show_event_cannot_retrieve_current_location),
+        // Toast.LENGTH_SHORT).show();
+        // }
+        // }
+        // }
 
-        for (Event e : mEventsList) {
-            if (mMyEventsChecked && !(e.getCreatorId() == SettingsManager.getInstance().getUserID())) {
-                mCurrentList.remove(e);
-            }
+        // TODO
 
-            if (mOngoingChecked && !e.getStartDate().before(new GregorianCalendar())) {
-                mCurrentList.remove(e);
-            }
-
-            if (mNearMeChecked && (mMyLocation != null)) {
-
-                double distanceMeEvent = distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
-                        mMyLocation.getLatitude(), mMyLocation.getLongitude());
-                String[] showKMContent = mShowKilometers.getText().toString().split(" ");
-                double distanceMax = Double.parseDouble(showKMContent[0]);
-
-                if (!(distanceMeEvent < distanceMax)) {
-                    mCurrentList.remove(e);
-                }
-            }
-        }
+        ServiceContainer.getCache().getNearEvents();
+        ServiceContainer.getCache().getOnGoingEvents();
+        ServiceContainer.getCache().getMyEvents();
 
         EventsListItemAdapter adapter = new EventsListItemAdapter(this, mCurrentList, mMyLocation);
         this.setListAdapter(adapter);
     }
 
     /**
-     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired by
+     * <<<<<<< HEAD
+     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired
+     * by
      * wikipedia. This is costly as there are several library calls to sin, cos, etc...
+     * =======
+     * Computes the distance between two GPS locations (takes into consideration
+     * the earth radius), inspired
+     * by
+     * wikipedia. This is costly as there are several library calls to sin, cos,
+     * etc...
+     * >>>>>>> javatar-team-backend
      * 
      * @param lat1
      *            latitude of point 1
@@ -310,11 +318,10 @@ public class ShowEventsActivity extends ListActivity {
 
             Map<String, Object> output = new HashMap<String, Object>();
 
-            Event event = Cache.getInstance().getEventById(eventId);
+            Event event = ServiceContainer.getCache().getPublicEvent(eventId);
             output.put(EVENT_KEY, event);
 
-            String creatorName = Cache.getInstance().getUserById(event.getCreatorId()).getName();
-            output.put(CREATOR_NAME_KEY, creatorName);
+            output.put(CREATOR_NAME_KEY, event.getCreator().getName());
 
             return output;
         }
@@ -330,56 +337,59 @@ public class ShowEventsActivity extends ListActivity {
             if ((event == null) || (creatorName == null)) {
                 Log.e(TAG, "The server returned a null event or creatorName");
 
-                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
-                        .show();
+                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error),
+                    Toast.LENGTH_SHORT).show();
 
             } else {
 
-                // Construct the dialog that display more detailed infos and offers to show event on the map or to
+                // Construct the dialog that display more detailed infos and offers to show event on the map
+                // or to
                 // show more details.
 
                 AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
 
-                String[] textForDates = EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(),
-                        mContext);
+                String[] textForDates =
+                    EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), mContext);
 
-                final String message = textForDates[0] + " " + textForDates[1] + "\n"
+                final String message =
+                    textForDates[0] + " " + textForDates[1] + "\n"
                         + mContext.getString(R.string.show_event_by) + " " + creatorName + "\n\n"
                         + event.getDescription();
 
                 alertDialog.setTitle(event.getName()
-                        + " @ "
-                        + event.getLocationString()
-                        + "\n"
-                        + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
-                                .getLatitude(), event.getLocation().getLongitude()) + " km away");
+                    + " @ "
+                    + event.getLocationString()
+                    + "\n"
+                    + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
+                        .getLatitude(), event.getLocation().getLongitude()) + " km away");
                 alertDialog.setMessage(message);
 
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-                        mContext.getString(R.string.show_event_on_the_map_button),
-                        new DialogInterface.OnClickListener() {
+                    mContext.getString(R.string.show_event_on_the_map_button),
+                    new DialogInterface.OnClickListener() {
 
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                Toast.makeText(mContext,
-                                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                                        Toast.LENGTH_SHORT).show();
-                                Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                                showEventIntent.putExtra("location", event.getLocation());
-                                ShowEventsActivity.this.startActivity(showEventIntent);
-                            }
-                        });
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            Toast.makeText(mContext,
+                                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                                Toast.LENGTH_SHORT).show();
+                            Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                            showEventIntent.putExtra("location", event.getLocation());
+                            ShowEventsActivity.this.startActivity(showEventIntent);
+                        }
+                    });
 
                 alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
-                        mContext.getString(R.string.show_event_details_button), new DialogInterface.OnClickListener() {
+                    mContext.getString(R.string.show_event_details_button),
+                    new DialogInterface.OnClickListener() {
 
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
-                                showEventIntent.putExtra("EVENT", event.getId());
-                                ShowEventsActivity.this.startActivity(showEventIntent);
-                            }
-                        });
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
+                            showEventIntent.putExtra("EVENT", event.getId());
+                            ShowEventsActivity.this.startActivity(showEventIntent);
+                        }
+                    });
 
                 alertDialog.show();
             }
@@ -389,7 +399,6 @@ public class ShowEventsActivity extends ListActivity {
 
     /**
      * Listens for the progress change of the Seekbar and updates the list accordingly.
-     * 
      * 
      * @author SpicyCH
      */

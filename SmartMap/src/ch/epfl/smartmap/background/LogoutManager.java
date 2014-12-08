@@ -6,12 +6,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.widget.Toast;
 import ch.epfl.smartmap.activities.StartActivity;
-import ch.epfl.smartmap.database.DatabaseHelper;
 
 import com.facebook.Session;
 
 /**
- * Lets the user logout from SmartMap. This is a singleton, use LogoutManager.getInstance().
+ * Lets the user logout from SmartMap. This is a singleton, use
+ * LogoutManager.getInstance().
  * 
  * @author SpicyCH
  */
@@ -30,7 +30,8 @@ public final class LogoutManager {
     }
 
     /**
-     * First shows an alert dialog to the user for confirmation, then logout user from SmartMap.
+     * First shows an alert dialog to the user for confirmation, then logout
+     * user from SmartMap.
      * 
      * @author SpicyCH
      */
@@ -68,18 +69,20 @@ public final class LogoutManager {
 
     /**
      * Clears the cache, the database and return to the StartActivity. <br />
-     * Note: we don't need to destroy the PHP session on the server since we can re-auth with another login on
+     * Note: we don't need to destroy the PHP session on the server since we can
+     * re-auth with another login on
      * top of
      * the previous one.
      * 
      * @author SpicyCH
      */
     private void logout() {
-        // Clear cache and database. Note: the preferences set in the SettingsActivity will be kept since they
+        // Clear cache and database. Note: the preferences set in the
+        // SettingsActivity will be kept since they
         // are local
         // to the device.
-        DatabaseHelper.getInstance().clearAll();
-        SettingsManager.getInstance().clearAll();
+        ServiceContainer.getDatabase().clearAll();
+        ServiceContainer.getSettingsManager().clearAll();
 
         // Close the FB session to avoid re-logging in automatically
         if (Session.getActiveSession() != null) {
@@ -87,7 +90,8 @@ public final class LogoutManager {
         }
 
         // Stop the service
-        mContext.stopService(new Intent(mContext, UpdateService.class));
+        mContext.stopService(new Intent(mContext, InvitationsService.class));
+        mContext.stopService(new Intent(mContext, OwnPositionService.class));
 
         // Go to the SartActivity where the user can log back again with (another) account.
         mContext.startActivity(new Intent(mContext, StartActivity.class));

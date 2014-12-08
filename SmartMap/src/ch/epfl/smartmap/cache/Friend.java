@@ -33,6 +33,7 @@ public final class Friend implements User {
     private String mLocationString;
     private Location mLocation;
     private Bitmap mImage;
+    private Boolean mIsBlocked;
 
     protected Friend(ImmutableUser user) {
         super();
@@ -71,6 +72,12 @@ public final class Friend implements User {
             mImage = User.NO_IMAGE;
         } else {
             mImage = user.getImage();
+        }
+
+        if (user.isBlocked() == null) {
+            mIsBlocked = User.DEFAULT_BLOCK_VALUE;
+        } else {
+            mIsBlocked = user.isBlocked();
         }
     }
 
@@ -112,7 +119,8 @@ public final class Friend implements User {
 
     @Override
     public ImmutableUser getImmutableCopy() {
-        return new ImmutableUser(mID, mName, mPhoneNumber, mEmail, mLocation, mLocationString, mImage);
+        return new ImmutableUser(mID, mName, mPhoneNumber, mEmail, mLocation, mLocationString, mImage,
+            mIsBlocked);
     }
 
     /*
@@ -219,20 +227,29 @@ public final class Friend implements User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getType()
-     */
-    @Override
-    public Type getType() {
-        return Type.FRIEND;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see java.lang.Object#hashcode
      */
     @Override
     public int hashCode() {
         return (int) mID;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#isBlocked()
+     */
+    @Override
+    public boolean isBlocked() {
+        return mIsBlocked;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#isFriend()
+     */
+    @Override
+    public boolean isFriend() {
+        return true;
     }
 
     /*

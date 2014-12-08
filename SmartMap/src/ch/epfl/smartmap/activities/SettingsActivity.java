@@ -12,8 +12,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.database.DatabaseHelper;
 
 /**
  * A {@link PreferenceActivity} to handle our settings.
@@ -25,19 +23,15 @@ public class SettingsActivity extends PreferenceActivity {
     /**
      * A preference value change listener that updates the preference's summary to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new PreferenceListener();
+    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
+        new PreferenceListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setupActionBar();
-
-        // Needed for the espresso tests
-        SettingsManager.initialize(this.getApplicationContext());
-        DatabaseHelper.initialize(this.getApplicationContext());
-
-        this.getFragmentManager().beginTransaction().replace(android.R.id.content, new GeneralPreferenceFragment())
-                .commit();
+        this.getFragmentManager().beginTransaction()
+            .replace(android.R.id.content, new GeneralPreferenceFragment()).commit();
     }
 
     @Override
@@ -60,13 +54,15 @@ public class SettingsActivity extends PreferenceActivity {
             this.getActionBar().setDisplayHomeAsUpEnabled(true);
             // Set action bar color to main color
             this.getActionBar().setBackgroundDrawable(
-                    new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+                new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         }
     }
 
     /**
-     * Binds a preference's summary to its value. More specifically, when the preference's value is changed, its summary
-     * (line of text below the preference title) is updated to reflect the value. The summary is also immediately
+     * Binds a preference's summary to its value. More specifically, when the preference's value is changed,
+     * its summary
+     * (line of text below the preference title) is updated to reflect the value. The summary is also
+     * immediately
      * updated upon calling this method. The exact display format is dependent on the type of preference.
      * 
      * @see #sBindPreferenceSummaryToValueListener
@@ -78,11 +74,12 @@ public class SettingsActivity extends PreferenceActivity {
         // Trigger the listener immediately with the preference's
         // current value.
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, PreferenceManager
-                .getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), ""));
+            .getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), ""));
     }
 
     /**
-     * This fragment shows all the settings for simplicity's sake. We can add some other ones if we have many settings
+     * This fragment shows all the settings for simplicity's sake. We can add some other ones if we have many
+     * settings
      * in the future and want them to be split by headers.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -92,15 +89,16 @@ public class SettingsActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             this.addPreferencesFromResource(R.xml.pref_general);
 
-            bindPreferenceSummaryToValue(this.findPreference(this.getString(R.string.settings_key_refresh_frequency)));
-            bindPreferenceSummaryToValue(this.findPreference(this.getString(R.string.settings_key_last_seen_max)));
             bindPreferenceSummaryToValue(this.findPreference(this
-                    .getString(R.string.settings_key_max_distance_fetch_events)));
+                .getString(R.string.settings_key_refresh_frequency)));
+            bindPreferenceSummaryToValue(this.findPreference(this
+                .getString(R.string.settings_key_last_seen_max)));
+            bindPreferenceSummaryToValue(this.findPreference(this
+                .getString(R.string.settings_key_max_distance_fetch_events)));
         }
     }
 
     /**
-     * 
      * A listener on the preferences that helps bind a summary to its value.
      * 
      * @author SpicyCH
@@ -125,5 +123,4 @@ public class SettingsActivity extends PreferenceActivity {
             return true;
         }
     }
-
 }

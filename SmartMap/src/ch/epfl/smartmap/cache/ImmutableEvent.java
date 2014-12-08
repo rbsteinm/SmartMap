@@ -9,26 +9,31 @@ import java.util.TimeZone;
 import android.location.Location;
 
 /**
- * An event that can be seen on the map
+ * This class only acts as a container of all the informations we may want to pass to an event. It doesn't do
+ * any check for null/wrong values. You can use this class to create an Event (Beware having set all the
+ * required fields then), or just to update the infotmations on an Event (you can then use null values if you
+ * don't want to update a field).
  * 
  * @author jfperren
  */
 public class ImmutableEvent {
 
-    private final long mId;
-    private final String mName;
-    private final Long mCreatorId;
-    private final String mDescription;
-    private final Location mLocation;
-    private final String mLocationString;
-    private final GregorianCalendar mStartDate;
-    private final GregorianCalendar mEndDate;
-    private final List<Long> mParticipants;
+    private long mId;
+    private String mName;
+    private Long mCreatorId;
+    private String mDescription;
+    private Location mLocation;
+    private String mLocationString;
+    private GregorianCalendar mStartDate;
+    private GregorianCalendar mEndDate;
+    private List<Long> mParticipantIds;
+
+    // These will be set by the cache
+    private User mCreator;
+    private List<User> mParticipants;
 
     /**
-     * Constructor, put {@code null} (or {@code User.NO_ID} for id) if you dont
-     * want the value to be taken
-     * into account.
+     * Constructor
      * 
      * @param id
      * @param name
@@ -41,7 +46,7 @@ public class ImmutableEvent {
      * @param participants
      */
     public ImmutableEvent(long id, String name, long creatorId, String description, Calendar startDate,
-        Calendar endDate, Location location, String locationString, List<Long> participants) {
+        Calendar endDate, Location location, String locationString, List<Long> participantIds) {
 
         mId = id;
         mName = name;
@@ -51,9 +56,13 @@ public class ImmutableEvent {
         mEndDate = new GregorianCalendar(TimeZone.getDefault());
         mStartDate.setTime(startDate.getTime());
         mEndDate.setTime(endDate.getTime());
-        mParticipants = new ArrayList<Long>(participants);
+        mParticipantIds = new ArrayList<Long>(participantIds);
         mLocation = new Location(location);
         mLocationString = locationString;
+    }
+
+    public User getCreator() {
+        return mCreator;
     }
 
     public long getCreatorId() {
@@ -68,7 +77,7 @@ public class ImmutableEvent {
         return (Calendar) mEndDate.clone();
     }
 
-    public long getID() {
+    public long getId() {
         return mId;
     }
 
@@ -84,11 +93,65 @@ public class ImmutableEvent {
         return mName;
     }
 
+    public List<Long> getParticipantIds() {
+        return new ArrayList<Long>(mParticipantIds);
+    }
+
+    public List<User> getParticipants() {
+        return new ArrayList<User>(mParticipants);
+    }
+
     public GregorianCalendar getStartDate() {
         return mStartDate;
     }
 
-    public List<Long> getParticipants() {
-        return new ArrayList<Long>(mParticipants);
+    public ImmutableEvent setCreator(User newCreator) {
+        mCreator = newCreator;
+        return this;
+    }
+
+    public ImmutableEvent setCreatorId(long creatorId) {
+        mCreatorId = creatorId;
+        return this;
+    }
+
+    public ImmutableEvent setDescription(String newDescription) {
+        mDescription = newDescription;
+        return this;
+    }
+
+    public ImmutableEvent setEndDate(GregorianCalendar newEndDate) {
+        mEndDate.setTime(newEndDate.getTime());
+        return this;
+    }
+
+    public ImmutableEvent setId(long newId) {
+        mId = newId;
+        return this;
+    }
+
+    public ImmutableEvent setLocation(Location newLocation) {
+        mLocation.set(newLocation);
+        return this;
+    }
+
+    public ImmutableEvent setLocationString(String newLocationString) {
+        mLocationString = newLocationString;
+        return this;
+    }
+
+    public ImmutableEvent setName(String newName) {
+        mName = newName;
+        return this;
+    }
+
+    public ImmutableEvent setParticipants(List<User> newParticipants) {
+        mParticipants = new ArrayList<User>(mParticipants);
+        return this;
+    }
+
+    public ImmutableEvent setStartDate(GregorianCalendar newStartDate) {
+        mStartDate.setTime(newStartDate.getTime());
+        return this;
     }
 }

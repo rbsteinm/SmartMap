@@ -36,6 +36,13 @@
             android:layout_below="@+id/show_event_info_event_name"
             android:text="Town, Country"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+        
+        <fragment
+            android:id="@+id/show_event_map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="fill_parent"
+            android:layout_height="100dp"
+            android:layout_below="@id/show_event_info_town_and_country"/>
 
         <Button
             android:id="@+id/show_event_info_invite_friends_button"

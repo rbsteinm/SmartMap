@@ -58,7 +58,12 @@
         </activity>
 
         <service
-            android:name=".background.UpdateService"
+            android:name=".background.InvitationsService"
+            android:enabled="true" >
+        </service>
+        
+        <service
+            android:name=".background.OwnPositionService"
             android:enabled="true" >
         </service>
 
@@ -127,7 +132,7 @@
                 android:value="MainActivity" />
         </activity>
         <activity
-            android:name=".activities.NotificationsActivity"
+            android:name=".activities.InvitationPanelActivity"
             android:label="@string/title_activity_notifications"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Dialog" >

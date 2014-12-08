@@ -22,7 +22,8 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import ch.epfl.smartmap.background.SettingsManager;
+import android.util.Log;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 
@@ -58,14 +59,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     private static final int SERVER_RESPONSE_OK = 200;
     private static CookieManager mCookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
 
-    private static final NetworkSmartMapClient ONE_INSTANCE = new NetworkSmartMapClient();
-
-    private NetworkSmartMapClient() {
+    public NetworkSmartMapClient() {
 
         CookieHandler.setDefault(mCookieManager);
-        if (ONE_INSTANCE != null) {
-            throw new IllegalStateException("Already instantiated");
-        }
     }
 
     /*
@@ -178,16 +174,16 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         HttpURLConnection conn = this.getHttpURLConnection("/auth");
         String response = this.sendViaPost(params, conn);
 
-        SettingsManager.getInstance().setUserName(name);
-        SettingsManager.getInstance().setFacebookID(facebookId);
-        SettingsManager.getInstance().setToken(fbAccessToken);
+        ServiceContainer.getSettingsManager().setUserName(name);
+        ServiceContainer.getSettingsManager().setFacebookID(facebookId);
+        ServiceContainer.getSettingsManager().setToken(fbAccessToken);
 
         SmartMapParser parser = null;
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
             long id = parser.parseId(response);
-            SettingsManager.getInstance().setUserID(id);
+            ServiceContainer.getSettingsManager().setUserID(id);
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
         } catch (SmartMapParseException e) {
@@ -390,16 +386,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-        List<Long> invitersIds = new ArrayList<Long>();
-        List<Long> newFriendsIds = new ArrayList<Long>();
-
-        for (ImmutableUser u : inviters) {
-            invitersIds.add(u.getId());
-        }
-        for (ImmutableUser u : newFriends) {
-            newFriendsIds.add(u.getId());
-        }
-        return new NetworkNotificationBag(invitersIds, newFriendsIds, removedFriends);
+        return new NetworkNotificationBag(inviters, newFriends, removedFriends);
 
     }
 
@@ -650,7 +637,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public void updateEvent(ImmutableEvent event) throws SmartMapClientException {
 
         Map<String, String> params = this.getParamsForEvent(event);
-        params.put("eventId", Long.toString(event.getID()));
+        params.put("eventId", Long.toString(event.getId()));
         HttpURLConnection conn = this.getHttpURLConnection("/updateEvent");
 
         String response = this.sendViaPost(params, conn);
@@ -714,7 +701,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             serverURL = new URL(SERVER_URL + uri);
             connection = NETWORK_PROVIDER.getConnection(serverURL);
         } catch (MalformedURLException e1) {
-            e1.printStackTrace();
+            Log.e(NetworkSmartMapClient.class.getSimpleName(), e1.getMessage());
             throw new IllegalArgumentException();
         } catch (IOException e) {
             throw new SmartMapClientException(e);
@@ -837,10 +824,4 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         }
         return response;
     }
-
-    public static NetworkSmartMapClient getInstance() {
-
-        return ONE_INSTANCE;
-    }
-
 }

@@ -86,5 +86,4 @@
         android:title="@string/pref_title_fetch_events_distance" />
         
     </PreferenceCategory>
-
 </PreferenceScreen>

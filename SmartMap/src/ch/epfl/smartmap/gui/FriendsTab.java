@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -15,7 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.UserInformationActivity;
-import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.listeners.OnCacheListener;
 
@@ -38,17 +39,17 @@ public class FriendsTab extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mFriendList = Cache.getInstance().getAllFriends();
+        mFriendList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
 
         // Create custom Adapter and pass it to the Activity
         FriendListItemAdapter adapter = new FriendListItemAdapter(mContext, mFriendList);
         this.setListAdapter(adapter);
 
         // Initialize the listener
-        Cache.getInstance().addOnCacheListener(new OnCacheListener() {
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
             public void onFriendListUpdate() {
-                mFriendList = Cache.getInstance().getAllFriends();
+                mFriendList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
                 ((Activity) mContext).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -74,6 +75,7 @@ public class FriendsTab extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        this.setListAdapter(new FriendListItemAdapter(mContext, Cache.getInstance().getAllFriends()));
+        this.setListAdapter(new FriendListItemAdapter(mContext, new ArrayList<User>(ServiceContainer.getCache()
+            .getAllFriends())));
     }
 }

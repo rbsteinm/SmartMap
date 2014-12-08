@@ -230,7 +230,7 @@ public class JsonSmartMapParser implements SmartMapParser {
                 String locationString = Utils.getCityFromLocation(location);
 
                 ImmutableUser user =
-                    new ImmutableUser(userId, null, null, null, location, locationString, null);
+                    new ImmutableUser(userId, null, null, null, location, locationString, null, false);
 
                 users.add(user);
             }
@@ -279,10 +279,9 @@ public class JsonSmartMapParser implements SmartMapParser {
      */
     private void checkLastSeen(GregorianCalendar lastSeen) throws SmartMapParseException {
         GregorianCalendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        if (lastSeen.getTimeInMillis() > (now.getTimeInMillis() + SERVER_TIME_DIFFERENCE_THRESHHOLD)) {
+        if (Math.abs(now.getTimeInMillis() - lastSeen.getTimeInMillis()) > SERVER_TIME_DIFFERENCE_THRESHHOLD) {
             throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString()
-                + "\n compared to \n" + now.toString() + "\n Values: "
-                + Utils.getLastSeenStringFromCalendar(lastSeen));
+                + " compared to " + now.toString());
         }
     }
 
@@ -450,7 +449,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         location.setLongitude(longitude);
         ImmutableEvent event =
             new ImmutableEvent(id, name, creatorId, description, startingDate, endDate, location,
-                positionName, participants);
+                positionName, new ArrayList<Long>());
 
         return event;
     }
@@ -502,7 +501,6 @@ public class JsonSmartMapParser implements SmartMapParser {
             lastSeen.setLongitude(longitude);
             lastSeen.setTime(this.parseDate(lastSeenString).getTimeInMillis());
         }
-
-        return new ImmutableUser(id, name, phoneNumber, email, lastSeen, null, null);
+        return new ImmutableUser(id, name, phoneNumber, email, null, null, null, false);
     }
 }
