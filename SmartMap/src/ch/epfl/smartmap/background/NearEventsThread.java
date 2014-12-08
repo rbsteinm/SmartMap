@@ -25,7 +25,8 @@ public class NearEventsThread extends Thread {
                         pos.getLatitude(), ServiceContainer.getSettingsManager().getNearEventsMaxDistance());
                 ServiceContainer.getSearchEngine()
                     .findPublicEventByIds(new HashSet<Long>(nearEventIds), null);
-                Log.d(TAG, "Fetch Near Events");
+                Log.d(TAG, "Fetch Near Events : " + nearEventIds + " radius "
+                    + ServiceContainer.getSettingsManager().getNearEventsMaxDistance());
             } catch (SmartMapClientException e) {
                 Log.e(TAG, "Couldn't retrieve public events: " + e);
             }
