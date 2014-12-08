@@ -38,6 +38,6 @@ public class SettingsManagerTest extends AndroidTestCase {
     @Test
     public void testGetUserID() {
         mManager.setUserID(mID);
-        assertTrue(mManager.getUserID() == mID);
+        assertTrue(mManager.getUserId() == mID);
     }
 }

@@ -220,7 +220,7 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean isGoing() {
-        return mParticipants.contains(ServiceContainer.getSettingsManager().getUserID());
+        return mParticipants.contains(ServiceContainer.getSettingsManager().getUserId());
     }
 
     /*
@@ -251,7 +251,7 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean isOwn() {
-        return mCreator.getId() == ServiceContainer.getSettingsManager().getUserID();
+        return mCreator.getId() == ServiceContainer.getSettingsManager().getUserId();
     }
 
     /*

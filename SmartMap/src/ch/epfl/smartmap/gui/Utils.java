@@ -37,9 +37,8 @@ public class Utils {
     public static final String NEVER_SEEN = "Never seen on SmartMap";
 
     public static double distanceToMe(LatLng latLng) {
-        return Math.sqrt(Math.pow(latLng.latitude
-            - ServiceContainer.getSettingsManager().getLocation().getLatitude(), 2)
-            + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+        return Math.sqrt(Math.pow(latLng.latitude - ServiceContainer.getSettingsManager().getLocation().getLatitude(),
+            2) + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
     }
 
     public static String getCityFromLocation(Location location) {
@@ -50,11 +49,29 @@ public class Utils {
         Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
 
         try {
-            List<Address> addresses =
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
                 return addresses.get(0).getLocality();
             } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
+                return addresses.get(0).getCountryName();
+            } else {
+                return Displayable.NO_LOCATION_STRING;
+            }
+        } catch (IOException e) {
+            return Displayable.NO_LOCATION_STRING;
+        }
+    }
+
+    public static String getCountryFromLocation(Location location) {
+        if (location == null) {
+            return Displayable.NO_LOCATION_STRING;
+        }
+
+        Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
+
+        try {
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {
                 return Displayable.NO_LOCATION_STRING;

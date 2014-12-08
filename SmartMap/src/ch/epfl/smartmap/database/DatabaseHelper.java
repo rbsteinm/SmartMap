@@ -144,7 +144,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The application's context, used to access the files
      */
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME + "_" + ServiceContainer.getSettingsManager().getUserID(), null, DATABASE_VERSION);
+        super(context, DATABASE_NAME + "_" + ServiceContainer.getSettingsManager().getUserId(), null, DATABASE_VERSION);
         mContext = context;
         mDatabase = this.getWritableDatabase();
         this.onCreate(mDatabase);

@@ -142,7 +142,7 @@ public final class SettingsManager {
     /**
      * @return The local user's ID if it is found, DEFAULT_ID value otherwise
      */
-    public long getUserID() {
+    public long getUserId() {
         return mSharedPref.getLong(USER_ID, DEFAULT_ID);
     }
 
