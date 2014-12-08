@@ -6,8 +6,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Represents an online User which is not a Friend, therefore allowing less
@@ -120,8 +120,8 @@ public class Stranger implements User {
      * @see ch.epfl.smartmap.cache.Localisable#getMarkerOptions()
      */
     @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        throw new UnsupportedOperationException();
+    public BitmapDescriptor getMarkerIcon(Context context) {
+        return NO_MARKER_ICON;
     }
 
     /*

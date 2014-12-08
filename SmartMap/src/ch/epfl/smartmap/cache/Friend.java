@@ -11,9 +11,9 @@ import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.map.CircularMarkerIconMaker;
 import ch.epfl.smartmap.map.MarkerIconMaker;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Represents a Friend, for each there is only one single instance that can be accessed via static method
@@ -34,6 +34,8 @@ public final class Friend implements User {
     private Location mLocation;
     private Bitmap mImage;
     private Boolean mIsBlocked;
+
+    private final MarkerIconMaker mMarkerIconMaker;
 
     protected Friend(ImmutableUser user) {
         super();
@@ -79,6 +81,8 @@ public final class Friend implements User {
         } else {
             mIsBlocked = user.isBlocked();
         }
+        mMarkerIconMaker = new CircularMarkerIconMaker(this);
+
     }
 
     /*
@@ -164,24 +168,11 @@ public final class Friend implements User {
         return mLocationString;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Localisable#getMarkerOptions()
-     */
     @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        MarkerIconMaker iconMaker = new CircularMarkerIconMaker(context);
+    public BitmapDescriptor getMarkerIcon(Context context) {
 
-        Bitmap profilePicture =
-            Bitmap.createScaledBitmap(this.getImage(), PICTURE_WIDTH, PICTURE_HEIGHT, false);
+        return BitmapDescriptorFactory.fromBitmap(mMarkerIconMaker.getMarkerIcon(context));
 
-        Bitmap markerIcon = iconMaker.getMarkerIcon(profilePicture);
-
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(this.getLatLng()).title(this.getName())
-            .icon(BitmapDescriptorFactory.fromBitmap(markerIcon)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
-
-        return markerOptions;
     }
 
     /*

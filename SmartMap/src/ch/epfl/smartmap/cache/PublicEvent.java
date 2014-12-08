@@ -12,9 +12,9 @@ import android.location.Location;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * An event that can be seen on the map
@@ -163,22 +163,9 @@ public class PublicEvent implements Event {
         return mLocationString;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
-     * )
-     * @author hugo-S
-     */
     @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
-            .title(this.getName())
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
-        return markerOptions;
-
+    public BitmapDescriptor getMarkerIcon(Context context) {
+        return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
     }
 
     @Override

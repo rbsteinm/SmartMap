@@ -4,8 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Objects that can be displayed with image, title and subtitle.
@@ -26,7 +26,7 @@ public interface Displayable extends Stockable {
 
     Location NO_LOCATION = new Location(PROVIDER_NAME);
 
-    MarkerOptions NO_MARKER_OPTIONS = null;
+    BitmapDescriptor NO_MARKER_ICON = null;
 
     /**
      * @param context
@@ -44,12 +44,7 @@ public interface Displayable extends Stockable {
 
     String getLocationString();
 
-    /**
-     * @param context
-     *            , the application's context
-     * @return the options to display the marker
-     */
-    MarkerOptions getMarkerOptions(Context context);
+    BitmapDescriptor getMarkerIcon(Context context);
 
     /**
      * @return Text containing various information (description, last seen,
@@ -63,4 +58,5 @@ public interface Displayable extends Stockable {
     String getTitle();
 
     boolean isVisible();
+
 }

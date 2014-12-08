@@ -221,7 +221,7 @@ public class AboutActivity extends Activity {
 
         // Infinite copyright ((c) 2014 - YYYY)
         if (!year.equals(APP_BORN_YEAR)) {
-            copyrightMsg = "\u00a9 " + APP_BORN_YEAR + " - " + year;
+            copyrightMsg = "\u00a9 " + this.APP_BORN_YEAR + " - " + year;
         }
         mCopyright.setText(copyrightMsg);
 

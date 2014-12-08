@@ -96,6 +96,22 @@ public class Notifications {
     }
 
     /**
+     * Build the notification and notify it with notification manager.
+     * 
+     * @param activity
+     *            current activity
+     * @param notification
+     *            notification to notify
+     * @param notificationId
+     *            id of current notification
+     */
+    private static void displayNotification(Context context, Notification notification, long notificationId) {
+        NotificationManager notificationManager =
+            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify((int) notificationId, notification);
+    }
+
+    /**
      * Create an event invitation notification and notify it
      * 
      * @param view
@@ -222,21 +238,5 @@ public class Notifications {
 
         displayNotification(context, noti.build(), notificationID);
 
-    }
-
-    /**
-     * Build the notification and notify it with notification manager.
-     * 
-     * @param activity
-     *            current activity
-     * @param notification
-     *            notification to notify
-     * @param notificationId
-     *            id of current notification
-     */
-    private static void displayNotification(Context context, Notification notification, long notificationId) {
-        NotificationManager notificationManager =
-            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify((int) notificationId, notification);
     }
 }

@@ -35,9 +35,6 @@ public interface User extends Displayable {
 
     long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
 
-    float MARKER_ANCHOR_X = (float) 0.5;
-
-    float MARKER_ANCHOR_Y = 1;
     int PICTURE_WIDTH = 50;
     int PICTURE_HEIGHT = 50;
     double NO_LATITUDE = 0.0;
