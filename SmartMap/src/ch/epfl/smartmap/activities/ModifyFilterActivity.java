@@ -237,15 +237,17 @@ public class ModifyFilterActivity extends Activity {
                     if (v.equals(mOutsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
                         User droppedItem = mCache.getFriend(droppedItemId);
+                        if (mFriendsInside.contains(droppedItem)) {
+                            mFriendsInside.remove(droppedItem);
+                            mFriendsOutside.add(droppedItem);
+                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
+                                .getBaseContext(), mFriendsInside));
+                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
+                                .getBaseContext(), mFriendsOutside));
+                            return true;
+                        }
 
-                        mFriendsInside.remove(droppedItem);
-                        mFriendsOutside.add(droppedItem);
-                        mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                            .getBaseContext(), mFriendsInside));
-                        mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                            .getBaseContext(), mFriendsOutside));
-
-                        return true;
+                        return false;
                     } else {
                         return false;
                     }
@@ -293,15 +295,17 @@ public class ModifyFilterActivity extends Activity {
                     if (v.equals(mInsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
                         User droppedItem = mCache.getFriend(droppedItemId);
+                        if (mFriendsOutside.contains(droppedItem)) {
+                            mFriendsInside.add(droppedItem);
+                            mFriendsOutside.remove(droppedItem);
+                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
+                                .getBaseContext(), mFriendsInside));
+                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
+                                .getBaseContext(), mFriendsOutside));
 
-                        mFriendsInside.add(droppedItem);
-                        mFriendsOutside.remove(droppedItem);
-                        mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                            .getBaseContext(), mFriendsInside));
-                        mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                            .getBaseContext(), mFriendsOutside));
-
-                        return true;
+                            return true;
+                        }
+                        return false;
                     } else {
                         return false;
                     }

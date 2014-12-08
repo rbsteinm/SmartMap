@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -17,7 +18,6 @@ import android.util.Log;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.cache.Event;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -32,7 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class DefaultMarkerManager implements MarkerManager {
 
-    public static final String TAG = "MARKER MANAGER";
+    public static final String TAG = DefaultMarkerManager.class.getSimpleName();
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
     public static final long HANDLER_DELAY = 16;
@@ -69,6 +69,49 @@ public class DefaultMarkerManager implements MarkerManager {
         mDisplayedItems.put(marker.getId(), item);
         mDictionnaryMarkers.put(marker.getId(), marker);
         return marker;
+    }
+
+    /**
+     * Animate the given marker from it's position to the given one
+     * 
+     * @param marker
+     * @param toPosition
+     * @param hideMarker
+     * @param map
+     */
+    private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker,
+        final Displayable item, final Context context) {
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = mGoogleMap.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 1000;
+
+        final Interpolator interpolator = new LinearInterpolator();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed / duration);
+                double lng = (t * toPosition.longitude) + ((1 - t) * startLatLng.longitude);
+                double lat = (t * toPosition.latitude) + ((1 - t) * startLatLng.latitude);
+                marker.setPosition(new LatLng(lat, lng));
+
+                if (t < 1.0) {
+                    // Post again 16ms later.
+                    handler.postDelayed(this, HANDLER_DELAY);
+                } else {
+                    if (hideMarker) {
+                        marker.setVisible(false);
+                    } else {
+                        marker.setVisible(true);
+                    }
+                }
+            }
+        });
+
     }
 
     /**
@@ -190,19 +233,12 @@ public class DefaultMarkerManager implements MarkerManager {
      * java.util.List)
      */
     @Override
-    public void updateMarkers(Context context, List<Displayable> itemsToDisplay) {
+    public void updateMarkers(Context context, Set<Displayable> itemsToDisplay) {
         Log.d(TAG, "updateMarkers");
         // In the list friendsToDisplay, search if each friend s already
         // displayed
         for (Displayable item : itemsToDisplay) {
-            Log.d("Markers", "search for markers");
-            if (item instanceof Event) {
-                Log.d("Markers", "Display event !");
-            }
             Marker marker;
-            Log.d("Markers", "search marker for " + item.getTitle());
-            Log.d("Markers", "location of " + item.getTitle() + "is " + item.getLocation());
-            Log.d("Markers", "latlng of " + item.getTitle() + "is " + item.getLatLng());
             // if the item is already displayed, get the marker for this
             // item, else add a new marker
             if (this.isDisplayedItem(item)) {
@@ -213,18 +249,21 @@ public class DefaultMarkerManager implements MarkerManager {
 
             }
 
-            // Log.d("markers", "marker's position for " + item.getTitle() + " is " + marker.getPosition());
+            // Log.d("markers", "marker's position for " + item.getTitle() +
+            // " is " + marker.getPosition());
             if ((marker.getPosition().latitude != item.getLatLng().latitude)
                 || (marker.getPosition().longitude != item.getLatLng().longitude)) {
 
                 this.animateMarker(marker, item.getLatLng(), false, item, context);
             }
-            // Log.d("markers", "final position of marker of " + item.getTitle() + " before setIcon is "
+            // Log.d("markers", "final position of marker of " + item.getTitle()
+            // + " before setIcon is "
             // + marker.getPosition());
             marker.setIcon(item.getMarkerIcon(context));
             // Log.d(
             // "markers",
-            // "final position of marker of " + item.getTitle() + " after setIcon is "
+            // "final position of marker of " + item.getTitle() +
+            // " after setIcon is "
             // + marker.getPosition());
         }
 
@@ -236,49 +275,6 @@ public class DefaultMarkerManager implements MarkerManager {
 
             }
         }
-
-    }
-
-    /**
-     * Animate the given marker from it's position to the given one
-     * 
-     * @param marker
-     * @param toPosition
-     * @param hideMarker
-     * @param map
-     */
-    private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker,
-        final Displayable item, final Context context) {
-        final Handler handler = new Handler();
-        final long start = SystemClock.uptimeMillis();
-        Projection proj = mGoogleMap.getProjection();
-        Point startPoint = proj.toScreenLocation(marker.getPosition());
-        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
-        final long duration = 1000;
-
-        final Interpolator interpolator = new LinearInterpolator();
-
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                long elapsed = SystemClock.uptimeMillis() - start;
-                float t = interpolator.getInterpolation((float) elapsed / duration);
-                double lng = (t * toPosition.longitude) + ((1 - t) * startLatLng.longitude);
-                double lat = (t * toPosition.latitude) + ((1 - t) * startLatLng.latitude);
-                marker.setPosition(new LatLng(lat, lng));
-
-                if (t < 1.0) {
-                    // Post again 16ms later.
-                    handler.postDelayed(this, HANDLER_DELAY);
-                } else {
-                    if (hideMarker) {
-                        marker.setVisible(false);
-                    } else {
-                        marker.setVisible(true);
-                    }
-                }
-            }
-        });
 
     }
 }

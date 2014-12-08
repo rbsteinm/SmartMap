@@ -152,15 +152,6 @@ public class DefaultFilter implements Filter {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#isVisible()
-     */
-    @Override
-    public boolean isVisible() {
-        return false;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Filter#update(ch.epfl.smartmap.cache.ImmutableFilter)
      */
     @Override

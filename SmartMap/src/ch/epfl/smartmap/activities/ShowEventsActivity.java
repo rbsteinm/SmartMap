@@ -281,7 +281,7 @@ public class ShowEventsActivity extends ListActivity {
 
             Map<String, Object> output = new HashMap<String, Object>();
 
-            Event event = ServiceContainer.getCache().getPublicEvent(eventId);
+            Event event = ServiceContainer.getCache().getEvent(eventId);
             output.put(EVENT_KEY, event);
 
             output.put(CREATOR_NAME_KEY, event.getCreator().getName());

@@ -4,6 +4,7 @@
 package ch.epfl.smartmap.map;
 
 import java.util.List;
+import java.util.Set;
 
 import android.content.Context;
 import ch.epfl.smartmap.cache.Displayable;
@@ -76,6 +77,6 @@ public interface MarkerManager {
      * @param friendsToDisplay
      *            the updated friends
      */
-    void updateMarkers(Context context, List<Displayable> itemsToDisplay);
+    void updateMarkers(Context context, Set<Displayable> itemsToDisplay);
 
 }

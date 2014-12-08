@@ -221,7 +221,7 @@ public class JsonSmartMapParser implements SmartMapParser {
                 this.checkId(userId);
                 this.checkLatitude(latitude);
                 this.checkLongitude(longitude);
-                this.checkLastSeen(lastSeen);
+                // this.checkLastSeen(lastSeen);
 
                 Location location = new Location("SmartMapServers");
                 location.setTime(lastSeen.getTimeInMillis());

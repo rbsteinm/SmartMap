@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import android.app.ActionBar;
@@ -101,23 +102,24 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     public static final String LOCATION_EXTRA = "LOCATION";
-
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+
     private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
     private static final int MENU_ITEM_NOTIFICATION_INDEX = 1;
-
     private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
     private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private SideMenu mSideMenu;
     private GoogleMap mGoogleMap;
+
     private DefaultMarkerManager mFriendMarkerManager;
     private DefaultMarkerManager mEventMarkerManager;
-
     private DefaultZoomManager mMapZoomer;
+
     private SupportMapFragment mFragmentMap;
+
     private Menu mMenu;
 
     private MenuTheme mMenuTheme;
@@ -205,8 +207,12 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             mFriendMarkerManager = new DefaultMarkerManager(mGoogleMap);
             mEventMarkerManager = new DefaultMarkerManager(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
-
-            // this.zoomAccordingToAllMarkers();
+            // Adds markers
+            mFriendMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
+                .getAllVisibleFriends()));
+            mEventMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
+                .getAllVisibleEvents()));
+            this.zoomAccordingToAllMarkers();
 
             // Add listeners to the GoogleMap
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
@@ -308,7 +314,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mEventMarkerManager.updateMarkers(MainActivity.this, new ArrayList<Displayable>(ServiceContainer
+
+                mEventMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(ServiceContainer
                     .getCache().getAllVisibleEvents()));
                 MainActivity.this.updateItemMenu();
             }
@@ -334,7 +341,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mFriendMarkerManager.updateMarkers(MainActivity.this, new ArrayList<Displayable>(ServiceContainer
+                mFriendMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(ServiceContainer
                     .getCache().getAllVisibleFriends()));
                 // MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
@@ -489,8 +496,14 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     /**
+     * <<<<<<< HEAD
      * Sets the view for Item Focus, this means - Write name / Display photo on
      * ActionBar - Sets ActionMenu for Item
+     * =======
+     * Sets the view for Item Focus, this means - Write name / Display photo on
+     * ActionBar - Sets ActionMenu
+     * for Item
+     * >>>>>>> a52284645a7fdabf92fc5582f572f8a918a484d2
      * Focus
      * 
      * @param item

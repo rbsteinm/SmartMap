@@ -124,33 +124,35 @@ public class OwnPositionService extends Service {
         }
     }
 
-    private static final String TAG = OwnPositionService.class.getSimpleName();
-    private LocationManager mLocManager;
     // minimum distance to update position
-    private static final float MIN_NETWORK_DISTANCE = 0;
+    private static final String TAG = OwnPositionService.class.getSimpleName();
     // minimum distance before gps updates are requested
+    private LocationManager mLocManager;
+    // Time between position updates on GPS
+    private static final float MIN_NETWORK_DISTANCE = 0;
+    // Time between position updates on Network
     private static final float MIN_GPS_DISTANCE = 50;
 
-    // Time between position updates on GPS
+    // Time before restart
     private static final int GPS_UPDATE_TIME = 5 * 60 * 1000;
 
-    // Time between position updates on Network
-    private static final int NETWORK_UPDATE_TIME = ServiceContainer.getSettingsManager().getRefreshFrequency();
-
-    // Time before restart
-    private static final int RESTART_DELAY = 2000;
-
-    private float mCurrentAccuracy = 0;
+    private static int NETWORK_UPDATE_TIME = 10000;
 
     /*
      * (non-Javadoc)
      * @see android.app.Service#onBind(android.content.Intent)
      */
+    private static final int RESTART_DELAY = 2000;
+
+    private float mCurrentAccuracy = 0;
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
+    // Ugly workaround because of KitKat stopping services when app gets closed
+    // (Android issue #63618)
     @Override
     public void onCreate() {
         super.onCreate();
@@ -174,13 +176,13 @@ public class OwnPositionService extends Service {
             ServiceContainer.setCache(new Cache());
         }
 
+        NETWORK_UPDATE_TIME = ServiceContainer.getSettingsManager().getRefreshFrequency();
+
         new StartUp().execute();
 
         return START_STICKY;
     }
 
-    // Ugly workaround because of KitKat stopping services when app gets closed
-    // (Android issue #63618)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
@@ -191,4 +193,5 @@ public class OwnPositionService extends Service {
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
     }
+
 }
