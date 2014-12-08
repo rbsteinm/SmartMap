@@ -24,13 +24,11 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.FriendInvitation;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableFilter;
 import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
-import ch.epfl.smartmap.cache.Stockable;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
 import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
@@ -224,6 +222,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The {@code ImmutableInvitation} to add to the database
      */
     public long addInvitation(ImmutableInvitation invitation) {
+
         ContentValues values = new ContentValues();
         values.put(KEY_USER_ID, invitation.getUserId());
         values.put(KEY_EVENT_ID, invitation.getEventId());
@@ -435,7 +434,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 long date = cursor.getLong(cursor.getColumnIndex(KEY_DATE));
                 int type = cursor.getInt(cursor.getColumnIndex(KEY_TYPE));
 
-                invitations.add(new ImmutableInvitation(userId, eventId, status, date, type));
+                invitations.add(new ImmutableInvitation(id, userId, eventId, status, date, type));
             } while (cursor.moveToNext());
         }
 
@@ -583,37 +582,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Returns a list of all friend invitations with the specified status
-     * 
-     * @param status
-     *            The invitations status
-     * @return A list of {@code FriendInvitation}
-     */
-    public List<ImmutableInvitation> getFriendInvitationsByStatus(int status) {
-        List<ImmutableInvitation> invitations = new ArrayList<ImmutableInvitation>();
-
-        String query = "SELECT  * FROM " + TABLE_INVITATIONS;
-
-        Cursor cursor = mDatabase.rawQuery(query, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                int currentStatus = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
-                if (currentStatus == status) {
-                    long userId = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
-
-                    // TODO Replace -1 with timestamp
-                    invitations.add(new ImmutableInvitation(userId, Stockable.NO_ID, currentStatus, -1,
-                        ImmutableInvitation.FRIEND_INVITATION));
-                }
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return invitations;
-    }
-
-    /**
      * Returns a list of all pending friends
      * 
      * @return A list of users who were sent friend requests
@@ -662,35 +630,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return pic;
     }
 
-    /**
-     * Returns a list of all unanswered received invitations
-     * 
-     * @return A list of {@code FriendInvitation}
-     */
-    public List<ImmutableInvitation> getUnansweredFriendInvitations() {
-        List<ImmutableInvitation> invitations = new ArrayList<ImmutableInvitation>();
-
-        String query = "SELECT  * FROM " + TABLE_INVITATIONS;
-
-        Cursor cursor = mDatabase.rawQuery(query, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                int status = cursor.getInt(cursor.getColumnIndex(KEY_STATUS));
-                if ((status == Invitation.READ) || (status == Invitation.UNREAD)) {
-                    long userId = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
-
-                    // TODO Replace -1 with timestamp
-                    invitations.add(new ImmutableInvitation(userId, Stockable.NO_ID, status, -1,
-                        ImmutableInvitation.FRIEND_INVITATION));
-                }
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return invitations;
-    }
-
     private void notifyOnInvitationListUpdateListeners() {
         for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
             listener.onInvitationListUpdate();
@@ -702,21 +641,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             listener.onInvitationStatusUpdate(id, status);
         }
     }
-
-    /**
-     * Fills the friend database with server data
-     */
-    // public void initializeAllFriends() {
-    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-    // try {
-    // List<Long> friends = client.getFriendsIds();
-    // for (long userID : friends) {
-    // this.addUser(client.getUserInfo(userID));
-    // }
-    // } catch (SmartMapClientException e) {
-    // Log.e("UpdateService", e.getMessage());
-    // }
-    // }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -885,35 +809,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Updates a {@code FriendInvitation} in the database
-     * 
-     * @param invitation
-     *            The {@code FriendInvitation} to update
-     * @return The number of rows that were updated
-     */
-    public int updateFriendInvitation(FriendInvitation invitation) {
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_ID, invitation.getId());
-        values.put(KEY_NAME, invitation.getUser().getName());
-        values.put(KEY_USER_ID, invitation.getUser().getId());
-        values.put(KEY_STATUS, invitation.getStatus());
-
-        int rows =
-            mDatabase.update(TABLE_INVITATIONS, values, KEY_ID + " = ?",
-                new String[]{String.valueOf(invitation.getId())});
-
-        if (rows > 0) {
-            this.notifyOnInvitationListUpdateListeners();
-        }
-        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.REFUSED)) {
-            this.notifyOnInvitationStatusUpdateListeners(invitation.getUser().getId(), invitation.getStatus());
-        }
-
-        return rows;
-    }
-
-    /**
      * Updates the database contents to be up-to-date with the cache
      */
     public void updateFromCache() {
@@ -929,5 +824,37 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         for (Event event : events) {
             this.addEvent(event.getImmutableCopy());
         }
+    }
+
+    /**
+     * Updates a {@code ImmutableInvitation} in the database
+     * 
+     * @param invitation
+     *            The {@code ImmutableInvitation} to update
+     * @return The number of rows that were updated
+     */
+    public int updateInvitation(ImmutableInvitation invitation) {
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, invitation.getId());
+        values.put(KEY_USER_ID, invitation.getUser().getId());
+        values.put(KEY_EVENT_ID, invitation.getEventId());
+        values.put(KEY_STATUS, invitation.getStatus());
+        values.put(KEY_DATE, invitation.getTimeStamp());
+        values.put(KEY_TYPE, invitation.getType());
+
+        int rows =
+            mDatabase.update(TABLE_INVITATIONS, values, KEY_ID + " = ?",
+                new String[]{String.valueOf(invitation.getId())});
+
+        if (rows > 0) {
+            this.notifyOnInvitationListUpdateListeners();
+        }
+        if ((invitation.getStatus() == Invitation.ACCEPTED)
+            || (invitation.getStatus() == Invitation.DECLINED)) {
+            this.notifyOnInvitationStatusUpdateListeners(invitation.getUser().getId(), invitation.getStatus());
+        }
+
+        return rows;
     }
 }

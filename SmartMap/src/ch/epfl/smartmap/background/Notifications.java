@@ -11,8 +11,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
-import ch.epfl.smartmap.cache.AcceptedFriendInvitation;
-import ch.epfl.smartmap.cache.EventInvitation;
+import ch.epfl.smartmap.cache.GenericInvitation;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -39,7 +38,7 @@ public class Notifications {
      * @param user
      *            The invited
      */
-    public static void acceptedFriendNotification(Context context, AcceptedFriendInvitation invitation) {
+    public static void acceptedFriendNotification(Context context, GenericInvitation invitation) {
 
         // Get ID of notifications
         notificationID++;
@@ -75,13 +74,11 @@ public class Notifications {
                 .setAutoCancel(true)
                 .setContentTitle(context.getString(R.string.notification_acceptedfriend_title))
                 .setContentText(
-                    invitation.getUser().getName() + " "
-                        + context.getString(R.string.notification_invitation_accepted) + "\n"
-                        + context.getString(R.string.notification_open_friend_list))
+                    invitation.getUser().getName() + " " + context.getString(R.string.notification_invitation_accepted)
+                        + "\n" + context.getString(R.string.notification_open_friend_list))
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(
-                    invitation.getUser().getName() + " "
-                        + context.getString(R.string.notification_invitation_accepted))
+                    invitation.getUser().getName() + " " + context.getString(R.string.notification_invitation_accepted))
                 .setContentIntent(pFriendIntent);
 
         Log.d("DEBUG-NOTIFICATION", "notificationVibrate : "
@@ -97,6 +94,22 @@ public class Notifications {
     }
 
     /**
+     * Build the notification and notify it with notification manager.
+     * 
+     * @param activity
+     *            current activity
+     * @param notification
+     *            notification to notify
+     * @param notificationId
+     *            id of current notification
+     */
+    private static void displayNotification(Context context, Notification notification, long notificationId) {
+        NotificationManager notificationManager =
+            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify((int) notificationId, notification);
+    }
+
+    /**
      * Create an event invitation notification and notify it
      * 
      * @param view
@@ -106,7 +119,7 @@ public class Notifications {
      * @param event
      *            the Event
      */
-    public static void newEventNotification(Context context, EventInvitation invitation) {
+    public static void newEventNotification(Context context, GenericInvitation invitation) {
 
         // Get ID and the number of ongoing Event notifications
         notificationID++;
@@ -124,9 +137,8 @@ public class Notifications {
 
         String[] events = new String[2];
         events[0] =
-            new String(invitation.getUser().getName() + " "
-                + context.getString(R.string.notification_event_invitation) + " "
-                + invitation.getEvent().getName());
+            new String(invitation.getUser().getName() + " " + context.getString(R.string.notification_event_invitation)
+                + " " + invitation.getEvent().getName());
         events[1] = context.getString(R.string.notification_open_event_list);
 
         // Sets a title for the Inbox style big view
@@ -144,14 +156,12 @@ public class Notifications {
                 .setAutoCancel(true)
                 .setContentTitle(context.getString(R.string.notification_inviteevent_title))
                 .setContentText(
-                    invitation.getUser().getName() + " "
-                        + context.getString(R.string.notification_event_invitation)
+                    invitation.getUser().getName() + " " + context.getString(R.string.notification_event_invitation)
                         + invitation.getEvent().getName() + "\n"
                         + context.getString(R.string.notification_open_event_list))
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(
-                    invitation.getUser().getName() + " "
-                        + context.getString(R.string.notification_event_invitation)
+                    invitation.getUser().getName() + " " + context.getString(R.string.notification_event_invitation)
                         + invitation.getEvent().getName()).setContentIntent(pEventIntent);
         if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
             noti.setVibrate(PATTERN);
@@ -223,21 +233,5 @@ public class Notifications {
 
         displayNotification(context, noti.build(), notificationID);
 
-    }
-
-    /**
-     * Build the notification and notify it with notification manager.
-     * 
-     * @param activity
-     *            current activity
-     * @param notification
-     *            notification to notify
-     * @param notificationId
-     *            id of current notification
-     */
-    private static void displayNotification(Context context, Notification notification, long notificationId) {
-        NotificationManager notificationManager =
-            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify((int) notificationId, notification);
     }
 }

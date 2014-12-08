@@ -15,7 +15,7 @@ public interface Invitation {
     int UNREAD = 0;
     int READ = 1;
     int ACCEPTED = 2;
-    int REFUSED = 3;
+    int DECLINED = 3;
 
     int FRIEND_INVITATION = 0;
     int EVENT_INVITATION = 1;
@@ -26,6 +26,9 @@ public interface Invitation {
      */
     long getId();
 
+    /**
+     * @return immutable copy of this invitation
+     */
     ImmutableInvitation getImmutableCopy();
 
     /**
@@ -48,6 +51,9 @@ public interface Invitation {
      */
     String getTitle();
 
+    /**
+     * @return invitation's type
+     */
     int getType();
 
     /**
@@ -55,5 +61,9 @@ public interface Invitation {
      */
     User getUser();
 
+    /**
+     * @param invitation
+     *            the invitation to update
+     */
     void update(ImmutableInvitation invitation);
 }
