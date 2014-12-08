@@ -156,7 +156,7 @@
                 android:value="ch.epfl.smartmap.activities.ShowEventsActivity" />
         </activity>
         <activity
-            android:name="ch.epfl.smartmap.activities.AboutActivity"
+            android:name=".activities.AboutActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_about"
             android:parentActivityName=".activities.MainActivity"
@@ -174,6 +174,24 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.epfl.smartmap.activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activities.ShowFiltersActivity"
+            android:label="@string/title_activity_show_filters"
+            android:parentActivityName=".activities.MainActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.smartmap.activities.MainActivity" />
+        </activity>
+        <activity
+            android:name="ch.epfl.smartmap.activities.ModifyFilterActivity"
+            android:label="@string/title_activity_modify_filter" 
+            android:parentActivityName=".activities.MainActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.epfl.smartmap.activities.ShowFiltersActivity" />
         </activity>
     </application>
 

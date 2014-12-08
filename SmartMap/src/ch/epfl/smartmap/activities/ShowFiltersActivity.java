@@ -1,0 +1,101 @@
+package ch.epfl.smartmap.activities;
+
+import java.util.List;
+
+import android.app.AlertDialog;
+import android.app.ListActivity;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.MockDB;
+import ch.epfl.smartmap.gui.FilterListItemAdapter;
+
+/**
+ * An Activity that displays the different filters
+ * 
+ * @author hugo-S
+ * @author rbsteinm
+ */
+public class ShowFiltersActivity extends ListActivity {
+
+    private List<Filter> mFilterList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_show_filters);
+
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+
+        // mock stuff, filter list should be taken from the cache (or database?)
+        MockDB.fillFilters();
+        mFilterList = MockDB.FILTER_LIST;
+
+        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
+    }
+
+    public void addNewFilterDialog(MenuItem item) {
+        // inflate the alertDialog
+        LayoutInflater inflater = this.getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.new_filter_alert_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("New filter");
+        builder.setView(alertLayout);
+
+        // Add positive button
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // TODO what is exectued when the user confirms the new filter's creation
+            }
+        });
+
+        // Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.show_filters, menu);
+        return true;
+    }
+
+    @Override
+    public void onListItemClick(ListView listView, View view, int position, long id) {
+        Filter filter = mFilterList.get(position);
+        Intent intent = new Intent(this.getBaseContext(), ModifyFilterActivity.class);
+        intent.putExtra("FILTER", filter.getId());
+        ShowFiltersActivity.this.startActivity(intent);
+        super.onListItemClick(listView, view, position, id);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_friends_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/activity_show_filters_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+         android:textStyle="bold"
+        android:textSize="20sp" />
+    
+    <TextView
+        android:id="@+id/activity_show_filters_showOnMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:textSize="16sp"
+         android:textStyle="italic"
+        android:text="@string/show_on_map" />
+
+    <Switch
+        android:id="@+id/activity_show_filters_follow_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/activity_show_filters_showOnMap"
+        android:clickable="true"
+        android:focusable="false" />
+    
+        <TextView
+        android:id="@+id/activity_show_filters_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_show_filters_name"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@id/activity_show_filters_follow_switch"
+        android:textSize="15sp"
+        android:textColor="@color/main_grey" />
+
+</RelativeLayout>
