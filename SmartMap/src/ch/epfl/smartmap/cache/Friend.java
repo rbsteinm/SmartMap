@@ -199,10 +199,10 @@ public final class Friend implements User {
      */
     @Override
     public String getSubtitle() {
-        String infos = "";
-        infos += Utils.getLastSeenStringFromCalendar(this.getLastSeen());
-        infos += " near ";
-        infos += mLocationString;
+        String infos = Utils.getLastSeenStringFromCalendar(this.getLastSeen());
+        if (!infos.equals(Utils.NEVER_SEEN)) {
+            infos += " near " + mLocationString;
+        }
 
         return infos;
     }

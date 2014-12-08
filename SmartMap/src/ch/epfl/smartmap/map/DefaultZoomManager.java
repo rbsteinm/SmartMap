@@ -1,12 +1,16 @@
 package ch.epfl.smartmap.map;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import ch.epfl.smartmap.gui.Utils;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,6 +27,7 @@ import com.google.android.gms.maps.model.Marker;
  */
 public class DefaultZoomManager extends FragmentActivity implements ZoomManager {
     public static final String TAG = "ZOOM MANAGER";
+
     private static final int GMAP_ZOOM_LEVEL = 14;
     private static final int PADDING = 35; // offset from edges of the map in
                                            // pixels
@@ -74,6 +79,7 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
      */
     @Override
     public void zoomAccordingToMarkers(final List<Marker> markers) {
+        Log.d(TAG, "ZOOM");
         if (!markers.isEmpty()) {
 
             if (mMapView.getViewTreeObserver().isAlive()) {
@@ -85,8 +91,25 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 
                         // LatLng centre = new LatLng(CENTER_LATTITUDE,
                         // CENTER_LONGITUDE);
-                        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+                        /*
+                         * @author jfperren
+                         * Did this quick fix to remove extreme values and have a more accurate zoom
+                         */
+                        double average = 0;
                         for (Marker marker : markers) {
+                            average += Utils.distanceToMe(marker.getPosition());
+                        }
+                        average /= markers.size();
+                        Set<Marker> importantMarkers = new HashSet<Marker>();
+                        for (Marker marker : markers) {
+                            if (Utils.distanceToMe(marker.getPosition()) < (average * 2)) {
+                                importantMarkers.add(marker);
+                            }
+                        }
+
+                        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+                        for (Marker marker : importantMarkers) {
                             boundsBuilder.include(marker.getPosition());
                         }
                         LatLngBounds bounds = boundsBuilder.build();

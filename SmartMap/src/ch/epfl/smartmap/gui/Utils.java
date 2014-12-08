@@ -14,7 +14,10 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
+
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Class that count the redraw badge on app icon
@@ -29,6 +32,15 @@ public class Utils {
     public static final long ONE_HOUR = 60 * ONE_MINUTE;
     public static final long ONE_DAY = 24 * ONE_HOUR;
     public static final long TEN_DAYS = 10 * ONE_DAY;
+    public static final long ONE_YEAR = 365 * ONE_DAY;
+
+    public static final String NEVER_SEEN = "Never seen on SmartMap";
+
+    public static double distanceToMe(LatLng latLng) {
+        return Math.sqrt(Math.pow(latLng.latitude
+            - ServiceContainer.getSettingsManager().getLocation().getLatitude(), 2)
+            + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+    }
 
     public static String getCityFromLocation(Location location) {
         if (location == null) {
@@ -77,7 +89,7 @@ public class Utils {
             } else {
                 return "" + hours + " hours ago";
             }
-        } else {
+        } else if (diff < ONE_YEAR) {
             // Give time in days
             int days = (int) (diff / ONE_DAY);
             if (days == 1) {
@@ -85,6 +97,8 @@ public class Utils {
             } else {
                 return "" + days + " days ago";
             }
+        } else {
+            return "Never seen on SmartMap";
         }
     }
 

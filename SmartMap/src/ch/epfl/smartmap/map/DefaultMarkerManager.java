@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -190,7 +191,7 @@ public class DefaultMarkerManager implements MarkerManager {
      * java.util.List)
      */
     @Override
-    public void updateMarkers(Context context, List<Displayable> itemsToDisplay) {
+    public void updateMarkers(Context context, Set<Displayable> itemsToDisplay) {
         Log.d(TAG, "updateMarkers");
         // In the list friendsToDisplay, search if each friend s already
         // displayed

@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import android.app.ActionBar;
@@ -125,8 +126,12 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             mFriendMarkerManager = new DefaultMarkerManager(mGoogleMap);
             mEventMarkerManager = new DefaultMarkerManager(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
-
-            // this.zoomAccordingToAllMarkers();
+            // Adds markers
+            mFriendMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
+                .getAllVisibleFriends()));
+            mEventMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
+                .getAllVisibleEvents()));
+            this.zoomAccordingToAllMarkers();
 
             // Add listeners to the GoogleMap
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
@@ -322,7 +327,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mEventMarkerManager.updateMarkers(MainActivity.this, new ArrayList<Displayable>(
+                mEventMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(
                     ServiceContainer.getCache().getAllVisibleEvents()));
                 MainActivity.this.updateItemMenu();
             }
@@ -348,7 +353,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mFriendMarkerManager.updateMarkers(MainActivity.this, new ArrayList<Displayable>(
+                mFriendMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(
                     ServiceContainer.getCache().getAllVisibleFriends()));
                 // MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
