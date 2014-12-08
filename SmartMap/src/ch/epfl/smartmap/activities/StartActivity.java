@@ -47,6 +47,27 @@ public class StartActivity extends FragmentActivity {
     private TextView mProgressText;
     private com.facebook.widget.LoginButton mLoginButton;
 
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check
+     *            this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        // TODO : Decomment when auditErrors coded for other classes
+        if (depth == 0) {
+            return 0;
+        }
+
+        int auditErrors = 0;
+        // auditErrors += mSearchEngine.auditErrors(depth - 1);
+        // What are the rep invariants?
+
+        return auditErrors;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -125,8 +146,7 @@ public class StartActivity extends FragmentActivity {
             mLogoImage.setVisibility(View.INVISIBLE);
 
             mFacebookFragment = new LoginFragment();
-            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment)
-                .commit();
+            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment).commit();
         }
 
         // Beware of the order in which services are created, Cache and
@@ -139,27 +159,6 @@ public class StartActivity extends FragmentActivity {
         ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplication()));
         ServiceContainer.setCache(new Cache());
         ServiceContainer.setSearchEngine(new CachedSearchEngine());
-    }
-
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
-        }
-
-        int auditErrors = 0;
-        // auditErrors += mSearchEngine.auditErrors(depth - 1);
-        // What are the rep invariants?
-
-        return auditErrors;
     }
 
     @Override
