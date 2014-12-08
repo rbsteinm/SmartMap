@@ -181,6 +181,10 @@ public class Cache {
         return this.getPublicEvents(mEventIds);
     }
 
+    public Set<Filter> getAllFilters() {
+        return this.getFilters(mFilterIds);
+    }
+
     /**
      * OK
      * 
@@ -188,10 +192,6 @@ public class Cache {
      */
     public Set<User> getAllFriends() {
         return this.getFriends(mFriendIds);
-    }
-
-    public Set<Filter> getAllFilters() {
-        return this.getFilters(mFilterIds);
     }
 
     public SortedSet<Invitation> getAllInvitations() {
@@ -588,6 +588,13 @@ public class Cache {
         }
     }
 
+    public long putFilter(ImmutableFilter newFilter) {
+        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
+        singleton.add(newFilter);
+        this.putFilters(singleton);
+        return nextFilterId - 1;
+    }
+
     public void putFilters(Set<ImmutableFilter> newFilters) {
         for (ImmutableFilter newFilter : newFilters) {
             // Create new Unique Id
@@ -600,12 +607,6 @@ public class Cache {
         for (CacheListener listener : mListeners) {
             listener.onFilterListUpdate();
         }
-    }
-
-    public void putFilter(ImmutableFilter newFilter) {
-        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
-        singleton.add(newFilter);
-        this.putFilters(singleton);
     }
 
     public void putFriend(ImmutableUser newFriend) {
@@ -879,6 +880,25 @@ public class Cache {
         }
     }
 
+    public void updateFilter(ImmutableFilter updatedFilter) {
+        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
+        singleton.add(updatedFilter);
+        this.updateFilters(singleton);
+    }
+
+    public void updateFilters(Set<ImmutableFilter> updatedFilters) {
+        for (ImmutableFilter updatedFilter : updatedFilters) {
+            Filter cachedFilter = this.getFilter(updatedFilter.getId());
+            if (cachedFilter != null) {
+                cachedFilter.update(updatedFilter);
+            }
+        }
+
+        for (CacheListener listener : mListeners) {
+            listener.onFilterListUpdate();
+        }
+    }
+
     /**
      * OK
      * 
@@ -888,12 +908,6 @@ public class Cache {
         Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
         singleton.add(updatedFriend);
         this.updateFriends(singleton);
-    }
-
-    public void updateFilter(ImmutableFilter updatedFilter) {
-        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
-        singleton.add(updatedFilter);
-        this.updateFilters(singleton);
     }
 
     // TODO
@@ -924,19 +938,6 @@ public class Cache {
 
         for (CacheListener listener : mListeners) {
             listener.onFriendListUpdate();
-        }
-    }
-
-    public void updateFilters(Set<ImmutableFilter> updatedFilters) {
-        for (ImmutableFilter updatedFilter : updatedFilters) {
-            Filter cachedFilter = this.getFilter(updatedFilter.getId());
-            if (cachedFilter != null) {
-                cachedFilter.update(updatedFilter);
-            }
-        }
-
-        for (CacheListener listener : mListeners) {
-            listener.onFilterListUpdate();
         }
     }
 

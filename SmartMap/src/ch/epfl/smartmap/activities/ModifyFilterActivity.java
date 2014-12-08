@@ -82,6 +82,8 @@ public class ModifyFilterActivity extends Activity {
 
         mListViewOutside.setOnDragListener(mFromOutsideDragListener);
         mInsideFilterLayout.setOnDragListener(mFromOutsideDragListener);
+
+        this.setFilter();
     }
 
     /*
@@ -92,16 +94,8 @@ public class ModifyFilterActivity extends Activity {
     protected void onResume() {
 
         super.onResume();
+        this.setFilter();
 
-        mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
-        for (long id : mFilter.getFriendIds()) {
-            mFriendsInside.add(mCache.getFriend(id));
-        }
-        for (User friend : mCache.getAllFriends()) {
-            if (!mFriendsInside.contains(friend)) {
-                mFriendsOutside.add(friend);
-            }
-        }
         this.setTitle(mFilter.getName());
         // For the moment,mock stuff
         // this.setTitle("Sweng Team");
@@ -197,6 +191,18 @@ public class ModifyFilterActivity extends Activity {
 
         // display the AlertDialog
         builder.create().show();
+    }
+
+    private void setFilter() {
+        mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
+        for (long id : mFilter.getFriendIds()) {
+            mFriendsInside.add(mCache.getFriend(id));
+        }
+        for (User friend : mCache.getAllFriends()) {
+            if (!mFriendsInside.contains(friend)) {
+                mFriendsOutside.add(friend);
+            }
+        }
     }
 
     protected class ListInsideDragEventListener implements View.OnDragListener {

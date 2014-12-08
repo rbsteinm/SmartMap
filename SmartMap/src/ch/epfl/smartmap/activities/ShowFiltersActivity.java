@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -20,6 +21,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.ImmutableFilter;
 import ch.epfl.smartmap.gui.FilterListItemAdapter;
 
 /**
@@ -55,7 +57,7 @@ public class ShowFiltersActivity extends ListActivity {
     public void addNewFilterDialog(MenuItem item) {
         // inflate the alertDialog
         LayoutInflater inflater = this.getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.new_filter_alert_dialog, null);
+        final View alertLayout = inflater.inflate(R.layout.new_filter_alert_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("New filter");
         builder.setView(alertLayout);
@@ -65,11 +67,14 @@ public class ShowFiltersActivity extends ListActivity {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 EditText editText =
-                    (EditText) ShowFiltersActivity.this.findViewById(R.id.show_filters_alert_dialog_edittext);
+                    (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                 String filterName = editText.getText().toString();
-                //Start a new instance of ModifyFilterActivity passing it the new filter's name
+                Long newFilterId =
+                    mCache
+                        .putFilter(new ImmutableFilter(Filter.NO_ID, filterName, new HashSet<Long>(), true));
+                // Start a new instance of ModifyFilterActivity passing it the new filter's name
                 Intent intent = new Intent(mContext, ModifyFilterActivity.class);
-                intent.putExtra("FILTER_NAME", filterName);
+                intent.putExtra("FILTER", newFilterId);
                 mContext.startActivity(intent);
             }
         });
