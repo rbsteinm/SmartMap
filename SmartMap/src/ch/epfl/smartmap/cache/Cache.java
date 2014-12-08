@@ -374,33 +374,30 @@ public class Cache {
     }
 
     public Set<Event> getLiveEvents() {
-        Set<Event> onLiveEvents = this.getAllEvents();
-        for (Event event : onLiveEvents) {
-            if (!event.isLive()) {
-                onLiveEvents.remove(event);
+        return this.getEvents(new SearchFilter<Event>() {
+            @Override
+            public boolean filter(Event item) {
+                return item.isLive();
             }
-        }
-        return onLiveEvents;
+        });
     }
 
     public Set<Event> getMyEvents() {
-        Set<Event> myEvents = this.getAllEvents();
-        for (Event event : myEvents) {
-            if (!event.isOwn()) {
-                myEvents.remove(event);
+        return this.getEvents(new SearchFilter<Event>() {
+            @Override
+            public boolean filter(Event item) {
+                return item.isOwn();
             }
-        }
-        return myEvents;
+        });
     }
 
     public Set<Event> getNearEvents() {
-        Set<Event> nearEvents = this.getAllEvents();
-        for (Event event : nearEvents) {
-            if (!event.isNear()) {
-                nearEvents.remove(event);
+        return this.getEvents(new SearchFilter<Event>() {
+            @Override
+            public boolean filter(Event item) {
+                return item.isNear();
             }
-        }
-        return nearEvents;
+        });
     }
 
     /**
