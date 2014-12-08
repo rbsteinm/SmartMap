@@ -45,14 +45,12 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
      * @param context
      * @param itemsArrayList
      */
-    public EventsListItemAdapter(Context context, List<Event> itemsArrayList) {
+    public EventsListItemAdapter(Context context, List<Event> itemsArrayList, Location location) {
         super(context, R.layout.gui_event_list_item, itemsArrayList);
 
         mContext = context;
         mItemsArrayList = itemsArrayList;
-
-        // TODO use real user's location
-        mMyLocation = new Location("default");
+        mMyLocation = new Location(location);
     }
 
     @Override

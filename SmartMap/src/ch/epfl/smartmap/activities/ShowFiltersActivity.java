@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
@@ -30,6 +32,7 @@ public class ShowFiltersActivity extends ListActivity {
 
     private List<Filter> mFilterList;
     private Cache mCache;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,7 @@ public class ShowFiltersActivity extends ListActivity {
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         mCache = ServiceContainer.getCache();
         mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
+        mContext = this;
 
         // mock stuff, filter list should be taken from the cache (or database?)
         // MockDB.fillFilters();
@@ -60,7 +64,13 @@ public class ShowFiltersActivity extends ListActivity {
         builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                // TODO what is exectued when the user confirms the new filter's creation
+                EditText editText =
+                    (EditText) ShowFiltersActivity.this.findViewById(R.id.show_filters_alert_dialog_edittext);
+                String filterName = editText.getText().toString();
+                //Start a new instance of ModifyFilterActivity passing it the new filter's name
+                Intent intent = new Intent(mContext, ModifyFilterActivity.class);
+                intent.putExtra("FILTER_NAME", filterName);
+                mContext.startActivity(intent);
             }
         });
 
