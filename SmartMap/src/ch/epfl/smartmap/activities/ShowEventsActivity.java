@@ -53,15 +53,7 @@ public class ShowEventsActivity extends ListActivity {
     private boolean mOngoingChecked;
     private boolean mNearMeChecked;
 
-    /**
-     * Contains all events
-     */
     private List<Event> mEventsList;
-
-    /**
-     * Contains the displayed events
-     */
-    private List<Event> mCurrentList;
 
     private Location mMyLocation;
 
@@ -77,7 +69,7 @@ public class ShowEventsActivity extends ListActivity {
         this.initializeGUI();
 
         // Create custom Adapter and pass it to the Activity
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList);
         this.setListAdapter(adapter);
     }
 
@@ -88,8 +80,7 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Triggered when a checkbox is clicked. Updates the displayed list of
-     * events.
+     * Triggered when a checkbox is clicked. Updates the displayed list of events.
      * 
      * @param v
      *            the checkbox whose status changed
@@ -213,65 +204,30 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
+        Log.d(TAG, "Updating event's list to match user's choice");
+
         mMyLocation = ServiceContainer.getSettingsManager().getLocation();
-        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllVisibleEvents());
-        mCurrentList = new ArrayList<Event>();
+        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllEvents());
 
-        // // Copy complete list into current list
-        // for (Event e : mEventsList) {
-        // mCurrentList.add(e);
-        // }
-        //
-        // for (Event e : mEventsList) {
-        // if (mMyEventsChecked) {
-        // if
-        // (!ServiceContainer.getCache().getFriend(e.getCreatorId()).getName().equals(mMyName))
-        // {
-        // mCurrentList.remove(e);
-        // }
-        // }
-        //
-        // if (mOngoingChecked && !e.getStartDate().before(new
-        // GregorianCalendar())) {
-        // mCurrentList.remove(e);
-        // }
-        //
-        // if (mNearMeChecked) {
-        // if (mMyLocation != null) {
-        // double distanceMeEvent =
-        // distance(e.getLocation().getLatitude(),
-        // e.getLocation().getLongitude(),
-        // mMyLocation.getLatitude(), mMyLocation.getLongitude());
-        // String[] showKMContent =
-        // mShowKilometers.getText().toString().split(" ");
-        // double distanceMax = Double.parseDouble(showKMContent[0]);
-        // if (!(distanceMeEvent < distanceMax)) {
-        // mCurrentList.remove(e);
-        // }
-        // } else {
-        // Toast.makeText(this.getApplicationContext(),
-        // this.getString(R.string.show_event_cannot_retrieve_current_location),
-        // Toast.LENGTH_SHORT).show();
-        // }
-        // }
-        // }
+        if (mNearMeChecked) {
+            mEventsList.retainAll(ServiceContainer.getCache().getNearEvents());
+        }
 
-        // TODO
+        if (mMyEventsChecked) {
+            mEventsList.retainAll(ServiceContainer.getCache().getMyEvents());
+        }
 
-        ServiceContainer.getCache().getNearEvents();
-        ServiceContainer.getCache().getLiveEvents();
-        ServiceContainer.getCache().getMyEvents();
+        if (mOngoingChecked) {
+            mEventsList.retainAll(ServiceContainer.getCache().getLiveEvents());
+        }
 
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mCurrentList, mMyLocation);
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList);
         this.setListAdapter(adapter);
     }
 
     /**
-     * Computes the distance between two GPS locations (takes into consideration
-     * the earth radius), inspired
-     * by
-     * wikipedia. This is costly as there are several library calls to sin, cos,
-     * etc...
+     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired by
+     * wikipedia. This is costly as there are several library calls to sin, cos, etc...
      * 
      * @param lat1
      *            latitude of point 1
@@ -339,8 +295,8 @@ public class ShowEventsActivity extends ListActivity {
             if ((event == null) || (creatorName == null)) {
                 Log.e(TAG, "The server returned a null event or creatorName");
 
-                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error),
-                    Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
+                        .show();
 
             } else {
 
@@ -351,48 +307,46 @@ public class ShowEventsActivity extends ListActivity {
 
                 AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
 
-                String[] textForDates =
-                    EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), mContext);
+                String[] textForDates = EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(),
+                        mContext);
 
-                final String message =
-                    textForDates[0] + " " + textForDates[1] + "\n"
+                final String message = textForDates[0] + " " + textForDates[1] + "\n"
                         + mContext.getString(R.string.show_event_by) + " " + creatorName + "\n\n"
                         + event.getDescription();
 
                 alertDialog.setTitle(event.getName()
-                    + " @ "
-                    + event.getLocationString()
-                    + "\n"
-                    + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
-                        .getLatitude(), event.getLocation().getLongitude()) + " km away");
+                        + " @ "
+                        + event.getLocationString()
+                        + "\n"
+                        + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
+                                .getLatitude(), event.getLocation().getLongitude()) + " km away");
                 alertDialog.setMessage(message);
 
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-                    mContext.getString(R.string.show_event_on_the_map_button),
-                    new DialogInterface.OnClickListener() {
+                        mContext.getString(R.string.show_event_on_the_map_button),
+                        new DialogInterface.OnClickListener() {
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            Toast.makeText(mContext,
-                                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                                Toast.LENGTH_SHORT).show();
-                            Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                            showEventIntent.putExtra("location", event.getLocation());
-                            ShowEventsActivity.this.startActivity(showEventIntent);
-                        }
-                    });
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                Toast.makeText(mContext,
+                                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                                        Toast.LENGTH_SHORT).show();
+                                Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                                showEventIntent.putExtra("location", event.getLocation());
+                                ShowEventsActivity.this.startActivity(showEventIntent);
+                            }
+                        });
 
                 alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
-                    mContext.getString(R.string.show_event_details_button),
-                    new DialogInterface.OnClickListener() {
+                        mContext.getString(R.string.show_event_details_button), new DialogInterface.OnClickListener() {
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
-                            showEventIntent.putExtra("EVENT", event.getId());
-                            ShowEventsActivity.this.startActivity(showEventIntent);
-                        }
-                    });
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
+                                showEventIntent.putExtra("EVENT", event.getId());
+                                ShowEventsActivity.this.startActivity(showEventIntent);
+                            }
+                        });
 
                 alertDialog.show();
             }
@@ -401,8 +355,7 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Listens for the progress change of the Seekbar and updates the list
-     * accordingly.
+     * Listens for the progress change of the Seekbar and updates the list accordingly.
      * 
      * @author SpicyCH
      */
