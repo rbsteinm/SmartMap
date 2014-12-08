@@ -1,7 +1,5 @@
 package ch.epfl.smartmap.background;
 
-import java.util.List;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -116,8 +114,8 @@ public class InvitationsService extends Service {
                         ServiceContainer.getCache().updateFriendInvitations(nb,
                             InvitationsService.this.getApplicationContext());
                         // Get event invitations
-                        List<Long> invitations = ServiceContainer.getNetworkClient().getEventInvitations();
-                        ServiceContainer.getCache().updateEventInvitations(invitations);
+                        // List<Long> invitations = ServiceContainer.getNetworkClient().getEventInvitations();
+                        // ServiceContainer.getCache().updateEventInvitations(invitations);
                         Log.d(TAG, "Successfully fetched invitations");
                     } catch (SmartMapClientException e) {
                         Log.e(TAG, "Couldn't retrieve invitations due to a server error: " + e);
