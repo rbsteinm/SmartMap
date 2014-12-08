@@ -466,11 +466,13 @@ public class Cache {
         // Clear all sets
         mFriendIds.clear();
         mEventIds.clear();
+        mFilterIds.clear();
 
         // Initialize id Lists
         mFriendIds.addAll(database.getFriendIds());
         Log.d(TAG, "Friend ids : " + mFriendIds);
         // mPublicEventIds.addAll(DatabaseHelper.getInstance().getEventIds());
+        mFilterIds.addAll(database.getFilterIds());
 
         // Fill with database values
         for (long id : mFriendIds) {
@@ -482,10 +484,15 @@ public class Cache {
             mEventInstances.put(id, new PublicEvent(database.getEvent(id)));
         }
 
+        for (long id : mFilterIds) {
+            mFilterInstances.put(id, new DefaultFilter(database.getFilter(id)));
+        }
+
         // Notify listeners
         for (CacheListener listener : mListeners) {
             listener.onEventListUpdate();
             listener.onFriendListUpdate();
+            listener.onFilterListUpdate();
         }
     }
 

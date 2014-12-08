@@ -83,7 +83,7 @@ public class ModifyFilterActivity extends Activity {
         mListViewOutside.setOnDragListener(mFromOutsideDragListener);
         mInsideFilterLayout.setOnDragListener(mFromOutsideDragListener);
 
-        this.setFilter();
+        // this.setFilter();
     }
 
     /*
