@@ -101,7 +101,10 @@ public class ModifyFilterActivity extends Activity {
         // mFriendsOutside.add(friend);
         // }
         // }
+        // this.setTitle(mFilter.getName());
         // For the moment,mock stuff
+        this.setTitle("Sweng Team");
+
         mFriendsInside =
             new ArrayList<User>(Arrays.asList(mockDB.JULIEN, mockDB.ALAIN, mockDB.ROBIN, mockDB.MATTHIEU,
                 mockDB.NICOLAS, mockDB.MARION, mockDB.RAPHAEL, mockDB.HUGO));
