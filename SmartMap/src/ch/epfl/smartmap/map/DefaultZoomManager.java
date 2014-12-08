@@ -26,7 +26,7 @@ import com.google.android.gms.maps.model.Marker;
  * @author hugo-S
  */
 public class DefaultZoomManager extends FragmentActivity implements ZoomManager {
-    public static final String TAG = "ZOOM MANAGER";
+    public static final String TAG = DefaultZoomManager.class.getSimpleName();
 
     private static final int GMAP_ZOOM_LEVEL = 14;
     private static final int PADDING = 35; // offset from edges of the map in
@@ -61,7 +61,9 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.map.ZoomManager#centerOnLocation(com.google.android.gms.maps.model.LatLng)
+     * @see
+     * ch.epfl.smartmap.map.ZoomManager#centerOnLocation(com.google.android.
+     * gms.maps.model.LatLng)
      */
     @Override
     public void centerOnLocation(LatLng latLng) {
@@ -94,7 +96,8 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 
                         /*
                          * @author jfperren
-                         * Did this quick fix to remove extreme values and have a more accurate zoom
+                         * Did this quick fix to remove extreme values and have
+                         * a more accurate zoom
                          */
                         double average = 0;
                         for (Marker marker : markers) {
@@ -149,7 +152,9 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.map.ZoomManager#zoomWithoutAnimation(com.google.android.gms.maps.model.LatLng)
+     * @see
+     * ch.epfl.smartmap.map.ZoomManager#zoomWithoutAnimation(com.google.android
+     * .gms.maps.model.LatLng)
      */
     @Override
     public void zoomWithoutAnimation(LatLng latLng) {

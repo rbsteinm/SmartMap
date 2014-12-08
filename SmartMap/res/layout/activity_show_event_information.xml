@@ -25,7 +25,6 @@
             android:layout_alignParentTop="true"
             android:layout_marginLeft="17dp"
             android:layout_marginTop="17dp"
-            android:text="event name"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
@@ -34,15 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/show_event_info_event_name"
             android:layout_below="@+id/show_event_info_event_name"
-            android:text="Town, Country"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-        
-        <fragment
-            android:id="@+id/show_event_map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="fill_parent"
-            android:layout_height="100dp"
-            android:layout_below="@id/show_event_info_town_and_country"/>
 
         <Button
             android:id="@+id/show_event_info_invite_friends_button"
@@ -70,7 +61,6 @@
             android:layout_alignLeft="@+id/show_event_info_creator"
             android:layout_below="@+id/show_event_info_creator"
             android:layout_marginTop="41dp"
-            android:text="Event description"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
@@ -79,7 +69,6 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/show_event_info_town_and_country"
             android:layout_below="@+id/show_event_info_town_and_country"
-            android:text="Start"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
@@ -88,7 +77,6 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/show_event_info_town_and_country"
             android:layout_below="@+id/show_event_info_start"
-            android:text="End"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
@@ -97,15 +85,15 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/show_event_info_town_and_country"
             android:layout_below="@+id/show_event_info_end"
-            android:text="By creator"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         
         <fragment
             android:id="@+id/show_event_info_map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="match_parent"
             android:layout_below="@id/show_event_info_description"
+            android:layout_above="@id/show_event_info_invite_friends_button"
             android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 

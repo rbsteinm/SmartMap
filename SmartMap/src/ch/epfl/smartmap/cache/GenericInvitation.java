@@ -177,8 +177,9 @@ public class GenericInvitation implements Invitation {
         if (invitation.getEvent() != null) {
             mEvent = invitation.getEvent();
         }
-        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)
-            || (invitation.getStatus() == Invitation.READ) || (invitation.getStatus() == Invitation.UNREAD)) {
+        if ((invitation.getStatus() == Invitation.ACCEPTED)
+            || (invitation.getStatus() == Invitation.DECLINED) || (invitation.getStatus() == Invitation.READ)
+            || (invitation.getStatus() == Invitation.UNREAD)) {
             mStatus = invitation.getStatus();
         }
         if (invitation.getTimeStamp() >= 0) {

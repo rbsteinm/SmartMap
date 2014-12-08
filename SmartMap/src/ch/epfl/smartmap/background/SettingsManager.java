@@ -102,8 +102,9 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public int getNearEventsMaxDistance() {
+        String defaultValue = mContext.getString(R.string.pref_events_max_distance_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_max_distance_fetch_events), "100000"));
+                mContext.getString(R.string.settings_key_max_distance_fetch_events), defaultValue));
     }
 
     /**
@@ -111,8 +112,9 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public int getRefreshFrequency() {
+        String defaultValue = mContext.getString(R.string.pref_sync_frequency_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_refresh_frequency), "10000"));
+                mContext.getString(R.string.settings_key_refresh_frequency), defaultValue));
     }
 
     /**
@@ -121,8 +123,9 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public int getTimeToWaitBeforeHidingFriends() {
+        String defaultValue = mContext.getString(R.string.pref_last_seen_max_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_last_seen_max), "3600000"));
+                mContext.getString(R.string.settings_key_last_seen_max), defaultValue));
     }
 
     /**
@@ -142,7 +145,7 @@ public final class SettingsManager {
     /**
      * @return The local user's ID if it is found, DEFAULT_ID value otherwise
      */
-    public long getUserID() {
+    public long getUserId() {
         return mSharedPref.getLong(USER_ID, DEFAULT_ID);
     }
 

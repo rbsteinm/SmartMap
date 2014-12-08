@@ -191,7 +191,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache
-                        ServiceContainer.getCache().putFriend(databaseResult);
+                        ServiceContainer.getCache().putStranger(databaseResult);
                         if (callback != null) {
                             callback.onResult(ServiceContainer.getCache().getStranger(id));
                         }
@@ -203,7 +203,7 @@ public final class CachedSearchEngine implements SearchEngine {
                             networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
                             if (networkResult != null) {
                                 // Match on server, put it in cache
-                                ServiceContainer.getCache().putFriend(networkResult);
+                                ServiceContainer.getCache().putStranger(networkResult);
                                 if (callback != null) {
 
                                     callback.onResult(ServiceContainer.getCache().getStranger(id));

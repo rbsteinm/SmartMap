@@ -307,7 +307,7 @@ public class AddEventActivity extends FragmentActivity {
             SettingsManager setMng = ServiceContainer.getSettingsManager();
 
             ImmutableEvent event =
-                new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), setMng.getUserID(),
+                new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), setMng.getUserId(),
                     mDescription.getText().toString(), startDate, endDate, location, mPlaceName.getText()
                         .toString(), new HashSet<Long>());
 

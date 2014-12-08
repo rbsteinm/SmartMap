@@ -64,6 +64,26 @@ public class Utils {
         }
     }
 
+    public static String getCountryFromLocation(Location location) {
+        if (location == null) {
+            return Displayable.NO_LOCATION_STRING;
+        }
+
+        Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
+
+        try {
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
+                return addresses.get(0).getCountryName();
+            } else {
+                return Displayable.NO_LOCATION_STRING;
+            }
+        } catch (IOException e) {
+            return Displayable.NO_LOCATION_STRING;
+        }
+    }
+
     public static String getDateString(Calendar calendar) {
 
         Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));

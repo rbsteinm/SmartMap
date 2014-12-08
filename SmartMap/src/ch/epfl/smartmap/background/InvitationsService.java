@@ -59,7 +59,6 @@ public class InvitationsService extends Service {
             ServiceContainer.setCache(new Cache());
         }
 
-        Log.d(TAG, "StartCommand");
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... arg0) {
@@ -79,6 +78,7 @@ public class InvitationsService extends Service {
 
         mHandler.removeCallbacks(getInvitations);
         mHandler.post(getInvitations);
+        Log.d(TAG, "Service started");
 
         return START_STICKY;
     }
