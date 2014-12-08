@@ -54,6 +54,17 @@ public class ShowFiltersActivity extends ListActivity {
         this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
+    }
+
     public void addNewFilterDialog(MenuItem item) {
         // inflate the alertDialog
         LayoutInflater inflater = this.getLayoutInflater();
