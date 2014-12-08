@@ -245,14 +245,13 @@ public final class CachedSearchEngine implements SearchEngine {
                     }
                 } else {
                     // Fetch online
-                    Set<ImmutableUser> networkResult;
+                    List<ImmutableUser> networkResult;
                     try {
-                        networkResult =
-                            new HashSet<ImmutableUser>(ServiceContainer.getNetworkClient().findUsers(query));
+                        networkResult = ServiceContainer.getNetworkClient().findUsers(query);
                         for (ImmutableUser user : networkResult) {
-                            User cachedUser = ServiceContainer.getCache().getStranger(user.getId());
-                            if (cachedUser != null) {
-                                result.add(cachedUser);
+                            if (user != null) {
+                                ServiceContainer.getCache().putStranger(user);
+                                result.add(ServiceContainer.getCache().getUser(user.getId()));
                             }
                         }
                     } catch (SmartMapClientException e) {
