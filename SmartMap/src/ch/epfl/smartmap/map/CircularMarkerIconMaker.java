@@ -50,7 +50,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     public static final int SHAPE_TAIL_LENGTH = 53;
     public static final float SATURATION_BEGIN = 2f;
     public static final float SATURATION_END = -0.08f;
-    public static final long TIMEOUT_COLOR = 5; // minutes
+    public static final long TIMEOUT_COLOR = 30; // minutes
     public static final int SECONDS_IN_MINUTE = 60;
     public static final int MILLISECONDS_IN_SECOND = 1000;
 
