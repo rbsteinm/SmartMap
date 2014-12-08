@@ -45,21 +45,6 @@ public class SetLocationActivity extends FragmentActivity {
     private LatLng mMyPosition;
     private LatLng mEventPosition;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_set_location);
-
-        // Makes the logo clickable (clicking it returns to previous activity)
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
-        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        // Maybe set it longer, how?
-        Toast.makeText(this, this.getString(R.string.set_location_toast), Toast.LENGTH_LONG).show();
-
-        this.displayMap();
-    }
-
     /**
      * Display the map with the current location
      */
@@ -81,15 +66,13 @@ public class SetLocationActivity extends FragmentActivity {
 
             // Get my position from SettingsManager
             mMyPosition =
-                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(),
-                    ServiceContainer.getSettingsManager().getLocation().getLongitude());
+                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
+                    .getSettingsManager().getLocation().getLongitude());
 
-            mEventPosition =
-                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(),
-                    ServiceContainer.getSettingsManager().getLocation().getLongitude());
+            mEventPosition = this.getIntent().getParcelableExtra("eventPosition");
 
             // Enabling MyLocation Layer of Google Map
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mMyPosition);
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
 
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition).draggable(true));
 
@@ -111,6 +94,21 @@ public class SetLocationActivity extends FragmentActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_set_location);
+
+        // Makes the logo clickable (clicking it returns to previous activity)
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        // Maybe set it longer, how?
+        Toast.makeText(this, this.getString(R.string.set_location_toast), Toast.LENGTH_LONG).show();
+
+        this.displayMap();
     }
 
     @Override
@@ -137,8 +135,7 @@ public class SetLocationActivity extends FragmentActivity {
                 List<Address> addresses;
 
                 try {
-                    addresses =
-                        geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
+                    addresses = geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
                     if (addresses.size() > 0) {
                         // Makes sure that an address is associated to the
                         // coordinates, the user could

@@ -288,6 +288,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_LATITUDE, user.getLocation().getLatitude());
             values.put(KEY_POSNAME, user.getLocationString());
             values.put(KEY_LASTSEEN, user.getLocation().getTime());
+            values.put(KEY_BLOCKED, user.isBlocked() ? 1 : 0);
 
             mDatabase.insert(TABLE_USER, null, values);
         } else {
@@ -569,11 +570,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             location.setTime(lastSeen);
             String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
             Bitmap image = this.getPictureById(id);
+            boolean isBlocked = cursor.getInt(cursor.getColumnIndex(KEY_BLOCKED)) == 1;
 
             cursor.close();
 
-            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image,
-                User.DEFAULT_BLOCK_VALUE);
+            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image, isBlocked);
         }
 
         return null;
@@ -821,6 +822,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         if (!friend.getLocationString().equals(Friend.NO_LOCATION_STRING)) {
             values.put(KEY_POSNAME, friend.getLocationString());
         }
+
+        values.put(KEY_BLOCKED, friend.isBlocked() ? 1 : 0);
 
         return mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",
             new String[]{String.valueOf(friend.getId())});
