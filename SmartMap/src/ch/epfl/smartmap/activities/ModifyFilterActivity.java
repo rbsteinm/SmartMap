@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.MockDB;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
@@ -27,6 +29,9 @@ public class ModifyFilterActivity extends Activity {
     private List<User> mFriendsInside;
     private List<User> mFriendsOutside;
 
+    private Filter mFilter;
+    private Cache mCache;
+
     private final MockDB mockDB = new MockDB();
 
     @Override
@@ -40,6 +45,11 @@ public class ModifyFilterActivity extends Activity {
         mListInside = (ListView) this.findViewById(R.id.activity_modify_filter_inside_list);
         mListOutside = (ListView) this.findViewById(R.id.activity_modify_filter_outside_list);
 
+        mFriendsInside = new ArrayList<User>();
+        mFriendsOutside = new ArrayList<User>();
+
+        // mCache=ServiceContainer.getCache();
+
     }
 
     /*
@@ -52,6 +62,15 @@ public class ModifyFilterActivity extends Activity {
         super.onResume();
 
         // TODO set the inside and outside list using the intent and the cache
+        // mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
+        // for (long id :mFilter.getFriendIds()){
+        // mFriendsInside.addFriend(mCache.getFrien(id));
+        // }
+        // for(User friend:mCache.getAllFriends()){
+        // if(!mFriendsInside.contains(friend)){
+        // mFriendsOutside.add(friend);
+        // }
+        // }
         // For the moment,mock stuff
         mFriendsInside =
             new ArrayList<User>(Arrays.asList(mockDB.JULIEN, mockDB.ALAIN, mockDB.ROBIN, mockDB.MATTHIEU,
