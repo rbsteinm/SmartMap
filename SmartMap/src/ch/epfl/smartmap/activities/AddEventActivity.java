@@ -52,6 +52,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class AddEventActivity extends FragmentActivity {
 
+    public static final String LOCATION_EXTRA = "LOCATION";
+
     private static final String TAG = AddEventActivity.class.getSimpleName();
 
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
@@ -451,13 +453,13 @@ public class AddEventActivity extends FragmentActivity {
     /**
      * @param data
      *            the intent containing the extras. The position (LatLgn) is retrieved from the
-     *            getParcelable(LOCATION_SERVICE).
+     *            getParcelable().
      * @author SpicyCH
      */
     private void updateLocation(Intent data) {
         Bundle extras = data.getExtras();
 
-        mEventPosition = extras.getParcelable(LOCATION_SERVICE);
+        mEventPosition = extras.getParcelable(LOCATION_EXTRA);
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         String cityName = "";
         List<Address> addresses = null;
