@@ -36,8 +36,7 @@ public class OwnPositionService extends Service {
     // Time between position updates on GPS
     private static final int GPS_UPDATE_TIME = 5 * 60 * 1000;
     // Time between position updates on Network
-    private static final int NETWORK_UPDATE_TIME = ServiceContainer.getSettingsManager()
-        .getRefreshFrequency();
+    private static int NETWORK_UPDATE_TIME = 10000;
 
     // Time before restart
     private static final int RESTART_DELAY = 2000;
@@ -76,6 +75,8 @@ public class OwnPositionService extends Service {
             ServiceContainer.setCache(new Cache());
         }
 
+        NETWORK_UPDATE_TIME = ServiceContainer.getSettingsManager().getRefreshFrequency();
+
         new StartUp().execute();
 
         return START_STICKY;
@@ -88,10 +89,8 @@ public class OwnPositionService extends Service {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
         restartService.setPackage(this.getPackageName());
         PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
-                PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService =
-            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
     }
@@ -157,8 +156,7 @@ public class OwnPositionService extends Service {
         protected Boolean doInBackground(Void... arg0) {
             try {
                 // Authentify in order to communicate with NetworkClient
-                ServiceContainer.getNetworkClient().authServer(
-                    ServiceContainer.getSettingsManager().getUserName(),
+                ServiceContainer.getNetworkClient().authServer(ServiceContainer.getSettingsManager().getUserName(),
                     ServiceContainer.getSettingsManager().getFacebookID(),
                     ServiceContainer.getSettingsManager().getToken());
                 return true;
@@ -186,8 +184,8 @@ public class OwnPositionService extends Service {
 
                 // And try to run LocationManager with GPS Provider
                 if (mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME,
-                        MIN_GPS_DISTANCE, new MyLocationListener());
+                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME, MIN_GPS_DISTANCE,
+                        new MyLocationListener());
                 }
             } else {
                 // FIXME : Handle this case
