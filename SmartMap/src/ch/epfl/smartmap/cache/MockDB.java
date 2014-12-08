@@ -53,8 +53,8 @@ public class MockDB {
         CHRISTIE, MARIE));
 
     public static final Filter SWENG_TEAM = new DefaultFilter("Sweng Team");
-    public static final Filter EPFL_FRIENDS = new DefaultFilter("EPFL Friends");
 
+    public static final Filter EPFL_FRIENDS = new DefaultFilter("EPFL Friends");
     public static final ArrayList<Filter> FILTER_LIST = new ArrayList<Filter>(Arrays.asList(SWENG_TEAM,
         EPFL_FRIENDS));
 
@@ -75,12 +75,14 @@ public class MockDB {
 
     }
 
-    public static User getUserById(long id) {
-        if (id == 1) {
-            return MARIE;
-        } else {
-            return ALAIN;
+    public static User getFriend(long id) {
+        for (Displayable friend : FRIENDS_LIST) {
+            if (friend.getId() == id) {
+                return (User) friend;
+            }
+
         }
+        return null;
     }
 
     // public static final ArrayList<Displayable> EVENTS_LIST = new ArrayList<Displayable>(Arrays.asList(

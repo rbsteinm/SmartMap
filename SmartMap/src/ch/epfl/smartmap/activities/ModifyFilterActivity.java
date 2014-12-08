@@ -5,9 +5,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.os.Bundle;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnDragListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
@@ -24,8 +31,8 @@ public class ModifyFilterActivity extends Activity {
 
     private LinearLayout mInsideFilterLayout;
     private LinearLayout mOutsideFilterLayout;
-    private ListView mListInside;
-    private ListView mListOutside;
+    private ListView mListViewInside;
+    private ListView mListViewOutside;
     private List<User> mFriendsInside;
     private List<User> mFriendsOutside;
 
@@ -34,22 +41,42 @@ public class ModifyFilterActivity extends Activity {
 
     private final MockDB mockDB = new MockDB();
 
+    private OnItemLongClickListener mOnInsideItemLongClickListener;
+    private OnItemLongClickListener mOnOutsideItemLongClickListener;
+
+    private OnDragListener mFromInsideDragListener;
+    private OnDragListener mFromOutsideDragListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_modify_filter);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
+        // mCache=ServiceContainer.getCache();
+
         mInsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_inside_layout);
         mOutsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_outside_layout);
-        mListInside = (ListView) this.findViewById(R.id.activity_modify_filter_inside_list);
-        mListOutside = (ListView) this.findViewById(R.id.activity_modify_filter_outside_list);
+        mListViewInside = (ListView) this.findViewById(R.id.activity_modify_filter_inside_list);
+        mListViewOutside = (ListView) this.findViewById(R.id.activity_modify_filter_outside_list);
 
         mFriendsInside = new ArrayList<User>();
         mFriendsOutside = new ArrayList<User>();
 
-        // mCache=ServiceContainer.getCache();
+        mOnInsideItemLongClickListener = new OnInsideListItemLongClickListener();
+        mOnOutsideItemLongClickListener = new OnOutsideListItemLongClickListener();
 
+        mListViewInside.setOnItemLongClickListener(mOnInsideItemLongClickListener);
+        mListViewOutside.setOnItemLongClickListener(mOnOutsideItemLongClickListener);
+
+        mFromInsideDragListener = new ListInsideDragEventListener();
+        mFromOutsideDragListener = new ListOutsideDragEventListener();
+
+        mListViewInside.setOnDragListener(mFromInsideDragListener);
+        mOutsideFilterLayout.setOnDragListener(mFromInsideDragListener);
+
+        mListViewOutside.setOnDragListener(mFromOutsideDragListener);
+        mInsideFilterLayout.setOnDragListener(mFromOutsideDragListener);
     }
 
     /*
@@ -81,11 +108,11 @@ public class ModifyFilterActivity extends Activity {
 
         FriendListItemAdapter insideAdapter =
             new FriendListItemAdapter(this.getBaseContext(), mFriendsInside);
-        mListInside.setAdapter(insideAdapter);
+        mListViewInside.setAdapter(insideAdapter);
 
         FriendListItemAdapter outsideAdapter =
             new FriendListItemAdapter(this.getBaseContext(), mFriendsOutside);
-        mListOutside.setAdapter(outsideAdapter);
+        mListViewOutside.setAdapter(outsideAdapter);
 
     }
 
@@ -108,4 +135,171 @@ public class ModifyFilterActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    protected class ListInsideDragEventListener implements View.OnDragListener {
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            final int action = event.getAction();
+
+            switch (action) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    // All involved view accept ACTION_DRAG_STARTED for MIMETYPE_TEXT_PLAIN
+                    if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+                case DragEvent.ACTION_DRAG_ENTERED:
+
+                    return true;
+                case DragEvent.ACTION_DRAG_LOCATION:
+
+                    return true;
+                case DragEvent.ACTION_DRAG_EXITED:
+
+                    return true;
+                case DragEvent.ACTION_DROP:
+                    // Gets the item containing the dragged data
+                    ClipData.Item item = event.getClipData().getItemAt(0);
+
+                    // If apply only if drop on buttonTarget
+                    if (v.equals(mOutsideFilterLayout)) {
+                        Long droppedItemId = Long.valueOf(item.getText().toString());
+                        User droppedItem = mockDB.getFriend(droppedItemId);
+
+                        mFriendsInside.remove(droppedItem);
+                        mFriendsOutside.add(droppedItem);
+                        mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
+                            .getBaseContext(), mFriendsInside));
+                        mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
+                            .getBaseContext(), mFriendsOutside));
+
+                        // mFilter.removeUser(droppedItemId);
+
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+                case DragEvent.ACTION_DRAG_ENDED:
+
+                    return true;
+                default: // unknown case
+
+                    return false;
+
+            }
+        }
+    }
+
+    protected class ListOutsideDragEventListener implements View.OnDragListener {
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            final int action = event.getAction();
+
+            switch (action) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    // All involved view accept ACTION_DRAG_STARTED for MIMETYPE_TEXT_PLAIN
+                    if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+                case DragEvent.ACTION_DRAG_ENTERED:
+
+                    return true;
+                case DragEvent.ACTION_DRAG_LOCATION:
+
+                    return true;
+                case DragEvent.ACTION_DRAG_EXITED:
+
+                    return true;
+                case DragEvent.ACTION_DROP:
+                    // Gets the item containing the dragged data
+                    ClipData.Item item = event.getClipData().getItemAt(0);
+
+                    // If apply only if drop on buttonTarget
+                    if (v.equals(mInsideFilterLayout)) {
+                        Long droppedItemId = Long.valueOf(item.getText().toString());
+                        User droppedItem = mockDB.getFriend(droppedItemId);
+
+                        mFriendsInside.add(droppedItem);
+                        mFriendsOutside.remove(droppedItem);
+                        mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
+                            .getBaseContext(), mFriendsInside));
+                        mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
+                            .getBaseContext(), mFriendsOutside));
+
+                        // mFilter.addUser(droppedItemId);
+
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+                case DragEvent.ACTION_DRAG_ENDED:
+
+                    return true;
+                default: // unknown case
+
+                    return false;
+
+            }
+        }
+    }
+
+    private class OnInsideListItemLongClickListener implements OnItemLongClickListener {
+
+        /*
+         * (non-Javadoc)
+         * @see android.widget.AdapterView.OnItemLongClickListener#onItemLongClick(android.widget.AdapterView,
+         * android.view.View, int, long)
+         */
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+            // Selected item is passed as item in dragData
+            ClipData.Item item = new ClipData.Item(Long.toString(mFriendsInside.get(position).getId()));
+
+            String[] clipDescription = {ClipDescription.MIMETYPE_TEXT_PLAIN};
+            ClipData dragData = new ClipData(null, clipDescription, item);
+
+            view.startDrag(dragData, // ClipData
+                new View.DragShadowBuilder(view), // View.DragShadowBuilder
+                null, // Object myLocalState
+                0); // flags
+
+            return true;
+        }
+
+    }
+
+    private class OnOutsideListItemLongClickListener implements OnItemLongClickListener {
+
+        /*
+         * (non-Javadoc)
+         * @see android.widget.AdapterView.OnItemLongClickListener#onItemLongClick(android.widget.AdapterView,
+         * android.view.View, int, long)
+         */
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+            // Selected item is passed as item in dragData
+            ClipData.Item item = new ClipData.Item(Long.toString(mFriendsOutside.get(position).getId()));
+
+            String[] clipDescription = {ClipDescription.MIMETYPE_TEXT_PLAIN};
+            ClipData dragData = new ClipData(null, clipDescription, item);
+
+            view.startDrag(dragData, // ClipData
+                new View.DragShadowBuilder(view), // View.DragShadowBuilder
+                null, // Object myLocalState
+                0); // flags
+
+            return true;
+        }
+
+    }
 }
