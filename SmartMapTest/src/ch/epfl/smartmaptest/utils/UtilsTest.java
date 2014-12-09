@@ -87,6 +87,16 @@ public class UtilsTest extends AndroidTestCase {
 
     }
 
+    public void testLastSeen100Years() {
+        Calendar hundredYearsAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        hundredYearsAgo.add(Calendar.YEAR, -100);
+
+        assertEquals(
+            ServiceContainer.getSettingsManager().getContext()
+                .getString(R.string.utils_never_seen_on_smartmap),
+            Utils.getLastSeenStringFromCalendar(hundredYearsAgo));
+    }
+
     public void testLastSeenFiveMins() {
         Calendar fiveMinsAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
         fiveMinsAgo.add(Calendar.MINUTE, -5);
@@ -94,10 +104,6 @@ public class UtilsTest extends AndroidTestCase {
         assertEquals(
             "5 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago),
             Utils.getLastSeenStringFromCalendar(fiveMinsAgo));
-    }
-
-    public void testLastSeenFiveYears() {
-
     }
 
     public void testLastSeenNow() {
