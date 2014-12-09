@@ -34,8 +34,9 @@ public class ProfileActivity extends Activity {
     protected void onResume() {
         super.onResume();
         mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
-        // TODO find a way to get user's own profile picture/subtitles, should be stored in the cache
-        mSubtitlesView.setText("mock subtitles");
+        // TODO find a way to get user's own profile picture/, should be stored in the cache
+        mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
+
     }
 
     @Override
