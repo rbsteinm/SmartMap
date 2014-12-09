@@ -55,7 +55,7 @@ public class UserInformationActivity extends Activity {
                 });
 
             } catch (SmartMapClientException e) {
-                Log.e(TAG, "SmartMapClientException : " + e);
+                Log.e(TAG, "Error while removing friend: " + e);
                 confirmString = e.getMessage();
             }
             return confirmString;
@@ -124,7 +124,8 @@ public class UserInformationActivity extends Activity {
         mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
         mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
         // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override

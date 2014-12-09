@@ -95,7 +95,8 @@ public class InvitationsService extends Service {
             protected Boolean doInBackground(Void... arg0) {
                 try {
                     // Authentify in order to communicate with NetworkClient
-                    ServiceContainer.getNetworkClient().authServer(ServiceContainer.getSettingsManager().getUserName(),
+                    ServiceContainer.getNetworkClient().authServer(
+                        ServiceContainer.getSettingsManager().getUserName(),
                         ServiceContainer.getSettingsManager().getFacebookID(),
                         ServiceContainer.getSettingsManager().getToken());
                     return true;
@@ -120,8 +121,10 @@ public class InvitationsService extends Service {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
         restartService.setPackage(this.getPackageName());
         PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
+                PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService =
+            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
     }

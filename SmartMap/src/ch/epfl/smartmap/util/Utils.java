@@ -38,8 +38,9 @@ public class Utils {
     public static final String NEVER_SEEN = "Never seen on SmartMap";
 
     public static double distanceToMe(LatLng latLng) {
-        return Math.sqrt(Math.pow(latLng.latitude - ServiceContainer.getSettingsManager().getLocation().getLatitude(),
-                2) + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+        return Math.sqrt(Math.pow(latLng.latitude
+            - ServiceContainer.getSettingsManager().getLocation().getLatitude(), 2)
+            + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
     }
 
     public static String getCityFromLocation(Location location) {
@@ -50,7 +51,8 @@ public class Utils {
         Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
 
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
                 return addresses.get(0).getLocality();
             } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
@@ -71,7 +73,8 @@ public class Utils {
         Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
 
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {
@@ -91,7 +94,7 @@ public class Utils {
         if (yearsDiff == 0) {
             if (daysDiff > 7) {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                        + calendar.get(Calendar.YEAR);
+                    + calendar.get(Calendar.YEAR);
             } else if (daysDiff > 1) {
                 return "Next " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else if (daysDiff == 1) {
@@ -104,17 +107,18 @@ public class Utils {
                 return "Last " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                        + calendar.get(Calendar.YEAR);
+                    + calendar.get(Calendar.YEAR);
             }
         } else {
             return formatForClock(calendar.get(Calendar.DAY_OF_MONTH)) + "."
-                    + formatForClock(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
+                + formatForClock(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
         }
     }
 
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
-        long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
+        long diff =
+            GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
                 - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
@@ -150,7 +154,8 @@ public class Utils {
     }
 
     public static String getTimeString(Calendar calendar) {
-        return formatForClock(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + formatForClock(calendar.get(Calendar.MINUTE));
+        return formatForClock(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
+            + formatForClock(calendar.get(Calendar.MINUTE));
     }
 
     public static void setBadgeCount(Context context, LayerDrawable icon, int count) {

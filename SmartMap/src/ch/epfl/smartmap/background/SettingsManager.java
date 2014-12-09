@@ -134,9 +134,7 @@ public final class SettingsManager {
         }
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(ServiceContainer.getSettingsManager().getLastSeen());
-        String subtitle =
-            Utils.getLastSeenStringFromCalendar(calendar) + " near "
-                + this.getLocationName();
+        String subtitle = Utils.getLastSeenStringFromCalendar(calendar) + " near " + this.getLocationName();
         return subtitle;
     }
 
@@ -145,7 +143,8 @@ public final class SettingsManager {
     }
 
     /**
-     * @return the time to wait in milliseconds before hiding inactive friends from the map. Or the int value -1 if the
+     * @return the time to wait in milliseconds before hiding inactive friends from the map. Or the int value
+     *         -1 if the
      *         user never wants to hide inactive friends.
      * @author SpicyCH
      */
@@ -209,45 +208,53 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event invitations and the user activated the
+     * @return <code>true</code> if the user enabled the notifications for event invitations and the user
+     *         activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_event_invitations), true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(mContext.getString(R.string.settings_key_notifications_event_invitations), true)
+            : false;
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event proximity and the user activated the
+     * @return <code>true</code> if the user enabled the notifications for event proximity and the user
+     *         activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_event_proximity), true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(mContext.getString(R.string.settings_key_notifications_event_proximity), true)
+            : false;
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for friend requests and the user activated the
+     * @return <code>true</code> if the user enabled the notifications for friend requests and the user
+     *         activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_friend_requests), true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(mContext.getString(R.string.settings_key_notifications_friend_requests), true)
+            : false;
     }
 
     /**
      * A friendship confirmation happens when another user accepts your friend request.
      * 
-     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the user
+     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
+     *         user
      *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_friendship_confirmations), true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(mContext.getString(R.string.settings_key_notifications_friendship_confirmations),
+                true) : false;
     }
 
     /**
@@ -256,8 +263,8 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsVibrate() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
     }
 
     /**
@@ -392,7 +399,8 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user wants to see his private events on his map, <code>false</code> otherwise.
+     * @return <code>true</code> if the user wants to see his private events on his map, <code>false</code>
+     *         otherwise.
      * @author SpicyCH
      */
     public boolean showPrivateEvents() {
@@ -401,7 +409,8 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user wants to see public events on his map, <code>false</code> otherwise.
+     * @return <code>true</code> if the user wants to see public events on his map, <code>false</code>
+     *         otherwise.
      * @author SpicyCH
      */
     public boolean showPublicEvents() {
