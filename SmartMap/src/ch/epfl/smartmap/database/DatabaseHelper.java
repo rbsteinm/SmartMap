@@ -528,17 +528,18 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     public List<Long> getFilterIds() {
         List<Long> filterIds = new ArrayList<Long>();
-        String query = "SELECT  * FROM " + TABLE_FILTER;
-
-        Cursor cursor = mDatabase.rawQuery(query, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                filterIds.add(cursor.getLong(cursor.getColumnIndex(KEY_FILTER_ID)));
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
+        // FIXME
+        // String query = "SELECT  * FROM " + TABLE_FILTER;
+        //
+        // Cursor cursor = mDatabase.rawQuery(query, null);
+        //
+        // if (cursor.moveToFirst()) {
+        // do {
+        // filterIds.add(cursor.getLong(cursor.getColumnIndex(KEY_FILTER_ID)));
+        // } while (cursor.moveToNext());
+        // }
+        //
+        // cursor.close();
         return filterIds;
 
     }

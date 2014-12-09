@@ -69,7 +69,7 @@ public class DefaultFilter implements Filter {
      */
     @Override
     public Bitmap getImage() {
-        return Displayable.DEFAULT_IMAGE;
+        return Filter.DEFAULT_IMAGE;
     }
 
     @Override
