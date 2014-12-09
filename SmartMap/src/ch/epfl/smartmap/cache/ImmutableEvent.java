@@ -7,9 +7,12 @@ import java.util.Set;
 import android.location.Location;
 
 /**
- * This class only acts as a container of all the informations we may want to pass to an event. It doesn't do
- * any check for null/wrong values. You can use this class to create an Event (Beware having set all the
- * required fields then), or just to update the infotmations on an Event (you can then use null values if you
+ * This class only acts as a container of all the informations we may want to
+ * pass to an event. It doesn't do
+ * any check for null/wrong values. You can use this class to create an Event
+ * (Beware having set all the
+ * required fields then), or just to update the infotmations on an Event (you
+ * can then use null values if you
  * don't want to update a field).
  * 
  * @author jfperren
@@ -141,8 +144,8 @@ public class ImmutableEvent {
         return this;
     }
 
-    public ImmutableEvent setParticipants(Set<User> newParticipants) {
-        mParticipants = newParticipants;
+    public ImmutableEvent setParticipantIds(Set<Long> newParticipantIds) {
+        mParticipantIds = newParticipantIds;
         return this;
     }
 

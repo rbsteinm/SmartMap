@@ -24,11 +24,9 @@ import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
- * The Cache contains all instances of network objects that are used by the GUI.
- * Therefore, every request to
+ * The Cache contains all instances of network objects that are used by the GUI. Therefore, every request to
  * find an
- * user or an event should go through it. It will automatically fill itself with
- * the database on creation, and
+ * user or an event should go through it. It will automatically fill itself with the database on creation, and
  * then
  * updates the database as changes are made.
  * 
@@ -36,7 +34,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class Cache {
 
-    private static final String TAG = Cache.class.getSimpleName();
+    static final public String TAG = Cache.class.getSimpleName();
 
     // SparseArrays containing live instances
     private LongSparseArray<User> mUserInstances;
@@ -48,6 +46,7 @@ public class Cache {
     private final Set<Long> mUserIds;
     private final Set<Long> mEventIds;
     private final Set<Long> mFilterIds;
+
     private final Set<Long> mInvitationIds;
     private final Set<Long> mInvitingFriendsIds;
 
@@ -81,8 +80,9 @@ public class Cache {
     }
 
     /**
-     * Called when the user accepts an invitation. If it's a friend, it's added to the cache
-     * and if it's an event the user joins it and it's infos are re-updated
+     * Called when the user accepts an invitation. If it's a friend, it's added to the cache and if it's an
+     * event the
+     * user joins it and it's infos are re-updated
      * 
      * @param invitation
      * @param callback
@@ -127,6 +127,38 @@ public class Cache {
      */
     public synchronized void addOnCacheListener(CacheListener listener) {
         mListeners.add(listener);
+    }
+
+    /**
+     * @param ids
+     * @param event
+     * @param callback
+     */
+    public synchronized void addParticipantsToEvent(Set<Long> ids, Event event,
+        final NetworkRequestCallback callback) {
+        Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
+        newParticipantIds.addAll(ids);
+
+        final ImmutableEvent newImmutableEvent =
+            event.getImmutableCopy().setParticipantIds(newParticipantIds);
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceContainer.getNetworkClient().updateEvent(newImmutableEvent);
+                    ServiceContainer.getCache().updateEvent(newImmutableEvent);
+                    if (callback != null) {
+                        callback.onSuccess();
+                    }
+                } catch (SmartMapClientException e) {
+                    if (callback != null) {
+                        callback.onFailure();
+                    }
+                }
+                return null;
+            }
+        }.execute();
     }
 
     /**
@@ -608,38 +640,30 @@ public class Cache {
 
     public synchronized void putEvents(Set<ImmutableEvent> newEvents) {
         for (final ImmutableEvent newEvent : newEvents) {
+            // Fetch Creator
+            ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(),
+                new SearchRequestCallback<User>() {
+                    @Override
+                    public synchronized void onNetworkError() {
+                        // Don't add
+                    }
 
-            mEventIds.add(newEvent.getId());
-            if (this.getUser(newEvent.getId()) != null) {
-                mEventInstances.put(newEvent.getId(),
-                    new PublicEvent(newEvent.setCreator(this.getUser(newEvent.getId()))));
-            } else {
-                // Put unknown Creator
-                mEventInstances.put(newEvent.getId(), new PublicEvent(newEvent.setCreator(User.NOBODY)));
-                // & Fetch Creator online
-                ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(),
-                    new SearchRequestCallback<User>() {
-                        @Override
-                        public void onNetworkError() {
-                            // Don't add
+                    @Override
+                    public synchronized void onNotFound() {
+                        // Don't add
+                    }
+
+                    @Override
+                    public synchronized void onResult(User result) {
+                        mEventIds.add(newEvent.getId());
+                        mEventInstances.put(newEvent.getId(), new PublicEvent(newEvent.setCreator(result)));
+
+                        // Notify listeners
+                        for (CacheListener listener : mListeners) {
+                            listener.onEventListUpdate();
                         }
-
-                        @Override
-                        public void onNotFound() {
-                            // Don't add
-                        }
-
-                        @Override
-                        public void onResult(User result) {
-                            Cache.this.updateEvent(newEvent.setCreator(result));
-                        }
-                    });
-            }
-
-            // Notify listeners
-            for (CacheListener listener : mListeners) {
-                listener.onEventListUpdate();
-            }
+                    }
+                });
         }
     }
 
@@ -705,7 +729,25 @@ public class Cache {
             if (mInvitationInstances.get(newInvitation.getId()) == null) {
                 // Need to add it, give it to the database to get the id
                 final long id = ServiceContainer.getDatabase().addInvitation(newInvitation);
-                mInvitationInstances.put(id, new GenericInvitation(newInvitation.setId(id)));
+                ServiceContainer.getSearchEngine().findStrangerById(id, new SearchRequestCallback<User>() {
+
+                    @Override
+                    public synchronized void onNetworkError() {
+                        // TODO
+                    }
+
+                    @Override
+                    public synchronized void onNotFound() {
+                        // TODO
+                    }
+
+                    @Override
+                    public synchronized void onResult(User result) {
+                        mInvitationIds.add(id);
+                        mInvitationInstances.put(id, new GenericInvitation(newInvitation.setUser(result)
+                            .setId(id)));
+                    }
+                });
             }
         }
 
@@ -865,6 +907,38 @@ public class Cache {
                 l.onFriendListUpdate();
             }
         }
+    }
+
+    /**
+     * @param ids
+     * @param event
+     * @param callback
+     */
+    public synchronized void removeParticipantsFromEvent(Set<Long> ids, Event event,
+        final NetworkRequestCallback callback) {
+        Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
+        newParticipantIds.removeAll(ids);
+
+        final ImmutableEvent newImmutableEvent =
+            event.getImmutableCopy().setParticipantIds(newParticipantIds);
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceContainer.getNetworkClient().updateEvent(newImmutableEvent);
+                    ServiceContainer.getCache().updateEvent(newImmutableEvent);
+                    if (callback != null) {
+                        callback.onSuccess();
+                    }
+                } catch (SmartMapClientException e) {
+                    if (callback != null) {
+                        callback.onFailure();
+                    }
+                }
+                return null;
+            }
+        }.execute();
     }
 
     public synchronized void retainEvents(List<Long> ids) {

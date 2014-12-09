@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- NOTE: The app authors are shown in AboutActivity -->
+    <string-array name="app_authors">
+        <item>Robin Genolet</item>
+        <item>Julien Perrenoud</item>
+        <item>Matthieu Girod</item>
+        <item>Alain Milliet</item>
+        <item>Nicolas Ritter</item>
+        <item>Raphaël Steinmann</item>
+        <item>Hugo Sbai</item>
+        <item>Marion Sbai</item>
+    </string-array>
+    
+    <!-- NOTE: The special thanks list is also shown in AboutActivity -->
+    <string-array name="app_special_thanks">
+        <item>Prof. James Larus</item>
+        <item>Călin Iorgulescu</item>
+        <item>Lukas Kellenberger</item>
+    </string-array>
+
     <string name="app_name">SmartMap</string>
     <string name="action_settings">Settings</string>
     <string name="action_showfriends">Show friends</string>
@@ -22,7 +41,7 @@
     </string-array>
 
     <string name="title_activity_pager">Friends</string>
-    <string name="search_bar_hint">Search...</string>
+    <string name="search_bar_hint">Search…</string>
     <string name="title_activity_map_fragment">MapFragment</string>
 
     <!-- User interface labels and strings -->
@@ -74,7 +93,7 @@
 
     <!-- StartActivity -->
     <string name="welcome">W E L C O M E</string>
-    <string name="loading_text">Logging in...</string>
+    <string name="loading_text">Logging in…</string>
     <string name="logo_description">logo</string>
 
     <!-- ShowEventsActivity -->
@@ -84,11 +103,11 @@
     <string name="ShowEventsCheckBoxStatus">Ongoing</string>
     <string name="showEventsMenuNewEvent">Create a new event</string>
     <string name="show_event_on_the_map_button">Show on the map</string>
-    <string name="show_event_on_the_map_loading">Opening event on the map...</string>
+    <string name="show_event_on_the_map_loading">Opening event on the map…</string>
     <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
     <string name="show_event_details_button">See details</string>
     <string name="show_event_server_error">Couldn\'t fetch wished content from our server, sorry :(</string>
-    <string name="show_event_loading_info">Loading informations...</string>
+    <string name="show_event_loading_info">Loading informations…</string>
     <string name="show_events_menu_refresh">Refresh</string>
 
     <!-- EventsListItemAdapter -->
@@ -103,10 +122,22 @@
     <string name="events_list_item_adapter_to">to</string>
 
     <!-- ShowEventInformationActivity -->
+    <string name="event_info_title_text">Title</string>
+    <string name="event_info_when_text">When</string>
+    <string name="event_info_by_text">Created by</string>
+    <string name="event_info_description_text">Description</string>
+    <string name="event_info_where_text">Where</string>
+    <string name="event_info_going_text">Going</string>
+    <string name="event_info_participants_text">Participants</string>
     <string name="title_activity_show_event_information">Show event</string>
     <string name="show_event_info_invite_friends_button">Invite friends</string>
     <string name="show_event_by">By</string>
-    <string name="show_event_info_event_description">Description</string>
+    <string name="show_event_info_event_no_description">No Description given</string>
+    <string name="participant_img_content_description">participant image</string>
+    <string name="add_participant_failure">Failure while adding participants</string>
+    <string name="add_participant_success">Successfully added participants</string>
+    <string name="refresh_participants_network_error">Network Error while getting participants</string>
+    <string name="refresh_participants_not_found">Couldn\'t find participants</string>
 
     <!-- Error Messages -->
     <string name="error_client_side">An error occurred on our side, sorry :(</string>
@@ -214,7 +245,7 @@
     <string name="settings_key_events_show_public">events_show_public</string>
     <string name="settings_key_events_show_private">events_show_private</string>
     <string name="settings_key_max_distance_fetch_events">events_fetch_distance</string>
-    
+
     <!-- SettingsManager -->
     <string name="settings_manager_default_name">No name</string>
     <string name="settings_manager_default_number">No number</string>
@@ -237,7 +268,7 @@
     <string name="about_dummy_copyright">© 2014</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    
+
     <!-- Utils -->
     <string name="utils_never_seen_on_smartmap">Never seen on SmartMap</string>
     <string name="utils_next">Next</string>
@@ -250,11 +281,12 @@
     <string name="utils_minutes_ago">minutes ago</string>
     <string name="utils_one_hour_ago">1 hour ago</string>
     <string name="utils_hours_ago">hours ago</string>
-    <string name="utils_days_ago">daya ago</string>
+    <string name="utils_days_ago">days ago</string>
 
-    <!-- Nothing below this line! -->
-
+    <!-- ProfileActivity -->
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="hello_world">Hello world!</string>
+
+    <!-- Nothing below this line! -->
 
 </resources>
