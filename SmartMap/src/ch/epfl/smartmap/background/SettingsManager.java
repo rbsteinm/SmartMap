@@ -70,6 +70,10 @@ public final class SettingsManager {
         return mEditor.commit();
     }
 
+    public Context getContext() {
+        return mContext;
+    }
+
     /**
      * @return The session cookie if it is found, DEFAULT_COOKIE value otherwise
      */
@@ -107,6 +111,10 @@ public final class SettingsManager {
         return loc;
     }
 
+    public String getLocationName() {
+        return mSharedPref.getString(LOCATION_NAME, DEFAULT_LOC_NAME);
+    }
+
     /**
      * @return the maximum distance from the user, in meters, for which we can fetch events.<br />
      *         Special cases: 0 if the user selected 'None' and 41'000'000 if the user selected 'All'.
@@ -136,10 +144,6 @@ public final class SettingsManager {
         calendar.setTimeInMillis(ServiceContainer.getSettingsManager().getLastSeen());
         String subtitle = Utils.getLastSeenStringFromCalendar(calendar) + " near " + this.getLocationName();
         return subtitle;
-    }
-
-    public String getLocationName() {
-        return mSharedPref.getString(LOCATION_NAME, DEFAULT_LOC_NAME);
     }
 
     /**
@@ -246,8 +250,20 @@ public final class SettingsManager {
     /**
      * A friendship confirmation happens when another user accepts your friend request.
      * 
+<<<<<<< HEAD
      * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
      *         user
+=======
+     <<<<<<< HEAD
+     * 
+     * @return <code>true</code> if the user enabled the notifications for
+     *         friendship confirmations and the
+     *         user
+     *         =======
+     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
+     *         user
+     *         >>>>>>> 39092ebfcd7ec3e217b3d3b2da359e53a13b9813
+>>>>>>> ca50153cb0116b66bbf459435c04b7988e8acd96
      *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */

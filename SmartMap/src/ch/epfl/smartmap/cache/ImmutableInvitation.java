@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.cache;
 
+
 /**
  * Immutable implementation of Invitation, which serves only as container
  * purposes,

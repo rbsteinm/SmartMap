@@ -44,8 +44,7 @@ public class AddFriendActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_add_friend);
         // Set action bar color to main color
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
@@ -126,15 +125,25 @@ public class AddFriendActivity extends ListActivity {
 
         @Override
         public void onNetworkError() {
-            Toast.makeText(AddFriendActivity.this.getBaseContext(),
-                "Couldn't find friends due to a network error. Please try again later.", Toast.LENGTH_LONG)
-                .show();
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                        "Couldn't find friends due to a network error. Please try again later.", Toast.LENGTH_LONG)
+                        .show();
+                }
+            });
         }
 
         @Override
         public void onNotFound() {
-            Toast.makeText(AddFriendActivity.this.getBaseContext(), "No user found for this query.",
-                Toast.LENGTH_LONG).show();
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(AddFriendActivity.this.getBaseContext(), "No user found for this query.",
+                        Toast.LENGTH_LONG).show();
+                }
+            });
         }
 
         @Override
@@ -163,14 +172,24 @@ public class AddFriendActivity extends ListActivity {
 
                 @Override
                 public void onFailure() {
-                    Toast.makeText(AddFriendActivity.this.getBaseContext(),
-                        "Friend request sent couldn't be sent.", Toast.LENGTH_SHORT).show();
+                    AddFriendActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                                "Friend request sent couldn't be sent.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
 
                 @Override
                 public void onSuccess() {
-                    Toast.makeText(AddFriendActivity.this.getBaseContext(), "Friend request sent !",
-                        Toast.LENGTH_SHORT).show();
+                    AddFriendActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(AddFriendActivity.this.getBaseContext(), "Friend request sent !",
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             });
             return null;

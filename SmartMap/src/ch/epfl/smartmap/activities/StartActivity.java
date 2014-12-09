@@ -24,14 +24,12 @@ import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-import ch.epfl.smartmap.util.Utils;
 
 import com.facebook.Session;
 
 /**
- * This Activity displays the introduction to the app and the authentication if
- * you are not already logged in,
- * in the other case it just loads mainActivity
+ * This Activity displays the introduction to the app and the authentication if you are not already logged in, in the
+ * other case it just loads mainActivity
  * 
  * @author agpmilli
  * @author SpicyCH
@@ -46,27 +44,6 @@ public class StartActivity extends FragmentActivity {
     private ProgressBar mProgressBar;
     private TextView mProgressText;
     private com.facebook.widget.LoginButton mLoginButton;
-
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
-        }
-
-        int auditErrors = 0;
-        // auditErrors += mSearchEngine.auditErrors(depth - 1);
-        // What are the rep invariants?
-
-        return auditErrors;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,13 +62,12 @@ public class StartActivity extends FragmentActivity {
         // Displays the facebook app hash in LOG.d
         try {
             Log.d(TAG, "Retrieving sha1 app hash...");
-            PackageInfo info =
-                this.getPackageManager().getPackageInfo("ch.epfl.smartmap", PackageManager.GET_SIGNATURES);
+            PackageInfo info = this.getPackageManager().getPackageInfo("ch.epfl.smartmap",
+                    PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
             }
-            Utils.sContext = this;
         } catch (NameNotFoundException e) {
             Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
         } catch (NoSuchAlgorithmException e) {
@@ -135,7 +111,7 @@ public class StartActivity extends FragmentActivity {
                 public void run() {
                     mFacebookFragment = new LoginFragment();
                     StartActivity.this.getSupportFragmentManager().beginTransaction()
-                        .add(android.R.id.content, mFacebookFragment).commit();
+                            .add(android.R.id.content, mFacebookFragment).commit();
                     Log.d(TAG, "facebook session is open");
                 }
             }, timeOut);
@@ -160,6 +136,26 @@ public class StartActivity extends FragmentActivity {
         ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplication()));
         ServiceContainer.setCache(new Cache());
         ServiceContainer.setSearchEngine(new CachedSearchEngine());
+    }
+
+    /**
+     * Checks that the Representation Invariant is not violated.
+     * 
+     * @param depth
+     *            represents how deep the audit check is done (use 1 to check this object only)
+     * @return The number of audit errors in this object
+     */
+    public int auditErrors(int depth) {
+        // TODO : Decomment when auditErrors coded for other classes
+        if (depth == 0) {
+            return 0;
+        }
+
+        int auditErrors = 0;
+        // auditErrors += mSearchEngine.auditErrors(depth - 1);
+        // What are the rep invariants?
+
+        return auditErrors;
     }
 
     @Override

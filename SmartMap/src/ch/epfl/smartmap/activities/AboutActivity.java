@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
+import java.util.TimeZone;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -212,7 +213,7 @@ public class AboutActivity extends Activity {
         }
 
         // Display the copyright
-        GregorianCalendar now = new GregorianCalendar();
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
         String year = Integer.toString(now.get(Calendar.YEAR));
         String copyrightMsg = "\u00a9 " + year;
 
