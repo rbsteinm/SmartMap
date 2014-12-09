@@ -24,10 +24,11 @@ import com.google.android.gms.maps.model.LatLng;
  * Class that count the redraw badge on app icon
  * 
  * @author agpmilli
+ * @author jfperren
+ * @author SpicyCH
  */
 public class Utils {
 
-    public static Context sContext;
     public static final long ONE_SECOND = 1000;
     public static final long ONE_MINUTE = 60 * ONE_SECOND;
     public static final long ONE_HOUR = 60 * ONE_MINUTE;
@@ -36,6 +37,7 @@ public class Utils {
     public static final long ONE_YEAR = 365 * ONE_DAY;
 
     public static final String NEVER_SEEN = "Never seen on SmartMap";
+    private static Context mContext;
 
     public static double distanceToMe(LatLng latLng) {
         return Math.sqrt(Math.pow(latLng.latitude - ServiceContainer.getSettingsManager().getLocation().getLatitude(),
@@ -47,7 +49,8 @@ public class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
+        mContext = ServiceContainer.getSettingsManager().getContext();
+        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
 
         try {
             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
@@ -68,7 +71,7 @@ public class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
+        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
 
         try {
             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);

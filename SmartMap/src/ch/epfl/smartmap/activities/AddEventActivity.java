@@ -3,6 +3,7 @@ package ch.epfl.smartmap.activities;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.TimeZone;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -246,7 +247,7 @@ public class AddEventActivity extends FragmentActivity {
             GregorianCalendar end = this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText()
                     .toString());
 
-            GregorianCalendar now = new GregorianCalendar();
+            Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
 
             // Needed to let the user click the default time without errors.
             now.add(GregorianCalendar.MINUTE, -1);
@@ -406,7 +407,7 @@ public class AddEventActivity extends FragmentActivity {
         mPickEndDate.addTextChangedListener(mTextChangedListener);
         mPickEndTime.addTextChangedListener(mTextChangedListener);
 
-        GregorianCalendar now = new GregorianCalendar();
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
 
         mPickStartTime.setText(TimePickerFragment.formatForClock(now.get(Calendar.HOUR_OF_DAY)) + ":"
                 + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));
