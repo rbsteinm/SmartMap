@@ -36,7 +36,9 @@ public class Utils {
     public static final long TEN_DAYS = 10 * ONE_DAY;
     public static final long ONE_YEAR = 365 * ONE_DAY;
 
-    public static final String NEVER_SEEN = "Never seen on SmartMap";
+    public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
+            .getString(R.string.utils_never_seen_on_smartmap);
+
     private static Context mContext;
 
     public static double distanceToMe(LatLng latLng) {
@@ -96,15 +98,17 @@ public class Utils {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
                         + calendar.get(Calendar.YEAR);
             } else if (daysDiff > 1) {
-                return "Next " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
+                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else if (daysDiff == 1) {
-                return "Tomorrow";
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
             } else if (daysDiff == 0) {
-                return "Today";
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
             } else if (daysDiff == -1) {
-                return "Yesterday";
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else if (daysDiff > -7) {
-                return "Last " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
+                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
                         + calendar.get(Calendar.YEAR);
@@ -122,33 +126,36 @@ public class Utils {
 
         if (diff < ONE_MINUTE) {
             // Give time in seconds
-            return "Now";
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_now);
         } else if (diff < ONE_HOUR) {
             // Give time in minutes
             int minutes = (int) (diff / ONE_MINUTE);
             if (minutes == 1) {
-                return "1 minute ago";
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
             } else {
-                return "" + minutes + " minutes ago";
+                return minutes + " "
+                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
             }
         } else if (diff < ONE_DAY) {
             // Give time hours
             int hours = (int) (diff / ONE_HOUR);
             if (hours == 1) {
-                return "1 hour ago";
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_hour_ago);
             } else {
-                return "" + hours + " hours ago";
+                return "" + hours + " "
+                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
             }
         } else if (diff < ONE_YEAR) {
             // Give time in days
             int days = (int) (diff / ONE_DAY);
             if (days == 1) {
-                return "Yesterday";
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else {
-                return "" + days + " days ago";
+                return "" + days + " "
+                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
             }
         } else {
-            return "Never seen on SmartMap";
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
         }
     }
 
