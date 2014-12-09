@@ -13,12 +13,12 @@ import android.test.RenamingDelegatingContext;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.ServerFeedbackException;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * Tests whether we can interact with the real SmartMap server.

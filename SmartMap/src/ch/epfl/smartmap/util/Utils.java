@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.gui;
+package ch.epfl.smartmap.util;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -16,6 +16,7 @@ import android.location.Location;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.gui.BadgeDrawable;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -37,9 +38,8 @@ public class Utils {
     public static final String NEVER_SEEN = "Never seen on SmartMap";
 
     public static double distanceToMe(LatLng latLng) {
-        return Math.sqrt(Math.pow(latLng.latitude
-            - ServiceContainer.getSettingsManager().getLocation().getLatitude(), 2)
-            + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+        return Math.sqrt(Math.pow(latLng.latitude - ServiceContainer.getSettingsManager().getLocation().getLatitude(),
+            2) + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
     }
 
     public static String getCityFromLocation(Location location) {
@@ -50,8 +50,7 @@ public class Utils {
         Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
 
         try {
-            List<Address> addresses =
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
                 return addresses.get(0).getLocality();
             } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
@@ -72,8 +71,7 @@ public class Utils {
         Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
 
         try {
-            List<Address> addresses =
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {

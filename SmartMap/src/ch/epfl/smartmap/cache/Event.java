@@ -10,7 +10,7 @@ import java.util.TimeZone;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * Describes an event

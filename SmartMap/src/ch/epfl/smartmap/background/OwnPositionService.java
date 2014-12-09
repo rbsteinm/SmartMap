@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,9 +15,9 @@ import android.os.SystemClock;
 import android.util.Log;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * @author jfperren
@@ -100,12 +99,12 @@ public class OwnPositionService extends Service {
         protected void onPostExecute(Boolean result) {
             if (result) {
                 // Creates a Criteria, used to chose LocationManager settings
-                Criteria criteria = new Criteria();
-                criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
-
-                mLocManager.requestSingleUpdate(criteria, new MyLocationListener(), null);
-
+                // Criteria criteria = new Criteria();
+                // criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                // criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
+                Log.d(TAG, "Avant de get une fois notre position");
+                mLocManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new MyLocationListener(), null);
+                Log.d(TAG, "Après de get une fois notre position");
                 // Try to run LocationManager with Network Provider
                 if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                     mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_TIME,

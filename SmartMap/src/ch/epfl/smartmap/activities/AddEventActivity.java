@@ -1,18 +1,13 @@
 package ch.epfl.smartmap.activities;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -35,6 +30,7 @@ import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
 import ch.epfl.smartmap.map.DefaultZoomManager;
+import ch.epfl.smartmap.util.Utils;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -78,6 +74,8 @@ public class AddEventActivity extends FragmentActivity {
         }
     }
 
+    public static final String LOCATION_EXTRA = "LOCATION";
+
     private static final String TAG = AddEventActivity.class.getSimpleName();
 
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
@@ -89,8 +87,10 @@ public class AddEventActivity extends FragmentActivity {
     private static final int INDEX_MONTH = 1;
 
     private static final int INDEX_DAY = 0;
+    private static final String TIME_PICKER_DESCR = "timePicker";
 
-    public static final String LOCATION_EXTRA = "LOCATION";
+    private static final String DATE_PICKER_DESCR = "datePicker";
+
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
     private LatLng mEventPosition;
@@ -109,8 +109,7 @@ public class AddEventActivity extends FragmentActivity {
 
     /**
      * @return <code>true</code> if all the fields (event name, event dates,
-     *         etc...) are legally set and the
-     *         event is
+     *         etc...) are legally set and the event is
      *         ready to be created.
      * @author SpicyCH
      */
@@ -126,8 +125,7 @@ public class AddEventActivity extends FragmentActivity {
 
     /**
      * Ensures the end of the event is after its start and end of the event is
-     * not in the past. Displays a
-     * toast and
+     * not in the past. Displays a toast and
      * reset the bad field set by the user if necessary.
      * 
      * @param startDate
@@ -156,16 +154,14 @@ public class AddEventActivity extends FragmentActivity {
                 // The user is trying to create the end of the event before its
                 // start!
 
-                endDate.setText("");
-                endTime.setText("");
+                this.resetEndOfEvent(endDate, endTime);
 
                 Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
                     Toast.LENGTH_LONG).show();
             } else if (end.before(now)) {
                 // The user is trying to create an event in the past
 
-                endDate.setText("");
-                endTime.setText("");
+                this.resetEndOfEvent(endDate, endTime);
 
                 Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_end_cannot_be_in_past),
                     Toast.LENGTH_LONG).show();
@@ -260,14 +256,13 @@ public class AddEventActivity extends FragmentActivity {
             mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
             mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
+            mGoogleMap.clear();
+
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
 
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer.getSettingsManager()
                 .getLocation().getLatitude(), ServiceContainer.getSettingsManager().getLocation().getLongitude()));
             Log.d(TAG, " " + mGoogleMap.getMyLocation());
-            // new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new
-            // LatLng(mGoogleMap.getMyLocation().getLatitude(),
-            // mGoogleMap.getMyLocation().getLatitude()));
 
         }
     }
@@ -309,6 +304,7 @@ public class AddEventActivity extends FragmentActivity {
         mPlaceName = (EditText) this.findViewById(R.id.addEventPlaceName);
 
         mPlaceName.setFocusable(true);
+
         // Initialize mEventPosition to position of user
         mEventPosition =
             new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
@@ -331,7 +327,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new TimePickerFragment(mPickStartTime);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), "timePicker");
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), TIME_PICKER_DESCR);
             }
 
         });
@@ -344,7 +340,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment(mPickStartDate);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), "datePicker");
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER_DESCR);
             }
         });
 
@@ -353,7 +349,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment(mPickEndDate);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), "datePicker");
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER_DESCR);
             }
         });
 
@@ -362,7 +358,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new TimePickerFragment(mPickEndTime);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), "timePicker");
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), TIME_PICKER_DESCR);
             }
         });
         this.displayMap();
@@ -414,14 +410,14 @@ public class AddEventActivity extends FragmentActivity {
                     mGoogleMap.clear();
                 }
                 Intent setLocationIntent = new Intent(AddEventActivity.this, SetLocationActivity.class);
-                setLocationIntent.putExtra("eventPosition", mEventPosition);
+                setLocationIntent.putExtra(LOCATION_EXTRA, mEventPosition);
                 AddEventActivity.this.startActivityForResult(setLocationIntent, PICK_LOCATION_REQUEST);
             }
         });
 
         Bundle extras = this.getIntent().getExtras();
         if (extras != null) {
-            LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
+            LatLng latLng = extras.getParcelable(LOCATION_EXTRA);
             if ((latLng != null) && (Math.abs(latLng.latitude) > 0)) {
                 // The user long clicked the map in MainActivity and wants to
                 // create an event
@@ -452,7 +448,6 @@ public class AddEventActivity extends FragmentActivity {
                 this.createEvent();
                 break;
             default:
-                // No other menu items!
                 break;
         }
 
@@ -473,6 +468,18 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
+     * Reset the two given EditTexts.
+     * 
+     * @param first
+     * @param second
+     * @author SpicyCH
+     */
+    private void resetEndOfEvent(EditText first, EditText second) {
+        first.setText("");
+        second.setText("");
+    }
+
+    /**
      * @param data
      *            the intent containing the extras. The position (LatLgn) is
      *            retrieved from the
@@ -481,25 +488,28 @@ public class AddEventActivity extends FragmentActivity {
      */
     private void updateLocation(Intent data) {
         Bundle extras = data.getExtras();
+        mEventPosition = extras.getParcelable(LOCATION_EXTRA);
 
-        mEventPosition = extras.getParcelable(LOCATION_SERVICE);
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        String cityName = "";
-        List<Address> addresses = null;
-        try {
-            addresses = geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
-        } catch (IOException e) {
-            Log.d(TAG, "Google couldn't retrieve any adresses fromt he coordinates: " + e);
-        }
-        if ((!addresses.isEmpty()) || ((cityName != null) && !cityName.isEmpty())) {
-            cityName = addresses.get(0).getLocality();
-            mPlaceName.setText(cityName);
-            mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
+        if (mEventPosition != null) {
+            Location location = new Location("");
+            location.setLatitude(mEventPosition.latitude);
+            location.setLongitude(mEventPosition.longitude);
+
+            String cityName = Utils.getCityFromLocation(location);
+
+            if ((cityName != null) && !cityName.isEmpty()) {
+                mPlaceName.setText(cityName);
+                mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
+                new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
+            } else {
+                Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location_name),
+                    Toast.LENGTH_LONG).show();
+                mPlaceName.setText("");
+            }
         } else {
-            Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location_name),
-                Toast.LENGTH_LONG).show();
-            mPlaceName.setText("");
+
+            Log.e(TAG, "No event position set (extras.getParcelable(LOCATION_EXTRA) was null)");
+            Toast.makeText(mContext, this.getString(R.string.error_client_side), Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -5,7 +5,7 @@ import java.util.Set;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * A list of user IDs
