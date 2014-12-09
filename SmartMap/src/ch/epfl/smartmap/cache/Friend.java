@@ -143,7 +143,8 @@ public final class Friend extends AbstractUser {
      */
     @Override
     public boolean isVisible() {
-        return ServiceContainer.getCache().getAllActiveFilters().contains(this);
+        return ServiceContainer.getCache().getAllActiveFilters().contains(this)
+            && !mLocation.equals(NO_LOCATION);
     }
 
     @Override
