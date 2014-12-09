@@ -255,8 +255,8 @@ public class PublicEvent implements Event {
         }
 
         if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
-            mStartDate = new GregorianCalendar(TimeZone.getDefault());
-            mEndDate = new GregorianCalendar(TimeZone.getDefault());
+            mStartDate = (Calendar) event.getStartDate().clone();
+            mEndDate = (Calendar) event.getEndDate().clone();
         }
 
         if (event.getLocation() != null) {
