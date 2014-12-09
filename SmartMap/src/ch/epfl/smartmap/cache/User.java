@@ -18,8 +18,8 @@ public interface User extends Displayable {
 
     long NO_ID = -1;
     String NO_NAME = "Unknown User";
-    Bitmap NO_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext().getResources(),
-            R.drawable.ic_default_user);
+    Bitmap NO_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
+        .getResources(), R.drawable.ic_default_user);
 
     String NO_PHONE_NUMBER = "No phone Number";
     String NO_EMAIL = "No email";

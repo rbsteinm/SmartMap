@@ -139,9 +139,13 @@ public class Cache {
                     createdEvent.setId(eventId);
                     // Puts event in Cache
                     Cache.this.putEvent(createdEvent);
-                    callback.onSuccess();
+                    if (callback != null) {
+                        callback.onSuccess();
+                    }
                 } catch (SmartMapClientException e) {
-                    callback.onFailure();
+                    if (callback != null) {
+                        callback.onFailure();
+                    }
                 }
                 return null;
             }
@@ -598,29 +602,37 @@ public class Cache {
 
     public synchronized void putEvents(Set<ImmutableEvent> newEvents) {
         for (final ImmutableEvent newEvent : newEvents) {
-            // Fetch Creator
-            ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(), new SearchRequestCallback<User>() {
-                @Override
-                public synchronized void onNetworkError() {
-                    // Don't add
-                }
+            mEventIds.add(newEvent.getId());
+            if (this.getUser(newEvent.getId()) != null) {
+                mEventInstances.put(newEvent.getId(),
+                    new PublicEvent(newEvent.setCreator(this.getUser(newEvent.getId()))));
+            } else {
+                // Put unknown Creator
+                mEventInstances.put(newEvent.getId(), new PublicEvent(newEvent.setCreator(User.NOBODY)));
+                // & Fetch Creator online
+                ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(),
+                    new SearchRequestCallback<User>() {
+                        @Override
+                        public void onNetworkError() {
+                            // Don't add
+                        }
 
-                @Override
-                public synchronized void onNotFound() {
-                    // Don't add
-                }
+                        @Override
+                        public void onNotFound() {
+                            // Don't add
+                        }
 
-                @Override
-                public synchronized void onResult(User result) {
-                    mEventIds.add(newEvent.getId());
-                    mEventInstances.put(newEvent.getId(), new PublicEvent(newEvent.setCreator(result)));
+                        @Override
+                        public void onResult(User result) {
+                            Cache.this.updateEvent(newEvent.setCreator(result));
+                        }
+                    });
+            }
 
-                    // Notify listeners
-                    for (CacheListener listener : mListeners) {
-                        listener.onEventListUpdate();
-                    }
-                }
-            });
+            // Notify listeners
+            for (CacheListener listener : mListeners) {
+                listener.onEventListUpdate();
+            }
         }
     }
 
@@ -1048,32 +1060,6 @@ public class Cache {
         }
     }
 
-    private void updateFriendRequests(Set<ImmutableUser> invitingFriends, Context ctx) {
-        for (ImmutableUser friend : invitingFriends) {
-            if (!mInvitingFriendsIds.contains(friend.getId())) {
-
-                // Adding new friend in cache and database
-                mInvitingFriendsIds.add(friend.getId());
-                this.putStranger(friend);
-                ServiceContainer.getDatabase().addPendingFriend(friend.getId(), friend.getName());
-
-                // Creating the invitation
-                ImmutableInvitation invitation =
-                    new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD, GregorianCalendar
-                        .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(), Invitation.FRIEND_INVITATION);
-
-                this.putInvitation(invitation);
-
-                // Sending notification
-                if (ServiceContainer.getSettingsManager().notificationsEnabled()
-                    && ServiceContainer.getSettingsManager().notificationsForFriendRequests()) {
-                    Notifications.newFriendNotification(ctx, friend);
-                }
-            }
-
-        }
-    }
-
     private void acceptNewFriends(Set<ImmutableUser> friends, final Context ctx) {
         for (ImmutableUser friend : friends) {
             this.putFriend(friend);
@@ -1137,7 +1123,35 @@ public class Cache {
         }
     }
 
-    private interface SearchFilter<T> {
+    private void updateFriendRequests(Set<ImmutableUser> invitingFriends, Context ctx) {
+        for (ImmutableUser friend : invitingFriends) {
+            if (!mInvitingFriendsIds.contains(friend.getId())) {
+
+                // Adding new friend in cache and database
+                mInvitingFriendsIds.add(friend.getId());
+                this.putStranger(friend);
+                ServiceContainer.getDatabase().addPendingFriend(friend.getId(), friend.getName());
+
+                // Creating the invitation
+                ImmutableInvitation invitation =
+                    new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD, GregorianCalendar
+                        .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(), Invitation.FRIEND_INVITATION);
+
+                invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
+                invitation.setUser(this.getUser(friend.getId()));
+                this.putInvitation(invitation);
+
+                // Sending notification
+                if (ServiceContainer.getSettingsManager().notificationsEnabled()
+                    && ServiceContainer.getSettingsManager().notificationsForFriendRequests()) {
+                    Notifications.newFriendNotification(ctx, friend);
+                }
+            }
+
+        }
+    }
+
+    public interface SearchFilter<T> {
         boolean filter(T item);
     }
 }
