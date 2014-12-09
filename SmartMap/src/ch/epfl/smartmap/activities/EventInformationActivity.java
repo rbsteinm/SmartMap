@@ -123,6 +123,7 @@ public class EventInformationActivity extends ListActivity {
         // Hack so that SonarQube doesn't complain that v is not used
         Log.d(TAG, "View with id " + v.getId() + " clicked");
         Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
+        inviteFriends.putExtra("EVENT", mEvent.getId());
         this.startActivityForResult(inviteFriends, 1);
     }
 
@@ -150,49 +151,63 @@ public class EventInformationActivity extends ListActivity {
         switch (v.getId()) {
             case R.id.event_info_going_checkbox:
                 if (checkBox.isChecked()) {
-                    Log.d(TAG, "Add Participants");
                     ServiceContainer.getCache().addParticipantsToEvent(
                         new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
                         new NetworkRequestCallback() {
                             @Override
                             public void onFailure() {
-                                // TODO What to do?
-                                // Toast.makeText(EventInformationActivity.this,
-                                // EventInformationActivity.this.getString(R.string.add_participant_failure),
-                                // Toast.LENGTH_SHORT).show();
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.add_participant_failure),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
                             }
 
                             @Override
                             public void onSuccess() {
-                                // TODO What to do?
-                                // Toast.makeText(EventInformationActivity.this,
-                                // EventInformationActivity.this.getString(R.string.add_participant_success),
-                                // Toast.LENGTH_SHORT).show();
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.add_participant_success),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
                         });
                 } else {
-                    Log.d(TAG, "Remove Participants");
                     ServiceContainer.getCache().removeParticipantsFromEvent(
                         new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
                         new NetworkRequestCallback() {
                             @Override
                             public void onFailure() {
-                                // TODO What to do?
-                                // Toast.makeText(EventInformationActivity.this,
-                                // EventInformationActivity.this.getString(R.string.add_participant_failure),
-                                // Toast.LENGTH_SHORT).show();
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.add_participant_failure),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
 
                             @Override
                             public void onSuccess() {
-                                // TODO What to do?
-                                // Toast.makeText(EventInformationActivity.this,
-                                // EventInformationActivity.this.getString(R.string.add_participant_success),
-                                // Toast.LENGTH_SHORT).show();
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.add_participant_success),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
                         });
                 }
-                Log.d(TAG, "isGoing : " + mEvent.isGoing() + "    participants : " + mEvent.getParticipantIds());
                 break;
             default:
                 break;
@@ -264,11 +279,7 @@ public class EventInformationActivity extends ListActivity {
 
             long eventId = this.getIntent().getLongExtra(EVENT_KEY, -1);
 
-            Log.d(TAG, "Received event id " + eventId);
-
             mEvent = ServiceContainer.getCache().getEvent(eventId);
-
-            Log.d(TAG, "Event is going : " + mEvent.isGoing() + "   participants : " + mEvent.getParticipantIds());
 
             this.initializeGUI();
 
@@ -305,16 +316,27 @@ public class EventInformationActivity extends ListActivity {
 
             @Override
             public void onNetworkError() {
-                Toast.makeText(EventInformationActivity.this,
-                    EventInformationActivity.this.getString(R.string.refresh_participants_network_error),
-                    Toast.LENGTH_SHORT).show();
+                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(EventInformationActivity.this,
+                            EventInformationActivity.this.getString(R.string.refresh_participants_network_error),
+                            Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onNotFound() {
-                Toast.makeText(EventInformationActivity.this,
-                    EventInformationActivity.this.getString(R.string.refresh_participants_not_found),
-                    Toast.LENGTH_SHORT).show();
+                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(EventInformationActivity.this,
+                            EventInformationActivity.this.getString(R.string.refresh_participants_not_found),
+                            Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
 
             @Override
