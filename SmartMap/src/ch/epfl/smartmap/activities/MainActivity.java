@@ -29,6 +29,7 @@ import ch.epfl.smartmap.background.NearEventsThread;
 import ch.epfl.smartmap.background.OwnPositionService;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.UpdateDatabaseThread;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Invitation;
@@ -98,7 +99,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.startService(new Intent(this, InvitationsService.class));
         this.startService(new Intent(this, OwnPositionService.class));
         // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         this.getActionBar().setHomeButtonEnabled(true);
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         mMenuTheme = MenuTheme.MAP;
@@ -171,7 +173,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         // get the value of the user string
         Location eventLocation = startingIntent.getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
         if (eventLocation != null) {
-            mMapZoomer.zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
+            mMapZoomer
+                .zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
             eventLocation = null;
         }
 
@@ -252,30 +255,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         MenuItem item = mMenu.findItem(R.id.action_notifications);
         mIcon = (LayerDrawable) item.getIcon();
 
-        MainActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // Update LayerDrawable's BadgeDrawable
-                Utils.setBadgeCount(MainActivity.this, mIcon,
-                    ServiceContainer.getCache().getFriendInvitationsByStatus(Invitation.UNREAD).size());
-            }
-        });
-
-        // And set a Listener on InvitationList
-        ServiceContainer.getDatabase().addOnInvitationListUpdateListener(new OnInvitationListUpdateListener() {
-            @Override
-            public void onInvitationListUpdate() {
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Update LayerDrawable's BadgeDrawable
-                        Utils.setBadgeCount(MainActivity.this, mIcon, ServiceContainer.getCache()
-                            .getFriendInvitationsByStatus(Invitation.UNREAD).size());
-                    }
-                });
-            }
-        });
-
         // Get Views
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView mSearchView = (SearchView) searchItem.getActionView();
@@ -313,6 +292,9 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             }
         });
 
+        // Update notif count
+        this.updateNotifCount();
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -322,8 +304,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             @Override
             public void run() {
 
-                mEventMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(ServiceContainer
-                    .getCache().getAllVisibleEvents()));
+                mEventMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(
+                    ServiceContainer.getCache().getAllVisibleEvents()));
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -331,7 +313,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
      */
     @Override
@@ -342,7 +323,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
      */
     @Override
@@ -350,8 +330,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mFriendMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(ServiceContainer
-                    .getCache().getAllVisibleFriends()));
+                mFriendMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(
+                    ServiceContainer.getCache().getAllVisibleFriends()));
                 // MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
             }
@@ -364,9 +344,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                // Update LayerDrawable's BadgeDrawable
-                Utils.setBadgeCount(MainActivity.this, mIcon,
-                    ServiceContainer.getCache().getFriendInvitationsByStatus(Invitation.UNREAD).size());
+                MainActivity.this.updateNotifCount();
             }
         });
     }
@@ -457,7 +435,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     /**
-     * Sets the view for Item Focus, this means - Write name / Display photo on ActionBar - Sets ActionMenu for Item
+     * Sets the view for Item Focus, this means - Write name / Display photo on ActionBar - Sets ActionMenu
+     * for Item
      * Focus
      * 
      * @param item
@@ -541,6 +520,23 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         }
     }
 
+    public void updateNotifCount() {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Update LayerDrawable's BadgeDrawable
+                Utils.setBadgeCount(MainActivity.this, mIcon,
+                    ServiceContainer.getCache().getInvitations(new Cache.SearchFilter<Invitation>() {
+                        @Override
+                        public boolean filter(Invitation item) {
+                            // Get Unread invitations
+                            return (item.getStatus() == Invitation.UNREAD);
+                        }
+                    }).size());
+            }
+        });
+    }
+
     private void zoomAccordingToAllMarkers() {
 
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
@@ -558,7 +554,9 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
      * @author jfperren
      */
     private enum MenuTheme {
-        MAP, SEARCH, ITEM;
+        MAP,
+        SEARCH,
+        ITEM;
     }
 
     /**

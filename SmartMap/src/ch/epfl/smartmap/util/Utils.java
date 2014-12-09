@@ -8,6 +8,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.location.Address;
@@ -37,7 +39,7 @@ public class Utils {
     public static final long ONE_YEAR = 365 * ONE_DAY;
 
     public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
-            .getString(R.string.utils_never_seen_on_smartmap);
+        .getString(R.string.utils_never_seen_on_smartmap);
 
     public static double distanceToMe(LatLng latLng) {
         return Math.sqrt(Math.pow(latLng.latitude - ServiceContainer.getSettingsManager().getLocation().getLatitude(),
@@ -62,6 +64,34 @@ public class Utils {
             }
         } catch (IOException e) {
             return Displayable.NO_LOCATION_STRING;
+        }
+    }
+
+    public static int getColorInInterval(double value, double startValue, double endValue, int startColor,
+        int endColor) {
+        if (startValue > endValue) {
+            return getColorInInterval(value, endValue, startValue, endColor, startColor);
+        } else {
+            if ((startValue < value) && (value < endValue)) {
+                // Compute a mix of the two colors
+                double intervalLength = endValue - startValue;
+                double percentageStart = (startValue - value) / intervalLength;
+                double percentageEnd = (value - endValue) / intervalLength;
+
+                int red =
+                    (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
+                int green =
+                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color
+                        .green(endColor)));
+                int blue =
+                    (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
+
+                return Color.rgb(red, green, blue);
+            } else if (value < startValue) {
+                return startColor;
+            } else {
+                return endColor;
+            }
         }
     }
 
@@ -95,8 +125,8 @@ public class Utils {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
                         + calendar.get(Calendar.YEAR);
             } else if (daysDiff > 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
-                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next)
+                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else if (daysDiff == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
             } else if (daysDiff == 0) {
@@ -104,8 +134,8 @@ public class Utils {
             } else if (daysDiff == -1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else if (daysDiff > -7) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
-                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last)
+                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
                         + calendar.get(Calendar.YEAR);
@@ -130,17 +160,20 @@ public class Utils {
             if (minutes == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
             } else {
-                return minutes + " "
-                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
+                return minutes
+                    + " "
+                    + ServiceContainer.getSettingsManager().getContext()
+                        .getString(R.string.utils_minutes_ago);
             }
         } else if (diff < ONE_DAY) {
             // Give time hours
             int hours = (int) (diff / ONE_HOUR);
             if (hours == 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_hour_ago);
+                return ServiceContainer.getSettingsManager().getContext()
+                    .getString(R.string.utils_one_hour_ago);
             } else {
                 return "" + hours + " "
-                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
             }
         } else if (diff < ONE_YEAR) {
             // Give time in days
@@ -149,11 +182,21 @@ public class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else {
                 return "" + days + " "
-                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
             }
         } else {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
+            return ServiceContainer.getSettingsManager().getContext()
+                .getString(R.string.utils_never_seen_on_smartmap);
         }
+    }
+
+    public static ColorMatrix getMatrixForColor(int color) {
+        float r = Color.red(color) / 255f;
+        float g = Color.green(color) / 255f;
+        float b = Color.blue(color) / 255f;
+
+        float[] src = {r, 0, 0, 0, 0, 0, g, 0, 0, 0, 0, 0, b, 0, 0, 0, 0, 0, 1, 0};
+        return new ColorMatrix(src);
     }
 
     public static String getTimeString(Calendar calendar) {

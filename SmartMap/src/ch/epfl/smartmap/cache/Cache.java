@@ -24,11 +24,9 @@ import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
- * The Cache contains all instances of network objects that are used by the GUI.
- * Therefore, every request to
+ * The Cache contains all instances of network objects that are used by the GUI. Therefore, every request to
  * find an
- * user or an event should go through it. It will automatically fill itself with
- * the database on creation, and
+ * user or an event should go through it. It will automatically fill itself with the database on creation, and
  * then
  * updates the database as changes are made.
  * 
@@ -36,24 +34,20 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class Cache {
 
-    private interface SearchFilter<T> {
-        boolean filter(T item);
-    }
-
     static final public String TAG = Cache.class.getSimpleName();
+
     // SparseArrays containing live instances
     private LongSparseArray<User> mUserInstances;
     private final LongSparseArray<Event> mEventInstances;
     private final LongSparseArray<Filter> mFilterInstances;
-
     private final LongSparseArray<Invitation> mInvitationInstances;
+
     // These Sets are the keys for the LongSparseArrays
     private final Set<Long> mUserIds;
     private final Set<Long> mEventIds;
-
     private final Set<Long> mFilterIds;
-    private final Set<Long> mInvitationIds;
 
+    private final Set<Long> mInvitationIds;
     private final Set<Long> mInvitingFriendsIds;
 
     // This Set contains the id of all our friends
@@ -86,14 +80,15 @@ public class Cache {
     }
 
     /**
-     * Called when the user accepts an invitation. If it's a friend, it's added
-     * to the cache
-     * and if it's an event the user joins it and it's infos are re-updated
+     * Called when the user accepts an invitation. If it's a friend, it's added to the cache and if it's an
+     * event the
+     * user joins it and it's infos are re-updated
      * 
      * @param invitation
      * @param callback
      */
-    public synchronized void acceptInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
+    public synchronized void acceptInvitation(final Invitation invitation,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -127,50 +122,6 @@ public class Cache {
         }.execute();
     }
 
-    private void acceptNewFriends(Set<ImmutableUser> friends, final Context ctx) {
-        for (ImmutableUser friend : friends) {
-            this.putFriend(friend);
-
-            ImmutableInvitation invitation =
-                new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD, GregorianCalendar
-                    .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(),
-                    Invitation.ACCEPTED_FRIEND_INVITATION);
-
-            invitation.setUser(this.getFriend(friend.getId()));
-
-            this.putInvitation(invitation);
-
-            new AsyncTask<ImmutableUser, Void, Void>() {
-
-                @Override
-                protected Void doInBackground(ImmutableUser... params) {
-                    try {
-                        ServiceContainer.getNetworkClient().ackAcceptedInvitation(params[0].getId());
-                        Bitmap image = ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
-                        params[0].setImage(image);
-
-                        Cache.this.updateFriend(params[0]);
-
-                        if (ServiceContainer.getSettingsManager().notificationsEnabled()
-
-                        && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations()) {
-                            Notifications.acceptedFriendNotification(ctx, params[0]);
-                        }
-
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Couldn't ack new friend: " + e.getMessage());
-                    }
-                    return null;
-                }
-
-            }.execute(friend);
-        }
-
-        for (CacheListener listener : mListeners) {
-            listener.onFriendListUpdate();
-        }
-    }
-
     /**
      * OK
      */
@@ -183,11 +134,13 @@ public class Cache {
      * @param event
      * @param callback
      */
-    public synchronized void addParticipantsToEvent(Set<Long> ids, Event event, final NetworkRequestCallback callback) {
+    public synchronized void addParticipantsToEvent(Set<Long> ids, Event event,
+        final NetworkRequestCallback callback) {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.addAll(ids);
 
-        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final ImmutableEvent newImmutableEvent =
+            event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -214,7 +167,8 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
+    public synchronized void createEvent(final ImmutableEvent createdEvent,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -240,7 +194,8 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void declineInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
+    public synchronized void declineInvitation(final Invitation invitation,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -416,24 +371,6 @@ public class Cache {
         }
     }
 
-    public synchronized SortedSet<Invitation> getFriendInvitations() {
-        return this.getInvitations(mInvitationIds, new SearchFilter<Invitation>() {
-            @Override
-            public synchronized boolean filter(Invitation invitation) {
-                return invitation.getType() == Invitation.FRIEND_INVITATION;
-            }
-        });
-    }
-
-    public synchronized SortedSet<Invitation> getFriendInvitationsByStatus(final int status) {
-        return this.getInvitations(mInvitationIds, new SearchFilter<Invitation>() {
-            @Override
-            public synchronized boolean filter(Invitation invitation) {
-                return invitation.getStatus() == status;
-            }
-        });
-    }
-
     /**
      * OK
      * 
@@ -455,6 +392,19 @@ public class Cache {
         return mInvitationInstances.get(id);
     }
 
+    public synchronized SortedSet<Invitation> getInvitations(SearchFilter<Invitation> filter) {
+        SortedSet<Invitation> invitations = new TreeSet<Invitation>();
+
+        for (long id : mInvitationIds) {
+            Invitation invitation = mInvitationInstances.get(id);
+            if ((filter == null) || ((invitation != null) && filter.filter(invitation))) {
+                invitations.add(invitation);
+            }
+        }
+
+        return invitations;
+    }
+
     public synchronized SortedSet<Invitation> getInvitations(Set<Long> ids) {
         SortedSet<Invitation> invitations = new TreeSet<Invitation>();
         for (long id : ids) {
@@ -463,19 +413,6 @@ public class Cache {
                 invitations.add(invitation);
             }
         }
-        return invitations;
-    }
-
-    public synchronized SortedSet<Invitation> getInvitations(Set<Long> ids, SearchFilter<Invitation> filter) {
-        SortedSet<Invitation> invitations = new TreeSet<Invitation>();
-
-        for (long id : ids) {
-            Invitation invitation = mInvitationInstances.get(id);
-            if ((filter == null) || ((invitation != null) && filter.filter(invitation))) {
-                invitations.add(invitation);
-            }
-        }
-
         return invitations;
     }
 
@@ -540,7 +477,8 @@ public class Cache {
     public synchronized SortedSet<Invitation> getUnansweredFriendInvitations() {
         SortedSet<Invitation> unansweredFriendInvitations = this.getAllInvitations();
         for (Invitation invitation : unansweredFriendInvitations) {
-            if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)) {
+            if ((invitation.getStatus() == Invitation.ACCEPTED)
+                || (invitation.getStatus() == Invitation.DECLINED)) {
                 unansweredFriendInvitations.remove(invitation);
             }
         }
@@ -636,10 +574,11 @@ public class Cache {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, new ArrayList<Long>(usersIds));
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId,
+                        new ArrayList<Long>(usersIds));
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Couldn't invite friends to event:" + e.getMessage());
+                    Log.e(TAG, "Couldn't invite friends to event:" + e);
                     callback.onFailure();
                 }
                 return null;
@@ -655,7 +594,7 @@ public class Cache {
                     ServiceContainer.getNetworkClient().inviteFriend(params[0]);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Error while inviting friend: " + e.getMessage());
+                    Log.e(TAG, "Error while inviting friend: " + e);
                     callback.onFailure();
                 }
                 return null;
@@ -669,7 +608,8 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
+    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent,
+        final NetworkRequestCallback callback) {
         new AsyncTask<ImmutableEvent, Void, Void>() {
 
             @Override
@@ -680,6 +620,7 @@ public class Cache {
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     callback.onFailure();
+                    Log.e(TAG, "Error while modifying own event: " + e);
                 }
                 return null;
             }
@@ -701,28 +642,29 @@ public class Cache {
     public synchronized void putEvents(Set<ImmutableEvent> newEvents) {
         for (final ImmutableEvent newEvent : newEvents) {
             // Fetch Creator
-            ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(), new SearchRequestCallback<User>() {
-                @Override
-                public synchronized void onNetworkError() {
-                    // Don't add
-                }
-
-                @Override
-                public synchronized void onNotFound() {
-                    // Don't add
-                }
-
-                @Override
-                public synchronized void onResult(User result) {
-                    mEventIds.add(newEvent.getId());
-                    mEventInstances.put(newEvent.getId(), new PublicEvent(newEvent.setCreator(result)));
-
-                    // Notify listeners
-                    for (CacheListener listener : mListeners) {
-                        listener.onEventListUpdate();
+            ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(),
+                new SearchRequestCallback<User>() {
+                    @Override
+                    public synchronized void onNetworkError() {
+                        // Don't add
                     }
-                }
-            });
+
+                    @Override
+                    public synchronized void onNotFound() {
+                        // Don't add
+                    }
+
+                    @Override
+                    public synchronized void onResult(User result) {
+                        mEventIds.add(newEvent.getId());
+                        mEventInstances.put(newEvent.getId(), new PublicEvent(newEvent.setCreator(result)));
+
+                        // Notify listeners
+                        for (CacheListener listener : mListeners) {
+                            listener.onEventListUpdate();
+                        }
+                    }
+                });
         }
     }
 
@@ -803,7 +745,8 @@ public class Cache {
                     @Override
                     public synchronized void onResult(User result) {
                         mInvitationIds.add(id);
-                        mInvitationInstances.put(id, new GenericInvitation(newInvitation.setUser(result).setId(id)));
+                        mInvitationInstances.put(id, new GenericInvitation(newInvitation.setUser(result)
+                            .setId(id)));
                     }
                 });
             }
@@ -977,7 +920,8 @@ public class Cache {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.removeAll(ids);
 
-        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final ImmutableEvent newImmutableEvent =
+            event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -996,26 +940,6 @@ public class Cache {
                 return null;
             }
         }.execute();
-    }
-
-    private void removeRemovedFriends(Set<Long> removedFriendsIds) {
-        for (Long id : removedFriendsIds) {
-            this.removeFriend(id);
-
-            new AsyncTask<Long, Void, Void>() {
-
-                @Override
-                protected Void doInBackground(Long... params) {
-                    try {
-                        ServiceContainer.getNetworkClient().ackRemovedFriend(params[0]);
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Couldn't ack removed friend: " + e);
-                    }
-                    return null;
-                }
-
-            }.execute(id);
-        }
     }
 
     public synchronized void retainEvents(List<Long> ids) {
@@ -1069,7 +993,7 @@ public class Cache {
                         mInvitationIds.add(generic.getId());
                         mInvitationInstances.put(generic.getId(), generic);
                     } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Unable to ack event invitation !" + e.getMessage());
+                        Log.e(TAG, "Unable to ack event invitation !" + e);
                     }
                     return null;
                 }
@@ -1134,34 +1058,6 @@ public class Cache {
 
     }
 
-    private void updateFriendRequests(Set<ImmutableUser> invitingFriends, Context ctx) {
-        for (ImmutableUser friend : invitingFriends) {
-            if (!mInvitingFriendsIds.contains(friend.getId())) {
-
-                // Adding new friend in cache and database
-                mInvitingFriendsIds.add(friend.getId());
-                this.putStranger(friend);
-                ServiceContainer.getDatabase().addPendingFriend(friend.getId(), friend.getName());
-
-                // Creating the invitation
-                ImmutableInvitation invitation =
-                    new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD, GregorianCalendar
-                        .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(), Invitation.FRIEND_INVITATION);
-
-                invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
-                invitation.setUser(this.getUser(friend.getId()));
-                this.putInvitation(invitation);
-
-                // Sending notification
-                if (ServiceContainer.getSettingsManager().notificationsEnabled()
-                    && ServiceContainer.getSettingsManager().notificationsForFriendRequests()) {
-                    Notifications.newFriendNotification(ctx, friend);
-                }
-            }
-
-        }
-    }
-
     /**
      * OK
      * 
@@ -1180,8 +1076,8 @@ public class Cache {
         }
     }
 
-    public synchronized void
-        updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
+    public synchronized void updateFromNetwork(final SmartMapClient networkClient,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1244,5 +1140,103 @@ public class Cache {
             cachedEvent.update(event);
             return false;
         }
+    }
+
+    private void acceptNewFriends(Set<ImmutableUser> friends, final Context ctx) {
+        for (ImmutableUser friend : friends) {
+            this.putFriend(friend);
+
+            ImmutableInvitation invitation =
+                new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD, GregorianCalendar
+                    .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(),
+                    Invitation.ACCEPTED_FRIEND_INVITATION);
+
+            invitation.setUser(this.getFriend(friend.getId()));
+
+            this.putInvitation(invitation);
+
+            new AsyncTask<ImmutableUser, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(ImmutableUser... params) {
+                    try {
+                        ServiceContainer.getNetworkClient().ackAcceptedInvitation(params[0].getId());
+                        Bitmap image =
+                            ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
+                        params[0].setImage(image);
+
+                        Cache.this.updateFriend(params[0]);
+
+                        if (ServiceContainer.getSettingsManager().notificationsEnabled()
+
+                        && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations()) {
+                            Notifications.acceptedFriendNotification(ctx, params[0]);
+                        }
+
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Couldn't ack new friend: " + e);
+                    }
+                    return null;
+                }
+
+            }.execute(friend);
+        }
+
+        for (CacheListener listener : mListeners) {
+            listener.onFriendListUpdate();
+        }
+    }
+
+    private void removeRemovedFriends(Set<Long> removedFriendsIds) {
+        for (Long id : removedFriendsIds) {
+            this.removeFriend(id);
+
+            new AsyncTask<Long, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Long... params) {
+                    try {
+                        ServiceContainer.getNetworkClient().ackRemovedFriend(params[0]);
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Couldn't ack removed friend: " + e);
+                    }
+                    return null;
+                }
+
+            }.execute(id);
+        }
+    }
+
+    private void updateFriendRequests(Set<ImmutableUser> invitingFriends, Context ctx) {
+        for (ImmutableUser friend : invitingFriends) {
+            if (!mInvitingFriendsIds.contains(friend.getId())) {
+
+                // Adding new friend in cache and database
+                mInvitingFriendsIds.add(friend.getId());
+                this.putStranger(friend);
+                ServiceContainer.getDatabase().addPendingFriend(friend.getId(), friend.getName());
+
+                // Creating the invitation
+                ImmutableInvitation invitation =
+                    new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD,
+                        GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(),
+                        Invitation.FRIEND_INVITATION);
+
+                invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
+                invitation.setUser(this.getUser(friend.getId()));
+                this.putInvitation(invitation);
+
+                // Sending notification
+                if (ServiceContainer.getSettingsManager().notificationsEnabled()
+                    && ServiceContainer.getSettingsManager().notificationsForFriendRequests()) {
+                    Notifications.newFriendNotification(ctx, friend);
+                }
+            }
+
+        }
+    }
+
+    public interface SearchFilter<T> {
+        boolean filter(T item);
     }
 }

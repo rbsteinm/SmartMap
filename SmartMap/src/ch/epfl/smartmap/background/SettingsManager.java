@@ -132,7 +132,7 @@ public final class SettingsManager {
     public int getNearEventsMaxDistance() {
         String defaultValue = mContext.getString(R.string.pref_events_max_distance_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_max_distance_fetch_events), defaultValue));
+            mContext.getString(R.string.settings_key_max_distance_fetch_events), defaultValue));
     }
 
     /**
@@ -142,7 +142,7 @@ public final class SettingsManager {
     public int getRefreshFrequency() {
         String defaultValue = mContext.getString(R.string.pref_sync_frequency_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_refresh_frequency), defaultValue));
+            mContext.getString(R.string.settings_key_refresh_frequency), defaultValue));
     }
 
     public String getSubtitle() {
@@ -151,9 +151,10 @@ public final class SettingsManager {
         }
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(ServiceContainer.getSettingsManager().getLastSeen());
+
         String subtitle = Utils.getLastSeenStringFromCalendar(calendar) + " "
-                + ServiceContainer.getSettingsManager().getContext().getString(R.string.settings_manager_near) + " "
-                + this.getLocationName();
+            + ServiceContainer.getSettingsManager().getContext().getString(R.string.settings_manager_near) + " "
+            + this.getLocationName();
         return subtitle;
     }
 
@@ -165,7 +166,7 @@ public final class SettingsManager {
     public int getTimeToWaitBeforeHidingFriends() {
         String defaultValue = mContext.getString(R.string.pref_last_seen_max_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_last_seen_max), defaultValue));
+            mContext.getString(R.string.settings_key_last_seen_max), defaultValue));
     }
 
     /**
@@ -209,7 +210,7 @@ public final class SettingsManager {
      */
     public boolean isOffline() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_general_offline), false);
+            mContext.getString(R.string.settings_key_general_offline), false);
     }
 
     /**
@@ -218,7 +219,7 @@ public final class SettingsManager {
      */
     public boolean notificationsEnabled() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_enabled), true);
+            mContext.getString(R.string.settings_key_notifications_enabled), true);
     }
 
     /**
@@ -228,7 +229,7 @@ public final class SettingsManager {
      */
     public boolean notificationsForEventInvitations() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_event_invitations), true) : false;
+            mContext.getString(R.string.settings_key_notifications_event_invitations), true) : false;
     }
 
     /**
@@ -238,7 +239,7 @@ public final class SettingsManager {
      */
     public boolean notificationsForEventProximity() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_event_proximity), true) : false;
+            mContext.getString(R.string.settings_key_notifications_event_proximity), true) : false;
     }
 
     /**
@@ -248,20 +249,38 @@ public final class SettingsManager {
      */
     public boolean notificationsForFriendRequests() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_friend_requests), true) : false;
+            mContext.getString(R.string.settings_key_notifications_friend_requests), true) : false;
     }
 
     /**
      * A friendship confirmation happens when another user accepts your friend request.
      * 
+<<<<<<< HEAD
+     <<<<<<< HEAD
+     * 
+     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
+     *         user
+     *         =======
+     *         <<<<<<< HEAD
+     * @return <code>true</code> if the user enabled the notifications for
+     *         friendship confirmations and the
+     *         user
+     *         =======
+     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
+     *         user
+     *         >>>>>>> 39092ebfcd7ec3e217b3d3b2da359e53a13b9813
+     *         >>>>>>> ca50153cb0116b66bbf459435c04b7988e8acd96
+     *         activated the notifications in general, <code>false</code> otherwise.
+=======
      * @return <code>true</code> if the user enabled notifications for friendship confirmations and the user activated
      *         the notifications in general, <code>false</code> otherwise.
      * 
+>>>>>>> 352eccea9a697a4803c9271400aa30c48e0b0282
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_friendship_confirmations), true) : false;
+            mContext.getString(R.string.settings_key_notifications_friendship_confirmations), true) : false;
     }
 
     /**
@@ -271,7 +290,7 @@ public final class SettingsManager {
      */
     public boolean notificationsVibrate() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
+            mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
     }
 
     /**
@@ -411,7 +430,7 @@ public final class SettingsManager {
      */
     public boolean showPrivateEvents() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_events_show_private), true);
+            mContext.getString(R.string.settings_key_events_show_private), true);
     }
 
     /**
@@ -420,6 +439,6 @@ public final class SettingsManager {
      */
     public boolean showPublicEvents() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_events_show_public), true);
+            mContext.getString(R.string.settings_key_events_show_public), true);
     }
 }
