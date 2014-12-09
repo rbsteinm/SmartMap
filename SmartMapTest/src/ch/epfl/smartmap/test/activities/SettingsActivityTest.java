@@ -1,19 +1,18 @@
 package ch.epfl.smartmap.test.activities;
 
-import static com.google.android.apps.common.testing.ui.espresso.Espresso.onData;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 
 import android.content.Context;
 import android.preference.Preference;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.activities.SettingsActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.background.SettingsManager;
 
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.android.apps.common.testing.ui.espresso.matcher.BoundedMatcher;
@@ -52,6 +51,7 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
         super.setUp();
         this.getActivity();
         mContext = this.getActivity().getApplicationContext();
+        ServiceContainer.setSettingsManager(new SettingsManager(this.getActivity()));
     }
 
     @Override
@@ -158,20 +158,6 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
             .getTimeToWaitBeforeHidingFriends());
     }
 
-    @SuppressWarnings("unchecked")
-    public void testCanEnableVibrations() {
-        this.enableNotifications();
-        assertEquals("Cannot enable notifications", true, ServiceContainer.getSettingsManager()
-            .notificationsEnabled());
-
-        // Here vibrate is not on the screen, so we must use onData
-        boolean initValue = ServiceContainer.getSettingsManager().notificationsVibrate();
-        onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("notifications_vibrate"))).perform(
-            ViewActions.click());
-        assertTrue("Couldn't change boolean status of notifications for vibrations",
-            initValue != ServiceContainer.getSettingsManager().notificationsVibrate());
-    }
-
     public void testCannotActivateEventsNotificationsIfNotifDisabled() {
         this.disableNotifications();
         onView(
@@ -204,60 +190,6 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
             ViewActions.click());
         assertEquals("Can enable a checkbox when its dependency is disabled", false, ServiceContainer
             .getSettingsManager().notificationsForFriendshipConfirmations());
-    }
-
-    @SuppressWarnings("unchecked")
-    public void testCannotActivateVibrateNotificationsIfNotifDisabled() {
-        // todo use ondata to load listview
-        this.disableNotifications();
-
-        // Here vibrate is not on the screen, so we must use onData
-        onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("notifications_vibrate"))).perform(
-            ViewActions.click());
-        assertEquals("Can enable a checkbox when its dependency is disabled", false, ServiceContainer
-            .getSettingsManager().notificationsVibrate());
-
-    }
-
-    @SuppressWarnings("unchecked")
-    public void testCanSetPublicAndPrivateEvents() {
-        onData(Matchers.<Object> allOf(withPreferenceKey("events_show_public"))).perform(ViewActions.click());
-        boolean initValue = ServiceContainer.getSettingsManager().showPublicEvents();
-        onData(Matchers.<Object> allOf(withPreferenceKey("events_show_public"))).perform(ViewActions.click());
-
-        assertTrue("Couldn't change boolean status of public events", initValue != ServiceContainer
-            .getSettingsManager().showPublicEvents());
-
-        /*
-         * Private events are disable due to deadline not letting us the time to
-         * implement them.
-         * onData(Matchers.<Object>
-         * allOf(PreferenceMatchers.withKey("events_show_private"))).perform(
-         * ViewActions.click());
-         * boolean initValue2 =
-         * ServiceContainer.getSettingsManager().showPrivateEvents();
-         * onData(Matchers.<Object>
-         * allOf(PreferenceMatchers.withKey("events_show_private"))).perform(
-         * ViewActions.click());
-         * assertTrue("Couldn't change boolean status of private events",
-         * initValue2 != SettingsManager
-         * .getInstance().showPrivateEvents());
-         */
-    }
-
-    public void testClickingOfflineChangesSettings() {
-        boolean initialValue = ServiceContainer.getSettingsManager().isOffline();
-        if (initialValue) {
-            onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_offline)))
-                .perform(ViewActions.click());
-        }
-        initialValue = ServiceContainer.getSettingsManager().isOffline();
-        assertEquals("Couldn't set the button to false", false, initialValue);
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_offline)))
-            .perform(ViewActions.click());
-        boolean finalValue = ServiceContainer.getSettingsManager().isOffline();
-        assertTrue("intitialValue was " + initialValue + " and finalValue was " + finalValue,
-            initialValue != finalValue);
     }
 
     public void testInit() {
