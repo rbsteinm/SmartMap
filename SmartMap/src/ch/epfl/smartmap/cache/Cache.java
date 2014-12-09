@@ -564,7 +564,7 @@ public class Cache {
                         new ArrayList<Long>(usersIds));
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Couldn't invite friends to event:" + e.getMessage());
+                    Log.e(TAG, "Couldn't invite friends to event:" + e);
                     callback.onFailure();
                 }
                 return null;
@@ -580,7 +580,7 @@ public class Cache {
                     ServiceContainer.getNetworkClient().inviteFriend(params[0]);
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Error while inviting friend: " + e.getMessage());
+                    Log.e(TAG, "Error while inviting friend: " + e);
                     callback.onFailure();
                 }
                 return null;
@@ -606,6 +606,7 @@ public class Cache {
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     callback.onFailure();
+                    Log.e(TAG, "Error while modifying own event: " + e);
                 }
                 return null;
             }
@@ -936,7 +937,7 @@ public class Cache {
                         mInvitationIds.add(generic.getId());
                         mInvitationInstances.put(generic.getId(), generic);
                     } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Unable to ack event invitation !" + e.getMessage());
+                        Log.e(TAG, "Unable to ack event invitation !" + e);
                     }
                     return null;
                 }
@@ -1117,7 +1118,7 @@ public class Cache {
                         }
 
                     } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Couldn't ack new friend: " + e.getMessage());
+                        Log.e(TAG, "Couldn't ack new friend: " + e);
                     }
                     return null;
                 }

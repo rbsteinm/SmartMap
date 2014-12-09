@@ -23,19 +23,19 @@ public class SearchResultView extends RelativeLayout {
 
     private static final String TAG = "SEARCH RESULT VIEW";
     @SuppressWarnings("unused")
-    private final static String AUDIT_TAG = "AuditError : " + TAG;
+    private static final String AUDIT_TAG = "AuditError : " + TAG;
 
     // TODO : Image size should depend on size of layout without image
     private static final int IMAGE_SIZE = 150;
-    private final static int PHOTO_RIGHT_MARGIN = 40;
+    private static final int PHOTO_RIGHT_MARGIN = 40;
     // Margins & Paddings
     private static final int PADDING_RIGHT = 20;
     private static final int PADDING_LEFT = 20;
     private static final int PADDING_TOP = 20;
     private static final int PADDING_BOTTOM = 20;
-    private final static int TITLE_BOTTOM_PADDING = 5;
+    private static final int TITLE_BOTTOM_PADDING = 5;
     // Text Sizes
-    private final static float TITLE_TEXT_SIZE = 17f;
+    private static final float TITLE_TEXT_SIZE = 17f;
     // Distances
     private static final int CLICK_DISTANCE_THRESHHOLD = 10;
 
