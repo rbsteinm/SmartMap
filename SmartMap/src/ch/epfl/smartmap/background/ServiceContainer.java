@@ -1,8 +1,10 @@
 package ch.epfl.smartmap.background;
 
+import android.content.Context;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.search.CachedSearchEngine;
+import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 
 /**
@@ -65,6 +67,14 @@ public class ServiceContainer {
      */
     public static SettingsManager getSettingsManager() {
         return mSettingsManager;
+    }
+
+    public static void initSmartMapServices(Context context) {
+        setSettingsManager(new SettingsManager(context));
+        setNetworkClient(new NetworkSmartMapClient());
+        setDatabaseHelper(new DatabaseHelper(context));
+        setCache(new Cache());
+        setSearchEngine(new CachedSearchEngine());
     }
 
     /**

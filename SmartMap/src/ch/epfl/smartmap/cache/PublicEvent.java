@@ -1,10 +1,8 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -32,7 +30,7 @@ public class PublicEvent implements Event {
     static final public String TAG = PublicEvent.class.getSimpleName();
 
     // Mandatory fields
-    private long mId;
+    private final long mId;
     private String mName;
     private long mCreatorId;
     private Set<Long> mParticipantIds;
@@ -43,8 +41,8 @@ public class PublicEvent implements Event {
     private String mDescription;
     private String mLocationString;
 
-    private User mCreator;
-    private Set<User> mParticipants;
+    private final User mCreator;
+    private final Set<User> mParticipants;
 
     public static final int DEFAULT_ICON = R.drawable.default_event;
 
@@ -65,9 +63,10 @@ public class PublicEvent implements Event {
         mStartDate = (event.getStartDate() != null) ? (Calendar) event.getStartDate().clone() : NO_START_DATE;
         mEndDate = (event.getEndDate() != null) ? (Calendar) event.getEndDate().clone() : NO_END_DATE;
         mLocation = (event.getLocation() != null) ? new Location(event.getLocation()) : NO_LOCATION;
-        mLocationString =
-            (event.getLocationString() != null) ? event.getLocationString() : NO_LOCATION_STRING;
+        mLocationString = (event.getLocationString() != null) ? event.getLocationString() : NO_LOCATION_STRING;
         mDescription = (event.getDescription() != null) ? event.getDescription() : NO_DESCRIPTION;
+        mParticipantIds =
+            (event.getParticipantIds() != null) ? new HashSet<Long>(event.getParticipantIds()) : NO_PARTICIPANTIDS;
         mParticipants =
             (event.getParticipants() != null) ? new HashSet<User>(event.getParticipants()) : NO_PARTICIPANTS;
     }
@@ -78,8 +77,7 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj != null) && (this.getClass() == obj.getClass())
-            && (this.getId() == ((PublicEvent) obj).getId());
+        return (obj != null) && (this.getClass() == obj.getClass()) && (this.getId() == ((PublicEvent) obj).getId());
     }
 
     /*
@@ -155,8 +153,8 @@ public class PublicEvent implements Event {
      * @see ch.epfl.smartmap.cache.Event#getParticipants()
      */
     @Override
-    public List<User> getParticipants() {
-        return new ArrayList<User>(mParticipants);
+    public Set<Long> getParticipantIds() {
+        return mParticipantIds;
     }
 
     @Override
@@ -219,8 +217,7 @@ public class PublicEvent implements Event {
     @Override
     public boolean isNear() {
         Location ourLocation = ServiceContainer.getSettingsManager().getLocation();
-        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager()
-            .getNearEventsMaxDistance();
+        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager().getNearEventsMaxDistance();
     }
 
     /*
@@ -255,8 +252,8 @@ public class PublicEvent implements Event {
         }
 
         if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
-            mStartDate = new GregorianCalendar(TimeZone.getDefault());
-            mEndDate = new GregorianCalendar(TimeZone.getDefault());
+            mStartDate = (Calendar) event.getStartDate().clone();
+            mEndDate = (Calendar) event.getEndDate().clone();
         }
 
         if (event.getLocation() != null) {
@@ -269,6 +266,10 @@ public class PublicEvent implements Event {
 
         if (event.getDescription() == null) {
             mDescription = event.getDescription();
+        }
+
+        if (event.getParticipantIds() != null) {
+            mParticipantIds = event.getParticipantIds();
         }
     }
 }

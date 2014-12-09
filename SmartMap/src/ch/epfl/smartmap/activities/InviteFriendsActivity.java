@@ -51,7 +51,7 @@ public class InviteFriendsActivity extends ListActivity {
             Log.d(TAG, "Friend at position " + position + " set to true");
 
             mSelectedPositions.set(position, true);
-            v.setBackgroundColor(Color.parseColor("#dcdcdc"));
+            v.setBackgroundColor(this.getResources().getColor(R.color.on_friend_clicked));
         } else {
             Log.d(TAG, "Friend at position " + position + " set to false");
 
@@ -125,9 +125,7 @@ public class InviteFriendsActivity extends ListActivity {
             // TODO invite friends
             // TODO send invites via InvitationManager
         } else {
-            Toast
-                .makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG)
-                .show();
+            Toast.makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG).show();
         }
 
     }

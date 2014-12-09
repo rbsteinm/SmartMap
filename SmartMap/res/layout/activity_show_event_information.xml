@@ -7,33 +7,177 @@
     android:paddingLeft="@dimen/activity_user_information_side_margin"
     android:paddingRight="@dimen/activity_user_information_side_margin"
     android:paddingTop="@dimen/activity_user_information_top_margin"
-    tools:context="ch.epfl.smartmap.activities.UserInformationActivity" >
+    tools:context="ch.epfl.smartmap.activities.EventInformationActivity" >
 
     <RelativeLayout
         android:id="@+id/show_event_info_header"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/div_background" >
+        android:layout_alignParentTop="true"
+        android:background="@drawable/div_background"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp" >
+
+        <TextView
+            android:id="@+id/event_info_title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/event_info_title_text"
+            android:textColor="@color/main_blue"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/show_event_info_event_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="17dp"
-            android:layout_marginTop="17dp"
+            android:layout_alignBaseline="@id/event_info_title_text"
+            android:layout_marginLeft="70dp"
+            android:layout_toRightOf="@id/event_info_title_text"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/event_info_when_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/event_info_title_text"
+            android:layout_below="@id/event_info_title_text"
+            android:layout_marginTop="15dp"
+            android:text="@string/event_info_when_text"
+            android:textColor="@color/main_blue"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/show_event_info_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/event_info_when_text"
+            android:layout_alignLeft="@id/show_event_info_event_name"
+            android:layout_below="@id/show_event_info_event_name"
+            android:layout_toRightOf="@id/event_info_when_text"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/show_event_info_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/show_event_info_town_and_country"
+            android:layout_below="@+id/show_event_info_start"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/event_info_by_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/event_info_when_text"
+            android:layout_below="@id/event_info_when_text"
+            android:layout_marginTop="15dp"
+            android:text="@string/event_info_by_text"
+            android:textColor="@color/main_blue"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/show_event_info_creator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/event_info_by_text"
+            android:layout_alignLeft="@id/show_event_info_start"
+            android:layout_below="@id/show_event_info_start"
+            android:layout_toRightOf="@id/event_info_by_text"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/event_info_description_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/event_info_by_text"
+            android:layout_below="@id/event_info_by_text"
+            android:layout_marginTop="15dp"
+            android:text="@string/event_info_description_text"
+            android:textColor="@color/main_blue"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/show_event_info_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/event_info_description_text"
+            android:layout_alignLeft="@id/show_event_info_creator"
+            android:layout_below="@id/show_event_info_creator"
+            android:layout_toRightOf="@id/event_info_description_text"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/event_info_where_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/event_info_description_text"
+            android:layout_below="@id/event_info_description_text"
+            android:layout_marginTop="15dp"
+            android:text="@string/event_info_where_text"
+            android:textColor="@color/main_blue"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/show_event_info_town_and_country"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/show_event_info_event_name"
-            android:layout_below="@+id/show_event_info_event_name"
+            android:layout_alignBaseline="@id/event_info_where_text"
+            android:layout_alignLeft="@id/show_event_info_description"
+            android:layout_below="@id/show_event_info_description"
+            android:layout_toRightOf="@id/event_info_where_text"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/event_info_going_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/event_info_where_text"
+            android:layout_below="@id/event_info_where_text"
+            android:layout_marginTop="15dp"
+            android:text="@string/event_info_going_text"
+            android:textColor="@color/main_blue"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:id="@+id/event_info_going_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/event_info_going_text"
+            android:layout_alignLeft="@id/show_event_info_town_and_country"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/show_event_info_town_and_country"
+            android:layout_toRightOf="@id/event_info_going_text"
+            android:onClick="onCheckboxClicked" />
+
+        <TextView
+            android:id="@+id/event_info_participants_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/event_info_going_text"
+            android:layout_below="@id/event_info_going_text"
+            android:layout_marginTop="15dp"
+            android:text="@string/event_info_participants_text"
+            android:textColor="@color/main_blue"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@+id/show_event_info_invite_friends_button"
+            android:layout_alignLeft="@id/show_event_info_town_and_country"
+            android:layout_alignTop="@id/event_info_participants_text"
+            android:layout_toRightOf="@id/event_info_participants_text"
+            android:tag="@+id/event_info_list" />
 
         <Button
             android:id="@+id/show_event_info_invite_friends_button"
@@ -53,48 +197,6 @@
             android:layout_centerInParent="true"
             android:onClick="openMapAtEventLocation"
             android:text="@string/show_event_on_the_map_button" />
-
-        <TextView
-            android:id="@+id/show_event_info_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/show_event_info_creator"
-            android:layout_below="@+id/show_event_info_creator"
-            android:layout_marginTop="41dp"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
-            android:id="@+id/show_event_info_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/show_event_info_town_and_country"
-            android:layout_below="@+id/show_event_info_town_and_country"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
-            android:id="@+id/show_event_info_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/show_event_info_town_and_country"
-            android:layout_below="@+id/show_event_info_start"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
-            android:id="@+id/show_event_info_creator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/show_event_info_town_and_country"
-            android:layout_below="@+id/show_event_info_end"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-        
-        <fragment
-            android:id="@+id/show_event_info_map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/show_event_info_description"
-            android:layout_above="@id/show_event_info_invite_friends_button"
-            android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 
 </RelativeLayout>

@@ -3,7 +3,6 @@ package ch.epfl.smartmap.cache;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -23,6 +22,7 @@ public interface Event extends Displayable {
 
     long NO_ID = -1;
     Set<User> NO_PARTICIPANTS = new HashSet<User>();
+    Set<Long> NO_PARTICIPANTIDS = new HashSet<Long>();
     String NO_DESCRIPTION = "This event currently has no description";
     String NO_NAME = "Anonymous Event";
     Calendar NO_START_DATE = GregorianCalendar.getInstance(TimeZone.getDefault());
@@ -50,10 +50,11 @@ public interface Event extends Displayable {
 
     String getName();
 
-    List<User> getParticipants();
+    Set<Long> getParticipantIds();
 
     /**
-     * @return The date (year, month, day, hour, minute) at which the event starts
+     * @return The date (year, month, day, hour, minute) at which the event
+     *         starts
      */
     Calendar getStartDate();
 
