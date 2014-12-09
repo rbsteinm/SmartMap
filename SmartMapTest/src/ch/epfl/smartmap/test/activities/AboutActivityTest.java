@@ -3,7 +3,7 @@ package ch.epfl.smartmap.test.activities;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
@@ -36,7 +36,20 @@ public class AboutActivityTest extends ActivityInstrumentationTestCase2<AboutAct
     }
 
     public void testOurNamesDisplayed() {
-        List<String> ourNames = new ArrayList<String>();
+        List<String> teamMembers = Arrays.asList(mContext.getResources().getStringArray(R.array.app_authors));
+
+        for (String s : teamMembers) {
+            onView(ViewMatchers.withText(s)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        }
+    }
+
+    public void testThanksListDisplayed() {
+        List<String> thanksTo =
+            Arrays.asList(mContext.getResources().getStringArray(R.array.app_special_thanks));
+
+        for (String s : thanksTo) {
+            onView(ViewMatchers.withText(s)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        }
     }
 
     public void testVersionNumberDisplayed() {
