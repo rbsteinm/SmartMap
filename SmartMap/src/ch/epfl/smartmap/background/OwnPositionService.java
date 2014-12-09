@@ -90,8 +90,7 @@ public class OwnPositionService extends Service {
         protected Boolean doInBackground(Void... arg0) {
             try {
                 // Authentify in order to communicate with NetworkClient
-                ServiceContainer.getNetworkClient().authServer(
-                    ServiceContainer.getSettingsManager().getUserName(),
+                ServiceContainer.getNetworkClient().authServer(ServiceContainer.getSettingsManager().getUserName(),
                     ServiceContainer.getSettingsManager().getFacebookID(),
                     ServiceContainer.getSettingsManager().getToken());
                 return true;
@@ -110,7 +109,7 @@ public class OwnPositionService extends Service {
                 // criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
                 Log.d(TAG, "Avant de get une fois notre position");
                 mLocManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new MyLocationListener(), null);
-                Log.d(TAG, "Après de get une fois notre position");
+                Log.d(TAG, "Aprï¿½s de get une fois notre position");
                 // Try to run LocationManager with Network Provider
                 if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                     mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_TIME,
@@ -119,8 +118,8 @@ public class OwnPositionService extends Service {
 
                 // And try to run LocationManager with GPS Provider
                 if (mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME,
-                        MIN_GPS_DISTANCE, new MyLocationListener());
+                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME, MIN_GPS_DISTANCE,
+                        new MyLocationListener());
                 }
             } else {
                 // FIXME : Handle this case
@@ -193,10 +192,8 @@ public class OwnPositionService extends Service {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
         restartService.setPackage(this.getPackageName());
         PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
-                PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService =
-            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
     }
