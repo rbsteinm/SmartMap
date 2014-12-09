@@ -494,11 +494,9 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     /**
-     * <<<<<<< HEAD Sets the view for Item Focus, this means - Write name /
+     * Sets the view for Item Focus, this means - Write name /
      * Display photo on ActionBar - Sets ActionMenu
-     * for Item ======= Sets the view for Item Focus, this means - Write name /
-     * Display photo on ActionBar - Sets
-     * ActionMenu for Item >>>>>>> a52284645a7fdabf92fc5582f572f8a918a484d2
+     * for Item
      * Focus
      * 
      * @param item

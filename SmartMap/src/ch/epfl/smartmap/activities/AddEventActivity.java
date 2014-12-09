@@ -260,14 +260,9 @@ public class AddEventActivity extends FragmentActivity {
             mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
             mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-            mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
-
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer.getSettingsManager()
                 .getLocation().getLatitude(), ServiceContainer.getSettingsManager().getLocation().getLongitude()));
             Log.d(TAG, " " + mGoogleMap.getMyLocation());
-            // new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new
-            // LatLng(mGoogleMap.getMyLocation().getLatitude(),
-            // mGoogleMap.getMyLocation().getLatitude()));
 
         }
     }
@@ -414,14 +409,14 @@ public class AddEventActivity extends FragmentActivity {
                     mGoogleMap.clear();
                 }
                 Intent setLocationIntent = new Intent(AddEventActivity.this, SetLocationActivity.class);
-                setLocationIntent.putExtra("eventPosition", mEventPosition);
+                setLocationIntent.putExtra(LOCATION_EXTRA, mEventPosition);
                 AddEventActivity.this.startActivityForResult(setLocationIntent, PICK_LOCATION_REQUEST);
             }
         });
 
         Bundle extras = this.getIntent().getExtras();
         if (extras != null) {
-            LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
+            LatLng latLng = extras.getParcelable(LOCATION_EXTRA);
             if ((latLng != null) && (Math.abs(latLng.latitude) > 0)) {
                 // The user long clicked the map in MainActivity and wants to
                 // create an event
@@ -482,7 +477,7 @@ public class AddEventActivity extends FragmentActivity {
     private void updateLocation(Intent data) {
         Bundle extras = data.getExtras();
 
-        mEventPosition = extras.getParcelable(LOCATION_SERVICE);
+        mEventPosition = extras.getParcelable(LOCATION_EXTRA);
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         String cityName = "";
         List<Address> addresses = null;
@@ -491,6 +486,7 @@ public class AddEventActivity extends FragmentActivity {
         } catch (IOException e) {
             Log.d(TAG, "Google couldn't retrieve any adresses fromt he coordinates: " + e);
         }
+
         if ((!addresses.isEmpty()) || ((cityName != null) && !cityName.isEmpty())) {
             cityName = addresses.get(0).getLocality();
             mPlaceName.setText(cityName);
