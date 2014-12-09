@@ -6,10 +6,10 @@ import org.json.JSONObject;
 import org.junit.Test;
 
 import android.test.AndroidTestCase;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.servercom.JsonSmartMapParser;
 import ch.epfl.smartmap.servercom.SmartMapParseException;
 import ch.epfl.smartmap.servercom.SmartMapParser;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * Tests whether the app correctly handles malformed JSON

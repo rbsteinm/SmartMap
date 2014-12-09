@@ -11,11 +11,11 @@ import android.location.Location;
 import android.test.AndroidTestCase;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.servercom.JsonSmartMapParser;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 import ch.epfl.smartmap.servercom.SmartMapParseException;
 import ch.epfl.smartmap.servercom.SmartMapParser;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * Tests whether the app correctly handles proper JSON
