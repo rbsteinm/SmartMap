@@ -34,13 +34,18 @@ public class OwnPositionService extends Service {
         @Override
         public void onLocationChanged(final Location newLocation) {
             // check if new location is accurate enough
+            Log.d(TAG, "Position dans settingsManager : " + ServiceContainer.getSettingsManager().getLocation()
+                + "\n new location : " + newLocation);
             if ((ServiceContainer.getSettingsManager().getLocation().distanceTo(newLocation) >= newLocation
                 .getAccuracy()) || (newLocation.getAccuracy() <= mCurrentAccuracy)) {
+                Log.d(TAG, "are we here?");
                 mCurrentAccuracy = newLocation.getAccuracy();
                 // Name of our location
                 String locName = Utils.getCityFromLocation(newLocation);
                 // Give new location to SettingsManager
                 ServiceContainer.getSettingsManager().setLocationName(locName);
+                ServiceContainer.getSettingsManager().setLocation(newLocation);
+
                 // Sends new Position to server
                 if (!ServiceContainer.getSettingsManager().isOffline()) {
                     new AsyncTask<Void, Void, Void>() {
