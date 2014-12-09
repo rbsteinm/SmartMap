@@ -19,6 +19,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * Activity that shows full informations about a Displayable Object.
@@ -147,25 +148,13 @@ public class UserInformationActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Get User & Database
+        //Set user informations
         mUser = ServiceContainer.getCache().getUser(this.getIntent().getLongExtra("USER", User.NO_ID));
-        if (mUser.getLocation() != null) {
-            mDistanceToUser =
-                Math.round(ServiceContainer.getSettingsManager().getLocation().distanceTo(mUser.getLocation()));
-        } else {
-            mDistanceToUser = 0;
-        }
-
-        // Set Informations
         mNameView.setText(mUser.getName());
         mSubtitlesView.setText(mUser.getSubtitle());
         mPictureView.setImageBitmap(mUser.getImage());
         mFollowSwitch.setChecked(mUser.isVisible());
         mBlockSwitch.setChecked(mUser.isBlocked());
-        if (mDistanceToUser != 0) {
-            mDistanceView.setText(mDistanceToUser + " meters away from you");
-        } else {
-            mDistanceView.setText("");
-        }
+        mDistanceView.setText(Utils.printDistanceToMe(mUser.getLocation()));
     }
 }
