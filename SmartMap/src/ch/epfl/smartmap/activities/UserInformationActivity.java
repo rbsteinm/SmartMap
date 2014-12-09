@@ -71,7 +71,6 @@ public class UserInformationActivity extends Activity {
 
     private static final String TAG = UserInformationActivity.class.getSimpleName();
     private User mUser;
-    private int mDistanceToUser;
     private Switch mFollowSwitch;
     private Switch mBlockSwitch;
     private TextView mSubtitlesView;
