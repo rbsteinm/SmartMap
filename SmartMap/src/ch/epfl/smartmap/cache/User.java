@@ -6,7 +6,7 @@ import java.util.GregorianCalendar;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.util.Utils;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
  * Describes a generic user of the app
@@ -18,7 +18,8 @@ public interface User extends Displayable {
 
     long NO_ID = -1;
     String NO_NAME = "Unknown User";
-    Bitmap NO_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(), R.drawable.ic_default_user);
+    Bitmap NO_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext().getResources(),
+            R.drawable.ic_default_user);
 
     String NO_PHONE_NUMBER = "No phone Number";
     String NO_EMAIL = "No email";

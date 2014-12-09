@@ -5,7 +5,7 @@ import java.util.Set;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.util.Utils;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
  * A list of user IDs
@@ -17,7 +17,8 @@ public interface Filter extends Displayable {
     // Id of the Default filter
     long DEFAULT_FILTER_ID = 0;
 
-    Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(), R.drawable.ic_hashtag);
+    Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
+            .getResources(), R.drawable.ic_hashtag);
 
     /**
      * Adds a user to the list
