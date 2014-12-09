@@ -22,7 +22,7 @@
     </string-array>
 
     <string name="title_activity_pager">Friends</string>
-    <string name="search_bar_hint">Search...</string>
+    <string name="search_bar_hint">Search…</string>
     <string name="title_activity_map_fragment">MapFragment</string>
 
     <!-- User interface labels and strings -->
@@ -74,7 +74,7 @@
 
     <!-- StartActivity -->
     <string name="welcome">W E L C O M E</string>
-    <string name="loading_text">Logging in...</string>
+    <string name="loading_text">Logging in…</string>
     <string name="logo_description">logo</string>
 
     <!-- ShowEventsActivity -->
@@ -84,11 +84,11 @@
     <string name="ShowEventsCheckBoxStatus">Ongoing</string>
     <string name="showEventsMenuNewEvent">Create a new event</string>
     <string name="show_event_on_the_map_button">Show on the map</string>
-    <string name="show_event_on_the_map_loading">Opening event on the map...</string>
+    <string name="show_event_on_the_map_loading">Opening event on the map…</string>
     <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
     <string name="show_event_details_button">See details</string>
     <string name="show_event_server_error">Couldn\'t fetch wished content from our server, sorry :(</string>
-    <string name="show_event_loading_info">Loading informations...</string>
+    <string name="show_event_loading_info">Loading informations…</string>
     <string name="show_events_menu_refresh">Refresh</string>
 
     <!-- EventsListItemAdapter -->
@@ -214,7 +214,7 @@
     <string name="settings_key_events_show_public">events_show_public</string>
     <string name="settings_key_events_show_private">events_show_private</string>
     <string name="settings_key_max_distance_fetch_events">events_fetch_distance</string>
-    
+
     <!-- SettingsManager -->
     <string name="settings_manager_default_name">No name</string>
     <string name="settings_manager_default_number">No number</string>
@@ -237,7 +237,7 @@
     <string name="about_dummy_copyright">© 2014</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    
+
     <!-- Utils -->
     <string name="utils_never_seen_on_smartmap">Never seen on SmartMap</string>
     <string name="utils_next">Next</string>
@@ -250,11 +250,12 @@
     <string name="utils_minutes_ago">minutes ago</string>
     <string name="utils_one_hour_ago">1 hour ago</string>
     <string name="utils_hours_ago">hours ago</string>
-    <string name="utils_days_ago">daya ago</string>
+    <string name="utils_days_ago">days ago</string>
 
-    <!-- Nothing below this line! -->
-
+    <!-- ProfileActivity -->
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="hello_world">Hello world!</string>
+
+    <!-- Nothing below this line! -->
 
 </resources>
