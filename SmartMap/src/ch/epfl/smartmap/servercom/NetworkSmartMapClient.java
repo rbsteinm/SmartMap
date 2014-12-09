@@ -391,7 +391,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getInvitations()
      */
     @Override
-    public NotificationBag getInvitations() throws SmartMapClientException {
+    public InvitationBag getInvitations() throws SmartMapClientException {
 
         HttpURLConnection conn = this.getHttpURLConnection("/getInvitations");
         String response = this.sendViaPost(new HashMap<String, String>(), conn);
@@ -413,7 +413,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-        return new NetworkNotificationBag(inviters, newFriends, removedFriends);
+        return new NetworkInvitationBag(inviters, newFriends, removedFriends);
 
     }
 

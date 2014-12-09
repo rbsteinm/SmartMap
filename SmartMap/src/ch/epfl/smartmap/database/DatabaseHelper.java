@@ -435,7 +435,10 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 long date = cursor.getLong(cursor.getColumnIndex(KEY_DATE));
                 int type = cursor.getInt(cursor.getColumnIndex(KEY_TYPE));
 
-                invitations.add(new ImmutableInvitation(id, userId, eventId, status, date, type));
+                ImmutableUser user = new ImmutableUser(id, null, null, null, null, null, null, false);
+
+                invitations.add(new ImmutableInvitation(id, user, eventId, status, date, type));
+
             } while (cursor.moveToNext());
         }
 

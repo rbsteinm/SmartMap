@@ -19,7 +19,7 @@ import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
-import ch.epfl.smartmap.servercom.NotificationBag;
+import ch.epfl.smartmap.servercom.InvitationBag;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -133,9 +133,8 @@ public class Cache {
             this.putFriend(friend);
 
             ImmutableInvitation invitation =
-                new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD, GregorianCalendar
-                    .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(),
-                    Invitation.ACCEPTED_FRIEND_INVITATION);
+                new ImmutableInvitation(0, friend, Event.NO_ID, Invitation.UNREAD, GregorianCalendar.getInstance(
+                    TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(), Invitation.ACCEPTED_FRIEND_INVITATION);
 
             invitation.setUser(this.getFriend(friend.getId()));
 
@@ -769,33 +768,69 @@ public class Cache {
     }
 
     public synchronized void putInvitations(Set<ImmutableInvitation> newInvitations) {
+        Log.d(TAG, "Put invitation : " + newInvitations.size());
+        boolean isListModified = false;
         for (final ImmutableInvitation newInvitation : newInvitations) {
-            if (mInvitationInstances.get(newInvitation.getId()) == null) {
-                // Need to add it, give it to the database to get the id
-                final long id = ServiceContainer.getDatabase().addInvitation(newInvitation);
-                ServiceContainer.getSearchEngine().findStrangerById(id, new SearchRequestCallback<User>() {
-
-                    @Override
-                    public synchronized void onNetworkError() {
-                        // TODO
+            Log.d(TAG, "Invitation id : " + newInvitation.getId());
+            Invitation invitation = null;
+            switch (newInvitation.getType()) {
+                case Invitation.FRIEND_INVITATION:
+                    Cache.this.putStranger(newInvitation.getImmUser());
+                    newInvitation.setUser(Cache.this.getUser(newInvitation.getUserId()));
+                    if (newInvitation.getId() == Invitation.NO_ID) {
+                        // Send from server, need to add local ID
+                        long id = ServiceContainer.getDatabase().addInvitation(newInvitation);
+                        newInvitation.setId(id);
+                        // Phone notification
+                        Notifications.newFriendNotification(ServiceContainer.getSettingsManager().getContext(),
+                            newInvitation.getImmUser());
+                        // Ack to server
+                        new AsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                try {
+                                    Log.d(TAG, "Ack server");
+                                    ServiceContainer.getNetworkClient()
+                                        .ackAcceptedInvitation(newInvitation.getUserId());
+                                } catch (SmartMapClientException e) {
+                                    Log.e(TAG, "Client exception : " + e);
+                                }
+                                return null;
+                            }
+                        }.execute();
                     }
+                    invitation = new GenericInvitation(newInvitation);
+                    break;
 
-                    @Override
-                    public synchronized void onNotFound() {
-                        // TODO
+                case Invitation.ACCEPTED_FRIEND_INVITATION:
+                    Cache.this.putFriend(newInvitation.getImmUser());
+                    newInvitation.setUser(Cache.this.getUser(newInvitation.getUserId()));
+                    if (newInvitation.getId() == Invitation.NO_ID) {
+                        // Send from server, need to add local ID
+                        long id = ServiceContainer.getDatabase().addInvitation(newInvitation);
+                        newInvitation.setId(id);
+                        // Phone notification
+                        Notifications.acceptedFriendNotification(ServiceContainer.getSettingsManager().getContext(),
+                            newInvitation.getImmUser());
                     }
+                    invitation = new GenericInvitation(newInvitation);
+                    break;
+                case Invitation.EVENT_INVITATION:
 
-                    @Override
-                    public synchronized void onResult(User result) {
-                        mInvitationIds.add(id);
-                        mInvitationInstances.put(id, new GenericInvitation(newInvitation.setUser(result).setId(id)));
-                    }
-                });
+                    break;
+                default:
+                    break;
             }
+
+            mInvitationIds.add(invitation.getId());
+            mInvitationInstances.put(invitation.getId(), invitation);
+            isListModified = true;
         }
 
-        for (CacheListener listener : mListeners) {
-            listener.onInvitationListUpdate();
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onInvitationListUpdate();
+            }
         }
     }
 
@@ -1045,7 +1080,7 @@ public class Cache {
                         }
 
                         ImmutableInvitation invitation =
-                            new ImmutableInvitation(0, e.getCreator().getId(), e.getId(), Invitation.UNREAD,
+                            new ImmutableInvitation(0, e.getCreator().getImmutableCopy(), e.getId(), Invitation.UNREAD,
                                 new GregorianCalendar().getTimeInMillis(), Invitation.UNREAD);
 
                         invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
@@ -1111,12 +1146,8 @@ public class Cache {
     }
 
     // TODO
-    public synchronized void updateFriendInvitations(NotificationBag notifBag, final Context ctx) {
-
-        this.updateFriendRequests(notifBag.getInvitingUsers(), ctx);
-        this.acceptNewFriends(notifBag.getNewFriends(), ctx);
-        this.removeRemovedFriends(notifBag.getRemovedFriendsIds());
-
+    public synchronized void updateFriendInvitations(InvitationBag notifBag, final Context ctx) {
+        this.putInvitations(notifBag.getInvitations());
     }
 
     private void updateFriendRequests(Set<ImmutableUser> invitingFriends, Context ctx) {
@@ -1130,8 +1161,8 @@ public class Cache {
 
                 // Creating the invitation
                 ImmutableInvitation invitation =
-                    new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD, GregorianCalendar
-                        .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(), Invitation.FRIEND_INVITATION);
+                    new ImmutableInvitation(0, friend, Event.NO_ID, Invitation.UNREAD, GregorianCalendar.getInstance(
+                        TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(), Invitation.FRIEND_INVITATION);
 
                 invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
                 invitation.setUser(this.getUser(friend.getId()));

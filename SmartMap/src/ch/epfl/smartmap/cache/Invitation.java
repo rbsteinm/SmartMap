@@ -9,6 +9,8 @@ import android.content.Intent;
  */
 public interface Invitation {
 
+    long NO_ID = -1;
+
     /**
      * int representing invitation status
      */
