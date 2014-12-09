@@ -13,34 +13,13 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * Displays each user in a row. The friend items are clickable to signify they
- * are invited. Use ViewHolder pattern as in
+ * Displays each user in a row. The friend items are clickable to signify they are invited. Use ViewHolder pattern as in
  * {@link ch.epfl.smartmap.gui.EventsListItemAdapter}.
  * 
  * @author SpicyCH
  * @author agpmilli
  */
 public class FriendPickerListAdapter extends ArrayAdapter<User> {
-
-    /**
-     * TODO
-     */
-    public static class ViewHolder {
-        private TextView mName;
-        private ImageView mPicture;
-        private long mId;
-
-        public long getId() {
-            return mId;
-        }
-
-        public void setId(long newId) {
-            this.mId = newId;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private static final String TAG = FriendPickerListAdapter.class.getSimpleName();
 
     private final Context mContext;
 
@@ -65,21 +44,43 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
         ViewHolder viewHolder;
         User user = this.getItem(position);
 
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.gui_select_friend_item, parent, false);
-            viewHolder = new ViewHolder();
-            viewHolder.mName = (TextView) convertView.findViewById(R.id.activity_friends_name);
-            viewHolder.mPicture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
-            viewHolder.setId(user.getId());
+        View newConvertView;
 
-            convertView.setTag(viewHolder);
+        if (convertView == null) {
+            newConvertView = inflater.inflate(R.layout.gui_select_friend_item, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.mName = (TextView) newConvertView.findViewById(R.id.activity_friends_name);
+            viewHolder.mPicture = (ImageView) newConvertView.findViewById(R.id.activity_friends_picture);
         } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+            newConvertView = convertView;
+            viewHolder = (ViewHolder) newConvertView.getTag();
         }
 
         viewHolder.mName.setText(user.getName());
         viewHolder.mPicture.setImageBitmap(user.getImage());
+        viewHolder.setId(user.getId());
+        newConvertView.setTag(viewHolder);
 
-        return convertView;
+        return newConvertView;
+    }
+
+    /**
+     * A <code>ViewHolder</code> to store views and avoid useless findViewById().
+     * 
+     * @see <a
+     *      href="http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder">developer.android</a>
+     */
+    public static class ViewHolder {
+        private TextView mName;
+        private ImageView mPicture;
+        private long mId;
+
+        public long getId() {
+            return mId;
+        }
+
+        public void setId(long newId) {
+            this.mId = newId;
+        }
     }
 }
