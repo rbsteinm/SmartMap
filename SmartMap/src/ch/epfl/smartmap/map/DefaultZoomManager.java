@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.util.Utils;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -115,6 +116,10 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
                         for (Marker marker : importantMarkers) {
                             boundsBuilder.include(marker.getPosition());
                         }
+                        // Include own pos in case there is no marker
+                        boundsBuilder.include(new LatLng(ServiceContainer.getSettingsManager().getLocation()
+                            .getLatitude(), ServiceContainer.getSettingsManager().getLocation()
+                            .getLongitude()));
                         LatLngBounds bounds = boundsBuilder.build();
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                             mMapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);

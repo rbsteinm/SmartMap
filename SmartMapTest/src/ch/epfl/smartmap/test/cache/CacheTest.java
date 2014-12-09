@@ -11,16 +11,14 @@ import org.junit.Test;
 import android.location.Location;
 import android.test.AndroidTestCase;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableFilter;
+import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.search.CachedSearchEngine;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 
 /**
  * @author jfperren
@@ -45,17 +43,20 @@ public class CacheTest extends AndroidTestCase {
 
     private static ImmutableEvent EVENT_WITH_NO_ID;
 
+    private static ImmutableInvitation ACCEPTED_FRIEND_INVITATION = new ImmutableInvitation(1, 2,
+        Event.NO_ID, Invitation.UNREAD, 1, Invitation.ACCEPTED_FRIEND_INVITATION);
+    private static ImmutableInvitation FRIEND_INVITATION = new ImmutableInvitation(2, 1, Event.NO_ID,
+        Invitation.READ, 1, Invitation.FRIEND_INVITATION);
+    private static ImmutableInvitation EVENT_INVITATION = new ImmutableInvitation(3, 2, 2,
+        Invitation.ACCEPTED, 1, Invitation.EVENT_INVITATION);
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mCache = new Cache();
 
         // Add services
-        ServiceContainer.setCache(mCache);
-        ServiceContainer.setSettingsManager(new SettingsManager(this.getContext()));
-        ServiceContainer.setSearchEngine(new CachedSearchEngine());
-        ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
-        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getContext()));
+        ServiceContainer.initSmartMapServices(this.getContext());
+        mCache = ServiceContainer.getCache();
 
         DATE_ONE = GregorianCalendar.getInstance();
         DATE_TWO = GregorianCalendar.getInstance();
@@ -132,13 +133,32 @@ public class CacheTest extends AndroidTestCase {
     public void testPutAndGetFriend() {
         mCache.putFriend(JULIEN);
         mCache.putFriend(ALAIN);
-        // Get event
+        // Get friend
         assertEquals(mCache.getFriend(JULIEN.getId()).getId(), JULIEN.getId());
         // Get all friends
         assertEquals(mCache.getAllFriends().size(), 2);
-        // Get all events with id
+        // Get all friends with id
         Set<Long> ids = new HashSet<Long>();
         ids.add((long) 1);
         assertEquals(mCache.getFriends(ids).size(), 1);
+    }
+
+    @Test
+    public void testPutAndGetInvitations() {
+        mCache.putInvitations(new HashSet<ImmutableInvitation>(Arrays.asList(ACCEPTED_FRIEND_INVITATION,
+            FRIEND_INVITATION, EVENT_INVITATION)));
+        // Get invitation
+        assertEquals(mCache.getInvitation(FRIEND_INVITATION.getId()).getId(), FRIEND_INVITATION.getId());
+        // Get unread invitations
+        assertEquals(mCache.getUnansweredFriendInvitations().size(), 2);
+        // Get all invitations
+        assertEquals(mCache.getAllInvitations().size(), 3);
+        // Get invitation with filter
+        assertEquals(mCache.getInvitations(new Cache.SearchFilter<Invitation>() {
+            @Override
+            public boolean filter(Invitation item) {
+                return item.getStatus() == Invitation.ACCEPTED;
+            }
+        }), 1);
     }
 }

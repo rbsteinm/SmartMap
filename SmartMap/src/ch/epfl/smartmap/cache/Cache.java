@@ -96,7 +96,7 @@ public class Cache {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
                             ImmutableUser newFriend =
-                            ServiceContainer.getNetworkClient().acceptInvitation(invitation.getId());
+                                ServiceContainer.getNetworkClient().acceptInvitation(invitation.getId());
                             Cache.this.putFriend(newFriend);
                             break;
                         case Invitation.EVENT_INVITATION:
@@ -339,24 +339,6 @@ public class Cache {
         }
     }
 
-    public synchronized SortedSet<Invitation> getFriendInvitations() {
-        return this.getInvitations(mInvitationIds, new SearchFilter<Invitation>() {
-            @Override
-            public synchronized boolean filter(Invitation invitation) {
-                return invitation.getType() == Invitation.FRIEND_INVITATION;
-            }
-        });
-    }
-
-    public synchronized SortedSet<Invitation> getFriendInvitationsByStatus(final int status) {
-        return this.getInvitations(mInvitationIds, new SearchFilter<Invitation>() {
-            @Override
-            public synchronized boolean filter(Invitation invitation) {
-                return invitation.getStatus() == status;
-            }
-        });
-    }
-
     /**
      * OK
      * 
@@ -378,6 +360,19 @@ public class Cache {
         return mInvitationInstances.get(id);
     }
 
+    public synchronized SortedSet<Invitation> getInvitations(SearchFilter<Invitation> filter) {
+        SortedSet<Invitation> invitations = new TreeSet<Invitation>();
+
+        for (long id : mInvitationIds) {
+            Invitation invitation = mInvitationInstances.get(id);
+            if ((filter == null) || ((invitation != null) && filter.filter(invitation))) {
+                invitations.add(invitation);
+            }
+        }
+
+        return invitations;
+    }
+
     public synchronized SortedSet<Invitation> getInvitations(Set<Long> ids) {
         SortedSet<Invitation> invitations = new TreeSet<Invitation>();
         for (long id : ids) {
@@ -386,19 +381,6 @@ public class Cache {
                 invitations.add(invitation);
             }
         }
-        return invitations;
-    }
-
-    public synchronized SortedSet<Invitation> getInvitations(Set<Long> ids, SearchFilter<Invitation> filter) {
-        SortedSet<Invitation> invitations = new TreeSet<Invitation>();
-
-        for (long id : ids) {
-            Invitation invitation = mInvitationInstances.get(id);
-            if ((filter == null) || ((invitation != null) && filter.filter(invitation))) {
-                invitations.add(invitation);
-            }
-        }
-
         return invitations;
     }
 
@@ -637,21 +619,21 @@ public class Cache {
                 // & Fetch Creator online
                 ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(),
                     new SearchRequestCallback<User>() {
-                    @Override
-                    public void onNetworkError() {
-                        // Don't add
-                    }
+                        @Override
+                        public void onNetworkError() {
+                            // Don't add
+                        }
 
-                    @Override
-                    public void onNotFound() {
-                        // Don't add
-                    }
+                        @Override
+                        public void onNotFound() {
+                            // Don't add
+                        }
 
-                    @Override
-                    public void onResult(User result) {
-                        Cache.this.updateEvent(newEvent.setCreator(result));
-                    }
-                });
+                        @Override
+                        public void onResult(User result) {
+                            Cache.this.updateEvent(newEvent.setCreator(result));
+                        }
+                    });
             }
 
             // Notify listeners
@@ -1112,7 +1094,7 @@ public class Cache {
 
                         if (ServiceContainer.getSettingsManager().notificationsEnabled()
 
-                            && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations()) {
+                        && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations()) {
                             Notifications.acceptedFriendNotification(ctx, params[0]);
                         }
 

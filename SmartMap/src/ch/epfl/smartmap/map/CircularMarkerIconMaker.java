@@ -19,8 +19,10 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * An implementation of {@link MarkerIconMaker}, that creates a circular icon for a user
@@ -28,6 +30,8 @@ import ch.epfl.smartmap.cache.User;
  * @author hugo-S
  */
 public class CircularMarkerIconMaker implements MarkerIconMaker {
+
+    private static final String TAG = CircularMarkerIconMaker.class.getSimpleName();
 
     /**
      * the user that the icon represents
@@ -153,7 +157,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @param context
      */
     private void initializeMarkerShape(Context context) {
-        int idForm = R.drawable.marker_form;
+        int idForm = R.drawable.marker_form_2;
         mBaseMarkerShape = BitmapFactory.decodeResource(context.getResources(), idForm);
         mCurrentMarkerShape = mBaseMarkerShape.copy(mBaseMarkerShape.getConfig(), true);
         mCanvasCurrentShape = new Canvas(mCurrentMarkerShape);
@@ -222,13 +226,22 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         long timeoutInMillis = this.minutesToMilliseconds(TIMEOUT_COLOR);
 
         Canvas canvas = new Canvas(mCurrentMarkerShape);
-        ColorMatrix cm = new ColorMatrix();
-        if (elapsedTime < timeoutInMillis) {
-            cm.setSaturation((((SATURATION_BEGIN * timeoutInMillis) - elapsedTime) + (SATURATION_END * elapsedTime))
-                / timeoutInMillis);
-        } else {
-            cm.setSaturation(SATURATION_END);
-        }
+        // ColorMatrix cm = new ColorMatrix();
+        // if (elapsedTime < timeoutInMillis) {
+        // cm.setSaturation((((SATURATION_BEGIN * timeoutInMillis) - elapsedTime) + (SATURATION_END *
+        // elapsedTime))
+        // / timeoutInMillis);
+        // } else {
+        // cm.setSaturation(SATURATION_END);
+        // }
+
+        int green =
+            ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_green);
+        int blue =
+            ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_blue);
+
+        int color = Utils.getColorInInterval(elapsedTime, 0, timeoutInMillis, green, blue);
+        ColorMatrix cm = Utils.getMatrixForColor(color);
 
         ColorMatrixColorFilter lightingColorFilter = new ColorMatrixColorFilter(cm);
         Paint paintLightening = new Paint();
@@ -238,6 +251,5 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         // update the marker icon with the new marker shape
         mMarkerIcon = this.overlay(mCurrentMarkerShape, mProfilePicture);
         mMarkerIcon = this.scaleMarker(mMarkerIcon, SCALE_MARKER);
-
     }
 }
