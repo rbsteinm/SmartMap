@@ -196,7 +196,7 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean isGoing() {
-        return mParticipants.contains(ServiceContainer.getSettingsManager().getUserId());
+        return mParticipantIds.contains(ServiceContainer.getSettingsManager().getUserId());
     }
 
     /*
