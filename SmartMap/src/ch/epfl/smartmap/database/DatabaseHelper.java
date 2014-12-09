@@ -43,7 +43,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
     private static final String DATABASE_NAME = "SmartMapDB";
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
@@ -180,6 +180,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_LATITUDE, event.getLocation().getLatitude());
             values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
             values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
+            values.put(KEY_POSNAME, event.getLocationString());
 
             mDatabase.insert(TABLE_EVENT, null, values);
         } else {
@@ -529,19 +530,18 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     public List<Long> getFilterIds() {
         List<Long> filterIds = new ArrayList<Long>();
         // FIXME
-        // String query = "SELECT  * FROM " + TABLE_FILTER;
-        //
-        // Cursor cursor = mDatabase.rawQuery(query, null);
-        //
-        // if (cursor.moveToFirst()) {
-        // do {
-        // filterIds.add(cursor.getLong(cursor.getColumnIndex(KEY_FILTER_ID)));
-        // } while (cursor.moveToNext());
-        // }
-        //
-        // cursor.close();
-        return filterIds;
+        String query = "SELECT  * FROM " + TABLE_FILTER;
 
+        Cursor cursor = mDatabase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                filterIds.add(cursor.getLong(cursor.getColumnIndex(KEY_ID)));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return filterIds;
     }
 
     /**
@@ -649,6 +649,18 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return pic;
     }
 
+    private void notifyOnInvitationListUpdateListeners() {
+        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
+            listener.onInvitationListUpdate();
+        }
+    }
+
+    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
+        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
+            listener.onInvitationStatusUpdate(id, status);
+        }
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_USER);
@@ -658,6 +670,21 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_INVITATIONS);
         db.execSQL(CREATE_TABLE_PENDING);
     }
+
+    // /**
+    // * Fully updates the friends database (not only positions)
+    // */
+    // public void refreshFriendsInfo() {
+    // List<User> friends = this.getAllFriends();
+    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+    // for (User f : friends) {
+    // try {
+    // this.updateUser(client.getUserInfo(f.getID()));
+    // } catch (SmartMapClientException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // }
 
     /**
      * Uses listFriendsPos() to update the entire friends database with updated
@@ -702,21 +729,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
         this.onCreate(db);
     }
-
-    // /**
-    // * Fully updates the friends database (not only positions)
-    // */
-    // public void refreshFriendsInfo() {
-    // List<User> friends = this.getAllFriends();
-    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-    // for (User f : friends) {
-    // try {
-    // this.updateUser(client.getUserInfo(f.getID()));
-    // } catch (SmartMapClientException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // }
 
     /**
      * Stores a profile picture
@@ -821,6 +833,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void updateFromCache() {
         Log.d(TAG, "Update Database from Cache");
+
+        mDatabase.delete(TABLE_USER, null, null);
+        mDatabase.delete(TABLE_FILTER, null, null);
+        mDatabase.delete(TABLE_FILTER_USER, null, null);
+        mDatabase.delete(TABLE_EVENT, null, null);
+
         // FIXME : Need to store only our events, filters, friends, and
         // settings.
         Set<User> friends = ServiceContainer.getCache().getAllFriends();
@@ -868,17 +886,5 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return rows;
-    }
-
-    private void notifyOnInvitationListUpdateListeners() {
-        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
-            listener.onInvitationListUpdate();
-        }
-    }
-
-    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
-        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
-            listener.onInvitationStatusUpdate(id, status);
-        }
     }
 }
