@@ -29,10 +29,41 @@ import ch.epfl.smartmap.gui.FriendPickerListAdapter;
  */
 public class InviteFriendsActivity extends ListActivity {
 
-    private final String TAG = InviteFriendsActivity.class.getSimpleName();
+    /**
+     * Callback
+     * 
+     * @author SpicyCH
+     */
+    class InviteFriendsCallback implements NetworkRequestCallback {
+        @Override
+        public void onFailure() {
+            InviteFriendsActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(InviteFriendsActivity.this,
+                        InviteFriendsActivity.this.getString(R.string.invite_friends_failure), Toast.LENGTH_SHORT)
+                        .show();
+                }
+            });
+        }
 
+        @Override
+        public void onSuccess() {
+            InviteFriendsActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(InviteFriendsActivity.this,
+                        InviteFriendsActivity.this.getString(R.string.invite_friends_success), Toast.LENGTH_SHORT)
+                        .show();
+                }
+            });
+        }
+    }
+
+    private static final String TAG = InviteFriendsActivity.class.getSimpleName();
     private FriendPickerListAdapter mAdapter;
     private List<Boolean> mSelectedPositions;
+
     private List<User> mUserList;
 
     /**
@@ -62,34 +93,10 @@ public class InviteFriendsActivity extends ListActivity {
 
         Log.d(TAG, "Friends ids to invite: " + friendsIds);
 
-        if (friendsIds.size() > 0) {
+        if (!friendsIds.isEmpty()) {
             // Invite friends if at least one selected
             ServiceContainer.getCache().inviteFriendsToEvent(this.getIntent().getLongExtra("EVENT", 0), friendsIds,
-                new NetworkRequestCallback() {
-                    @Override
-                    public void onFailure() {
-                        InviteFriendsActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(InviteFriendsActivity.this,
-                                    InviteFriendsActivity.this.getString(R.string.invite_friends_failure),
-                                    Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onSuccess() {
-                        InviteFriendsActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(InviteFriendsActivity.this,
-                                    InviteFriendsActivity.this.getString(R.string.invite_friends_success),
-                                    Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
+                new InviteFriendsCallback());
         } else {
             Toast.makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG).show();
         }
@@ -147,13 +154,16 @@ public class InviteFriendsActivity extends ListActivity {
             case R.id.invite_friend_send_button:
                 this.inviteFriends();
                 this.finish();
-
+                break;
+            default:
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     /**
+     * Sets the list adapter of this class.
+     * 
      * @author SpicyCH
      */
     private void setAdapter() {
