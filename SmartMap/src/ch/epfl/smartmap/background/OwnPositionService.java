@@ -1,5 +1,7 @@
 package ch.epfl.smartmap.background;
 
+import java.util.GregorianCalendar;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -42,6 +44,7 @@ public class OwnPositionService extends Service {
                 String locName = Utils.getCityFromLocation(newLocation);
                 // Give new location to SettingsManager
                 ServiceContainer.getSettingsManager().setLocationName(locName);
+                ServiceContainer.getSettingsManager().setLastSeen(new GregorianCalendar().getTimeInMillis());
                 // Sends new Position to server
                 if (!ServiceContainer.getSettingsManager().isOffline()) {
                     new AsyncTask<Void, Void, Void>() {
