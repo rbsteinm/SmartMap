@@ -1,18 +1,13 @@
 package ch.epfl.smartmap.activities;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -34,6 +29,7 @@ import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
+import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -462,16 +458,14 @@ public class AddEventActivity extends FragmentActivity {
         Bundle extras = data.getExtras();
 
         mEventPosition = extras.getParcelable(LOCATION_SERVICE);
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        String cityName = "";
-        List<Address> addresses = null;
-        try {
-            addresses = geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
-        } catch (IOException e) {
-            Log.d(TAG, "Google couldn't retrieve any adresses fromt he coordinates: " + e);
-        }
-        if ((!addresses.isEmpty()) || ((cityName != null) && !cityName.isEmpty())) {
-            cityName = addresses.get(0).getLocality();
+
+        Location location = new Location("");
+        location.setLatitude(mEventPosition.latitude);
+        location.setLongitude(mEventPosition.longitude);
+
+        String cityName = Utils.getCityFromLocation(location);
+
+        if (((cityName != null) && !cityName.isEmpty())) {
             mPlaceName.setText(cityName);
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
