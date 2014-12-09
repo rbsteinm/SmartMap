@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- NOTE: The app authors are shown in AboutActivity -->
+    <string-array name="app_authors">
+        <item>Robin Genolet</item>
+        <item>Julien Perrenoud</item>
+        <item>Matthieu Girod</item>
+        <item>Alain Milliet</item>
+        <item>Nicolas Ritter</item>
+        <item>Raphaël Steinmann</item>
+        <item>Hugo Sbai</item>
+        <item>Marion Sbai</item>
+    </string-array>
+    
+    <!-- NOTE: The special thanks list is also shown in AboutActivity -->
+    <string-array name="app_special_thanks">
+        <item>Prof. James Larus</item>
+        <item>Călin Iorgulescu</item>
+        <item>Lukas Kellenberger</item>
+    </string-array>
+
     <string name="app_name">SmartMap</string>
     <string name="action_settings">Settings</string>
     <string name="action_showfriends">Show friends</string>
