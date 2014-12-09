@@ -135,12 +135,19 @@ public final class SettingsManager {
     }
 
     public String getSubtitle() {
+        if (this.getLastSeen() == DEFAULT_LASTSEEN) {
+            return "unknown";
+        }
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(ServiceContainer.getSettingsManager().getLastSeen());
         String subtitle =
             Utils.getLastSeenStringFromCalendar(calendar) + " near "
-                + ServiceContainer.getSettingsManager().getLocation();
-        return mSharedPref.getString(subtitle, DEFAULT_SUBTITLE);
+                + this.getLocationName();
+        return subtitle;
+    }
+
+    public String getLocationName() {
+        return mSharedPref.getString(LOCATION_NAME, DEFAULT_LOC_NAME);
     }
 
     /**

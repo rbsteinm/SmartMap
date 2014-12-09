@@ -60,8 +60,8 @@ public class SetLocationActivity extends FragmentActivity {
 
             // Get my position from SettingsManager
             mMyPosition =
-                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
-                    .getSettingsManager().getLocation().getLongitude());
+                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(),
+                    ServiceContainer.getSettingsManager().getLocation().getLongitude());
 
             mEventPosition = this.getIntent().getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
 
