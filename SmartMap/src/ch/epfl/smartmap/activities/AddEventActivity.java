@@ -69,6 +69,10 @@ public class AddEventActivity extends FragmentActivity {
     private static final String TIME_PICKER_DESCR = "timePicker";
     private static final String DATE_PICKER_DESCR = "datePicker";
 
+    private static final int MAX_NAME_SIZE = 60;
+    private static final int MIN_NAME_SIZE = 2;
+    private static final int MAX_DESCRIPTION_SIZE = 255;
+
     private GoogleMap mGoogleMap;
 
     private SupportMapFragment mFragmentMap;
@@ -309,33 +313,7 @@ public class AddEventActivity extends FragmentActivity {
                     setMng.getUserId(), mDescription.getText().toString(), startDate, endDate, location, mPlaceName
                             .getText().toString(), new HashSet<Long>());
 
-            ServiceContainer.getCache().createEvent(event, new NetworkRequestCallback() {
-
-                @Override
-                public void onFailure() {
-                    AddEventActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(mContext,
-                                    mContext.getString(R.string.add_event_toast_couldnt_create_event_server),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-
-                @Override
-                public void onSuccess() {
-                    AddEventActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
-                                    Toast.LENGTH_SHORT).show();
-
-                            mActivity.finish();
-                        }
-                    });
-                }
-            });
+            ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
         }
     }
 
@@ -346,13 +324,13 @@ public class AddEventActivity extends FragmentActivity {
     private boolean fieldsHaveLegalLength() {
 
         int eventNameSize = mEventName.getText().toString().length();
-        boolean eventNameLegal = !((eventNameSize < 2) || (eventNameSize > 60));
+        boolean eventNameLegal = !((eventNameSize < MIN_NAME_SIZE) || (eventNameSize > MAX_NAME_SIZE));
 
         int placeNameSize = mPlaceName.getText().toString().length();
-        boolean placeNameLegal = !((placeNameSize < 2) || (placeNameSize > 60));
+        boolean placeNameLegal = !((placeNameSize < MIN_NAME_SIZE) || (placeNameSize > MAX_NAME_SIZE));
 
         int descrSize = mDescription.getText().toString().length();
-        boolean descrLegal = descrSize < 255;
+        boolean descrLegal = descrSize < MAX_DESCRIPTION_SIZE;
 
         return eventNameLegal && placeNameLegal && descrLegal;
     }
@@ -514,6 +492,43 @@ public class AddEventActivity extends FragmentActivity {
         }
     }
 
+    /**
+     * 
+     * Callback
+     * 
+     * @author SpicyCH
+     */
+    class CreateEventNetworkCallback implements NetworkRequestCallback {
+        @Override
+        public void onFailure() {
+            AddEventActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_couldnt_create_event_server),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @Override
+        public void onSuccess() {
+            AddEventActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, mContext.getString(R.string.add_event_toast_event_created),
+                            Toast.LENGTH_SHORT).show();
+
+                    mActivity.finish();
+                }
+            });
+        }
+    }
+
+    /**
+     * Listener on the TextViews used to display the dates
+     * 
+     * @author SpicyCH
+     */
     class DateChangedListener implements TextWatcher {
         @Override
         public void afterTextChanged(Editable s) {
