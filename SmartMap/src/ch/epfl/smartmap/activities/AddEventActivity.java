@@ -288,6 +288,9 @@ public class AddEventActivity extends FragmentActivity {
                     + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
                     + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
                     + mEventPosition.longitude);
+        } else if (!this.fieldsHaveLegalLength()) {
+            Toast.makeText(mContext, this.getString(R.string.add_event_toast_fields_bad_size), Toast.LENGTH_LONG)
+                    .show();
         } else {
 
             GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
@@ -332,6 +335,26 @@ public class AddEventActivity extends FragmentActivity {
                 }
             });
         }
+    }
+
+    /**
+     * 
+     * @return <code>true</code> if all fields' length are legal, <code>false</code> otherwise.
+     * 
+     * @author SpicyCH
+     */
+    private boolean fieldsHaveLegalLength() {
+
+        int eventNameSize = mEventName.getText().toString().length();
+        boolean eventNameLegal = !((eventNameSize < 2) || (eventNameSize > 60));
+
+        int placeNameSize = mPlaceName.getText().toString().length();
+        boolean placeNameLegal = !((placeNameSize < 2) || (placeNameSize > 60));
+
+        int descrSize = mDescription.getText().toString().length();
+        boolean descrLegal = descrSize < 255;
+
+        return eventNameLegal && placeNameLegal && descrLegal;
     }
 
     /**
