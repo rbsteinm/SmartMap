@@ -3,6 +3,7 @@ package ch.epfl.smartmap.gui;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -55,10 +56,10 @@ public class SearchLayout extends LinearLayout {
     private static final Type DEFAULT_SEARCH_TYPE = Type.ALL;
 
     // Data structures
-    private final HashMap<Type, ScrollView> mScrollViews;
-    private final HashMap<Type, SearchResultViewGroup> mSearchResultViewGroups;
-    private final HashMap<Type, Integer> mSearchTypeIndexes;
-    private final HashMap<Type, TextView> mTitleTextViews;
+    private final Map<Type, ScrollView> mScrollViews;
+    private final Map<Type, SearchResultViewGroup> mSearchResultViewGroups;
+    private final Map<Type, Integer> mSearchTypeIndexes;
+    private final Map<Type, TextView> mTitleTextViews;
     private final List<Type> mActiveSearchTypes;
     private SearchEngine mSearchEngine;
     // Extra views
@@ -217,7 +218,7 @@ public class SearchLayout extends LinearLayout {
         // % operator
         int previousSearchTypeIndex =
             ((mSearchTypeIndexes.get(mCurrentSearchType).intValue() - 1) + mActiveSearchTypes.size())
-                % mActiveSearchTypes.size();
+            % mActiveSearchTypes.size();
         Type previousSearchType = mActiveSearchTypes.get(previousSearchTypeIndex);
         return previousSearchType;
     }
