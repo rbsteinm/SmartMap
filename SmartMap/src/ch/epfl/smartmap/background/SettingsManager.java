@@ -13,8 +13,7 @@ import ch.epfl.smartmap.util.Utils;
  * Used to get and set settings and local info using SharedPreferences
  * 
  * @author ritterni
- * @author SpicyCH (add support for the user settings - we might want to change
- *         the design if my methods are
+ * @author SpicyCH (add support for the user settings - we might want to change the design if my methods are
  *         bottlenecks)
  */
 
@@ -79,16 +78,14 @@ public final class SettingsManager {
     }
 
     /**
-     * @return The local user's email if it is found, DEFAULT_EMAIL value
-     *         otherwise
+     * @return The local user's email if it is found, DEFAULT_EMAIL value otherwise
      */
     public String getEmail() {
         return mSharedPref.getString(EMAIL, DEFAULT_EMAIL);
     }
 
     /**
-     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
-     *         otherwise
+     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value otherwise
      * @author SpicyCH
      */
     public long getFacebookID() {
@@ -111,10 +108,8 @@ public final class SettingsManager {
     }
 
     /**
-     * @return the maximum distance from the user, in meters, for which we can
-     *         fetch events.<br />
-     *         Special cases: 0 if the user selected 'None' and 41'000'000 if
-     *         the user selected 'All'.
+     * @return the maximum distance from the user, in meters, for which we can fetch events.<br />
+     *         Special cases: 0 if the user selected 'None' and 41'000'000 if the user selected 'All'.
      * @author SpicyCH
      */
     public int getNearEventsMaxDistance() {
@@ -124,8 +119,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return the frequence in milliseconds at which we fetch and upload the
-     *         datas. Used by the service.
+     * @return the frequence in milliseconds at which we fetch and upload the datas. Used by the service.
      * @author SpicyCH
      */
     public int getRefreshFrequency() {
@@ -135,18 +129,23 @@ public final class SettingsManager {
     }
 
     public String getSubtitle() {
+        if (this.getLastSeen() == DEFAULT_LASTSEEN) {
+            return "unknown";
+        }
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(ServiceContainer.getSettingsManager().getLastSeen());
         String subtitle =
             Utils.getLastSeenStringFromCalendar(calendar) + " near "
-                + ServiceContainer.getSettingsManager().getLocation();
-        return mSharedPref.getString(subtitle, DEFAULT_SUBTITLE);
+                + this.getLocationName();
+        return subtitle;
+    }
+
+    public String getLocationName() {
+        return mSharedPref.getString(LOCATION_NAME, DEFAULT_LOC_NAME);
     }
 
     /**
-     * @return the time to wait in milliseconds before hiding inactive friends
-     *         from the map. Or the int value
-     *         -1 if the
+     * @return the time to wait in milliseconds before hiding inactive friends from the map. Or the int value -1 if the
      *         user never wants to hide inactive friends.
      * @author SpicyCH
      */
@@ -157,16 +156,14 @@ public final class SettingsManager {
     }
 
     /**
-     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN
-     *         value otherwise
+     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN value otherwise
      */
     public String getToken() {
         return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);
     }
 
     /**
-     * @return The local user's phone number if it is found, DEFAULT_NUMBER
-     *         value otherwise
+     * @return The local user's phone number if it is found, DEFAULT_NUMBER value otherwise
      */
     public String getUPhoneNumber() {
         return mSharedPref.getString(PHONE_NUMBER, DEFAULT_NUMBER);
@@ -180,8 +177,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return The local user's name if it is found, DEFAULT_NAME value
-     *         otherwise
+     * @return The local user's name if it is found, DEFAULT_NAME value otherwise
      */
     public String getUserName() {
         return mSharedPref.getString(USER_NAME, DEFAULT_NAME);
@@ -195,8 +191,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user is offline, <code>false</code>
-     *         otherwise (if he's online).
+     * @return <code>true</code> if the user is offline, <code>false</code> otherwise (if he's online).
      * @author SpicyCH
      */
     public boolean isOffline() {
@@ -205,8 +200,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications,
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsEnabled() {
@@ -215,9 +209,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event
-     *         invitations and the user
-     *         activated the
+     * @return <code>true</code> if the user enabled the notifications for event invitations and the user activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
@@ -227,9 +219,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event
-     *         proximity and the user
-     *         activated the
+     * @return <code>true</code> if the user enabled the notifications for event proximity and the user activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
@@ -239,9 +229,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for
-     *         friend requests and the user
-     *         activated the
+     * @return <code>true</code> if the user enabled the notifications for friend requests and the user activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
@@ -251,14 +239,10 @@ public final class SettingsManager {
     }
 
     /**
-     * A friendship confirmation happens when another user accepts your friend
-     * request.
+     * A friendship confirmation happens when another user accepts your friend request.
      * 
-     * @return <code>true</code> if the user enabled the notifications for
-     *         friendship confirmations and the
-     *         user
-     *         activated the notifications in general, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the user
+     *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
@@ -267,8 +251,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications
-     *         vibrations and the user activated the
+     * @return <code>true</code> if the user enabled the notifications vibrations and the user activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
@@ -409,8 +392,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user wants to see his private events on
-     *         his map, <code>false</code> otherwise.
+     * @return <code>true</code> if the user wants to see his private events on his map, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean showPrivateEvents() {
@@ -419,8 +401,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user wants to see public events on his
-     *         map, <code>false</code> otherwise.
+     * @return <code>true</code> if the user wants to see public events on his map, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean showPublicEvents() {
