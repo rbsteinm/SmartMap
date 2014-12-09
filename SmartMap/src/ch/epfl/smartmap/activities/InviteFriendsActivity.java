@@ -22,22 +22,80 @@ import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 
 /**
  * This activity lets the user invite friends to an event. Launched from
- * {@link ch.epfl.smartmap.activities.EventInformationActivity} or the search
- * panel.
+ * {@link ch.epfl.smartmap.activities.EventInformationActivity} or the search panel.
  * 
  * @author SpicyCH
  */
 public class InviteFriendsActivity extends ListActivity {
 
-    private final String TAG = InviteFriendsActivity.class.getSimpleName();
+    private static final String TAG = InviteFriendsActivity.class.getSimpleName();
 
     private FriendPickerListAdapter mAdapter;
     private List<Boolean> mSelectedPositions;
     private List<User> mUserList;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_invite_friends);
+
+        this.getActionBar().setHomeButtonEnabled(true);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        this.setAdapter();
+
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        if (!mSelectedPositions.get(position)) {
+            Log.d(TAG, "Friend at position " + position + " set to true");
+
+            mSelectedPositions.set(position, true);
+            v.setBackgroundColor(this.getResources().getColor(R.color.on_friend_clicked));
+        } else {
+            Log.d(TAG, "Friend at position " + position + " set to false");
+
+            mSelectedPositions.set(position, false);
+            v.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.invite_friends, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case android.R.id.home:
+                this.setResult(RESULT_CANCELED);
+                this.finish();
+                break;
+            case R.id.invite_friend_send_button:
+                this.inviteFriends();
+                this.setResult(RESULT_OK);
+                this.finish();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
-     * Invites the selected friends. Displays a toast describing if the
-     * invitations were sent or not.
+     * Invites the selected friends. Displays a toast describing if the invitations were sent or not.
      * 
      * @author SpicyCH
      */
@@ -62,103 +120,20 @@ public class InviteFriendsActivity extends ListActivity {
 
         Log.d(TAG, "Friends ids to invite: " + friendsIds);
 
-        if (friendsIds.size() > 0) {
+        if (!friendsIds.isEmpty()) {
             // Invite friends if at least one selected
             ServiceContainer.getCache().inviteFriendsToEvent(this.getIntent().getLongExtra("EVENT", 0), friendsIds,
-                new NetworkRequestCallback() {
-                    @Override
-                    public void onFailure() {
-                        InviteFriendsActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(InviteFriendsActivity.this,
-                                    InviteFriendsActivity.this.getString(R.string.invite_friends_failure),
-                                    Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onSuccess() {
-                        InviteFriendsActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(InviteFriendsActivity.this,
-                                    InviteFriendsActivity.this.getString(R.string.invite_friends_success),
-                                    Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
+                    new InviteFriendsCallback());
         } else {
             Toast.makeText(this, this.getString(R.string.invite_friends_no_items_selected), Toast.LENGTH_LONG).show();
         }
 
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_invite_friends);
-
-        this.getActionBar().setHomeButtonEnabled(true);
-        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        this.setAdapter();
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.invite_friends, menu);
-        return true;
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        if (!mSelectedPositions.get(position)) {
-            Log.d(TAG, "Friend at position " + position + " set to true");
-
-            mSelectedPositions.set(position, true);
-            v.setBackgroundColor(this.getResources().getColor(R.color.on_friend_clicked));
-        } else {
-            Log.d(TAG, "Friend at position " + position + " set to false");
-
-            mSelectedPositions.set(position, false);
-            v.setBackgroundColor(Color.TRANSPARENT);
-        }
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                return true;
-            case android.R.id.home:
-                this.setResult(RESULT_CANCELED);
-                this.finish();
-                break;
-            case R.id.invite_friend_send_button:
-
-                this.inviteFriends();
-
-                // Return to caller
-                this.setResult(RESULT_OK);
-                this.finish();
-
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     /**
+     * Sets the list adapter of this class.
+     * 
+     * 
      * @author SpicyCH
      */
     private void setAdapter() {
@@ -175,5 +150,36 @@ public class InviteFriendsActivity extends ListActivity {
         // Create custom Adapter and pass it to the Activity.
         mAdapter = new FriendPickerListAdapter(this, mUserList);
         this.setListAdapter(mAdapter);
+    }
+
+    /**
+     * Callback
+     * 
+     * @author SpicyCH
+     */
+    class InviteFriendsCallback implements NetworkRequestCallback {
+        @Override
+        public void onFailure() {
+            InviteFriendsActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(InviteFriendsActivity.this,
+                            InviteFriendsActivity.this.getString(R.string.invite_friends_failure), Toast.LENGTH_SHORT)
+                            .show();
+                }
+            });
+        }
+
+        @Override
+        public void onSuccess() {
+            InviteFriendsActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(InviteFriendsActivity.this,
+                            InviteFriendsActivity.this.getString(R.string.invite_friends_success), Toast.LENGTH_SHORT)
+                            .show();
+                }
+            });
+        }
     }
 }
