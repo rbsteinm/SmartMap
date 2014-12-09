@@ -44,9 +44,9 @@ public interface Invitation {
     int getStatus();
 
     /**
-     * @return invitation's text
+     * @return invitation's subtitle
      */
-    String getText();
+    String getSubtitle();
 
     /**
      * @return invitation's title
