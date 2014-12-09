@@ -255,16 +255,14 @@ public class AddEventActivity extends FragmentActivity {
                 // The user is trying to create the end of the event before its
                 // start!
 
-                endDate.setText("");
-                endTime.setText("");
+                this.resetEndOfEvent(endDate, endTime);
 
                 Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
                         Toast.LENGTH_LONG).show();
             } else if (end.before(now)) {
                 // The user is trying to create an event in the past
 
-                endDate.setText("");
-                endTime.setText("");
+                this.resetEndOfEvent(endDate, endTime);
 
                 Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_end_cannot_be_in_past),
                         Toast.LENGTH_LONG).show();
@@ -439,6 +437,19 @@ public class AddEventActivity extends FragmentActivity {
     private boolean isValidTime(String s) {
         String[] sArray = s.split(":");
         return sArray.length == ELEMENTS_HH_MM;
+    }
+
+    /**
+     * Reset the two given EditTexts.
+     * 
+     * @param first
+     * @param second
+     * 
+     * @author SpicyCH
+     */
+    private void resetEndOfEvent(EditText first, EditText second) {
+        first.setText("");
+        second.setText("");
     }
 
     /**
