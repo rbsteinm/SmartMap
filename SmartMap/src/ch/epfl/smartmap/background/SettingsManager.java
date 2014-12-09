@@ -71,6 +71,10 @@ public final class SettingsManager {
         return mEditor.commit();
     }
 
+    public Context getContext() {
+        return mContext;
+    }
+
     /**
      * @return The session cookie if it is found, DEFAULT_COOKIE value otherwise
      */
@@ -195,8 +199,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user is offline, <code>false</code>
-     *         otherwise (if he's online).
+     * @return <code>true</code> if the user is offline, <code>false</code> otherwise (if he's online).
      * @author SpicyCH
      */
     public boolean isOffline() {
@@ -205,8 +208,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications,
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsEnabled() {
@@ -222,8 +224,9 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_event_invitations), true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(mContext.getString(R.string.settings_key_notifications_event_invitations), true)
+            : false;
     }
 
     /**
@@ -234,8 +237,9 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_event_proximity), true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(mContext.getString(R.string.settings_key_notifications_event_proximity), true)
+            : false;
     }
 
     /**
@@ -246,8 +250,9 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_friend_requests), true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(mContext.getString(R.string.settings_key_notifications_friend_requests), true)
+            : false;
     }
 
     /**
@@ -257,13 +262,13 @@ public final class SettingsManager {
      * @return <code>true</code> if the user enabled the notifications for
      *         friendship confirmations and the
      *         user
-     *         activated the notifications in general, <code>false</code>
-     *         otherwise.
+     *         activated the notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_friendship_confirmations), true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(mContext.getString(R.string.settings_key_notifications_friendship_confirmations),
+                true) : false;
     }
 
     /**
@@ -273,8 +278,8 @@ public final class SettingsManager {
      * @author SpicyCH
      */
     public boolean notificationsVibrate() {
-        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
+        return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext)
+            .getBoolean(mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
     }
 
     /**

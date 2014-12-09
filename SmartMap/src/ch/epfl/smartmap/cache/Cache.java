@@ -138,9 +138,13 @@ public class Cache {
                     createdEvent.setId(eventId);
                     // Puts event in Cache
                     Cache.this.putEvent(createdEvent);
-                    callback.onSuccess();
+                    if (callback != null) {
+                        callback.onSuccess();
+                    }
                 } catch (SmartMapClientException e) {
-                    callback.onFailure();
+                    if (callback != null) {
+                        callback.onFailure();
+                    }
                 }
                 return null;
             }
@@ -593,30 +597,37 @@ public class Cache {
 
     public synchronized void putEvents(Set<ImmutableEvent> newEvents) {
         for (final ImmutableEvent newEvent : newEvents) {
-            // Fetch Creator
-            ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(),
-                new SearchRequestCallback<User>() {
-                    @Override
-                    public synchronized void onNetworkError() {
-                        // Don't add
-                    }
-
-                    @Override
-                    public synchronized void onNotFound() {
-                        // Don't add
-                    }
-
-                    @Override
-                    public synchronized void onResult(User result) {
-                        mEventIds.add(newEvent.getId());
-                        mEventInstances.put(newEvent.getId(), new PublicEvent(newEvent.setCreator(result)));
-
-                        // Notify listeners
-                        for (CacheListener listener : mListeners) {
-                            listener.onEventListUpdate();
+            mEventIds.add(newEvent.getId());
+            if (this.getUser(newEvent.getId()) != null) {
+                mEventInstances.put(newEvent.getId(),
+                    new PublicEvent(newEvent.setCreator(this.getUser(newEvent.getId()))));
+            } else {
+                // Put unknown Creator
+                mEventInstances.put(newEvent.getId(), new PublicEvent(newEvent.setCreator(User.NOBODY)));
+                // & Fetch Creator online
+                ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(),
+                    new SearchRequestCallback<User>() {
+                        @Override
+                        public void onNetworkError() {
+                            // Don't add
                         }
-                    }
-                });
+
+                        @Override
+                        public void onNotFound() {
+                            // Don't add
+                        }
+
+                        @Override
+                        public void onResult(User result) {
+                            Cache.this.updateEvent(newEvent.setCreator(result));
+                        }
+                    });
+            }
+
+            // Notify listeners
+            for (CacheListener listener : mListeners) {
+                listener.onEventListUpdate();
+            }
         }
     }
 
@@ -1157,7 +1168,7 @@ public class Cache {
         }
     }
 
-    private interface SearchFilter<T> {
+    public interface SearchFilter<T> {
         boolean filter(T item);
     }
 }
