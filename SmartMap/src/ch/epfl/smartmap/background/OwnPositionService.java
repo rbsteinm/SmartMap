@@ -199,5 +199,4 @@ public class OwnPositionService extends Service {
             }
         }
     }
-
 }
