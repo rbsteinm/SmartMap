@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.search.SearchEngine;
 import ch.epfl.smartmap.search.SearchEngine.Type;
@@ -32,7 +30,7 @@ import ch.epfl.smartmap.search.SearchEngine.Type;
  * 
  * @author jfperren
  */
-public class SearchLayout extends LinearLayout implements CacheListener {
+public class SearchLayout extends LinearLayout {
 
     @SuppressWarnings("unused")
     private static final String TAG = "SEARCH_RESULT_SWIPEABLE_CONTAINER";
@@ -94,41 +92,6 @@ public class SearchLayout extends LinearLayout implements CacheListener {
         this.addSearchTypes(Type.ALL, Type.FRIENDS, Type.EVENTS, Type.TAGS, Type.GROUPS);
         // Set default search type
         this.setSearchType(DEFAULT_SEARCH_TYPE);
-        ServiceContainer.getCache().addOnCacheListener(this);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onEventListUpdate()
-     */
-    @Override
-    public void onEventListUpdate() {
-        // TODO
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
-     */
-    @Override
-    public void onFilterListUpdate() {
-        // TODO Auto-generated method stub
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
-     */
-    @Override
-    public void onFriendListUpdate() {
-        this.updateCurrentPanel();
-    }
-
-    @Override
-    public void onInvitationListUpdate() {
-        // Nothing
-
     }
 
     /**
@@ -282,8 +245,6 @@ public class SearchLayout extends LinearLayout implements CacheListener {
     }
 
     private void updateCurrentPanel() {
-        Log.d("SearchLayout", "Update current panel");
-
         new AsyncTask<Void, Void, List<Displayable>>() {
             @Override
             public List<Displayable> doInBackground(Void... params) {
