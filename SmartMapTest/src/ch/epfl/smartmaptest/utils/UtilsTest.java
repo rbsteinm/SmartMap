@@ -4,13 +4,16 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import junit.framework.TestCase;
+import android.test.AndroidTestCase;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.util.Utils;
 
 /**
  * @author SpicyCH
  */
-public class UtilsTest extends TestCase {
+public class UtilsTest extends AndroidTestCase {
 
     private Calendar now;
     private Calendar yesterday;
@@ -20,6 +23,9 @@ public class UtilsTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
+        super.setUp();
+        ServiceContainer.setSettingsManager(new SettingsManager(this.getContext()));
+
         now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
 
         yesterday = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
@@ -33,10 +39,24 @@ public class UtilsTest extends TestCase {
 
         tenDaysAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));;
         tenDaysAgo.add(Calendar.DAY_OF_YEAR, -10);
-        super.setUp();
     }
 
-    public void test1() {
-        assertEquals("Today", Utils.getDateString(now));
+    public void testInTenDays() {
+
+    }
+
+    public void testToday() {
+        assertEquals(ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today),
+            Utils.getDateString(now));
+    }
+
+    public void testTomorrow() {
+        assertEquals(ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow),
+            Utils.getDateString(tomorrow));
+    }
+
+    public void testYesterday() {
+        assertEquals(ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday),
+            Utils.getDateString(yesterday));
     }
 }

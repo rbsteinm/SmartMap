@@ -28,14 +28,14 @@
 //
 // public class NetworkEndToEndTest extends AndroidTestCase {
 //
-<<<<<<< HEAD
 // // private final static long SMARTMAP_SWENG_FACEBOOK_ID = 1482245642055847L;
 // // private final static String SMARTMAP_SWENG_NAME = "SmartMap SwEng";
 // // private final static String SMARTMAP_SWENG_FB_ACCESS_TOKEN =
 // //
 // "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
 // // private static final long SMARTMAP_SWENG_ID = 3;
-// // private static final ImmutableUser SMARTMAP_SWENG = new ImmutableUser(SMARTMAP_SWENG_ID,
+// // private static final ImmutableUser SMARTMAP_SWENG = new
+// ImmutableUser(SMARTMAP_SWENG_ID,
 // // SMARTMAP_SWENG_NAME, null, null, null, null, null);
 // //
 // // private final static long SMART_MAP_FACEBOOK_ID = 1395136807427991L;
@@ -44,7 +44,8 @@
 // //
 // "CAAEWMqbRPIkBAPayty1578xCWRA4mHMTAVORgG8HNFKDJHoReb05eaVvRR59fGL2JsrBtLlKhgG7ZB0ZAtVut4OpiiwXZCBx1SCEhZAegiu6IqKX8SnJjyZAA1ZCqQP7ctt3q1hhYv78x9UNInmYYAPQ2SdepRxlalCaJbVdrlZAanM0TIZAZBjQIqzVb9uvjEG8uoSNB4RJ2X9psGtBmm9mn";
 // // private static final long SMART_MAP_ID = 11;
-// // private static final ImmutableUser SMART_MAP = new ImmutableUser(SMART_MAP_ID, SMART_MAP_NAME, null,
+// // private static final ImmutableUser SMART_MAP = new
+// ImmutableUser(SMART_MAP_ID, SMART_MAP_NAME, null,
 // // null, null, null, null);
 // //
 // // private final static Location LOCATION = new Location("SmartMapServers");
@@ -54,9 +55,12 @@
 // //
 // // private static long CREATED_EVENT_ID;
 // //
-// // private static final ImmutableEvent FOOTBALL_TOURNAMENT = new ImmutableEvent(0, "Football Tournament",
-// // SMARTMAP_SWENG.getId(), "Not a basketball tournament !", new GregorianCalendar(2014, 11, 23),
-// // new GregorianCalendar(2014, 11, 27), LOCATION, "Stade de la Pontaise", Arrays.asList((long) 3));
+// // private static final ImmutableEvent FOOTBALL_TOURNAMENT = new
+// ImmutableEvent(0, "Football Tournament",
+// // SMARTMAP_SWENG.getId(), "Not a basketball tournament !", new
+// GregorianCalendar(2014, 11, 23),
+// // new GregorianCalendar(2014, 11, 27), LOCATION, "Stade de la Pontaise",
+// Arrays.asList((long) 3));
 // //
 // // private static final long VALID_EVENT_ID_1 = 95;
 // // private static final long VALID_EVENT_ID_2 = 96;
@@ -215,7 +219,8 @@
 // // }
 // //
 // // public void testInviteUsersToEvent() throws SmartMapClientException {
-// // networkClient.inviteUsersToEvent(VALID_EVENT_ID_1, Arrays.asList(VALID_ID_1, SMART_MAP_ID));
+// // networkClient.inviteUsersToEvent(VALID_EVENT_ID_1,
+// Arrays.asList(VALID_ID_1, SMART_MAP_ID));
 // // }
 // //
 // // public void testJoinEvent() throws SmartMapClientException {
@@ -258,13 +263,16 @@
 // //
 // // ImmutableEvent update =
 // // new ImmutableEvent(CREATED_EVENT_ID, "Toto", SMARTMAP_SWENG.getId(),
-// // "Not a basketball tournament !", new GregorianCalendar(2014, 11, 23), new GregorianCalendar(
+// // "Not a basketball tournament !", new GregorianCalendar(2014, 11, 23), new
+// GregorianCalendar(
 // // 2014, 11, 27), LOCATION, "Stade de la Pontaise", Arrays.asList((long) 3));
 // //
 // // networkClient.updateEvent(update);
 // //
-// // ImmutableEvent modifiedEvent = networkClient.getEventInfo(CREATED_EVENT_ID);
-// // assertEquals("Updated event name does not match", modifiedEvent.getName(), "Toto");
+// // ImmutableEvent modifiedEvent =
+// networkClient.getEventInfo(CREATED_EVENT_ID);
+// // assertEquals("Updated event name does not match", modifiedEvent.getName(),
+// "Toto");
 // // }
 // //
 // // @Test
@@ -275,18 +283,24 @@
 // // private void assertValidEvent(ImmutableEvent event) {
 // // assertTrue("Unexpected event id", event.getID() >= 0);
 // // assertTrue("Unexpected creator id", event.getCreatorId() >= 0);
-// // assertTrue("Unexpected end and start dates", event.getEndDate().after(event.getStartDate()));
-// // assertTrue("Unexpected latitude", (-90 <= event.getLocation().getLatitude())
+// // assertTrue("Unexpected end and start dates",
+// event.getEndDate().after(event.getStartDate()));
+// // assertTrue("Unexpected latitude", (-90 <=
+// event.getLocation().getLatitude())
 // // && (event.getLocation().getLatitude() <= 90));
-// // assertTrue("Unexpected longitude", (-180 <= event.getLocation().getLongitude())
+// // assertTrue("Unexpected longitude", (-180 <=
+// event.getLocation().getLongitude())
 // // && (event.getLocation().getLongitude() <= 180));
-// // assertTrue("Unexpected position name", ((2 < event.getLocationString().length()) && (event
+// // assertTrue("Unexpected position name", ((2 <
+// event.getLocationString().length()) && (event
 // // .getLocationString().length() <= 60)));
 // // assertTrue("Unexpected event name",
 // // ((2 < event.getName().length()) && (event.getName().length() <= 60)));
 // // assertTrue("Unexpected creator id.", event.getCreatorId() > 0);
-// // assertTrue("Unexpected event description", (event.getName().length() <= 255));
-// // assertTrue("Unexpected participants list", event.getParticipants() != null);
+// // assertTrue("Unexpected event description", (event.getName().length() <=
+// 255));
+// // assertTrue("Unexpected participants list", event.getParticipants() !=
+// null);
 // // for (long id : event.getParticipants()) {
 // // assertTrue("Unexpected participants id", id >= 0);
 // // }
@@ -294,9 +308,9 @@
 // //
 // // private void assertValidIdAndName(ImmutableUser user) {
 // // assertTrue("Unexpected id", user.getId() >= 0);
-// // assertTrue("Unexpected name", (2 < user.getName().length()) && (user.getName().length() <= 60));
+// // assertTrue("Unexpected name", (2 < user.getName().length()) &&
+// (user.getName().length() <= 60));
 // // }
-=======
 // private final static long SMARTMAP_SWENG_FACEBOOK_ID = 1482245642055847L;
 // private final static String SMARTMAP_SWENG_NAME = "SmartMap SwEng";
 // private final static String SMARTMAP_SWENG_FB_ACCESS_TOKEN =
@@ -575,5 +589,4 @@
 // assertTrue("Unexpected name", (2 < user.getName().length()) &&
 // (user.getName().length() <= 60));
 // }
->>>>>>> 39092ebfcd7ec3e217b3d3b2da359e53a13b9813
 // }
