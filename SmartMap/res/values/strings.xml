@@ -281,7 +281,10 @@
     <string name="utils_minutes_ago">minutes ago</string>
     <string name="utils_one_hour_ago">1 hour ago</string>
     <string name="utils_hours_ago">hours ago</string>
-    <string name="utils_days_ago">days ago</string>
+    <string name="utils_days_ago">daya ago</string>
+    
+    <!-- SettingsManager -->
+    <string name="near">near</string>
 
     <!-- ProfileActivity -->
     <string name="title_activity_profile">ProfileActivity</string>
