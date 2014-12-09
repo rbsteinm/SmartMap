@@ -14,17 +14,18 @@ import ch.epfl.smartmap.cache.User;
 
 /**
  * Displays each user in a row. The friend items are clickable to signify they
- * are invited. Use ViewHolder
- * pattern as in {@link ch.epfl.smartmap.gui.EventsListItemAdapter}.
+ * are invited. Use ViewHolder pattern as in
+ * {@link ch.epfl.smartmap.gui.EventsListItemAdapter}.
  * 
  * @author SpicyCH
  * @author agpmilli
  */
 public class FriendPickerListAdapter extends ArrayAdapter<User> {
 
-    static class ViewHolder {
+    public static class ViewHolder {
         TextView name;
         ImageView picture;
+        long id;
     }
 
     @SuppressWarnings("unused")
@@ -32,6 +33,18 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
 
     private final Context mContext;
 
+    /*
+     * (non-Javadoc)
+     * <<<<<<< HEAD
+     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
+     * android.view.ViewGroup) callback
+     * function
+     * =======
+     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
+     * android.view.ViewGroup) callback function
+     * >>>>>>> 9e5b351149aebbad9e99d070c948acd979e5ab02
+     * automatically called one time for each user in the list
+     */
     /**
      * @param context
      *            Context of the Activity where we want to display the user list
@@ -45,13 +58,6 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
         mContext = context;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-     * android.view.ViewGroup) callback
-     * function
-     * automatically called one time for each user in the list
-     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -65,6 +71,7 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
             viewHolder = new ViewHolder();
             viewHolder.name = (TextView) convertView.findViewById(R.id.activity_friends_name);
             viewHolder.picture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
+            viewHolder.id = user.getId();
 
             convertView.setTag(viewHolder);
         } else {

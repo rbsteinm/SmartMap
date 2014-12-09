@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventViewHolder;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * This activity shows the events and offers to filter them.
@@ -80,7 +82,8 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Triggered when a checkbox is clicked. Updates the displayed list of events.
+     * Triggered when a checkbox is clicked. Updates the displayed list of
+     * events.
      * 
      * @param v
      *            the checkbox whose status changed
@@ -228,8 +231,10 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired by
-     * wikipedia. This is costly as there are several library calls to sin, cos, etc...
+     * Computes the distance between two GPS locations (takes into consideration
+     * the earth radius), inspired by
+     * wikipedia. This is costly as there are several library calls to sin, cos,
+     * etc...
      * 
      * @param lat1
      *            latitude of point 1
@@ -301,7 +306,7 @@ public class ShowEventsActivity extends ListActivity {
                 Log.e(TAG, "The server returned a null event or creatorName");
 
                 Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
-                        .show();
+                .show();
 
             } else {
 
@@ -317,58 +322,59 @@ public class ShowEventsActivity extends ListActivity {
         }
 
         /**
-         * 
-         * 
          * @author SpicyCH
          */
         private void displayDialog(final Event event, String creatorName) {
             AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
 
-            String[] textForDates = EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(),
-                    mContext);
+            Calendar start = event.getStartDate();
+            Calendar end = event.getEndDate();
 
-            final String message = textForDates[0] + " " + textForDates[1] + "\n"
-                    + mContext.getString(R.string.show_event_by) + " " + creatorName + "\n\n" + event.getDescription();
+            final String message =
+                Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - " + Utils.getDateString(end) + " "
+                    + Utils.getTimeString((end)) + "\n" + mContext.getString(R.string.show_event_by) + " "
+                    + creatorName + "\n\n" + event.getDescription();
 
             alertDialog.setTitle(event.getName()
-                    + " @ "
-                    + event.getLocationString()
-                    + "\n"
-                    + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
-                            event.getLocation().getLatitude(), event.getLocation().getLongitude()) + " km away");
+                + " @ "
+                + event.getLocationString()
+                + "\n"
+                + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation().getLatitude(),
+                    event.getLocation().getLongitude()) + " km away");
             alertDialog.setMessage(message);
 
             alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-                    mContext.getString(R.string.show_event_on_the_map_button), new DialogInterface.OnClickListener() {
+                mContext.getString(R.string.show_event_on_the_map_button), new DialogInterface.OnClickListener() {
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            Toast.makeText(mContext,
-                                    ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                                    Toast.LENGTH_SHORT).show();
-                            Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                            showEventIntent.putExtra("location", event.getLocation());
-                            ShowEventsActivity.this.startActivity(showEventIntent);
-                        }
-                    });
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    Toast.makeText(mContext,
+                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                        Toast.LENGTH_SHORT).show();
+                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                    showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
+                    ShowEventsActivity.this.startActivity(showEventIntent);
+                }
+            });
 
             alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, mContext.getString(R.string.show_event_details_button),
-                    new DialogInterface.OnClickListener() {
+                new DialogInterface.OnClickListener() {
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
-                            showEventIntent.putExtra("EVENT", event.getId());
-                            ShowEventsActivity.this.startActivity(showEventIntent);
-                        }
-                    });
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
+                    showEventIntent.putExtra("EVENT", event.getId());
+                    ShowEventsActivity.this.startActivity(showEventIntent);
+                }
+            });
 
             alertDialog.show();
         }
     }
 
     /**
-     * Listens for the progress change of the Seekbar and updates the list accordingly.
+     * Listens for the progress change of the Seekbar and updates the list
+     * accordingly.
      * 
      * @author SpicyCH
      */

@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.WindowManager;
 
 /**
- * An API 11+ implementation of {@link SystemUiHider}. Uses APIs available in Honeycomb and later (specifically
- * {@link View#setSystemUiVisibility(int)}) to show and hide the system UI.
+ * An API 11+ implementation of {@link SystemUiHider}. Uses APIs available in Honeycomb and later
+ * (specifically {@link View#setSystemUiVisibility(int)}) to show and hide the system UI.
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
@@ -24,7 +24,8 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
 
     /**
      * Flags to test against the first parameter in
-     * {@link android.view.View.OnSystemUiVisibilityChangeListener#onSystemUiVisibilityChange(int)} to determine the
+     * {@link android.view.View.OnSystemUiVisibilityChangeListener#onSystemUiVisibilityChange(int)} to
+     * determine the
      * system UI visibility state.
      */
     private int mTestFlags;
@@ -35,10 +36,12 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
      */
     private boolean mVisible = true;
 
-    private final View.OnSystemUiVisibilityChangeListener mSystemUiVisibilityChangeListener = new VisibilityChangeListener();
+    private final View.OnSystemUiVisibilityChangeListener mSystemUiVisibilityChangeListener =
+        new VisibilityChangeListener();
 
     /**
-     * Constructor not intended to be called by clients. Use {@link SystemUiHider#getInstance} to obtain an instance.
+     * Constructor not intended to be called by clients. Use {@link SystemUiHider#getInstance} to obtain an
+     * instance.
      */
     protected SystemUiHiderHoneycomb(Activity activity, View anchorView, int flags) {
         super(activity, anchorView, flags);
@@ -98,7 +101,7 @@ public class SystemUiHiderHoneycomb extends SystemUiHiderBase {
                     // and use the old window flags API.
                     mActivity.getActionBar().hide();
                     mActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 }
 
                 // Trigger the registered listener and cache the visibility

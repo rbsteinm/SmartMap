@@ -13,8 +13,7 @@ import ch.epfl.smartmap.util.Utils;
  * Used to get and set settings and local info using SharedPreferences
  * 
  * @author ritterni
- * @author SpicyCH (add support for the user settings - we might want to change
- *         the design if my methods are
+ * @author SpicyCH (add support for the user settings - we might want to change the design if my methods are
  *         bottlenecks)
  */
 
@@ -35,15 +34,15 @@ public final class SettingsManager {
     public static final String LOCATION_NAME = "LocName";
 
     public static final long DEFAULT_ID = -1;
-    public static final String DEFAULT_NAME = "No name";
-    public static final String DEFAULT_NUMBER = "No number";
-    public static final String DEFAULT_EMAIL = "No email";
-    public static final String DEFAULT_SUBTITLE = "unknown";
+    public static String DEFAULT_NAME;
+    public final String DEFAULT_NUMBER;
+    public final String DEFAULT_EMAIL;
+    public final String DEFAULT_SUBTITLE;
     public static final long DEFAULT_LASTSEEN = 0;
-    public static final String DEFAULT_TOKEN = "No token";
+    public final String DEFAULT_TOKEN;
     public static final long DEFAULT_FB_ID = -1;
-    public static final String DEFAULT_COOKIE = "No cookie";
-    public static final String DEFAULT_LOC_NAME = "";
+    public final String DEFAULT_COOKIE;
+    public final String DEFAULT_LOC_NAME;
 
     private final Context mContext;
     private final SharedPreferences mSharedPref;
@@ -59,16 +58,29 @@ public final class SettingsManager {
         mContext = context;
         mSharedPref = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         mEditor = mSharedPref.edit();
+
+        DEFAULT_NAME = mContext.getString(R.string.settings_manager_default_name);
+        DEFAULT_NUMBER = mContext.getString(R.string.settings_manager_default_number);
+        DEFAULT_EMAIL = mContext.getString(R.string.settings_manager_default_email);
+        DEFAULT_SUBTITLE = mContext.getString(R.string.settings_manager_default_subtitle);
+        DEFAULT_TOKEN = mContext.getString(R.string.settings_manager_default_token);
+        DEFAULT_COOKIE = mContext.getString(R.string.settings_manager_default_cookie);
+        DEFAULT_LOC_NAME = mContext.getString(R.string.settings_manager_default_locname);
+
     }
 
     /**
      * Clears the settings
      * 
-     * @return True if the settings were cleared successfully
+     * @return <code>true</code> if the settings were cleared successfully, <code>false</code> otherwise.
      */
     public boolean clearAll() {
         mEditor.clear();
         return mEditor.commit();
+    }
+
+    public Context getContext() {
+        return mContext;
     }
 
     /**
@@ -79,16 +91,14 @@ public final class SettingsManager {
     }
 
     /**
-     * @return The local user's email if it is found, DEFAULT_EMAIL value
-     *         otherwise
+     * @return The local user's email if it is found, DEFAULT_EMAIL value otherwise
      */
     public String getEmail() {
         return mSharedPref.getString(EMAIL, DEFAULT_EMAIL);
     }
 
     /**
-     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value
-     *         otherwise
+     * @return The local user's Facebook ID if it is found, DEFAULT_FB_ID value otherwise
      * @author SpicyCH
      */
     public long getFacebookID() {
@@ -110,63 +120,63 @@ public final class SettingsManager {
         return loc;
     }
 
+    public String getLocationName() {
+        return mSharedPref.getString(LOCATION_NAME, DEFAULT_LOC_NAME);
+    }
+
     /**
-     * @return the maximum distance from the user, in meters, for which we can
-     *         fetch events.<br />
-     *         Special cases: 0 if the user selected 'None' and 41'000'000 if
-     *         the user selected 'All'.
+     * @return the maximum distance from the user, in meters, for which we can fetch events.<br />
+     *         Special cases: 0 if the user selected 'None' and 41'000'000 if the user selected 'All'.
      * @author SpicyCH
      */
     public int getNearEventsMaxDistance() {
         String defaultValue = mContext.getString(R.string.pref_events_max_distance_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-            mContext.getString(R.string.settings_key_max_distance_fetch_events), defaultValue));
+                mContext.getString(R.string.settings_key_max_distance_fetch_events), defaultValue));
     }
 
     /**
-     * @return the frequence in milliseconds at which we fetch and upload the
-     *         datas. Used by the service.
+     * @return the frequence in milliseconds at which we fetch and upload the datas. Used by the service.
      * @author SpicyCH
      */
     public int getRefreshFrequency() {
         String defaultValue = mContext.getString(R.string.pref_sync_frequency_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-            mContext.getString(R.string.settings_key_refresh_frequency), defaultValue));
+                mContext.getString(R.string.settings_key_refresh_frequency), defaultValue));
     }
 
     public String getSubtitle() {
+        if (this.getLastSeen() == DEFAULT_LASTSEEN) {
+            return DEFAULT_SUBTITLE;
+        }
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(ServiceContainer.getSettingsManager().getLastSeen());
-        String subtitle =
-            Utils.getLastSeenStringFromCalendar(calendar) + " near "
-                + ServiceContainer.getSettingsManager().getLocation();
-        return mSharedPref.getString(subtitle, DEFAULT_SUBTITLE);
+        String subtitle = Utils.getLastSeenStringFromCalendar(calendar) + " "
+                + ServiceContainer.getSettingsManager().getContext().getString(R.string.settings_manager_near) + " "
+                + this.getLocationName();
+        return subtitle;
     }
 
     /**
-     * @return the time to wait in milliseconds before hiding inactive friends
-     *         from the map. Or the int value
-     *         -1 if the
+     * @return the time to wait in milliseconds before hiding inactive friends from the map. Or the int value -1 if the
      *         user never wants to hide inactive friends.
      * @author SpicyCH
      */
     public int getTimeToWaitBeforeHidingFriends() {
         String defaultValue = mContext.getString(R.string.pref_last_seen_max_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-            mContext.getString(R.string.settings_key_last_seen_max), defaultValue));
+                mContext.getString(R.string.settings_key_last_seen_max), defaultValue));
     }
 
     /**
-     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN
-     *         value otherwise
+     * @return The local user's Facebook token if it is found, DEFAULT_TOKEN value otherwise
      */
     public String getToken() {
         return mSharedPref.getString(TOKEN, DEFAULT_TOKEN);
     }
 
     /**
-     * @return The local user's phone number if it is found, DEFAULT_NUMBER
-     *         value otherwise
+     * @return The local user's phone number if it is found, DEFAULT_NUMBER value otherwise
      */
     public String getUPhoneNumber() {
         return mSharedPref.getString(PHONE_NUMBER, DEFAULT_NUMBER);
@@ -180,8 +190,7 @@ public final class SettingsManager {
     }
 
     /**
-     * @return The local user's name if it is found, DEFAULT_NAME value
-     *         otherwise
+     * @return The local user's name if it is found, DEFAULT_NAME value otherwise
      */
     public String getUserName() {
         return mSharedPref.getString(USER_NAME, DEFAULT_NAME);
@@ -195,86 +204,74 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user is offline, <code>false</code>
-     *         otherwise (if he's online).
+     * @return <code>true</code> if the user is offline, <code>false</code> otherwise (if he's online).
      * @author SpicyCH
      */
     public boolean isOffline() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_general_offline), false);
+                mContext.getString(R.string.settings_key_general_offline), false);
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications,
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the user enabled the notifications, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsEnabled() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_enabled), true);
+                mContext.getString(R.string.settings_key_notifications_enabled), true);
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event
-     *         invitations and the user
-     *         activated the
+     * @return <code>true</code> if the user enabled the notifications for event invitations and the user activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventInvitations() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_event_invitations), true) : false;
+                mContext.getString(R.string.settings_key_notifications_event_invitations), true) : false;
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for event
-     *         proximity and the user
-     *         activated the
+     * @return <code>true</code> if the user enabled the notifications for event proximity and the user activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForEventProximity() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_event_proximity), true) : false;
+                mContext.getString(R.string.settings_key_notifications_event_proximity), true) : false;
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications for
-     *         friend requests and the user
-     *         activated the
+     * @return <code>true</code> if the user enabled the notifications for friend requests and the user activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsForFriendRequests() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_friend_requests), true) : false;
+                mContext.getString(R.string.settings_key_notifications_friend_requests), true) : false;
     }
 
     /**
-     * A friendship confirmation happens when another user accepts your friend
-     * request.
+     * A friendship confirmation happens when another user accepts your friend request.
      * 
-     * @return <code>true</code> if the user enabled the notifications for
-     *         friendship confirmations and the
-     *         user
-     *         activated the notifications in general, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> if the user enabled notifications for friendship confirmations and the user activated
+     *         the notifications in general, <code>false</code> otherwise.
+     * 
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_friendship_confirmations), true) : false;
+                mContext.getString(R.string.settings_key_notifications_friendship_confirmations), true) : false;
     }
 
     /**
-     * @return <code>true</code> if the user enabled the notifications
-     *         vibrations and the user activated the
+     * @return <code>true</code> if the user enabled the notifications vibrations and the user activated the
      *         notifications in general, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean notificationsVibrate() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
+                mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
     }
 
     /**
@@ -409,22 +406,20 @@ public final class SettingsManager {
     }
 
     /**
-     * @return <code>true</code> if the user wants to see his private events on
-     *         his map, <code>false</code> otherwise.
+     * @return <code>true</code> if the user wants to see his private events on his map, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean showPrivateEvents() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_events_show_private), true);
+                mContext.getString(R.string.settings_key_events_show_private), true);
     }
 
     /**
-     * @return <code>true</code> if the user wants to see public events on his
-     *         map, <code>false</code> otherwise.
+     * @return <code>true</code> if the user wants to see public events on his map, <code>false</code> otherwise.
      * @author SpicyCH
      */
     public boolean showPublicEvents() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-            mContext.getString(R.string.settings_key_events_show_public), true);
+                mContext.getString(R.string.settings_key_events_show_public), true);
     }
 }

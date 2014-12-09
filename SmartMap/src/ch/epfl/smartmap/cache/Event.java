@@ -9,7 +9,7 @@ import java.util.TimeZone;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.util.Utils;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
  * Describes an event
@@ -28,7 +28,8 @@ public interface Event extends Displayable {
     Calendar NO_START_DATE = GregorianCalendar.getInstance(TimeZone.getDefault());
     Calendar NO_END_DATE = GregorianCalendar.getInstance(TimeZone.getDefault());
 
-    Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(Utils.sContext.getResources(), R.drawable.default_event);
+    Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
+        .getResources(), R.drawable.default_event);
 
     /**
      * @return The ID of the user who created the event

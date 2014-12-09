@@ -24,7 +24,6 @@ import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
-import ch.epfl.smartmap.gui.EventsListItemAdapter;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 import ch.epfl.smartmap.util.Utils;
 
@@ -50,8 +49,8 @@ public class EventInformationActivity extends ListActivity {
     private boolean mGoingChecked;
     private List<User> mParticipantsList;
     private Set<Long> mParticipantIdsList;
-
     private TextView mPlaceNameAndCountry;
+
     /**
      * Used to get the event id the getExtra of the starting intent, and to pass
      * the retrieved event from doInBackground
@@ -77,10 +76,12 @@ public class EventInformationActivity extends ListActivity {
         mStart = (TextView) this.findViewById(R.id.show_event_info_start);
         mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
 
-        String[] result = EventsListItemAdapter.getTextFromDate(mEvent.getStartDate(), mEvent.getEndDate(), mContext);
+        String startString =
+            Utils.getDateString(mEvent.getStartDate()) + " " + Utils.getTimeString(mEvent.getStartDate());
+        String endString = Utils.getDateString(mEvent.getEndDate()) + " " + Utils.getTimeString((mEvent.getEndDate()));
 
-        mStart.setText(result[0]);
-        mEnd.setText(result[1]);
+        mStart.setText(startString);
+        mEnd.setText(endString);
 
         mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
         if ((mEvent.getDescription() == null) || mEvent.getDescription().equals("")) {
@@ -146,9 +147,6 @@ public class EventInformationActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_show_event_information);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        mContext = this.getApplicationContext();
-
     }
 
     @Override
