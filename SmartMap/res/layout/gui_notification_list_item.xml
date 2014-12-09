@@ -6,18 +6,21 @@
 
     <ImageView
         android:id="@+id/activity_notification_picture"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:adjustViewBounds="true"
         android:contentDescription="@string/notification_img_content_description"
-        android:scaleType="fitXY" />
+        android:scaleType="fitCenter" />
 
     <TextView
         android:id="@+id/activity_notification_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="50dp"
-        android:textColor="#FFFFFF"
+        android:layout_height="match_parent"
         android:layout_alignTop="@id/activity_notification_picture"
+        android:layout_toRightOf="@id/activity_notification_picture"
+        android:layout_marginLeft="5dp"
+        android:textColor="#FFFFFF"
         android:textSize="16sp"
         android:textStyle="bold" />
 
@@ -26,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/activity_notification_title"
-        android:layout_marginLeft="50dp"
+        android:layout_alignLeft="@id/activity_notification_title"
         android:textColor="#FFFFFF"
         android:textSize="12sp" />
 

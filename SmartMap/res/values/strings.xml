@@ -197,13 +197,11 @@
     <string name="notification_open_friend_list">Click here to open your list of friends.</string>
     <string name="notification_open_event_list">Click here to open your list of events.</string>
 
-    <!-- Notification Activity -->
+    <!-- Invitation Activity -->
     <string name="notification_img_content_description">Image of notification</string>
     <string name="title_activity_notifications">Invitations</string>
     <string name="notification_open_friend_invitation_list">Click here to open your list of invitations.</string>
     <string name="notification_open_event_invitation_list">Click here to open event description.</string>
-    <string name="notification_open_friend_info1">Click here to open </string>
-    <string name="notification_open_friend_info2">\'s profile </string>
     <string name="notification_friend_request_title">Friend request from </string>
     <string name="notification_event_request_title">Event request from </string>
     <string name="notification_accepted_friend_title">accepted your invitation</string>

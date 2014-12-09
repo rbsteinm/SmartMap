@@ -119,12 +119,11 @@ public class EventInformationActivity extends ListActivity {
      * @author SpicyCH
      */
     public void inviteFriendsToEvent(View v) {
-
         // Hack so that SonarQube doesn't complain that v is not used
         Log.d(TAG, "View with id " + v.getId() + " clicked");
         Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
         inviteFriends.putExtra("EVENT", mEvent.getId());
-        this.startActivityForResult(inviteFriends, 1);
+        this.startActivity(inviteFriends);
     }
 
     @Override
@@ -313,7 +312,6 @@ public class EventInformationActivity extends ListActivity {
 
         mParticipantIdsList = ServiceContainer.getCache().getEvent(mEvent.getId()).getParticipantIds();
         ServiceContainer.getSearchEngine().findUserByIds(mParticipantIdsList, new SearchRequestCallback<Set<User>>() {
-
             @Override
             public void onNetworkError() {
                 EventInformationActivity.this.runOnUiThread(new Runnable() {

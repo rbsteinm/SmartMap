@@ -142,15 +142,10 @@ public class InviteFriendsActivity extends ListActivity {
             case R.id.action_settings:
                 return true;
             case android.R.id.home:
-                this.setResult(RESULT_CANCELED);
                 this.finish();
                 break;
             case R.id.invite_friend_send_button:
-
                 this.inviteFriends();
-
-                // Return to caller
-                this.setResult(RESULT_OK);
                 this.finish();
 
                 break;

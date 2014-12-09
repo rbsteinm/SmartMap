@@ -76,8 +76,8 @@ public class GenericInvitation implements Invitation, Comparable {
 
     @Override
     public boolean equals(Object that) {
-        return ((that != null) && (that instanceof GenericInvitation) && (this.getId() == ((GenericInvitation) that)
-            .getId()));
+        return (that != null) && (that instanceof GenericInvitation)
+            && (this.getId() == ((GenericInvitation) that).getId());
     }
 
     public Event getEvent() {
@@ -89,11 +89,16 @@ public class GenericInvitation implements Invitation, Comparable {
         return mId;
     }
 
+    @Override
     public Bitmap getImage() {
         if (this.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
             return BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext().getResources(),
                 R.drawable.ic_accepted_friend_request);
+        } else if (this.getType() == Invitation.FRIEND_INVITATION) {
+            return BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext().getResources(),
+                R.drawable.ic_action_add_person);
         } else {
+            // TODO change
             return BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext().getResources(),
                 R.drawable.ic_action_add_person);
         }
@@ -167,12 +172,13 @@ public class GenericInvitation implements Invitation, Comparable {
     public String getTitle() {
         Context context = ServiceContainer.getSettingsManager().getContext();
         if (mType == ImmutableInvitation.FRIEND_INVITATION) {
-            return mUser.getName() + context.getResources().getString(R.string.invitation_want_to_be_your_friend);
+            return mUser.getName() + " " + context.getResources().getString(R.string.invitation_want_to_be_your_friend);
         } else if (mType == ImmutableInvitation.EVENT_INVITATION) {
-            return mUser.getName() + context.getResources().getString(R.string.invitation_invites_your_to)
+            return mUser.getName() + " " + context.getResources().getString(R.string.invitation_invites_your_to) + " "
                 + mEvent.getName();
         } else if (mType == ImmutableInvitation.ACCEPTED_FRIEND_INVITATION) {
-            return mUser.getName() + context.getResources().getString(R.string.invitation_accepted_your_friend_request);
+            return mUser.getName() + " "
+                + context.getResources().getString(R.string.invitation_accepted_your_friend_request);
         } else {
             return "";
         }
