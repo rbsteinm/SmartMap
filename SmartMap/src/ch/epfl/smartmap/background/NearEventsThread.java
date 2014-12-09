@@ -23,6 +23,7 @@ public class NearEventsThread extends Thread {
                 List<Long> nearEventIds =
                     ServiceContainer.getNetworkClient().getPublicEvents(pos.getLongitude(),
                         pos.getLatitude(), ServiceContainer.getSettingsManager().getNearEventsMaxDistance());
+                ServiceContainer.getCache().clearEvents();
                 ServiceContainer.getSearchEngine()
                     .findPublicEventByIds(new HashSet<Long>(nearEventIds), null);
                 Log.d(TAG, "Fetch Near Events : " + nearEventIds + " radius "

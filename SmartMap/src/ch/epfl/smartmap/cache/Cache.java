@@ -120,6 +120,11 @@ public class Cache {
         mListeners.add(listener);
     }
 
+    public synchronized void clearEvents() {
+        mEventIds.clear();
+        mEventInstances.clear();
+    }
+
     /**
      * OK
      * 
