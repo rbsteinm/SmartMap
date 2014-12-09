@@ -31,7 +31,7 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 
     private static final int GMAP_ZOOM_LEVEL = 14;
     private static final int PADDING = 35; // offset from edges of the map in
-                                           // pixels
+    // pixels
     private final View mMapView;
     private final GoogleMap mGoogleMap;
 
