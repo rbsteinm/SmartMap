@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -89,8 +90,10 @@ public class OwnPositionService extends Service {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
         restartService.setPackage(this.getPackageName());
         PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
+                PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService =
+            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
     }
@@ -158,7 +161,8 @@ public class OwnPositionService extends Service {
         protected Boolean doInBackground(Void... arg0) {
             try {
                 // Authentify in order to communicate with NetworkClient
-                ServiceContainer.getNetworkClient().authServer(ServiceContainer.getSettingsManager().getUserName(),
+                ServiceContainer.getNetworkClient().authServer(
+                    ServiceContainer.getSettingsManager().getUserName(),
                     ServiceContainer.getSettingsManager().getFacebookID(),
                     ServiceContainer.getSettingsManager().getToken());
                 return true;
@@ -172,10 +176,11 @@ public class OwnPositionService extends Service {
         protected void onPostExecute(Boolean result) {
             if (result) {
                 // Creates a Criteria, used to chose LocationManager settings
-                // Criteria criteria = new Criteria();
-                // criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                // criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
-                mLocManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new MyLocationListener(), null);
+                Criteria criteria = new Criteria();
+                criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                Log.d(TAG, "Avant de get une fois notre position");
+                mLocManager.requestSingleUpdate(criteria, new MyLocationListener(), null);
+                Log.d(TAG, "Après de get une fois notre position");
                 // Try to run LocationManager with Network Provider
                 if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                     mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_TIME,
@@ -184,8 +189,8 @@ public class OwnPositionService extends Service {
 
                 // And try to run LocationManager with GPS Provider
                 if (mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME, MIN_GPS_DISTANCE,
-                        new MyLocationListener());
+                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME,
+                        MIN_GPS_DISTANCE, new MyLocationListener());
                 }
             } else {
                 // FIXME : Handle this case
