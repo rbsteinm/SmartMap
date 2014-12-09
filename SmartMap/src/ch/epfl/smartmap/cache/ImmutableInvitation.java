@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.cache;
 
-
 /**
  * Immutable implementation of Invitation, which serves only as container
  * purposes,
@@ -17,11 +16,12 @@ public final class ImmutableInvitation {
 
     // Invitation informations
     private long mId;
-    private final long mUserId;
     private final long mEventId;
     private int mStatus;
     private long mTimeStamp;
     private int mType;
+
+    private final ImmutableUser mImmUser;
 
     // These will be instanciated and put here by the Cache
     private Event mEvent;
@@ -32,9 +32,9 @@ public final class ImmutableInvitation {
      * want the value to be taken
      * into account.
      */
-    public ImmutableInvitation(long id, long userId, long eventId, int status, long timeStamp, int type) {
+    public ImmutableInvitation(long id, ImmutableUser user, long eventId, int status, long timeStamp, int type) {
         mId = id;
-        mUserId = userId;
+        mImmUser = user;
         mEventId = eventId;
         mStatus = status;
         mType = type;
@@ -51,6 +51,10 @@ public final class ImmutableInvitation {
 
     public long getId() {
         return mId;
+    }
+
+    public ImmutableUser getImmUser() {
+        return mImmUser;
     }
 
     public int getStatus() {
@@ -70,7 +74,7 @@ public final class ImmutableInvitation {
     }
 
     public long getUserId() {
-        return mUserId;
+        return mImmUser.getId();
     }
 
     public ImmutableInvitation setEvent(Event newEvent) {
