@@ -107,8 +107,8 @@ public class Utils {
                         + calendar.get(Calendar.YEAR);
             }
         } else {
-            return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                    + calendar.get(Calendar.YEAR);
+            return formatForClock(calendar.get(Calendar.DAY_OF_MONTH)) + "."
+                    + formatForClock(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
         }
     }
 
