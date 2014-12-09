@@ -456,20 +456,26 @@ public class AddEventActivity extends FragmentActivity {
         Bundle extras = data.getExtras();
         mEventPosition = extras.getParcelable(LOCATION_EXTRA);
 
-        Location location = new Location("");
-        location.setLatitude(mEventPosition.latitude);
-        location.setLongitude(mEventPosition.longitude);
+        if (mEventPosition != null) {
+            Location location = new Location("");
+            location.setLatitude(mEventPosition.latitude);
+            location.setLongitude(mEventPosition.longitude);
 
-        String cityName = Utils.getCityFromLocation(location);
+            String cityName = Utils.getCityFromLocation(location);
 
-        if (((cityName != null) && !cityName.isEmpty())) {
-            mPlaceName.setText(cityName);
-            mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
+            if (((cityName != null) && !cityName.isEmpty())) {
+                mPlaceName.setText(cityName);
+                mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
+                new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
+            } else {
+                Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location_name),
+                        Toast.LENGTH_LONG).show();
+                mPlaceName.setText("");
+            }
         } else {
-            Toast.makeText(mContext, this.getString(R.string.add_event_toast_couldnt_retrieve_location_name),
-                    Toast.LENGTH_LONG).show();
-            mPlaceName.setText("");
+
+            Log.e(TAG, "No event position set (extras.getParcelable(LOCATION_EXTRA) was null)");
+            Toast.makeText(mContext, this.getString(R.string.error_client_side), Toast.LENGTH_LONG).show();
         }
     }
 
