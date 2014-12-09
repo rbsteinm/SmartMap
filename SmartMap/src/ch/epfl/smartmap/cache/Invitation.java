@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 
 /**
  * Describes a generic invitation of the app
@@ -27,6 +28,11 @@ public interface Invitation {
      * @return invitation's id
      */
     long getId();
+
+    /**
+     * @return invitation's image icon
+     */
+    Bitmap getImage();
 
     /**
      * @return immutable copy of this invitation

@@ -54,7 +54,7 @@ public class InvitationListItemAdapter extends ArrayAdapter<Invitation> {
 
         title.setText(mItemsArrayList.get(position).getTitle());
         text.setText(mItemsArrayList.get(position).getSubtitle());
-        image.setImageBitmap(mItemsArrayList.get(position).getUser().getImage());
+        image.setImageBitmap(mItemsArrayList.get(position).getImage());
 
         return convertView;
     }
