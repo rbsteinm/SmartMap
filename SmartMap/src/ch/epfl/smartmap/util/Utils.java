@@ -42,8 +42,27 @@ public class Utils {
         .getString(R.string.utils_never_seen_on_smartmap);
 
     public static double distanceToMe(LatLng latLng) {
-        return Math.sqrt(Math.pow(latLng.latitude - ServiceContainer.getSettingsManager().getLocation().getLatitude(),
-                2) + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+        Location location = new Location("LocFromLatLng");
+        location.setLatitude(latLng.latitude);
+        location.setLongitude(latLng.longitude);
+        return ServiceContainer.getSettingsManager().getLocation().distanceTo(location);
+    }
+
+    /**
+     * @param time
+     *            a second, minute, hour, day or month
+     * @return the time prefixed with 0 if it was < 10
+     * @author SpicyCH
+     */
+    private static String formatForClock(int time) {
+        String hourOfDayString = "";
+        if (time < 10) {
+            hourOfDayString += "0" + time;
+        } else {
+            hourOfDayString += time;
+        }
+
+        return hourOfDayString;
     }
 
     public static String getCityFromLocation(Location location) {
@@ -67,8 +86,8 @@ public class Utils {
         }
     }
 
-    public static int getColorInInterval(double value, double startValue, double endValue, int startColor,
-        int endColor) {
+    public static int
+        getColorInInterval(double value, double startValue, double endValue, int startColor, int endColor) {
         if (startValue > endValue) {
             return getColorInInterval(value, endValue, startValue, endColor, startColor);
         } else {
@@ -78,13 +97,10 @@ public class Utils {
                 double percentageStart = (startValue - value) / intervalLength;
                 double percentageEnd = (value - endValue) / intervalLength;
 
-                int red =
-                    (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
+                int red = (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
                 int green =
-                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color
-                        .green(endColor)));
-                int blue =
-                    (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
+                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color.green(endColor)));
+                int blue = (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
 
                 return Color.rgb(red, green, blue);
             } else if (value < startValue) {
@@ -123,10 +139,10 @@ public class Utils {
         if (yearsDiff == 0) {
             if (daysDiff > 7) {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                        + calendar.get(Calendar.YEAR);
+                    + calendar.get(Calendar.YEAR);
             } else if (daysDiff > 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next)
-                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
+                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else if (daysDiff == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
             } else if (daysDiff == 0) {
@@ -134,21 +150,22 @@ public class Utils {
             } else if (daysDiff == -1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else if (daysDiff > -7) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last)
-                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
+                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                        + calendar.get(Calendar.YEAR);
+                    + calendar.get(Calendar.YEAR);
             }
         } else {
             return formatForClock(calendar.get(Calendar.DAY_OF_MONTH)) + "."
-                    + formatForClock(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
+                + formatForClock(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
         }
     }
 
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
-        long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
+        long diff =
+            GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
                 - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
@@ -160,17 +177,14 @@ public class Utils {
             if (minutes == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
             } else {
-                return minutes
-                    + " "
-                    + ServiceContainer.getSettingsManager().getContext()
-                        .getString(R.string.utils_minutes_ago);
+                return minutes + " "
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
             }
         } else if (diff < ONE_DAY) {
             // Give time hours
             int hours = (int) (diff / ONE_HOUR);
             if (hours == 1) {
-                return ServiceContainer.getSettingsManager().getContext()
-                    .getString(R.string.utils_one_hour_ago);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_hour_ago);
             } else {
                 return "" + hours + " "
                     + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
@@ -185,8 +199,7 @@ public class Utils {
                     + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
             }
         } else {
-            return ServiceContainer.getSettingsManager().getContext()
-                .getString(R.string.utils_never_seen_on_smartmap);
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
         }
     }
 
@@ -218,22 +231,5 @@ public class Utils {
         badge.setCount(count);
         icon.mutate();
         icon.setDrawableByLayerId(R.id.ic_badge, badge);
-    }
-
-    /**
-     * @param time
-     *            a second, minute, hour, day or month
-     * @return the time prefixed with 0 if it was < 10
-     * @author SpicyCH
-     */
-    private static String formatForClock(int time) {
-        String hourOfDayString = "";
-        if (time < 10) {
-            hourOfDayString += "0" + time;
-        } else {
-            hourOfDayString += time;
-        }
-
-        return hourOfDayString;
     }
 }
