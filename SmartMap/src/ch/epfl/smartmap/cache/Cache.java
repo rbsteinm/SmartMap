@@ -36,13 +36,13 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class Cache {
 
-    static final public String TAG = Cache.class.getSimpleName();
+    private static final String TAG = Cache.class.getSimpleName();
 
     // SparseArrays containing live instances
     private LongSparseArray<User> mUserInstances;
-    private LongSparseArray<Event> mEventInstances;
-    private LongSparseArray<Filter> mFilterInstances;
-    private LongSparseArray<Invitation> mInvitationInstances;
+    private final LongSparseArray<Event> mEventInstances;
+    private final LongSparseArray<Filter> mFilterInstances;
+    private final LongSparseArray<Invitation> mInvitationInstances;
 
     // These Sets are the keys for the LongSparseArrays
     private final Set<Long> mUserIds;
@@ -80,6 +80,13 @@ public class Cache {
         mListeners = new ArrayList<CacheListener>();
     }
 
+    /**
+     * Called when the user accepts an invitation. If it's a friend, it's added to the cache
+     * and if it's an event the user joins it and it's infos are re-updated
+     * 
+     * @param invitation
+     * @param callback
+     */
     public synchronized void acceptInvitation(final Invitation invitation,
         final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
@@ -88,26 +95,25 @@ public class Cache {
                 try {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
-                            // Get friends info
                             ImmutableUser newFriend =
-                                ServiceContainer.getNetworkClient().acceptInvitation(invitation.getId());
-                            // Add friend to cache
+                            ServiceContainer.getNetworkClient().acceptInvitation(invitation.getId());
                             Cache.this.putFriend(newFriend);
+                            break;
                         case Invitation.EVENT_INVITATION:
                             long eventId = ((GenericInvitation) invitation).getEvent().getId();
-                            // Join event
                             ServiceContainer.getNetworkClient().joinEvent(eventId);
-                            // Reupdate event
                             Cache.this.putEvent(ServiceContainer.getNetworkClient().getEventInfo(eventId));
+                            break;
                         default:
                             assert false;
+                            break;
                     }
 
                     Cache.this.updateInvitation(invitation.getImmutableCopy().setStatus(Invitation.ACCEPTED));
 
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Error while accepting invitation: " + e.getMessage());
+                    Log.e(TAG, "Error while accepting invitation: " + e);
                     callback.onFailure();
                 }
                 return null;
@@ -145,6 +151,8 @@ public class Cache {
                         callback.onSuccess();
                     }
                 } catch (SmartMapClientException e) {
+                    Log.e(TAG, "Error while creating event: " + e);
+                    callback.onFailure();
                     if (callback != null) {
                         callback.onFailure();
                     }
@@ -164,17 +172,20 @@ public class Cache {
                         case Invitation.FRIEND_INVITATION:
                             // Decline online
                             ServiceContainer.getNetworkClient().declineInvitation(invitation.getId());
+                            break;
                         case Invitation.EVENT_INVITATION:
                             // No interaction needed here
+                            break;
                         default:
                             assert false;
+                            break;
                     }
 
                     Cache.this.updateInvitation(invitation.getImmutableCopy().setStatus(Invitation.DECLINED));
 
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Error while accepting invitation: " + e.getMessage());
+                    Log.e(TAG, "Error while declining invitation: " + e);
                     callback.onFailure();
                 }
                 return null;
@@ -368,7 +379,14 @@ public class Cache {
     }
 
     public synchronized SortedSet<Invitation> getInvitations(Set<Long> ids) {
-        return this.getInvitations(mInvitationIds, null);
+        SortedSet<Invitation> invitations = new TreeSet<Invitation>();
+        for (long id : ids) {
+            Invitation invitation = this.getInvitation(id);
+            if (invitation != null) {
+                invitations.add(invitation);
+            }
+        }
+        return invitations;
     }
 
     public synchronized SortedSet<Invitation> getInvitations(Set<Long> ids, SearchFilter<Invitation> filter) {
@@ -608,6 +626,7 @@ public class Cache {
 
     public synchronized void putEvents(Set<ImmutableEvent> newEvents) {
         for (final ImmutableEvent newEvent : newEvents) {
+
             mEventIds.add(newEvent.getId());
             if (this.getUser(newEvent.getId()) != null) {
                 mEventInstances.put(newEvent.getId(),
@@ -618,21 +637,21 @@ public class Cache {
                 // & Fetch Creator online
                 ServiceContainer.getSearchEngine().findUserById(newEvent.getCreatorId(),
                     new SearchRequestCallback<User>() {
-                        @Override
-                        public void onNetworkError() {
-                            // Don't add
-                        }
+                    @Override
+                    public void onNetworkError() {
+                        // Don't add
+                    }
 
-                        @Override
-                        public void onNotFound() {
-                            // Don't add
-                        }
+                    @Override
+                    public void onNotFound() {
+                        // Don't add
+                    }
 
-                        @Override
-                        public void onResult(User result) {
-                            Cache.this.updateEvent(newEvent.setCreator(result));
-                        }
-                    });
+                    @Override
+                    public void onResult(User result) {
+                        Cache.this.updateEvent(newEvent.setCreator(result));
+                    }
+                });
             }
 
             // Notify listeners
@@ -1075,7 +1094,6 @@ public class Cache {
                     .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(),
                     Invitation.ACCEPTED_FRIEND_INVITATION);
 
-            invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
             invitation.setUser(this.getFriend(friend.getId()));
 
             this.putInvitation(invitation);
@@ -1093,8 +1111,8 @@ public class Cache {
                         Cache.this.updateFriend(params[0]);
 
                         if (ServiceContainer.getSettingsManager().notificationsEnabled()
-                            && ServiceContainer.getSettingsManager()
-                                .notificationsForFriendshipConfirmations()) {
+
+                            && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations()) {
                             Notifications.acceptedFriendNotification(ctx, params[0]);
                         }
 

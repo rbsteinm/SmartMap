@@ -63,8 +63,8 @@ public class InvitationsService extends Service {
                 try {
                     // Authentify in order to communicate with NetworkClient
                     ServiceContainer.getNetworkClient().authServer(ServiceContainer.getSettingsManager().getUserName(),
-                            ServiceContainer.getSettingsManager().getFacebookID(),
-                            ServiceContainer.getSettingsManager().getToken());
+                        ServiceContainer.getSettingsManager().getFacebookID(),
+                        ServiceContainer.getSettingsManager().getToken());
                     return true;
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Couldn't log in: " + e);
@@ -87,10 +87,10 @@ public class InvitationsService extends Service {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
         restartService.setPackage(this.getPackageName());
         PendingIntent restartServicePending = PendingIntent.getService(this.getApplicationContext(), 1, restartService,
-                PendingIntent.FLAG_ONE_SHOT);
+            PendingIntent.FLAG_ONE_SHOT);
         AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
-                restartServicePending);
+            restartServicePending);
     }
 
     /**
@@ -109,7 +109,7 @@ public class InvitationsService extends Service {
                         // Get friends invitations
                         nb = ServiceContainer.getNetworkClient().getInvitations();
                         ServiceContainer.getCache().updateFriendInvitations(nb,
-                                InvitationsService.this.getApplicationContext());
+                            InvitationsService.this.getApplicationContext());
                         // Get event invitations
                         List<Long> invitations = ServiceContainer.getNetworkClient().getEventInvitations();
                         ServiceContainer.getCache().updateEventInvitations(invitations);

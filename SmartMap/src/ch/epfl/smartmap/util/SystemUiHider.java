@@ -5,41 +5,48 @@ import android.os.Build;
 import android.view.View;
 
 /**
- * A utility class that helps with showing and hiding system UI such as the status bar and navigation/system bar. This
+ * A utility class that helps with showing and hiding system UI such as the status bar and navigation/system
+ * bar. This
  * class uses backward-compatibility techniques described in <a href=
- * "http://developer.android.com/training/backward-compatible-ui/index.html"> Creating Backward-Compatible UIs</a> to
+ * "http://developer.android.com/training/backward-compatible-ui/index.html"> Creating Backward-Compatible
+ * UIs</a> to
  * ensure that devices running any version of ndroid OS are supported. More specifically, there are separate
  * implementations of this abstract class: for newer devices, {@link #getInstance} will return a
  * {@link SystemUiHiderHoneycomb} instance, while on older devices {@link #getInstance} will return a
  * {@link SystemUiHiderBase} instance.
  * <p>
- * For more on system bars, see <a href= "http://developer.android.com/design/get-started/ui-overview.html#system-bars"
- * > System Bars</a>.
+ * For more on system bars, see <a href=
+ * "http://developer.android.com/design/get-started/ui-overview.html#system-bars" > System Bars</a>.
  * 
  * @see android.view.View#setSystemUiVisibility(int)
  * @see android.view.WindowManager.LayoutParams#FLAG_FULLSCREEN
  */
 public abstract class SystemUiHider {
     /**
-     * When this flag is set, the {@link android.view.WindowManager.LayoutParams#FLAG_LAYOUT_IN_SCREEN} flag will be set
-     * on older devices, making the status bar "float" on top of the activity layout. This is most useful when there are
+     * When this flag is set, the {@link android.view.WindowManager.LayoutParams#FLAG_LAYOUT_IN_SCREEN} flag
+     * will be set
+     * on older devices, making the status bar "float" on top of the activity layout. This is most useful when
+     * there are
      * no controls at the top of the activity layout.
      * <p>
      * This flag isn't used on newer devices because the <a
-     * href="http://developer.android.com/design/patterns/actionbar.html">action bar</a>, the most important structural
-     * element of an Android app, should be visible and not obscured by the system UI.
+     * href="http://developer.android.com/design/patterns/actionbar.html">action bar</a>, the most important
+     * structural element of an Android app, should be visible and not obscured by the system UI.
      */
     public static final int FLAG_LAYOUT_IN_SCREEN_OLDER_DEVICES = 0x1;
 
     /**
-     * When this flag is set, {@link #show()} and {@link #hide()} will toggle the visibility of the status bar. If there
+     * When this flag is set, {@link #show()} and {@link #hide()} will toggle the visibility of the status
+     * bar. If there
      * is a navigation bar, show and hide will toggle low profile mode.
      */
     public static final int FLAG_FULLSCREEN = 0x2;
 
     /**
-     * When this flag is set, {@link #show()} and {@link #hide()} will toggle the visibility of the navigation bar, if
-     * it's present on the device and the device allows hiding it. In cases where the navigation bar is present but
+     * When this flag is set, {@link #show()} and {@link #hide()} will toggle the visibility of the navigation
+     * bar, if
+     * it's present on the device and the device allows hiding it. In cases where the navigation bar is
+     * present but
      * cannot be hidden, show and hide will toggle low profile mode.
      */
     public static final int FLAG_HIDE_NAVIGATION = FLAG_FULLSCREEN | 0x4;
@@ -130,7 +137,8 @@ public abstract class SystemUiHider {
     }
 
     /**
-     * Creates and returns an instance of {@link SystemUiHider} that is appropriate for this device. The object will be
+     * Creates and returns an instance of {@link SystemUiHider} that is appropriate for this device. The
+     * object will be
      * either a {@link SystemUiHiderBase} or {@link SystemUiHiderHoneycomb} depending on the device.
      * 
      * @param activity

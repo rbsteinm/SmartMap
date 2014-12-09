@@ -306,7 +306,7 @@ public class ShowEventsActivity extends ListActivity {
                 Log.e(TAG, "The server returned a null event or creatorName");
 
                 Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
-                    .show();
+                .show();
 
             } else {
 
@@ -346,27 +346,27 @@ public class ShowEventsActivity extends ListActivity {
             alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
                 mContext.getString(R.string.show_event_on_the_map_button), new DialogInterface.OnClickListener() {
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(mContext,
-                            ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                            Toast.LENGTH_SHORT).show();
-                        Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                        showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
-                        ShowEventsActivity.this.startActivity(showEventIntent);
-                    }
-                });
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    Toast.makeText(mContext,
+                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                        Toast.LENGTH_SHORT).show();
+                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
+                    showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
+                    ShowEventsActivity.this.startActivity(showEventIntent);
+                }
+            });
 
             alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, mContext.getString(R.string.show_event_details_button),
                 new DialogInterface.OnClickListener() {
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
-                        showEventIntent.putExtra("EVENT", event.getId());
-                        ShowEventsActivity.this.startActivity(showEventIntent);
-                    }
-                });
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
+                    showEventIntent.putExtra("EVENT", event.getId());
+                    ShowEventsActivity.this.startActivity(showEventIntent);
+                }
+            });
 
             alertDialog.show();
         }

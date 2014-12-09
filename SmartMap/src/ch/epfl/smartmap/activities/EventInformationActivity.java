@@ -263,7 +263,7 @@ public class EventInformationActivity extends FragmentActivity {
                 Log.e(TAG, "The server returned a null event or creatorName");
 
                 Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
-                    .show();
+                .show();
 
             } else {
                 mEvent = event;

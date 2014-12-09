@@ -99,9 +99,10 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         viewHolder.getStartTextView().setText(startString);
         viewHolder.getEndTextView().setText(endString);
 
-        double distanceMeEvent = ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
-                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position).getLocation()
-                        .getLongitude());
+        double distanceMeEvent =
+            ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
+                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position)
+                    .getLocation().getLongitude());
         distanceMeEvent = Math.floor(distanceMeEvent * HUNDRED_PERCENT) / HUNDRED_PERCENT;
 
         viewHolder.getNameTextView().setText(event.getName() + " @ " + event.getLocationString());
