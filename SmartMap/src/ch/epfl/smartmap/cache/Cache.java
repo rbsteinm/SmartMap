@@ -1062,8 +1062,6 @@ public class Cache {
                     new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD, GregorianCalendar
                         .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(), Invitation.FRIEND_INVITATION);
 
-                invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
-                invitation.setUser(this.getUser(friend.getId()));
                 this.putInvitation(invitation);
 
                 // Sending notification
@@ -1085,7 +1083,6 @@ public class Cache {
                     .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(),
                     Invitation.ACCEPTED_FRIEND_INVITATION);
 
-            invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
             invitation.setUser(this.getFriend(friend.getId()));
 
             this.putInvitation(invitation);

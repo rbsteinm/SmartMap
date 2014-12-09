@@ -107,7 +107,6 @@ public class OwnPositionService extends Service {
             // check if new location is accurate enough
             if ((ServiceContainer.getSettingsManager().getLocation().distanceTo(newLocation) >= newLocation
                 .getAccuracy()) || (newLocation.getAccuracy() <= mCurrentAccuracy)) {
-                Log.d(TAG, "are we here?");
                 mCurrentAccuracy = newLocation.getAccuracy();
                 // Give new location to SettingsManager
                 ServiceContainer.getSettingsManager().setLocation(newLocation);
@@ -176,9 +175,7 @@ public class OwnPositionService extends Service {
                 // Criteria criteria = new Criteria();
                 // criteria.setAccuracy(Criteria.ACCURACY_FINE);
                 // criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
-                Log.d(TAG, "Avant de get une fois notre position");
                 mLocManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new MyLocationListener(), null);
-                Log.d(TAG, "Apr�s de get une fois notre position");
                 // Try to run LocationManager with Network Provider
                 if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                     mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_TIME,
