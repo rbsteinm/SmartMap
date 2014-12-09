@@ -126,8 +126,10 @@ public class SetLocationActivity extends FragmentActivity {
                 addEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, mEventPosition);
                 this.setResult(RESULT_OK, addEventIntent);
                 this.finish();
+                break;
             case android.R.id.home:
                 this.finish();
+                break;
             default:
                 break;
         }

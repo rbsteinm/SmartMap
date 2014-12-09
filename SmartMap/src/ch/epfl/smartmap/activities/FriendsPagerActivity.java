@@ -26,8 +26,8 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
     private ViewPager mPager;
     private ActionBar mActionBar;
-    private final String[] mTabs = {"Friends", "Invitations"};
-    private static final int INVITATION_INDEX = 1;
+    private final static String[] TABS = {"Friends", "Invitations"};
+    private final static int INVITATION_INDEX = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +50,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Adding Tabs
-        for (String tabName : mTabs) {
+        for (String tabName : TABS) {
             mActionBar.addTab(mActionBar.newTab().setText(tabName).setTabListener(this));
         }
 

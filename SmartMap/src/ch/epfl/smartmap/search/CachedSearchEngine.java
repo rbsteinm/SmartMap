@@ -403,7 +403,7 @@ public final class CachedSearchEngine implements SearchEngine {
     @Override
     public List<Displayable> sendQuery(String query, Type searchType) {
         query = query.toLowerCase(Locale.US);
-        ArrayList<Displayable> results = new ArrayList<Displayable>();
+        List<Displayable> results = new ArrayList<Displayable>();
 
         switch (searchType) {
             case ALL:

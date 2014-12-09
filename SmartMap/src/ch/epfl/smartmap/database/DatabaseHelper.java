@@ -377,7 +377,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * @return the {@code List} of all events
      */
     public List<ImmutableEvent> getAllEvents() {
-        ArrayList<ImmutableEvent> events = new ArrayList<ImmutableEvent>();
+        List<ImmutableEvent> events = new ArrayList<ImmutableEvent>();
 
         String query = "SELECT  * FROM " + TABLE_EVENT;
 
@@ -397,7 +397,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      */
     public Set<ImmutableFilter> getAllFilters() {
 
-        HashSet<ImmutableFilter> filters = new HashSet<ImmutableFilter>();
+        Set<ImmutableFilter> filters = new HashSet<ImmutableFilter>();
 
         String query = "SELECT  * FROM " + TABLE_FILTER;
 

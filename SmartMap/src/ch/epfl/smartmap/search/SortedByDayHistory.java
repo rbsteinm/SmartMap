@@ -57,7 +57,7 @@ public class SortedByDayHistory implements History {
     }
 
     @Override
-    public ArrayList<Displayable> getEntriesForIndex(int index) {
+    public List<Displayable> getEntriesForIndex(int index) {
         return new ArrayList<Displayable>(mHistoryEntries.get(index));
     }
 

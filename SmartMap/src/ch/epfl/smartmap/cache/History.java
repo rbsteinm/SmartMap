@@ -1,7 +1,7 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Represents an history of search results.
@@ -13,7 +13,7 @@ public interface History {
 
     Date getDateForIndex(int index);
 
-    ArrayList<Displayable> getEntriesForIndex(int index);
+    List<Displayable> getEntriesForIndex(int index);
 
     boolean isEmpty();
 
