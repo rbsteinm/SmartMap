@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventViewHolder;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * This activity shows the events and offers to filter them.
@@ -324,10 +326,11 @@ public class ShowEventsActivity extends ListActivity {
         private void displayDialog(final Event event, String creatorName) {
             AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
 
-            String[] textForDates = EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(),
-                    mContext);
+            Calendar start = event.getStartDate();
+            Calendar end = event.getEndDate();
 
-            final String message = textForDates[0] + " " + textForDates[1] + "\n"
+            final String message = Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - "
+                    + Utils.getDateString(end) + " " + Utils.getTimeString((end)) + "\n"
                     + mContext.getString(R.string.show_event_by) + " " + creatorName + "\n\n" + event.getDescription();
 
             alertDialog.setTitle(event.getName()
@@ -347,7 +350,7 @@ public class ShowEventsActivity extends ListActivity {
                                     ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
                                     Toast.LENGTH_SHORT).show();
                             Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                            showEventIntent.putExtra("location", event.getLocation());
+                            showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
                             ShowEventsActivity.this.startActivity(showEventIntent);
                         }
                     });
