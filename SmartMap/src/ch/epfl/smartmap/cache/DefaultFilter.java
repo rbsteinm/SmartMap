@@ -6,6 +6,7 @@ import java.util.Set;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
@@ -129,7 +130,11 @@ public class DefaultFilter implements Filter {
      */
     @Override
     public String getSubtitle() {
-        return "This is a filter";
+        String subtitle = "";
+        for (Long id : mIds) {
+            subtitle += ServiceContainer.getCache().getFriend(id).getName() + " ";
+        }
+        return subtitle;
     }
 
     /*
