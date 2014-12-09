@@ -162,10 +162,11 @@ public class EventInformationActivity extends ListActivity {
         super.onListItemClick(l, v, position, id);
 
         FriendPickerListAdapter.ViewHolder viewHolder = (ViewHolder) v.getTag();
-
-        Intent userInfoIntent = new Intent(EventInformationActivity.this, UserInformationActivity.class);
-        userInfoIntent.putExtra("USER", viewHolder.getId());
-        EventInformationActivity.this.startActivity(userInfoIntent);
+        if (viewHolder.getId() != ServiceContainer.getSettingsManager().getUserId()) {
+            Intent userInfoIntent = new Intent(EventInformationActivity.this, UserInformationActivity.class);
+            userInfoIntent.putExtra("USER", viewHolder.getId());
+            EventInformationActivity.this.startActivity(userInfoIntent);
+        }
 
     }
 
