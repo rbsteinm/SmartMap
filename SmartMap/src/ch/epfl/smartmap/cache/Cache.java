@@ -120,11 +120,6 @@ public class Cache {
         mListeners.add(listener);
     }
 
-    public synchronized void clearEvents() {
-        mEventIds.clear();
-        mEventInstances.clear();
-    }
-
     /**
      * OK
      * 
@@ -863,6 +858,15 @@ public class Cache {
         if (isListModified) {
             for (CacheListener l : mListeners) {
                 l.onFriendListUpdate();
+            }
+        }
+    }
+
+    public synchronized void retainEvents(List<Long> ids) {
+        for (long id : mEventIds) {
+            if (!ids.contains(id)) {
+                mEventIds.remove(id);
+                mEventInstances.remove(id);
             }
         }
     }
