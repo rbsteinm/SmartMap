@@ -862,6 +862,15 @@ public class Cache {
         }
     }
 
+    public synchronized void retainEvents(List<Long> ids) {
+        for (long id : mEventIds) {
+            if (!ids.contains(id)) {
+                mEventIds.remove(id);
+                mEventInstances.remove(id);
+            }
+        }
+    }
+
     /**
      * OK
      * 
