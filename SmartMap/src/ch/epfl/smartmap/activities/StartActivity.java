@@ -22,9 +22,9 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.util.Utils;
 
 import com.facebook.Session;
 

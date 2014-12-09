@@ -29,8 +29,8 @@ import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.gui.DatePickerFragment;
 import ch.epfl.smartmap.gui.TimePickerFragment;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.map.DefaultZoomManager;
+import ch.epfl.smartmap.util.Utils;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;

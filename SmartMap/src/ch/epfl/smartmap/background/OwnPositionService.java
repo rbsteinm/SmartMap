@@ -15,9 +15,9 @@ import android.os.SystemClock;
 import android.util.Log;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * @author jfperren

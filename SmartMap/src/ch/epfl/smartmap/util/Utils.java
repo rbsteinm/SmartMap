@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.gui;
+package ch.epfl.smartmap.util;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -16,6 +16,7 @@ import android.location.Location;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.gui.BadgeDrawable;
 
 import com.google.android.gms.maps.model.LatLng;
 

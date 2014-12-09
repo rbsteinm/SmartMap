@@ -19,8 +19,8 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.map.DefaultZoomManager;
+import ch.epfl.smartmap.util.Utils;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
