@@ -8,6 +8,8 @@ import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMat
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.AddEventActivity;
+import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.background.SettingsManager;
 
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
@@ -34,6 +36,7 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         super.setUp();
         this.getActivity();
         mAddEventActivity = this.getActivity();
+        ServiceContainer.setSettingsManager(new SettingsManager(this.getActivity()));
     }
 
     public void testCannotCreateEventWith1Field() {
@@ -76,44 +79,6 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
     }
-
-    // This test doesn't compile cause of gui component missing TODO enlever
-    // public void testCannotCreateWithEmptyNameAndGoodOtherFields() {
-    //
-    // // Regression test for bug #40
-    //
-    // Handler myHandler = new Handler();
-    //
-    // Runnable updateRunnable = new Runnable() {
-    // @Override
-    // public void run() {
-    // // call the activity method that updates the UI
-    //
-    // TextView latitude = (TextView) mAddEventActivity
-    // .findViewById(R.id.addEventLatitude);
-    // TextView longitude = (TextView) mAddEventActivity
-    // .findViewById(R.id.addEventLongitude);
-    //
-    // latitude.setText("1");
-    // longitude.setText("2");
-    // }
-    // };
-    //
-    // myHandler.post(updateRunnable);
-    //
-    // onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
-    // onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
-    //
-    // onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
-    // onView(ViewMatchers.withText("Done")).perform(ViewActions.click());
-    //
-    // onView(withId(R.id.addEventButtonCreateEvent)).perform(
-    // ViewActions.click());
-    //
-    // onView(withId(R.id.addEventDescription)).check(
-    // ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    //
-    // }
 
     public void testOpenSetLocationWhenClickOnMap() {
         onView(withId(R.id.add_event_map)).perform(click());
