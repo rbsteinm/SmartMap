@@ -256,14 +256,14 @@ public class AddEventActivity extends FragmentActivity {
                 // The user is trying to create the end of the event before its
                 // start!
 
-                this.resetEndOfEvent(endDate, endTime);
+                this.resetFields(endDate, endTime);
 
                 Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_cannot_end_before_starting),
                         Toast.LENGTH_LONG).show();
             } else if (end.before(now)) {
                 // The user is trying to create an event in the past
 
-                this.resetEndOfEvent(endDate, endTime);
+                this.resetFields(endDate, endTime);
 
                 Toast.makeText(mContext, this.getString(R.string.add_event_toast_event_end_cannot_be_in_past),
                         Toast.LENGTH_LONG).show();
@@ -289,6 +289,7 @@ public class AddEventActivity extends FragmentActivity {
                     + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
                     + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
                     + mEventPosition.longitude);
+
         } else if (!this.fieldsHaveLegalLength()) {
             Toast.makeText(mContext, this.getString(R.string.add_event_toast_fields_bad_size), Toast.LENGTH_LONG)
                     .show();
@@ -475,7 +476,7 @@ public class AddEventActivity extends FragmentActivity {
      * @param second
      * @author SpicyCH
      */
-    private void resetEndOfEvent(EditText first, EditText second) {
+    private void resetFields(EditText first, EditText second) {
         first.setText("");
         second.setText("");
     }
