@@ -1,34 +1,32 @@
 package ch.epfl.smartmap.activities;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import android.app.Dialog;
+import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
+import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
-import ch.epfl.smartmap.map.DefaultZoomManager;
+import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 import ch.epfl.smartmap.util.Utils;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * This activity shows an event in a complete screens. It display in addition
@@ -38,52 +36,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * @author SpicyCH
  * @author agpmilli
  */
-public class EventInformationActivity extends FragmentActivity {
-
-    class LoadEventTask extends AsyncTask<Long, Void, Map<String, Object>> {
-        @Override
-        protected Map<String, Object> doInBackground(Long... params) {
-
-            Log.d(TAG, "Retrieving event...");
-
-            long eventId = params[0];
-
-            Map<String, Object> output = new HashMap<String, Object>();
-
-            Event event = ServiceContainer.getCache().getEvent(eventId);
-            output.put(EVENT_KEY, event);
-
-            output.put(CREATOR_NAME_KEY, event.getCreator().getName());
-
-            return output;
-        }
-
-        @Override
-        protected void onPostExecute(Map<String, Object> result) {
-
-            Log.d(TAG, "Processing event...");
-
-            final Event event = (Event) result.get(EVENT_KEY);
-            final String creatorName = (String) result.get(CREATOR_NAME_KEY);
-
-            if ((event == null) || (creatorName == null)) {
-                Log.e(TAG, "The server returned a null event or creatorName");
-
-                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
-                    .show();
-
-            } else {
-                mEvent = event;
-                EventInformationActivity.this.initializeGUI(event, creatorName);
-            }
-        }
-    }
+public class EventInformationActivity extends ListActivity {
 
     private static final String TAG = EventInformationActivity.class.getSimpleName();
 
-    private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-    private GoogleMap mGoogleMap;
-    private SupportMapFragment mFragmentMap;
     private Context mContext;
     private Event mEvent;
     private TextView mEventTitle;
@@ -91,6 +47,9 @@ public class EventInformationActivity extends FragmentActivity {
     private TextView mStart;
     private TextView mEnd;
     private TextView mEventDescription;
+    private boolean mGoingChecked;
+    private List<User> mParticipantsList;
+    private Set<Long> mParticipantIdsList;
 
     private TextView mPlaceNameAndCountry;
     /**
@@ -100,45 +59,12 @@ public class EventInformationActivity extends FragmentActivity {
      */
     private static final String EVENT_KEY = "EVENT";
 
-    private static final String CREATOR_NAME_KEY = "CREATOR_NAME";
-
-    /**
-     * Display the map with the current location
-     * 
-     * @author agpmilli
-     */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) {
-            // Google Play Services are not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap =
-                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.show_event_info_map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            // Enabling MyLocation Layer of Google Map
-            mGoogleMap.setMyLocationEnabled(true);
-
-            mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
-            mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
-
-            mGoogleMap.addMarker(new MarkerOptions().position(mEvent.getLatLng()));
-
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEvent.getLatLng());
-        }
-    }
-
     /**
      * Initializes the different views of this activity.
      * 
      * @author SpicyCH
      */
-    private void initializeGUI(final Event mEvent, String creatorName) {
+    private void initializeGUI() {
 
         this.setTitle(mEvent.getName());
 
@@ -146,7 +72,7 @@ public class EventInformationActivity extends FragmentActivity {
         mEventTitle.setText(mEvent.getName());
 
         mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
-        mEventCreator.setText(this.getString(R.string.show_event_by) + " " + creatorName);
+        mEventCreator.setText(mEvent.getCreator().getName());
 
         mStart = (TextView) this.findViewById(R.id.show_event_info_start);
         mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
@@ -157,24 +83,15 @@ public class EventInformationActivity extends FragmentActivity {
         mEnd.setText(result[1]);
 
         mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
-        mEventDescription.setText(this.getString(R.string.show_event_info_event_description) + ":\n"
-            + mEvent.getDescription());
+        if ((mEvent.getDescription() == null) || mEvent.getDescription().equals("")) {
+            mEventDescription.setText(this.getString(R.string.show_event_info_event_no_description));
+        } else {
+            mEventDescription.setText(mEvent.getDescription());
+        }
 
         mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
         mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", "
             + Utils.getCountryFromLocation(mEvent.getLocation()));
-
-        this.displayMap();
-
-        mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng position) {
-                if (mEvent.getLatLng() != null) {
-                    mGoogleMap.clear();
-                }
-                EventInformationActivity.this.openMapAtEventLocation(null);
-            }
-        });
     }
 
     /**
@@ -198,6 +115,32 @@ public class EventInformationActivity extends FragmentActivity {
         this.finish();
     }
 
+    /**
+     * Triggered when going checkbox is clicked. Updates the displayed list of
+     * participants.
+     * 
+     * @param v
+     *            the checkbox whose status changed
+     * @author agpmilli
+     */
+    public void onCheckboxClicked(View v) {
+        if (!(v instanceof CheckBox)) {
+            throw new IllegalArgumentException("This method requires v to be a CheckBox");
+        }
+
+        CheckBox checkBox = (CheckBox) v;
+
+        switch (v.getId()) {
+            case R.id.event_info_going_checkbox:
+                mGoingChecked = checkBox.isChecked();
+                break;
+            default:
+                break;
+        }
+
+        this.updateCurrentList();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -206,24 +149,6 @@ public class EventInformationActivity extends FragmentActivity {
 
         mContext = this.getApplicationContext();
 
-        // This activity needs a (positive) event id to process. If none given,
-        // we finish it.
-        if (this.getIntent().getLongExtra(EVENT_KEY, -1) > 0) {
-
-            long eventId = this.getIntent().getLongExtra(EVENT_KEY, -1);
-
-            Log.d(TAG, "Received event id " + eventId);
-
-            // Need an AsyncTask because getEventById searches on our server if
-            // event not stored in cache.
-            LoadEventTask loadEvent = new LoadEventTask();
-            loadEvent.execute(eventId);
-        } else {
-            Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
-            Toast.makeText(mContext, mContext.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
-            this.finish();
-        }
-
     }
 
     @Override
@@ -231,6 +156,17 @@ public class EventInformationActivity extends FragmentActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.show_event_information, menu);
         return true;
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        Intent userInfoIntent = new Intent(EventInformationActivity.this, UserInformationActivity.class);
+        // TODO
+        // userInfoIntent.putExtra("USER", );
+        EventInformationActivity.this.startActivity(userInfoIntent);
+
     }
 
     /**
@@ -259,6 +195,33 @@ public class EventInformationActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // This activity needs a (positive) event id to process. If none given,
+        // we finish it.
+        if (this.getIntent().getLongExtra(EVENT_KEY, -1) > 0) {
+
+            long eventId = this.getIntent().getLongExtra(EVENT_KEY, -1);
+
+            Log.d(TAG, "Received event id " + eventId);
+
+            mEvent = ServiceContainer.getCache().getEvent(eventId);
+
+            this.initializeGUI();
+
+            // This is needed to show an update of the list of participant
+            this.updateCurrentList();
+
+        } else {
+            Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
+            Toast.makeText(mContext, mContext.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
+            this.finish();
+        }
+
+    }
+
     /**
      * Triggered when the button 'Shop on the map' is pressed. Opens the map at
      * the location of the event.
@@ -269,5 +232,86 @@ public class EventInformationActivity extends FragmentActivity {
         Intent showEventIntent = new Intent(this, MainActivity.class);
         showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, mEvent.getLocation());
         this.startActivity(showEventIntent);
+    }
+
+    /**
+     * Update list of participant when we click on Going checkBox
+     */
+    private void updateCurrentList() {
+        Log.d(TAG, "event : " + ServiceContainer.getCache().getEvent(mEvent.getId()));
+        mParticipantIdsList = ServiceContainer.getCache().getEvent(mEvent.getId()).getParticipantIds();
+
+        ServiceContainer.getSearchEngine().findUserByIds(mParticipantIdsList, new SearchRequestCallback<Set<User>>() {
+
+            @Override
+            public void onNetworkError() {
+                Toast.makeText(EventInformationActivity.this,
+                    EventInformationActivity.this.getString(R.string.refresh_participants_network_error),
+                    Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNotFound() {
+                Toast.makeText(EventInformationActivity.this,
+                    EventInformationActivity.this.getString(R.string.refresh_participants_not_found),
+                    Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResult(Set<User> result) {
+                mParticipantsList = new ArrayList<User>(result);
+                if (!mGoingChecked) {
+                    ServiceContainer.getCache().addParticipantsToEvent(
+                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
+                        new NetworkRequestCallback() {
+                            @Override
+                            public void onFailure() {
+                                // TODO
+                                // Toast.makeText(EventInformationActivity.this,
+                                // EventInformationActivity.this.getString(R.string.add_participant_failure),
+                                // Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                // TODO
+                                // Toast.makeText(EventInformationActivity.this,
+                                // EventInformationActivity.this.getString(R.string.add_participant_success),
+                                // Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                } else {
+                    ServiceContainer.getCache().removeParticipantsFromEvent(
+                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
+                        new NetworkRequestCallback() {
+                            @Override
+                            public void onFailure() {
+                                // TODO
+                                // Toast.makeText(EventInformationActivity.this,
+                                // EventInformationActivity.this.getString(R.string.add_participant_failure),
+                                // Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                // TODO
+                                // Toast.makeText(EventInformationActivity.this,
+                                // EventInformationActivity.this.getString(R.string.add_participant_success),
+                                // Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                }
+
+                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        FriendPickerListAdapter adapter =
+                            new FriendPickerListAdapter(EventInformationActivity.this, mParticipantsList);
+                        EventInformationActivity.this.setListAdapter(adapter);
+                    }
+                });
+            }
+        });
+
     }
 }

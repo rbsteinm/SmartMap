@@ -103,10 +103,22 @@
     <string name="events_list_item_adapter_to">to</string>
 
     <!-- ShowEventInformationActivity -->
+    <string name="event_info_title_text">Title</string>
+    <string name="event_info_when_text">When</string>
+    <string name="event_info_by_text">Created by</string>
+    <string name="event_info_description_text">Description</string>
+    <string name="event_info_where_text">Where</string>
+    <string name="event_info_going_text">Going</string>
+    <string name="event_info_participants_text">Participants</string>
     <string name="title_activity_show_event_information">Show event</string>
     <string name="show_event_info_invite_friends_button">Invite friends</string>
     <string name="show_event_by">By</string>
-    <string name="show_event_info_event_description">Description</string>
+    <string name="show_event_info_event_no_description">No Description given</string>
+    <string name="participant_img_content_description">participant image</string>
+    <string name="add_participant_failure">Failure while adding participants</string>
+    <string name="add_participant_success">Successfully added participants</string>
+    <string name="refresh_participants_network_error">Network Error while getting participants</string>
+    <string name="refresh_participants_not_found">Couldn\'t find participants</string>
 
     <!-- Error Messages -->
     <string name="error_client_side">An error occurred on our side, sorry :(</string>
