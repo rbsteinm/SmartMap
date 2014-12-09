@@ -6,7 +6,7 @@ import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
-import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * A class to represent the user's invitations

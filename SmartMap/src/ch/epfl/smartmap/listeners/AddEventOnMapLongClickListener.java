@@ -2,18 +2,20 @@ package ch.epfl.smartmap.listeners;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
+import android.util.Log;
 import ch.epfl.smartmap.activities.AddEventActivity;
 
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Listener that loads AddEventActivity with the location when the map is long clicked.
- * 
+ * Listener that loads AddEventActivity with the location, city name and country
+ * name when the map is long clicked.
  * @author SpicyCH
  */
 public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
+
+    private static final String TAG = AddEventOnMapLongClickListener.class.getSimpleName();
 
     private final Activity mActivity;
 
@@ -26,10 +28,8 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
     public void onMapLongClick(LatLng latLng) {
         Intent result = new Intent(mActivity, AddEventActivity.class);
 
-        Bundle extras = new Bundle();
-        extras.putParcelable(AddEventActivity.LOCATION_EXTRA, latLng);
-
-        result.putExtras(extras);
+        Log.d(TAG, "latLng : " + latLng);
+        result.putExtra(AddEventActivity.LOCATION_EXTRA, latLng);
 
         if (mActivity.getIntent().getBooleanExtra("pickLocationForEvent", false)) {
             // Return the result to the calling activity (AddEventActivity)
@@ -40,5 +40,4 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
         }
 
     }
-
 }

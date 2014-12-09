@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.gui;
+package ch.epfl.smartmap.util;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -16,6 +16,7 @@ import android.location.Location;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
+import ch.epfl.smartmap.gui.BadgeDrawable;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -37,9 +38,8 @@ public class Utils {
     public static final String NEVER_SEEN = "Never seen on SmartMap";
 
     public static double distanceToMe(LatLng latLng) {
-        return Math.sqrt(Math.pow(latLng.latitude
-            - ServiceContainer.getSettingsManager().getLocation().getLatitude(), 2)
-            + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+        return Math.sqrt(Math.pow(latLng.latitude - ServiceContainer.getSettingsManager().getLocation().getLatitude(),
+                2) + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
     }
 
     public static String getCityFromLocation(Location location) {
@@ -50,8 +50,7 @@ public class Utils {
         Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
 
         try {
-            List<Address> addresses =
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
                 return addresses.get(0).getLocality();
             } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
@@ -72,8 +71,7 @@ public class Utils {
         Geocoder geocoder = new Geocoder(sContext, Locale.getDefault());
 
         try {
-            List<Address> addresses =
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {
@@ -93,7 +91,7 @@ public class Utils {
         if (yearsDiff == 0) {
             if (daysDiff > 7) {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                    + calendar.get(Calendar.YEAR);
+                        + calendar.get(Calendar.YEAR);
             } else if (daysDiff > 1) {
                 return "Next " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else if (daysDiff == 1) {
@@ -106,18 +104,17 @@ public class Utils {
                 return "Last " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                    + calendar.get(Calendar.YEAR);
+                        + calendar.get(Calendar.YEAR);
             }
         } else {
             return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                + calendar.get(Calendar.YEAR);
+                    + calendar.get(Calendar.YEAR);
         }
     }
 
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
-        long diff =
-            GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
+        long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
                 - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
@@ -153,7 +150,7 @@ public class Utils {
     }
 
     public static String getTimeString(Calendar calendar) {
-        return calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE);
+        return formatForClock(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + formatForClock(calendar.get(Calendar.MINUTE));
     }
 
     public static void setBadgeCount(Context context, LayerDrawable icon, int count) {
@@ -171,5 +168,22 @@ public class Utils {
         badge.setCount(count);
         icon.mutate();
         icon.setDrawableByLayerId(R.id.ic_badge, badge);
+    }
+
+    /**
+     * @param time
+     *            a second, minute, hour, day or month
+     * @return the time prefixed with 0 if it was < 10
+     * @author SpicyCH
+     */
+    private static String formatForClock(int time) {
+        String hourOfDayString = "";
+        if (time < 10) {
+            hourOfDayString += "0" + time;
+        } else {
+            hourOfDayString += time;
+        }
+
+        return hourOfDayString;
     }
 }

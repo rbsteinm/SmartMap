@@ -14,7 +14,7 @@ import android.location.Location;
 import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.util.Utils;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;

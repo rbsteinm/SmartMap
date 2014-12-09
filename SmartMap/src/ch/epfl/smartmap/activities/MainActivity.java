@@ -36,12 +36,12 @@ import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.listeners.AddEventOnMapLongClickListener;
 import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
 import ch.epfl.smartmap.map.DefaultMarkerManager;
 import ch.epfl.smartmap.map.DefaultZoomManager;
+import ch.epfl.smartmap.util.Utils;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -494,11 +494,9 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     /**
-     * <<<<<<< HEAD Sets the view for Item Focus, this means - Write name /
+     * Sets the view for Item Focus, this means - Write name /
      * Display photo on ActionBar - Sets ActionMenu
-     * for Item ======= Sets the view for Item Focus, this means - Write name /
-     * Display photo on ActionBar - Sets
-     * ActionMenu for Item >>>>>>> a52284645a7fdabf92fc5582f572f8a918a484d2
+     * for Item
      * Focus
      * 
      * @param item
