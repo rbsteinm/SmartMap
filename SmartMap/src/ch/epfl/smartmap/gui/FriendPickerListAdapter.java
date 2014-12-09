@@ -22,10 +22,21 @@ import ch.epfl.smartmap.cache.User;
  */
 public class FriendPickerListAdapter extends ArrayAdapter<User> {
 
+    /**
+     * TODO
+     */
     public static class ViewHolder {
-        TextView name;
-        ImageView picture;
-        long id;
+        private TextView mName;
+        private ImageView mPicture;
+        private long mId;
+
+        public long getId() {
+            return mId;
+        }
+
+        public void setId(long newId) {
+            this.mId = newId;
+        }
     }
 
     @SuppressWarnings("unused")
@@ -33,18 +44,6 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
 
     private final Context mContext;
 
-    /*
-     * (non-Javadoc)
-     * <<<<<<< HEAD
-     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-     * android.view.ViewGroup) callback
-     * function
-     * =======
-     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-     * android.view.ViewGroup) callback function
-     * >>>>>>> 9e5b351149aebbad9e99d070c948acd979e5ab02
-     * automatically called one time for each user in the list
-     */
     /**
      * @param context
      *            Context of the Activity where we want to display the user list
@@ -69,17 +68,17 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.gui_select_friend_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.name = (TextView) convertView.findViewById(R.id.activity_friends_name);
-            viewHolder.picture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
-            viewHolder.id = user.getId();
+            viewHolder.mName = (TextView) convertView.findViewById(R.id.activity_friends_name);
+            viewHolder.mPicture = (ImageView) convertView.findViewById(R.id.activity_friends_picture);
+            viewHolder.setId(user.getId());
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.name.setText(user.getName());
-        viewHolder.picture.setImageBitmap(user.getImage());
+        viewHolder.mName.setText(user.getName());
+        viewHolder.mPicture.setImageBitmap(user.getImage());
 
         return convertView;
     }

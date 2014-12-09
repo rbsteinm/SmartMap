@@ -25,6 +25,7 @@ import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
+import ch.epfl.smartmap.gui.FriendPickerListAdapter.ViewHolder;
 import ch.epfl.smartmap.util.Utils;
 
 /**
@@ -160,9 +161,10 @@ public class EventInformationActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
+        FriendPickerListAdapter.ViewHolder viewHolder = (ViewHolder) v.getTag();
+
         Intent userInfoIntent = new Intent(EventInformationActivity.this, UserInformationActivity.class);
-        // TODO
-        // userInfoIntent.putExtra("USER", );
+        userInfoIntent.putExtra("USER", viewHolder.getId());
         EventInformationActivity.this.startActivity(userInfoIntent);
 
     }
