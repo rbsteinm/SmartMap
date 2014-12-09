@@ -62,6 +62,9 @@ public class AddEventActivity extends FragmentActivity {
     private static final int INDEX_MONTH = 1;
     private static final int INDEX_DAY = 0;
 
+    private static final String TIME_PICKER = "timePicker";
+    protected static final String DATE_PICKER = "datePicker";
+
     private GoogleMap mGoogleMap;
 
     private SupportMapFragment mFragmentMap;
@@ -388,7 +391,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new TimePickerFragment(mPickStartTime);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), "timePicker");
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), TIME_PICKER);
             }
 
         });
@@ -401,7 +404,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment(mPickStartDate);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), "datePicker");
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER);
             }
         });
 
@@ -410,7 +413,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment(mPickEndDate);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), "datePicker");
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER);
             }
         });
 
@@ -419,7 +422,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new TimePickerFragment(mPickEndTime);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), "timePicker");
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), TIME_PICKER);
             }
         });
         this.displayMap();
