@@ -11,6 +11,7 @@ import java.util.TimeZone;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.gui.Utils;
@@ -27,6 +28,8 @@ import com.google.android.gms.maps.model.LatLng;
  */
 
 public class PublicEvent implements Event {
+
+    static final public String TAG = PublicEvent.class.getSimpleName();
 
     // Mandatory fields
     private long mId;
@@ -219,6 +222,8 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean isOwn() {
+        Log.d(TAG, "creator id : " + mCreator.getId() + "  my id : "
+            + ServiceContainer.getSettingsManager().getUserId());
         return mCreator.getId() == ServiceContainer.getSettingsManager().getUserId();
     }
 
