@@ -457,7 +457,7 @@ public class AddEventActivity extends FragmentActivity {
     private void updateLocation(Intent data) {
         Bundle extras = data.getExtras();
 
-        mEventPosition = extras.getParcelable(LOCATION_SERVICE);
+        mEventPosition = extras.getParcelable(LOCATION_EXTRA);
 
         Location location = new Location("");
         location.setLatitude(mEventPosition.latitude);
