@@ -40,7 +40,6 @@ public class UserInformationActivity extends Activity {
     private ImageView mPictureView;
     private TextView mDistanceView;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,8 +52,7 @@ public class UserInformationActivity extends Activity {
         mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
         mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
         // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
@@ -62,8 +60,12 @@ public class UserInformationActivity extends Activity {
         super.onResume();
         // Get User & Database TODO set a listener on the user
         mUser = ServiceContainer.getCache().getUser(this.getIntent().getLongExtra("USER", User.NO_ID));
-        mDistanceToUser =
-            Math.round(ServiceContainer.getSettingsManager().getLocation().distanceTo(mUser.getLocation()));
+        if (mUser.getLocation() != null) {
+            mDistanceToUser =
+                Math.round(ServiceContainer.getSettingsManager().getLocation().distanceTo(mUser.getLocation()));
+        } else {
+            mDistanceToUser = 0;
+        }
 
         // Set Informations
         mNameView.setText(mUser.getName());
@@ -71,7 +73,11 @@ public class UserInformationActivity extends Activity {
         mPictureView.setImageBitmap(mUser.getImage());
         mFollowSwitch.setChecked(mUser.isVisible());
         mBlockSwitch.setChecked(mUser.isBlocked());
-        mDistanceView.setText(mDistanceToUser + " meters away from you");
+        if (mDistanceToUser != 0) {
+            mDistanceView.setText(mDistanceToUser + " meters away from you");
+        } else {
+            mDistanceView.setText("");
+        }
     }
 
     public void displayDeleteConfirmationDialog(View view) {

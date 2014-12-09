@@ -40,19 +40,20 @@ public class GenericInvitation implements Invitation {
         } else {
             mId = invitation.getId();
         }
-        if (invitation.getEvent() == null) {
+        if ((invitation.getType() == Invitation.EVENT_INVITATION) && (invitation.getEvent() == null)) {
             throw new IllegalArgumentException();
         } else {
             mEvent = invitation.getEvent();
         }
         if ((invitation.getStatus() != Invitation.UNREAD)
-            || ((invitation.getStatus() != Invitation.READ)
-                || (invitation.getStatus() != Invitation.DECLINED) || (invitation.getStatus() != Invitation.ACCEPTED))) {
-            throw new IllegalArgumentException();
+            && ((invitation.getStatus() != Invitation.READ) && (invitation.getStatus() != Invitation.DECLINED) && (invitation
+                .getStatus() != Invitation.ACCEPTED))) {
+            throw new IllegalArgumentException("Status is " + invitation.getStatus());
         } else {
             mStatus = invitation.getStatus();
         }
-        if ((invitation.getType() != 0) || ((invitation.getType() != 1) || (invitation.getType() != 2))) {
+        if ((invitation.getType() != Invitation.ACCEPTED_FRIEND_INVITATION)
+            && ((invitation.getType() != Invitation.EVENT_INVITATION) && (invitation.getType() != Invitation.FRIEND_INVITATION))) {
             throw new IllegalArgumentException();
         } else {
             mType = invitation.getType();
@@ -177,9 +178,8 @@ public class GenericInvitation implements Invitation {
         if (invitation.getEvent() != null) {
             mEvent = invitation.getEvent();
         }
-        if ((invitation.getStatus() == Invitation.ACCEPTED)
-            || (invitation.getStatus() == Invitation.DECLINED) || (invitation.getStatus() == Invitation.READ)
-            || (invitation.getStatus() == Invitation.UNREAD)) {
+        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)
+            || (invitation.getStatus() == Invitation.READ) || (invitation.getStatus() == Invitation.UNREAD)) {
             mStatus = invitation.getStatus();
         }
         if (invitation.getTimeStamp() >= 0) {
