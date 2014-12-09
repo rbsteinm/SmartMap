@@ -216,6 +216,7 @@
     <string name="settings_key_max_distance_fetch_events">events_fetch_distance</string>
 
     <!-- AboutActivity -->
+    <string name="title_activity_about">AboutActivity</string>
     <string name="about_version">Version</string>
     <string name="about_release">release</string>
     <string name="about_unkown_version">unknown</string>
@@ -224,12 +225,25 @@
     <string name="about_dummy_names">Name 1\nName 2\nName 3</string>
     <string name="about_dev_by">Developed by</string>
     <string name="about_dummy_copyright">© 2014</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    
+    <!-- Utils -->
+    <string name="utils_never_seen_on_smartmap">Never seen on SmartMap</string>
+    <string name="utils_next">Next</string>
+    <string name="utils_tomorrow">Tomorrow</string>
+    <string name="utils_today">Today</string>
+    <string name="utils_yesterday">Yesterday</string>
+    <string name="utils_last">Last</string>
+    <string name="utils_now">Now</string>
+    <string name="utils_one_min">1 minute ago</string>
+    <string name="utils_minutes_ago">minutes ago</string>
+    <string name="utils_one_hour_ago">1 hour ago</string>
+    <string name="utils_hours_ago">hours ago</string>
+    <string name="utils_days_ago">daya ago</string>
 
     <!-- Nothing below this line! -->
 
-    <string name="title_activity_about">AboutActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="hello_world">Hello world!</string>
 

@@ -80,8 +80,7 @@ public class Cache {
         mListeners = new ArrayList<CacheListener>();
     }
 
-    public synchronized void acceptInvitation(final Invitation invitation,
-        final NetworkRequestCallback callback) {
+    public synchronized void acceptInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -129,8 +128,7 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void createEvent(final ImmutableEvent createdEvent,
-        final NetworkRequestCallback callback) {
+    public synchronized void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -154,8 +152,7 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void declineInvitation(final Invitation invitation,
-        final NetworkRequestCallback callback) {
+    public synchronized void declineInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -445,8 +442,7 @@ public class Cache {
     public synchronized SortedSet<Invitation> getUnansweredFriendInvitations() {
         SortedSet<Invitation> unansweredFriendInvitations = this.getAllInvitations();
         for (Invitation invitation : unansweredFriendInvitations) {
-            if ((invitation.getStatus() == Invitation.ACCEPTED)
-                || (invitation.getStatus() == Invitation.DECLINED)) {
+            if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)) {
                 unansweredFriendInvitations.remove(invitation);
             }
         }
@@ -542,8 +538,7 @@ public class Cache {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId,
-                        new ArrayList<Long>(usersIds));
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, new ArrayList<Long>(usersIds));
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Couldn't invite friends to event:" + e.getMessage());
@@ -576,8 +571,7 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent,
-        final NetworkRequestCallback callback) {
+    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
         new AsyncTask<ImmutableEvent, Void, Void>() {
 
             @Override
@@ -1000,8 +994,8 @@ public class Cache {
         }
     }
 
-    public synchronized void updateFromNetwork(final SmartMapClient networkClient,
-        final NetworkRequestCallback callback) {
+    public synchronized void
+        updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1075,7 +1069,6 @@ public class Cache {
                     .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(),
                     Invitation.ACCEPTED_FRIEND_INVITATION);
 
-            invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
             invitation.setUser(this.getFriend(friend.getId()));
 
             this.putInvitation(invitation);
@@ -1086,15 +1079,13 @@ public class Cache {
                 protected Void doInBackground(ImmutableUser... params) {
                     try {
                         ServiceContainer.getNetworkClient().ackAcceptedInvitation(params[0].getId());
-                        Bitmap image =
-                            ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
+                        Bitmap image = ServiceContainer.getNetworkClient().getProfilePicture(params[0].getId());
                         params[0].setImage(image);
 
                         Cache.this.updateFriend(params[0]);
 
                         if (ServiceContainer.getSettingsManager().notificationsEnabled()
-                            && ServiceContainer.getSettingsManager()
-                                .notificationsForFriendshipConfirmations()) {
+                            && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations()) {
                             Notifications.acceptedFriendNotification(ctx, params[0]);
                         }
 
@@ -1143,9 +1134,8 @@ public class Cache {
 
                 // Creating the invitation
                 ImmutableInvitation invitation =
-                    new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD,
-                        GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(),
-                        Invitation.FRIEND_INVITATION);
+                    new ImmutableInvitation(0, friend.getId(), Event.NO_ID, Invitation.UNREAD, GregorianCalendar
+                        .getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(), Invitation.FRIEND_INVITATION);
 
                 invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
                 invitation.setUser(this.getUser(friend.getId()));

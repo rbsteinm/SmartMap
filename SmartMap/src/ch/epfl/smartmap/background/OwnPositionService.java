@@ -110,7 +110,6 @@ public class OwnPositionService extends Service {
             // check if new location is accurate enough
             if ((ServiceContainer.getSettingsManager().getLocation().distanceTo(newLocation) >= newLocation
                 .getAccuracy()) || (newLocation.getAccuracy() <= mCurrentAccuracy)) {
-                Log.d(TAG, "are we here?");
                 mCurrentAccuracy = newLocation.getAccuracy();
                 // Give new location to SettingsManager
                 ServiceContainer.getSettingsManager().setLocation(newLocation);
