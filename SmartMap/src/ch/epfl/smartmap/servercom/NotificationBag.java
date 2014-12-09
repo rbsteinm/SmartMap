@@ -5,7 +5,6 @@ package ch.epfl.smartmap.servercom;
 
 import java.util.Set;
 
-import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 
 /**
@@ -15,8 +14,6 @@ import ch.epfl.smartmap.cache.ImmutableUser;
  * @author Pamoi
  */
 public interface NotificationBag {
-
-    Set<ImmutableInvitation> getInvitations();
 
     /**
      * Get a list of the users that sent an invitation request.

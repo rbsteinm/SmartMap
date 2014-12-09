@@ -28,7 +28,7 @@ public class InvitationsService extends Service {
     private static final String TAG = InvitationsService.class.getSimpleName();
 
     // Time between each invitation fetch
-    private static final int INVITE_UPDATE_DELAY = 120000;
+    private static final int INVITE_UPDATE_DELAY = 30000;
     // Time before restarting
     private static final int RESTART_DELAY = 2000;
     // Handler for Runnables
