@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.cache;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,10 +38,10 @@ public class Cache {
     static final public String TAG = Cache.class.getSimpleName();
 
     // SparseArrays containing live instances
-    private final LongSparseArray<User> mUserInstances;
-    private final LongSparseArray<Event> mEventInstances;
-    private final LongSparseArray<Filter> mFilterInstances;
-    private final LongSparseArray<Invitation> mInvitationInstances;
+    private LongSparseArray<User> mUserInstances;
+    private LongSparseArray<Event> mEventInstances;
+    private LongSparseArray<Filter> mFilterInstances;
+    private LongSparseArray<Invitation> mInvitationInstances;
 
     // These Sets are the keys for the LongSparseArrays
     private final Set<Long> mUserIds;
@@ -374,33 +375,30 @@ public class Cache {
     }
 
     public Set<Event> getLiveEvents() {
-        Set<Event> onLiveEvents = this.getAllEvents();
-        for (Event event : onLiveEvents) {
-            if (!event.isLive()) {
-                onLiveEvents.remove(event);
+        return this.getEvents(new SearchFilter<Event>() {
+            @Override
+            public boolean filter(Event item) {
+                return item.isLive();
             }
-        }
-        return onLiveEvents;
+        });
     }
 
     public Set<Event> getMyEvents() {
-        Set<Event> myEvents = this.getAllEvents();
-        for (Event event : myEvents) {
-            if (!event.isOwn()) {
-                myEvents.remove(event);
+        return this.getEvents(new SearchFilter<Event>() {
+            @Override
+            public boolean filter(Event item) {
+                return item.isOwn();
             }
-        }
-        return myEvents;
+        });
     }
 
     public Set<Event> getNearEvents() {
-        Set<Event> nearEvents = this.getAllEvents();
-        for (Event event : nearEvents) {
-            if (!event.isNear()) {
-                nearEvents.remove(event);
+        return this.getEvents(new SearchFilter<Event>() {
+            @Override
+            public boolean filter(Event item) {
+                return item.isNear();
             }
-        }
-        return nearEvents;
+        });
     }
 
     /**
@@ -675,18 +673,35 @@ public class Cache {
     }
 
     public void putInvitations(Set<ImmutableInvitation> newInvitations) {
-        // for (ImmutableInvitation newInvitation : newInvitations) {
-        // if (mInvitationInstances.get(newInvitation.getId() == null)) {
-        // // Need to add it, give it to the database to get the id
-        // int id = 0; //
-        // ServiceContainer.getDatabase().addInvitation(newInvitation);
-        // mInvitationInstances.put(id, new Invitation(newInvitation));
-        // }
-        // }
-        //
-        // for (CacheListener listener : mListeners) {
-        // listener.onFriendListUpdate();
-        // }
+        for (final ImmutableInvitation newInvitation : newInvitations) {
+            if (mInvitationInstances.get(newInvitation.getId()) == null) {
+                // Need to add it, give it to the database to get the id
+                final long id = ServiceContainer.getDatabase().addInvitation(newInvitation);
+                ServiceContainer.getSearchEngine().findStrangerById(id, new SearchRequestCallback<User>() {
+
+                    @Override
+                    public void onNetworkError() {
+                        // TODO
+                    }
+
+                    @Override
+                    public void onNotFound() {
+                        // TODO
+                    }
+
+                    @Override
+                    public void onResult(User result) {
+                        mInvitationInstances.put(id, new GenericInvitation(newInvitation.setUser(result)
+                            .setId(id)));
+                    }
+                });
+
+            }
+        }
+
+        for (CacheListener listener : mListeners) {
+            listener.onFriendListUpdate();
+        }
     }
 
     /**
@@ -855,41 +870,42 @@ public class Cache {
 
     // TODO
     public void updateEventInvitations(List<Long> events) {
-        // for (Long eventId : events) {
-        // new AsyncTask<Long, Void, Void>() {
-        //
-        // @Override
-        // protected Void doInBackground(Long... params) {
-        // try {
-        // ServiceContainer.getNetworkClient().ackEventInvitation(params[0]);
-        //
-        // mEventInvitationIds.add(params[0]);
-        // Event e = Cache.this.getPublicEvent(params[0]);
-        //
-        // User fromCache = Cache.this.getUser(e.getCreatorId());
-        // ImmutableUser creator = null;
-        // if (fromCache == null) {
-        // creator = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
-        // } else {
-        // creator = fromCache.getImmutableCopy();
-        // }
-        //
-        // EventInvitation invitation =
-        // new EventInvitation(new ImmutableInvitation(creator.getId(),
-        // Invitation.UNREAD),
-        // e.getImmutableCopy());
-        //
-        // invitation.setId(ServiceContainer.getDatabase().addEventInvitation(invitation));
-        //
-        // mEventInvitationInstances.put(invitation.getId(), invitation);
-        // } catch (SmartMapClientException e) {
-        // Log.e(TAG, "Unable to ack event invitation !" + e.getMessage());
-        // }
-        // return null;
-        // }
-        // }.execute(eventId);
-        //
-        // }
+        for (Long eventId : events) {
+            new AsyncTask<Long, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Long... params) {
+                    try {
+                        ServiceContainer.getNetworkClient().ackEventInvitation(params[0]);
+
+                        // mEventInvitationIds.add(params[0]);
+                        Event e = Cache.this.getEvent(params[0]);
+
+                        User fromCache = Cache.this.getUser(e.getCreator().getId());
+                        ImmutableUser creator = null;
+                        if (fromCache == null) {
+                            creator = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
+                        } else {
+                            creator = fromCache.getImmutableCopy();
+                        }
+
+                        ImmutableInvitation invitation =
+                            new ImmutableInvitation(0, e.getCreator().getId(), e.getId(), Invitation.UNREAD,
+                                new GregorianCalendar().getTimeInMillis(), Invitation.UNREAD);
+
+                        invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));
+                        GenericInvitation generic = new GenericInvitation(invitation);
+
+                        mInvitationIds.add(generic.getId());
+                        mInvitationInstances.put(generic.getId(), generic);
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Unable to ack event invitation !" + e.getMessage());
+                    }
+                    return null;
+                }
+            }.execute(eventId);
+
+        }
     }
 
     /**
@@ -941,15 +957,49 @@ public class Cache {
     }
 
     // TODO
-    public void updateFriendInvitations(NotificationBag notifBag, Context ctx) {
+    public void updateFriendInvitations(NotificationBag notifBag, final Context ctx) {
+        this.putInvitations(notifBag.getInvitations());
 
-        // for (long id : this.putInvitingUsers(notifBag.getInvitingUsers())) {
-        // Notifications.newFriendNotification(ctx,
-        // this.getUser(id).getImmutableCopy());
-        // }
-        //
-        // this.acceptNewFriends(notifBag.getNewFriends(), ctx);
-        // this.removeRemovedFriends(notifBag.getRemovedFriendsIds());
+        for (ImmutableUser user : notifBag.getInvitingUsers()) {
+            ServiceContainer.getSearchEngine().findUserById(user.getId(), new SearchRequestCallback<User>() {
+                @Override
+                public void onNetworkError() {
+                    // TODO
+                }
+
+                @Override
+                public void onNotFound() {
+                    // TODO
+                }
+
+                @Override
+                public void onResult(User result) {
+                    Notifications.newFriendNotification(ctx, result.getImmutableCopy());
+                }
+            });
+        }
+
+        for (ImmutableUser user : notifBag.getNewFriends()) {
+            ServiceContainer.getSearchEngine().findUserById(user.getId(), new SearchRequestCallback<User>() {
+                @Override
+                public void onNetworkError() {
+                    // TODO
+                }
+
+                @Override
+                public void onNotFound() {
+                    // TODO
+                }
+
+                @Override
+                public void onResult(User result) {
+                    Notifications.acceptedFriendNotification(ctx, result.getImmutableCopy());
+                }
+            });
+        }
+
+        this.acceptNewFriends(notifBag.getNewFriends(), ctx);
+        this.removeRemovedFriends(notifBag.getRemovedFriendsIds());
 
     }
 
@@ -980,36 +1030,30 @@ public class Cache {
                     // Fetch friend ids
                     Set<Long> newFriendIds = new HashSet<Long>(networkClient.getFriendsIds());
 
-                    // Remove friends that are no longer friends
-                    for (long id : mFriendIds) {
-                        if (!newFriendIds.contains(id)) {
-                            Cache.this.removeFriend(id);
-                        }
-                    }
-
                     // Sets new friend ids
                     mFriendIds.clear();
                     mFriendIds.addAll(newFriendIds);
 
+                    LongSparseArray<User> newUserInstances = new LongSparseArray<User>();
+
                     // Update each friends
                     for (long id : newFriendIds) {
-                        User friend = Cache.this.getFriend(id);
-
                         // Get online values
                         ImmutableUser onlineValues = networkClient.getUserInfo(id);
                         // Fetch Image
                         Bitmap image = ServiceContainer.getNetworkClient().getProfilePicture(id);
                         onlineValues.setImage(image);
 
-                        if (friend != null) {
-                            // Simply update
-                            friend.update(onlineValues.setImage(image));
+                        if (mUserInstances.get(id) != null) {
+                            User oldFriend = mUserInstances.get(id);
+                            oldFriend.update(onlineValues);
+                            newUserInstances.put(id, oldFriend);
                         } else {
-                            // Add friend
-                            Cache.this.putFriend(onlineValues);
+                            newUserInstances.put(id, new Friend(onlineValues));
                         }
-
                     }
+
+                    mUserInstances = newUserInstances;
 
                     // TODO : Update Events
                     callback.onSuccess();

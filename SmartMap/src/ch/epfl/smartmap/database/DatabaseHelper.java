@@ -145,7 +145,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The application's context, used to access the files
      */
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME + "_" + ServiceContainer.getSettingsManager().getUserID(), null,
+        super(context, DATABASE_NAME + "_" + ServiceContainer.getSettingsManager().getUserId(), null,
             DATABASE_VERSION);
         mContext = context;
         mDatabase = this.getWritableDatabase();
@@ -476,7 +476,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
             event =
                 new ImmutableEvent(id, name, creatorId, description, startDate, endDate, location,
-                    locationString, new ArrayList<Long>());
+                    locationString, new HashSet<Long>());
         }
 
         cursor.close();
@@ -528,17 +528,18 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     public List<Long> getFilterIds() {
         List<Long> filterIds = new ArrayList<Long>();
-        String query = "SELECT  * FROM " + TABLE_FILTER;
-
-        Cursor cursor = mDatabase.rawQuery(query, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                filterIds.add(cursor.getLong(cursor.getColumnIndex(KEY_FILTER_ID)));
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
+        // FIXME
+        // String query = "SELECT  * FROM " + TABLE_FILTER;
+        //
+        // Cursor cursor = mDatabase.rawQuery(query, null);
+        //
+        // if (cursor.moveToFirst()) {
+        // do {
+        // filterIds.add(cursor.getLong(cursor.getColumnIndex(KEY_FILTER_ID)));
+        // } while (cursor.moveToNext());
+        // }
+        //
+        // cursor.close();
         return filterIds;
 
     }
@@ -650,7 +651,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d(TAG, "onCreate");
         db.execSQL(CREATE_TABLE_USER);
         db.execSQL(CREATE_TABLE_FILTER);
         db.execSQL(CREATE_TABLE_FILTER_USER);

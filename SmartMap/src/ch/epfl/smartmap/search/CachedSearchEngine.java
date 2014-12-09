@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.History;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
@@ -191,7 +192,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache
-                        ServiceContainer.getCache().putFriend(databaseResult);
+                        ServiceContainer.getCache().putStranger(databaseResult);
                         if (callback != null) {
                             callback.onResult(ServiceContainer.getCache().getStranger(id));
                         }
@@ -203,7 +204,7 @@ public final class CachedSearchEngine implements SearchEngine {
                             networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
                             if (networkResult != null) {
                                 // Match on server, put it in cache
-                                ServiceContainer.getCache().putFriend(networkResult);
+                                ServiceContainer.getCache().putStranger(networkResult);
                                 if (callback != null) {
 
                                     callback.onResult(ServiceContainer.getCache().getStranger(id));
@@ -415,6 +416,11 @@ public final class CachedSearchEngine implements SearchEngine {
                 }
                 break;
             case TAGS:
+                for (Filter f : ServiceContainer.getCache().getAllFilters()) {
+                    if (f.getName().toLowerCase(Locale.US).contains(query)) {
+                        results.add(f);
+                    }
+                }
 
                 break;
             default:

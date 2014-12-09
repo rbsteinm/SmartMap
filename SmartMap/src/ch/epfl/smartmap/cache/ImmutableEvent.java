@@ -2,7 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.Set;
 
 import android.location.Location;
 
@@ -24,11 +24,11 @@ public class ImmutableEvent {
     private String mLocationString;
     private Calendar mStartDate;
     private Calendar mEndDate;
-    private List<Long> mParticipantIds;
+    private Set<Long> mParticipantIds;
 
     // These will be set by the cache
     private User mCreator;
-    private List<User> mParticipants;
+    private Set<User> mParticipants;
 
     /**
      * Constructor
@@ -44,7 +44,7 @@ public class ImmutableEvent {
      * @param participants
      */
     public ImmutableEvent(long id, String name, long creatorId, String description, Calendar startDate,
-        Calendar endDate, Location location, String locationString, List<Long> participantIds) {
+        Calendar endDate, Location location, String locationString, Set<Long> participantIds) {
 
         mId = id;
         mName = name;
@@ -89,11 +89,11 @@ public class ImmutableEvent {
         return mName;
     }
 
-    public List<Long> getParticipantIds() {
+    public Set<Long> getParticipantIds() {
         return mParticipantIds;
     }
 
-    public List<User> getParticipants() {
+    public Set<User> getParticipants() {
         return mParticipants;
     }
 
@@ -141,7 +141,7 @@ public class ImmutableEvent {
         return this;
     }
 
-    public ImmutableEvent setParticipants(List<User> newParticipants) {
+    public ImmutableEvent setParticipants(Set<User> newParticipants) {
         mParticipants = newParticipants;
         return this;
     }

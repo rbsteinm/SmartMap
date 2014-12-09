@@ -32,11 +32,12 @@
         <item>1 day</item>
         <item>Never</item>
     </string-array>
+    <string name="pref_last_seen_max_default_value">3600000</string>
     <string-array name="pref_last_seen_max_values">
         <!-- NOTE: the time is in ms -->
         <item>600000</item>
         <item>1800000</item>
-        <item>3600000</item>
+        <item>@string/pref_last_seen_max_default_value</item>
         <item>10800000</item>
         <item>43200000</item>
         <item>86400000</item>
@@ -59,10 +60,11 @@
         <item>1 minute</item>
         <item>2 minutes</item>
     </string-array>
+    <string name="pref_sync_frequency_default_value">10000</string>
     <string-array name="pref_sync_frequency_values">
         <!-- NOTE: the time is in ms -->
         <item>5000</item>
-        <item>10000</item>
+        <item>@string/pref_sync_frequency_default_value</item>
         <item>30000</item>
         <item>60000</item>
         <item>120000</item>
@@ -77,12 +79,13 @@
         <item>1000 km</item>
         <item>All</item>
     </string-array>
+    <string name="pref_events_max_distance_default_value">100000</string>
     <string-array name="pref_events_max_distance_values">
         <!-- NOTE: the distances are in meters -->
         <item>0</item>
         <item>10000</item>
         <item>50000</item>
-        <item>100000</item>
+        <item>@string/pref_events_max_distance_default_value</item>
         <item>500000</item>
         <item>1000000</item>
         <item>41000000</item>
