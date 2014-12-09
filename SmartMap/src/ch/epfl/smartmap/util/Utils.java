@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
  * @author agpmilli
  * @author jfperren
  * @author SpicyCH
+ * @author rbsteinm
  */
 public class Utils {
 
@@ -37,15 +38,46 @@ public class Utils {
     public static final long ONE_DAY = 24 * ONE_HOUR;
     public static final long TEN_DAYS = 10 * ONE_DAY;
     public static final long ONE_YEAR = 365 * ONE_DAY;
+    public static final int DAYS_IN_A_WEEK = 7;
+    private static final float MAX_COLOR = 255f;
+    private static final double ONE_THOUSAND_METERS = 1000.0;
+    private static final double TEN = 10.0;
 
     public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
         .getString(R.string.utils_never_seen_on_smartmap);
 
     public static double distanceToMe(LatLng latLng) {
-        Location location = new Location("LocFromLatLng");
-        location.setLatitude(latLng.latitude);
-        location.setLongitude(latLng.longitude);
+        return Math.sqrt(Math.pow(latLng.latitude
+            - ServiceContainer.getSettingsManager().getLocation().getLatitude(), 2)
+            + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+    }
+
+    public static double distanceToMe(Location location) {
         return ServiceContainer.getSettingsManager().getLocation().distanceTo(location);
+    }
+
+    /**
+     * @param location
+     *            point you want to have the distance to
+     * @return a String telling how far you are from location
+     */
+    public static String printDistanceToMe(Location location) {
+
+        double distance = distanceToMe(location);
+        String textDistance = "";
+        if (distance >= ONE_THOUSAND_METERS) {
+            distance = distance / ONE_THOUSAND_METERS;
+            distance = Math.round(distance * TEN) / TEN;
+            textDistance =
+                distance
+                + " km "
+                + ServiceContainer.getSettingsManager().getContext()
+                .getString(R.string.utils_away_from_you);
+        } else {
+            distance = Math.round(distance);
+            textDistance = ((int) distance) + " meters away from you";
+        }
+        return textDistance;
     }
 
     /**
@@ -56,7 +88,7 @@ public class Utils {
      */
     private static String formatForClock(int time) {
         String hourOfDayString = "";
-        if (time < 10) {
+        if (time < TEN) {
             hourOfDayString += "0" + time;
         } else {
             hourOfDayString += time;
@@ -70,10 +102,12 @@ public class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder =
+            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
                 return addresses.get(0).getLocality();
             } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
@@ -86,8 +120,8 @@ public class Utils {
         }
     }
 
-    public static int
-        getColorInInterval(double value, double startValue, double endValue, int startColor, int endColor) {
+    public static int getColorInInterval(double value, double startValue, double endValue, int startColor,
+        int endColor) {
         if (startValue > endValue) {
             return getColorInInterval(value, endValue, startValue, endColor, startColor);
         } else {
@@ -97,10 +131,13 @@ public class Utils {
                 double percentageStart = (startValue - value) / intervalLength;
                 double percentageEnd = (value - endValue) / intervalLength;
 
-                int red = (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
+                int red =
+                    (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
                 int green =
-                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color.green(endColor)));
-                int blue = (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
+                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color
+                        .green(endColor)));
+                int blue =
+                    (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
 
                 return Color.rgb(red, green, blue);
             } else if (value < startValue) {
@@ -116,10 +153,12 @@ public class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder =
+            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {
@@ -137,21 +176,21 @@ public class Utils {
         int daysDiff = calendar.get(Calendar.DAY_OF_YEAR) - now.get(Calendar.DAY_OF_YEAR);
 
         if (yearsDiff == 0) {
-            if (daysDiff > 7) {
+            if (daysDiff > DAYS_IN_A_WEEK) {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
                     + calendar.get(Calendar.YEAR);
             } else if (daysDiff > 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
-                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next)
+                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else if (daysDiff == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
             } else if (daysDiff == 0) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
             } else if (daysDiff == -1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
-            } else if (daysDiff > -7) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
-                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+            } else if (daysDiff > -DAYS_IN_A_WEEK) {
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last)
+                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
                     + calendar.get(Calendar.YEAR);
@@ -166,7 +205,7 @@ public class Utils {
 
         long diff =
             GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
-                - calendar.getTimeInMillis();
+            - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
             // Give time in seconds
@@ -177,14 +216,17 @@ public class Utils {
             if (minutes == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
             } else {
-                return minutes + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
+                return minutes
+                    + " "
+                    + ServiceContainer.getSettingsManager().getContext()
+                    .getString(R.string.utils_minutes_ago);
             }
         } else if (diff < ONE_DAY) {
             // Give time hours
             int hours = (int) (diff / ONE_HOUR);
             if (hours == 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_hour_ago);
+                return ServiceContainer.getSettingsManager().getContext()
+                    .getString(R.string.utils_one_hour_ago);
             } else {
                 return "" + hours + " "
                     + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
@@ -199,21 +241,23 @@ public class Utils {
                     + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
             }
         } else {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
+            return ServiceContainer.getSettingsManager().getContext()
+                .getString(R.string.utils_never_seen_on_smartmap);
         }
     }
 
     public static ColorMatrix getMatrixForColor(int color) {
-        float r = Color.red(color) / 255f;
-        float g = Color.green(color) / 255f;
-        float b = Color.blue(color) / 255f;
+        float r = Color.red(color) / MAX_COLOR;
+        float g = Color.green(color) / MAX_COLOR;
+        float b = Color.blue(color) / MAX_COLOR;
 
         float[] src = {r, 0, 0, 0, 0, 0, g, 0, 0, 0, 0, 0, b, 0, 0, 0, 0, 0, 1, 0};
         return new ColorMatrix(src);
     }
 
     public static String getTimeString(Calendar calendar) {
-        return formatForClock(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + formatForClock(calendar.get(Calendar.MINUTE));
+        return formatForClock(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
+            + formatForClock(calendar.get(Calendar.MINUTE));
     }
 
     public static void setBadgeCount(Context context, LayerDrawable icon, int count) {

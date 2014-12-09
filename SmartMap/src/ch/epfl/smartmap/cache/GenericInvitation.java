@@ -14,7 +14,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
  * 
  * @author agpmilli
  */
-public class GenericInvitation implements Invitation {
+public class GenericInvitation implements Invitation, Comparable {
 
     @SuppressWarnings("unused")
     private static final String TAG = GenericInvitation.class.getSimpleName();
@@ -47,14 +47,14 @@ public class GenericInvitation implements Invitation {
             mEvent = invitation.getEvent();
         }
         if ((invitation.getStatus() != Invitation.UNREAD)
-                && ((invitation.getStatus() != Invitation.READ) && (invitation.getStatus() != Invitation.DECLINED) && (invitation
-                        .getStatus() != Invitation.ACCEPTED))) {
+            && ((invitation.getStatus() != Invitation.READ)
+                && (invitation.getStatus() != Invitation.DECLINED) && (invitation.getStatus() != Invitation.ACCEPTED))) {
             throw new IllegalArgumentException("Status is " + invitation.getStatus());
         } else {
             mStatus = invitation.getStatus();
         }
         if ((invitation.getType() != Invitation.ACCEPTED_FRIEND_INVITATION)
-                && ((invitation.getType() != Invitation.EVENT_INVITATION) && (invitation.getType() != Invitation.FRIEND_INVITATION))) {
+            && ((invitation.getType() != Invitation.EVENT_INVITATION) && (invitation.getType() != Invitation.FRIEND_INVITATION))) {
             throw new IllegalArgumentException();
         } else {
             mType = invitation.getType();
@@ -65,13 +65,17 @@ public class GenericInvitation implements Invitation {
         } else {
             mTimeStamp = invitation.getTimeStamp();
         }
+    }
 
+    @Override
+    public int compareTo(Object that) {
+        return Long.valueOf(this.getId()).compareTo(Long.valueOf(((Invitation) that).getId()));
     }
 
     @Override
     public boolean equals(Object that) {
         return ((that != null) && (that instanceof GenericInvitation) && (this.getId() == ((GenericInvitation) that)
-                .getId()));
+            .getId()));
     }
 
     public Event getEvent() {
@@ -85,13 +89,12 @@ public class GenericInvitation implements Invitation {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Invitation#getImmutableCopy()
      */
     @Override
     public ImmutableInvitation getImmutableCopy() {
-        return new ImmutableInvitation(mId, mUser.getId(), mEvent.getId(), mStatus, mTimeStamp,
-                ImmutableInvitation.EVENT_INVITATION);
+        return new ImmutableInvitation(mId, mUser.getImmutableCopy(), mEvent.getId(), mStatus, mTimeStamp,
+            ImmutableInvitation.EVENT_INVITATION);
     }
 
     @Override
@@ -126,16 +129,26 @@ public class GenericInvitation implements Invitation {
         return mStatus;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#getSubtitle()
+     */
     @Override
-    public String getText() {
+    public String getSubtitle() {
         Context context = ServiceContainer.getSettingsManager().getContext();
-        if (mType == ImmutableInvitation.FRIEND_INVITATION) {
-            return context.getResources().getString(R.string.notification_open_friend_list);
-        } else if (mType == ImmutableInvitation.EVENT_INVITATION) {
-            return context.getResources().getString(R.string.notification_open_event_invitation_list);
+        if (mStatus == DECLINED) {
+            return context.getResources().getString(R.string.invitation_declined);
+        } else if (mStatus == ACCEPTED) {
+            return context.getResources().getString(R.string.invitation_accepted);
+        } else if (mType == FRIEND_INVITATION) {
+            return context.getResources().getString(
+                R.string.invitation_click_here_to_open_your_list_of_invitations);
+        } else if (mType == EVENT_INVITATION) {
+            return context.getResources().getString(R.string.invitation_click_here_to_see_the_event);
+        } else if (mType == ACCEPTED_FRIEND_INVITATION) {
+            return context.getResources().getString(R.string.invitation_click_here_for_informations);
         } else {
-            return context.getResources().getString(R.string.notification_open_friend_info1) + " " + mUser.getName()
-                    + " " + context.getResources().getString(R.string.notification_open_friend_info2);
+            return "";
         }
     }
 
@@ -143,12 +156,16 @@ public class GenericInvitation implements Invitation {
     public String getTitle() {
         Context context = ServiceContainer.getSettingsManager().getContext();
         if (mType == ImmutableInvitation.FRIEND_INVITATION) {
-            return context.getResources().getString(R.string.notification_open_friend_list) + " " + mUser.getName();
+            return mUser.getName()
+                + context.getResources().getString(R.string.invitation_want_to_be_your_friend);
         } else if (mType == ImmutableInvitation.EVENT_INVITATION) {
-            return context.getResources().getString(R.string.notification_event_request_title) + " " + mUser.getName();
+            return mUser.getName() + context.getResources().getString(R.string.invitation_invites_your_to)
+                + mEvent.getName();
+        } else if (mType == ImmutableInvitation.ACCEPTED_FRIEND_INVITATION) {
+            return mUser.getName()
+                + context.getResources().getString(R.string.invitation_accepted_your_friend_request);
         } else {
-            return mUser.getName() + " "
-                    + context.getResources().getString(R.string.notification_accepted_friend_title);
+            return "";
         }
     }
 
@@ -169,8 +186,8 @@ public class GenericInvitation implements Invitation {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see ch.epfl.smartmap.cache.Invitation#update(ch.epfl.smartmap.cache. ImmutableInvitation)
+     * @see ch.epfl.smartmap.cache.Invitation#update(ch.epfl.smartmap.cache.
+     * ImmutableInvitation)
      */
     @Override
     public void update(ImmutableInvitation invitation) {
@@ -180,16 +197,17 @@ public class GenericInvitation implements Invitation {
         if (invitation.getEvent() != null) {
             mEvent = invitation.getEvent();
         }
-        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)
-                || (invitation.getStatus() == Invitation.READ) || (invitation.getStatus() == Invitation.UNREAD)) {
+        if ((invitation.getStatus() == Invitation.ACCEPTED)
+            || (invitation.getStatus() == Invitation.DECLINED) || (invitation.getStatus() == Invitation.READ)
+            || (invitation.getStatus() == Invitation.UNREAD)) {
             mStatus = invitation.getStatus();
         }
         if (invitation.getTimeStamp() >= 0) {
             mTimeStamp = invitation.getTimeStamp();
         }
         if ((invitation.getType() == ImmutableInvitation.ACCEPTED_FRIEND_INVITATION)
-                || (invitation.getType() == ImmutableInvitation.EVENT_INVITATION)
-                || (invitation.getType() == ImmutableInvitation.FRIEND_INVITATION)) {
+            || (invitation.getType() == ImmutableInvitation.EVENT_INVITATION)
+            || (invitation.getType() == ImmutableInvitation.FRIEND_INVITATION)) {
             mType = invitation.getType();
         }
     }

@@ -9,6 +9,8 @@ import android.content.Intent;
  */
 public interface Invitation {
 
+    long NO_ID = -1;
+
     /**
      * int representing invitation status
      */
@@ -42,9 +44,9 @@ public interface Invitation {
     int getStatus();
 
     /**
-     * @return invitation's text
+     * @return invitation's subtitle
      */
-    String getText();
+    String getSubtitle();
 
     /**
      * @return invitation's title

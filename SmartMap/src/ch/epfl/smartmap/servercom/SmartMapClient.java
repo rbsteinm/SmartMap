@@ -121,14 +121,14 @@ public interface SmartMapClient {
      * accepted an invitation from us, and the list of users that removed us
      * from their friends
      * 
-     * @return an object of type {@link NotificationBag} that encapsulates the 3
+     * @return an object of type {@link InvitationBag} that encapsulates the 3
      *         lists and offers methods
      *         to ack the removed friends and the new friends. Must call this
      *         two methods to ack the server
      *         that the new friends and the removed friends were retrieved
      * @throws SmartMapClientException
      */
-    NotificationBag getInvitations() throws SmartMapClientException;
+    InvitationBag getInvitations() throws SmartMapClientException;
 
     /**
      * @param id

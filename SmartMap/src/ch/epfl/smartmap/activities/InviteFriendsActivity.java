@@ -76,7 +76,6 @@ public class InviteFriendsActivity extends ListActivity {
                                     Toast.LENGTH_SHORT).show();
                             }
                         });
-
                     }
 
                     @Override
