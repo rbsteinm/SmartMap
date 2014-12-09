@@ -69,7 +69,7 @@ public class SetLocationActivity extends FragmentActivity {
                 new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
                     .getSettingsManager().getLocation().getLongitude());
 
-            mEventPosition = this.getIntent().getParcelableExtra("eventPosition");
+            mEventPosition = this.getIntent().getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
 
             // Enabling MyLocation Layer of Google Map
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);

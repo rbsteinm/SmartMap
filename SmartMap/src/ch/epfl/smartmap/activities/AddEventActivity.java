@@ -62,8 +62,8 @@ public class AddEventActivity extends FragmentActivity {
     private static final int INDEX_MONTH = 1;
     private static final int INDEX_DAY = 0;
 
-    private static final String TIME_PICKER = "timePicker";
-    protected static final String DATE_PICKER = "datePicker";
+    private static final String TIME_PICKER_DESCR = "timePicker";
+    private static final String DATE_PICKER_DESCR = "datePicker";
 
     private GoogleMap mGoogleMap;
 
@@ -100,14 +100,14 @@ public class AddEventActivity extends FragmentActivity {
                     mGoogleMap.clear();
                 }
                 Intent setLocationIntent = new Intent(AddEventActivity.this, SetLocationActivity.class);
-                setLocationIntent.putExtra("eventPosition", mEventPosition);
+                setLocationIntent.putExtra(LOCATION_EXTRA, mEventPosition);
                 AddEventActivity.this.startActivityForResult(setLocationIntent, PICK_LOCATION_REQUEST);
             }
         });
 
         Bundle extras = this.getIntent().getExtras();
         if (extras != null) {
-            LatLng latLng = extras.getParcelable(LOCATION_SERVICE);
+            LatLng latLng = extras.getParcelable(LOCATION_EXTRA);
             if ((latLng != null) && (Math.abs(latLng.latitude) > 0)) {
                 // The user long clicked the map in MainActivity and wants to
                 // create an event
@@ -138,14 +138,9 @@ public class AddEventActivity extends FragmentActivity {
             mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
             mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-            mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
-
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer.getSettingsManager()
                     .getLocation().getLatitude(), ServiceContainer.getSettingsManager().getLocation().getLongitude()));
             Log.d(TAG, " " + mGoogleMap.getMyLocation());
-            // new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new
-            // LatLng(mGoogleMap.getMyLocation().getLatitude(),
-            // mGoogleMap.getMyLocation().getLatitude()));
 
         }
     }
@@ -189,7 +184,6 @@ public class AddEventActivity extends FragmentActivity {
                 this.createEvent();
                 break;
             default:
-                // No other menu items!
                 break;
         }
 
@@ -334,6 +328,7 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
+     * 
      * @param dayMonthYear
      *            a String like "16/09/1993"
      * @param hourMinute
@@ -370,6 +365,7 @@ public class AddEventActivity extends FragmentActivity {
         mPlaceName = (EditText) this.findViewById(R.id.addEventPlaceName);
 
         mPlaceName.setFocusable(true);
+
         // Initialize mEventPosition to position of user
         mEventPosition = new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
                 .getSettingsManager().getLocation().getLongitude());
@@ -391,7 +387,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new TimePickerFragment(mPickStartTime);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), TIME_PICKER);
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), TIME_PICKER_DESCR);
             }
 
         });
@@ -404,7 +400,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment(mPickStartDate);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER);
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER_DESCR);
             }
         });
 
@@ -413,7 +409,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new DatePickerFragment(mPickEndDate);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER);
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER_DESCR);
             }
         });
 
@@ -422,7 +418,7 @@ public class AddEventActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 DialogFragment newFragment = new TimePickerFragment(mPickEndTime);
-                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), TIME_PICKER);
+                newFragment.show(AddEventActivity.this.getSupportFragmentManager(), TIME_PICKER_DESCR);
             }
         });
         this.displayMap();
@@ -443,7 +439,6 @@ public class AddEventActivity extends FragmentActivity {
      * 
      * @param first
      * @param second
-     * 
      * @author SpicyCH
      */
     private void resetEndOfEvent(EditText first, EditText second) {
@@ -459,7 +454,6 @@ public class AddEventActivity extends FragmentActivity {
      */
     private void updateLocation(Intent data) {
         Bundle extras = data.getExtras();
-
         mEventPosition = extras.getParcelable(LOCATION_EXTRA);
 
         Location location = new Location("");
