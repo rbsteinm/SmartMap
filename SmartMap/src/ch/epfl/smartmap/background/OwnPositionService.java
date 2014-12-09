@@ -1,5 +1,7 @@
 package ch.epfl.smartmap.background;
 
+import java.util.GregorianCalendar;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -15,9 +17,9 @@ import android.os.SystemClock;
 import android.util.Log;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * @author jfperren
@@ -36,26 +38,29 @@ public class OwnPositionService extends Service {
             // check if new location is accurate enough
             if ((ServiceContainer.getSettingsManager().getLocation().distanceTo(newLocation) >= newLocation
                 .getAccuracy()) || (newLocation.getAccuracy() <= mCurrentAccuracy)) {
+                Log.d(TAG, "are we here?");
                 mCurrentAccuracy = newLocation.getAccuracy();
-                // Name of our location
-                String locName = Utils.getCityFromLocation(newLocation);
                 // Give new location to SettingsManager
-                ServiceContainer.getSettingsManager().setLocationName(locName);
-                // Sends new Position to server
-                if (!ServiceContainer.getSettingsManager().isOffline()) {
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        public Void doInBackground(Void... params) {
-                            try {
-                                ServiceContainer.getNetworkClient().updatePos(newLocation);
-                                Log.d(TAG, "Location Update");
-                            } catch (SmartMapClientException e) {
-                                Log.e(TAG, "Error in LocationListener : " + e);
-                            }
-                            return null;
+                ServiceContainer.getSettingsManager().setLocation(newLocation);
+            }
+            // Sends new Position to server
+            if (!ServiceContainer.getSettingsManager().isOffline()) {
+                ServiceContainer.getSettingsManager().setLastSeen(new GregorianCalendar().getTimeInMillis());
+                ServiceContainer.getSettingsManager().setLocationName(
+                    Utils.getCityFromLocation(ServiceContainer.getSettingsManager().getLocation()));
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    public Void doInBackground(Void... params) {
+                        try {
+                            ServiceContainer.getNetworkClient().updatePos(
+                                ServiceContainer.getSettingsManager().getLocation());
+                            Log.d(TAG, "Location Update");
+                        } catch (SmartMapClientException e) {
+                            Log.e(TAG, "Error in LocationListener : " + e);
                         }
-                    }.execute();
-                }
+                        return null;
+                    }
+                }.execute();
             }
         }
 
@@ -85,7 +90,8 @@ public class OwnPositionService extends Service {
         protected Boolean doInBackground(Void... arg0) {
             try {
                 // Authentify in order to communicate with NetworkClient
-                ServiceContainer.getNetworkClient().authServer(ServiceContainer.getSettingsManager().getUserName(),
+                ServiceContainer.getNetworkClient().authServer(
+                    ServiceContainer.getSettingsManager().getUserName(),
                     ServiceContainer.getSettingsManager().getFacebookID(),
                     ServiceContainer.getSettingsManager().getToken());
                 return true;
@@ -113,8 +119,8 @@ public class OwnPositionService extends Service {
 
                 // And try to run LocationManager with GPS Provider
                 if (mLocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME, MIN_GPS_DISTANCE,
-                        new MyLocationListener());
+                    mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_TIME,
+                        MIN_GPS_DISTANCE, new MyLocationListener());
                 }
             } else {
                 // FIXME : Handle this case
@@ -187,8 +193,10 @@ public class OwnPositionService extends Service {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
         restartService.setPackage(this.getPackageName());
         PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent.getService(this.getApplicationContext(), 1, restartService,
+                PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService =
+            (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
             restartServicePending);
     }

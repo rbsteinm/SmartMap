@@ -6,7 +6,7 @@ import java.util.GregorianCalendar;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * Describes a generic user of the app

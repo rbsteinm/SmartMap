@@ -14,7 +14,7 @@ import android.location.Location;
 import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.util.Utils;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -52,7 +52,14 @@ public class PublicEvent implements Event {
     public static final float MARKER_ANCHOR_Y = 1;
 
     protected PublicEvent(ImmutableEvent event) {
-        mId = (event.getId() >= 0) ? event.getId() : NO_ID;
+        // Set id
+        if (event.getId() >= 0) {
+            mId = event.getId();
+        } else {
+            throw new IllegalArgumentException("Trying to create an Event with incorrect Id");
+        }
+
+        // Set other values
         mName = (event.getName() != null) ? event.getName() : NO_NAME;
         mCreator = (event.getCreator() != null) ? event.getCreator() : User.NOBODY;
         mStartDate = (event.getStartDate() != null) ? (Calendar) event.getStartDate().clone() : NO_START_DATE;

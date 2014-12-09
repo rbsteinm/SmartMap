@@ -8,8 +8,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -26,128 +26,6 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * @author rbsteinm
  */
 public class UserInformationActivity extends Activity {
-
-    @SuppressWarnings("unused")
-    private static final String TAG = UserInformationActivity.class.getSimpleName();
-
-    private User mUser;
-    private int mDistanceToUser;
-
-    private Switch mFollowSwitch;
-    private Switch mBlockSwitch;
-    private TextView mSubtitlesView;
-    private TextView mNameView;
-    private ImageView mPictureView;
-    private TextView mDistanceView;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_user_information);
-        // Get views
-        mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
-        mNameView = (TextView) this.findViewById(R.id.user_info_name);
-        mSubtitlesView = (TextView) this.findViewById(R.id.user_info_subtitles);
-        mFollowSwitch = (Switch) this.findViewById(R.id.user_info_follow_switch);
-        mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
-        mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
-        // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Get User & Database TODO set a listener on the user
-        mUser = ServiceContainer.getCache().getUser(this.getIntent().getLongExtra("USER", User.NO_ID));
-        if (mUser.getLocation() != null) {
-            mDistanceToUser =
-                Math.round(ServiceContainer.getSettingsManager().getLocation().distanceTo(mUser.getLocation()));
-        } else {
-            mDistanceToUser = 0;
-        }
-
-        // Set Informations
-        mNameView.setText(mUser.getName());
-        mSubtitlesView.setText(mUser.getSubtitle());
-        mPictureView.setImageBitmap(mUser.getImage());
-        mFollowSwitch.setChecked(mUser.isVisible());
-        mBlockSwitch.setChecked(mUser.isBlocked());
-        if (mDistanceToUser != 0) {
-            mDistanceView.setText(mDistanceToUser + " meters away from you");
-        } else {
-            mDistanceView.setText("");
-        }
-    }
-
-    public void displayDeleteConfirmationDialog(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("remove " + mUser.getName() + " from your friends?");
-
-        // Add positive button
-        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                new RemoveFriend().execute(mUser.getId());
-            }
-        });
-
-        // Add negative button
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-
-        // display the AlertDialog
-        builder.create().show();
-    }
-
-    public void followUnfollow(View view) {
-        // TODO need methond setVisible
-        // new FollowFriend().execute(mUser.getId());
-    }
-
-    @Override
-    public void onBackPressed() {
-        this.onNotificationOpen();
-        this.finish();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.user_information, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        switch (id) {
-            case android.R.id.home:
-                this.onNotificationOpen();
-                this.finish();
-                break;
-            default:
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * When this tab is open by a notification
-     */
-    private void onNotificationOpen() {
-        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
-            this.startActivity(new Intent(this, MainActivity.class));
-        }
-    }
 
     /**
      * Asynchronous task that removes a friend from the users friendList both
@@ -177,7 +55,8 @@ public class UserInformationActivity extends Activity {
                 });
 
             } catch (SmartMapClientException e) {
-                confirmString = "Network error, operation failed";
+                Log.e(TAG, "SmartMapClientException : " + e);
+                confirmString = e.getMessage();
             }
             return confirmString;
         }
@@ -187,5 +66,105 @@ public class UserInformationActivity extends Activity {
             Toast.makeText(UserInformationActivity.this, confirmString, Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    private static final String TAG = UserInformationActivity.class.getSimpleName();
+    private User mUser;
+    private int mDistanceToUser;
+    private Switch mFollowSwitch;
+    private Switch mBlockSwitch;
+    private TextView mSubtitlesView;
+    private TextView mNameView;
+    private ImageView mPictureView;
+    private TextView mDistanceView;
+
+    public void displayDeleteConfirmationDialog(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("remove " + mUser.getName() + " from your friends?");
+
+        // Add positive button
+        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                new RemoveFriend().execute(mUser.getId());
+            }
+        });
+
+        // Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
+    }
+
+    public void followUnfollow(View view) {
+        // TODO need method setVisible
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.onNotificationOpen();
+        this.finish();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_user_information);
+        // Get views
+        mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
+        mNameView = (TextView) this.findViewById(R.id.user_info_name);
+        mSubtitlesView = (TextView) this.findViewById(R.id.user_info_subtitles);
+        mFollowSwitch = (Switch) this.findViewById(R.id.user_info_follow_switch);
+        mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
+        mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
+        // Set actionbar color
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.user_information, menu);
+        return true;
+    }
+
+    /**
+     * When this tab is open by a notification
+     */
+    private void onNotificationOpen() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Get User & Database
+        mUser = ServiceContainer.getCache().getUser(this.getIntent().getLongExtra("USER", User.NO_ID));
+        if (mUser.getLocation() != null) {
+            mDistanceToUser =
+                Math.round(ServiceContainer.getSettingsManager().getLocation().distanceTo(mUser.getLocation()));
+        } else {
+            mDistanceToUser = 0;
+        }
+
+        // Set Informations
+        mNameView.setText(mUser.getName());
+        mSubtitlesView.setText(mUser.getSubtitle());
+        mPictureView.setImageBitmap(mUser.getImage());
+        mFollowSwitch.setChecked(mUser.isVisible());
+        mBlockSwitch.setChecked(mUser.isBlocked());
+        if (mDistanceToUser != 0) {
+            mDistanceView.setText(mDistanceToUser + " meters away from you");
+        } else {
+            mDistanceView.setText("");
+        }
     }
 }

@@ -16,7 +16,7 @@ import android.util.Log;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * A {@link SmartMapParser} implementation that parses objects from Json format

@@ -1,10 +1,13 @@
 package ch.epfl.smartmap.background;
 
+import java.util.GregorianCalendar;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.preference.PreferenceManager;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * Used to get and set settings and local info using SharedPreferences
@@ -20,6 +23,8 @@ public final class SettingsManager {
     public static final String USER_NAME = "UserName";
     public static final String PHONE_NUMBER = "PhoneNumber";
     public static final String EMAIL = "Email";
+    public static final String SUBTITLE = "Subtitle";
+    public static final String LASTSEEN = "LastSeen";
     public static final String TOKEN = "Token";
     public static final String FB_ID = "FacebookID";
     public static final String COOKIE = "Cookie";
@@ -32,6 +37,8 @@ public final class SettingsManager {
     public static final String DEFAULT_NAME = "No name";
     public static final String DEFAULT_NUMBER = "No number";
     public static final String DEFAULT_EMAIL = "No email";
+    public static final String DEFAULT_SUBTITLE = "unknown";
+    public static final long DEFAULT_LASTSEEN = 0;
     public static final String DEFAULT_TOKEN = "No token";
     public static final long DEFAULT_FB_ID = -1;
     public static final String DEFAULT_COOKIE = "No cookie";
@@ -85,6 +92,10 @@ public final class SettingsManager {
         return mSharedPref.getLong(FB_ID, DEFAULT_FB_ID);
     }
 
+    public long getLastSeen() {
+        return mSharedPref.getLong(LASTSEEN, DEFAULT_LASTSEEN);
+    }
+
     /**
      * @return The local user's current position as a Location object
      */
@@ -104,7 +115,7 @@ public final class SettingsManager {
     public int getNearEventsMaxDistance() {
         String defaultValue = mContext.getString(R.string.pref_events_max_distance_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_max_distance_fetch_events), defaultValue));
+            mContext.getString(R.string.settings_key_max_distance_fetch_events), defaultValue));
     }
 
     /**
@@ -114,7 +125,23 @@ public final class SettingsManager {
     public int getRefreshFrequency() {
         String defaultValue = mContext.getString(R.string.pref_sync_frequency_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_refresh_frequency), defaultValue));
+            mContext.getString(R.string.settings_key_refresh_frequency), defaultValue));
+    }
+
+    public String getSubtitle() {
+        if (this.getLastSeen() == DEFAULT_LASTSEEN) {
+            return "unknown";
+        }
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(ServiceContainer.getSettingsManager().getLastSeen());
+        String subtitle =
+            Utils.getLastSeenStringFromCalendar(calendar) + " near "
+                + this.getLocationName();
+        return subtitle;
+    }
+
+    public String getLocationName() {
+        return mSharedPref.getString(LOCATION_NAME, DEFAULT_LOC_NAME);
     }
 
     /**
@@ -125,7 +152,7 @@ public final class SettingsManager {
     public int getTimeToWaitBeforeHidingFriends() {
         String defaultValue = mContext.getString(R.string.pref_last_seen_max_default_value);
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                mContext.getString(R.string.settings_key_last_seen_max), defaultValue));
+            mContext.getString(R.string.settings_key_last_seen_max), defaultValue));
     }
 
     /**
@@ -169,7 +196,7 @@ public final class SettingsManager {
      */
     public boolean isOffline() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_general_offline), false);
+            mContext.getString(R.string.settings_key_general_offline), false);
     }
 
     /**
@@ -178,7 +205,7 @@ public final class SettingsManager {
      */
     public boolean notificationsEnabled() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_enabled), true);
+            mContext.getString(R.string.settings_key_notifications_enabled), true);
     }
 
     /**
@@ -188,7 +215,7 @@ public final class SettingsManager {
      */
     public boolean notificationsForEventInvitations() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_event_invitations), true) : false;
+            mContext.getString(R.string.settings_key_notifications_event_invitations), true) : false;
     }
 
     /**
@@ -198,7 +225,7 @@ public final class SettingsManager {
      */
     public boolean notificationsForEventProximity() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_event_proximity), true) : false;
+            mContext.getString(R.string.settings_key_notifications_event_proximity), true) : false;
     }
 
     /**
@@ -208,7 +235,7 @@ public final class SettingsManager {
      */
     public boolean notificationsForFriendRequests() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_friend_requests), true) : false;
+            mContext.getString(R.string.settings_key_notifications_friend_requests), true) : false;
     }
 
     /**
@@ -220,7 +247,7 @@ public final class SettingsManager {
      */
     public boolean notificationsForFriendshipConfirmations() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_friendship_confirmations), true) : false;
+            mContext.getString(R.string.settings_key_notifications_friendship_confirmations), true) : false;
     }
 
     /**
@@ -230,7 +257,7 @@ public final class SettingsManager {
      */
     public boolean notificationsVibrate() {
         return this.notificationsEnabled() ? PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
+            mContext.getString(R.string.settings_key_notifications_vibrate), true) : false;
     }
 
     /**
@@ -281,6 +308,11 @@ public final class SettingsManager {
         return mEditor.commit();
     }
 
+    public boolean setLastSeen(long newLastSeen) {
+        mEditor.putLong(LASTSEEN, newLastSeen);
+        return mEditor.commit();
+    }
+
     /**
      * Stores the local users location
      * 
@@ -303,6 +335,11 @@ public final class SettingsManager {
      */
     public boolean setLocationName(String locName) {
         mEditor.putString(LOCATION_NAME, locName);
+        return mEditor.commit();
+    }
+
+    public boolean setSubtitle(String newSubtitle) {
+        mEditor.putString(SUBTITLE, newSubtitle);
         return mEditor.commit();
     }
 
@@ -360,7 +397,7 @@ public final class SettingsManager {
      */
     public boolean showPrivateEvents() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_events_show_private), true);
+            mContext.getString(R.string.settings_key_events_show_private), true);
     }
 
     /**
@@ -369,6 +406,6 @@ public final class SettingsManager {
      */
     public boolean showPublicEvents() {
         return PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(
-                mContext.getString(R.string.settings_key_events_show_public), true);
+            mContext.getString(R.string.settings_key_events_show_public), true);
     }
 }

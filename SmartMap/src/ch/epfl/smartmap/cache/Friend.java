@@ -7,9 +7,9 @@ import java.util.TimeZone;
 import android.content.Context;
 import android.location.Location;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.gui.Utils;
 import ch.epfl.smartmap.map.CircularMarkerIconMaker;
 import ch.epfl.smartmap.map.MarkerIconMaker;
+import ch.epfl.smartmap.util.Utils;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -143,7 +143,8 @@ public final class Friend extends AbstractUser {
      */
     @Override
     public boolean isVisible() {
-        return ServiceContainer.getCache().getAllActiveFilters().contains(this);
+        return ServiceContainer.getCache().getAllActiveFilters().contains(this)
+            && !mLocation.equals(NO_LOCATION);
     }
 
     @Override
