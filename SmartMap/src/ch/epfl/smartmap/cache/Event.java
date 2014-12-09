@@ -53,8 +53,7 @@ public interface Event extends Displayable {
     List<User> getParticipants();
 
     /**
-     * @return The date (year, month, day, hour, minute) at which the event
-     *         starts
+     * @return The date (year, month, day, hour, minute) at which the event starts
      */
     Calendar getStartDate();
 

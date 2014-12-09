@@ -8,8 +8,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -55,7 +55,8 @@ public class UserInformationActivity extends Activity {
                 });
 
             } catch (SmartMapClientException e) {
-                confirmString = "Network error, operation failed";
+                Log.e(TAG, "SmartMapClientException : " + e);
+                confirmString = e.getMessage();
             }
             return confirmString;
         }
@@ -67,17 +68,14 @@ public class UserInformationActivity extends Activity {
 
     }
 
-    @SuppressWarnings("unused")
     private static final String TAG = UserInformationActivity.class.getSimpleName();
     private User mUser;
-
     private int mDistanceToUser;
     private Switch mFollowSwitch;
     private Switch mBlockSwitch;
     private TextView mSubtitlesView;
     private TextView mNameView;
     private ImageView mPictureView;
-
     private TextView mDistanceView;
 
     public void displayDeleteConfirmationDialog(View view) {
@@ -105,8 +103,7 @@ public class UserInformationActivity extends Activity {
     }
 
     public void followUnfollow(View view) {
-        // TODO need methond setVisible
-        // new FollowFriend().execute(mUser.getId());
+        // TODO need method setVisible
     }
 
     @Override
@@ -147,30 +144,16 @@ public class UserInformationActivity extends Activity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        switch (id) {
-            case android.R.id.home:
-                this.onNotificationOpen();
-                this.finish();
-                break;
-            default:
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-        // Get User & Database TODO set a listener on the user
+        // Get User & Database
         mUser = ServiceContainer.getCache().getUser(this.getIntent().getLongExtra("USER", User.NO_ID));
-        mDistanceToUser =
-            Math.round(ServiceContainer.getSettingsManager().getLocation().distanceTo(mUser.getLocation()));
+        if (mUser.getLocation() != null) {
+            mDistanceToUser =
+                Math.round(ServiceContainer.getSettingsManager().getLocation().distanceTo(mUser.getLocation()));
+        } else {
+            mDistanceToUser = 0;
+        }
 
         // Set Informations
         mNameView.setText(mUser.getName());
@@ -178,6 +161,10 @@ public class UserInformationActivity extends Activity {
         mPictureView.setImageBitmap(mUser.getImage());
         mFollowSwitch.setChecked(mUser.isVisible());
         mBlockSwitch.setChecked(mUser.isBlocked());
-        mDistanceView.setText(mDistanceToUser + " meters away from you");
+        if (mDistanceToUser != 0) {
+            mDistanceView.setText(mDistanceToUser + " meters away from you");
+        } else {
+            mDistanceView.setText("");
+        }
     }
 }

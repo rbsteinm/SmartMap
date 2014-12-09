@@ -17,7 +17,6 @@ import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.NotificationBag;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
-import ch.epfl.smartmap.util.Utils;
 
 /**
  * A background service that updates friends' position periodically
@@ -26,43 +25,12 @@ import ch.epfl.smartmap.util.Utils;
  */
 public class InvitationsService extends Service {
 
-    /**
-     * Retrieves and handles invitations
-     * 
-     * @author ritterni
-     */
-    private class InvitationsRunnable implements Runnable {
-        @Override
-        public void run() {
-            new AsyncTask<Void, Void, NotificationBag>() {
-                @Override
-                protected NotificationBag doInBackground(Void... arg0) {
-                    NotificationBag nb = null;
-                    try {
-                        // Get friends invitations
-                        nb = ServiceContainer.getNetworkClient().getInvitations();
-                        ServiceContainer.getCache().updateFriendInvitations(nb,
-                            InvitationsService.this.getApplicationContext());
-                        // Get event invitations
-                        List<Long> invitations = ServiceContainer.getNetworkClient().getEventInvitations();
-                        ServiceContainer.getCache().updateEventInvitations(invitations);
-                        Log.d(TAG, "Successfully fetched invitations");
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Couldn't retrieve invitations due to a server error: " + e);
-                    }
-                    return nb;
-                }
-            }.execute();
-            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
-        }
-    }
-
     private static final String TAG = InvitationsService.class.getSimpleName();
+
     // Time between each invitation fetch
-    private static final int INVITE_UPDATE_DELAY = 120000;
+    private static final int INVITE_UPDATE_DELAY = 30000;
     // Time before restarting
     private static final int RESTART_DELAY = 2000;
-
     // Handler for Runnables
     private final Handler mHandler = new Handler();
 
@@ -76,7 +44,6 @@ public class InvitationsService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Recreating services if they are not set
-        Utils.sContext = this.getApplicationContext();
         if (ServiceContainer.getSettingsManager() == null) {
             ServiceContainer.setSettingsManager(new SettingsManager(this.getApplicationContext()));
         }
@@ -96,8 +63,8 @@ public class InvitationsService extends Service {
                 try {
                     // Authentify in order to communicate with NetworkClient
                     ServiceContainer.getNetworkClient().authServer(ServiceContainer.getSettingsManager().getUserName(),
-                        ServiceContainer.getSettingsManager().getFacebookID(),
-                        ServiceContainer.getSettingsManager().getToken());
+                            ServiceContainer.getSettingsManager().getFacebookID(),
+                            ServiceContainer.getSettingsManager().getToken());
                     return true;
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Couldn't log in: " + e);
@@ -119,10 +86,41 @@ public class InvitationsService extends Service {
     public void onTaskRemoved(Intent rootIntent) {
         Intent restartService = new Intent(this.getApplicationContext(), this.getClass());
         restartService.setPackage(this.getPackageName());
-        PendingIntent restartServicePending =
-            PendingIntent.getService(this.getApplicationContext(), 1, restartService, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent restartServicePending = PendingIntent.getService(this.getApplicationContext(), 1, restartService,
+                PendingIntent.FLAG_ONE_SHOT);
         AlarmManager alarmService = (AlarmManager) this.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + RESTART_DELAY,
-            restartServicePending);
+                restartServicePending);
+    }
+
+    /**
+     * Retrieves and handles invitations
+     * 
+     * @author ritterni
+     */
+    private class InvitationsRunnable implements Runnable {
+        @Override
+        public void run() {
+            new AsyncTask<Void, Void, NotificationBag>() {
+                @Override
+                protected NotificationBag doInBackground(Void... arg0) {
+                    NotificationBag nb = null;
+                    try {
+                        // Get friends invitations
+                        nb = ServiceContainer.getNetworkClient().getInvitations();
+                        ServiceContainer.getCache().updateFriendInvitations(nb,
+                                InvitationsService.this.getApplicationContext());
+                        // Get event invitations
+                        List<Long> invitations = ServiceContainer.getNetworkClient().getEventInvitations();
+                        ServiceContainer.getCache().updateEventInvitations(invitations);
+                        Log.d(TAG, "Successfully fetched invitations");
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Couldn't retrieve invitations due to a server error: " + e);
+                    }
+                    return nb;
+                }
+            }.execute();
+            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
+        }
     }
 }
