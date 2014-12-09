@@ -1,13 +1,7 @@
 package ch.epfl.smartmap.activities;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
 import android.app.Dialog;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -129,26 +123,7 @@ public class SetLocationActivity extends FragmentActivity {
         switch (id) {
             case R.id.set_location_done:
                 Intent addEventIntent = new Intent(this, AddEventActivity.class);
-                Bundle extras = new Bundle();
-                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-                String cityName = "";
-                List<Address> addresses;
-
-                try {
-                    addresses = geocoder.getFromLocation(mEventPosition.latitude, mEventPosition.longitude, 1);
-                    if (addresses.size() > 0) {
-                        // Makes sure that an address is associated to the
-                        // coordinates, the user could
-                        // have long
-                        // clicked in the middle of the sea after all :)
-                        cityName = addresses.get(0).getLocality();
-                    }
-                } catch (IOException e) {
-                }
-
-                extras.putString(CITY_NAME, cityName);
-                extras.putParcelable(LOCATION_SERVICE, mEventPosition);
-                addEventIntent.putExtras(extras);
+                addEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, mEventPosition);
                 this.setResult(RESULT_OK, addEventIntent);
                 this.finish();
             case android.R.id.home:

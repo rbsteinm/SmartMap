@@ -257,6 +257,10 @@ public class AddEventActivity extends FragmentActivity {
             mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
             mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
+            mGoogleMap.clear();
+
+            mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
+
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer.getSettingsManager()
                 .getLocation().getLatitude(), ServiceContainer.getSettingsManager().getLocation().getLongitude()));
             Log.d(TAG, " " + mGoogleMap.getMyLocation());
@@ -265,9 +269,6 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * =======
-     * >>>>>>> 5530de3336fa961ad9df2337acd8dbd84fd3beb1
-     * 
      * @param dayMonthYear
      *            a String like "16/09/1993"
      * @param hourMinute
@@ -500,8 +501,8 @@ public class AddEventActivity extends FragmentActivity {
 
         if ((!addresses.isEmpty()) || ((cityName != null) && !cityName.isEmpty())) {
             cityName = addresses.get(0).getLocality();
-
             mPlaceName.setText(cityName);
+            mGoogleMap.clear();
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
         } else {
