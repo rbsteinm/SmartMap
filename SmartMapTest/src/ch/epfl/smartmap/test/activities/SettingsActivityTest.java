@@ -40,54 +40,10 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  * @author SpicyCH
  */
 public class SettingsActivityTest extends ActivityInstrumentationTestCase2<SettingsActivity> {
-    public static Matcher<Object> withPreferenceKey(final Matcher<Preference> preferenceMatcher) {
-        checkNotNull(preferenceMatcher);
-        return new BoundedMatcher<Object, Preference>(Preference.class) {
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("with preference key:");
-                preferenceMatcher.describeTo(description);
-            }
-
-            @Override
-            protected boolean matchesSafely(Preference pref) {
-                return preferenceMatcher.matches(pref);
-            }
-        };
-    }
-
-    public static Matcher<Object> withPreferenceKey(String expectedKeyText) {
-        checkNotNull(expectedKeyText);
-        checkArgument(!expectedKeyText.isEmpty());
-        return withPreferenceKey(PreferenceMatchers.withKey(expectedKeyText));
-    }
-
     private Context mContext;
 
     public SettingsActivityTest() {
         super(SettingsActivity.class);
-    }
-
-    private void disableNotifications() {
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled)))
-            .perform(ViewActions.click());
-        boolean initValue = ServiceContainer.getSettingsManager().notificationsEnabled();
-        if (initValue) {
-            onView(
-                ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled)))
-                .perform(ViewActions.click());
-        }
-    }
-
-    private void enableNotifications() {
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled)))
-            .perform(ViewActions.click());
-        boolean initValue = ServiceContainer.getSettingsManager().notificationsEnabled();
-        if (!initValue) {
-            onView(
-                ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled)))
-                .perform(ViewActions.click());
-        }
     }
 
     // The standard JUnit 3 setUp method run for for every test
@@ -108,24 +64,29 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
         boolean initValue = ServiceContainer.getSettingsManager().notificationsEnabled();
         assertEquals("Failed to disable notifications", false, initValue);
 
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled)))
-            .perform(ViewActions.click());
+        onView(
+            ViewMatchers.withText(mContext
+                .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
+            ViewActions.click());
         assertEquals("Failed to enable notifications", true, ServiceContainer.getSettingsManager()
             .notificationsEnabled());
     }
 
     public void testCanActivateEventNotifications() {
         this.enableNotifications();
-        assertEquals("Cannot enable notifications", true, ServiceContainer.getSettingsManager().notificationsEnabled());
+        assertEquals("Cannot enable notifications", true, ServiceContainer.getSettingsManager()
+            .notificationsEnabled());
 
         boolean initValue = ServiceContainer.getSettingsManager().notificationsForEventInvitations();
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_invitations)))
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_invitations)))
             .perform(ViewActions.click());
         assertTrue("Couldn't change boolean status of notifications for event invitations",
             initValue != ServiceContainer.getSettingsManager().notificationsForEventInvitations());
 
         boolean initValue2 = ServiceContainer.getSettingsManager().notificationsForEventProximity();
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_proximity)))
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_proximity)))
             .perform(ViewActions.click());
         assertTrue("Couldn't change boolean status of notifications for event proximity",
             initValue2 != ServiceContainer.getSettingsManager().notificationsForEventProximity());
@@ -134,23 +95,28 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
 
     public void testCanActivateFriendRequests() {
         this.enableNotifications();
-        assertEquals("Cannot enable notifications", true, ServiceContainer.getSettingsManager().notificationsEnabled());
+        assertEquals("Cannot enable notifications", true, ServiceContainer.getSettingsManager()
+            .notificationsEnabled());
 
         boolean initValue = ServiceContainer.getSettingsManager().notificationsForFriendRequests();
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_friend_requests)))
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_friend_requests)))
             .perform(ViewActions.click());
-        assertTrue("Couldn't change boolean status of notifications for friend requests", initValue != ServiceContainer
-            .getSettingsManager().notificationsForFriendRequests());
+        assertTrue("Couldn't change boolean status of notifications for friend requests",
+            initValue != ServiceContainer.getSettingsManager().notificationsForFriendRequests());
 
     }
 
     public void testCanActivateFriendshipConfirmations() {
         this.enableNotifications();
-        assertEquals("Cannot enable notifications", true, ServiceContainer.getSettingsManager().notificationsEnabled());
+        assertEquals("Cannot enable notifications", true, ServiceContainer.getSettingsManager()
+            .notificationsEnabled());
 
         boolean initValue = ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations();
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_friendship_confirmations)))
-            .perform(ViewActions.click());
+        onView(
+            ViewMatchers.withText(mContext
+                .getString(ch.epfl.smartmap.R.string.pref_title_friendship_confirmations))).perform(
+            ViewActions.click());
         assertTrue("Couldn't change boolean status of notifications for friendship confirmations",
             initValue != ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations());
 
@@ -158,14 +124,16 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
 
     public void testCanChangeRefreshDataFrequency() {
 
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_refresh_frequency)))
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_refresh_frequency)))
             .perform(ViewActions.click());
         onView(ViewMatchers.withText("5 seconds")).perform(ViewActions.click());
 
         assertEquals("Couldn't set the frequency to 5 seconds", 5000, ServiceContainer.getSettingsManager()
             .getRefreshFrequency());
 
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_refresh_frequency)))
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_refresh_frequency)))
             .perform(ViewActions.click());
         onView(ViewMatchers.withText("10 seconds (default)")).perform(ViewActions.click());
 
@@ -175,15 +143,15 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
 
     public void testCanChangeTimeToWaitBeforeHiding() {
 
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_last_seen_max))).perform(
-            ViewActions.click());
+        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_last_seen_max)))
+            .perform(ViewActions.click());
         onView(ViewMatchers.withText("10 minutes")).perform(ViewActions.click());
 
         assertEquals("Couldn't set to 10 minutes", 600000, ServiceContainer.getSettingsManager()
             .getTimeToWaitBeforeHidingFriends());
 
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_last_seen_max))).perform(
-            ViewActions.click());
+        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_last_seen_max)))
+            .perform(ViewActions.click());
         onView(ViewMatchers.withText("1 hour (default)")).perform(ViewActions.click());
 
         assertEquals("Couldn't set to 1 hour", 3600000, ServiceContainer.getSettingsManager()
@@ -193,24 +161,27 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
     @SuppressWarnings("unchecked")
     public void testCanEnableVibrations() {
         this.enableNotifications();
-        assertEquals("Cannot enable notifications", true, ServiceContainer.getSettingsManager().notificationsEnabled());
+        assertEquals("Cannot enable notifications", true, ServiceContainer.getSettingsManager()
+            .notificationsEnabled());
 
         // Here vibrate is not on the screen, so we must use onData
         boolean initValue = ServiceContainer.getSettingsManager().notificationsVibrate();
         onData(Matchers.<Object> allOf(PreferenceMatchers.withKey("notifications_vibrate"))).perform(
             ViewActions.click());
-        assertTrue("Couldn't change boolean status of notifications for vibrations", initValue != ServiceContainer
-            .getSettingsManager().notificationsVibrate());
+        assertTrue("Couldn't change boolean status of notifications for vibrations",
+            initValue != ServiceContainer.getSettingsManager().notificationsVibrate());
     }
 
     public void testCannotActivateEventsNotificationsIfNotifDisabled() {
         this.disableNotifications();
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_invitations)))
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_invitations)))
             .perform(ViewActions.click());
         assertEquals("Can enable a checkbox when its dependency is disabled", false, ServiceContainer
             .getSettingsManager().notificationsForEventInvitations());
 
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_proximity)))
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_event_proximity)))
             .perform(ViewActions.click());
         assertEquals("Can enable a checkbox when its dependency is disabled", false, ServiceContainer
             .getSettingsManager().notificationsForEventProximity());
@@ -218,7 +189,8 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
 
     public void testCannotActivateFriendRequestsNotificationsIfNotifDisabled() {
         this.disableNotifications();
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_friend_requests)))
+        onView(
+            ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_friend_requests)))
             .perform(ViewActions.click());
         assertEquals("Can enable a checkbox when its dependency is disabled", false, ServiceContainer
             .getSettingsManager().notificationsForFriendRequests());
@@ -226,8 +198,10 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
 
     public void testCannotActivateFriendshipNotificationsIfNotifDisabled() {
         this.disableNotifications();
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_friendship_confirmations)))
-            .perform(ViewActions.click());
+        onView(
+            ViewMatchers.withText(mContext
+                .getString(ch.epfl.smartmap.R.string.pref_title_friendship_confirmations))).perform(
+            ViewActions.click());
         assertEquals("Can enable a checkbox when its dependency is disabled", false, ServiceContainer
             .getSettingsManager().notificationsForFriendshipConfirmations());
     }
@@ -274,16 +248,70 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
     public void testClickingOfflineChangesSettings() {
         boolean initialValue = ServiceContainer.getSettingsManager().isOffline();
         if (initialValue) {
-            onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_offline))).perform(
-                ViewActions.click());
+            onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_offline)))
+                .perform(ViewActions.click());
         }
         initialValue = ServiceContainer.getSettingsManager().isOffline();
         assertEquals("Couldn't set the button to false", false, initialValue);
-        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_offline))).perform(
-            ViewActions.click());
+        onView(ViewMatchers.withText(mContext.getString(ch.epfl.smartmap.R.string.pref_title_offline)))
+            .perform(ViewActions.click());
         boolean finalValue = ServiceContainer.getSettingsManager().isOffline();
         assertTrue("intitialValue was " + initialValue + " and finalValue was " + finalValue,
             initialValue != finalValue);
+    }
+
+    public void testInit() {
+        assertTrue(true);
+    }
+
+    private void disableNotifications() {
+        onView(
+            ViewMatchers.withText(mContext
+                .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
+            ViewActions.click());
+        boolean initValue = ServiceContainer.getSettingsManager().notificationsEnabled();
+        if (initValue) {
+            onView(
+                ViewMatchers.withText(mContext
+                    .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
+                ViewActions.click());
+        }
+    }
+
+    private void enableNotifications() {
+        onView(
+            ViewMatchers.withText(mContext
+                .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
+            ViewActions.click());
+        boolean initValue = ServiceContainer.getSettingsManager().notificationsEnabled();
+        if (!initValue) {
+            onView(
+                ViewMatchers.withText(mContext
+                    .getString(ch.epfl.smartmap.R.string.pref_title_notifications_enabled))).perform(
+                ViewActions.click());
+        }
+    }
+
+    public static Matcher<Object> withPreferenceKey(final Matcher<Preference> preferenceMatcher) {
+        checkNotNull(preferenceMatcher);
+        return new BoundedMatcher<Object, Preference>(Preference.class) {
+            @Override
+            protected boolean matchesSafely(Preference pref) {
+                return preferenceMatcher.matches(pref);
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("with preference key:");
+                preferenceMatcher.describeTo(description);
+            }
+        };
+    }
+
+    public static Matcher<Object> withPreferenceKey(String expectedKeyText) {
+        checkNotNull(expectedKeyText);
+        checkArgument(!expectedKeyText.isEmpty());
+        return withPreferenceKey(PreferenceMatchers.withKey(expectedKeyText));
     }
 
 }

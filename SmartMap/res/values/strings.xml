@@ -214,6 +214,16 @@
     <string name="settings_key_events_show_public">events_show_public</string>
     <string name="settings_key_events_show_private">events_show_private</string>
     <string name="settings_key_max_distance_fetch_events">events_fetch_distance</string>
+    
+    <!-- SettingsManager -->
+    <string name="settings_manager_default_name">No name</string>
+    <string name="settings_manager_default_number">No number</string>
+    <string name="settings_manager_default_email">No email</string>
+    <string name="settings_manager_default_subtitle">unknown</string>
+    <string name="settings_manager_default_token">No token</string>
+    <string name="settings_manager_default_cookie">No cookie</string>
+    <string name="settings_manager_default_locname">unknown</string>
+    <string name="settings_manager_near">near</string>
 
     <!-- AboutActivity -->
     <string name="title_activity_about">AboutActivity</string>
