@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.R.color;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
@@ -52,8 +51,7 @@ public class InviteFriendsActivity extends ListActivity {
             Log.d(TAG, "Friend at position " + position + " set to true");
 
             mSelectedPositions.set(position, true);
-            v.setBackgroundColor(color.on_friend_clicked);
-            // TODO
+            v.setBackgroundColor(this.getResources().getColor(R.color.on_friend_clicked));
         } else {
             Log.d(TAG, "Friend at position " + position + " set to false");
 
