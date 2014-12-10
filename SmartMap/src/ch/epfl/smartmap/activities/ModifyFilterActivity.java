@@ -189,9 +189,8 @@ public class ModifyFilterActivity extends Activity {
     }
 
     private void saveFilter() {
-        mCache.updateFilter(new ImmutableFilter(mFilter.getId(), mFilter.getName(), this
+        mCache.putFilter(new ImmutableFilter(mFilter.getId(), mFilter.getName(), this
             .friendListToIdSet(mFriendsInside), mFilter.isActive()));
-
     }
 
     private void saveFilterDialog() {

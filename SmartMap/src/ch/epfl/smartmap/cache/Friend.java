@@ -142,12 +142,17 @@ public final class Friend extends User {
     }
 
     @Override
-    public void update(ImmutableUser user) {
+    public boolean update(ImmutableUser user) {
+        // TODO : Update hasChanged to work correctly
+        boolean hasChanged = false;
+
         super.update(user);
 
         mPhoneNumber = (user.getPhoneNumber() != null) ? user.getPhoneNumber() : mPhoneNumber;
         mEmail = (user.getEmail() != null) ? user.getEmail() : mEmail;
         mLocationString = (user.getLocationString() != null) ? user.getLocationString() : mLocationString;
         mLocation = (user.getLocation() != null) ? new Location(user.getLocation()) : mLocation;
+
+        return true;
     }
 }

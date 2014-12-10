@@ -160,10 +160,15 @@ public class DefaultFilter implements Filter {
      * @see ch.epfl.smartmap.cache.Filter#update(ch.epfl.smartmap.cache.ImmutableFilter)
      */
     @Override
-    public void update(ImmutableFilter filter) {
+    public boolean update(ImmutableFilter filter) {
+        // TODO : Update hasChanged to work correctly
+        boolean hasChanged = false;
+
         mId = filter.getId();
         mName = filter.getName();
         mIds = new HashSet<Long>(filter.getIds());
         mIsActive = filter.isActive();
+
+        return true;
     }
 }

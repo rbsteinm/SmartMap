@@ -106,13 +106,18 @@ public abstract class User implements UserInterface {
     }
 
     @Override
-    public void update(ImmutableUser user) {
+    public boolean update(ImmutableUser user) {
+        // TODO : Update hasChanged to work correctly
+        boolean hasChanged = false;
+
         if (user.getName() != null) {
             mName = user.getName();
         }
         if (user.getImage() != null) {
             mImage = user.getImage();
         }
+
+        return true;
     }
 
     public static User createFromContainer(ImmutableUser userInfos) {

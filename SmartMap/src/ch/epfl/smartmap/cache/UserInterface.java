@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.cache;
 
-
 /**
  * Describes a generic user of the app
  * 
@@ -15,5 +14,5 @@ public interface UserInterface extends Displayable {
 
     String getName();
 
-    void update(ImmutableUser user);
+    boolean update(ImmutableUser user);
 }

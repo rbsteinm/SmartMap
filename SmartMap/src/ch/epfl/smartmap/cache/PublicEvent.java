@@ -242,9 +242,18 @@ public class PublicEvent implements Event {
     }
 
     @Override
-    public void update(ImmutableEvent event) {
-        if ((event.getName() != null) && !event.getName().equals("")) {
+    public boolean update(ImmutableEvent event) {
+        // TODO Modify hasChanged to work correctly
+        boolean hasChanged = false;
+
+        if ((event.getName() != null) && !event.getName().equals("") && (event.getName() != mName)) {
+            hasChanged = true;
             mName = event.getName();
+        }
+
+        if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
+            mStartDate = (Calendar) event.getStartDate().clone();
+            mEndDate = (Calendar) event.getEndDate().clone();
         }
 
         if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
@@ -267,5 +276,7 @@ public class PublicEvent implements Event {
         if (event.getParticipantIds() != null) {
             mParticipantIds = event.getParticipantIds();
         }
+
+        return true;
     }
 }

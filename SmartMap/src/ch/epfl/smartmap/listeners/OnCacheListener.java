@@ -30,7 +30,7 @@ public class OnCacheListener implements CacheListener {
      * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
      */
     @Override
-    public void onFriendListUpdate() {
+    public void onUserListUpdate() {
         // TODO Auto-generated method stub
 
     }

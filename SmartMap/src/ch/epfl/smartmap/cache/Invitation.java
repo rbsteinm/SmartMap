@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 public interface Invitation {
 
     long NO_ID = -1;
+    long ALREADY_RECEIVED = -2;
 
     /**
      * int representing invitation status
@@ -78,5 +79,5 @@ public interface Invitation {
      * @param invitation
      *            the invitation to update
      */
-    void update(ImmutableInvitation invitation);
+    boolean update(ImmutableInvitation invitation);
 }

@@ -217,7 +217,10 @@ public class GenericInvitation implements Invitation, Comparable {
      * ImmutableInvitation)
      */
     @Override
-    public void update(ImmutableInvitation invitation) {
+    public boolean update(ImmutableInvitation invitation) {
+        // TODO : Update hasChanged to work correctly
+        boolean hasChanged = false;
+
         if (invitation.getUser() != null) {
             mUser = invitation.getUser();
         }
@@ -237,5 +240,7 @@ public class GenericInvitation implements Invitation, Comparable {
             || (invitation.getType() == ImmutableInvitation.FRIEND_INVITATION)) {
             mType = invitation.getType();
         }
+
+        return true;
     }
 }
