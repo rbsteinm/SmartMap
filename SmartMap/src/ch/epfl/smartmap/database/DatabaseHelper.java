@@ -43,7 +43,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
     private static final String DATABASE_NAME = "SmartMapDB";
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
@@ -72,6 +72,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_COUNTRY_NAME = "countryName";
     private static final String KEY_LASTSEEN = "lastSeen";
     private static final String KEY_BLOCKED = "isBlocked";
+    private static final String KEY_FRIENDSHIP_STATUS = "friendStatus";
 
     private static final String KEY_ID = "id";
     private static final String KEY_FILTER_ID = "filterID";
@@ -85,7 +86,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     // Columns for the User table
     private static final String[] USER_COLUMNS = {KEY_USER_ID, KEY_NAME, KEY_NUMBER, KEY_EMAIL,
-        KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_LASTSEEN, KEY_BLOCKED};
+        KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_LASTSEEN, KEY_BLOCKED, KEY_FRIENDSHIP_STATUS};
 
     // Columns for the Filter table
     private static final String[] FILTER_COLUMNS = {KEY_ID, KEY_NAME};
@@ -108,7 +109,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_USER = "CREATE TABLE IF NOT EXISTS " + TABLE_USER + "("
         + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_NUMBER + " TEXT," + KEY_EMAIL
         + " TEXT," + KEY_LONGITUDE + " DOUBLE," + KEY_LATITUDE + " DOUBLE," + KEY_POSNAME + " TEXT,"
-        + KEY_LASTSEEN + " INTEGER," + KEY_BLOCKED + " INTEGER" + ")";
+        + KEY_LASTSEEN + " INTEGER," + KEY_BLOCKED + " INTEGER," + KEY_FRIENDSHIP_STATUS + " INTEGER" + ")";
 
     // Table of filters
     private static final String CREATE_TABLE_FILTER = "CREATE TABLE IF NOT EXISTS " + TABLE_FILTER + "("
@@ -232,7 +233,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_DATE, invitation.getTimeStamp());
         values.put(KEY_TYPE, invitation.getType());
 
-        // TODO : Put information on event/user
+        if (invitation.getUser() != null) {
+            addUser(invitation.getUser().getImmutableCopy());
+        }
+        if (invitation.getEvent() != null) {
+            addEvent(invitation.getEvent().getImmutableCopy());
+        }
 
         this.notifyOnInvitationListUpdateListeners();
 
@@ -292,6 +298,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_POSNAME, user.getLocationString());
             values.put(KEY_LASTSEEN, user.getLocation().getTime());
             values.put(KEY_BLOCKED, user.isBlocked() ? 1 : 0);
+            // TODO values.put(KEY_FRIENDSHIP_STATUS, user.getFriendStatus());
 
             mDatabase.insert(TABLE_USER, null, values);
         } else {
@@ -577,9 +584,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
             Bitmap image = this.getPictureById(id);
             boolean isBlocked = cursor.getInt(cursor.getColumnIndex(KEY_BLOCKED)) == 1;
+            int status = cursor.getInt(cursor.getColumnIndex(KEY_FRIENDSHIP_STATUS));
 
             cursor.close();
 
+            // TODO put status in ImmutableUser constructor
             return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image, isBlocked);
         }
 
@@ -655,6 +664,18 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return pic;
     }
 
+    private void notifyOnInvitationListUpdateListeners() {
+        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
+            listener.onInvitationListUpdate();
+        }
+    }
+
+    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
+        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
+            listener.onInvitationStatusUpdate(id, status);
+        }
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_USER);
@@ -664,6 +685,21 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_INVITATIONS);
         db.execSQL(CREATE_TABLE_PENDING);
     }
+
+    // /**
+    // * Fully updates the friends database (not only positions)
+    // */
+    // public void refreshFriendsInfo() {
+    // List<User> friends = this.getAllFriends();
+    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
+    // for (User f : friends) {
+    // try {
+    // this.updateUser(client.getUserInfo(f.getID()));
+    // } catch (SmartMapClientException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // }
 
     /**
      * Uses listFriendsPos() to update the entire friends database with updated
@@ -708,21 +744,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
         this.onCreate(db);
     }
-
-    // /**
-    // * Fully updates the friends database (not only positions)
-    // */
-    // public void refreshFriendsInfo() {
-    // List<User> friends = this.getAllFriends();
-    // NetworkSmartMapClient client = NetworkSmartMapClient.getInstance();
-    // for (User f : friends) {
-    // try {
-    // this.updateUser(client.getUserInfo(f.getID()));
-    // } catch (SmartMapClientException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // }
 
     /**
      * Stores a profile picture
@@ -816,6 +837,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_POSNAME, friend.getLocationString());
         }
 
+        // TODO
+        // if(friend.getFriendStatus() != DEFAULT_VALUE){
+        // values.put(KEY_FRIENDSHIP_STATUS, user.getFriendStatus())
+        // }
+
         values.put(KEY_BLOCKED, friend.isBlocked() ? 1 : 0);
 
         return mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",
@@ -833,8 +859,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         mDatabase.delete(TABLE_FILTER_USER, null, null);
         mDatabase.delete(TABLE_EVENT, null, null);
 
-        // FIXME : Need to store only our events, filters, friends, and
-        // settings.
         Set<User> friends = ServiceContainer.getCache().getAllFriends();
         Set<Event> events = ServiceContainer.getCache().getMyEvents();
         Set<Filter> filters = ServiceContainer.getCache().getAllFilters();
@@ -880,17 +904,5 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return rows;
-    }
-
-    private void notifyOnInvitationListUpdateListeners() {
-        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
-            listener.onInvitationListUpdate();
-        }
-    }
-
-    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
-        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
-            listener.onInvitationStatusUpdate(id, status);
-        }
     }
 }
