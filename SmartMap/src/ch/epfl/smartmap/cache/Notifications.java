@@ -10,6 +10,7 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
  * This class creates different sort of notifications
@@ -74,7 +75,10 @@ public class Notifications {
                         + context.getString(R.string.notification_open_friend_list))
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(user.getName() + " " + context.getString(R.string.notification_invitation_accepted))
-                .setVibrate(PATTERN).setContentIntent(pFriendIntent);
+                .setContentIntent(pFriendIntent);
+        if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
+            noti.setVibrate(PATTERN);
+        }
 
         displayNotification(context, noti.build(), notificationID);
 
@@ -90,6 +94,22 @@ public class Notifications {
         NotificationManager notificationManager =
             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
+    }
+
+    /**
+     * Display notification in status bar using notification manager
+     * 
+     * @param context
+     *            the current context
+     * @param notification
+     *            th notification to display
+     * @param notificationId
+     *            the notification id
+     */
+    private static void displayNotification(Context context, Notification notification, long notificationId) {
+        NotificationManager notificationManager =
+            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify((int) notificationId, notification);
     }
 
     /**
@@ -148,7 +168,10 @@ public class Notifications {
                  * CachedSearchEngine.getInstance().findFriendById(event.
                  * getCreatorId()) +
                  */" " + context.getString(R.string.notification_event_invitation) + invitation.getEvent().getName())
-                .setVibrate(PATTERN).setContentIntent(pEventIntent);
+                .setContentIntent(pEventIntent);
+        if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
+            noti.setVibrate(PATTERN);
+        }
 
         displayNotification(context, noti.build(), notificationID);
     }
@@ -198,26 +221,12 @@ public class Notifications {
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(user.getName() + " " + context.getString(R.string.notification_friend_invitation))
                 .setContentTitle(context.getString(R.string.notification_invitefriend_title))
-                .setVibrate(PATTERN)
                 .setContentText(
                     user.getName() + " " + context.getString(R.string.notification_friend_invitation) + "\n"
                         + context.getString(R.string.notification_open_friend_list));
+        if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
+            noti.setVibrate(PATTERN);
+        }
         displayNotification(context, noti.build(), notificationID);
-    }
-
-    /**
-     * Display notification in status bar using notification manager
-     * 
-     * @param context
-     *            the current context
-     * @param notification
-     *            th notification to display
-     * @param notificationId
-     *            the notification id
-     */
-    private static void displayNotification(Context context, Notification notification, long notificationId) {
-        NotificationManager notificationManager =
-            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify((int) notificationId, notification);
     }
 }
