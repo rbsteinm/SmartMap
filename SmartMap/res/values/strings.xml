@@ -106,9 +106,10 @@
     <string name="show_event_on_the_map_loading">Opening event on the map…</string>
     <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
     <string name="show_event_details_button">See details</string>
-    <string name="show_event_server_error">Couldn\'t fetch wished content from our server, sorry :(</string>
+    <string name="show_event_server_error">Couldn\'t fetch wished content from our server</string>
     <string name="show_event_loading_info">Loading informations…</string>
     <string name="show_events_menu_refresh">Refresh</string>
+    <string name="ten_letters">aaaaaaaaaa</string>
 
     <!-- EventsListItemAdapter -->
     <string name="events_list_item_adapter_event_live">Event is live!</string>
@@ -313,6 +314,7 @@
     <string name="utils_hours_ago">hours ago</string>
     <string name="utils_days_ago">days ago</string>
     <string name="utils_away_from_you">away from you</string>
+    <string name="utils_meters_away_from_you">meters away from you</string>
     
     <!-- SettingsManager -->
     <string name="near">near</string>

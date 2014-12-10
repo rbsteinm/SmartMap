@@ -28,7 +28,8 @@ import ch.epfl.smartmap.gui.FriendPickerListAdapter.ViewHolder;
 import ch.epfl.smartmap.util.Utils;
 
 /**
- * This activity shows an event in a complete screens. It display in addition two buttons: one to invite friends, and
+ * This activity shows an event in a complete screens. It display in addition
+ * two buttons: one to invite friends, and
  * one to see the event on the map.
  * 
  * @author SpicyCH
@@ -53,213 +54,11 @@ public class EventInformationActivity extends ListActivity {
     private TextView mPlaceNameAndCountry;
 
     /**
-     * Used to get the event id the getExtra of the starting intent, and to pass the retrieved event from doInBackground
+     * Used to get the event id the getExtra of the starting intent, and to pass
+     * the retrieved event from doInBackground
      * to onPostExecute.
      */
     private static final String EVENT_KEY = "EVENT";
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_show_event_information);
-        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        FriendPickerListAdapter.ViewHolder viewHolder = (ViewHolder) v.getTag();
-        if (viewHolder.getId() != ServiceContainer.getSettingsManager().getUserId()) {
-            Intent userInfoIntent = new Intent(EventInformationActivity.this, UserInformationActivity.class);
-            userInfoIntent.putExtra("USER", viewHolder.getId());
-            EventInformationActivity.this.startActivity(userInfoIntent);
-        }
-
-    }
-
-    /**
-     * Triggered when the user clicks the "Invite friends" button.<br />
-     * It launches InviteFriendsActivity for a result.
-     * 
-     * @param v
-     * @author SpicyCH
-     */
-    public void inviteFriendsToEvent(View v) {
-        // Hack so that SonarQube doesn't complain that v is not used
-        Log.d(TAG, "View with id " + v.getId() + " clicked");
-        Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
-        inviteFriends.putExtra("EVENT", mEvent.getId());
-        this.startActivity(inviteFriends);
-    }
-
-    @Override
-    public void onBackPressed() {
-        this.onNotificationOpen();
-        this.finish();
-    }
-
-    /**
-     * Triggered when going checkbox is clicked. Updates the displayed list of participants.
-     * 
-     * @param v
-     *            the checkbox whose status changed
-     * @author agpmilli
-     */
-    public void onCheckboxClicked(View v) {
-
-        if (!(v instanceof CheckBox)) {
-            throw new IllegalArgumentException("This method requires v to be a CheckBox");
-        }
-
-        CheckBox checkBox = (CheckBox) v;
-
-        switch (v.getId()) {
-            case R.id.event_info_going_checkbox:
-                if (checkBox.isChecked()) {
-                    ServiceContainer.getCache().addParticipantsToEvent(
-                            new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())),
-                            mEvent, new NetworkRequestCallback() {
-                                @Override
-                                public void onFailure() {
-                                    EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(
-                                                    EventInformationActivity.this,
-                                                    EventInformationActivity.this
-                                                            .getString(R.string.event_going_failure),
-                                                    Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-
-                                }
-
-                                @Override
-                                public void onSuccess() {
-                                    EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(
-                                                    EventInformationActivity.this,
-                                                    EventInformationActivity.this
-                                                            .getString(R.string.event_going_success),
-                                                    Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-                            });
-                } else {
-                    ServiceContainer.getCache().removeParticipantsFromEvent(
-                            new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())),
-                            mEvent, new NetworkRequestCallback() {
-                                @Override
-                                public void onFailure() {
-                                    EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(
-                                                    EventInformationActivity.this,
-                                                    EventInformationActivity.this
-                                                            .getString(R.string.event_quit_failure), Toast.LENGTH_SHORT)
-                                                    .show();
-                                        }
-                                    });
-                                }
-
-                                @Override
-                                public void onSuccess() {
-                                    EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(
-                                                    EventInformationActivity.this,
-                                                    EventInformationActivity.this
-                                                            .getString(R.string.event_quit_success), Toast.LENGTH_SHORT)
-                                                    .show();
-                                        }
-                                    });
-                                }
-                            });
-                }
-                break;
-            default:
-                break;
-        }
-
-        this.updateCurrentList();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.show_event_information, menu);
-
-        // Disable the delete event button if we are not the creator
-        if (!mEvent.isOwn()) {
-            MenuItem item = menu.findItem(R.id.event_info_delete_button);
-            item.setVisible(false);
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                return true;
-            case android.R.id.home:
-                this.onNotificationOpen();
-                this.finish();
-                break;
-            case R.id.event_info_delete_button:
-                ServiceContainer.getCache().removeEvent(mEvent.getId());
-                break;
-            default:
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // This activity needs a (positive) event id to process. If none given,
-        // we finish it.
-        if (this.getIntent().getLongExtra(EVENT_KEY, -1) > 0) {
-
-            long eventId = this.getIntent().getLongExtra(EVENT_KEY, -1);
-
-            mEvent = ServiceContainer.getCache().getEvent(eventId);
-
-            this.initializeGUI();
-
-            // This is needed to show an update of the list of participant
-            this.updateCurrentList();
-
-        } else {
-            Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
-            Toast.makeText(EventInformationActivity.this,
-                    EventInformationActivity.this.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
-            this.finish();
-        }
-
-    }
-
-    /**
-     * Triggered when the button 'Shop on the map' is pressed. Opens the map at the location of the event.
-     * 
-     * @author SpicyCH
-     */
-    public void openMapAtEventLocation(View v) {
-        Intent showEventIntent = new Intent(this, MainActivity.class);
-        showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, mEvent.getLocation());
-        this.startActivity(showEventIntent);
-    }
 
     /**
      * Initializes the different views of this activity.
@@ -307,7 +106,146 @@ public class EventInformationActivity extends ListActivity {
 
         mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
         mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", "
-                + Utils.getCountryFromLocation(mEvent.getLocation()));
+            + Utils.getCountryFromLocation(mEvent.getLocation()));
+    }
+
+    /**
+     * Triggered when the user clicks the "Invite friends" button.<br />
+     * It launches InviteFriendsActivity for a result.
+     * 
+     * @param v
+     * @author SpicyCH
+     */
+    public void inviteFriendsToEvent(View v) {
+        // Hack so that SonarQube doesn't complain that v is not used
+        Log.d(TAG, "View with id " + v.getId() + " clicked");
+        Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
+        inviteFriends.putExtra("EVENT", mEvent.getId());
+        this.startActivity(inviteFriends);
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.onNotificationOpen();
+        this.finish();
+    }
+
+    /**
+     * Triggered when going checkbox is clicked. Updates the displayed list of
+     * participants.
+     * 
+     * @param v
+     *            the checkbox whose status changed
+     * @author agpmilli
+     */
+    public void onCheckboxClicked(View v) {
+
+        if (!(v instanceof CheckBox)) {
+            throw new IllegalArgumentException("This method requires v to be a CheckBox");
+        }
+
+        CheckBox checkBox = (CheckBox) v;
+
+        switch (v.getId()) {
+            case R.id.event_info_going_checkbox:
+                if (checkBox.isChecked()) {
+                    ServiceContainer.getCache().addParticipantsToEvent(
+                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
+                        new NetworkRequestCallback() {
+                            @Override
+                            public void onFailure() {
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.event_going_failure),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.event_going_success),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        });
+                } else {
+                    ServiceContainer.getCache().removeParticipantsFromEvent(
+                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
+                        new NetworkRequestCallback() {
+                            @Override
+                            public void onFailure() {
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.event_quit_failure),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.event_quit_success),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        });
+                }
+                break;
+            default:
+                break;
+        }
+
+        this.updateCurrentList();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_show_event_information);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.show_event_information, menu);
+
+        // Disable the delete event button if we are not the creator
+        if (!mEvent.isOwn()) {
+            MenuItem item = menu.findItem(R.id.event_info_delete_button);
+            item.setVisible(false);
+        }
+
+        return true;
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        FriendPickerListAdapter.ViewHolder viewHolder = (ViewHolder) v.getTag();
+        if (viewHolder.getId() != ServiceContainer.getSettingsManager().getUserId()) {
+            Intent userInfoIntent = new Intent(EventInformationActivity.this, UserInformationActivity.class);
+            userInfoIntent.putExtra("USER", viewHolder.getId());
+            EventInformationActivity.this.startActivity(userInfoIntent);
+        }
+
     }
 
     /**
@@ -317,6 +255,65 @@ public class EventInformationActivity extends ListActivity {
         if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
             this.startActivity(new Intent(this, MainActivity.class));
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case android.R.id.home:
+                this.onNotificationOpen();
+                this.finish();
+                break;
+            case R.id.event_info_delete_button:
+                ServiceContainer.getCache().removeEvent(mEvent.getId());
+                this.finish();
+                break;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // This activity needs a (positive) event id to process. If none given,
+        // we finish it.
+        if (this.getIntent().getLongExtra(EVENT_KEY, -1) > 0) {
+
+            long eventId = this.getIntent().getLongExtra(EVENT_KEY, -1);
+
+            mEvent = ServiceContainer.getCache().getEvent(eventId);
+
+            this.initializeGUI();
+
+            // This is needed to show an update of the list of participant
+            this.updateCurrentList();
+
+        } else {
+            Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
+            Toast.makeText(EventInformationActivity.this,
+                EventInformationActivity.this.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
+            this.finish();
+        }
+
+    }
+
+    /**
+     * Triggered when the button 'Shop on the map' is pressed. Opens the map at
+     * the location of the event.
+     * 
+     * @author SpicyCH
+     */
+    public void openMapAtEventLocation(View v) {
+        Intent showEventIntent = new Intent(this, MainActivity.class);
+        showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, mEvent.getLocation());
+        this.startActivity(showEventIntent);
     }
 
     /**
@@ -332,8 +329,8 @@ public class EventInformationActivity extends ListActivity {
                     @Override
                     public void run() {
                         Toast.makeText(EventInformationActivity.this,
-                                EventInformationActivity.this.getString(R.string.refresh_participants_network_error),
-                                Toast.LENGTH_SHORT).show();
+                            EventInformationActivity.this.getString(R.string.refresh_participants_network_error),
+                            Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -344,8 +341,8 @@ public class EventInformationActivity extends ListActivity {
                     @Override
                     public void run() {
                         Toast.makeText(EventInformationActivity.this,
-                                EventInformationActivity.this.getString(R.string.refresh_participants_not_found),
-                                Toast.LENGTH_SHORT).show();
+                            EventInformationActivity.this.getString(R.string.refresh_participants_not_found),
+                            Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -358,8 +355,8 @@ public class EventInformationActivity extends ListActivity {
                 EventInformationActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        FriendPickerListAdapter adapter = new FriendPickerListAdapter(EventInformationActivity.this,
-                                mParticipantsList);
+                        FriendPickerListAdapter adapter =
+                            new FriendPickerListAdapter(EventInformationActivity.this, mParticipantsList);
                         EventInformationActivity.this.setListAdapter(adapter);
                     }
                 });
