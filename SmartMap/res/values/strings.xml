@@ -136,6 +136,10 @@
     <string name="participant_img_content_description">participant image</string>
     <string name="add_participant_failure">Failure while adding participants</string>
     <string name="add_participant_success">Successfully added participants</string>
+    <string name="event_quit_success">Event left</string>
+    <string name="event_quit_failure">Error while trying to quit event</string>
+    <string name="event_going_success">Event joined</string>
+    <string name="event_going_failure">Error while trying to join event</string>
     <string name="refresh_participants_network_error">Network Error while getting participants</string>
     <string name="refresh_participants_not_found">Couldn\'t find participants</string>
 
@@ -187,6 +191,8 @@
     <string name="title_activity_user_information">Friend Informations</string>
     <string name="user_information_picture_description">Profile Picture</string>
     <string name="title_activity_search">SearchActivity</string>
+    <string name="remove_friend_failure">Error while trying to remove a friend</string>
+    <string name="remove_friend_success">Successfully remove friend</string>
 
     <!-- Notification texts -->
     <string name="notification_acceptedfriend_title">Friend invitation accepted</string>
@@ -229,7 +235,7 @@
     <!-- FriendInformationActivity -->
     <string name="remove_friend_button_text">Remove</string>
     <string name="block_button_text">Block</string>
-    <string name="follow_switch">Show on map</string>
+    <string name="show_on_map_switch">Show on map</string>
     <string name="block_switch">Block</string>
 
     <!-- ShowFiltersActivity -->

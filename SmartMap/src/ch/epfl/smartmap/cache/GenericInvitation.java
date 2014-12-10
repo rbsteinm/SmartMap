@@ -21,7 +21,7 @@ public class GenericInvitation implements Invitation, Comparable {
     @SuppressWarnings("unused")
     private static final String TAG = GenericInvitation.class.getSimpleName();
 
-    private UserInterface mUser;
+    private User mUser;
     private Event mEvent;
     private int mStatus;
     private final long mId;
@@ -202,7 +202,7 @@ public class GenericInvitation implements Invitation, Comparable {
     }
 
     @Override
-    public UserInterface getUser() {
+    public User getUser() {
         return mUser;
     }
 

@@ -1,9 +1,13 @@
 package ch.epfl.smartmap.listeners;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.AboutActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.activities.ProfileActivity;
@@ -21,6 +25,8 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
 
     @SuppressWarnings("unused")
     private final static String TAG = DrawerItemClickListener.class.getSimpleName();
+    private final Context mContext;
+    private final DrawerLayout mDrawer;
 
     private static final int INDEX_PROFILE = 0;
     private static final int INDEX_FRIENDS = 1;
@@ -29,6 +35,11 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     private static final int INDEX_SETTINGS = 4;
     private static final int INDEX_ABOUT = 5;
     private static final int INDEX_LOGOUT = 6;
+
+    public DrawerItemClickListener(Context context) {
+        mContext = context;
+        mDrawer = (DrawerLayout) ((Activity) mContext).findViewById(R.id.drawer_layout);
+    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -58,5 +69,8 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
             default:
                 break;
         }
+        // TODO here the view loses the focus
+        parent.clearChildFocus(view);
+        mDrawer.closeDrawers();
     }
 }

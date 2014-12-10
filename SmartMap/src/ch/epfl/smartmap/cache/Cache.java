@@ -35,7 +35,7 @@ public class Cache {
 
     static final public String TAG = Cache.class.getSimpleName();
 
-    private LongSparseArray<UserInterface> mUserInstances;
+    private LongSparseArray<User> mUserInstances;
     // SparseArrays containing live instances
     private final LongSparseArray<Event> mEventInstances;
     private final LongSparseArray<Filter> mFilterInstances;
@@ -60,7 +60,7 @@ public class Cache {
     // Listeners
     public Cache() {
         // Init data structures
-        mUserInstances = new LongSparseArray<UserInterface>();
+        mUserInstances = new LongSparseArray<User>();
         mEventInstances = new LongSparseArray<Event>();
         mFilterInstances = new LongSparseArray<Filter>();
         mInvitationInstances = new LongSparseArray<Invitation>();
@@ -243,7 +243,7 @@ public class Cache {
         return this.getFilters(mFilterIds);
     }
 
-    public synchronized Set<UserInterface> getAllFriends() {
+    public synchronized Set<User> getAllFriends() {
         return this.getFriends(mFriendIds);
     }
 
@@ -267,12 +267,12 @@ public class Cache {
      * 
      * @return
      */
-    public synchronized Set<UserInterface> getAllVisibleFriends() {
+    public synchronized Set<User> getAllVisibleFriends() {
         // Get all friends
         Set<Long> allVisibleUsersId = new HashSet<Long>(mFriendIds);
 
         for (long id : mFriendIds) {
-            UserInterface user = this.getUser(id);
+            User user = this.getUser(id);
             if (user instanceof Friend) {
                 Log.d(TAG, "user number " + id + " is a FRIEND");
             } else if (user instanceof Stranger) {
@@ -376,7 +376,7 @@ public class Cache {
      * @param id
      * @return
      */
-    public synchronized UserInterface getFriend(long id) {
+    public synchronized User getFriend(long id) {
         if (mFriendIds.contains(id)) {
             return mUserInstances.get(id);
         } else {
@@ -390,10 +390,10 @@ public class Cache {
      * @param ids
      * @return
      */
-    public synchronized Set<UserInterface> getFriends(Set<Long> ids) {
-        Set<UserInterface> friends = new HashSet<UserInterface>();
+    public synchronized Set<User> getFriends(Set<Long> ids) {
+        Set<User> friends = new HashSet<User>();
         for (long id : ids) {
-            UserInterface friend = this.getFriend(id);
+            User friend = this.getFriend(id);
             if (friend != null) {
                 friends.add(friend);
             }
@@ -462,7 +462,7 @@ public class Cache {
      * @param id
      * @return
      */
-    public synchronized UserInterface getStranger(long id) {
+    public synchronized User getStranger(long id) {
         if (!mFriendIds.contains(id)) {
             return mUserInstances.get(id);
         } else {
@@ -476,10 +476,10 @@ public class Cache {
      * @param ids
      * @return
      */
-    public synchronized Set<UserInterface> getStrangers(Set<Long> ids) {
-        Set<UserInterface> strangers = new HashSet<UserInterface>();
+    public synchronized Set<User> getStrangers(Set<Long> ids) {
+        Set<User> strangers = new HashSet<User>();
         for (long id : ids) {
-            UserInterface stranger = this.getStranger(id);
+            User stranger = this.getStranger(id);
             if (stranger != null) {
                 strangers.add(stranger);
             }
@@ -504,8 +504,8 @@ public class Cache {
      * @param id
      * @return
      */
-    public synchronized UserInterface getUser(long id) {
-        UserInterface user = this.getFriend(id);
+    public synchronized User getUser(long id) {
+        User user = this.getFriend(id);
         if (user == null) {
             user = this.getStranger(id);
         }
@@ -518,10 +518,10 @@ public class Cache {
      * @param ids
      * @return
      */
-    public synchronized Set<UserInterface> getUsers(Set<Long> ids) {
-        Set<UserInterface> users = new HashSet<UserInterface>();
+    public synchronized Set<User> getUsers(Set<Long> ids) {
+        Set<User> users = new HashSet<User>();
         for (long id : ids) {
-            UserInterface user = this.getFriend(id);
+            User user = this.getFriend(id);
             if (user == null) {
                 user = this.getStranger(id);
             }
@@ -709,7 +709,7 @@ public class Cache {
 
         for (ImmutableUser newFriend : newFriends) {
             mUserIds.add(newFriend.getId());
-            if (newFriend.getFriendship() == UserInterface.FRIEND) {
+            if (newFriend.getFriendship() == User.FRIEND) {
                 mFriendIds.add(newFriend.getId());
             }
             if (mUserInstances.get(newFriend.getId()) == null) {
@@ -741,9 +741,7 @@ public class Cache {
         Log.d(TAG, unreadInvitations.toString());
         for (Invitation invitation : unreadInvitations) {
             Log.d(TAG, invitation.toString());
-            // TODO set them to read
-            // NULLPOINTER pour le moment quand je fais getImmutableCopy
-            // invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
+            invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
         }
     }
 
@@ -831,22 +829,36 @@ public class Cache {
      * 
      * @param id
      */
-    public synchronized void removeFriend(long id) {
+    public synchronized void removeFriend(long id, final NetworkRequestCallback callback) {
         Set<Long> singleton = new HashSet<Long>();
         singleton.add(id);
-        this.removeFriends(singleton);
+        this.removeFriends(singleton, callback);
     }
 
     /**
      * OK
      * 
      * @param ids
+     * @throws SmartMapClientException
      */
-    public synchronized void removeFriends(Set<Long> ids) {
+    public synchronized void removeFriends(Set<Long> ids, final NetworkRequestCallback callback) {
         boolean isListModified = false;
-
         for (long id : ids) {
             if (mFriendIds.contains(id)) {
+                new AsyncTask<Long, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Long... params) {
+                        try {
+                            ServiceContainer.getNetworkClient().removeFriend(params[0]);
+                            callback.onSuccess();
+                        } catch (SmartMapClientException e) {
+                            Log.e(TAG, "Error while inviting friend: " + e);
+                            callback.onFailure();
+                        }
+                        return null;
+                    }
+                }.execute(id);
+
                 // Remove id from sets
                 mFriendIds.remove(id);
                 mUserInstances.remove(id);
@@ -976,7 +988,7 @@ public class Cache {
      */
     public synchronized void updateFriends(Set<ImmutableUser> updatedFriends) {
         for (ImmutableUser updatedFriend : updatedFriends) {
-            UserInterface cachedFriend = this.getFriend(updatedFriend.getId());
+            User cachedFriend = this.getFriend(updatedFriend.getId());
             if (cachedFriend != null) {
                 cachedFriend.update(updatedFriend);
             }
@@ -1001,7 +1013,7 @@ public class Cache {
                     mFriendIds.clear();
                     mFriendIds.addAll(newFriendIds);
 
-                    LongSparseArray<UserInterface> newUserInstances = new LongSparseArray<UserInterface>();
+                    LongSparseArray<User> newUserInstances = new LongSparseArray<User>();
 
                     // Update each friends
                     for (long id : newFriendIds) {
@@ -1012,7 +1024,7 @@ public class Cache {
                         onlineValues.setImage(image);
 
                         if (mUserInstances.get(id) != null) {
-                            UserInterface oldFriend = mUserInstances.get(id);
+                            User oldFriend = mUserInstances.get(id);
                             oldFriend.update(onlineValues);
                             newUserInstances.put(id, oldFriend);
                         } else {

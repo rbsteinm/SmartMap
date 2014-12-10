@@ -25,20 +25,24 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.util.SystemUiHider;
 
 /**
- * This full-screen activity displays the credits for SmartMap. The name of the developers are sorted in random order
- * and it uses the version name and version code defined in the android manifest.
+ * This full-screen activity displays the credits for SmartMap. The name of the
+ * developers are sorted in random order
+ * and it uses the version name and version code defined in the android
+ * manifest.
  * 
  * @see SystemUiHider
  * @author SpicyCH
  */
 public class AboutActivity extends Activity {
     /**
-     * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
+     * Whether or not the system UI should be auto-hidden after
+     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
      */
     private static final boolean AUTO_HIDE = true;
 
     /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after user interaction before hiding the system
+     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
+     * user interaction before hiding the system
      * UI.
      */
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
@@ -49,7 +53,8 @@ public class AboutActivity extends Activity {
     private static final int HIDE_DELAY_MILLIS = 100;
 
     /**
-     * If set, will toggle the system UI visibility upon interaction. Otherwise, will show the system UI visibility upon
+     * If set, will toggle the system UI visibility upon interaction. Otherwise,
+     * will show the system UI visibility upon
      * interaction.
      */
     private static final boolean TOGGLE_ON_CLICK = true;
@@ -83,69 +88,9 @@ public class AboutActivity extends Activity {
     private TextView mVersion;
     private TextView mCopyright;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        this.setContentView(R.layout.activity_about);
-
-        // Hide action bar for true full screen. Only way to leave this activity is to physically use the
-        // pressback
-        // button.
-        this.getActionBar().hide();
-
-        final View contentView = this.findViewById(R.id.fullscreen_content);
-
-        // Set up an instance of SystemUiHider to control the system UI for
-        // this activity.
-        mSystemUiHider = SystemUiHider.getInstance(this, contentView, HIDER_FLAGS);
-        mSystemUiHider.setup();
-        mSystemUiHider.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
-            // Cached values.
-            private int mShortAnimTime;
-
-            @Override
-            @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-            public void onVisibilityChange(boolean visible) {
-                if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) && (mShortAnimTime == 0)) {
-                    mShortAnimTime = AboutActivity.this.getResources().getInteger(
-                            android.R.integer.config_shortAnimTime);
-                }
-
-                if (visible && AUTO_HIDE) {
-                    // Schedule a hide().
-                    AboutActivity.this.delayedHide(AUTO_HIDE_DELAY_MILLIS);
-                }
-            }
-        });
-
-        // Set up the user interaction to manually show or hide the system UI.
-        contentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (TOGGLE_ON_CLICK) {
-                    mSystemUiHider.toggle();
-                } else {
-                    mSystemUiHider.show();
-                }
-            }
-        });
-
-        this.initializeGUI();
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        // Trigger the initial hide() shortly after the activity has been created, to briefly hint to the user
-        // that he
-        // can still access android menus by swiping top to down.
-        this.delayedHide(HIDE_DELAY_MILLIS);
-    }
-
     /**
-     * Schedules a call to hide() in [delay] milliseconds, canceling any previously scheduled calls.
+     * Schedules a call to hide() in [delay] milliseconds, canceling any
+     * previously scheduled calls.
      */
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
@@ -153,7 +98,8 @@ public class AboutActivity extends Activity {
     }
 
     /**
-     * Add each item of the list as a TextView children of the given LinearLayout.
+     * Add each item of the list as a TextView children of the given
+     * LinearLayout.
      * 
      * @param teamMembers
      * @param linearLayout
@@ -161,7 +107,7 @@ public class AboutActivity extends Activity {
      */
     private void displayListInLayout(List<String> teamMembers, LinearLayout linearLayout) {
         for (String s : teamMembers) {
-            TextView textView = new TextView(this.getApplicationContext());
+            TextView textView = new TextView(this);
             textView.setText(s);
 
             LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -179,16 +125,17 @@ public class AboutActivity extends Activity {
         mVersion = (TextView) this.findViewById(R.id.about_version);
         mCopyright = (TextView) this.findViewById(R.id.about_copyright);
 
-        // Display version of this package (to change it, edit versionCode/versionName in the manifest
+        // Display version of this package (to change it, edit
+        // versionCode/versionName in the manifest
         try {
             PackageInfo manager = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
             mVersion.setText(this.getString(R.string.about_version) + " " + manager.versionName + ", "
-                    + this.getString(R.string.about_release) + " " + manager.versionCode);
+                + this.getString(R.string.about_release) + " " + manager.versionCode);
 
         } catch (NameNotFoundException e) {
             Log.d(TAG, "Couldn't retrieve package version: " + e);
             mVersion.setText(this.getString(R.string.about_version) + " "
-                    + this.getString(R.string.about_unkown_version));
+                + this.getString(R.string.about_unkown_version));
         }
 
         // Display the copyright
@@ -219,5 +166,68 @@ public class AboutActivity extends Activity {
         thanksHolder.setGravity(Gravity.CENTER);
 
         this.displayListInLayout(thanksTo, thanksHolder);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        this.setContentView(R.layout.activity_about);
+
+        // Hide action bar for true full screen. Only way to leave this activity
+        // is to physically use the
+        // pressback
+        // button.
+        this.getActionBar().hide();
+
+        final View contentView = this.findViewById(R.id.fullscreen_content);
+
+        // Set up an instance of SystemUiHider to control the system UI for
+        // this activity.
+        mSystemUiHider = SystemUiHider.getInstance(this, contentView, HIDER_FLAGS);
+        mSystemUiHider.setup();
+        mSystemUiHider.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
+            // Cached values.
+            private int mShortAnimTime;
+
+            @Override
+            @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+            public void onVisibilityChange(boolean visible) {
+                if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) && (mShortAnimTime == 0)) {
+                    mShortAnimTime =
+                        AboutActivity.this.getResources().getInteger(android.R.integer.config_shortAnimTime);
+                }
+
+                if (visible && AUTO_HIDE) {
+                    // Schedule a hide().
+                    AboutActivity.this.delayedHide(AUTO_HIDE_DELAY_MILLIS);
+                }
+            }
+        });
+
+        // Set up the user interaction to manually show or hide the system UI.
+        contentView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (TOGGLE_ON_CLICK) {
+                    mSystemUiHider.toggle();
+                } else {
+                    mSystemUiHider.show();
+                }
+            }
+        });
+
+        this.initializeGUI();
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        // Trigger the initial hide() shortly after the activity has been
+        // created, to briefly hint to the user
+        // that he
+        // can still access android menus by swiping top to down.
+        this.delayedHide(HIDE_DELAY_MILLIS);
     }
 }

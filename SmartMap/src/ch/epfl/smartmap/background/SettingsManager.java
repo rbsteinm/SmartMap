@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.preference.PreferenceManager;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.UserInterface;
+import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.util.Utils;
 
 /**
@@ -49,7 +49,7 @@ public final class SettingsManager {
     private final SharedPreferences mSharedPref;
     private final SharedPreferences.Editor mEditor;
 
-    private UserInterface self;
+    private User self;
 
     /**
      * SettingsManager constructor
@@ -149,7 +149,7 @@ public final class SettingsManager {
             mContext.getString(R.string.settings_key_refresh_frequency), defaultValue));
     }
 
-    public UserInterface getSelf() {
+    public User getSelf() {
         return self;
     }
 

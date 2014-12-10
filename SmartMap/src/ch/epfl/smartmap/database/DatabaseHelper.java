@@ -30,7 +30,6 @@ import ch.epfl.smartmap.cache.ImmutableFilter;
 import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.cache.UserInterface;
 
 /**
  * SQLite helper
@@ -287,8 +286,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 values.put(KEY_LATITUDE, user.getLocation().getLatitude());
                 values.put(KEY_LASTSEEN, user.getLocation().getTime());
             } else {
-                values.put(KEY_LONGITUDE, UserInterface.NO_LONGITUDE);
-                values.put(KEY_LATITUDE, UserInterface.NO_LATITUDE);
+                values.put(KEY_LONGITUDE, User.NO_LONGITUDE);
+                values.put(KEY_LATITUDE, User.NO_LATITUDE);
                 values.put(KEY_LASTSEEN, 0);
             }
 
@@ -388,7 +387,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 events.add(this.getEvent(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
             } while (cursor.moveToNext());
@@ -408,7 +407,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 // using getFilter to add this row's filter to the list
                 filters.add(this.getFilter(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
@@ -431,7 +430,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 long id = cursor.getLong(cursor.getColumnIndex(KEY_ID));
                 long userId = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
@@ -541,7 +540,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             mDatabase.query(TABLE_FILTER_USER, FILTER_USER_COLUMNS, KEY_FILTER_ID + " = ?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 ids.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
             } while (cursor.moveToNext());
@@ -561,7 +560,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 filterIds.add(cursor.getLong(cursor.getColumnIndex(KEY_ID)));
             } while (cursor.moveToNext());
@@ -581,7 +580,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 if (this.getUser(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID))).getFriendship() == User.FRIEND) {
                     friendIds.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
@@ -606,13 +605,13 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = mDatabase.rawQuery(query, null);
 
         ImmutableUser friend = null;
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 long id = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
                 friend =
                     new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)),
-                        UserInterface.NO_PHONE_NUMBER, UserInterface.NO_EMAIL, new Location(""), "",
-                        this.getPictureById(id), false, UserInterface.STRANGER);
+                        User.NO_PHONE_NUMBER, User.NO_EMAIL, new Location(""), "", this.getPictureById(id),
+                        false, User.STRANGER);
 
                 friends.add(friend);
             } while (cursor.moveToNext());
@@ -674,7 +673,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
 
             return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image,
-                isBlocked, UserInterface.FRIEND);
+                isBlocked, User.FRIEND);
         }
 
         return null;
@@ -805,7 +804,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     public int updateFriend(ImmutableUser friend) {
         ContentValues values = new ContentValues();
 
-        if (friend.getId() != UserInterface.NO_ID) {
+        if (friend.getId() != User.NO_ID) {
             values.put(KEY_USER_ID, friend.getId());
         }
         if (friend.getName() != null) {
@@ -818,8 +817,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_EMAIL, friend.getEmail());
         }
         if ((friend.getLocation() != null)
-            && ((friend.getLocation().getLatitude() != UserInterface.NO_LATITUDE) || (friend.getLocation()
-                .getLongitude() != UserInterface.NO_LONGITUDE))) {
+            && ((friend.getLocation().getLatitude() != User.NO_LATITUDE) || (friend.getLocation()
+                .getLongitude() != User.NO_LONGITUDE))) {
             values.put(KEY_LONGITUDE, friend.getLocation().getLongitude());
             values.put(KEY_LATITUDE, friend.getLocation().getLatitude());
         }
@@ -846,11 +845,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         mDatabase.delete(TABLE_FILTER_USER, null, null);
         mDatabase.delete(TABLE_EVENT, null, null);
 
-        Set<UserInterface> friends = ServiceContainer.getCache().getAllFriends();
+        Set<User> friends = ServiceContainer.getCache().getAllFriends();
         Set<Event> events = ServiceContainer.getCache().getMyEvents();
         Set<Filter> filters = ServiceContainer.getCache().getAllFilters();
 
-        for (UserInterface user : friends) {
+        for (User user : friends) {
             this.addUser(user.getImmutableCopy());
         }
         for (Event event : events) {

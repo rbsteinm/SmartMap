@@ -28,7 +28,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.ImmutableFilter;
-import ch.epfl.smartmap.cache.UserInterface;
+import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 
 /**
@@ -37,11 +37,15 @@ import ch.epfl.smartmap.gui.FriendListItemAdapter;
 public class ModifyFilterActivity extends Activity {
 
     private LinearLayout mInsideFilterLayout;
+
     private LinearLayout mOutsideFilterLayout;
+
     private ListView mListViewInside;
+
     private ListView mListViewOutside;
-    private List<UserInterface> mFriendsInside;
-    private List<UserInterface> mFriendsOutside;
+
+    private List<User> mFriendsInside;
+    private List<User> mFriendsOutside;
 
     private Filter mFilter;
     private Cache mCache;
@@ -65,8 +69,8 @@ public class ModifyFilterActivity extends Activity {
         mListViewInside = (ListView) this.findViewById(R.id.activity_modify_filter_inside_list);
         mListViewOutside = (ListView) this.findViewById(R.id.activity_modify_filter_outside_list);
 
-        mFriendsInside = new ArrayList<UserInterface>();
-        mFriendsOutside = new ArrayList<UserInterface>();
+        mFriendsInside = new ArrayList<User>();
+        mFriendsOutside = new ArrayList<User>();
 
         mOnInsideItemLongClickListener = new OnInsideListItemLongClickListener();
         mOnOutsideItemLongClickListener = new OnOutsideListItemLongClickListener();
@@ -97,12 +101,10 @@ public class ModifyFilterActivity extends Activity {
 
         this.setTitle(mFilter.getName());
 
-        FriendListItemAdapter insideAdapter =
-            new FriendListItemAdapter(this.getBaseContext(), mFriendsInside);
+        FriendListItemAdapter insideAdapter = new FriendListItemAdapter(this, mFriendsInside);
         mListViewInside.setAdapter(insideAdapter);
 
-        FriendListItemAdapter outsideAdapter =
-            new FriendListItemAdapter(this.getBaseContext(), mFriendsOutside);
+        FriendListItemAdapter outsideAdapter = new FriendListItemAdapter(this, mFriendsOutside);
         mListViewOutside.setAdapter(outsideAdapter);
 
     }
@@ -160,8 +162,7 @@ public class ModifyFilterActivity extends Activity {
                 mCache.putFilter(new ImmutableFilter(mFilter.getId(), newName, mFilter.getFriendIds(),
                     mFilter.isActive()));
 
-                Toast.makeText(ModifyFilterActivity.this.getBaseContext(), "New name saved",
-                    Toast.LENGTH_LONG).show();
+                Toast.makeText(ModifyFilterActivity.this, "New name saved", Toast.LENGTH_LONG).show();
                 ModifyFilterActivity.this.setTitle(newName);
 
             }
@@ -179,9 +180,9 @@ public class ModifyFilterActivity extends Activity {
         builder.create().show();
     }
 
-    private Set<Long> friendListToIdSet(List<UserInterface> friendList) {
+    private Set<Long> friendListToIdSet(List<User> friendList) {
         Set<Long> idSet = new HashSet<Long>();
-        for (UserInterface friend : friendList) {
+        for (User friend : friendList) {
             idSet.add(friend.getId());
         }
         return idSet;
@@ -202,9 +203,7 @@ public class ModifyFilterActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 ModifyFilterActivity.this.saveFilter();
-                Toast
-                    .makeText(ModifyFilterActivity.this.getBaseContext(), "Changes saved", Toast.LENGTH_LONG)
-                    .show();
+                Toast.makeText(ModifyFilterActivity.this, "Changes saved", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -226,7 +225,7 @@ public class ModifyFilterActivity extends Activity {
         for (long id : mFilter.getFriendIds()) {
             mFriendsInside.add(mCache.getFriend(id));
         }
-        for (UserInterface friend : mCache.getAllFriends()) {
+        for (User friend : mCache.getAllFriends()) {
             if (!mFriendsInside.contains(friend)) {
                 mFriendsOutside.add(friend);
             }
@@ -241,12 +240,10 @@ public class ModifyFilterActivity extends Activity {
 
             switch (action) {
                 case DragEvent.ACTION_DRAG_STARTED:
-                    // All involved view accept ACTION_DRAG_STARTED for MIMETYPE_TEXT_PLAIN
-                    if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    // All involved view accept ACTION_DRAG_STARTED for
+                    // MIMETYPE_TEXT_PLAIN
+
+                    return event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
 
                 case DragEvent.ACTION_DRAG_ENTERED:
 
@@ -264,14 +261,14 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mOutsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        UserInterface droppedItem = mCache.getFriend(droppedItemId);
+                        User droppedItem = mCache.getFriend(droppedItemId);
                         if (mFriendsInside.contains(droppedItem)) {
                             mFriendsInside.remove(droppedItem);
                             mFriendsOutside.add(droppedItem);
-                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                                .getBaseContext(), mFriendsInside));
-                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                                .getBaseContext(), mFriendsOutside));
+                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
+                                mFriendsInside));
+                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
+                                mFriendsOutside));
                             return true;
                         }
 
@@ -299,7 +296,8 @@ public class ModifyFilterActivity extends Activity {
 
             switch (action) {
                 case DragEvent.ACTION_DRAG_STARTED:
-                    // All involved view accept ACTION_DRAG_STARTED for MIMETYPE_TEXT_PLAIN
+                    // All involved view accept ACTION_DRAG_STARTED for
+                    // MIMETYPE_TEXT_PLAIN
                     if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
                         return true;
                     } else {
@@ -322,14 +320,14 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mInsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        UserInterface droppedItem = mCache.getFriend(droppedItemId);
+                        User droppedItem = mCache.getFriend(droppedItemId);
                         if (mFriendsOutside.contains(droppedItem)) {
                             mFriendsInside.add(droppedItem);
                             mFriendsOutside.remove(droppedItem);
-                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                                .getBaseContext(), mFriendsInside));
-                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                                .getBaseContext(), mFriendsOutside));
+                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
+                                mFriendsInside));
+                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
+                                mFriendsOutside));
 
                             return true;
                         }
@@ -353,7 +351,9 @@ public class ModifyFilterActivity extends Activity {
 
         /*
          * (non-Javadoc)
-         * @see android.widget.AdapterView.OnItemLongClickListener#onItemLongClick(android.widget.AdapterView,
+         * @see
+         * android.widget.AdapterView.OnItemLongClickListener#onItemLongClick
+         * (android.widget.AdapterView,
          * android.view.View, int, long)
          */
         @Override
@@ -379,7 +379,9 @@ public class ModifyFilterActivity extends Activity {
 
         /*
          * (non-Javadoc)
-         * @see android.widget.AdapterView.OnItemLongClickListener#onItemLongClick(android.widget.AdapterView,
+         * @see
+         * android.widget.AdapterView.OnItemLongClickListener#onItemLongClick
+         * (android.widget.AdapterView,
          * android.view.View, int, long)
          */
         @Override

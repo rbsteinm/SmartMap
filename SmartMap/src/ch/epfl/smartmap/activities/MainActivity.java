@@ -32,7 +32,7 @@ import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Invitation;
-import ch.epfl.smartmap.cache.UserInterface;
+import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.SearchLayout;
 import ch.epfl.smartmap.gui.SideMenu;
 import ch.epfl.smartmap.gui.SlidingPanel;
@@ -154,10 +154,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     @Override
     protected void onPause() {
         super.onPause();
-        // TODO A method to unregister to the service when the map is not
-        // opened?
-        // this.unregisterReceiver(mBroadcastReceiver);
-        // stopService(mUpdateServiceIntent);
     }
 
     @Override
@@ -240,6 +236,10 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -295,6 +295,10 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         return super.onCreateOptionsMenu(menu);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
+     */
     @Override
     public void onEventListUpdate() {
         this.runOnUiThread(new Runnable() {
@@ -308,20 +312,11 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         });
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
-     */
     @Override
     public void onFilterListUpdate() {
         // TODO Auto-generated method stub
-
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
-     */
     @Override
     public void onFriendListUpdate() {
         this.runOnUiThread(new Runnable() {
@@ -344,10 +339,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                 MainActivity.this.updateNotifCount();
             }
         });
-    }
-
-    public void onLocationChanged(Location location) {
-        ServiceContainer.getSettingsManager().setLocation(location);
     }
 
     @Override
@@ -407,7 +398,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
      * @author jfperren
      */
     public void openInformationActivity() {
-        if (mCurrentItem instanceof UserInterface) {
+        if (mCurrentItem instanceof User) {
             Intent intent = new Intent(this, UserInformationActivity.class);
             intent.putExtra("USER", mCurrentItem.getId());
             this.startActivity(intent);

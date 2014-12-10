@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.UserInterface;
+import ch.epfl.smartmap.cache.User;
 
 /**
  * Customized adapter that displays a list of users in a target activity This
@@ -19,11 +19,11 @@ import ch.epfl.smartmap.cache.UserInterface;
  * 
  * @author rbsteinm
  */
-public class FriendListItemAdapter extends ArrayAdapter<UserInterface> {
+public class FriendListItemAdapter extends ArrayAdapter<User> {
 
     private final Context mContext;
 
-    private final List<UserInterface> mItemsArrayList;
+    private final List<User> mItemsArrayList;
 
     /**
      * @param context
@@ -31,12 +31,12 @@ public class FriendListItemAdapter extends ArrayAdapter<UserInterface> {
      * @param userList
      *            list of users to display
      */
-    public FriendListItemAdapter(Context context, List<UserInterface> itemsArrayList) {
+    public FriendListItemAdapter(Context context, List<User> mFriendsOutside) {
 
-        super(context, R.layout.gui_friend_list_item, itemsArrayList);
+        super(context, R.layout.gui_friend_list_item, mFriendsOutside);
 
         mContext = context;
-        mItemsArrayList = itemsArrayList;
+        mItemsArrayList = mFriendsOutside;
     }
 
     /*
@@ -50,7 +50,7 @@ public class FriendListItemAdapter extends ArrayAdapter<UserInterface> {
 
         // Create inflater,get item to construct
         FriendViewHolder viewHolder;
-        UserInterface user = mItemsArrayList.get(position);
+        User user = mItemsArrayList.get(position);
 
         if (convertView == null) {
             LayoutInflater inflater =

@@ -19,7 +19,7 @@ public class Self extends User {
      */
     public Self() {
         super(ServiceContainer.getSettingsManager().getUserId(), ServiceContainer.getSettingsManager()
-            .getUserName(), UserInterface.NO_IMAGE);
+            .getUserName(), User.NO_IMAGE);
     }
 
     /*
@@ -28,7 +28,7 @@ public class Self extends User {
      */
     @Override
     public int getFriendship() {
-        return UserInterface.SELF;
+        return User.SELF;
     }
 
     /*

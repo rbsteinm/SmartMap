@@ -1,12 +1,5 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
  * Describes a generic user of the app
@@ -15,29 +8,6 @@ import ch.epfl.smartmap.background.ServiceContainer;
  */
 
 public interface UserInterface extends Displayable {
-
-    int STRANGER = 0;
-    int FRIEND = 1;
-    int SELF = 2;
-    int DONT_KNOW = -1;
-
-    long NO_ID = -1;
-    String NO_NAME = "Unknown User";
-    Bitmap NO_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
-        .getResources(), R.drawable.ic_default_user);
-
-    String NO_PHONE_NUMBER = "No phone Number";
-    String NO_EMAIL = "No email";
-    Calendar NO_LAST_SEEN = GregorianCalendar.getInstance();
-
-    UserInterface NOBODY = new Stranger(NO_ID, NO_NAME, NO_IMAGE);
-
-    int IMAGE_QUALITY = 100;
-    long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
-    int PICTURE_WIDTH = 50;
-    int PICTURE_HEIGHT = 50;
-    double NO_LATITUDE = 0.0;
-    double NO_LONGITUDE = 0.0;
 
     int getFriendship();
 

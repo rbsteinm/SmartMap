@@ -17,10 +17,9 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.History;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
-import ch.epfl.smartmap.cache.UserInterface;
+import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -179,12 +178,12 @@ public final class CachedSearchEngine implements SearchEngine {
      * @return the {@code Friend} with given id, or {@code null} if there was no
      *         match.
      */
-    public void findUserById(final long id, final SearchRequestCallback<UserInterface> callback) {
+    public void findUserById(final long id, final SearchRequestCallback<User> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 // Check for live instance
-                UserInterface user = ServiceContainer.getCache().getUser(id);
+                User user = ServiceContainer.getCache().getUser(id);
 
                 if (user != null) {
                     // Found in cache, return
@@ -236,16 +235,16 @@ public final class CachedSearchEngine implements SearchEngine {
         }.execute();
     }
 
-    public void findUserByIds(final Set<Long> ids, final SearchRequestCallback<Set<UserInterface>> callback) {
+    public void findUserByIds(final Set<Long> ids, final SearchRequestCallback<Set<User>> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 Set<ImmutableUser> immutableResult = new HashSet<ImmutableUser>();
-                Set<UserInterface> result = new HashSet<UserInterface>();
+                Set<User> result = new HashSet<User>();
 
                 for (long id : ids) {
                     // Check for live instance
-                    UserInterface stranger = ServiceContainer.getCache().getStranger(id);
+                    User stranger = ServiceContainer.getCache().getStranger(id);
 
                     if (stranger != null) {
                         // Found in cache, add to set of live instances
@@ -282,17 +281,17 @@ public final class CachedSearchEngine implements SearchEngine {
         }.execute();
     }
 
-    public void findUserByQuery(final String query, final SearchRequestCallback<Set<UserInterface>> callback) {
+    public void findUserByQuery(final String query, final SearchRequestCallback<Set<User>> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                Set<UserInterface> result = new HashSet<UserInterface>();
+                Set<User> result = new HashSet<User>();
 
                 if (mPreviousOnlineStrangerSearches.get(query) != null) {
                     // Fetch in cache
                     Set<Long> localResult = mPreviousOnlineStrangerSearches.get(query);
                     for (Long id : localResult) {
-                        UserInterface cachedUser = ServiceContainer.getCache().getStranger(id);
+                        User cachedUser = ServiceContainer.getCache().getStranger(id);
                         if (cachedUser != null) {
                             result.add(cachedUser);
                         }
@@ -365,16 +364,6 @@ public final class CachedSearchEngine implements SearchEngine {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.search.SearchEngine#getHistory()
-     */
-    @Override
-    public History getHistory() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.SearchEngine#sendQuery(java.lang.String,
      * ch.epfl.smartmap.cache.SearchEngine.Type)
      */
@@ -390,7 +379,7 @@ public final class CachedSearchEngine implements SearchEngine {
                 results.addAll(this.sendQuery(query, Type.TAGS));
                 break;
             case FRIENDS:
-                for (UserInterface f : ServiceContainer.getCache().getAllFriends()) {
+                for (User f : ServiceContainer.getCache().getAllFriends()) {
                     if (f.getName().toLowerCase(Locale.US).contains(query)) {
                         results.add(f);
                     }

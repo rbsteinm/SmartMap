@@ -27,7 +27,7 @@ public class Stranger extends User {
      */
     @Override
     public int getFriendship() {
-        return UserInterface.STRANGER;
+        return User.STRANGER;
     }
 
     /*
@@ -45,7 +45,7 @@ public class Stranger extends User {
      */
     @Override
     public Location getLocation() {
-        return UserInterface.NO_LOCATION;
+        return User.NO_LOCATION;
     }
 
     /*

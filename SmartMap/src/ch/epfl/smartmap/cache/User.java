@@ -1,20 +1,49 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
  * @author jfperren
  */
 public abstract class User implements UserInterface {
 
+    public static final int STRANGER = 0;
+    public static final int FRIEND = 1;
+    public static final int SELF = 2;
+    public static final int DONT_KNOW = -1;
+
+    public static final long NO_ID = -1;
+    public static final String NO_NAME = "Unknown User";
+    public static final Bitmap NO_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
+        .getContext().getResources(), R.drawable.ic_default_user);
+
+    public static final String NO_PHONE_NUMBER = "No phone Number";
+    public static final String NO_EMAIL = "No email";
+    public static final Calendar NO_LAST_SEEN = GregorianCalendar.getInstance();
+
+    public static final User NOBODY = new Stranger(NO_ID, NO_NAME, NO_IMAGE);
+
+    public static final int IMAGE_QUALITY = 100;
+    public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
+    public static final int PICTURE_WIDTH = 50;
+    public static final int PICTURE_HEIGHT = 50;
+    public static final double NO_LATITUDE = 0.0;
+    public static double NO_LONGITUDE = 0.0;
+
     private final long mId;
     private String mName;
     private Bitmap mImage;
 
     protected User(long id, String name, Bitmap image) {
-        mId = (id >= 0) ? id : UserInterface.NO_ID;
-        mName = (name != null) ? name : UserInterface.NO_NAME;
-        mImage = (image != null) ? Bitmap.createBitmap(image) : UserInterface.NO_IMAGE;
+        mId = (id >= 0) ? id : User.NO_ID;
+        mName = (name != null) ? name : User.NO_NAME;
+        mImage = (image != null) ? Bitmap.createBitmap(image) : User.NO_IMAGE;
     }
 
     /*
@@ -23,7 +52,7 @@ public abstract class User implements UserInterface {
      */
     @Override
     public boolean equals(Object that) {
-        return (that != null) && (that instanceof UserInterface) && (mId == ((UserInterface) that).getId());
+        return (that != null) && (that instanceof User) && (mId == ((User) that).getId());
     }
 
     /*
@@ -86,14 +115,14 @@ public abstract class User implements UserInterface {
         }
     }
 
-    public static UserInterface createFromContainer(ImmutableUser userInfos) {
+    public static User createFromContainer(ImmutableUser userInfos) {
         switch (userInfos.getFriendship()) {
-            case UserInterface.FRIEND:
+            case User.FRIEND:
                 return new Friend(userInfos.getId(), userInfos.getName(), userInfos.getImage(),
                     userInfos.getLocation(), userInfos.getLocationString(), userInfos.isBlocked());
-            case UserInterface.STRANGER:
+            case User.STRANGER:
                 return new Stranger(userInfos.getId(), userInfos.getName(), userInfos.getImage());
-            case UserInterface.SELF:
+            case User.SELF:
                 return new Self();
             default:
                 throw new IllegalArgumentException("Unknown type of user");

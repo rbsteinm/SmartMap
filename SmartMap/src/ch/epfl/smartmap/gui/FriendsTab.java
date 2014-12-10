@@ -17,7 +17,7 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.UserInterface;
+import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
@@ -30,7 +30,7 @@ public class FriendsTab extends ListFragment {
 
     private static final String TAG = FriendsTab.class.getSimpleName();
 
-    private List<UserInterface> mFriendList;
+    private List<User> mFriendList;
 
     private final Context mContext;
 
@@ -42,7 +42,7 @@ public class FriendsTab extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mFriendList = new ArrayList<UserInterface>(ServiceContainer.getCache().getAllFriends());
+        mFriendList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
 
         // Create custom Adapter and pass it to the Activity
         this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
@@ -51,7 +51,7 @@ public class FriendsTab extends ListFragment {
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
             public void onFriendListUpdate() {
-                mFriendList = new ArrayList<UserInterface>(ServiceContainer.getCache().getAllFriends());
+                mFriendList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
                 ((Activity) mContext).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -65,7 +65,7 @@ public class FriendsTab extends ListFragment {
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
-        UserInterface user = mFriendList.get(position);
+        User user = mFriendList.get(position);
         RelativeLayout rl = (RelativeLayout) view;
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
@@ -77,7 +77,7 @@ public class FriendsTab extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        mFriendList = new ArrayList<UserInterface>(ServiceContainer.getCache().getAllFriends());
+        mFriendList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
         this.setListAdapter(new FriendListItemAdapter(mContext, mFriendList));
     }
 }

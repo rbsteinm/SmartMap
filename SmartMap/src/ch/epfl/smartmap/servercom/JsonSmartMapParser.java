@@ -16,7 +16,6 @@ import android.util.Log;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.cache.UserInterface;
 import ch.epfl.smartmap.util.Utils;
 
 /**
@@ -469,8 +468,8 @@ public class JsonSmartMapParser implements SmartMapParser {
     private ImmutableUser parseFriendFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = 0;
         String name = null;
-        String phoneNumber = UserInterface.NO_PHONE_NUMBER;
-        String email = UserInterface.NO_EMAIL;
+        String phoneNumber = User.NO_PHONE_NUMBER;
+        String email = User.NO_EMAIL;
         double latitude = UNITIALIZED_LATITUDE;
         double longitude = UNITIALIZED_LONGITUDE;
         String lastSeenString = null;

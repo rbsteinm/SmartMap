@@ -3,7 +3,6 @@ package ch.epfl.smartmap.search;
 import java.util.List;
 
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.cache.History;
 
 /**
  * Provides a method {@code sendQuery(String query)} that returns a list of
@@ -12,11 +11,6 @@ import ch.epfl.smartmap.cache.History;
  * @author jfperren
  */
 public interface SearchEngine {
-
-    /**
-     * @return History of searches of this SearchEngine
-     */
-    History getHistory();
 
     /**
      * Sends a Query, computes it and return matched results

@@ -21,7 +21,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 public interface Event extends Displayable {
 
     long NO_ID = -1;
-    Set<UserInterface> NO_PARTICIPANTS = new HashSet<UserInterface>();
+    Set<User> NO_PARTICIPANTS = new HashSet<User>();
     Set<Long> NO_PARTICIPANTIDS = new HashSet<Long>();
     String NO_DESCRIPTION = "This event currently has no description";
     String NO_NAME = "Anonymous Event";
@@ -34,7 +34,7 @@ public interface Event extends Displayable {
     /**
      * @return The ID of the user who created the event
      */
-    UserInterface getCreator();
+    User getCreator();
 
     /**
      * @return The event's description

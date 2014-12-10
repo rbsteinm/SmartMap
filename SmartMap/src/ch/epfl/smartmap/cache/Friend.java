@@ -39,12 +39,12 @@ public final class Friend extends User {
         super(id, name, image);
 
         if (locationString == null) {
-            mLocationString = UserInterface.NO_LOCATION_STRING;
+            mLocationString = User.NO_LOCATION_STRING;
         } else {
             mLocationString = locationString;
         }
         if (location == null) {
-            mLocation = UserInterface.NO_LOCATION;
+            mLocation = User.NO_LOCATION;
         } else {
             mLocation = new Location(location);
         }
@@ -64,7 +64,7 @@ public final class Friend extends User {
      */
     @Override
     public int getFriendship() {
-        return UserInterface.FRIEND;
+        return User.FRIEND;
     }
 
     @Override
