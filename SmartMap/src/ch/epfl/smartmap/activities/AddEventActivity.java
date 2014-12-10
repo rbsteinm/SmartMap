@@ -249,6 +249,7 @@ public class AddEventActivity extends FragmentActivity {
             location.setLongitude(mEventPosition.longitude);
             SettingsManager setMng = ServiceContainer.getSettingsManager();
 
+            // TODO NullPointer dans le getSelf.getImmutableCopy()
             ImmutableEvent event =
                 new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), setMng.getSelf()
                     .getImmutableCopy(), mDescription.getText().toString(), startDate, endDate, location, mPlaceName

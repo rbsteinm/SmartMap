@@ -15,11 +15,13 @@ import ch.epfl.smartmap.util.Utils;
 
 /**
  * <p>
- * Adapter used to display the events in a list view. Used in {@link ch.epfl.smartmap.activities.ShowEventsActivity}.
+ * Adapter used to display the events in a list view. Used in
+ * {@link ch.epfl.smartmap.activities.ShowEventsActivity}.
  * </p>
  * <p>
  * To make the scrolling smooth, we use the view adapter design pattern. <br />
- * See <a href= "http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder"
+ * See <a href=
+ * "http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder"
  * >developer.android on ViewHolder</a>
  * </p>
  * 
@@ -84,7 +86,8 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         viewHolder.getStartTextView().setText(startString);
         viewHolder.getEndTextView().setText(endString);
 
-        viewHolder.getNameTextView().setText(event.getName() + " @ " + event.getLocationString());
+        viewHolder.getNameTextView().setText(
+            event.getName() + " " + mContext.getResources().getString(R.string.near) + " " + event.getLocationString());
 
         newConvertView.setId(position);
 
