@@ -110,8 +110,14 @@ public class GenericInvitation implements Invitation, Comparable {
      */
     @Override
     public ImmutableInvitation getImmutableCopy() {
-        return new ImmutableInvitation(mId, mUser.getImmutableCopy(), mEvent.getId(), mStatus, mTimeStamp,
-            ImmutableInvitation.EVENT_INVITATION);
+        if (this.getType() == Invitation.EVENT_INVITATION) {
+            return new ImmutableInvitation(mId, mUser.getImmutableCopy(), mEvent.getId(), mStatus, mTimeStamp,
+                ImmutableInvitation.EVENT_INVITATION);
+        } else {
+            return new ImmutableInvitation(mId, mUser.getImmutableCopy(), Event.NO_ID, mStatus, mTimeStamp,
+                ImmutableInvitation.EVENT_INVITATION);
+        }
+
     }
 
     @Override
@@ -166,6 +172,11 @@ public class GenericInvitation implements Invitation, Comparable {
         } else {
             return "";
         }
+    }
+
+    @Override
+    public long getTimeStamp() {
+        return mTimeStamp;
     }
 
     @Override

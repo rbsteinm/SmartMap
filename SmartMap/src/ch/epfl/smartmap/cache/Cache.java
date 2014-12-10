@@ -141,7 +141,7 @@ public class Cache {
             this.putFriend(friend);
 
             ImmutableInvitation invitation =
-                new ImmutableInvitation(0, friend, Event.NO_ID, Invitation.UNREAD, GregorianCalendar.getInstance(
+                new ImmutableInvitation(0, friend, 0, Invitation.UNREAD, GregorianCalendar.getInstance(
                     TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(), Invitation.ACCEPTED_FRIEND_INVITATION);
 
             invitation.setUser(this.getFriend(friend.getId()));
@@ -883,7 +883,18 @@ public class Cache {
     }
 
     public synchronized void readAllInvitations() {
-        // Set<Invitation> unreadInvitations = this.getIn
+        SortedSet<Invitation> unreadInvitations = this.getInvitations(new Cache.SearchFilter<Invitation>() {
+            @Override
+            public boolean filter(Invitation item) {
+                // Get Unread invitations
+                return item.getStatus() == Invitation.UNREAD;
+            }
+        });
+        for (Invitation invitation : unreadInvitations) {
+            // TODO set them to read
+            // NULLPOINTER pour le moment quand je fais getImmutableCopy
+            // invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
+        }
     }
 
     /**
@@ -1178,7 +1189,7 @@ public class Cache {
 
                 // Creating the invitation
                 ImmutableInvitation invitation =
-                    new ImmutableInvitation(0, friend, Event.NO_ID, Invitation.UNREAD, GregorianCalendar.getInstance(
+                    new ImmutableInvitation(0, friend, 0, Invitation.UNREAD, GregorianCalendar.getInstance(
                         TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis(), Invitation.FRIEND_INVITATION);
 
                 invitation.setId(ServiceContainer.getDatabase().addInvitation(invitation));

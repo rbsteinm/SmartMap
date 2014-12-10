@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -16,6 +17,7 @@ import ch.epfl.smartmap.cache.GenericInvitation;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.Notifications;
 import ch.epfl.smartmap.gui.InvitationListItemAdapter;
+import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
  * This activity displays the notifications received
@@ -27,6 +29,8 @@ public class InvitationPanelActivity extends ListActivity {
     @SuppressWarnings("unused")
     private static final String TAG = InvitationPanelActivity.class.getSimpleName();
 
+    private List<Invitation> mInvitationList;
+
     private Context mContext;
 
     @Override
@@ -36,6 +40,24 @@ public class InvitationPanelActivity extends ListActivity {
         Notifications.cancelNotification(this);
 
         mContext = this.getBaseContext();
+
+        mInvitationList = new ArrayList<Invitation>(ServiceContainer.getCache().getAllInvitations());
+
+        this.setListAdapter(new InvitationListItemAdapter(mContext, mInvitationList));
+
+        // Initialize the listener
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onInvitationListUpdate() {
+                InvitationPanelActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext,
+                            mInvitationList));
+                    }
+                });
+            }
+        });
     }
 
     @Override
