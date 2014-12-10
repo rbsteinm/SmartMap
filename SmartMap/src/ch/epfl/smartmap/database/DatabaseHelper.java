@@ -394,7 +394,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 events.add(this.getEvent(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
             } while (cursor.moveToNext());
@@ -414,7 +414,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 // using getFilter to add this row's filter to the list
                 filters.add(this.getFilter(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
@@ -437,7 +437,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 long id = cursor.getLong(cursor.getColumnIndex(KEY_ID));
                 long userId = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
@@ -527,7 +527,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             mDatabase.query(TABLE_FILTER_USER, FILTER_USER_COLUMNS, KEY_FILTER_ID + " = ?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 ids.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
             } while (cursor.moveToNext());
@@ -547,7 +547,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 filterIds.add(cursor.getLong(cursor.getColumnIndex(KEY_ID)));
             } while (cursor.moveToNext());
@@ -605,7 +605,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 // TODO
                 // if (cursor.getLong(cursor.getColumnIndex(KEY_USER_ID) == User.FRIEND_STATUS){
@@ -631,7 +631,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = mDatabase.rawQuery(query, null);
 
         ImmutableUser friend = null;
-        if (cursor.moveToFirst()) {
+        if ((cursor != null) && cursor.moveToFirst()) {
             do {
                 long id = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
                 friend =
