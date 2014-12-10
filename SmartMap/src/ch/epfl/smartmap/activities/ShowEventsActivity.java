@@ -40,10 +40,7 @@ public class ShowEventsActivity extends ListActivity {
 
     private static final String TAG = ShowEventsActivity.class.getSimpleName();
 
-    private static final double EARTH_RADIUS_KM = 6378.1;
-
     private static final int SEEK_BAR_MIN_VALUE = 2;
-    private static final int ONE_HUNDRED = 100;
 
     private SeekBar mSeekBar;
 

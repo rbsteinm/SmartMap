@@ -28,13 +28,7 @@ import ch.epfl.smartmap.util.Utils;
  */
 public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
-    private static final int HUNDRED_PERCENT = 100;
-
     private final Context mContext;
-
-    private final List<Event> mItemsArrayList;
-
-    private final Location mMyLocation;
 
     /**
      * Constructor
@@ -46,8 +40,6 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         super(context, R.layout.gui_event_list_item, itemsArrayList);
 
         mContext = context;
-        mItemsArrayList = itemsArrayList;
-        mMyLocation = new Location(location);
     }
 
     @Override
