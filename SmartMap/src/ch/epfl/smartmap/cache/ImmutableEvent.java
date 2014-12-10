@@ -21,13 +21,15 @@ public class ImmutableEvent {
 
     private long mId;
     private String mName;
-    private Long mCreatorId;
     private String mDescription;
     private Location mLocation;
     private String mLocationString;
     private Calendar mStartDate;
     private Calendar mEndDate;
     private Set<Long> mParticipantIds;
+
+    // An event contains informations about his creator
+    private ImmutableUser mImmCreator;
 
     // These will be set by the cache
     private User mCreator;
@@ -46,12 +48,13 @@ public class ImmutableEvent {
      * @param locationString
      * @param participants
      */
-    public ImmutableEvent(long id, String name, long creatorId, String description, Calendar startDate,
-        Calendar endDate, Location location, String locationString, Set<Long> participantIds) {
+    public ImmutableEvent(long id, String name, ImmutableUser creator, String description,
+        Calendar startDate, Calendar endDate, Location location, String locationString,
+        Set<Long> participantIds) {
 
         mId = id;
         mName = name;
-        mCreatorId = creatorId;
+        mImmCreator = creator;
         mDescription = description;
         mStartDate = startDate;
         mEndDate = endDate;
@@ -65,7 +68,7 @@ public class ImmutableEvent {
     }
 
     public long getCreatorId() {
-        return mCreatorId;
+        return mImmCreator.getId();
     }
 
     public String getDescription() {
@@ -78,6 +81,10 @@ public class ImmutableEvent {
 
     public long getId() {
         return mId;
+    }
+
+    public ImmutableUser getImmCreator() {
+        return mImmCreator;
     }
 
     public Location getLocation() {
@@ -109,11 +116,6 @@ public class ImmutableEvent {
         return this;
     }
 
-    public ImmutableEvent setCreatorId(long creatorId) {
-        mCreatorId = creatorId;
-        return this;
-    }
-
     public ImmutableEvent setDescription(String newDescription) {
         mDescription = newDescription;
         return this;
@@ -126,6 +128,11 @@ public class ImmutableEvent {
 
     public ImmutableEvent setId(long newId) {
         mId = newId;
+        return this;
+    }
+
+    public ImmutableEvent setImmutableCreator(ImmutableUser newCreator) {
+        mImmCreator = newCreator;
         return this;
     }
 

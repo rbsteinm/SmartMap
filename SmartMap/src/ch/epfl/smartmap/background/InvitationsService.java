@@ -110,9 +110,12 @@ public class InvitationsService extends Service {
                         InvitationBag userInvitBag = ServiceContainer.getNetworkClient().getInvitations();
                         ServiceContainer.getCache().putInvitations(userInvitBag.getInvitations());
                         // Get event invitations
-                        InvitationBag eventInvitBag = ServiceContainer.getNetworkClient().getInvitations();
+                        InvitationBag eventInvitBag =
+                            ServiceContainer.getNetworkClient().getEventInvitations();
                         ServiceContainer.getCache().putInvitations(eventInvitBag.getInvitations());
-                        Log.d(TAG, "Successfully fetched invitations");
+                        Log.d(TAG,
+                            "Successfully fetched invitations / users : " + userInvitBag.getInvitations()
+                                + " / events : " + eventInvitBag.getInvitations());
                     } catch (SmartMapClientException e) {
                         Log.e(TAG, "Couldn't retrieve invitations due to a server error: " + e);
                     }

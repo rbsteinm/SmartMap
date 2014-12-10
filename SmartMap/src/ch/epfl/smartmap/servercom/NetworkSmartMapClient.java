@@ -55,6 +55,8 @@ import ch.epfl.smartmap.cache.ImmutableUser;
 
 final public class NetworkSmartMapClient implements SmartMapClient {
 
+    private static final String TAG = NetworkSmartMapClient.class.getSimpleName();
+
     private static final String SERVER_URL = "http://smartmap.ddns.net";
     private static final NetworkProvider NETWORK_PROVIDER = new DefaultNetworkProvider();
     private static final int SERVER_RESPONSE_OK = 200;
@@ -324,6 +326,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
             eventInvitations = parser.parseEventList(response);
+            Log.d(TAG, "event size :" + eventInvitations.size());
 
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);

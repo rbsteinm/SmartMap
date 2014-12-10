@@ -29,10 +29,7 @@ import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableFilter;
 import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
-import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.listeners.OnInvitationListUpdateListener;
-import ch.epfl.smartmap.listeners.OnInvitationStatusUpdateListener;
 
 /**
  * SQLite helper
@@ -48,11 +45,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
-
-    private final List<OnInvitationListUpdateListener> mOnInvitationListUpdateListeners =
-        new ArrayList<OnInvitationListUpdateListener>();
-    private final List<OnInvitationStatusUpdateListener> mOnInvitationStatusUpdateListeners =
-        new ArrayList<OnInvitationStatusUpdateListener>();
 
     public static final String TABLE_USER = "users";
     public static final String TABLE_FILTER = "filters";
@@ -176,10 +168,14 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_NAME, event.getName());
             values.put(KEY_EVTDESC, event.getDescription());
             values.put(KEY_USER_ID, event.getCreatorId());
-            values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
-            values.put(KEY_LATITUDE, event.getLocation().getLatitude());
-            values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
-            values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
+            if (event.getLocation() != null) {
+                values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
+                values.put(KEY_LATITUDE, event.getLocation().getLatitude());
+            }
+            if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
+                values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
+                values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
+            }
             values.put(KEY_POSNAME, event.getLocationString());
 
             mDatabase.insert(TABLE_EVENT, null, values);
@@ -232,19 +228,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_DATE, invitation.getTimeStamp());
         values.put(KEY_TYPE, invitation.getType());
 
-        // TODO : Put information on event/user
-
-        this.notifyOnInvitationListUpdateListeners();
+        this.addUser(invitation.getUserInfos());
+        if (invitation.getEventInfos() != null) {
+            this.addEvent(invitation.getEventInfos());
+        }
 
         return mDatabase.insert(TABLE_INVITATIONS, null, values);
-    }
-
-    public void addOnInvitationListUpdateListener(OnInvitationListUpdateListener listener) {
-        mOnInvitationListUpdateListeners.add(listener);
-    }
-
-    public void addOnInvitationStatusUpdateListener(OnInvitationStatusUpdateListener listener) {
-        mOnInvitationStatusUpdateListeners.add(listener);
     }
 
     /**
@@ -287,10 +276,17 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_NAME, user.getName());
             values.put(KEY_NUMBER, user.getPhoneNumber());
             values.put(KEY_EMAIL, user.getEmail());
-            values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
-            values.put(KEY_LATITUDE, user.getLocation().getLatitude());
+            if (user.getLocation() != null) {
+                values.put(KEY_LONGITUDE, user.getLocation().getLongitude());
+                values.put(KEY_LATITUDE, user.getLocation().getLatitude());
+                values.put(KEY_LASTSEEN, user.getLocation().getTime());
+            } else {
+                values.put(KEY_LONGITUDE, User.NO_LONGITUDE);
+                values.put(KEY_LATITUDE, User.NO_LATITUDE);
+                values.put(KEY_LASTSEEN, 0);
+            }
+
             values.put(KEY_POSNAME, user.getLocationString());
-            values.put(KEY_LASTSEEN, user.getLocation().getTime());
             values.put(KEY_BLOCKED, user.isBlocked() ? 1 : 0);
 
             mDatabase.insert(TABLE_USER, null, values);
@@ -439,8 +435,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 long date = cursor.getLong(cursor.getColumnIndex(KEY_DATE));
                 int type = cursor.getInt(cursor.getColumnIndex(KEY_TYPE));
 
-                ImmutableUser user = this.getFriend(id);
-                ImmutableEvent event = this.getEvent(id);
+                ImmutableUser user = this.getFriend(userId);
+                ImmutableEvent event = this.getEvent(eventId);
 
                 invitations.add(new ImmutableInvitation(id, user, event, status, date, type));
 
@@ -482,8 +478,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             long creatorId = cursor.getColumnIndex(KEY_USER_ID);
 
             event =
-                new ImmutableEvent(id, name, creatorId, description, startDate, endDate, location,
-                    locationString, new HashSet<Long>());
+                new ImmutableEvent(id, name, this.getFriend(creatorId), description, startDate, endDate,
+                    location, locationString, new HashSet<Long>());
         }
 
         cursor.close();
@@ -807,12 +803,14 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         if (friend.getEmail() != Friend.NO_EMAIL) {
             values.put(KEY_EMAIL, friend.getEmail());
         }
-        if ((friend.getLocation().getLatitude() != User.NO_LATITUDE)
-            || (friend.getLocation().getLongitude() != User.NO_LONGITUDE)) {
+        if ((friend.getLocation() != null)
+            && ((friend.getLocation().getLatitude() != User.NO_LATITUDE) || (friend.getLocation()
+                .getLongitude() != User.NO_LONGITUDE))) {
             values.put(KEY_LONGITUDE, friend.getLocation().getLongitude());
             values.put(KEY_LATITUDE, friend.getLocation().getLatitude());
         }
-        if (!friend.getLocationString().equals(Friend.NO_LOCATION_STRING)) {
+        if ((friend.getLocationString() != null)
+            && !friend.getLocationString().equals(Friend.NO_LOCATION_STRING)) {
             values.put(KEY_POSNAME, friend.getLocationString());
         }
 
@@ -871,26 +869,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             mDatabase.update(TABLE_INVITATIONS, values, KEY_ID + " = ?",
                 new String[]{String.valueOf(invitation.getId())});
 
-        if (rows > 0) {
-            this.notifyOnInvitationListUpdateListeners();
-        }
-        if ((invitation.getStatus() == Invitation.ACCEPTED)
-            || (invitation.getStatus() == Invitation.DECLINED)) {
-            this.notifyOnInvitationStatusUpdateListeners(invitation.getUser().getId(), invitation.getStatus());
-        }
-
         return rows;
-    }
-
-    private void notifyOnInvitationListUpdateListeners() {
-        for (OnInvitationListUpdateListener listener : mOnInvitationListUpdateListeners) {
-            listener.onInvitationListUpdate();
-        }
-    }
-
-    private void notifyOnInvitationStatusUpdateListeners(long id, int status) {
-        for (OnInvitationStatusUpdateListener listener : mOnInvitationStatusUpdateListeners) {
-            listener.onInvitationStatusUpdate(id, status);
-        }
     }
 }

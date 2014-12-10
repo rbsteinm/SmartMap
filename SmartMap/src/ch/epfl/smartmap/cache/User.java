@@ -16,6 +16,10 @@ import ch.epfl.smartmap.background.ServiceContainer;
 
 public interface User extends Displayable {
 
+    int STRANGER = 0;
+    int FRIEND = 1;
+    int SELF = 2;
+
     long NO_ID = -1;
     String NO_NAME = "Unknown User";
     Bitmap NO_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
@@ -25,7 +29,8 @@ public interface User extends Displayable {
     String NO_EMAIL = "No email";
     Calendar NO_LAST_SEEN = GregorianCalendar.getInstance();
 
-    User NOBODY = new Stranger(new ImmutableUser(NO_ID, NO_NAME, null, null, null, null, NO_IMAGE, false));
+    User NOBODY =
+        new Stranger(new ImmutableUser(NO_ID, NO_NAME, null, null, null, null, NO_IMAGE, false, -1));
 
     // ???
     int IMAGE_QUALITY = 100;
@@ -35,13 +40,13 @@ public interface User extends Displayable {
     double NO_LATITUDE = 0.0;
     double NO_LONGITUDE = 0.0;
 
+    int getFriendship();
+
     ImmutableUser getImmutableCopy();
 
     String getName();
 
     boolean isBlocked();
-
-    boolean isFriend();
 
     boolean isVisible();
 

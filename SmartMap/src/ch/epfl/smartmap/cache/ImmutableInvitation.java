@@ -47,7 +47,7 @@ public final class ImmutableInvitation {
     }
 
     public long getEventId() {
-        return mEventInfos.getId();
+        return mEventInfos != null ? mEventInfos.getId() : Event.NO_ID;
     }
 
     public ImmutableEvent getEventInfos() {
@@ -75,7 +75,7 @@ public final class ImmutableInvitation {
     }
 
     public long getUserId() {
-        return mUserInfos.getId();
+        return mUserInfos != null ? mUserInfos.getId() : User.NO_ID;
     }
 
     public ImmutableUser getUserInfos() {

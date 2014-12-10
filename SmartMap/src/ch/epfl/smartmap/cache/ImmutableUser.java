@@ -20,6 +20,7 @@ public final class ImmutableUser {
     private Location mLocation;
     private Bitmap mImage;
     private boolean mIsBlocked;
+    private int mFriendship;
 
     /**
      * Constructor, put {@code null} (or {@code User.NO_ID} for id) if you dont want the value to be taken
@@ -34,7 +35,7 @@ public final class ImmutableUser {
      * @param image
      */
     public ImmutableUser(long id, String name, String phoneNumber, String email, Location location,
-        String locationString, Bitmap image, boolean isBlocked) {
+        String locationString, Bitmap image, boolean isBlocked, int friendship) {
 
         mId = id;
         mName = name;
@@ -44,10 +45,15 @@ public final class ImmutableUser {
         mLocationString = locationString;
         mImage = image;
         mIsBlocked = isBlocked;
+        mFriendship = friendship;
     }
 
     public String getEmail() {
         return mEmail;
+    }
+
+    public int getFriendship() {
+        return mFriendship;
     }
 
     public long getId() {

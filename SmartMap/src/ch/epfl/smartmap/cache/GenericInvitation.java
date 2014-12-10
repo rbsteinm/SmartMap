@@ -33,7 +33,8 @@ public class GenericInvitation implements Invitation, Comparable {
     public static final String PROVIDER_NAME = "SmartMapServers";
 
     public GenericInvitation(ImmutableInvitation invitation) {
-        if (invitation.getUser() == null) {
+        if ((invitation.getUser() == null)
+            && ((invitation.getType() == Invitation.FRIEND_INVITATION) || (invitation.getType() == Invitation.ACCEPTED_FRIEND_INVITATION))) {
             throw new IllegalArgumentException();
         } else {
             mUser = invitation.getUser();

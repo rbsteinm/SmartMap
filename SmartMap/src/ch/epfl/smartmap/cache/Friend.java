@@ -63,6 +63,15 @@ public final class Friend extends AbstractUser {
         return mEmail;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getFriendship()
+     */
+    @Override
+    public int getFriendship() {
+        return User.FRIEND;
+    }
+
     @Override
     public ImmutableUser getImmutableCopy() {
         return super.getImmutableCopy().setPhoneNumber(mPhoneNumber).setEmail(mEmail).setLocation(mLocation)
@@ -126,15 +135,6 @@ public final class Friend extends AbstractUser {
         }
 
         return infos;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#isFriend()
-     */
-    @Override
-    public boolean isFriend() {
-        return true;
     }
 
     /*

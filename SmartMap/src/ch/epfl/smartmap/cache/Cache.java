@@ -529,38 +529,14 @@ public class Cache {
         mFilterInstances.clear();
         mInvitationInstances.clear();
 
-        // Clear all sets
+        // Clear friend ids
         mFriendIds.clear();
-        mEventIds.clear();
-        mFilterIds.clear();
-        mInvitingFriendsIds.clear();
-
-        // Initialize id Lists
-        mFriendIds.addAll(database.getFriendIds());
-        Log.d(TAG, "Friend ids : " + mFriendIds);
-        // mPublicEventIds.addAll(DatabaseHelper.getInstance().getEventIds());
-        mFilterIds.addAll(database.getFilterIds());
 
         // Fill with database values
-        for (long id : mFriendIds) {
-            Log.d(TAG, "Added friend : " + id);
-            mUserInstances.put(id, new Friend(database.getFriend(id)));
-        }
-        for (long id : mEventIds) {
-            Log.d(TAG, "Added event : " + id);
-            mEventInstances.put(id, new PublicEvent(database.getEvent(id)));
-        }
-
-        for (long id : mFilterIds) {
-            mFilterInstances.put(id, new DefaultFilter(database.getFilter(id)));
-        }
-
-        // Initialize pending friends
-        Set<ImmutableUser> pendingFriends = database.getPendingFriends();
-        for (ImmutableUser friend : pendingFriends) {
-            mInvitingFriendsIds.add(friend.getId());
-            mUserInstances.put(friend.getId(), new Friend(friend));
-        }
+        this.putUsers(database.getUsers());
+        this.putEvents(database.getAllEvents());
+        this.putFilters(database.getAllFilters());
+        this.putInvitations(database.getAllInvitations());
 
         // Notify listeners
         for (CacheListener listener : mListeners) {
@@ -743,7 +719,7 @@ public class Cache {
                     invitation = this.processAcceptedFriendInvitation(newInvitation);
                     break;
                 case Invitation.EVENT_INVITATION:
-
+                    invitation = this.processEventInvitation(newInvitation);
                     break;
                 default:
                     break;
@@ -1174,6 +1150,23 @@ public class Cache {
         return new GenericInvitation(newInvitation);
     }
 
+    private Invitation processEventInvitation(ImmutableInvitation newInvitation) {
+        Log.d(TAG, "Event invit ID :" + newInvitation.getId());
+        // Add Event in Cache
+        Cache.this.putEvent(newInvitation.getEventInfos());
+        newInvitation.setEvent(Cache.this.getEvent(newInvitation.getEventId()));
+        if (newInvitation.getId() == Invitation.NO_ID) {
+            // Send from server, need to add local ID
+            long id = ServiceContainer.getDatabase().addInvitation(newInvitation);
+            newInvitation.setId(id);
+            Log.d(TAG, "Database gives id " + id);
+            // Phone notification
+            Notifications.newEventNotification(ServiceContainer.getSettingsManager().getContext(),
+                newInvitation);
+        }
+        return new GenericInvitation(newInvitation);
+    }
+
     private Invitation processFriendInvitation(final ImmutableInvitation newInvitation) {
         // Add inviter in Cache
         Cache.this.putStranger(newInvitation.getUserInfos());
@@ -1217,7 +1210,6 @@ public class Cache {
                     }
                     return null;
                 }
-
             }.execute(id);
         }
     }

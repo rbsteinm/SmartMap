@@ -22,6 +22,15 @@ public class Stranger extends AbstractUser {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getFriendship()
+     */
+    @Override
+    public int getFriendship() {
+        return User.STRANGER;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Localisable#getLatLng()
      */
     @Override
@@ -63,15 +72,6 @@ public class Stranger extends AbstractUser {
     @Override
     public String getSubtitle() {
         return "Add as Friend to see more informations";
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#isFriend()
-     */
-    @Override
-    public boolean isFriend() {
-        return false;
     }
 
     /*

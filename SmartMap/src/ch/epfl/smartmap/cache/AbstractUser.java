@@ -48,7 +48,7 @@ public abstract class AbstractUser implements User {
 
     @Override
     public ImmutableUser getImmutableCopy() {
-        return new ImmutableUser(mId, mName, null, null, null, null, mImage, mBlocked);
+        return new ImmutableUser(mId, mName, null, null, null, null, mImage, mBlocked, this.getFriendship());
     }
 
     /*
@@ -94,6 +94,19 @@ public abstract class AbstractUser implements User {
         }
         if (user.getImage() != null) {
             mImage = user.getImage();
+        }
+    }
+
+    public static User createFromContainer(ImmutableUser userInfos) {
+        switch (userInfos.getFriendship()) {
+            case User.FRIEND:
+                return new Friend(userInfos);
+            case User.STRANGER:
+                return new Stranger(userInfos);
+            case User.SELF:
+                return new Self();
+            default:
+                throw new IllegalArgumentException("Unknown type of user");
         }
     }
 }

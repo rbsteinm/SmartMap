@@ -32,7 +32,6 @@ public class PublicEvent implements Event {
     // Mandatory fields
     private final long mId;
     private String mName;
-    private long mCreatorId;
     private Set<Long> mParticipantIds;
     private Calendar mStartDate;
     private Calendar mEndDate;
@@ -42,7 +41,6 @@ public class PublicEvent implements Event {
     private String mLocationString;
 
     private final User mCreator;
-    private final Set<User> mParticipants;
 
     public static final int DEFAULT_ICON = R.drawable.default_event;
 
@@ -63,12 +61,12 @@ public class PublicEvent implements Event {
         mStartDate = (event.getStartDate() != null) ? (Calendar) event.getStartDate().clone() : NO_START_DATE;
         mEndDate = (event.getEndDate() != null) ? (Calendar) event.getEndDate().clone() : NO_END_DATE;
         mLocation = (event.getLocation() != null) ? new Location(event.getLocation()) : NO_LOCATION;
-        mLocationString = (event.getLocationString() != null) ? event.getLocationString() : NO_LOCATION_STRING;
+        mLocationString =
+            (event.getLocationString() != null) ? event.getLocationString() : NO_LOCATION_STRING;
         mDescription = (event.getDescription() != null) ? event.getDescription() : NO_DESCRIPTION;
         mParticipantIds =
-            (event.getParticipantIds() != null) ? new HashSet<Long>(event.getParticipantIds()) : NO_PARTICIPANTIDS;
-        mParticipants =
-            (event.getParticipants() != null) ? new HashSet<User>(event.getParticipants()) : NO_PARTICIPANTS;
+            (event.getParticipantIds() != null) ? new HashSet<Long>(event.getParticipantIds())
+                : NO_PARTICIPANTIDS;
     }
 
     /*
@@ -77,7 +75,8 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj != null) && (this.getClass() == obj.getClass()) && (this.getId() == ((PublicEvent) obj).getId());
+        return (obj != null) && (this.getClass() == obj.getClass())
+            && (this.getId() == ((PublicEvent) obj).getId());
     }
 
     /*
@@ -111,8 +110,8 @@ public class PublicEvent implements Event {
 
     @Override
     public ImmutableEvent getImmutableCopy() {
-        return new ImmutableEvent(mId, mName, mCreatorId, mDescription, mStartDate, mEndDate, mLocation,
-            mLocationString, mParticipantIds);
+        return new ImmutableEvent(mId, mName, mCreator.getImmutableCopy(), mDescription, mStartDate,
+            mEndDate, mLocation, mLocationString, mParticipantIds);
     }
 
     /*
@@ -217,7 +216,8 @@ public class PublicEvent implements Event {
     @Override
     public boolean isNear() {
         Location ourLocation = ServiceContainer.getSettingsManager().getLocation();
-        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager().getNearEventsMaxDistance();
+        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager()
+            .getNearEventsMaxDistance();
     }
 
     /*
@@ -245,10 +245,6 @@ public class PublicEvent implements Event {
     public void update(ImmutableEvent event) {
         if ((event.getName() != null) && !event.getName().equals("")) {
             mName = event.getName();
-        }
-
-        if (event.getCreatorId() > 0) {
-            mCreatorId = event.getCreatorId();
         }
 
         if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
