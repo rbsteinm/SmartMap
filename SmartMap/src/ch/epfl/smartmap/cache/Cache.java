@@ -493,14 +493,13 @@ public class Cache {
     }
 
     public synchronized SortedSet<Invitation> getUnansweredFriendInvitations() {
-        SortedSet<Invitation> unansweredFriendInvitations = this.getAllInvitations();
-        for (Invitation invitation : unansweredFriendInvitations) {
-            if ((invitation.getStatus() == Invitation.ACCEPTED)
-                || (invitation.getStatus() == Invitation.DECLINED)) {
-                unansweredFriendInvitations.remove(invitation);
+        return this.getInvitations(new SearchFilter<Invitation>() {
+            @Override
+            public boolean filter(Invitation item) {
+                int type = item.getType();
+                return (type == Invitation.READ) || (type == Invitation.UNREAD);
             }
-        }
-        return unansweredFriendInvitations;
+        });
     }
 
     /**
