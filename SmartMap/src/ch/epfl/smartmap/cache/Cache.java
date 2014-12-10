@@ -7,16 +7,15 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LongSparseArray;
 import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.listeners.CacheListener;
-import ch.epfl.smartmap.servercom.InvitationBag;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -87,7 +86,8 @@ public class Cache {
      * @param invitation
      * @param callback
      */
-    public synchronized void acceptInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
+    public synchronized void acceptInvitation(final Invitation invitation,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -138,7 +138,8 @@ public class Cache {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.addAll(ids);
 
-        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final ImmutableEvent newImmutableEvent =
+            event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -165,7 +166,8 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
+    public synchronized void createEvent(final ImmutableEvent createdEvent,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -191,7 +193,8 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void declineInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
+    public synchronized void declineInvitation(final Invitation invitation,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -245,6 +248,10 @@ public class Cache {
 
     public synchronized SortedSet<Invitation> getAllInvitations() {
         return this.getInvitations(mInvitationIds);
+    }
+
+    public synchronized Set<User> getAllUsers() {
+        return this.getUsers(mUserIds);
     }
 
     public synchronized Set<Event> getAllVisibleEvents() {
@@ -486,7 +493,8 @@ public class Cache {
     public synchronized SortedSet<Invitation> getUnansweredFriendInvitations() {
         SortedSet<Invitation> unansweredFriendInvitations = this.getAllInvitations();
         for (Invitation invitation : unansweredFriendInvitations) {
-            if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)) {
+            if ((invitation.getStatus() == Invitation.ACCEPTED)
+                || (invitation.getStatus() == Invitation.DECLINED)) {
                 unansweredFriendInvitations.remove(invitation);
             }
         }
@@ -534,19 +542,30 @@ public class Cache {
         mFilterInstances.clear();
         mInvitationInstances.clear();
 
+        // Clear ids
+        mUserIds.clear();
+        mEventIds.clear();
+        mFilterIds.clear();
+        mInvitationIds.clear();
+
         // Clear friend ids
         mFriendIds.clear();
 
         // Fill with database values
+        Log.d(TAG, "Init, put users : " + database.getAllUsers());
         this.putUsers(database.getAllUsers());
+
+        Log.d(TAG, "Init, put events : " + database.getAllEvents());
         this.putEvents(database.getAllEvents());
+        Log.d(TAG, "Init, put filters : " + database.getAllFilters());
         this.putFilters(database.getAllFilters());
+        Log.d(TAG, "Init, put invitations : " + database.getAllInvitations());
         this.putInvitations(database.getAllInvitations());
 
         // Notify listeners
         for (CacheListener listener : mListeners) {
             listener.onEventListUpdate();
-            listener.onFriendListUpdate();
+            listener.onUserListUpdate();
             listener.onFilterListUpdate();
         }
     }
@@ -558,7 +577,8 @@ public class Cache {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, new ArrayList<Long>(usersIds));
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId,
+                        new ArrayList<Long>(usersIds));
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Couldn't invite friends to event:" + e);
@@ -585,13 +605,21 @@ public class Cache {
         }.execute(id);
     }
 
+    public void logState() {
+        Log.d(TAG, "CACHE STATE : Users : " + mUserIds);
+        Log.d(TAG, "CACHE STATE : Events : " + mEventIds);
+        Log.d(TAG, "CACHE STATE : Filters : " + mFilterIds);
+        Log.d(TAG, "CACHE STATE : Invits : " + mInvitationIds);
+    }
+
     /**
      * OK
      * 
      * @param createdEvent
      * @param callback
      */
-    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
+    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent,
+        final NetworkRequestCallback callback) {
         new AsyncTask<ImmutableEvent, Void, Void>() {
 
             @Override
@@ -622,12 +650,51 @@ public class Cache {
     }
 
     public synchronized void putEvents(Set<ImmutableEvent> newEvents) {
+        boolean needToCallListeners = false;
+
+        Set<ImmutableUser> usersToAdd = new HashSet<ImmutableUser>();
+        Set<ImmutableEvent> eventsToUpdate = new HashSet<ImmutableEvent>();
+        Set<ImmutableEvent> eventsToAdd = new HashSet<ImmutableEvent>();
+
         for (final ImmutableEvent newEvent : newEvents) {
-            mEventIds.add(newEvent.getId());
-            // Add user to cache & set real instance to event
-            this.putUser(newEvent.getImmCreator());
-            mEventInstances.put(newEvent.getId(),
-                new PublicEvent(newEvent.setCreator(this.getUser(newEvent.getImmCreator().getId()))));
+            Log.d(TAG,
+                "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getImmCreator());
+            // Get id
+            long eventId = newEvent.getId();
+
+            if (this.getEvent(eventId) != null) {
+                // Put in the update list
+                eventsToUpdate.add(newEvent);
+            } else {
+                // Need to add to Cache, check if contains all informations
+                if (newEvent.getImmCreator() != null) {
+                    eventsToAdd.add(newEvent);
+                    usersToAdd.add(newEvent.getImmCreator());
+                }
+            }
+
+            // Add users that need to be added
+            this.putUsers(usersToAdd);
+
+            // Add user to Container for new Events & Add to SparseArray
+            for (ImmutableEvent eventInfo : eventsToAdd) {
+                needToCallListeners = true;
+                eventInfo.setCreator(this.getUser(eventInfo.getCreatorId()));
+                mEventIds.add(newEvent.getId());
+                mEventInstances.put(newEvent.getId(), new PublicEvent(eventInfo));
+            }
+
+            // Update Events to need to be updated & put true if update didnt call listeners
+            needToCallListeners = !this.updateEvents(eventsToUpdate) && needToCallListeners;
+
+            // Update Listeners if needed
+            if (needToCallListeners) {
+                for (CacheListener listener : mListeners) {
+                    Log.d(TAG, "Called listeners on Events");
+                    listener.onEventListUpdate();
+                }
+            }
+            this.logState();
         }
     }
 
@@ -639,56 +706,125 @@ public class Cache {
     }
 
     public synchronized void putFilters(Set<ImmutableFilter> newFilters) {
+        boolean needToCallListeners = false;
+
+        Set<ImmutableFilter> filtersToUpdate = new HashSet<ImmutableFilter>();
+
         for (ImmutableFilter newFilter : newFilters) {
-            // Create new Unique Id
-            newFilter.setId(nextFilterId++);
-            mFilterIds.add(newFilter.getId());
-            mFilterInstances.put(newFilter.getId(), new DefaultFilter(newFilter));
+            if (newFilter.getId() == Filter.NO_ID) {
+                // New filter, need to add it
+                long filterId = nextFilterId++;
+                newFilter.setId(filterId);
+                mFilterIds.add(filterId);
+                mFilterInstances.put(filterId, new DefaultFilter(newFilter));
+                needToCallListeners = true;
+            } else {
+                // Put in update set
+                filtersToUpdate.add(newFilter);
+            }
         }
+
+        // Update filters that need to be added
+        needToCallListeners = !this.updateFilters(filtersToUpdate) && needToCallListeners;
 
         // Notify listeners
-        for (CacheListener listener : mListeners) {
-            listener.onFilterListUpdate();
+        if (needToCallListeners) {
+            Log.d(TAG, "Called listeners on Filters");
+            for (CacheListener listener : mListeners) {
+                listener.onFilterListUpdate();
+            }
         }
+        this.logState();
     }
 
-    public synchronized void putInvitation(ImmutableInvitation newInvitation) {
+    public synchronized void putInvitation(ImmutableInvitation invitationInfo) {
         Set<ImmutableInvitation> singleton = new HashSet<ImmutableInvitation>();
-        singleton.add(newInvitation);
+        singleton.add(invitationInfo);
         this.putInvitations(singleton);
     }
 
-    public synchronized void putInvitations(Set<ImmutableInvitation> newInvitations) {
-        Log.d(TAG, "Put invitation : " + newInvitations.size());
-        boolean isListModified = false;
-        for (final ImmutableInvitation newInvitation : newInvitations) {
-            Log.d(TAG, "Invitation id : " + newInvitation.getId());
-            Invitation invitation = null;
-            switch (newInvitation.getType()) {
-                case Invitation.FRIEND_INVITATION:
-                    invitation = this.processFriendInvitation(newInvitation);
-                    break;
+    public synchronized void putInvitations(Set<ImmutableInvitation> invitationInfos) {
+        boolean needToCallListeners = false;
 
-                case Invitation.ACCEPTED_FRIEND_INVITATION:
-                    invitation = this.processAcceptedFriendInvitation(newInvitation);
-                    break;
-                case Invitation.EVENT_INVITATION:
-                    invitation = this.processEventInvitation(newInvitation);
-                    break;
-                default:
-                    break;
+        // Contains values to add later all at once
+        Set<ImmutableUser> usersToAdd = new HashSet<ImmutableUser>();
+        Set<ImmutableEvent> eventsToAdd = new HashSet<ImmutableEvent>();
+        Set<ImmutableInvitation> invitationsToAdd = new HashSet<ImmutableInvitation>();
+
+        for (final ImmutableInvitation invitationInfo : invitationInfos) {
+            // Get Id
+            if (invitationInfo.getId() == Invitation.NO_ID) {
+                // Get Id from database
+                invitationInfo.setId(ServiceContainer.getDatabase().addInvitation(invitationInfo));
             }
 
-            mInvitationIds.add(invitation.getId());
-            mInvitationInstances.put(invitation.getId(), invitation);
-            isListModified = true;
+            if ((invitationInfo.getId() != Invitation.ALREADY_RECEIVED)
+                && (this.getInvitation(invitationInfo.getId()) == null)) {
+                switch (invitationInfo.getType()) {
+                    case Invitation.FRIEND_INVITATION:
+                        // Check that it contains all informations
+                        if (invitationInfo.getUserInfos() != null) {
+                            invitationsToAdd.add(invitationInfo);
+                            usersToAdd.add(invitationInfo.getUserInfos());
+                        }
+                        break;
+                    case Invitation.ACCEPTED_FRIEND_INVITATION:
+                        // Check that it contains all informations
+                        if (invitationInfo.getUserInfos() != null) {
+                            usersToAdd.add(invitationInfo.getUserInfos());
+                            invitationsToAdd.add(invitationInfo);
+                        }
+                        // Ack
+                        break;
+                    case Invitation.EVENT_INVITATION:
+                        // Check that it contains all informations
+                        if (invitationInfo.getEventInfos() != null) {
+                            invitationsToAdd.add(invitationInfo);
+                            eventsToAdd.add(invitationInfo.getEventInfos());
+                        }
+                        // Ack
+                        break;
+                    default:
+                        assert false;
+                        break;
+                }
+            }
         }
 
-        if (isListModified) {
+        // Add all users
+        this.putUsers(usersToAdd);
+
+        // Add all events
+        this.putEvents(eventsToAdd);
+
+        // Create and add live instances of Invitations
+        for (ImmutableInvitation invitationInfo : invitationsToAdd) {
+            switch (invitationInfo.getType()) {
+                case Invitation.FRIEND_INVITATION:
+                case Invitation.ACCEPTED_FRIEND_INVITATION:
+                    invitationInfo.setUser(this.getUser(invitationInfo.getUserInfos().getId()));
+                    break;
+                case Invitation.EVENT_INVITATION:
+                    invitationInfo.setEvent(this.getEvent(invitationInfo.getEventInfos().getId()));
+                    break;
+                default:
+                    assert false;
+                    break;
+            }
+            mInvitationIds.add(invitationInfo.getId());
+            mInvitationInstances.put(invitationInfo.getId(), new GenericInvitation(invitationInfo));
+
+            needToCallListeners = true;
+        }
+
+        if (needToCallListeners) {
+            Log.d(TAG, "Called listeners on Invitations");
             for (CacheListener listener : mListeners) {
                 listener.onInvitationListUpdate();
             }
         }
+
+        this.logState();
     }
 
     public synchronized void putUser(ImmutableUser newFriend) {
@@ -697,30 +833,38 @@ public class Cache {
         this.putUsers(singleton);
     }
 
-    public synchronized void putUsers(Set<ImmutableUser> newFriends) {
-        boolean isListModified = false;
+    public synchronized void putUsers(Set<ImmutableUser> newUsers) {
+        boolean needToCallListeners = false;
 
-        for (ImmutableUser newFriend : newFriends) {
-            mUserIds.add(newFriend.getId());
-            if (newFriend.getFriendship() == User.FRIEND) {
-                mFriendIds.add(newFriend.getId());
+        Set<ImmutableUser> usersToUpdate = new HashSet<ImmutableUser>();
+
+        for (ImmutableUser newUser : newUsers) {
+            mUserIds.add(newUser.getId());
+
+            if (newUser.getFriendship() == User.FRIEND) {
+                mFriendIds.add(newUser.getId());
             }
-            if (mUserInstances.get(newFriend.getId()) == null) {
+            if (mUserInstances.get(newUser.getId()) == null) {
                 // Need to add it
-                mUserInstances.put(newFriend.getId(), User.createFromContainer(newFriend));
-                isListModified = true;
+                mUserInstances.put(newUser.getId(), User.createFromContainer(newUser));
+                needToCallListeners = true;
             } else {
-                // Only update
-                this.updateFriend(newFriend);
+                // Put in set for update
+                usersToUpdate.add(newUser);
             }
         }
+
+        // Update users that need to be updated
+        needToCallListeners = !this.updateUsers(usersToUpdate) && needToCallListeners;
 
         // Notify listeners if needed
-        if (isListModified) {
+        if (needToCallListeners) {
+            Log.d(TAG, "Called listeners on User");
             for (CacheListener listener : mListeners) {
-                listener.onFriendListUpdate();
+                listener.onUserListUpdate();
             }
         }
+        this.logState();
     }
 
     public synchronized void readAllInvitations() {
@@ -865,7 +1009,7 @@ public class Cache {
         // Notify listeners if needed
         if (isListModified) {
             for (CacheListener l : mListeners) {
-                l.onFriendListUpdate();
+                l.onUserListUpdate();
             }
         }
     }
@@ -880,7 +1024,8 @@ public class Cache {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.removeAll(ids);
 
-        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final ImmutableEvent newImmutableEvent =
+            event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -910,123 +1055,85 @@ public class Cache {
         }
     }
 
-    /**
-     * OK
-     * 
-     * @param updatedEvent
-     */
-    public synchronized void updateEvent(ImmutableEvent updatedEvent) {
-        Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
-        singleton.add(updatedEvent);
-        this.updateEvents(singleton);
-    }
-
-    /**
-     * OK
-     * 
-     * @param updatedEvents
-     */
-    public synchronized void updateEvents(Set<ImmutableEvent> updatedEvents) {
-        for (ImmutableEvent updatedEvent : updatedEvents) {
-            Event cachedEvent = this.getEvent(updatedEvent.getId());
-            if (cachedEvent != null) {
-                cachedEvent.update(updatedEvent);
-            }
-        }
-
-        for (CacheListener listener : mListeners) {
-            listener.onEventListUpdate();
-        }
-    }
-
-    public synchronized void updateFilter(ImmutableFilter updatedFilter) {
-        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
-        singleton.add(updatedFilter);
-        this.updateFilters(singleton);
-    }
-
-    public synchronized void updateFilters(Set<ImmutableFilter> updatedFilters) {
-        for (ImmutableFilter updatedFilter : updatedFilters) {
-            Filter cachedFilter = this.getFilter(updatedFilter.getId());
-            if (cachedFilter != null) {
-                cachedFilter.update(updatedFilter);
-            }
-        }
-
-        for (CacheListener listener : mListeners) {
-            listener.onFilterListUpdate();
-        }
-    }
-
-    /**
-     * OK
-     * 
-     * @param updatedFriend
-     */
-    public synchronized void updateFriend(ImmutableUser updatedFriend) {
-        Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
-        singleton.add(updatedFriend);
-        this.updateFriends(singleton);
-    }
-
-    public synchronized void updateFriendInvitations(InvitationBag notifBag, final Context ctx) {
-        this.putInvitations(notifBag.getInvitations());
-    }
-
-    /**
-     * OK
-     * 
-     * @param updatedFriends
-     */
-    public synchronized void updateFriends(Set<ImmutableUser> updatedFriends) {
-        for (ImmutableUser updatedFriend : updatedFriends) {
-            User cachedFriend = this.getFriend(updatedFriend.getId());
-            if (cachedFriend != null) {
-                cachedFriend.update(updatedFriend);
-            }
-        }
-
-        for (CacheListener listener : mListeners) {
-            listener.onFriendListUpdate();
-        }
-    }
-
-    public synchronized void
-        updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
+    public synchronized void updateFromNetwork(final SmartMapClient networkClient,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                // TODO : Empty useless instances from Cache
                 try {
-                    // Fetch friend ids
-                    Set<Long> newFriendIds = new HashSet<Long>(networkClient.getFriendsIds());
+                    // Get settings
+                    SettingsManager settingsManager = ServiceContainer.getSettingsManager();
 
-                    // Sets new friend ids
-                    mFriendIds.clear();
-                    mFriendIds.addAll(newFriendIds);
+                    // Sets with new values (avoid calling multiple times the listeners)
+                    Set<ImmutableUser> updatedUsers = new HashSet<ImmutableUser>();
+                    Set<ImmutableEvent> updatedEvents = new HashSet<ImmutableEvent>();
 
-                    LongSparseArray<User> newUserInstances = new LongSparseArray<User>();
+                    // Update self informations
+                    long myId = settingsManager.getUserId();
+                    ImmutableUser self = networkClient.getUserInfo(myId);
+                    self.setImage(networkClient.getProfilePicture(myId));
+                    updatedUsers.add(self);
 
-                    // Update each friends
-                    for (long id : newFriendIds) {
-                        // Get online values
-                        ImmutableUser onlineValues = networkClient.getUserInfo(id);
-                        // Fetch Image
-                        Bitmap image = ServiceContainer.getNetworkClient().getProfilePicture(id);
-                        onlineValues.setImage(image);
+                    // Fetch friends via listFriendPos
+                    Set<ImmutableUser> listFriendPos =
+                        new HashSet<ImmutableUser>(networkClient.listFriendsPos());
 
-                        if (mUserInstances.get(id) != null) {
-                            User oldFriend = mUserInstances.get(id);
-                            oldFriend.update(onlineValues);
-                            newUserInstances.put(id, oldFriend);
-                        } else {
-                            newUserInstances.put(id, User.createFromContainer(onlineValues));
+                    for (ImmutableUser positionInfos : listFriendPos) {
+                        // get id
+                        long id = positionInfos.getId();
+                        // Get other online info
+                        ImmutableUser onlineInfos = networkClient.getUserInfo(id);
+                        // Get picture
+                        Bitmap image = networkClient.getProfilePicture(id);
+                        // Put all inside container
+                        onlineInfos.setLocation(positionInfos.getLocation());
+                        onlineInfos.setLocationString(positionInfos.getLocationString());
+                        onlineInfos.setImage(image);
+
+                        // Put friend in Set
+                        updatedUsers.add(onlineInfos);
+                    }
+
+                    // Get near Events
+                    Set<Long> nearEventIds =
+                        new HashSet<Long>(networkClient.getPublicEvents(settingsManager.getLocation()
+                            .getLatitude(), settingsManager.getLocation().getLongitude(), settingsManager
+                            .getNearEventsMaxDistance()));
+
+                    // Update all cached event if needed
+                    for (long id : mEventIds) {
+                        // Get event infos
+                        ImmutableEvent onlineInfos = networkClient.getEventInfo(id);
+                        // Check if event needs to be kept
+                        if (nearEventIds.contains(id) || (onlineInfos.getCreatorId() == myId)
+                            || onlineInfos.getParticipantIds().contains(myId)) {
+                            // if so, put it in Set
+                            updatedEvents.add(onlineInfos);
+                            updatedUsers.add(onlineInfos.getImmCreator());
                         }
                     }
 
-                    mUserInstances = newUserInstances;
+                    // Update users from invitations
+                    for (Invitation invitation : Cache.this.getAllInvitations()) {
+                        if (invitation.getType() == Invitation.FRIEND_INVITATION) {
+                            // get id
+                            long id = invitation.getUser().getId();
+                            // Get online info
+                            ImmutableUser onlineInfos = networkClient.getUserInfo(id);
+                            // Get picture
+                            Bitmap image = networkClient.getProfilePicture(id);
+                            // Put all inside container
+                            onlineInfos.setImage(image);
 
-                    // TODO : Update Events
+                            // Put friend in Set
+                            updatedUsers.add(onlineInfos);
+                        }
+                    }
+
+                    // Put new values in cache
+                    Cache.this.keepOnlyTheseUsers(updatedUsers);
+                    Cache.this.keepOnlyTheseEvents(updatedEvents);
+
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "SmartMapClientException : " + e);
@@ -1037,25 +1144,17 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void updateInvitation(ImmutableInvitation invitation) {
-        // TODO
+    private synchronized void keepOnlyTheseEvents(Set<ImmutableEvent> events) {
+        mEventIds.clear();
+        mEventInstances.clear();
+        this.putEvents(events);
     }
 
-    // TODO
-    public synchronized boolean updatePublicEvent(ImmutableEvent event) {
-        // Check in cache
-        Event cachedEvent = mEventInstances.get(event.getId());
-
-        if (cachedEvent == null) {
-            // Not in cache
-            cachedEvent = new PublicEvent(event);
-            mEventInstances.put(event.getId(), cachedEvent);
-            return true;
-        } else {
-            // In cache
-            cachedEvent.update(event);
-            return false;
-        }
+    private synchronized void keepOnlyTheseUsers(Set<ImmutableUser> users) {
+        mFriendIds.clear();
+        mUserIds.clear();
+        mUserInstances.clear();
+        this.putUsers(users);
     }
 
     private Invitation processAcceptedFriendInvitation(ImmutableInvitation newInvitation) {
@@ -1097,7 +1196,8 @@ public class Cache {
             newInvitation.setId(id);
             Log.d(TAG, "Database gives id " + id);
             // Phone notification
-            Notifications.newEventNotification(ServiceContainer.getSettingsManager().getContext(), newInvitation);
+            Notifications.newEventNotification(ServiceContainer.getSettingsManager().getContext(),
+                newInvitation);
         }
         return new GenericInvitation(newInvitation);
     }
@@ -1115,6 +1215,110 @@ public class Cache {
                 newInvitation.getUserInfos());
         }
         return new GenericInvitation(newInvitation);
+    }
+
+    private synchronized boolean updateEvent(ImmutableEvent eventInfo) {
+        Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
+        singleton.add(eventInfo);
+        return this.updateEvents(singleton);
+    }
+
+    private synchronized boolean updateEvents(Set<ImmutableEvent> eventInfos) {
+        boolean isListModified = false;
+        for (ImmutableEvent eventInfo : eventInfos) {
+            Event event = this.getEvent(eventInfo.getId());
+            if ((event != null) && event.update(eventInfo)) {
+                isListModified = true;
+            }
+        }
+
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onEventListUpdate();
+            }
+        }
+
+        return isListModified;
+    }
+
+    private synchronized boolean updateFilter(ImmutableFilter filterInfo) {
+        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
+        singleton.add(filterInfo);
+        return this.updateFilters(singleton);
+    }
+
+    private synchronized boolean updateFilters(Set<ImmutableFilter> filterInfos) {
+        boolean isListModified = false;
+
+        for (ImmutableFilter filterInfo : filterInfos) {
+            Filter filter = this.getFilter(filterInfo.getId());
+            if ((filter != null) && filter.update(filterInfo)) {
+                isListModified = true;
+            }
+        }
+
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onFilterListUpdate();
+            }
+        }
+
+        return isListModified;
+    }
+
+    private boolean updateInvitation(ImmutableInvitation invitation) {
+        Set<ImmutableInvitation> singleton = new HashSet<ImmutableInvitation>();
+        singleton.add(invitation);
+        return this.updateInvitations(singleton);
+    }
+
+    private boolean updateInvitations(Set<ImmutableInvitation> invitations) {
+        boolean isListModified = false;
+        for (ImmutableInvitation invitation : invitations) {
+            isListModified = isListModified || this.getInvitation(invitation.getId()).update(invitation);
+        }
+
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onInvitationListUpdate();
+            }
+        }
+
+        return isListModified;
+    }
+
+    /**
+     * OK
+     * 
+     * @param userInfo
+     */
+    private synchronized boolean updateUser(ImmutableUser userInfo) {
+        Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
+        singleton.add(userInfo);
+        return this.updateUsers(singleton);
+    }
+
+    /**
+     * OK
+     * 
+     * @param userInfos
+     */
+    private synchronized boolean updateUsers(Set<ImmutableUser> userInfos) {
+        boolean isListModified = false;
+        for (ImmutableUser userInfo : userInfos) {
+            User user = this.getUser(userInfo.getId());
+            if ((user != null) && user.update(userInfo)) {
+                isListModified = true;
+            }
+        }
+
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onUserListUpdate();
+            }
+        }
+
+        return isListModified;
     }
 
     /**

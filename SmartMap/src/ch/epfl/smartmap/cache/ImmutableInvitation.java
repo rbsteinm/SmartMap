@@ -54,6 +54,10 @@ public final class ImmutableInvitation {
         return mEventInfos;
     }
 
+    public long getHash() {
+        return (mUserInfos.getId() << 2) & mType;
+    }
+
     public long getId() {
         return mId;
     }

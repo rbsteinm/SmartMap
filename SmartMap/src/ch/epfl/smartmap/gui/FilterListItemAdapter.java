@@ -83,10 +83,10 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            mCache.updateFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter
+                            mCache.putFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter
                                 .getFriendIds(), true));
                         } else {
-                            mCache.updateFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter
+                            mCache.putFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter
                                 .getFriendIds(), false));
                         }
                     }

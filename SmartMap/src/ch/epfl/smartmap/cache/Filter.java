@@ -18,7 +18,7 @@ public interface Filter extends Displayable {
     long DEFAULT_FILTER_ID = 0;
 
     Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
-            .getResources(), R.drawable.ic_hashtag);
+        .getResources(), R.drawable.ic_hashtag);
 
     /**
      * Adds a user to the list
@@ -42,6 +42,5 @@ public interface Filter extends Displayable {
 
     boolean isActive();
 
-    void update(ImmutableFilter filter);
-
+    boolean update(ImmutableFilter filterInfo);
 }

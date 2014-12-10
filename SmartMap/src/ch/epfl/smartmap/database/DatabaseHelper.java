@@ -29,6 +29,7 @@ import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableFilter;
 import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -136,6 +137,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     // Table of invitations
     private static final String CREATE_TABLE_PENDING = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING + "("
         + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
+
+    private final Set<Long> receivedInvitationHashs = new HashSet<Long>();
 
     private final SQLiteDatabase mDatabase;
     private final Context mContext;
@@ -251,11 +254,33 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_DATE, invitation.getTimeStamp());
         values.put(KEY_TYPE, invitation.getType());
 
-        if (invitation.getUser() != null) {
-            this.addUser(invitation.getUser().getImmutableCopy());
+        if (invitation.getType() == Invitation.FRIEND_INVITATION) {
+            Log.d(TAG, "NEW FRIEND INVITATION");
+
+            // Get user infos
+            ImmutableUser userInfo = invitation.getUserInfos();
+
+            // Get pending ids
+            Set<Long> pendingIds = this.getPendingFriends();
+
+            Log.d(TAG, "Pending ids before : " + pendingIds);
+
+            if (pendingIds.contains(userInfo.getId())) {
+                // Already stored
+                return Invitation.ALREADY_RECEIVED;
+            } else {
+
+            }
+
+            Log.d(TAG, "Pending ids after : " + this.getPendingFriends());
         }
-        if (invitation.getEvent() != null) {
-            this.addEvent(invitation.getEvent().getImmutableCopy());
+
+        // Add invitation related infos in database
+        if (invitation.getUserInfos() != null) {
+            this.addUser(invitation.getUserInfos());
+        }
+        if (invitation.getEventInfos() != null) {
+            this.addEvent(invitation.getEventInfos());
         }
 
         return mDatabase.insert(TABLE_INVITATIONS, null, values);
@@ -267,7 +292,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * @param user
      *            The user who was sent a request
      */
-    public void addPendingFriend(long id, String name) {
+    public void addPendingFriend(long id) {
         Cursor cursor =
             mDatabase.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
@@ -275,10 +300,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
             values.put(KEY_USER_ID, id);
-            values.put(KEY_NAME, name);
 
             mDatabase.insert(TABLE_PENDING, null, values);
-
         }
         cursor.close();
     }
@@ -629,23 +652,16 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * 
      * @return A list of users who were sent friend requests
      */
-    public Set<ImmutableUser> getPendingFriends() {
-        Set<ImmutableUser> friends = new HashSet<ImmutableUser>();
+    public Set<Long> getPendingFriends() {
+        Set<Long> friends = new HashSet<Long>();
 
         String query = "SELECT  * FROM " + TABLE_PENDING;
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
-        ImmutableUser friend = null;
         if ((cursor != null) && cursor.moveToFirst()) {
             do {
-                long id = cursor.getLong(cursor.getColumnIndex(KEY_USER_ID));
-                friend =
-                    new ImmutableUser(id, cursor.getString(cursor.getColumnIndex(KEY_NAME)),
-                        User.NO_PHONE_NUMBER, User.NO_EMAIL, new Location(""), "", this.getPictureById(id),
-                        false, User.STRANGER);
-
-                friends.add(friend);
+                friends.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
             } while (cursor.moveToNext());
         }
 

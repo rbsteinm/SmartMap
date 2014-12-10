@@ -318,7 +318,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     @Override
-    public void onFriendListUpdate() {
+    public void onUserListUpdate() {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {

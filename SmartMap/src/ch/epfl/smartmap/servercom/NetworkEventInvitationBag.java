@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
+import android.util.Log;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.Invitation;
@@ -14,6 +15,7 @@ import ch.epfl.smartmap.cache.Invitation;
  */
 public class NetworkEventInvitationBag implements InvitationBag {
 
+    private static final String TAG = NetworkEventInvitationBag.class.getSimpleName();
     private final Set<ImmutableInvitation> invitations;
 
     /**
@@ -32,6 +34,10 @@ public class NetworkEventInvitationBag implements InvitationBag {
         for (ImmutableEvent event : hashSet) {
             invitations.add(new ImmutableInvitation(Invitation.NO_ID, null, event, Invitation.UNREAD,
                 timeStamp, Invitation.EVENT_INVITATION));
+            Log.d(
+                TAG,
+                "Network send invitation bag with event #" + event.getId() + "created by "
+                    + event.getImmCreator());
         }
     }
 

@@ -50,7 +50,7 @@ public class FriendsTab extends ListFragment {
         // Initialize the listener
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
-            public void onFriendListUpdate() {
+            public void onUserListUpdate() {
                 mFriendList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
                 ((Activity) mContext).runOnUiThread(new Runnable() {
                     @Override

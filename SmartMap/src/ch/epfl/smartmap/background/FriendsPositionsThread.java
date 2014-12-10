@@ -19,7 +19,7 @@ public class FriendsPositionsThread extends Thread {
             if (!ServiceContainer.getSettingsManager().isOffline()) {
                 try {
                     Log.d(TAG, "Update Friends Positions");
-                    ServiceContainer.getCache().updateFriends(
+                    ServiceContainer.getCache().putUsers(
                         new HashSet<ImmutableUser>(ServiceContainer.getNetworkClient().listFriendsPos()));
                 } catch (SmartMapClientException e) {
                     Log.e(InvitationsService.class.getSimpleName(), "Network error: " + e);
