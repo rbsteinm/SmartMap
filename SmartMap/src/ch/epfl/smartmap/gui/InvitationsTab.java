@@ -128,8 +128,11 @@ public class InvitationsTab extends ListFragment {
 
                     @Override
                     public void onSuccess() {
-                        // We show the user's informations
-                        InvitationsTab.this.startActivity(invitation.getIntent());
+                        // We need to get the invitation from the cache as it
+                        // has been modified
+                        Invitation updated = ServiceContainer.getCache().getInvitation(invitation.getId());
+                        // We run it's intent
+                        InvitationsTab.this.startActivity(updated.getIntent());
                     }
                 });
             }
@@ -158,6 +161,12 @@ public class InvitationsTab extends ListFragment {
                         ((Activity) mContext).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                // Remove invitation from list
+                                mInvitationList.remove(invitation);
+                                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
+                                    mInvitationList));
+
+                                // Confirm decline
                                 Toast.makeText(mContext, mContext.getString(R.string.decline_confirm),
                                     Toast.LENGTH_SHORT).show();
                             }

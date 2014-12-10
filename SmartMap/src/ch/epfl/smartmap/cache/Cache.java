@@ -95,7 +95,7 @@ public class Cache {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
                             ImmutableUser newFriend =
-                                ServiceContainer.getNetworkClient().acceptInvitation(invitation.getId());
+                                ServiceContainer.getNetworkClient().acceptInvitation(invitation.getUser().getId());
                             Cache.this.putUser(newFriend);
                             break;
                         case Invitation.EVENT_INVITATION:
