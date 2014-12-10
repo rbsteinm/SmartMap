@@ -3,6 +3,7 @@ package ch.epfl.smartmap.cache;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Static Database
@@ -58,7 +59,7 @@ public class MockDB {
     // MARION.getName(), new GregorianCalendar(2014, 11, 20), new GregorianCalendar(2014, 11, 20),
     // new Location("Marion's"));
 
-    public static final ArrayList<Displayable> FRIENDS_LIST = new ArrayList<Displayable>(Arrays.asList(
+    public static final List<Displayable> FRIENDS_LIST = new ArrayList<Displayable>(Arrays.asList(
         JULIEN, ALAIN, ROBIN, MATTHIEU, NICOLAS, MARION, RAPHAEL, HUGO, GUILLAUME, SELINE, CYRIL, PIETRO,
         CHRISTIE, MARIE));
 
@@ -67,7 +68,7 @@ public class MockDB {
 
     public static final Filter EPFL_FRIENDS = new DefaultFilter(new ImmutableFilter(2, "EPFL Friends",
         new HashSet<Long>(), false));
-    public static final ArrayList<Filter> FILTER_LIST = new ArrayList<Filter>(Arrays.asList(SWENG_TEAM,
+    public static final List<Filter> FILTER_LIST = new ArrayList<Filter>(Arrays.asList(SWENG_TEAM,
         EPFL_FRIENDS));
 
     public static void fillFilters() {

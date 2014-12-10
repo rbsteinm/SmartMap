@@ -44,9 +44,12 @@ public class EventInformationActivity extends ListActivity {
     private Event mEvent;
     private TextView mEventTitle;
     private TextView mEventCreator;
-    private TextView mStart;
-    private TextView mEnd;
+    private TextView mStartDate;
+    private TextView mEndDate;
+    private TextView mStartHour;
+    private TextView mEndHour;
     private TextView mEventDescription;
+    private CheckBox mGoingCheckBox;
     private boolean mGoingChecked;
     private List<User> mParticipantsList;
     private Set<Long> mParticipantIdsList;
@@ -74,18 +77,30 @@ public class EventInformationActivity extends ListActivity {
         mEventCreator = (TextView) this.findViewById(R.id.show_event_info_creator);
         mEventCreator.setText(mEvent.getCreator().getName());
 
-        mStart = (TextView) this.findViewById(R.id.show_event_info_start);
-        mEnd = (TextView) this.findViewById(R.id.show_event_info_end);
+        mStartDate = (TextView) this.findViewById(R.id.show_event_info_start_date);
+        mStartHour = (TextView) this.findViewById(R.id.show_event_info_start_hour);
+        mEndDate = (TextView) this.findViewById(R.id.show_event_info_end_date);
+        mEndHour = (TextView) this.findViewById(R.id.show_event_info_end_hour);
 
-        String startString =
-            Utils.getDateString(mEvent.getStartDate()) + " " + Utils.getTimeString(mEvent.getStartDate());
-        String endString = Utils.getDateString(mEvent.getEndDate()) + " " + Utils.getTimeString((mEvent.getEndDate()));
+        mGoingCheckBox = (CheckBox) this.findViewById(R.id.event_info_going_checkbox);
 
-        mStart.setText(startString);
-        mEnd.setText(endString);
+        if (mEvent.isGoing()) {
+            mGoingChecked = true;
+            mGoingCheckBox.setChecked(mGoingChecked);
+        }
+
+        String startDate = Utils.getDateString(mEvent.getStartDate());
+        String startHour = Utils.getTimeString(mEvent.getStartDate());
+        String endDate = Utils.getDateString(mEvent.getEndDate());
+        String endHour = Utils.getTimeString(mEvent.getEndDate());
+
+        mStartDate.setText(startDate);
+        mStartHour.setText(startHour);
+        mEndDate.setText(endDate);
+        mEndHour.setText(endHour);
 
         mEventDescription = (TextView) this.findViewById(R.id.show_event_info_description);
-        if ((mEvent.getDescription() == null) || mEvent.getDescription().equals("")) {
+        if ((mEvent.getDescription() == null) || mEvent.getDescription().isEmpty()) {
             mEventDescription.setText(this.getString(R.string.show_event_info_event_no_description));
         } else {
             mEventDescription.setText(mEvent.getDescription());
@@ -104,11 +119,11 @@ public class EventInformationActivity extends ListActivity {
      * @author SpicyCH
      */
     public void inviteFriendsToEvent(View v) {
-
         // Hack so that SonarQube doesn't complain that v is not used
         Log.d(TAG, "View with id " + v.getId() + " clicked");
         Intent inviteFriends = new Intent(this, InviteFriendsActivity.class);
-        this.startActivityForResult(inviteFriends, 1);
+        inviteFriends.putExtra("EVENT", mEvent.getId());
+        this.startActivity(inviteFriends);
     }
 
     @Override
@@ -126,6 +141,7 @@ public class EventInformationActivity extends ListActivity {
      * @author agpmilli
      */
     public void onCheckboxClicked(View v) {
+
         if (!(v instanceof CheckBox)) {
             throw new IllegalArgumentException("This method requires v to be a CheckBox");
         }
@@ -134,7 +150,64 @@ public class EventInformationActivity extends ListActivity {
 
         switch (v.getId()) {
             case R.id.event_info_going_checkbox:
-                mGoingChecked = checkBox.isChecked();
+                if (checkBox.isChecked()) {
+                    ServiceContainer.getCache().addParticipantsToEvent(
+                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
+                        new NetworkRequestCallback() {
+                            @Override
+                            public void onFailure() {
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.add_participant_failure),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.add_participant_success),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        });
+                } else {
+                    ServiceContainer.getCache().removeParticipantsFromEvent(
+                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
+                        new NetworkRequestCallback() {
+                            @Override
+                            public void onFailure() {
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.add_participant_failure),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onSuccess() {
+                                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(EventInformationActivity.this,
+                                            EventInformationActivity.this.getString(R.string.add_participant_success),
+                                            Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        });
+                }
                 break;
             default:
                 break;
@@ -206,8 +279,6 @@ public class EventInformationActivity extends ListActivity {
 
             long eventId = this.getIntent().getLongExtra(EVENT_KEY, -1);
 
-            Log.d(TAG, "Received event id " + eventId);
-
             mEvent = ServiceContainer.getCache().getEvent(eventId);
 
             this.initializeGUI();
@@ -239,69 +310,37 @@ public class EventInformationActivity extends ListActivity {
      * Update list of participant when we click on Going checkBox
      */
     private void updateCurrentList() {
-        Log.d(TAG, "event : " + ServiceContainer.getCache().getEvent(mEvent.getId()));
+
         mParticipantIdsList = ServiceContainer.getCache().getEvent(mEvent.getId()).getParticipantIds();
-
         ServiceContainer.getSearchEngine().findUserByIds(mParticipantIdsList, new SearchRequestCallback<Set<User>>() {
-
             @Override
             public void onNetworkError() {
-                Toast.makeText(EventInformationActivity.this,
-                    EventInformationActivity.this.getString(R.string.refresh_participants_network_error),
-                    Toast.LENGTH_SHORT).show();
+                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(EventInformationActivity.this,
+                            EventInformationActivity.this.getString(R.string.refresh_participants_network_error),
+                            Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onNotFound() {
-                Toast.makeText(EventInformationActivity.this,
-                    EventInformationActivity.this.getString(R.string.refresh_participants_not_found),
-                    Toast.LENGTH_SHORT).show();
+                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(EventInformationActivity.this,
+                            EventInformationActivity.this.getString(R.string.refresh_participants_not_found),
+                            Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
 
             @Override
             public void onResult(Set<User> result) {
                 mParticipantsList = new ArrayList<User>(result);
-                if (!mGoingChecked) {
-                    ServiceContainer.getCache().addParticipantsToEvent(
-                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
-                        new NetworkRequestCallback() {
-                            @Override
-                            public void onFailure() {
-                                // TODO
-                                // Toast.makeText(EventInformationActivity.this,
-                                // EventInformationActivity.this.getString(R.string.add_participant_failure),
-                                // Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onSuccess() {
-                                // TODO
-                                // Toast.makeText(EventInformationActivity.this,
-                                // EventInformationActivity.this.getString(R.string.add_participant_success),
-                                // Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                } else {
-                    ServiceContainer.getCache().removeParticipantsFromEvent(
-                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
-                        new NetworkRequestCallback() {
-                            @Override
-                            public void onFailure() {
-                                // TODO
-                                // Toast.makeText(EventInformationActivity.this,
-                                // EventInformationActivity.this.getString(R.string.add_participant_failure),
-                                // Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onSuccess() {
-                                // TODO
-                                // Toast.makeText(EventInformationActivity.this,
-                                // EventInformationActivity.this.getString(R.string.add_participant_success),
-                                // Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                }
 
                 EventInformationActivity.this.runOnUiThread(new Runnable() {
                     @Override

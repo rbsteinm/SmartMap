@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -12,11 +13,11 @@ import android.view.View;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.GenericInvitation;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.Notifications;
 import ch.epfl.smartmap.gui.InvitationListItemAdapter;
+import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
  * This activity displays the notifications received
@@ -28,6 +29,8 @@ public class InvitationPanelActivity extends ListActivity {
     @SuppressWarnings("unused")
     private static final String TAG = InvitationPanelActivity.class.getSimpleName();
 
+    private List<Invitation> mInvitationList;
+
     private Context mContext;
 
     @Override
@@ -37,6 +40,31 @@ public class InvitationPanelActivity extends ListActivity {
         Notifications.cancelNotification(this);
 
         mContext = this.getBaseContext();
+
+        mInvitationList = new ArrayList<Invitation>(ServiceContainer.getCache().getAllInvitations());
+
+        this.setListAdapter(new InvitationListItemAdapter(mContext, mInvitationList));
+
+        // Initialize the listener
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onInvitationListUpdate() {
+                InvitationPanelActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext,
+                            mInvitationList));
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.show_events, menu);
+        return true;
     }
 
     @Override
@@ -45,30 +73,6 @@ public class InvitationPanelActivity extends ListActivity {
         InvitationPanelActivity.this.startActivity(invitationIntent);
 
         super.onListItemClick(l, v, position, id);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext,
-            new ArrayList<Invitation>(ServiceContainer.getCache().getInvitations(
-                new Cache.SearchFilter<Invitation>() {
-                    @Override
-                    public boolean filter(Invitation item) {
-                        // Get FriendInvitations
-                        return item.getType() == Invitation.FRIEND_INVITATION;
-                    }
-                }))));
-
-        ServiceContainer.getCache().readAllInvitations();
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.show_events, menu);
-        return true;
     }
 
     @Override
@@ -82,5 +86,15 @@ public class InvitationPanelActivity extends ListActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, new ArrayList<Invitation>(
+            ServiceContainer.getCache().getAllInvitations())));
+
+        ServiceContainer.getCache().readAllInvitations();
+
     }
 }

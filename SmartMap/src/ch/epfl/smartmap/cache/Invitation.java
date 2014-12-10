@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.cache;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 
 /**
  * Describes a generic invitation of the app
@@ -8,6 +9,8 @@ import android.content.Intent;
  * @author agpmilli
  */
 public interface Invitation {
+
+    long NO_ID = -1;
 
     /**
      * int representing invitation status
@@ -27,6 +30,11 @@ public interface Invitation {
     long getId();
 
     /**
+     * @return invitation's image icon
+     */
+    Bitmap getImage();
+
+    /**
      * @return immutable copy of this invitation
      */
     ImmutableInvitation getImmutableCopy();
@@ -42,9 +50,14 @@ public interface Invitation {
     int getStatus();
 
     /**
-     * @return invitation's text
+     * @return invitation's subtitle
      */
-    String getText();
+    String getSubtitle();
+
+    /**
+     * @return invitation's timestamp
+     */
+    long getTimeStamp();
 
     /**
      * @return invitation's title

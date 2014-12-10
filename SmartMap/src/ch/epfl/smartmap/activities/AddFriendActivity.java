@@ -27,15 +27,11 @@ import ch.epfl.smartmap.gui.FriendListItemAdapter;
 import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
 
 /**
- * This Activity displays a list of users from the DB and lets you send them
- * friend requests
+ * This Activity displays a list of users from the DB and lets you send them friend requests
  * 
  * @author rbsteinm
  */
 public class AddFriendActivity extends ListActivity {
-
-    @SuppressWarnings("unused")
-    private static final String TAG = AddFriendActivity.class.getSimpleName();
 
     private SearchView mSearchBar;
 
@@ -129,8 +125,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this.getBaseContext(),
-                        "Couldn't find friends due to a network error. Please try again later.", Toast.LENGTH_LONG)
-                        .show();
+                            "Couldn't find friends due to a network error. Please try again later.", Toast.LENGTH_LONG)
+                            .show();
                 }
             });
         }
@@ -141,7 +137,7 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this.getBaseContext(), "No user found for this query.",
-                        Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -152,15 +148,14 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                        new ArrayList<User>(result)));
+                            new ArrayList<User>(result)));
                 }
             });
         }
     }
 
     /**
-     * Asynchronous task that sends a friend request to the friend whose id is
-     * given in parameter
+     * Asynchronous task that sends a friend request to the friend whose id is given in parameter
      * 
      * @author rbsteinm
      */
@@ -176,7 +171,7 @@ public class AddFriendActivity extends ListActivity {
                         @Override
                         public void run() {
                             Toast.makeText(AddFriendActivity.this.getBaseContext(),
-                                "Friend request sent couldn't be sent.", Toast.LENGTH_SHORT).show();
+                                    "Friend request sent couldn't be sent.", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -187,7 +182,7 @@ public class AddFriendActivity extends ListActivity {
                         @Override
                         public void run() {
                             Toast.makeText(AddFriendActivity.this.getBaseContext(), "Friend request sent !",
-                                Toast.LENGTH_SHORT).show();
+                                    Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

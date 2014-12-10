@@ -11,6 +11,8 @@ import java.util.Set;
 
 import android.location.Location;
 import android.os.AsyncTask;
+import android.util.Log;
+import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
@@ -30,6 +32,8 @@ public final class CachedSearchEngine implements SearchEngine {
     private static final CachedSearchEngine ONE_INSTANCE = new CachedSearchEngine();
 
     private static final float LOCATION_DISTANCE_THRESHHOLD = 0;
+
+    private static final String TAG = UserInformationActivity.class.getSimpleName();
 
     private final Map<String, Set<Long>> mPreviousOnlineStrangerSearches;
     private final List<Location> mPreviousOnlineEventSearchQueries;
@@ -82,6 +86,7 @@ public final class CachedSearchEngine implements SearchEngine {
                             networkResult = ServiceContainer.getNetworkClient().getEventInfo(id);
                         } catch (SmartMapClientException e) {
                             networkResult = null;
+                            Log.e(TAG, "Error while finding public events by Ids" + e);
                         }
 
                         if (networkResult != null) {
@@ -137,6 +142,7 @@ public final class CachedSearchEngine implements SearchEngine {
                                 networkResult = ServiceContainer.getNetworkClient().getEventInfo(id);
                             } catch (SmartMapClientException e) {
                                 networkResult = null;
+                                Log.e(TAG, "Error while finding public events by Ids" + e);
                             }
 
                             if (networkResult != null) {
@@ -218,6 +224,7 @@ public final class CachedSearchEngine implements SearchEngine {
                                 return null;
                             }
                         } catch (SmartMapClientException e) {
+                            Log.e(TAG, "Error while finding strangers by Ids" + e);
                             if (callback != null) {
                                 callback.onNetworkError();
                             }
@@ -256,6 +263,7 @@ public final class CachedSearchEngine implements SearchEngine {
                             }
                         }
                     } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Error while finding strangers by query" + e);
                         if (callback != null) {
                             callback.onNetworkError();
                         }
@@ -311,6 +319,7 @@ public final class CachedSearchEngine implements SearchEngine {
                         try {
                             networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
                         } catch (SmartMapClientException e) {
+                            Log.e(TAG, "Error while finding public users by Ids" + e);
                             networkResult = null;
                         }
 
@@ -360,6 +369,7 @@ public final class CachedSearchEngine implements SearchEngine {
                             new HashSet<Long>(ServiceContainer.getNetworkClient().getPublicEvents(
                                 location.getLatitude(), location.getLongitude(), radius));
                     } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Error while getting all near events by Ids" + e);
                         if (callback != null) {
                             if (callback != null) {
                                 callback.onNetworkError();
@@ -393,7 +403,7 @@ public final class CachedSearchEngine implements SearchEngine {
     @Override
     public List<Displayable> sendQuery(String query, Type searchType) {
         query = query.toLowerCase(Locale.US);
-        ArrayList<Displayable> results = new ArrayList<Displayable>();
+        List<Displayable> results = new ArrayList<Displayable>();
 
         switch (searchType) {
             case ALL:
