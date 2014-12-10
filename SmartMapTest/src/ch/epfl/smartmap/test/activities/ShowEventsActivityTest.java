@@ -50,10 +50,16 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
         this.getActivity().finish();
     }
 
-    public void testCanClickOnAnEvent() {
+    public void testCanClickOnAnEvent() throws InterruptedException {
 
         // Clicks the first element of the list
         onView(withId(0)).perform(ViewActions.click());
+        // Espresso.onData(anything()).inAdapterView(withContentDescription("listview")).atPosition(0)
+        // .perform(ViewActions.click());
+
+        // The dialog may need a network access that might take some time to be
+        // displayed
+        Thread.sleep(2000);
 
         // If the AlertDialog has been opened, then the button2 must be
         // displayed. Espresso sometimes cannot find this view, but relaunch the
