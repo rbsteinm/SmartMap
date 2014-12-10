@@ -95,7 +95,8 @@ public class Cache {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
                             ImmutableUser newFriend =
-                                ServiceContainer.getNetworkClient().acceptInvitation(invitation.getUser().getId());
+                                ServiceContainer.getNetworkClient().acceptInvitation(
+                                    invitation.getUser().getId());
                             Cache.this.putUser(newFriend);
                             break;
                         case Invitation.EVENT_INVITATION:
@@ -202,7 +203,8 @@ public class Cache {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
                             // Decline online
-                            ServiceContainer.getNetworkClient().declineInvitation(invitation.getId());
+                            ServiceContainer.getNetworkClient().declineInvitation(
+                                invitation.getUser().getId());
                             break;
                         case Invitation.EVENT_INVITATION:
                             // No interaction needed here
@@ -684,7 +686,8 @@ public class Cache {
                 mEventInstances.put(newEvent.getId(), new PublicEvent(eventInfo));
             }
 
-            // Update Events to need to be updated & put true if update didnt call listeners
+            // Update Events to need to be updated & put true if update didnt
+            // call listeners
             needToCallListeners = !this.updateEvents(eventsToUpdate) && needToCallListeners;
 
             // Update Listeners if needed
@@ -1064,7 +1067,8 @@ public class Cache {
                     // Get settings
                     SettingsManager settingsManager = ServiceContainer.getSettingsManager();
 
-                    // Sets with new values (avoid calling multiple times the listeners)
+                    // Sets with new values (avoid calling multiple times the
+                    // listeners)
                     Set<ImmutableUser> updatedUsers = new HashSet<ImmutableUser>();
                     Set<ImmutableEvent> updatedEvents = new HashSet<ImmutableEvent>();
 
