@@ -102,10 +102,9 @@ public class InvitationsService extends Service {
     private class InvitationsRunnable implements Runnable {
         @Override
         public void run() {
-            new AsyncTask<Void, Void, InvitationBag>() {
+            new AsyncTask<Void, Void, Void>() {
                 @Override
-                protected InvitationBag doInBackground(Void... arg0) {
-                    InvitationBag nb = null;
+                protected Void doInBackground(Void... arg0) {
                     try {
                         // Get friends invitations
                         InvitationBag userInvitBag = ServiceContainer.getNetworkClient().getInvitations();
@@ -113,11 +112,11 @@ public class InvitationsService extends Service {
                         // Get event invitations
                         InvitationBag eventInvitBag = ServiceContainer.getNetworkClient().getInvitations();
                         ServiceContainer.getCache().putInvitations(eventInvitBag.getInvitations());
-                        Log.d(TAG, "Successfully fetched invitations : " + nb.getInvitations());
+                        Log.d(TAG, "Successfully fetched invitations");
                     } catch (SmartMapClientException e) {
                         Log.e(TAG, "Couldn't retrieve invitations due to a server error: " + e);
                     }
-                    return nb;
+                    return null;
                 }
             }.execute();
             mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
