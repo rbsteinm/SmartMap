@@ -21,7 +21,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserInterface;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
@@ -51,7 +51,7 @@ public class EventInformationActivity extends ListActivity {
     private TextView mEventDescription;
     private CheckBox mGoingCheckBox;
     private boolean mGoingChecked;
-    private List<User> mParticipantsList;
+    private List<UserInterface> mParticipantsList;
     private Set<Long> mParticipantIdsList;
     private TextView mPlaceNameAndCountry;
 
@@ -312,7 +312,7 @@ public class EventInformationActivity extends ListActivity {
     private void updateCurrentList() {
 
         mParticipantIdsList = ServiceContainer.getCache().getEvent(mEvent.getId()).getParticipantIds();
-        ServiceContainer.getSearchEngine().findUserByIds(mParticipantIdsList, new SearchRequestCallback<Set<User>>() {
+        ServiceContainer.getSearchEngine().findUserByIds(mParticipantIdsList, new SearchRequestCallback<Set<UserInterface>>() {
             @Override
             public void onNetworkError() {
                 EventInformationActivity.this.runOnUiThread(new Runnable() {
@@ -339,8 +339,8 @@ public class EventInformationActivity extends ListActivity {
             }
 
             @Override
-            public void onResult(Set<User> result) {
-                mParticipantsList = new ArrayList<User>(result);
+            public void onResult(Set<UserInterface> result) {
+                mParticipantsList = new ArrayList<UserInterface>(result);
 
                 EventInformationActivity.this.runOnUiThread(new Runnable() {
                     @Override

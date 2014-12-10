@@ -36,7 +36,7 @@ public interface CacheInterface {
     /**
      * @return all Friends contained in the Cache
      */
-    Set<User> getAllFriends();
+    Set<UserInterface> getAllFriends();
 
     /**
      * @return all Events to which we are participating
@@ -76,7 +76,7 @@ public interface CacheInterface {
     /**
      * @return all Friends that should be displayed on the map
      */
-    Set<User> getAllVisibleFriends();
+    Set<UserInterface> getAllVisibleFriends();
 
     /**
      * @param id
@@ -99,14 +99,14 @@ public interface CacheInterface {
      * @return the Friend with corresponding id, {@code null} if it is not in
      *         Cache
      */
-    User getFriend(long id);
+    UserInterface getFriend(long id);
 
     /**
      * @param ids
      *            Set containing Friend ids
      * @return a Set containing the corresponding found Friends.
      */
-    User getFriends(Set<Long> ids);
+    UserInterface getFriends(Set<Long> ids);
 
     /**
      * @param id
@@ -114,14 +114,14 @@ public interface CacheInterface {
      * @return the Stranger with corresponding id, {@code null} if it is not in
      *         Cache
      */
-    User getStranger(long id);
+    UserInterface getStranger(long id);
 
     /**
      * @param ids
      *            Set containing Stranger ids
      * @return a Set containing the corresponding found Strangers.
      */
-    User getStrangers(Set<Long> ids);
+    UserInterface getStrangers(Set<Long> ids);
 
     /**
      * @param id
@@ -129,14 +129,14 @@ public interface CacheInterface {
      * @return the Stranger with corresponding id, {@code null} if it is not in
      *         Cache
      */
-    User getUser(long id);
+    UserInterface getUser(long id);
 
     /**
      * @param ids
      *            Set containing User ids
      * @return a Set containing the corresponding found Users.
      */
-    User getUsers(Set<Long> ids);
+    UserInterface getUsers(Set<Long> ids);
 
     /**
      * Completely wipes values and fill the Cache with what is contained in the

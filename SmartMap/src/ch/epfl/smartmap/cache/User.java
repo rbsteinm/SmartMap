@@ -1,54 +1,102 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
- * Describes a generic user of the app
- * 
- * @author ritterni
+ * @author jfperren
  */
+public abstract class User implements UserInterface {
 
-public interface User extends Displayable {
+    private final long mId;
+    private String mName;
+    private Bitmap mImage;
 
-    int STRANGER = 0;
-    int FRIEND = 1;
-    int SELF = 2;
+    protected User(long id, String name, Bitmap image) {
+        mId = (id >= 0) ? id : UserInterface.NO_ID;
+        mName = (name != null) ? name : UserInterface.NO_NAME;
+        mImage = (image != null) ? Bitmap.createBitmap(image) : UserInterface.NO_IMAGE;
+    }
 
-    long NO_ID = -1;
-    String NO_NAME = "Unknown User";
-    Bitmap NO_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
-        .getResources(), R.drawable.ic_default_user);
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object that) {
+        return (that != null) && (that instanceof UserInterface) && (mId == ((UserInterface) that).getId());
+    }
 
-    String NO_PHONE_NUMBER = "No phone Number";
-    String NO_EMAIL = "No email";
-    Calendar NO_LAST_SEEN = GregorianCalendar.getInstance();
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getID()
+     */
+    @Override
+    public long getId() {
+        return mId;
+    }
 
-    User NOBODY =
-        new Stranger(new ImmutableUser(NO_ID, NO_NAME, null, null, null, null, NO_IMAGE, false, -1));
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
+     */
+    @Override
+    public Bitmap getImage() {
+        return mImage;
+    }
 
-    // ???
-    int IMAGE_QUALITY = 100;
-    long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
-    int PICTURE_WIDTH = 50;
-    int PICTURE_HEIGHT = 50;
-    double NO_LATITUDE = 0.0;
-    double NO_LONGITUDE = 0.0;
+    @Override
+    public ImmutableUser getImmutableCopy() {
+        return new ImmutableUser(mId, mName, null, null, null, null, mImage, false, this.getFriendship());
+    }
 
-    int getFriendship();
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getName()
+     */
+    @Override
+    public String getName() {
+        return mName;
+    }
 
-    ImmutableUser getImmutableCopy();
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
+     */
+    @Override
+    public String getTitle() {
+        return this.getName();
+    }
 
-    String getName();
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#hashcode
+     */
+    @Override
+    public int hashCode() {
+        return (int) mId;
+    }
 
-    boolean isBlocked();
+    @Override
+    public void update(ImmutableUser user) {
+        if (user.getName() != null) {
+            mName = user.getName();
+        }
+        if (user.getImage() != null) {
+            mImage = user.getImage();
+        }
+    }
 
-    boolean isVisible();
-
-    void update(ImmutableUser user);
+    public static UserInterface createFromContainer(ImmutableUser userInfos) {
+        switch (userInfos.getFriendship()) {
+            case UserInterface.FRIEND:
+                return new Friend(userInfos.getId(), userInfos.getName(), userInfos.getImage(),
+                    userInfos.getLocation(), userInfos.getLocationString(), userInfos.isBlocked());
+            case UserInterface.STRANGER:
+                return new Stranger(userInfos.getId(), userInfos.getName(), userInfos.getImage());
+            case UserInterface.SELF:
+                return new Self();
+            default:
+                throw new IllegalArgumentException("Unknown type of user");
+        }
+    }
 }

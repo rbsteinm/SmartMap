@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.map.CircularMarkerIconMaker;
@@ -23,38 +24,32 @@ import com.google.android.gms.maps.model.LatLng;
  * @author ritterni
  */
 
-public final class Friend extends AbstractUser {
+public final class Friend extends User {
 
     private String mPhoneNumber;
     private String mEmail;
     private String mLocationString;
     private Location mLocation;
+    private boolean mIsBlocked;
 
     private final MarkerIconMaker mMarkerIconMaker;
 
-    protected Friend(ImmutableUser user) {
-        super(user);
+    protected Friend(long id, String name, Bitmap image, Location location, String locationString,
+        boolean isBlocked) {
+        super(id, name, image);
 
-        if (user.getPhoneNumber() == null) {
-            mPhoneNumber = User.NO_PHONE_NUMBER;
+        if (locationString == null) {
+            mLocationString = UserInterface.NO_LOCATION_STRING;
         } else {
-            mPhoneNumber = user.getPhoneNumber();
+            mLocationString = locationString;
         }
-        if (user.getEmail() == null) {
-            mEmail = User.NO_EMAIL;
+        if (location == null) {
+            mLocation = UserInterface.NO_LOCATION;
         } else {
-            mEmail = user.getEmail();
+            mLocation = new Location(location);
         }
-        if (user.getLocationString() == null) {
-            mLocationString = User.NO_LOCATION_STRING;
-        } else {
-            mLocationString = user.getLocationString();
-        }
-        if (user.getLocation() == null) {
-            mLocation = User.NO_LOCATION;
-        } else {
-            mLocation = new Location(user.getLocation());
-        }
+
+        mIsBlocked = isBlocked;
 
         mMarkerIconMaker = new CircularMarkerIconMaker(this);
     }
@@ -69,7 +64,7 @@ public final class Friend extends AbstractUser {
      */
     @Override
     public int getFriendship() {
-        return User.FRIEND;
+        return UserInterface.FRIEND;
     }
 
     @Override
@@ -137,11 +132,10 @@ public final class Friend extends AbstractUser {
         return infos;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#isVisible()
-     */
-    @Override
+    public boolean isBlocked() {
+        return mIsBlocked;
+    }
+
     public boolean isVisible() {
         return ServiceContainer.getCache().getAllActiveFilters().contains(this)
             && !mLocation.equals(NO_LOCATION);

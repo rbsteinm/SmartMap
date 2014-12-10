@@ -107,9 +107,11 @@ public class InvitationsService extends Service {
                 protected Void doInBackground(Void... arg0) {
                     try {
                         // Get friends invitations
+                        Log.d(TAG, "Friend invitations");
                         InvitationBag userInvitBag = ServiceContainer.getNetworkClient().getInvitations();
                         ServiceContainer.getCache().putInvitations(userInvitBag.getInvitations());
                         // Get event invitations
+                        Log.d(TAG, "Event invitations");
                         InvitationBag eventInvitBag =
                             ServiceContainer.getNetworkClient().getEventInvitations();
                         ServiceContainer.getCache().putInvitations(eventInvitBag.getInvitations());

@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.cache;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -14,10 +15,10 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * @author jfperren
  */
-public class Stranger extends AbstractUser {
+public class Stranger extends User {
 
-    protected Stranger(ImmutableUser user) {
-        super(user);
+    protected Stranger(long id, String name, Bitmap image) {
+        super(id, name, image);
     }
 
     /*
@@ -26,7 +27,7 @@ public class Stranger extends AbstractUser {
      */
     @Override
     public int getFriendship() {
-        return User.STRANGER;
+        return UserInterface.STRANGER;
     }
 
     /*
@@ -44,7 +45,7 @@ public class Stranger extends AbstractUser {
      */
     @Override
     public Location getLocation() {
-        throw new UnsupportedOperationException();
+        return UserInterface.NO_LOCATION;
     }
 
     /*
@@ -72,14 +73,5 @@ public class Stranger extends AbstractUser {
     @Override
     public String getSubtitle() {
         return "Add as Friend to see more informations";
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#isVisible()
-     */
-    @Override
-    public boolean isVisible() {
-        return false;
     }
 }

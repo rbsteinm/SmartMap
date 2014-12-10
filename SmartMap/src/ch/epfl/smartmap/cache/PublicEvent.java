@@ -40,7 +40,7 @@ public class PublicEvent implements Event {
     private String mDescription;
     private String mLocationString;
 
-    private final User mCreator;
+    private final UserInterface mCreator;
 
     public static final int DEFAULT_ICON = R.drawable.default_event;
 
@@ -57,7 +57,7 @@ public class PublicEvent implements Event {
 
         // Set other values
         mName = (event.getName() != null) ? event.getName() : NO_NAME;
-        mCreator = (event.getCreator() != null) ? event.getCreator() : User.NOBODY;
+        mCreator = (event.getCreator() != null) ? event.getCreator() : UserInterface.NOBODY;
         mStartDate = (event.getStartDate() != null) ? (Calendar) event.getStartDate().clone() : NO_START_DATE;
         mEndDate = (event.getEndDate() != null) ? (Calendar) event.getEndDate().clone() : NO_END_DATE;
         mLocation = (event.getLocation() != null) ? new Location(event.getLocation()) : NO_LOCATION;
@@ -84,7 +84,7 @@ public class PublicEvent implements Event {
      * @see ch.epfl.smartmap.cache.Event#getCreator()
      */
     @Override
-    public User getCreator() {
+    public UserInterface getCreator() {
         return mCreator;
     }
 

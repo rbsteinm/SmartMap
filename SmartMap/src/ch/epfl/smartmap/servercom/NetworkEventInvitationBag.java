@@ -8,7 +8,6 @@ import java.util.TimeZone;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.Invitation;
-import ch.epfl.smartmap.cache.User;
 
 /**
  * @author jfperren
@@ -31,8 +30,8 @@ public class NetworkEventInvitationBag implements InvitationBag {
         long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis();
 
         for (ImmutableEvent event : hashSet) {
-            invitations.add(new ImmutableInvitation(Invitation.NO_ID, User.NOBODY.getImmutableCopy(), event,
-                Invitation.UNREAD, timeStamp, Invitation.EVENT_INVITATION));
+            invitations.add(new ImmutableInvitation(Invitation.NO_ID, null, event, Invitation.UNREAD,
+                timeStamp, Invitation.EVENT_INVITATION));
         }
     }
 

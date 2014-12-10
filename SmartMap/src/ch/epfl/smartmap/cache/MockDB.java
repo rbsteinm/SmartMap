@@ -1,9 +1,5 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * Static Database
@@ -11,92 +7,97 @@ import java.util.List;
  * @author jfperren
  */
 public class MockDB {
-    public static final Friend JULIEN =
-        new Friend(new ImmutableUser(0, "Julien Perrenoud", User.NO_PHONE_NUMBER, User.NO_EMAIL,
-            User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend ALAIN = new Friend(new ImmutableUser(1, "Alain Milliet", User.NO_PHONE_NUMBER,
-        User.NO_EMAIL, User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend ROBIN = new Friend(new ImmutableUser(2, "Robin Genolet", User.NO_PHONE_NUMBER,
-        User.NO_EMAIL, User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend MATTHIEU =
-        new Friend(new ImmutableUser(3, "Matthieu Girod", User.NO_PHONE_NUMBER, User.NO_EMAIL,
-            User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend NICOLAS =
-        new Friend(new ImmutableUser(4, "Nicolas Ritter", User.NO_PHONE_NUMBER, User.NO_EMAIL,
-            User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend MARION = new Friend(new ImmutableUser(5, "Marion Sbai", User.NO_PHONE_NUMBER,
-        User.NO_EMAIL, User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend GUILLAUME =
-        new Friend(new ImmutableUser(6, "Guillaume Clement", User.NO_PHONE_NUMBER, User.NO_EMAIL,
-            User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend SELINE =
-        new Friend(new ImmutableUser(7, "Seline Eeckhout", User.NO_PHONE_NUMBER, User.NO_EMAIL,
-            User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend CYRIL = new Friend(new ImmutableUser(8, "Cyril Pulver", User.NO_PHONE_NUMBER,
-        User.NO_EMAIL, User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend PIETRO =
-        new Friend(new ImmutableUser(9, "Pietro Otelli", User.NO_PHONE_NUMBER, User.NO_EMAIL,
-            User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend CHRISTIE =
-        new Friend(new ImmutableUser(10, "Christie Palmer", User.NO_PHONE_NUMBER, User.NO_EMAIL,
-            User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend MARIE =
-        new Friend(new ImmutableUser(11, "Marie Wermeille", User.NO_PHONE_NUMBER, User.NO_EMAIL,
-            User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend HUGO = new Friend(new ImmutableUser(12, "Hugo Sbai", User.NO_PHONE_NUMBER,
-        User.NO_EMAIL, User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-    public static final Friend RAPHAEL =
-        new Friend(new ImmutableUser(13, "Raphael Steinmann", User.NO_PHONE_NUMBER, User.NO_EMAIL,
-            User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
-
-    // public static final PublicEvent FOOTBALL_TOURNAMENT = new PublicEvent("Football Tournament",
-    // HUGO.getID(), HUGO.getName(), new GregorianCalendar(2014, 11, 23),
-    // new GregorianCalendar(2014, 11, 27), new Location("SmartMapServers"));
-    // public static final PublicEvent CONFERENCE = new PublicEvent("Conference on cellular networks",
-    // HUGO.getID(), HUGO.getName(), new GregorianCalendar(2014, 11, 26),
-    // new GregorianCalendar(2014, 11, 26), new Location("Lausanne"));
-    // public static final PublicEvent MARION_BIRTHDAY = new PublicEvent("Marion's birthday", MARION.getID(),
-    // MARION.getName(), new GregorianCalendar(2014, 11, 20), new GregorianCalendar(2014, 11, 20),
-    // new Location("Marion's"));
-
-    public static final List<Displayable> FRIENDS_LIST = new ArrayList<Displayable>(Arrays.asList(
-        JULIEN, ALAIN, ROBIN, MATTHIEU, NICOLAS, MARION, RAPHAEL, HUGO, GUILLAUME, SELINE, CYRIL, PIETRO,
-        CHRISTIE, MARIE));
-
-    public static final Filter SWENG_TEAM = new DefaultFilter(new ImmutableFilter(1, "Sweng Team",
-        new HashSet<Long>(), true));
-
-    public static final Filter EPFL_FRIENDS = new DefaultFilter(new ImmutableFilter(2, "EPFL Friends",
-        new HashSet<Long>(), false));
-    public static final List<Filter> FILTER_LIST = new ArrayList<Filter>(Arrays.asList(SWENG_TEAM,
-        EPFL_FRIENDS));
-
-    public static void fillFilters() {
-        SWENG_TEAM.addFriend(RAPHAEL.getId());
-        SWENG_TEAM.addFriend(NICOLAS.getId());
-        SWENG_TEAM.addFriend(ALAIN.getId());
-        SWENG_TEAM.addFriend(JULIEN.getId());
-        SWENG_TEAM.addFriend(ROBIN.getId());
-        SWENG_TEAM.addFriend(MATTHIEU.getId());
-        SWENG_TEAM.addFriend(MARION.getId());
-        SWENG_TEAM.addFriend(HUGO.getId());
-
-        EPFL_FRIENDS.addFriend(GUILLAUME.getId());
-        EPFL_FRIENDS.addFriend(SELINE.getId());
-        EPFL_FRIENDS.addFriend(CHRISTIE.getId());
-        EPFL_FRIENDS.addFriend(MARIE.getId());
-
-    }
-
-    public static User getFriend(long id) {
-        for (Displayable friend : FRIENDS_LIST) {
-            if (friend.getId() == id) {
-                return (User) friend;
-            }
-
-        }
-        return null;
-    }
+    // public static final Friend JULIEN =
+    // new Friend(new ImmutableUser(0, "Julien Perrenoud", User.NO_PHONE_NUMBER, User.NO_EMAIL,
+    // User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend ALAIN = new Friend(new ImmutableUser(1, "Alain Milliet",
+    // User.NO_PHONE_NUMBER,
+    // User.NO_EMAIL, User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend ROBIN = new Friend(new ImmutableUser(2, "Robin Genolet",
+    // User.NO_PHONE_NUMBER,
+    // User.NO_EMAIL, User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend MATTHIEU =
+    // new Friend(new ImmutableUser(3, "Matthieu Girod", User.NO_PHONE_NUMBER, User.NO_EMAIL,
+    // User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend NICOLAS =
+    // new Friend(new ImmutableUser(4, "Nicolas Ritter", User.NO_PHONE_NUMBER, User.NO_EMAIL,
+    // User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend MARION = new Friend(new ImmutableUser(5, "Marion Sbai",
+    // User.NO_PHONE_NUMBER,
+    // User.NO_EMAIL, User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend GUILLAUME =
+    // new Friend(new ImmutableUser(6, "Guillaume Clement", User.NO_PHONE_NUMBER, User.NO_EMAIL,
+    // User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend SELINE =
+    // new Friend(new ImmutableUser(7, "Seline Eeckhout", User.NO_PHONE_NUMBER, User.NO_EMAIL,
+    // User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend CYRIL = new Friend(new ImmutableUser(8, "Cyril Pulver",
+    // User.NO_PHONE_NUMBER,
+    // User.NO_EMAIL, User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend PIETRO =
+    // new Friend(new ImmutableUser(9, "Pietro Otelli", User.NO_PHONE_NUMBER, User.NO_EMAIL,
+    // User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend CHRISTIE =
+    // new Friend(new ImmutableUser(10, "Christie Palmer", User.NO_PHONE_NUMBER, User.NO_EMAIL,
+    // User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend MARIE =
+    // new Friend(new ImmutableUser(11, "Marie Wermeille", User.NO_PHONE_NUMBER, User.NO_EMAIL,
+    // User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend HUGO = new Friend(new ImmutableUser(12, "Hugo Sbai", User.NO_PHONE_NUMBER,
+    // User.NO_EMAIL, User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    // public static final Friend RAPHAEL =
+    // new Friend(new ImmutableUser(13, "Raphael Steinmann", User.NO_PHONE_NUMBER, User.NO_EMAIL,
+    // User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, false));
+    //
+    // // public static final PublicEvent FOOTBALL_TOURNAMENT = new PublicEvent("Football Tournament",
+    // // HUGO.getID(), HUGO.getName(), new GregorianCalendar(2014, 11, 23),
+    // // new GregorianCalendar(2014, 11, 27), new Location("SmartMapServers"));
+    // // public static final PublicEvent CONFERENCE = new PublicEvent("Conference on cellular networks",
+    // // HUGO.getID(), HUGO.getName(), new GregorianCalendar(2014, 11, 26),
+    // // new GregorianCalendar(2014, 11, 26), new Location("Lausanne"));
+    // // public static final PublicEvent MARION_BIRTHDAY = new PublicEvent("Marion's birthday",
+    // MARION.getID(),
+    // // MARION.getName(), new GregorianCalendar(2014, 11, 20), new GregorianCalendar(2014, 11, 20),
+    // // new Location("Marion's"));
+    //
+    // public static final List<Displayable> FRIENDS_LIST = new ArrayList<Displayable>(Arrays.asList(
+    // JULIEN, ALAIN, ROBIN, MATTHIEU, NICOLAS, MARION, RAPHAEL, HUGO, GUILLAUME, SELINE, CYRIL, PIETRO,
+    // CHRISTIE, MARIE));
+    //
+    // public static final Filter SWENG_TEAM = new DefaultFilter(new ImmutableFilter(1, "Sweng Team",
+    // new HashSet<Long>(), true));
+    //
+    // public static final Filter EPFL_FRIENDS = new DefaultFilter(new ImmutableFilter(2, "EPFL Friends",
+    // new HashSet<Long>(), false));
+    // public static final List<Filter> FILTER_LIST = new ArrayList<Filter>(Arrays.asList(SWENG_TEAM,
+    // EPFL_FRIENDS));
+    //
+    // public static void fillFilters() {
+    // SWENG_TEAM.addFriend(RAPHAEL.getId());
+    // SWENG_TEAM.addFriend(NICOLAS.getId());
+    // SWENG_TEAM.addFriend(ALAIN.getId());
+    // SWENG_TEAM.addFriend(JULIEN.getId());
+    // SWENG_TEAM.addFriend(ROBIN.getId());
+    // SWENG_TEAM.addFriend(MATTHIEU.getId());
+    // SWENG_TEAM.addFriend(MARION.getId());
+    // SWENG_TEAM.addFriend(HUGO.getId());
+    //
+    // EPFL_FRIENDS.addFriend(GUILLAUME.getId());
+    // EPFL_FRIENDS.addFriend(SELINE.getId());
+    // EPFL_FRIENDS.addFriend(CHRISTIE.getId());
+    // EPFL_FRIENDS.addFriend(MARIE.getId());
+    //
+    // }
+    //
+    // public static User getFriend(long id) {
+    // for (Displayable friend : FRIENDS_LIST) {
+    // if (friend.getId() == id) {
+    // return (User) friend;
+    // }
+    //
+    // }
+    // return null;
+    // }
 
     // public static final ArrayList<Displayable> EVENTS_LIST = new ArrayList<Displayable>(Arrays.asList(
     // FOOTBALL_TOURNAMENT, CONFERENCE, MARION_BIRTHDAY));

@@ -21,7 +21,7 @@ import android.graphics.Rect;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserInterface;
 import ch.epfl.smartmap.util.Utils;
 
 /**
@@ -169,7 +169,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      */
     private void initializeProfilePicture() {
         mProfilePicture =
-            Bitmap.createScaledBitmap(mFriend.getImage(), User.PICTURE_WIDTH, User.PICTURE_HEIGHT, false);
+            Bitmap.createScaledBitmap(mFriend.getImage(), UserInterface.PICTURE_WIDTH, UserInterface.PICTURE_HEIGHT, false);
 
         mProfilePicture =
             Bitmap.createScaledBitmap(mProfilePicture, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,

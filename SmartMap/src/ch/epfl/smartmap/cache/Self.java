@@ -10,7 +10,7 @@ import com.google.android.gms.maps.model.LatLng;
 /**
  * @author jfperren
  */
-public class Self extends AbstractUser {
+public class Self extends User {
 
     /**
      * Constructor
@@ -18,8 +18,8 @@ public class Self extends AbstractUser {
      * @param user
      */
     public Self() {
-        super(new ImmutableUser(ServiceContainer.getSettingsManager().getUserId(), ServiceContainer
-            .getSettingsManager().getUserName(), null, null, null, null, User.NO_IMAGE, false, User.SELF));
+        super(ServiceContainer.getSettingsManager().getUserId(), ServiceContainer.getSettingsManager()
+            .getUserName(), UserInterface.NO_IMAGE);
     }
 
     /*
@@ -28,7 +28,7 @@ public class Self extends AbstractUser {
      */
     @Override
     public int getFriendship() {
-        return User.SELF;
+        return UserInterface.SELF;
     }
 
     /*
@@ -75,14 +75,5 @@ public class Self extends AbstractUser {
     @Override
     public String getSubtitle() {
         return "You are near " + ServiceContainer.getSettingsManager().getLocationName();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#isVisible()
-     */
-    @Override
-    public boolean isVisible() {
-        return false;
     }
 }

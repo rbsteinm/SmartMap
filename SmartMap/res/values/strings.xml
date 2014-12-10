@@ -173,8 +173,10 @@
     <!-- InviteFriendsActivity -->
     <string name="title_activity_invite_friends">Select friends</string>
     <string name="invite_friend_send_button">Invite</string>
+    <string name="invite_friend_success">Invitation sent!</string>
     <string name="invite_friends_success">Invitations sent!</string>
     <string name="invite_friends_no_items_selected">No invitations sent! Did you select any friends?</string>
+    <string name="invite_friend_failure">Error while inviting friend</string>
     <string name="invite_friends_failure">Error while inviting friends</string>
 
     <!-- FacebookFragment -->
@@ -302,7 +304,15 @@
     <!-- ProfileActivity -->
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="hello_world">Hello world!</string>
-
+    
+    <!-- AddfriendActivity -->
+    <string name="add">Add</string>
+    <string name="as_a_friend">as a friend ?</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_friend_network_error">Couldn\'t find friends due to a network error. Please try again later</string>
+    <string name="add_friend_not_found">No user found for this query</string>
+    <string name="add_friend_request_not_sent">Friend request sent couldn\'t be sent</string>
+    <string name="add_friend_request_sent">Friend request sent !</string>
     <!-- Nothing below this line! -->
 
 </resources>

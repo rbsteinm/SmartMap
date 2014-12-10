@@ -72,7 +72,7 @@ public interface Invitation {
     /**
      * @return user
      */
-    User getUser();
+    UserInterface getUser();
 
     /**
      * @param invitation

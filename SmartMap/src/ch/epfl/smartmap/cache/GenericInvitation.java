@@ -21,7 +21,7 @@ public class GenericInvitation implements Invitation, Comparable {
     @SuppressWarnings("unused")
     private static final String TAG = GenericInvitation.class.getSimpleName();
 
-    private User mUser;
+    private UserInterface mUser;
     private Event mEvent;
     private int mStatus;
     private final long mId;
@@ -185,7 +185,7 @@ public class GenericInvitation implements Invitation, Comparable {
             return mUser.getName() + " "
                 + context.getResources().getString(R.string.invitation_want_to_be_your_friend);
         } else if (mType == ImmutableInvitation.EVENT_INVITATION) {
-            return mUser.getName() + " "
+            return mEvent.getCreator().getName() + " "
                 + context.getResources().getString(R.string.invitation_invites_your_to) + " "
                 + mEvent.getName();
         } else if (mType == ImmutableInvitation.ACCEPTED_FRIEND_INVITATION) {
@@ -202,7 +202,7 @@ public class GenericInvitation implements Invitation, Comparable {
     }
 
     @Override
-    public User getUser() {
+    public UserInterface getUser() {
         return mUser;
     }
 

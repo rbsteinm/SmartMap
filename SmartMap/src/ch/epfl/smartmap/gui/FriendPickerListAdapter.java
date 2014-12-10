@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserInterface;
 
 /**
  * Displays each user in a row. The friend items are clickable to signify they are invited. Use ViewHolder pattern as in
@@ -19,7 +19,7 @@ import ch.epfl.smartmap.cache.User;
  * @author SpicyCH
  * @author agpmilli
  */
-public class FriendPickerListAdapter extends ArrayAdapter<User> {
+public class FriendPickerListAdapter extends ArrayAdapter<UserInterface> {
 
     private final Context mContext;
 
@@ -29,7 +29,7 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
      * @param userList
      *            list of users to display
      */
-    public FriendPickerListAdapter(Context context, List<User> userList) {
+    public FriendPickerListAdapter(Context context, List<UserInterface> userList) {
 
         super(context, R.layout.gui_friend_list_item, userList);
 
@@ -42,7 +42,7 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         ViewHolder viewHolder;
-        User user = this.getItem(position);
+        UserInterface user = this.getItem(position);
 
         View newConvertView;
 

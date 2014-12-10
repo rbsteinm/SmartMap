@@ -7,10 +7,10 @@ import java.util.Comparator;
  * 
  * @author ritterni
  */
-public class UserComparator implements Comparator<User> {
+public class UserComparator implements Comparator<UserInterface> {
 
     @Override
-    public int compare(User a, User b) {
+    public int compare(UserInterface a, UserInterface b) {
         return a.getName().compareToIgnoreCase(b.getName());
     }
 }

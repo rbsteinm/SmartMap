@@ -20,7 +20,7 @@ import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.History;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserInterface;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -179,28 +179,28 @@ public final class CachedSearchEngine implements SearchEngine {
      * @return the {@code Friend} with given id, or {@code null} if there was no
      *         match.
      */
-    public void findStrangerById(final long id, final SearchRequestCallback<User> callback) {
+    public void findUserById(final long id, final SearchRequestCallback<UserInterface> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 // Check for live instance
-                User stranger = ServiceContainer.getCache().getStranger(id);
+                UserInterface user = ServiceContainer.getCache().getUser(id);
 
-                if (stranger != null) {
+                if (user != null) {
                     // Found in cache, return
                     if (callback != null) {
-                        callback.onResult(stranger);
+                        callback.onResult(user);
                     }
                     return null;
                 } else {
                     // If not found, check in database
-                    ImmutableUser databaseResult = ServiceContainer.getDatabase().getFriend(id);
+                    ImmutableUser databaseResult = ServiceContainer.getDatabase().getUser(id);
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache
-                        ServiceContainer.getCache().putStranger(databaseResult);
+                        ServiceContainer.getCache().putUser(databaseResult);
                         if (callback != null) {
-                            callback.onResult(ServiceContainer.getCache().getStranger(id));
+                            callback.onResult(ServiceContainer.getCache().getUser(id));
                         }
                         return null;
                     } else {
@@ -210,7 +210,7 @@ public final class CachedSearchEngine implements SearchEngine {
                             networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
                             if (networkResult != null) {
                                 // Match on server, put it in cache
-                                ServiceContainer.getCache().putStranger(networkResult);
+                                ServiceContainer.getCache().putUser(networkResult);
                                 if (callback != null) {
 
                                     callback.onResult(ServiceContainer.getCache().getStranger(id));
@@ -236,79 +236,16 @@ public final class CachedSearchEngine implements SearchEngine {
         }.execute();
     }
 
-    public void findStrangerByQuery(final String query, final SearchRequestCallback<Set<User>> callback) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                Set<User> result = new HashSet<User>();
-
-                if (mPreviousOnlineStrangerSearches.get(query) != null) {
-                    // Fetch in cache
-                    Set<Long> localResult = mPreviousOnlineStrangerSearches.get(query);
-                    for (Long id : localResult) {
-                        User cachedUser = ServiceContainer.getCache().getStranger(id);
-                        if (cachedUser != null) {
-                            result.add(cachedUser);
-                        }
-                    }
-                } else {
-                    // Fetch online
-                    List<ImmutableUser> networkResult;
-                    try {
-                        networkResult = ServiceContainer.getNetworkClient().findUsers(query);
-                        for (ImmutableUser user : networkResult) {
-                            if (user != null) {
-                                ServiceContainer.getCache().putStranger(user);
-                                result.add(ServiceContainer.getCache().getUser(user.getId()));
-                            }
-                        }
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Error while finding strangers by query" + e);
-                        if (callback != null) {
-                            callback.onNetworkError();
-                        }
-                    }
-                }
-                if (callback != null) {
-                    callback.onResult(result);
-                }
-                return null;
-            }
-        }.execute();
-    }
-
-    /**
-     * Search for a {@code Friend} with this id. For performance concerns, this
-     * method should be called in an {@code AsyncTask}.
-     * 
-     * @param id
-     *            long id of {@code Friend}
-     * @return the {@code Friend} with given id, or {@code null} if there was no
-     *         match.
-     */
-    public void findUserById(final long id, final SearchRequestCallback<User> callback) {
-        // Check in cache
-        User user = ServiceContainer.getCache().getUser(id);
-        if (user != null) {
-            // Found
-            if (callback != null) {
-                callback.onResult(user);
-            }
-        } else {
-            this.findStrangerById(id, callback);
-        }
-    }
-
-    public void findUserByIds(final Set<Long> ids, final SearchRequestCallback<Set<User>> callback) {
+    public void findUserByIds(final Set<Long> ids, final SearchRequestCallback<Set<UserInterface>> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 Set<ImmutableUser> immutableResult = new HashSet<ImmutableUser>();
-                Set<User> result = new HashSet<User>();
+                Set<UserInterface> result = new HashSet<UserInterface>();
 
                 for (long id : ids) {
                     // Check for live instance
-                    User stranger = ServiceContainer.getCache().getStranger(id);
+                    UserInterface stranger = ServiceContainer.getCache().getStranger(id);
 
                     if (stranger != null) {
                         // Found in cache, add to set of live instances
@@ -330,13 +267,54 @@ public final class CachedSearchEngine implements SearchEngine {
                     }
                 }
 
-                ServiceContainer.getCache().putStrangers(immutableResult);
+                ServiceContainer.getCache().putUsers(immutableResult);
                 // Retrieve live instances from cache
                 for (ImmutableUser user : immutableResult) {
                     result.add(ServiceContainer.getCache().getStranger(user.getId()));
                 }
 
                 // Give results to the caller
+                if (callback != null) {
+                    callback.onResult(result);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    public void findUserByQuery(final String query, final SearchRequestCallback<Set<UserInterface>> callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                Set<UserInterface> result = new HashSet<UserInterface>();
+
+                if (mPreviousOnlineStrangerSearches.get(query) != null) {
+                    // Fetch in cache
+                    Set<Long> localResult = mPreviousOnlineStrangerSearches.get(query);
+                    for (Long id : localResult) {
+                        UserInterface cachedUser = ServiceContainer.getCache().getStranger(id);
+                        if (cachedUser != null) {
+                            result.add(cachedUser);
+                        }
+                    }
+                } else {
+                    // Fetch online
+                    List<ImmutableUser> networkResult;
+                    try {
+                        networkResult = ServiceContainer.getNetworkClient().findUsers(query);
+                        for (ImmutableUser user : networkResult) {
+                            if (user != null) {
+                                ServiceContainer.getCache().putUser(user);
+                                result.add(ServiceContainer.getCache().getUser(user.getId()));
+                            }
+                        }
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Error while finding strangers by query" + e);
+                        if (callback != null) {
+                            callback.onNetworkError();
+                        }
+                    }
+                }
                 if (callback != null) {
                     callback.onResult(result);
                 }
@@ -412,7 +390,7 @@ public final class CachedSearchEngine implements SearchEngine {
                 results.addAll(this.sendQuery(query, Type.TAGS));
                 break;
             case FRIENDS:
-                for (User f : ServiceContainer.getCache().getAllFriends()) {
+                for (UserInterface f : ServiceContainer.getCache().getAllFriends()) {
                     if (f.getName().toLowerCase(Locale.US).contains(query)) {
                         results.add(f);
                     }

@@ -32,8 +32,8 @@ public class ImmutableEvent {
     private ImmutableUser mImmCreator;
 
     // These will be set by the cache
-    private User mCreator;
-    private Set<User> mParticipants;
+    private UserInterface mCreator;
+    private Set<UserInterface> mParticipants;
 
     /**
      * Constructor
@@ -61,9 +61,10 @@ public class ImmutableEvent {
         mParticipantIds = participantIds;
         mLocation = location;
         mLocationString = locationString;
+
     }
 
-    public User getCreator() {
+    public UserInterface getCreator() {
         return mCreator;
     }
 
@@ -103,7 +104,7 @@ public class ImmutableEvent {
         return mParticipantIds;
     }
 
-    public Set<User> getParticipants() {
+    public Set<UserInterface> getParticipants() {
         return mParticipants;
     }
 
@@ -111,7 +112,7 @@ public class ImmutableEvent {
         return mStartDate;
     }
 
-    public ImmutableEvent setCreator(User newCreator) {
+    public ImmutableEvent setCreator(UserInterface newCreator) {
         mCreator = newCreator;
         return this;
     }

@@ -16,6 +16,7 @@ import android.util.Log;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserInterface;
 import ch.epfl.smartmap.util.Utils;
 
 /**
@@ -294,7 +295,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      *             if invalid latitude
      */
     private void checkLatitude(double latitude) throws SmartMapParseException {
-        if (!((MIN_LATITUDE <= latitude) && (latitude <= MAX_LATITUDE))) {
+        if (!((MIN_LATITUDE <= latitude) && (latitude <= MAX_LATITUDE)) || (latitude == Double.NaN)) {
             throw new SmartMapParseException("invalid latitude");
         }
     }
@@ -307,7 +308,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      *             if invalid longitude
      */
     private void checkLongitude(double longitude) throws SmartMapParseException {
-        if (!((MIN_LONGITUDE <= longitude) && (longitude <= MAX_LONGITUDE))) {
+        if (!((MIN_LONGITUDE <= longitude) && (longitude <= MAX_LONGITUDE)) || (longitude == Double.NaN)) {
             throw new SmartMapParseException("invalid longitude");
         }
     }
@@ -412,7 +413,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 
     private ImmutableEvent parseEventFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = -1;
-        long creatorId = -1;
+        ImmutableUser creator = null;
         GregorianCalendar startingDate = null;
         GregorianCalendar endDate = null;
         double latitude = UNITIALIZED_LATITUDE;
@@ -424,7 +425,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 
         try {
             id = jsonObject.getLong("id");
-            creatorId = jsonObject.getLong("creatorId");
+            creator = this.parseFriendFromJSON(jsonObject.getJSONObject("creator"));
             startingDate = this.parseDate(jsonObject.getString("startingDate"));
             endDate = this.parseDate(jsonObject.getString("endingDate"));
             latitude = jsonObject.getDouble("latitude");
@@ -438,19 +439,18 @@ public class JsonSmartMapParser implements SmartMapParser {
         }
 
         this.checkId(id);
-        this.checkId(creatorId);
         this.checkStartingAndEndDate(startingDate, endDate);
         this.checkLatitude(latitude);
         this.checkLongitude(longitude);
         this.checkName(positionName);
         this.checkName(name);
         this.checkEventDescription(description);
+        for (long participantId : participants) {
+            this.checkId(participantId);
+        }
         Location location = new Location("SmartMapServers");
         location.setLatitude(latitude);
         location.setLongitude(longitude);
-
-        // Contains only id of creator to be retrieved later
-        ImmutableUser creator = new ImmutableUser(creatorId, null, null, null, null, null, null, false, -1);
 
         ImmutableEvent event =
             new ImmutableEvent(id, name, creator, description, startingDate, endDate, location, positionName,
@@ -469,20 +469,22 @@ public class JsonSmartMapParser implements SmartMapParser {
     private ImmutableUser parseFriendFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = 0;
         String name = null;
-        String phoneNumber = User.NO_PHONE_NUMBER;
-        String email = User.NO_EMAIL;
+        String phoneNumber = UserInterface.NO_PHONE_NUMBER;
+        String email = UserInterface.NO_EMAIL;
         double latitude = UNITIALIZED_LATITUDE;
         double longitude = UNITIALIZED_LONGITUDE;
         String lastSeenString = null;
+        int friendship = User.DONT_KNOW;
 
         try {
             id = jsonObject.getLong("id");
             name = jsonObject.getString("name");
             phoneNumber = jsonObject.optString("phoneNumber", null);
             email = jsonObject.optString("email", null);
-            latitude = jsonObject.optDouble("latitude");
-            longitude = jsonObject.optDouble("longitude");
+            latitude = jsonObject.optDouble("latitude", UNITIALIZED_LATITUDE);
+            longitude = jsonObject.optDouble("longitude", UNITIALIZED_LONGITUDE);
             lastSeenString = jsonObject.optString("lastUpdate", null);
+            friendship = jsonObject.optInt("isFriend");
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
         }
@@ -490,7 +492,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         this.checkId(id);
         this.checkName(name);
 
-        Location lastSeen = null;
+        Location location = null;
 
         if (phoneNumber != null) {
             this.checkPhoneNumber(phoneNumber);
@@ -498,14 +500,24 @@ public class JsonSmartMapParser implements SmartMapParser {
         if (email != null) {
             this.checkEmail(email);
         }
-        // We do not want a location if it has not a latitude, longitude and
-        // last seen date.
-        if ((latitude != Double.NaN) && (longitude != Double.NaN) && (lastSeenString != null)) {
-            lastSeen = new Location("SmartMapServers");
-            lastSeen.setLatitude(latitude);
-            lastSeen.setLongitude(longitude);
-            lastSeen.setTime(this.parseDate(lastSeenString).getTimeInMillis());
+
+        if (latitude != UNITIALIZED_LATITUDE) {
+            this.checkLatitude(latitude);
         }
-        return new ImmutableUser(id, name, phoneNumber, email, null, null, null, false, -1);
+
+        if (longitude != UNITIALIZED_LONGITUDE) {
+            this.checkLongitude(longitude);
+        }
+
+        // We do not want a location if it has not
+        // last seen date.
+        if (lastSeenString != null) {
+            location = new Location("SmartMapServers");
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+            location.setTime(this.parseDate(lastSeenString).getTimeInMillis());
+        }
+
+        return new ImmutableUser(id, name, phoneNumber, email, null, null, null, false, friendship);
     }
 }

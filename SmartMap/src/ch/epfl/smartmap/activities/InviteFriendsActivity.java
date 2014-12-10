@@ -16,7 +16,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserInterface;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 
@@ -64,7 +64,7 @@ public class InviteFriendsActivity extends ListActivity {
     private FriendPickerListAdapter mAdapter;
     private List<Boolean> mSelectedPositions;
 
-    private List<User> mUserList;
+    private List<UserInterface> mUserList;
 
     /**
      * Invites the selected friends. Displays a toast describing if the
@@ -167,7 +167,7 @@ public class InviteFriendsActivity extends ListActivity {
      * @author SpicyCH
      */
     private void setAdapter() {
-        mUserList = new ArrayList<User>(ServiceContainer.getCache().getAllFriends());
+        mUserList = new ArrayList<UserInterface>(ServiceContainer.getCache().getAllFriends());
 
         // Create a new list of booleans with the size of the user list and
         // default value false.

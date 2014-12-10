@@ -25,7 +25,7 @@ public final class ImmutableInvitation {
 
     // These will be instanciated and put here by the Cache
     private Event mEvent;
-    private User mUser;
+    private UserInterface mUser;
 
     /**
      * Constructor, put {@code null} (or {@code User.NO_ID} for id) if you dont
@@ -70,12 +70,12 @@ public final class ImmutableInvitation {
         return mType;
     }
 
-    public User getUser() {
+    public UserInterface getUser() {
         return mUser;
     }
 
     public long getUserId() {
-        return mUserInfos != null ? mUserInfos.getId() : User.NO_ID;
+        return mUserInfos != null ? mUserInfos.getId() : UserInterface.NO_ID;
     }
 
     public ImmutableUser getUserInfos() {
@@ -107,7 +107,7 @@ public final class ImmutableInvitation {
         return this;
     }
 
-    public ImmutableInvitation setUser(User newUser) {
+    public ImmutableInvitation setUser(UserInterface newUser) {
         mUser = newUser;
         return this;
     }

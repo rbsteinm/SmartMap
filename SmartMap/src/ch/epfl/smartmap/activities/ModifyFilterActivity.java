@@ -28,7 +28,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.ImmutableFilter;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserInterface;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 
 /**
@@ -40,8 +40,8 @@ public class ModifyFilterActivity extends Activity {
     private LinearLayout mOutsideFilterLayout;
     private ListView mListViewInside;
     private ListView mListViewOutside;
-    private List<User> mFriendsInside;
-    private List<User> mFriendsOutside;
+    private List<UserInterface> mFriendsInside;
+    private List<UserInterface> mFriendsOutside;
 
     private Filter mFilter;
     private Cache mCache;
@@ -65,8 +65,8 @@ public class ModifyFilterActivity extends Activity {
         mListViewInside = (ListView) this.findViewById(R.id.activity_modify_filter_inside_list);
         mListViewOutside = (ListView) this.findViewById(R.id.activity_modify_filter_outside_list);
 
-        mFriendsInside = new ArrayList<User>();
-        mFriendsOutside = new ArrayList<User>();
+        mFriendsInside = new ArrayList<UserInterface>();
+        mFriendsOutside = new ArrayList<UserInterface>();
 
         mOnInsideItemLongClickListener = new OnInsideListItemLongClickListener();
         mOnOutsideItemLongClickListener = new OnOutsideListItemLongClickListener();
@@ -179,9 +179,9 @@ public class ModifyFilterActivity extends Activity {
         builder.create().show();
     }
 
-    private Set<Long> friendListToIdSet(List<User> friendList) {
+    private Set<Long> friendListToIdSet(List<UserInterface> friendList) {
         Set<Long> idSet = new HashSet<Long>();
-        for (User friend : friendList) {
+        for (UserInterface friend : friendList) {
             idSet.add(friend.getId());
         }
         return idSet;
@@ -226,7 +226,7 @@ public class ModifyFilterActivity extends Activity {
         for (long id : mFilter.getFriendIds()) {
             mFriendsInside.add(mCache.getFriend(id));
         }
-        for (User friend : mCache.getAllFriends()) {
+        for (UserInterface friend : mCache.getAllFriends()) {
             if (!mFriendsInside.contains(friend)) {
                 mFriendsOutside.add(friend);
             }
@@ -264,7 +264,7 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mOutsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mCache.getFriend(droppedItemId);
+                        UserInterface droppedItem = mCache.getFriend(droppedItemId);
                         if (mFriendsInside.contains(droppedItem)) {
                             mFriendsInside.remove(droppedItem);
                             mFriendsOutside.add(droppedItem);
@@ -322,7 +322,7 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mInsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mCache.getFriend(droppedItemId);
+                        UserInterface droppedItem = mCache.getFriend(droppedItemId);
                         if (mFriendsOutside.contains(droppedItem)) {
                             mFriendsInside.add(droppedItem);
                             mFriendsOutside.remove(droppedItem);
