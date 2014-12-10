@@ -108,7 +108,7 @@ public interface SmartMapClient {
      * @return the events to which the user is invited.
      *         For each retrieved invitation, must call {@code ackEventInvitation}
      */
-    List<Long> getEventInvitations() throws SmartMapClientException;
+    InvitationBag getEventInvitations() throws SmartMapClientException;
 
     /**
      * @return the list of the friends ids

@@ -16,12 +16,12 @@ public final class ImmutableInvitation {
 
     // Invitation informations
     private long mId;
-    private final long mEventId;
     private int mStatus;
     private long mTimeStamp;
     private int mType;
 
-    private final ImmutableUser mImmUser;
+    private final ImmutableUser mUserInfos;
+    private final ImmutableEvent mEventInfos;
 
     // These will be instanciated and put here by the Cache
     private Event mEvent;
@@ -32,10 +32,11 @@ public final class ImmutableInvitation {
      * want the value to be taken
      * into account.
      */
-    public ImmutableInvitation(long id, ImmutableUser user, long eventId, int status, long timeStamp, int type) {
+    public ImmutableInvitation(long id, ImmutableUser userInfos, ImmutableEvent eventInfos, int status,
+        long timeStamp, int type) {
         mId = id;
-        mImmUser = user;
-        mEventId = eventId;
+        mUserInfos = userInfos;
+        mEventInfos = eventInfos;
         mStatus = status;
         mType = type;
         mTimeStamp = timeStamp;
@@ -46,15 +47,15 @@ public final class ImmutableInvitation {
     }
 
     public long getEventId() {
-        return mEventId;
+        return mEventInfos.getId();
+    }
+
+    public ImmutableEvent getEventInfos() {
+        return mEventInfos;
     }
 
     public long getId() {
         return mId;
-    }
-
-    public ImmutableUser getImmUser() {
-        return mImmUser;
     }
 
     public int getStatus() {
@@ -74,7 +75,11 @@ public final class ImmutableInvitation {
     }
 
     public long getUserId() {
-        return mImmUser.getId();
+        return mUserInfos.getId();
+    }
+
+    public ImmutableUser getUserInfos() {
+        return mUserInfos;
     }
 
     public ImmutableInvitation setEvent(Event newEvent) {

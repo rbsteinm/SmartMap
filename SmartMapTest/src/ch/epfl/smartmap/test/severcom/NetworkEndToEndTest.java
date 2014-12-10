@@ -155,12 +155,12 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 		this.assertValidEvent(event);
 	}
 
-	public void testGetEventInvitations() throws SmartMapClientException {
-		List<Long> events = networkClient.getEventInvitations();
-		for (Long eventId : events) {
-			assertTrue("Ivalid event Id.", eventId > 0);
-		}
-	}
+	//	public void testGetEventInvitations() throws SmartMapClientException {
+	//		List<Long> events = networkClient.getEventInvitations();
+	//		for (Long eventId : events) {
+	//			assertTrue("Ivalid event Id.", eventId > 0);
+	//		}
+	//	}
 
 	public void testGetFriendsIds() throws SmartMapClientException {
 
@@ -315,9 +315,9 @@ public class NetworkEndToEndTest extends AndroidTestCase {
 	private void assertValidInvitation(ImmutableInvitation invitation){
 		assertNotNull("Null TimeStamp",invitation.getTimeStamp());
 		assertTrue("Unexpected invitation type", (invitation.getType()==Invitation.ACCEPTED_FRIEND_INVITATION)||(invitation.getType()==Invitation.FRIEND_INVITATION));
-		this.assertValidIdAndName(invitation.getImmUser());
+		this.assertValidIdAndName(invitation.getUserInfos());
 		if(invitation.getType()==Invitation.ACCEPTED_FRIEND_INVITATION){
-			this.assertValidLocation(invitation.getImmUser().getLocation());
+			this.assertValidLocation(invitation.getUserInfos().getLocation());
 		}
 
 	}
