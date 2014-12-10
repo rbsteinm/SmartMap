@@ -294,7 +294,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      *             if invalid latitude
      */
     private void checkLatitude(double latitude) throws SmartMapParseException {
-        if (!((MIN_LATITUDE <= latitude) && (latitude <= MAX_LATITUDE))) {
+        if (!((MIN_LATITUDE <= latitude) && (latitude <= MAX_LATITUDE)) || (latitude == Double.NaN)) {
             throw new SmartMapParseException("invalid latitude");
         }
     }
@@ -307,7 +307,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      *             if invalid longitude
      */
     private void checkLongitude(double longitude) throws SmartMapParseException {
-        if (!((MIN_LONGITUDE <= longitude) && (longitude <= MAX_LONGITUDE))) {
+        if (!((MIN_LONGITUDE <= longitude) && (longitude <= MAX_LONGITUDE)) || (longitude == Double.NaN)) {
             throw new SmartMapParseException("invalid longitude");
         }
     }
@@ -445,12 +445,15 @@ public class JsonSmartMapParser implements SmartMapParser {
         this.checkName(positionName);
         this.checkName(name);
         this.checkEventDescription(description);
+        for (long participantId : participants) {
+            this.checkId(participantId);
+        }
         Location location = new Location("SmartMapServers");
         location.setLatitude(latitude);
         location.setLongitude(longitude);
         ImmutableEvent event =
             new ImmutableEvent(id, name, creatorId, description, startingDate, endDate, location,
-                positionName, new HashSet<Long>());
+                positionName, new HashSet<Long>(participants));
 
         return event;
     }
@@ -476,8 +479,8 @@ public class JsonSmartMapParser implements SmartMapParser {
             name = jsonObject.getString("name");
             phoneNumber = jsonObject.optString("phoneNumber", null);
             email = jsonObject.optString("email", null);
-            latitude = jsonObject.optDouble("latitude");
-            longitude = jsonObject.optDouble("longitude");
+            latitude = jsonObject.optDouble("latitude", UNITIALIZED_LATITUDE);
+            longitude = jsonObject.optDouble("longitude", UNITIALIZED_LONGITUDE);
             lastSeenString = jsonObject.optString("lastUpdate", null);
         } catch (JSONException e) {
             throw new SmartMapParseException(e);
@@ -486,7 +489,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         this.checkId(id);
         this.checkName(name);
 
-        Location lastSeen = null;
+        Location location = null;
 
         if (phoneNumber != null) {
             this.checkPhoneNumber(phoneNumber);
@@ -494,14 +497,23 @@ public class JsonSmartMapParser implements SmartMapParser {
         if (email != null) {
             this.checkEmail(email);
         }
-        // We do not want a location if it has not a latitude, longitude and
-        // last seen date.
-        if ((latitude != Double.NaN) && (longitude != Double.NaN) && (lastSeenString != null)) {
-            lastSeen = new Location("SmartMapServers");
-            lastSeen.setLatitude(latitude);
-            lastSeen.setLongitude(longitude);
-            lastSeen.setTime(this.parseDate(lastSeenString).getTimeInMillis());
+
+        if (latitude != UNITIALIZED_LATITUDE) {
+            this.checkLatitude(latitude);
         }
-        return new ImmutableUser(id, name, phoneNumber, email, null, null, null, false);
+
+        if (longitude != UNITIALIZED_LONGITUDE) {
+            this.checkLongitude(longitude);
+        }
+
+        // We do not want a location if it has not
+        // last seen date.
+        if (lastSeenString != null) {
+            location = new Location("SmartMapServers");
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+            location.setTime(this.parseDate(lastSeenString).getTimeInMillis());
+        }
+        return new ImmutableUser(id, name, phoneNumber, email, location, null, null, false);
     }
 }
