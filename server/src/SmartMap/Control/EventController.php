@@ -5,17 +5,20 @@ namespace SmartMap\Control;
 use SmartMap\DBInterface\DatabaseException;
 use SmartMap\DBInterface\EventRepository;
 use SmartMap\DBInterface\Event;
+use SmartMap\DBInterface\UserRepository;
+use SmartMap\DBInterface\User;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class EventController {
 
-    private $mRepo;
+    private $mEventRepo;
 
-    public function __construct(EventRepository $repo)
+    public function __construct(EventRepository $eventRepo, UserRepository $userRepo)
     {
-        $this->mRepo = $repo;
+        $this->mEventRepo = $eventRepo;
+        $this->mUserRepo = $userRepo;
     }
 
     /**
@@ -54,7 +57,7 @@ class EventController {
                 $description
             );
 
-            $event = $this->mRepo->createEvent($event);
+            $event = $this->mEventRepo->createEvent($event);
         }
         catch (DatabaseException $e)
         {
@@ -100,7 +103,7 @@ class EventController {
 
         try
         {
-            $event = $this->mRepo->getEvent($eventId);
+            $event = $this->mEventRepo->getEvent($eventId);
 
             if ($userId != $event->getCreatorId())
             {
@@ -136,7 +139,7 @@ class EventController {
                 $event->setDescription($description);
             }
 
-            $this->mRepo->updateEvent($event);
+            $this->mEventRepo->updateEvent($event);
         }
         catch (DatabaseException $e)
         {
@@ -164,7 +167,7 @@ class EventController {
 
         try
         {
-            $eventsIds = $this->mRepo->getEventsInRadius($longitude, $latitude, $radius);
+            $eventsIds = $this->mEventRepo->getEventsInRadius($longitude, $latitude, $radius);
         }
         catch (DatabaseException $e)
         {
@@ -192,7 +195,7 @@ class EventController {
 
         try
         {
-            $this->mRepo->addUserToEvent($eventId, $userId);
+            $this->mEventRepo->addUserToEvent($eventId, $userId);
         }
         catch (DatabaseException $e)
         {
@@ -220,7 +223,7 @@ class EventController {
 
         try
         {
-            $this->mRepo->removeUserFromEvent($eventId, $userId);
+            $this->mEventRepo->removeUserFromEvent($eventId, $userId);
         }
         catch (DatabaseException $e)
         {
@@ -250,7 +253,7 @@ class EventController {
 
         try
         {
-            $this->mRepo->addEventInvitations($eventId, $userIds);
+            $this->mEventRepo->addEventInvitations($eventId, $userIds);
         }
         catch (DatabaseException $e)
         {
@@ -276,14 +279,27 @@ class EventController {
 
         try
         {
-            $eventsIds = $this->mRepo->getEventInvitations($userId);
+            $eventsIds = $this->mEventRepo->getEventInvitations($userId);
+
+            $eventList = array();
+
+            foreach($eventsIds as $id)
+            {
+                $event = $this->mEventRepo->getEvent($id);
+
+                $participants = $this->mEventRepo->getEventParticipants($id);
+
+                $creator = $this->mUserRepo->getUser($event->getCreatorId());
+
+                $eventList[] = $this->eventInfoArray($event, $creator, $participants);
+            }
         }
         catch (DatabaseException $e)
         {
             throw new ControlLogicException('Error in getEventInvitations.', 2, $e);
         }
 
-        $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventsIds);
+        $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventList);
 
         return new JsonResponse($response);
     }
@@ -304,7 +320,7 @@ class EventController {
 
         try
         {
-            $this->mRepo->removeEventInvitation($eventId, $userId);
+            $this->mEventRepo->removeEventInvitation($eventId, $userId);
         }
         catch (DatabaseException $e)
         {
@@ -332,16 +348,18 @@ class EventController {
 
         try
         {
-            $event = $this->mRepo->getEvent($eventId);
+            $event = $this->mEventRepo->getEvent($eventId);
 
-            $participants = $this->mRepo->getEventParticipants($eventId);
+            $participants = $this->mEventRepo->getEventParticipants($eventId);
+
+            $creator = $this->mUserRepo->getUser($event->getCreatorId());
         }
         catch (DatabaseException $e)
         {
             throw new ControlLogicException('Error in getEventInfo.', 2, $e);
         }
 
-        $eventsInfo = $this->eventInfoArray($event, $participants);
+        $eventsInfo = $this->eventInfoArray($event, $creator,$participants);
 
         $response = array('status' => 'Ok', 'message' => 'Fetched event.', 'event' => $eventsInfo);
 
@@ -353,14 +371,17 @@ class EventController {
      * a list of participants to generate JSON.
      *
      * @param Event $event
+     * @param User $creator
      * @param array $participants
      * @return array
      */
-    private function eventInfoArray(Event $event, $participants = array())
+    private function eventInfoArray(Event $event, User $creator, $participants = array())
     {
+        $creatorArray = array('id' => $creator->getId(), 'name' => $creator->getName());
+
         return array(
             'id' => $event->getId(),
-            'creatorId' => $event->getCreatorId(),
+            'creator' => $creatorArray,
             'startingDate' => $event->getStartingDate(),
             'endingDate' => $event->getEndingDate(),
             'longitude' => $event->getLongitude(),

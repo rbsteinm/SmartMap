@@ -535,6 +535,36 @@ class UserRepository
         
         return $ids;
     }
+
+    /**
+     * Get a list of the ids of users who are invited by the user with id $userId.
+     *
+     * @param $userId
+     * @return array
+     * @throws DatabaseException
+     */
+    public function getInvitedIds($userId)
+    {
+        $req = "SELECT id2 FROM " . self::$TABLE_INVITATIONS .  " WHERE id1 = ?";
+
+        try
+        {
+            $stmt = $this->mDb->executeQuery($req, array((int) $userId));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error getting invitations ids in getInvitedIds.', 1, $e);
+        }
+
+        $ids = array();
+
+        while ($id = $stmt->fetch())
+        {
+            $ids[] = (int) $id['id2'];
+        }
+
+        return $ids;
+    }
     
     /**
      * Adds an nvitation from the user with id $idUser to the user with

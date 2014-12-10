@@ -2,17 +2,13 @@ package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -38,6 +34,34 @@ import ch.epfl.smartmap.util.Utils;
  */
 public class ShowEventsActivity extends ListActivity {
 
+    /**
+     * Listens for the progress change of the Seekbar and updates the list
+     * accordingly.
+     * 
+     * @author SpicyCH
+     */
+    class SeekBarChangeListener implements OnSeekBarChangeListener {
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
+                seekBar.setProgress(SEEK_BAR_MIN_VALUE);
+            }
+            mShowKilometers.setText(mSeekBar.getProgress() + " km");
+            ShowEventsActivity.this.updateCurrentList();
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            // Nothing
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            // Nothing
+        }
+    }
+
     private static final String TAG = ShowEventsActivity.class.getSimpleName();
 
     private static final int SEEK_BAR_MIN_VALUE = 2;
@@ -45,8 +69,6 @@ public class ShowEventsActivity extends ListActivity {
     private SeekBar mSeekBar;
 
     private TextView mShowKilometers;
-
-    private Context mContext;
 
     private boolean mMyEventsChecked;
     private boolean mOngoingChecked;
@@ -56,31 +78,129 @@ public class ShowEventsActivity extends ListActivity {
 
     private Location mMyLocation;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_show_events);
+    /**
+     * @author SpicyCH
+     */
+    private void displayDialog(final Event event, String creatorName) {
+        AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
 
-        // Makes the logo clickable (clicking it returns to previous activity)
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
-        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+        Calendar start = event.getStartDate();
+        Calendar end = event.getEndDate();
 
-        this.initializeGUI();
+        final String message =
+            Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - " + Utils.getDateString(end) + " "
+                + Utils.getTimeString(end) + "\n" + ShowEventsActivity.this.getString(R.string.show_event_by) + " "
+                + creatorName + "\n\n" + event.getDescription();
 
-        // Create custom Adapter and pass it to the Activity
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
-        this.setListAdapter(adapter);
-    }
+        alertDialog.setTitle(event.getName() + " @ " + event.getLocationString() + "\n"
+            + Utils.distanceToMe(event.getLocation()));
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        Log.d(TAG, "Event at position " + position + " with id " + id + " (view id " + v.getId() + ")");
-        super.onListItemClick(l, v, position, id);
-        this.displayInfoDialog(position);
+        alertDialog.setMessage(message);
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
+            ShowEventsActivity.this.getString(R.string.show_event_on_the_map_button),
+            new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    Toast.makeText(ShowEventsActivity.this,
+                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading), Toast.LENGTH_SHORT)
+                        .show();
+                    Intent showEventIntent = new Intent(ShowEventsActivity.this, MainActivity.class);
+                    showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
+                    ShowEventsActivity.this.startActivity(showEventIntent);
+                }
+            });
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
+            ShowEventsActivity.this.getString(R.string.show_event_details_button),
+            new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    Intent showEventIntent = new Intent(ShowEventsActivity.this, EventInformationActivity.class);
+                    showEventIntent.putExtra("EVENT", event.getId());
+                    ShowEventsActivity.this.startActivity(showEventIntent);
+                }
+            });
+
+        alertDialog.show();
     }
 
     /**
-     * Triggered when a checkbox is clicked. Updates the displayed list of events.
+     * <p>
+     * Displays an AlertDialog with details about the event and two buttons: <br />
+     * -Show on map: opens the map at the location of the event<br />
+     * -See details: opens a new activity and display all the event's info
+     * </p>
+     * 
+     * @param position
+     *            the position of item that has been clicked
+     * @author SpicyCH
+     */
+    private void displayInfoDialog(int position) {
+
+        Toast.makeText(ShowEventsActivity.this, this.getString(R.string.show_event_loading_info), Toast.LENGTH_SHORT)
+            .show();
+
+        final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
+
+        this.getEvent(eventViewHolder.getEventId());
+
+    }
+
+    private void getEvent(long eventId) {
+
+        Log.d(TAG, "Retrieving event...");
+
+        Event event = ServiceContainer.getCache().getEvent(eventId);
+        String creatorName = event.getCreator().getName();
+
+        Log.d(TAG, "Processing event...");
+
+        if ((event == null) || (creatorName == null)) {
+            Log.e(TAG, "The server returned a null event or creatorName");
+
+            Toast.makeText(ShowEventsActivity.this,
+                ShowEventsActivity.this.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT).show();
+
+        } else {
+
+            // Construct the dialog that display more detailed infos and
+            // offers to show event on the map
+            // or to
+            // show more details.
+
+            this.displayDialog(event, creatorName);
+
+        }
+
+    }
+
+    private void initializeGUI() {
+
+        if (ServiceContainer.getSettingsManager() == null) {
+            ServiceContainer.initSmartMapServices(this);
+        }
+
+        mMyLocation = ServiceContainer.getSettingsManager().getLocation();
+
+        mMyEventsChecked = false;
+        mOngoingChecked = false;
+        mNearMeChecked = false;
+
+        mShowKilometers = (TextView) this.findViewById(R.id.showEventKilometers);
+
+        mSeekBar = (SeekBar) this.findViewById(R.id.showEventSeekBar);
+        mSeekBar.setEnabled(false);
+        mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
+
+        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllVisibleEvents());
+    }
+
+    /**
+     * Triggered when a checkbox is clicked. Updates the displayed list of
+     * events.
      * 
      * @param v
      *            the checkbox whose status changed
@@ -115,10 +235,33 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_show_events);
+
+        // Makes the logo clickable (clicking it returns to previous activity)
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        this.initializeGUI();
+
+        // Create custom Adapter and pass it to the Activity
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
+        this.setListAdapter(adapter);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.show_events, menu);
         return true;
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Log.d(TAG, "Event at position " + position + " with id " + id + " (view id " + v.getId() + ")");
+        super.onListItemClick(l, v, position, id);
+        this.displayInfoDialog(position);
     }
 
     @Override
@@ -131,7 +274,7 @@ public class ShowEventsActivity extends ListActivity {
                 this.finish();
                 break;
             case R.id.showEventsMenuNewEvent:
-                Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
+                Intent showEventIntent = new Intent(ShowEventsActivity.this, AddEventActivity.class);
                 this.startActivity(showEventIntent);
                 break;
             case R.id.show_events_menu_refresh:
@@ -154,57 +297,7 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * <p>
-     * Displays an AlertDialog with details about the event and two buttons: <br />
-     * -Show on map: opens the map at the location of the event<br />
-     * -See details: opens a new activity and display all the event's info
-     * </p>
-     * 
-     * @param position
-     *            the position of item that has been clicked
-     * @author SpicyCH
-     */
-    private void displayInfoDialog(int position) {
-
-        Toast.makeText(mContext, this.getString(R.string.show_event_loading_info), Toast.LENGTH_SHORT).show();
-
-        final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
-
-        // Need an AsyncTask because getEventById searches on our server if
-        // event not stored in cache.
-        LoadEventTask loadEvent = new LoadEventTask();
-        Log.d(TAG, "Executing loadEvent task with event id " + eventViewHolder.getEventId());
-        loadEvent.execute(eventViewHolder.getEventId());
-
-    }
-
-    private void initializeGUI() {
-
-        // We need to intialize the two following Singletons to let espresso
-        // tests pass.
-        mContext = this.getApplicationContext();
-
-        if (ServiceContainer.getSettingsManager() == null) {
-            ServiceContainer.initSmartMapServices(this.getApplicationContext());
-        }
-
-        mMyLocation = ServiceContainer.getSettingsManager().getLocation();
-
-        mMyEventsChecked = false;
-        mOngoingChecked = false;
-        mNearMeChecked = false;
-
-        mShowKilometers = (TextView) this.findViewById(R.id.showEventKilometers);
-
-        mSeekBar = (SeekBar) this.findViewById(R.id.showEventSeekBar);
-        mSeekBar.setEnabled(false);
-        mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
-
-        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllVisibleEvents());
-    }
-
-    /**
-     * This runs in O(n), can we do better?
+     * TODO javadoc
      */
     private void updateCurrentList() {
 
@@ -227,133 +320,6 @@ public class ShowEventsActivity extends ListActivity {
 
         EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
         this.setListAdapter(adapter);
-    }
-
-    /**
-     * Loads an event and displays its infos. TODO prendre dans le cache
-     * 
-     * @author SpicyCH
-     */
-    class LoadEventTask extends AsyncTask<Long, Void, Map<String, Object>> {
-        private static final String EVENT_KEY = "EVENT";
-        private static final String CREATOR_NAME_KEY = "CREATOR_NAME";
-
-        @Override
-        protected Map<String, Object> doInBackground(Long... params) {
-
-            Log.d(TAG, "Retrieving event...");
-
-            long eventId = params[0];
-
-            Map<String, Object> output = new HashMap<String, Object>();
-
-            Event event = ServiceContainer.getCache().getEvent(eventId);
-            output.put(EVENT_KEY, event);
-
-            output.put(CREATOR_NAME_KEY, event.getCreator().getName());
-
-            return output;
-        }
-
-        @Override
-        protected void onPostExecute(Map<String, Object> result) {
-
-            Log.d(TAG, "Processing event...");
-
-            final Event event = (Event) result.get(EVENT_KEY);
-            final String creatorName = (String) result.get(CREATOR_NAME_KEY);
-
-            if ((event == null) || (creatorName == null)) {
-                Log.e(TAG, "The server returned a null event or creatorName");
-
-                Toast.makeText(mContext, mContext.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
-                        .show();
-
-            } else {
-
-                // Construct the dialog that display more detailed infos and
-                // offers to show event on the map
-                // or to
-                // show more details.
-
-                this.displayDialog(event, creatorName);
-
-            }
-
-        }
-
-        /**
-         * @author SpicyCH
-         */
-        private void displayDialog(final Event event, String creatorName) {
-            AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
-
-            Calendar start = event.getStartDate();
-            Calendar end = event.getEndDate();
-
-            final String message = Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - "
-                    + Utils.getDateString(end) + " " + Utils.getTimeString(end) + "\n"
-                    + mContext.getString(R.string.show_event_by) + " " + creatorName + "\n\n" + event.getDescription();
-
-            alertDialog.setTitle(event.getName() + " @ " + event.getLocationString() + "\n"
-                    + Utils.distanceToMe(event.getLocation()));
-
-            alertDialog.setMessage(message);
-
-            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-                    mContext.getString(R.string.show_event_on_the_map_button), new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            Toast.makeText(mContext,
-                                    ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                                    Toast.LENGTH_SHORT).show();
-                            Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                            showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
-                            ShowEventsActivity.this.startActivity(showEventIntent);
-                        }
-                    });
-
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, mContext.getString(R.string.show_event_details_button),
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            Intent showEventIntent = new Intent(mContext, EventInformationActivity.class);
-                            showEventIntent.putExtra("EVENT", event.getId());
-                            ShowEventsActivity.this.startActivity(showEventIntent);
-                        }
-                    });
-
-            alertDialog.show();
-        }
-    }
-
-    /**
-     * Listens for the progress change of the Seekbar and updates the list accordingly.
-     * 
-     * @author SpicyCH
-     */
-    class SeekBarChangeListener implements OnSeekBarChangeListener {
-
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
-                seekBar.setProgress(SEEK_BAR_MIN_VALUE);
-            }
-            mShowKilometers.setText(mSeekBar.getProgress() + " km");
-            ShowEventsActivity.this.updateCurrentList();
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-            // Nothing
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-            // Nothing
-        }
     }
 
 }

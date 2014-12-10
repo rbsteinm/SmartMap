@@ -52,7 +52,8 @@
         android:tag="@+id/showEventsList"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginTop="100dp" />
+        android:layout_marginTop="100dp"
+        android:contentDescription="listview" />
 
     <TextView
         android:id="@+id/showEventKilometers"

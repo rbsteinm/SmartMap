@@ -54,6 +54,8 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
 
         // Clicks the first element of the list
         onView(withId(0)).perform(ViewActions.click());
+        // Espresso.onData(anything()).inAdapterView(withContentDescription("listview")).atPosition(0)
+        // .perform(ViewActions.click());
 
         // The dialog may need a network access that might take some time to be
         // displayed

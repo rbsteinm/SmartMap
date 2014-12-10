@@ -2,14 +2,10 @@ package ch.epfl.smartmap.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,7 +15,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.servercom.SmartMapClientException;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.util.Utils;
 
 /**
@@ -29,47 +25,7 @@ import ch.epfl.smartmap.util.Utils;
  */
 public class UserInformationActivity extends Activity {
 
-    /**
-     * Asynchronous task that removes a friend from the users friendList both
-     * from the server and from the cache
-     * 
-     * @author rbsteinm
-     */
-    private class RemoveFriend extends AsyncTask<Long, Void, String> {
-
-        private final Handler mHandler = new Handler();
-
-        @Override
-        protected String doInBackground(Long... params) {
-            String confirmString = "";
-            try {
-                ServiceContainer.getNetworkClient().removeFriend(params[0]);
-                confirmString = "You're no longer friend with " + mUser.getName();
-
-                // remove friend from cache and update displayed list
-                // TODO should not have to remove the friend from the cache too
-                final long userId = params[0];
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        ServiceContainer.getCache().removeFriend(userId);
-                    }
-                });
-
-            } catch (SmartMapClientException e) {
-                Log.e(TAG, "Error while removing friend: " + e);
-                confirmString = e.getMessage();
-            }
-            return confirmString;
-        }
-
-        @Override
-        protected void onPostExecute(String confirmString) {
-            Toast.makeText(UserInformationActivity.this, confirmString, Toast.LENGTH_LONG).show();
-        }
-
-    }
-
+    @SuppressWarnings("unused")
     private static final String TAG = UserInformationActivity.class.getSimpleName();
     private User mUser;
     private Switch mShowOnMapSwitch;
@@ -78,7 +34,6 @@ public class UserInformationActivity extends Activity {
     private TextView mNameView;
     private ImageView mPictureView;
     private TextView mDistanceView;
-    private Context mContext;
 
     public void displayDeleteConfirmationDialog(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -88,8 +43,32 @@ public class UserInformationActivity extends Activity {
         builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                new RemoveFriend().execute(mUser.getId());
-                ((Activity) mContext).finish();
+                ServiceContainer.getCache().removeFriend(mUser.getId(), new NetworkRequestCallback() {
+                    @Override
+                    public void onFailure() {
+                        UserInformationActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(UserInformationActivity.this,
+                                    UserInformationActivity.this.getString(R.string.remove_friend_failure),
+                                    Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        UserInformationActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(UserInformationActivity.this,
+                                    UserInformationActivity.this.getString(R.string.remove_friend_success),
+                                    Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+                UserInformationActivity.this.finish();
             }
         });
 
@@ -120,7 +99,6 @@ public class UserInformationActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_user_information);
-        mContext = this;
         // Get views
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
         mNameView = (TextView) this.findViewById(R.id.user_info_name);
@@ -129,8 +107,7 @@ public class UserInformationActivity extends Activity {
         mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
         mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
         // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
@@ -152,7 +129,7 @@ public class UserInformationActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        //Set user informations
+        // Set user informations
         mUser = ServiceContainer.getCache().getUser(this.getIntent().getLongExtra("USER", User.NO_ID));
         mNameView.setText(mUser.getName());
         mSubtitlesView.setText(mUser.getSubtitle());

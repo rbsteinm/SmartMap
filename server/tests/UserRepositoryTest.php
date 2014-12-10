@@ -494,6 +494,15 @@ class UserRepositoryTest extends PHPUnit_Extensions_Database_TestCase
 	    
 	    $this->assertEquals(array(1), $ids);
 	}
+
+    public function testGetInvitedIds()
+    {
+        $repo = new UserRepository(self::$doctrine);
+
+        $ids = $repo->getInvitedIds(1);
+
+        $this->assertEquals(array(4), $ids);
+    }
 	
 	public function testAddInvitation()
 	{
