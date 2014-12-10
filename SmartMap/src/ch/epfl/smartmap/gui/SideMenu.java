@@ -37,6 +37,7 @@ public class SideMenu extends DrawerLayout {
     public void initializeDrawerLayout() {
         // Set the adapter for the listView
         mDrawerListView.setAdapter(new SideMenuAdapter(mContext, mListItemsNames));
-        mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerListView.setOnItemClickListener(new DrawerItemClickListener(mContext));
     }
+
 }
