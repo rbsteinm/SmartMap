@@ -55,6 +55,11 @@ public interface Invitation {
     String getSubtitle();
 
     /**
+     * @return invitation's timestamp
+     */
+    long getTimeStamp();
+
+    /**
      * @return invitation's title
      */
     String getTitle();

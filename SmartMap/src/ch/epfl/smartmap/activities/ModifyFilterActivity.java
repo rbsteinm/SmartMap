@@ -12,12 +12,14 @@ import android.content.ClipDescription;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.DragEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnDragListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -43,8 +45,6 @@ public class ModifyFilterActivity extends Activity {
 
     private Filter mFilter;
     private Cache mCache;
-
-    // private final MockDB mockDB = new MockDB();
 
     private OnItemLongClickListener mOnInsideItemLongClickListener;
     private OnItemLongClickListener mOnOutsideItemLongClickListener;
@@ -83,7 +83,6 @@ public class ModifyFilterActivity extends Activity {
         mListViewOutside.setOnDragListener(mFromOutsideDragListener);
         mInsideFilterLayout.setOnDragListener(mFromOutsideDragListener);
 
-        // this.setFilter();
     }
 
     /*
@@ -97,15 +96,6 @@ public class ModifyFilterActivity extends Activity {
         this.setFilter();
 
         this.setTitle(mFilter.getName());
-        // For the moment,mock stuff
-        // this.setTitle("Sweng Team");
-        //
-        // mFriendsInside =
-        // new ArrayList<User>(Arrays.asList(mockDB.JULIEN, mockDB.ALAIN, mockDB.ROBIN, mockDB.MATTHIEU,
-        // mockDB.NICOLAS, mockDB.MARION, mockDB.RAPHAEL, mockDB.HUGO));
-        // mFriendsOutside =
-        // new ArrayList<User>(Arrays.asList(mockDB.GUILLAUME, mockDB.SELINE, mockDB.CYRIL, mockDB.PIETRO,
-        // mockDB.CHRISTIE, mockDB.MARIE));
 
         FriendListItemAdapter insideAdapter =
             new FriendListItemAdapter(this.getBaseContext(), mFriendsInside);
@@ -141,7 +131,7 @@ public class ModifyFilterActivity extends Activity {
                 this.saveFilterDialog();
                 break;
             case R.id.action_rename_filter:
-                // TODO : dialog asking for the name, rename filter, update cache?
+                this.renameFilterDialog(item);
                 break;
             default:
                 // No other menu items!
@@ -149,6 +139,44 @@ public class ModifyFilterActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void renameFilterDialog(MenuItem item) {
+        // inflate the alertDialog
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View alertLayout = inflater.inflate(R.layout.new_filter_alert_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Rename filter");
+        builder.setView(alertLayout);
+
+        // Add positive button
+        builder.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                EditText editText =
+                    (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
+                String newName = editText.getText().toString();
+
+                mCache.putFilter(new ImmutableFilter(mFilter.getId(), newName, mFilter.getFriendIds(),
+                    mFilter.isActive()));
+
+                Toast.makeText(ModifyFilterActivity.this.getBaseContext(), "New name saved",
+                    Toast.LENGTH_LONG).show();
+                ModifyFilterActivity.this.setTitle(newName);
+
+            }
+        });
+
+        // Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
     }
 
     private Set<Long> friendListToIdSet(List<User> friendList) {

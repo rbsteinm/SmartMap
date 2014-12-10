@@ -15,6 +15,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -312,17 +313,17 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     }
 
     @Override
-    public List<Long> getEventInvitations() throws SmartMapClientException {
+    public InvitationBag getEventInvitations() throws SmartMapClientException {
 
         HttpURLConnection conn = this.getHttpURLConnection("/getEventInvitations");
         String response = this.sendViaPost(new HashMap<String, String>(), conn);
 
-        List<Long> eventInvitations = new ArrayList<Long>();
+        List<ImmutableEvent> eventInvitations = new ArrayList<ImmutableEvent>();
 
         try {
             SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
-            eventInvitations = parser.parseIds(response, "events");
+            eventInvitations = parser.parseEventList(response);
 
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
@@ -330,7 +331,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-        return eventInvitations;
+        return new NetworkEventInvitationBag(new HashSet<ImmutableEvent>(eventInvitations));
     }
 
     /*

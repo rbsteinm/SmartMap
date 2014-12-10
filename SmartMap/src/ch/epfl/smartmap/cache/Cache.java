@@ -793,7 +793,18 @@ public class Cache {
     }
 
     public synchronized void readAllInvitations() {
-        // Set<Invitation> unreadInvitations = this.getIn
+        SortedSet<Invitation> unreadInvitations = this.getInvitations(new Cache.SearchFilter<Invitation>() {
+            @Override
+            public boolean filter(Invitation item) {
+                // Get Unread invitations
+                return item.getStatus() == Invitation.UNREAD;
+            }
+        });
+        for (Invitation invitation : unreadInvitations) {
+            // TODO set them to read
+            // NULLPOINTER pour le moment quand je fais getImmutableCopy
+            // invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
+        }
     }
 
     /**
