@@ -81,8 +81,6 @@ public class StartActivity extends FragmentActivity {
         ServiceContainer.setCache(new Cache());
         ServiceContainer.setSearchEngine(new CachedSearchEngine());
 
-        ServiceContainer.getSettingsManager().getSelf().getImage();
-
         // Displays the facebook app hash in LOG.d
         try {
             Log.d(TAG, "Retrieving sha1 app hash...");
