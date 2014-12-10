@@ -34,7 +34,7 @@ public class Cache {
 
     static final public String TAG = Cache.class.getSimpleName();
 
-    private LongSparseArray<User> mUserInstances;
+    private final LongSparseArray<User> mUserInstances;
     // SparseArrays containing live instances
     private final LongSparseArray<Event> mEventInstances;
     private final LongSparseArray<Filter> mFilterInstances;
@@ -461,6 +461,15 @@ public class Cache {
         });
     }
 
+    public synchronized Set<Event> getParticipatingEvents() {
+        return this.getEvents(new SearchFilter<Event>() {
+            @Override
+            public synchronized boolean filter(Event item) {
+                return item.isGoing();
+            }
+        });
+    }
+
     /**
      * OK
      * 
@@ -825,20 +834,30 @@ public class Cache {
 
         // Create and add live instances of Invitations
         for (ImmutableInvitation invitationInfo : invitationsToAdd) {
+            boolean isSetCorrectly = false;
+
             switch (invitationInfo.getType()) {
                 case Invitation.FRIEND_INVITATION:
                 case Invitation.ACCEPTED_FRIEND_INVITATION:
                     invitationInfo.setUser(this.getUser(invitationInfo.getUserInfos().getId()));
+                    isSetCorrectly = invitationInfo.getUser() != null;
                     break;
                 case Invitation.EVENT_INVITATION:
+                    Log.d(TAG, "Invitation tries to put event " + invitationInfo.getEventInfos().getId());
                     invitationInfo.setEvent(this.getEvent(invitationInfo.getEventInfos().getId()));
+                    isSetCorrectly = invitationInfo.getEvent() != null;
                     break;
                 default:
                     assert false;
                     break;
             }
-            mInvitationIds.add(invitationInfo.getId());
-            mInvitationInstances.put(invitationInfo.getId(), new GenericInvitation(invitationInfo));
+            Log.d(TAG, "Adding instance of invitation type " + invitationInfo.getType() + " with User "
+                + invitationInfo.getUser() + " or Event " + invitationInfo.getEvent());
+
+            if (isSetCorrectly) {
+                mInvitationIds.add(invitationInfo.getId());
+                mInvitationInstances.put(invitationInfo.getId(), new GenericInvitation(invitationInfo));
+            }
 
             needToCallListeners = true;
         }
@@ -1182,54 +1201,6 @@ public class Cache {
         mUserIds.clear();
         mUserInstances.clear();
         this.putUsers(users);
-    }
-
-    private Invitation processAcceptedFriendInvitation(ImmutableInvitation newInvitation) {
-        // Add User in Cache
-        Cache.this.putUser(newInvitation.getUserInfos());
-        newInvitation.setUser(Cache.this.getUser(newInvitation.getUserId()));
-        if (newInvitation.getId() == Invitation.NO_ID) {
-            // Send from server, need to add local ID
-            long id = ServiceContainer.getDatabase().addInvitation(newInvitation);
-            newInvitation.setId(id);
-            // Phone notification
-            Notifications.acceptedFriendNotification(ServiceContainer.getSettingsManager().getContext(),
-                newInvitation.getUserInfos());
-
-        }
-        return new GenericInvitation(newInvitation);
-    }
-
-    private Invitation processEventInvitation(ImmutableInvitation newInvitation) {
-        Log.d(TAG, "Event invit ID :" + newInvitation.getId());
-        // Add Event in Cache
-        Cache.this.putEvent(newInvitation.getEventInfos());
-        newInvitation.setEvent(Cache.this.getEvent(newInvitation.getEventId()));
-        if (newInvitation.getId() == Invitation.NO_ID) {
-            // Send from server, need to add local ID
-            long id = ServiceContainer.getDatabase().addInvitation(newInvitation);
-            newInvitation.setId(id);
-            Log.d(TAG, "Database gives id " + id);
-            // Phone notification
-            Notifications.newEventNotification(ServiceContainer.getSettingsManager().getContext(),
-                newInvitation);
-        }
-        return new GenericInvitation(newInvitation);
-    }
-
-    private Invitation processFriendInvitation(final ImmutableInvitation newInvitation) {
-        // Add inviter in Cache
-        Cache.this.putUser(newInvitation.getUserInfos());
-        newInvitation.setUser(Cache.this.getUser(newInvitation.getUserId()));
-        if (newInvitation.getId() == Invitation.NO_ID) {
-            // Send from server, need to add local ID
-            long id = ServiceContainer.getDatabase().addInvitation(newInvitation);
-            newInvitation.setId(id);
-            // Phone notification
-            Notifications.newFriendNotification(ServiceContainer.getSettingsManager().getContext(),
-                newInvitation.getUserInfos());
-        }
-        return new GenericInvitation(newInvitation);
     }
 
     private synchronized boolean updateEvent(ImmutableEvent eventInfo) {
