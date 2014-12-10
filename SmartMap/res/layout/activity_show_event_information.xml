@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@id/event_info_title_text"
             android:layout_below="@id/event_info_title_text"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="5dp"
             android:text="@string/event_info_when_text"
             android:textColor="@color/main_blue"
             android:textSize="16sp"
@@ -59,17 +59,17 @@
             android:layout_below="@id/show_event_info_event_name"
             android:layout_toRightOf="@id/event_info_when_text"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+        
 
         <TextView
             android:id="@+id/show_event_info_start_hour"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/show_event_info_start_date"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/show_event_info_event_name"
-            android:layout_marginRight="70dp"
+            android:layout_toRightOf="@+id/show_event_info_end_date"
+            android:layout_marginLeft="5dp"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-
+        
         <TextView
             android:id="@+id/show_event_info_end_date"
             android:layout_width="wrap_content"
@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@id/event_info_when_text"
             android:layout_below="@id/show_event_info_end_date"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/event_info_by_text"
             android:textColor="@color/main_blue"
             android:textSize="16sp"
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@id/event_info_by_text"
             android:layout_below="@id/event_info_by_text"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="5dp"
             android:text="@string/event_info_description_text"
             android:textColor="@color/main_blue"
             android:textSize="16sp"
@@ -140,7 +140,7 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@id/event_info_description_text"
             android:layout_below="@id/event_info_description_text"
-            android:layout_marginTop="65dp"
+            android:layout_marginTop="50dp"
             android:text="@string/event_info_where_text"
             android:textColor="@color/main_blue"
             android:textSize="16sp"

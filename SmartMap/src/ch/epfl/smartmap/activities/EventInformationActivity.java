@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,7 +39,6 @@ public class EventInformationActivity extends ListActivity {
 
     private static final String TAG = EventInformationActivity.class.getSimpleName();
 
-    private Context mContext;
     private Event mEvent;
     private TextView mEventTitle;
     private TextView mEventCreator;
@@ -160,7 +158,7 @@ public class EventInformationActivity extends ListActivity {
                                     @Override
                                     public void run() {
                                         Toast.makeText(EventInformationActivity.this,
-                                            EventInformationActivity.this.getString(R.string.add_participant_failure),
+                                            EventInformationActivity.this.getString(R.string.event_going_failure),
                                             Toast.LENGTH_SHORT).show();
                                     }
                                 });
@@ -173,7 +171,7 @@ public class EventInformationActivity extends ListActivity {
                                     @Override
                                     public void run() {
                                         Toast.makeText(EventInformationActivity.this,
-                                            EventInformationActivity.this.getString(R.string.add_participant_success),
+                                            EventInformationActivity.this.getString(R.string.event_going_success),
                                             Toast.LENGTH_SHORT).show();
                                     }
                                 });
@@ -189,7 +187,7 @@ public class EventInformationActivity extends ListActivity {
                                     @Override
                                     public void run() {
                                         Toast.makeText(EventInformationActivity.this,
-                                            EventInformationActivity.this.getString(R.string.add_participant_failure),
+                                            EventInformationActivity.this.getString(R.string.event_quit_failure),
                                             Toast.LENGTH_SHORT).show();
                                     }
                                 });
@@ -201,7 +199,7 @@ public class EventInformationActivity extends ListActivity {
                                     @Override
                                     public void run() {
                                         Toast.makeText(EventInformationActivity.this,
-                                            EventInformationActivity.this.getString(R.string.add_participant_success),
+                                            EventInformationActivity.this.getString(R.string.event_quit_success),
                                             Toast.LENGTH_SHORT).show();
                                     }
                                 });
@@ -288,7 +286,8 @@ public class EventInformationActivity extends ListActivity {
 
         } else {
             Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
-            Toast.makeText(mContext, mContext.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
+            Toast.makeText(EventInformationActivity.this,
+                EventInformationActivity.this.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
             this.finish();
         }
 

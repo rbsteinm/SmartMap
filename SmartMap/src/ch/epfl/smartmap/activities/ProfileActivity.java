@@ -31,15 +31,6 @@ public class ProfileActivity extends Activity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
-        // TODO find a way to get user's own profile picture/, should be stored in the cache
-        mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
-
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.profile, menu);
@@ -56,5 +47,15 @@ public class ProfileActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
+        mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
+        // TODO find a way to get user's own profile picture
+        // mPicture.setImageBitmap(ServiceContainer.getSettingsManager().getImage());
+
     }
 }

@@ -6,7 +6,6 @@ import java.util.List;
 
 import android.app.ActionBar;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -132,7 +131,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
      * Display the map with the current location
      */
     public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         // Showing status
         if (status != ConnectionResult.SUCCESS) { // Google Play Services are
             // not available
@@ -147,10 +146,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             // Enabling MyLocation Layer of Google Map
             mGoogleMap.setMyLocationEnabled(true);
         }
-    }
-
-    public Context getContext() {
-        return this;
     }
 
     public MenuTheme getMenuTheme() {
@@ -190,7 +185,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         mDrawerLayout = (DrawerLayout) this.findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) this.findViewById(R.id.left_drawer_listView);
 
-        mSideMenu = new SideMenu(this.getContext());
+        mSideMenu = new SideMenu(this);
         mSideMenu.initializeDrawerLayout();
 
         final SearchLayout mSearchLayout = (SearchLayout) this.findViewById(R.id.search_layout);
@@ -395,10 +390,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     @Override
     protected void onPause() {
         super.onPause();
-        // TODO A method to unregister to the service when the map is not
-        // opened?
-        // this.unregisterReceiver(mBroadcastReceiver);
-        // stopService(mUpdateServiceIntent);
     }
 
     @Override

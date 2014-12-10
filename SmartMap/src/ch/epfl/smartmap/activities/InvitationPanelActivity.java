@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -31,19 +30,15 @@ public class InvitationPanelActivity extends ListActivity {
 
     private List<Invitation> mInvitationList;
 
-    private Context mContext;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_notifications);
         Notifications.cancelNotification(this);
 
-        mContext = this.getBaseContext();
-
         mInvitationList = new ArrayList<Invitation>(ServiceContainer.getCache().getAllInvitations());
 
-        this.setListAdapter(new InvitationListItemAdapter(mContext, mInvitationList));
+        this.setListAdapter(new InvitationListItemAdapter(InvitationPanelActivity.this, mInvitationList));
 
         // Initialize the listener
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
@@ -52,8 +47,8 @@ public class InvitationPanelActivity extends ListActivity {
                 InvitationPanelActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext,
-                            mInvitationList));
+                        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(
+                            InvitationPanelActivity.this, mInvitationList));
                     }
                 });
             }
@@ -91,8 +86,8 @@ public class InvitationPanelActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(mContext, new ArrayList<Invitation>(
-            ServiceContainer.getCache().getAllInvitations())));
+        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(InvitationPanelActivity.this,
+            new ArrayList<Invitation>(ServiceContainer.getCache().getAllInvitations())));
 
         ServiceContainer.getCache().readAllInvitations();
 

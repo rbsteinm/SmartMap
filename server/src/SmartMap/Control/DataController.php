@@ -158,22 +158,39 @@ class DataController
      */
     public function getUserInfo(Request $request)
     {
+        $userId = RequestUtils::getIdFromRequest($request);
+
         $id = RequestUtils::getPostParam($request, 'user_id');
         
         try
         {
             $user = $this->mRepo->getUser($id);
+
+            $friendsIds = $this->mRepo->getFriendsIds($userId);
         }
         catch (DatabaseException $e)
         {
             throw new ControlLogicException('Error in getUserInfo.', 2, $e);
         }
+
+        $isFriend = 0;
+
+        if (in_array($id, $friendsIds))
+        {
+            $isFriend = 1;
+        }
+        else if ($userId == $id)
+        {
+            $isFriend = 2;
+        }
+
         // We only send public data
         $response = array(
             'status' => 'Ok',
             'message' => 'Fetched user info !',
             'id' => $user->getId(),
             'name' => $user->getName(),
+            'isFriend' => $isFriend
         );
         
         return new JsonResponse($response);
@@ -480,11 +497,18 @@ class DataController
         
         try
         {
-            $friendsIds = $this->mRepo->getFriendsIds($id);
+            // We do not return friends
+            $nonDisplayedUsers = $this->mRepo->getFriendsIds($id);
 
-            $friendsIds[] = $id; // We do not want to show the user in the search results.
+            $nonDisplayedUsers[] = $id; // We do not want to show the user in the search results.
+
+            // We do not return invited users
+            $nonDisplayedUsers = array_merge($nonDisplayedUsers, $this->mRepo->getInvitedIds($id));
+
+            // We do not want to return inviting users
+            $nonDisplayedUsers = array_merge($nonDisplayedUsers, $this->mRepo->getInvitationIds($id));
             
-            $users = $this->mRepo->findUsersByPartialName($partialName, $friendsIds);
+            $users = $this->mRepo->findUsersByPartialName($partialName, $nonDisplayedUsers);
         }
         catch (DatabaseException $e)
         {

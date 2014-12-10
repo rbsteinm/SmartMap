@@ -893,9 +893,7 @@ public class Cache {
         Log.d(TAG, unreadInvitations.toString());
         for (Invitation invitation : unreadInvitations) {
             Log.d(TAG, invitation.toString());
-            // TODO set them to read
-            // NULLPOINTER pour le moment quand je fais getImmutableCopy
-            // invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
+            invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
         }
     }
 
@@ -983,22 +981,36 @@ public class Cache {
      * 
      * @param id
      */
-    public synchronized void removeFriend(long id) {
+    public synchronized void removeFriend(long id, final NetworkRequestCallback callback) {
         Set<Long> singleton = new HashSet<Long>();
         singleton.add(id);
-        this.removeFriends(singleton);
+        this.removeFriends(singleton, callback);
     }
 
     /**
      * OK
      * 
      * @param ids
+     * @throws SmartMapClientException
      */
-    public synchronized void removeFriends(Set<Long> ids) {
+    public synchronized void removeFriends(Set<Long> ids, final NetworkRequestCallback callback) {
         boolean isListModified = false;
-
         for (long id : ids) {
             if (mFriendIds.contains(id)) {
+                new AsyncTask<Long, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Long... params) {
+                        try {
+                            ServiceContainer.getNetworkClient().removeFriend(params[0]);
+                            callback.onSuccess();
+                        } catch (SmartMapClientException e) {
+                            Log.e(TAG, "Error while inviting friend: " + e);
+                            callback.onFailure();
+                        }
+                        return null;
+                    }
+                }.execute(id);
+
                 // Remove id from sets
                 mFriendIds.remove(id);
                 mUserInstances.remove(id);
@@ -1048,25 +1060,26 @@ public class Cache {
         }.execute();
     }
 
-    private void removeRemovedFriends(Set<Long> removedFriendsIds) {
-        for (Long id : removedFriendsIds) {
-            this.removeFriend(id);
-
-            new AsyncTask<Long, Void, Void>() {
-
-                @Override
-                protected Void doInBackground(Long... params) {
-                    try {
-                        ServiceContainer.getNetworkClient().ackRemovedFriend(params[0]);
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Couldn't ack removed friend: " + e);
-                    }
-                    return null;
-                }
-
-            }.execute(id);
-        }
-    }
+    // TODO do we need it?
+    // private void removeRemovedFriends(Set<Long> removedFriendsIds) {
+    // for (Long id : removedFriendsIds) {
+    // this.removeFriend(id);
+    //
+    // new AsyncTask<Long, Void, Void>() {
+    //
+    // @Override
+    // protected Void doInBackground(Long... params) {
+    // try {
+    // ServiceContainer.getNetworkClient().ackRemovedFriend(params[0]);
+    // } catch (SmartMapClientException e) {
+    // Log.e(TAG, "Couldn't ack removed friend: " + e);
+    // }
+    // return null;
+    // }
+    //
+    // }.execute(id);
+    // }
+    // }
 
     public synchronized void retainEvents(List<Long> ids) {
         for (long id : mEventIds) {

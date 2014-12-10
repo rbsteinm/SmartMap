@@ -70,7 +70,7 @@ $app['profile.controller'] = $app->share(function() use($app) {
 });
 
 $app['event.controller'] = $app->share(function() use($app) {
-    return new SmartMap\Control\EventController($app['event.repository']);
+    return new SmartMap\Control\EventController($app['event.repository'], $app['user.repository']);
 });
 
 // Error management
