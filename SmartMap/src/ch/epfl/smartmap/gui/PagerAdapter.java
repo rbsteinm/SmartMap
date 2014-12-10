@@ -20,7 +20,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
         mContext = context;
         mFragments = new ArrayList<Fragment>();
         mFragments.add(new FriendsTab(mContext));
-        mFragments.add(new InvitationsTab(mContext));
+        mFragments.add(new InvitationsTab());
 
     }
 

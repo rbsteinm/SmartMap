@@ -28,7 +28,7 @@ public class UserInformationActivity extends Activity {
 
     @SuppressWarnings("unused")
     private static final String TAG = UserInformationActivity.class.getSimpleName();
-    private Friend mUser;
+    private User mUser;
     private Switch mShowOnMapSwitch;
     private Switch mBlockSwitch;
     private TextView mSubtitlesView;
@@ -48,30 +48,50 @@ public class UserInformationActivity extends Activity {
         mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
         mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
         // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         // Set user informations
-        mUser =
-            (Friend) ServiceContainer.getCache().getUser(this.getIntent().getLongExtra("USER", User.NO_ID));
-        mNameView.setText(mUser.getName());
-        mSubtitlesView.setText(mUser.getSubtitle());
-        mPictureView.setImageBitmap(mUser.getImage());
-        mShowOnMapSwitch.setChecked(mUser.isVisible());
-        mBlockSwitch.setChecked(mUser.isBlocked());
-        mDistanceView.setText(Utils.printDistanceToMe(mUser.getLocation()));
+        mUser = ServiceContainer.getCache().getUser(this.getIntent().getLongExtra("USER", User.NO_ID));
+
+        // Defensive case, should never happen
+        if (mUser == null) {
+            mNameView.setText("Unknown user");
+        } else {
+            // Ugly instanceof, case classes would be helpful
+            if (mUser instanceof Friend) {
+                Friend friend = (Friend) mUser;
+
+                mNameView.setText(friend.getName());
+                mSubtitlesView.setText(friend.getSubtitle());
+                mPictureView.setImageBitmap(friend.getImage());
+                mShowOnMapSwitch.setChecked(friend.isVisible());
+                mBlockSwitch.setChecked(friend.isBlocked());
+                mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
+
+            } else {
+                mNameView.setText(mUser.getName());
+                mSubtitlesView.setText(mUser.getSubtitle());
+                mPictureView.setImageBitmap(mUser.getImage());
+                mShowOnMapSwitch.setVisibility(View.INVISIBLE);
+                mBlockSwitch.setVisibility(View.INVISIBLE);
+                mDistanceView.setVisibility(View.INVISIBLE);
+                // We do not display the remove button as we are not friends yet
+                this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
     public void displayDeleteConfirmationDialog(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("remove " + mUser.getName() + " from your friends?");
+        builder.setMessage(this.getString(R.string.remove) + " " + mUser.getName() + " "
+            + this.getString(R.string.from_your_friends));
 
         // Add positive button
-        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(this.getString(R.string.remove), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 ServiceContainer.getCache().removeFriend(mUser.getId(), new NetworkRequestCallback() {
@@ -104,7 +124,7 @@ public class UserInformationActivity extends Activity {
         });
 
         // Add negative button
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(this.getString(R.string.cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
@@ -129,7 +149,8 @@ public class UserInformationActivity extends Activity {
     }
 
     public void showOnMap(View view) {
-        // TODO need superfiltre
+        // TODO need superfiltre. Don't forget to check that the user is a
+        // friend !
         // ServiceContainer.getCache().updateFilter(ServiceContainer.getCache().getFilter(SUPERFILTRE_ID));
     }
 

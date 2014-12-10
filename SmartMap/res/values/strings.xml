@@ -192,7 +192,9 @@
     <string name="user_information_picture_description">Profile Picture</string>
     <string name="title_activity_search">SearchActivity</string>
     <string name="remove_friend_failure">Error while trying to remove a friend</string>
-    <string name="remove_friend_success">Successfully remove friend</string>
+    <string name="remove_friend_success">Successfully removed friend</string>
+    <string name="remove">Remove</string>
+    <string name="from_your_friends">from your friends ?</string>
 
     <!-- Notification texts -->
     <string name="notification_acceptedfriend_title">Friend invitation accepted</string>
@@ -319,6 +321,14 @@
     <string name="add_friend_not_found">No user found for this query</string>
     <string name="add_friend_request_not_sent">Friend request sent couldn\'t be sent</string>
     <string name="add_friend_request_sent">Friend request sent !</string>
+    
+    <!-- InvitationsTab -->
+    <string name="accept_friend_network_error">The invitation couldn\'t be accepted. Please try again later.</string>
+    <string name="decline_friend_network_error">The invitation couldn\'t be declined. Please try again later.</string>
+    <string name="yes_accept">Yes, accept</string>
+    <string name="no_decline">No, decline</string>
+    <string name="decline_confirm">Invitation declined.</string>
+    
     <!-- Nothing below this line! -->
 
 </resources>
