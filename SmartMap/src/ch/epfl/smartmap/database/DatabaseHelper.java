@@ -206,6 +206,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             this.updateEvent(event);
         }
 
+        Log.d(TAG, "Add event, put User #" + event.getImmCreator().getId());
         this.addUser(event.getImmCreator());
 
         cursor.close();
@@ -269,7 +270,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 // Already stored
                 return Invitation.ALREADY_RECEIVED;
             } else {
-
+                this.addPendingFriend(userInfo.getId());
             }
 
             Log.d(TAG, "Pending ids after : " + this.getPendingFriends());

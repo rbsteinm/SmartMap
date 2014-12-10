@@ -12,7 +12,6 @@ import java.util.Set;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
-import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
@@ -32,7 +31,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
     private static final float LOCATION_DISTANCE_THRESHHOLD = 0;
 
-    private static final String TAG = UserInformationActivity.class.getSimpleName();
+    private static final String TAG = CachedSearchEngine.class.getSimpleName();
 
     private final Map<String, Set<Long>> mPreviousOnlineStrangerSearches;
     private final List<Location> mPreviousOnlineEventSearchQueries;
@@ -138,7 +137,9 @@ public final class CachedSearchEngine implements SearchEngine {
                             // If not found, check on the server
                             ImmutableEvent networkResult;
                             try {
+                                Log.d(TAG, "Try to get event online");
                                 networkResult = ServiceContainer.getNetworkClient().getEventInfo(id);
+                                Log.d(TAG, "Successfull");
                             } catch (SmartMapClientException e) {
                                 networkResult = null;
                                 Log.e(TAG, "Error while finding public events by Ids" + e);
