@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
@@ -14,7 +13,7 @@ import ch.epfl.smartmap.cache.Invitation;
 /**
  * @author Pamoi
  */
-public class NetworkInvitationBag implements InvitationBag {
+public class NetworkFriendInvitationBag implements InvitationBag {
     private final Set<ImmutableInvitation> invitations;
 
     /**
@@ -25,7 +24,7 @@ public class NetworkInvitationBag implements InvitationBag {
      * @param newFriends
      * @param removedFriendsIds
      */
-    public NetworkInvitationBag(List<ImmutableUser> invitingUsers, List<ImmutableUser> newFriends,
+    public NetworkFriendInvitationBag(List<ImmutableUser> invitingUsers, List<ImmutableUser> newFriends,
         List<Long> removedFriendsIds) {
         if (invitingUsers == null) {
             throw new IllegalArgumentException("invitingUsers list is null.");
@@ -41,13 +40,13 @@ public class NetworkInvitationBag implements InvitationBag {
         long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis();
 
         for (ImmutableUser user : invitingUsers) {
-            invitations.add(new ImmutableInvitation(Invitation.NO_ID, user, Event.NO_ID, Invitation.UNREAD, timeStamp,
-                Invitation.FRIEND_INVITATION));
+            invitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
+                timeStamp, Invitation.FRIEND_INVITATION));
         }
 
         for (ImmutableUser user : newFriends) {
-            invitations.add(new ImmutableInvitation(Invitation.NO_ID, user, Event.NO_ID, Invitation.UNREAD, timeStamp,
-                Invitation.ACCEPTED_FRIEND_INVITATION));
+            invitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
+                timeStamp, Invitation.ACCEPTED_FRIEND_INVITATION));
         }
     }
 
