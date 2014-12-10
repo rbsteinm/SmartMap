@@ -74,6 +74,7 @@ public class ShowEventsActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
+        Log.d(TAG, "Event at position " + position + " with id " + id + " (view id " + v.getId() + ")");
         super.onListItemClick(l, v, position, id);
         this.displayInfoDialog(position);
     }
@@ -183,6 +184,10 @@ public class ShowEventsActivity extends ListActivity {
         // tests pass.
         mContext = this.getApplicationContext();
 
+        if (ServiceContainer.getSettingsManager() == null) {
+            ServiceContainer.initSmartMapServices(this.getApplicationContext());
+        }
+
         mMyLocation = ServiceContainer.getSettingsManager().getLocation();
 
         mMyEventsChecked = false;
@@ -207,8 +212,6 @@ public class ShowEventsActivity extends ListActivity {
 
         mMyLocation = ServiceContainer.getSettingsManager().getLocation();
         mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllEvents());
-
-        Log.d(TAG, "mEventsList: " + mEventsList);
 
         if (mNearMeChecked) {
             mEventsList.retainAll(ServiceContainer.getCache().getNearEvents());
