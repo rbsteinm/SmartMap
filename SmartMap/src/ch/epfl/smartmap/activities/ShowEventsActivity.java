@@ -68,6 +68,7 @@ public class ShowEventsActivity extends ListActivity {
         this.initializeGUI();
 
         // Create custom Adapter and pass it to the Activity
+        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllVisibleEvents());
         EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
         this.setListAdapter(adapter);
     }
@@ -208,10 +209,11 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
-        Log.d(TAG, "Updating event's list to match user choices");
-
         mMyLocation = ServiceContainer.getSettingsManager().getLocation();
         mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllEvents());
+
+        Log.i(TAG, "Updating event's list to match user choices");
+        Log.d(TAG, "mEventsList: " + mEventsList);
 
         if (mNearMeChecked) {
             mEventsList.retainAll(ServiceContainer.getCache().getNearEvents());

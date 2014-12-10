@@ -7,12 +7,22 @@ import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMat
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.not;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.TimeZone;
+
 import android.app.ListActivity;
+import android.location.Location;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 import android.widget.SeekBar;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
+import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.cache.ImmutableEvent;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 
 import com.google.android.apps.common.testing.ui.espresso.UiController;
 import com.google.android.apps.common.testing.ui.espresso.ViewAction;
@@ -78,7 +88,8 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
 
     }
 
-    public void testCheckingMyEventsChangesListSize() {
+    public void testCheckingMyEventsChangesListSize() throws InterruptedException {
+        Thread.sleep(2000);
         int initialSize = mActivity.getListView().getCount();
         onView(withId(R.id.ShowEventsCheckBoxMyEv)).perform(ViewActions.click());
         mActivity = this.getActivity();
@@ -195,6 +206,31 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
          * dbHelper.addEvent(e2);
          * dbHelper.addEvent(e3);
          */
+
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        Calendar inTenMins = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        inTenMins.add(Calendar.MINUTE, 10);
+
+        Location location = new Location("");
+        location.setLatitude(20);
+        location.setLongitude(20);
+
+        ImmutableEvent event =
+            new ImmutableEvent(1, "Test event", 2, "Description.......", now, inTenMins, location,
+                "Somewhere", new HashSet<Long>());
+
+        ServiceContainer.getCache().createEvent(event, new NetworkRequestCallback() {
+
+            @Override
+            public void onFailure() {
+                // Nothing
+            }
+
+            @Override
+            public void onSuccess() {
+                // Nothing
+            }
+        });
 
     }
 
