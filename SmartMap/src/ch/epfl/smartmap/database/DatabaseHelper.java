@@ -607,7 +607,10 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
+                // TODO
+                // if (cursor.getLong(cursor.getColumnIndex(KEY_USER_ID) == User.FRIEND_STATUS){
                 friendIds.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
+                // }
             } while (cursor.moveToNext());
         }
 
