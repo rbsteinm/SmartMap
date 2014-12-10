@@ -121,7 +121,7 @@
     <string name="events_list_item_adapter_from">from</string>
     <string name="events_list_item_adapter_to">to</string>
 
-    <!-- ShowEventInformationActivity -->
+    <!-- EventInformationActivity -->
     <string name="event_info_title_text">Title</string>
     <string name="event_info_when_text">When</string>
     <string name="event_info_by_text">Created by</string>
@@ -142,6 +142,7 @@
     <string name="event_going_failure">Error while trying to join event</string>
     <string name="refresh_participants_network_error">Network Error while getting participants</string>
     <string name="refresh_participants_not_found">Couldn\'t find participants</string>
+    <string name="event_info_delete_button">Delete event</string>
 
     <!-- Error Messages -->
     <string name="error_client_side">An error occurred on our side, sorry :(</string>
