@@ -1,6 +1,7 @@
 <?php
 
 use SmartMap\DBInterface\Event;
+use SmartMap\DBInterface\User;
 use SmartMap\Control\EventController;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -18,15 +19,21 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  */
 class EventControllerTest extends PHPUnit_Framework_TestCase
 {
-    private $mockRepo;
+    private $mockEventRepo;
+    private $mockUserRepo;
 
     private $mValidEvent;
 
     public function setUp()
     {
-        $this->mockRepo = $this->getMockBuilder('SmartMap\DBInterface\EventRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mockEventRepo = $this->getMockBuilder('SmartMap\DBInterface\EventRepository')
+             ->disableOriginalConstructor()
+             ->getMock();
+
+        $this->mockUserRepo = $this->getMockBuilder('SmartMap\DBInterface\UserRepository')
+             ->disableOriginalConstructor()
+             ->getMock();
+
 
         $this->mValidEvent = new Event(
             1,
@@ -55,11 +62,11 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
             ''
         );
 
-        $this->mockRepo
+        $this->mockEventRepo
              ->method('createEvent')
              ->willReturn($returnEvent);
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
              ->method('createEvent')
              ->with($this->equalTo($this->mValidEvent));
 
@@ -77,7 +84,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 123);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $response = $controller->createEvent($request);
 
@@ -106,7 +113,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 123);
         $request->setSession($session);
 
-        $controller = new \SmartMap\Control\EventController($this->mockRepo);
+        $controller = new \SmartMap\Control\EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->createEvent($request);
     }
@@ -130,7 +137,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 123);
         $request->setSession($session);
 
-        $controller = new \SmartMap\Control\EventController($this->mockRepo);
+        $controller = new \SmartMap\Control\EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->createEvent($request);
     }
@@ -141,7 +148,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testCreateUserDBException()
     {
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('createEvent')
             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException('Oh no !')));
 
@@ -159,7 +166,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 123);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->createEvent($request);
     }
@@ -178,15 +185,15 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
             ''
         );
 
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('getEvent')
             ->willReturn($returnEvent);
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
              ->method('getEvent')
              ->with($this->equalTo($this->mValidEvent->getId()));
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
              ->method('updateEvent')
              ->with($this->equalTo($this->mValidEvent
                  ->setStartingDate('2014-11-18 23:05:25')
@@ -213,7 +220,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 123);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $response = $controller->updateEvent($request);
 
@@ -236,15 +243,15 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
             ''
         );
 
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('getEvent')
             ->willReturn($returnEvent);
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
             ->method('getEvent')
             ->with($this->equalTo($this->mValidEvent->getId()));
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
             ->method('updateEvent')
             ->with($this->equalTo($this->mValidEvent
                     ->setName('Toto')
@@ -261,7 +268,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 123);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $response = $controller->updateEvent($request);
 
@@ -276,11 +283,11 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidParameterUpdateEvent()
     {
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('getEvent')
             ->willReturn($this->mValidEvent);
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
             ->method('getEvent')
             ->with($this->equalTo($this->mValidEvent->getId()));
 
@@ -294,7 +301,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 123);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->updateEvent($request);
     }
@@ -305,11 +312,11 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testNotAllowedUpdateEvent()
     {
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('getEvent')
             ->willReturn($this->mValidEvent);
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
             ->method('getEvent')
             ->with($this->equalTo($this->mValidEvent->getId()));
 
@@ -323,7 +330,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 124); // Not the creator id of the event !
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->updateEvent($request);
     }
@@ -334,7 +341,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testDBExceptionUpdateEvent()
     {
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('getEvent')
             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException('Event does not exist.')));
 
@@ -346,7 +353,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 123);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->updateEvent($request);
     }
@@ -355,11 +362,11 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
     {
         $eventsIds = array(5, 22, 54);
 
-        $this->mockRepo
+        $this->mockEventRepo
              ->method('getEventsInRadius')
              ->willReturn($eventsIds);
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
              ->method('getEventsInRadius')
              ->with($this->equalTo(1.02), $this->equalTo(5.23), $this->equalTo(100));
 
@@ -373,7 +380,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 123);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $response = $controller->getPublicEvents($request);
 
@@ -388,7 +395,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
     public function testJoinEvent()
     {
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
              ->method('addUserToEvent')
              ->with($this->equalTo(1), $this->equalTo(14));
 
@@ -398,7 +405,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $response = $controller->joinEvent($request);
 
@@ -413,7 +420,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testJoinEventDBException()
     {
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('addUserToEvent')
             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
 
@@ -423,14 +430,14 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->joinEvent($request);
     }
 
     public function testLeaveEvent()
     {
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
             ->method('removeUserFromEvent')
             ->with($this->equalTo(1), $this->equalTo(14));
 
@@ -440,7 +447,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $response = $controller->leaveEvent($request);
 
@@ -455,7 +462,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testLeaveEventDBException()
     {
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('removeUserFromEvent')
             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
 
@@ -465,14 +472,14 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->leaveEvent($request);
     }
 
     public function testInviteUsersToEvent()
     {
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
              ->method('addEventInvitations')
              ->with($this->equalTo(3), $this->equalTo(array(1, 12, 14)));
 
@@ -482,7 +489,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $response = $controller->inviteUsersToEvent($request);
 
@@ -497,7 +504,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testInviteUsersDBException()
     {
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('addEventInvitations')
             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
 
@@ -507,42 +514,55 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->inviteUsersToEvent($request);
     }
 
     public function testGetEventInvitations()
     {
-        $this->mockRepo
+        $creator = new User(1, 2, 'Toto', 'VISIBLE', 1.0, 2.0);
+
+        $this->mockEventRepo
              ->method('getEventInvitations')
              ->willReturn(array(5, 7, 9));
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
              ->method('getEventInvitations')
              ->with($this->equalTo(14));
 
-        $this->mockRepo
+        $this->mockEventRepo
              ->method('getEvent')
              ->will($this->onConsecutiveCalls($this->mValidEvent, $this->mValidEvent, $this->mValidEvent));
 
-        $this->mockRepo->expects($this->exactly(3))
+        $this->mockEventRepo->expects($this->exactly(3))
              ->method('getEvent')
              ->withConsecutive(
                 array($this->equalTo(5)),
                 array($this->equalTo(7)),
                 array($this->equalTo(9)));
 
-        $this->mockRepo
+        $this->mockEventRepo
              ->method('getEventParticipants')
              ->will($this->onConsecutiveCalls(array(7, 9), array(1), array()));
 
-        $this->mockRepo->expects($this->exactly(3))
+        $this->mockEventRepo->expects($this->exactly(3))
              ->method('getEventParticipants')
              ->withConsecutive(
                 array($this->equalTo(5)),
                 array($this->equalTo(7)),
                 array($this->equalTo(9)));
+
+        $this->mockUserRepo
+             ->method('getUser')
+             ->willReturn($creator);
+
+        $this->mockUserRepo->expects($this->exactly(3))
+             ->method('getUser')
+             ->withConsecutive(
+                 array($this->equalTo($this->mValidEvent->getCreatorId())),
+                 array($this->equalTo($this->mValidEvent->getCreatorId())),
+                 array($this->equalTo($this->mValidEvent->getCreatorId())));
 
         $request = new Request($query = array(), $request = array());
         $session = new Session(new MockArraySessionStorage());
@@ -550,12 +570,14 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
         $response = $controller->getEventInvitations($request);
+
+        $validCreator = array('id' => 1,'name' => 'Toto');
 
         $event = array(
             'id' => $this->mValidEvent->getId(),
-            'creatorId' => $this->mValidEvent->getCreatorId(),
+            'creator' => $validCreator,
             'startingDate' => $this->mValidEvent->getStartingDate(),
             'endingDate' => $this->mValidEvent->getEndingDate(),
             'longitude' => $this->mValidEvent->getLongitude(),
@@ -593,7 +615,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testGetEventInvitationsDBException()
     {
-        $this->mockRepo
+        $this->mockEventRepo
              ->method('getEventInvitations')
              ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException('Toto')));
 
@@ -603,14 +625,14 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->getEventInvitations($request);
     }
 
     public function testAckEventInvitation()
     {
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
              ->method('removeEventInvitation')
              ->with($this->equalTo(36), $this->equalTo(14));
 
@@ -620,7 +642,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $response = $controller->ackEventInvitation($request);
 
@@ -635,7 +657,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testAckEventInvitationDBException()
     {
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('removeEventInvitation')
             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
 
@@ -645,28 +667,38 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->ackEventInvitation($request);
     }
 
     public function testGetEventInfo()
     {
-        $this->mockRepo
+        $creator = new User(1, 2, 'Toto', 'VISIBLE', 1.0, 2.0);
+
+        $this->mockEventRepo
              ->method('getEvent')
              ->willReturn($this->mValidEvent);
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
             ->method('getEvent')
             ->with($this->equalTo(36));
 
-        $this->mockRepo
+        $this->mockEventRepo
              ->method('getEventParticipants')
              ->willReturn(array(1,2,3));
 
-        $this->mockRepo->expects($this->once())
+        $this->mockEventRepo->expects($this->once())
              ->method('getEventParticipants')
              ->with($this->equalTo(36));
+
+        $this->mockUserRepo
+             ->method('getUser')
+             ->willReturn($creator);
+
+        $this->mockUserRepo->expects($this->once())
+             ->method('getUser')
+             ->with($this->equalTo($this->mValidEvent->getCreatorId()));
 
         $request = new Request($query = array(), $request = array('event_id' => 36));
 
@@ -674,13 +706,15 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $response = $controller->getEventInfo($request);
 
+        $validCreator = array('id' => 1,'name' => 'Toto');
+
         $event = array(
             'id' => $this->mValidEvent->getId(),
-            'creatorId' => $this->mValidEvent->getCreatorId(),
+            'creator' => $validCreator,
             'startingDate' => $this->mValidEvent->getStartingDate(),
             'endingDate' => $this->mValidEvent->getEndingDate(),
             'longitude' => $this->mValidEvent->getLongitude(),
@@ -702,7 +736,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testGetEventInfoDBException()
     {
-        $this->mockRepo
+        $this->mockEventRepo
             ->method('getEvent')
             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
 
@@ -712,7 +746,7 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
         $session->set('userId', 14);
         $request->setSession($session);
 
-        $controller = new EventController($this->mockRepo);
+        $controller = new EventController($this->mockEventRepo, $this->mockUserRepo);
 
         $controller->getEventInfo($request);
     }
