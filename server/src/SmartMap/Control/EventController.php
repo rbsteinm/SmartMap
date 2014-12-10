@@ -277,13 +277,24 @@ class EventController {
         try
         {
             $eventsIds = $this->mRepo->getEventInvitations($userId);
+
+            $eventList = array();
+
+            foreach($eventsIds as $id)
+            {
+                $event = $this->mRepo->getEvent($id);
+
+                $participants = $this->mRepo->getEventParticipants($id);
+
+                $eventList[] = $this->eventInfoArray($event, $participants);
+            }
         }
         catch (DatabaseException $e)
         {
             throw new ControlLogicException('Error in getEventInvitations.', 2, $e);
         }
 
-        $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventsIds);
+        $response = array('status' => 'Ok', 'message' => 'Fetched events.', 'events' => $eventList);
 
         return new JsonResponse($response);
     }

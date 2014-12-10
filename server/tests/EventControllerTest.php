@@ -514,31 +514,76 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
     public function testGetEventInvitations()
     {
-        $eventsIds = array(5, 7, 9);
         $this->mockRepo
              ->method('getEventInvitations')
-             ->willReturn($eventsIds);
+             ->willReturn(array(5, 7, 9));
 
         $this->mockRepo->expects($this->once())
-              ->method('getEventInvitations')
-              ->with($this->equalTo(14));
+             ->method('getEventInvitations')
+             ->with($this->equalTo(14));
+
+        $this->mockRepo
+             ->method('getEvent')
+             ->will($this->onConsecutiveCalls($this->mValidEvent, $this->mValidEvent, $this->mValidEvent));
+
+        $this->mockRepo->expects($this->exactly(3))
+             ->method('getEvent')
+             ->withConsecutive(
+                array($this->equalTo(5)),
+                array($this->equalTo(7)),
+                array($this->equalTo(9)));
+
+        $this->mockRepo
+             ->method('getEventParticipants')
+             ->will($this->onConsecutiveCalls(array(7, 9), array(1), array()));
+
+        $this->mockRepo->expects($this->exactly(3))
+             ->method('getEventParticipants')
+             ->withConsecutive(
+                array($this->equalTo(5)),
+                array($this->equalTo(7)),
+                array($this->equalTo(9)));
 
         $request = new Request($query = array(), $request = array());
-
-        $session =  new Session(new MockArraySessionStorage());
+        $session = new Session(new MockArraySessionStorage());
         $session->set('userId', 14);
+
         $request->setSession($session);
 
         $controller = new EventController($this->mockRepo);
-
         $response = $controller->getEventInvitations($request);
+
+        $event = array(
+            'id' => $this->mValidEvent->getId(),
+            'creatorId' => $this->mValidEvent->getCreatorId(),
+            'startingDate' => $this->mValidEvent->getStartingDate(),
+            'endingDate' => $this->mValidEvent->getEndingDate(),
+            'longitude' => $this->mValidEvent->getLongitude(),
+            'latitude' => $this->mValidEvent->getLatitude(),
+            'positionName' => $this->mValidEvent->getPositionName(),
+            'name' => $this->mValidEvent->getName(),
+            'description' => $this->mValidEvent->getDescription(),
+        );
+
+        $eventsList = array();
+
+        $event1 = $event;
+        $event1['participants'] = array(7, 9);
+        $eventsList[] = $event1;
+
+        $event2 = $event;
+        $event2['participants'] = array(1);
+        $eventsList[] = $event2;
+
+        $event3 = $event;
+        $event3['participants'] = array();
+        $eventsList[] = $event3;
 
         $validResponse = array(
             'status' => 'Ok',
             'message' => 'Fetched events.',
-            'events' => $eventsIds
+            'events' => $eventsList
         );
-
         $this->assertEquals(json_encode($validResponse), $response->getContent());
     }
 
