@@ -395,10 +395,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     @Override
     protected void onPause() {
         super.onPause();
-        // TODO A method to unregister to the service when the map is not
-        // opened?
-        // this.unregisterReceiver(mBroadcastReceiver);
-        // stopService(mUpdateServiceIntent);
     }
 
     @Override

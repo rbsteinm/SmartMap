@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -31,12 +30,10 @@ public class SetLocationActivity extends FragmentActivity {
     private static final String TAG = SetLocationActivity.class.getSimpleName();
 
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-    private static final String CITY_NAME = "CITY_NAME";
     static final int PICK_LOCATION_REQUEST = 1;
 
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
-    private LatLng mMyPosition;
     private LatLng mEventPosition;
 
     /**
@@ -57,11 +54,6 @@ public class SetLocationActivity extends FragmentActivity {
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
             mGoogleMap.setMyLocationEnabled(true);
-
-            // Get my position from SettingsManager
-            mMyPosition =
-                new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(),
-                    ServiceContainer.getSettingsManager().getLocation().getLongitude());
 
             mEventPosition = this.getIntent().getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
 

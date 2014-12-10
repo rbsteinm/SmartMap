@@ -283,6 +283,8 @@ public class AddEventActivity extends FragmentActivity {
 
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
 
+            mPlaceName.setText(ServiceContainer.getSettingsManager().getLocationName());
+
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer.getSettingsManager()
                 .getLocation().getLatitude(), ServiceContainer.getSettingsManager().getLocation().getLongitude()));
             Log.d(TAG, " " + mGoogleMap.getMyLocation());
@@ -556,7 +558,6 @@ public class AddEventActivity extends FragmentActivity {
                 mPlaceName.setText("");
             }
         } else {
-
             Log.e(TAG, "No event position set (extras.getParcelable(LOCATION_EXTRA) was null)");
             Toast.makeText(mContext, this.getString(R.string.error_client_side), Toast.LENGTH_LONG).show();
         }
