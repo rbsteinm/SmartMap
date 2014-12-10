@@ -7,7 +7,6 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,52 +33,77 @@ import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
  */
 public class AddFriendActivity extends ListActivity {
 
+    /**
+     * Callback that describes connection with network
+     * 
+     * @author agpmilli
+     */
+    class AddFriendCallback implements NetworkRequestCallback {
+        @Override
+        public void onFailure() {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(AddFriendActivity.this,
+                        AddFriendActivity.this.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @Override
+        public void onSuccess() {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(AddFriendActivity.this,
+                        AddFriendActivity.this.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
+
+        @Override
+        public void onNetworkError() {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(AddFriendActivity.this,
+                        AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
+                        Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @Override
+        public void onNotFound() {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(AddFriendActivity.this,
+                        AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
+                        Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @Override
+        public void onResult(final Set<User> result) {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
+                        new ArrayList<User>(result)));
+                }
+            });
+        }
+    }
+
     @SuppressWarnings("unused")
     private static final String TAG = AddFriendActivity.class.getSimpleName();
 
     private SearchView mSearchBar;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_add_friend);
-        // Set action bar color to main color
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-    }
-
-    @Override
-    protected void onListItemClick(ListView listView, View view, int position, long id) {
-        long userId = ((FriendViewHolder) view.getTag()).getUserId();
-        RelativeLayout rl = (RelativeLayout) view;
-        TextView tv = (TextView) rl.getChildAt(1);
-        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
-        String name = tv.getText().toString();
-        this.displayConfirmationDialog(name, userId);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.add_friend, menu);
-        mSearchBar = (SearchView) menu.findItem(R.id.add_friend_activity_searchBar).getActionView();
-        this.setSearchBarListener();
-        MenuItem searchMenuItem = menu.findItem(R.id.add_friend_activity_searchBar);
-        searchMenuItem.expandActionView();
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.add_friend_activity_searchBar) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     /**
      * Display a confirmation dialog
@@ -124,6 +148,47 @@ public class AddFriendActivity extends ListActivity {
 
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_add_friend);
+        // Set action bar color to main color
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.add_friend, menu);
+        mSearchBar = (SearchView) menu.findItem(R.id.add_friend_activity_searchBar).getActionView();
+        this.setSearchBarListener();
+        MenuItem searchMenuItem = menu.findItem(R.id.add_friend_activity_searchBar);
+        searchMenuItem.expandActionView();
+        return true;
+    }
+
+    @Override
+    protected void onListItemClick(ListView listView, View view, int position, long id) {
+        long userId = ((FriendViewHolder) view.getTag()).getUserId();
+        RelativeLayout rl = (RelativeLayout) view;
+        TextView tv = (TextView) rl.getChildAt(1);
+        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
+        String name = tv.getText().toString();
+        this.displayConfirmationDialog(name, userId);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.add_friend_activity_searchBar) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void setSearchBarListener() {
         mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
@@ -138,116 +203,5 @@ public class AddFriendActivity extends ListActivity {
                 return true;
             }
         });
-    }
-
-    private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
-
-        @Override
-        public void onNetworkError() {
-            AddFriendActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(AddFriendActivity.this,
-                        AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
-                        Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-
-        @Override
-        public void onNotFound() {
-            AddFriendActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(AddFriendActivity.this,
-                        AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
-                        Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-
-        @Override
-        public void onResult(final Set<User> result) {
-            AddFriendActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                        new ArrayList<User>(result)));
-                }
-            });
-        }
-    }
-
-    /**
-     * Asynchronous task that sends a friend request to the friend whose id is
-     * given in parameter
-     * 
-     * @author rbsteinm
-     */
-    private class SendFriendRequest extends AsyncTask<Long, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Long... params) {
-            ServiceContainer.getCache().inviteUser(params[0], new NetworkRequestCallback() {
-
-                @Override
-                public void onFailure() {
-                    AddFriendActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(
-                                AddFriendActivity.this,
-                                AddFriendActivity.this.getResources().getString(
-                                    R.string.add_friend_request_not_sent), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-
-                @Override
-                public void onSuccess() {
-                    AddFriendActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(
-                                AddFriendActivity.this,
-                                AddFriendActivity.this.getResources().getString(
-                                    R.string.add_friend_request_sent), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            });
-            return null;
-        }
-    }
-
-    /**
-     * Callback that describes connection with network
-     * 
-     * @author agpmilli
-     */
-    class AddFriendCallback implements NetworkRequestCallback {
-        @Override
-        public void onFailure() {
-            AddFriendActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(AddFriendActivity.this,
-                        AddFriendActivity.this.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT)
-                        .show();
-                }
-            });
-        }
-
-        @Override
-        public void onSuccess() {
-            AddFriendActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(AddFriendActivity.this,
-                        AddFriendActivity.this.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT)
-                        .show();
-                }
-            });
-        }
     }
 }
