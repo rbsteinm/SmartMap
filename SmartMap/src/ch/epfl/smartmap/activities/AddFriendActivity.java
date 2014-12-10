@@ -40,7 +40,8 @@ public class AddFriendActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_add_friend);
         // Set action bar color to main color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
@@ -78,10 +79,11 @@ public class AddFriendActivity extends ListActivity {
 
     private void displayConfirmationDialog(String name, final long userId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Add " + name + " as a friend?");
+        builder.setMessage(this.getResources().getString(R.string.add) + " " + name
+            + " " + this.getResources().getString(R.string.as_a_friend));
 
         // Add positive button
-        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 new SendFriendRequest().execute(userId);
@@ -89,7 +91,7 @@ public class AddFriendActivity extends ListActivity {
         });
 
         // Add negative button
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
@@ -125,8 +127,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this.getBaseContext(),
-                            "Couldn't find friends due to a network error. Please try again later.", Toast.LENGTH_LONG)
-                            .show();
+                        AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
+                        Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -136,8 +138,9 @@ public class AddFriendActivity extends ListActivity {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(AddFriendActivity.this.getBaseContext(), "No user found for this query.",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                        AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
+                        Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -148,7 +151,7 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                            new ArrayList<User>(result)));
+                        new ArrayList<User>(result)));
                 }
             });
         }
@@ -170,8 +173,10 @@ public class AddFriendActivity extends ListActivity {
                     AddFriendActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(AddFriendActivity.this.getBaseContext(),
-                                    "Friend request sent couldn't be sent.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(
+                                AddFriendActivity.this.getBaseContext(),
+                                AddFriendActivity.this.getResources().getString(
+                                    R.string.add_friend_request_not_sent), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -181,8 +186,10 @@ public class AddFriendActivity extends ListActivity {
                     AddFriendActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(AddFriendActivity.this.getBaseContext(), "Friend request sent !",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(
+                                AddFriendActivity.this.getBaseContext(),
+                                AddFriendActivity.this.getResources().getString(
+                                    R.string.add_friend_request_sent), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
