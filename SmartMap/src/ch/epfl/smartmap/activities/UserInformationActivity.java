@@ -72,7 +72,7 @@ public class UserInformationActivity extends Activity {
 
     private static final String TAG = UserInformationActivity.class.getSimpleName();
     private User mUser;
-    private Switch mFollowSwitch;
+    private Switch mShowOnMapSwitch;
     private Switch mBlockSwitch;
     private TextView mSubtitlesView;
     private TextView mNameView;
@@ -105,8 +105,9 @@ public class UserInformationActivity extends Activity {
         builder.create().show();
     }
 
-    public void followUnfollow(View view) {
-        // TODO need method setVisible
+    public void showOnMap(View view) {
+        // TODO need superfiltre
+        //ServiceContainer.getCache().updateFilter(ServiceContainer.getCache().getFilter(SUPERFILTRE_ID));
     }
 
     @Override
@@ -124,7 +125,7 @@ public class UserInformationActivity extends Activity {
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
         mNameView = (TextView) this.findViewById(R.id.user_info_name);
         mSubtitlesView = (TextView) this.findViewById(R.id.user_info_subtitles);
-        mFollowSwitch = (Switch) this.findViewById(R.id.user_info_follow_switch);
+        mShowOnMapSwitch = (Switch) this.findViewById(R.id.user_info_show_on_map_switch);
         mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
         mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
         // Set actionbar color
@@ -156,7 +157,7 @@ public class UserInformationActivity extends Activity {
         mNameView.setText(mUser.getName());
         mSubtitlesView.setText(mUser.getSubtitle());
         mPictureView.setImageBitmap(mUser.getImage());
-        mFollowSwitch.setChecked(mUser.isVisible());
+        mShowOnMapSwitch.setChecked(mUser.isVisible());
         mBlockSwitch.setChecked(mUser.isBlocked());
         mDistanceView.setText(Utils.printDistanceToMe(mUser.getLocation()));
     }
