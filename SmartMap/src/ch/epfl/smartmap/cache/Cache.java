@@ -87,8 +87,7 @@ public class Cache {
      * @param invitation
      * @param callback
      */
-    public synchronized void acceptInvitation(final Invitation invitation,
-        final NetworkRequestCallback callback) {
+    public synchronized void acceptInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -139,8 +138,7 @@ public class Cache {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.addAll(ids);
 
-        final ImmutableEvent newImmutableEvent =
-            event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -167,8 +165,7 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void createEvent(final ImmutableEvent createdEvent,
-        final NetworkRequestCallback callback) {
+    public synchronized void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -194,8 +191,7 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void declineInvitation(final Invitation invitation,
-        final NetworkRequestCallback callback) {
+    public synchronized void declineInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -490,8 +486,7 @@ public class Cache {
     public synchronized SortedSet<Invitation> getUnansweredFriendInvitations() {
         SortedSet<Invitation> unansweredFriendInvitations = this.getAllInvitations();
         for (Invitation invitation : unansweredFriendInvitations) {
-            if ((invitation.getStatus() == Invitation.ACCEPTED)
-                || (invitation.getStatus() == Invitation.DECLINED)) {
+            if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)) {
                 unansweredFriendInvitations.remove(invitation);
             }
         }
@@ -563,8 +558,7 @@ public class Cache {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId,
-                        new ArrayList<Long>(usersIds));
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, new ArrayList<Long>(usersIds));
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Couldn't invite friends to event:" + e);
@@ -597,8 +591,7 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent,
-        final NetworkRequestCallback callback) {
+    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
         new AsyncTask<ImmutableEvent, Void, Void>() {
 
             @Override
@@ -887,8 +880,7 @@ public class Cache {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.removeAll(ids);
 
-        final ImmutableEvent newImmutableEvent =
-            event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -999,8 +991,8 @@ public class Cache {
         }
     }
 
-    public synchronized void updateFromNetwork(final SmartMapClient networkClient,
-        final NetworkRequestCallback callback) {
+    public synchronized void
+        updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1077,6 +1069,19 @@ public class Cache {
             // Phone notification
             Notifications.acceptedFriendNotification(ServiceContainer.getSettingsManager().getContext(),
                 newInvitation.getUserInfos());
+            // Ack to server
+            new AsyncTask<Long, Void, Void>() {
+                @Override
+                protected Void doInBackground(Long... params) {
+                    try {
+                        Log.d(TAG, "Acknoledging accpeted invitation");
+                        ServiceContainer.getNetworkClient().ackAcceptedInvitation(params[0]);
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Error while acknowledging accpeted invitation : " + e);
+                    }
+                    return null;
+                }
+            }.execute(newInvitation.getUserId());
         }
         return new GenericInvitation(newInvitation);
     }
@@ -1092,8 +1097,7 @@ public class Cache {
             newInvitation.setId(id);
             Log.d(TAG, "Database gives id " + id);
             // Phone notification
-            Notifications.newEventNotification(ServiceContainer.getSettingsManager().getContext(),
-                newInvitation);
+            Notifications.newEventNotification(ServiceContainer.getSettingsManager().getContext(), newInvitation);
         }
         return new GenericInvitation(newInvitation);
     }
@@ -1109,19 +1113,6 @@ public class Cache {
             // Phone notification
             Notifications.newFriendNotification(ServiceContainer.getSettingsManager().getContext(),
                 newInvitation.getUserInfos());
-            // Ack to server
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    try {
-                        Log.d(TAG, "Ack server");
-                        ServiceContainer.getNetworkClient().ackAcceptedInvitation(newInvitation.getUserId());
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Client exception : " + e);
-                    }
-                    return null;
-                }
-            }.execute();
         }
         return new GenericInvitation(newInvitation);
     }
