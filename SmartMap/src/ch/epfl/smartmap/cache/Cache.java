@@ -34,7 +34,7 @@ public class Cache {
 
     static final public String TAG = Cache.class.getSimpleName();
 
-    private LongSparseArray<User> mUserInstances;
+    private final LongSparseArray<User> mUserInstances;
     // SparseArrays containing live instances
     private final LongSparseArray<Event> mEventInstances;
     private final LongSparseArray<Filter> mFilterInstances;

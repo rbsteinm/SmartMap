@@ -26,6 +26,11 @@ public interface Invitation {
     int ACCEPTED_FRIEND_INVITATION = 2;
 
     /**
+     * @return event
+     */
+    Event getEvent();
+
+    /**
      * @return invitation's id
      */
     long getId();

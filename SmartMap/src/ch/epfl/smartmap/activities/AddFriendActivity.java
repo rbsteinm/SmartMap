@@ -62,6 +62,11 @@ public class AddFriendActivity extends ListActivity {
         }
     }
 
+    /**
+     * Callback that describes connection with SearchRequest
+     * 
+     * @author Pamoi
+     */
     private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
 
         @Override
@@ -113,10 +118,11 @@ public class AddFriendActivity extends ListActivity {
      */
     private void displayConfirmationDialog(String name, final long userId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Add " + name + " as a friend?");
+        builder.setMessage(this.getResources().getString(R.string.add) + name + " "
+            + this.getResources().getString(R.string.as_a_friend));
 
         // Add positive button
-        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(this.getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 // invite friend
