@@ -215,7 +215,7 @@ public class EventInformationActivity extends ListActivity {
                 this.finish();
                 break;
             case R.id.event_info_delete_button:
-                Log.d(TAG, "Button delete clicked");
+                ServiceContainer.getCache().removeEvent(mEvent.getId());
                 break;
             default:
                 break;
