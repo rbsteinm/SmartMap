@@ -115,24 +115,23 @@ public class AddEventActivity extends FragmentActivity {
      * Used as a key to pass LatLng through Intents
      */
     public static final String LOCATION_EXTRA = "LOCATION";
-
     private static final String TAG = AddEventActivity.class.getSimpleName();
+
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
     static final int PICK_LOCATION_REQUEST = 1;
-
     private static final int ELEMENTS_HH_MM = 2;
+
     private static final int ELEMENTS_JJ_DD_YYYY = 3;
     private static final int INDEX_YEAR = 2;
 
     private static final int INDEX_MONTH = 1;
     private static final int INDEX_DAY = 0;
-
     private static final String TIME_PICKER_DESCR = "timePicker";
+
     private static final String DATE_PICKER_DESCR = "datePicker";
+
     private static final int MAX_NAME_SIZE = 60;
-
     private static final int MIN_NAME_SIZE = 2;
-
     private static final int MAX_DESCRIPTION_SIZE = 255;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
@@ -142,7 +141,9 @@ public class AddEventActivity extends FragmentActivity {
     private EditText mDescription;
     private EditText mEventName;
     private EditText mPickEndDate;
+
     private EditText mPickEndTime;
+
     private EditText mPickStartDate;
 
     private EditText mPickStartTime;

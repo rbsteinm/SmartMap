@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -72,24 +71,9 @@ public class AboutActivity extends Activity {
      */
     private SystemUiHider mSystemUiHider;
 
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the system UI. This is to prevent the jarring
-     * behavior of controls going away while interacting with activity UI.
-     */
-    View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                AboutActivity.this.delayedHide(AUTO_HIDE_DELAY_MILLIS);
-                view.performClick();
-            }
-            return false;
-        }
-    };
+    private final Handler mHideHandler = new Handler();
 
-    Handler mHideHandler = new Handler();
-
-    Runnable mHideRunnable = new Runnable() {
+    private final Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
             mSystemUiHider.hide();
@@ -118,7 +102,7 @@ public class AboutActivity extends Activity {
         mSystemUiHider.setup();
         mSystemUiHider.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
             // Cached values.
-            int mShortAnimTime;
+            private int mShortAnimTime;
 
             @Override
             @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)

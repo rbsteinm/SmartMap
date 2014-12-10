@@ -40,10 +40,7 @@ public class ShowEventsActivity extends ListActivity {
 
     private static final String TAG = ShowEventsActivity.class.getSimpleName();
 
-    private static final double EARTH_RADIUS_KM = 6378.1;
-
     private static final int SEEK_BAR_MIN_VALUE = 2;
-    private static final int ONE_HUNDRED = 100;
 
     private SeekBar mSeekBar;
 
@@ -230,42 +227,6 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired by
-     * wikipedia. This is costly as there are several library calls to sin, cos, etc...
-     * 
-     * @param lat1
-     *            latitude of point 1
-     * @param lon1
-     *            longitude of point 1
-     * @param lat2
-     *            latitude of point 2
-     * @param lon2
-     *            longitude of point 2
-     * @return the distance between the two locations in km, rounded to 2 digits
-     * @author SpicyCH
-     */
-    public static double distance(double lat1, double lon1, double lat2, double lon2) {
-
-        double radLat1 = Math.toRadians(lat1);
-        double radLong1 = Math.toRadians(lon1);
-        double radLat2 = Math.toRadians(lat2);
-        double radLong2 = Math.toRadians(lon2);
-
-        double sec1 = Math.sin(radLat1) * Math.sin(radLat2);
-        double dl = Math.abs(radLong1 - radLong2);
-        double sec2 = Math.cos(radLat1) * Math.cos(radLat2);
-        double centralAngle = Math.acos(sec1 + (sec2 * Math.cos(dl)));
-        double distance = centralAngle * EARTH_RADIUS_KM;
-
-        float[] dist = new float[10];
-        Location.distanceBetween(lat1, lon1, lat2, lon2, dist);
-        // TODO use this api method instead of wikipedia's one
-        Log.d(TAG, "dist: " + dist);
-
-        return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;
-    }
-
-    /**
      * Loads an event and displays its infos. TODO prendre dans le cache
      * 
      * @author SpicyCH
@@ -331,12 +292,9 @@ public class ShowEventsActivity extends ListActivity {
                     + Utils.getDateString(end) + " " + Utils.getTimeString(end) + "\n"
                     + mContext.getString(R.string.show_event_by) + " " + creatorName + "\n\n" + event.getDescription();
 
-            alertDialog.setTitle(event.getName()
-                    + " @ "
-                    + event.getLocationString()
-                    + "\n"
-                    + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
-                            event.getLocation().getLatitude(), event.getLocation().getLongitude()) + " km away");
+            alertDialog.setTitle(event.getName() + " @ " + event.getLocationString() + "\n"
+                    + Utils.distanceToMe(event.getLocation()));
+
             alertDialog.setMessage(message);
 
             alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,

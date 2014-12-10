@@ -2,6 +2,7 @@ package ch.epfl.smartmap.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -77,6 +78,7 @@ public class UserInformationActivity extends Activity {
     private TextView mNameView;
     private ImageView mPictureView;
     private TextView mDistanceView;
+    private Context mContext;
 
     public void displayDeleteConfirmationDialog(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -87,6 +89,7 @@ public class UserInformationActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 new RemoveFriend().execute(mUser.getId());
+                ((Activity) mContext).finish();
             }
         });
 
@@ -116,6 +119,7 @@ public class UserInformationActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_user_information);
+        mContext = this;
         // Get views
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
         mNameView = (TextView) this.findViewById(R.id.user_info_name);

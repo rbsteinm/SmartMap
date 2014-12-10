@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -62,11 +63,6 @@ public class AddFriendActivity extends ListActivity {
         }
     }
 
-    /**
-     * Callback TODO
-     * 
-     * @author ?
-     */
     private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
 
         @Override
@@ -75,8 +71,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this.getBaseContext(),
-                        "Couldn't find friends due to a network error. Please try again later.", Toast.LENGTH_LONG)
-                        .show();
+                        AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
+                        Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -86,7 +82,8 @@ public class AddFriendActivity extends ListActivity {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(AddFriendActivity.this.getBaseContext(), "No user found for this query.",
+                    Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                        AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
                         Toast.LENGTH_LONG).show();
                 }
             });
@@ -101,6 +98,46 @@ public class AddFriendActivity extends ListActivity {
                         new ArrayList<User>(result)));
                 }
             });
+        }
+    }
+
+    /**
+     * Asynchronous task that sends a friend request to the friend whose id is
+     * given in parameter
+     * 
+     * @author rbsteinm
+     */
+    private class SendFriendRequest extends AsyncTask<Long, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Long... params) {
+            ServiceContainer.getCache().inviteUser(params[0], new NetworkRequestCallback() {
+
+                @Override
+                public void onFailure() {
+                    AddFriendActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                                AddFriendActivity.this.getResources().getString(R.string.add_friend_request_not_sent),
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void onSuccess() {
+                    AddFriendActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                                AddFriendActivity.this.getResources().getString(R.string.add_friend_request_sent),
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+            return null;
         }
     }
 
