@@ -206,57 +206,12 @@ public class LoginFragment extends Fragment {
     }
 
     /**
-     * An AsyncTask to send the facebook user data to the SmartMap server asynchronously
-     * 
-     * @author SpicyCH
-     */
-    private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
-
-        private static final int FACEBOOK_ID_RADIX = 10;
-        private final Map<String, String> mParams;
-
-        /**
-         * @param params
-         */
-        public SendDataTask(Map<String, String> params) {
-            mParams = params;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Boolean doInBackground(Void... params) {
-
-            SmartMapClient networkClient = ServiceContainer.getNetworkClient();
-
-            try {
-                networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
-                        Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
-                        mParams.get(FACEBOOK_TOKEN_POST_NAME));
-            } catch (NumberFormatException e1) {
-                Log.e(TAG, "Couldn't parse to Long: " + e1);
-                return false;
-            } catch (SmartMapClientException e1) {
-                Log.e(TAG, "Couldn't authenticate : " + e1);
-                return false;
-            }
-
-            Log.i(TAG, "User' infos sent to SmartMap server");
-            return true;
-
-        }
-    }
-
-    /**
      * 
      * This callback uses the retrived facebook data to connect to our server.
      * 
      * @author SpicyCH
      */
-    class CustomGraphUserCallback implements Request.GraphUserCallback {
+    private class CustomGraphUserCallback implements Request.GraphUserCallback {
         @Override
         public void onCompleted(GraphUser user, Response response) {
 
@@ -305,6 +260,51 @@ public class LoginFragment extends Fragment {
             } else if (response.getError() != null) {
                 Log.e(TAG, "The user is null (authentication aborted?)");
             }
+        }
+    }
+
+    /**
+     * An AsyncTask to send the facebook user data to the SmartMap server asynchronously
+     * 
+     * @author SpicyCH
+     */
+    private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
+
+        private static final int FACEBOOK_ID_RADIX = 10;
+        private final Map<String, String> mParams;
+
+        /**
+         * @param params
+         */
+        public SendDataTask(Map<String, String> params) {
+            mParams = params;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            SmartMapClient networkClient = ServiceContainer.getNetworkClient();
+
+            try {
+                networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
+                        Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
+                        mParams.get(FACEBOOK_TOKEN_POST_NAME));
+            } catch (NumberFormatException e1) {
+                Log.e(TAG, "Couldn't parse to Long: " + e1);
+                return false;
+            } catch (SmartMapClientException e1) {
+                Log.e(TAG, "Couldn't authenticate : " + e1);
+                return false;
+            }
+
+            Log.i(TAG, "User' infos sent to SmartMap server");
+            return true;
+
         }
     }
 }

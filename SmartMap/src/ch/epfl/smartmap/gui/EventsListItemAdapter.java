@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.util.Utils;
 
@@ -93,11 +92,6 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
 
         viewHolder.getStartTextView().setText(startString);
         viewHolder.getEndTextView().setText(endString);
-
-        double distanceMeEvent = ShowEventsActivity.distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(),
-                mItemsArrayList.get(position).getLocation().getLatitude(), mItemsArrayList.get(position).getLocation()
-                        .getLongitude());
-        distanceMeEvent = Math.floor(distanceMeEvent * HUNDRED_PERCENT) / HUNDRED_PERCENT;
 
         viewHolder.getNameTextView().setText(event.getName() + " @ " + event.getLocationString());
 

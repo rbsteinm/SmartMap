@@ -498,7 +498,7 @@ public class AddEventActivity extends FragmentActivity {
      * 
      * @author SpicyCH
      */
-    class CreateEventNetworkCallback implements NetworkRequestCallback {
+    private class CreateEventNetworkCallback implements NetworkRequestCallback {
         @Override
         public void onFailure() {
             AddEventActivity.this.runOnUiThread(new Runnable() {
@@ -529,7 +529,7 @@ public class AddEventActivity extends FragmentActivity {
      * 
      * @author SpicyCH
      */
-    class DateChangedListener implements TextWatcher {
+    private class DateChangedListener implements TextWatcher {
         @Override
         public void afterTextChanged(Editable s) {
             // Remove the TextChangedListener to avoid useless calls
