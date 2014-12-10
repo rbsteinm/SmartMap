@@ -700,12 +700,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
             Bitmap image = this.getPictureById(id);
             boolean isBlocked = cursor.getInt(cursor.getColumnIndex(KEY_BLOCKED)) == 1;
-            int status = cursor.getInt(cursor.getColumnIndex(KEY_FRIENDSHIP));
+            int friendship = cursor.getInt(cursor.getColumnIndex(KEY_FRIENDSHIP));
 
             cursor.close();
 
             return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image,
-                isBlocked, User.FRIEND);
+                isBlocked, friendship);
         }
 
         return null;
