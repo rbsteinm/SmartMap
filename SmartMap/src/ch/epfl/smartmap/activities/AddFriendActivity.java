@@ -27,96 +27,40 @@ import ch.epfl.smartmap.gui.FriendListItemAdapter;
 import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
 
 /**
- * This Activity displays a list of users from the DB and lets you send them friend requests
+ * This Activity displays a list of users from the DB and lets you send them
+ * friend requests
  * 
  * @author rbsteinm
  */
 public class AddFriendActivity extends ListActivity {
 
-    private SearchView mSearchBar;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_add_friend);
-        // Set action bar color to main color
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-    }
-
-    @Override
-    protected void onListItemClick(ListView listView, View view, int position, long id) {
-        long userId = ((FriendViewHolder) view.getTag()).getUserId();
-        RelativeLayout rl = (RelativeLayout) view;
-        TextView tv = (TextView) rl.getChildAt(1);
-        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
-        String name = tv.getText().toString();
-        this.displayConfirmationDialog(name, userId);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.add_friend, menu);
-        mSearchBar = (SearchView) menu.findItem(R.id.add_friend_activity_searchBar).getActionView();
-        this.setSearchBarListener();
-        MenuItem searchMenuItem = menu.findItem(R.id.add_friend_activity_searchBar);
-        searchMenuItem.expandActionView();
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.add_friend_activity_searchBar) {
-            return true;
+    /**
+     * Callback that describes connection with network
+     * 
+     * @author agpmilli
+     */
+    class AddFriendCallback implements NetworkRequestCallback {
+        @Override
+        public void onFailure() {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(AddFriendActivity.this,
+                        AddFriendActivity.this.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
-        return super.onOptionsItemSelected(item);
-    }
 
-    private void displayConfirmationDialog(String name, final long userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(this.getResources().getString(R.string.add) + " " + name
-            + " " + this.getResources().getString(R.string.as_a_friend));
-
-        // Add positive button
-        builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                new SendFriendRequest().execute(userId);
-            }
-        });
-
-        // Add negative button
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-
-        // display the AlertDialog
-        builder.create().show();
-    }
-
-    private void setSearchBarListener() {
-        mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                ServiceContainer.getSearchEngine().findStrangerByQuery(newText, new FindFriendsCallback());
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextSubmit(String newText) {
-                ServiceContainer.getSearchEngine().findStrangerByQuery(newText, new FindFriendsCallback());
-                return true;
-            }
-        });
+        @Override
+        public void onSuccess() {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(AddFriendActivity.this,
+                        AddFriendActivity.this.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
@@ -158,7 +102,8 @@ public class AddFriendActivity extends ListActivity {
     }
 
     /**
-     * Asynchronous task that sends a friend request to the friend whose id is given in parameter
+     * Asynchronous task that sends a friend request to the friend whose id is
+     * given in parameter
      * 
      * @author rbsteinm
      */
@@ -173,10 +118,9 @@ public class AddFriendActivity extends ListActivity {
                     AddFriendActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(
-                                AddFriendActivity.this.getBaseContext(),
-                                AddFriendActivity.this.getResources().getString(
-                                    R.string.add_friend_request_not_sent), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                                AddFriendActivity.this.getResources().getString(R.string.add_friend_request_not_sent),
+                                Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -186,15 +130,119 @@ public class AddFriendActivity extends ListActivity {
                     AddFriendActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(
-                                AddFriendActivity.this.getBaseContext(),
-                                AddFriendActivity.this.getResources().getString(
-                                    R.string.add_friend_request_sent), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                                AddFriendActivity.this.getResources().getString(R.string.add_friend_request_sent),
+                                Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
             });
             return null;
         }
+    }
+
+    @SuppressWarnings("unused")
+    private static final String TAG = AddFriendActivity.class.getSimpleName();
+
+    private SearchView mSearchBar;
+
+    /**
+     * Display a confirmation dialog
+     * 
+     * @param name
+     * @param userId
+     */
+    private void displayConfirmationDialog(String name, final long userId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Add " + name + " as a friend?");
+
+        // Add positive button
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // invite friend
+                AddFriendActivity.this.inviteUser(userId);
+            }
+        });
+
+        // Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
+    }
+
+    /**
+     * Invites a user to be your friend. Displays a toast describing if the
+     * invitation was sent or not.
+     * 
+     * @author agpmilli
+     */
+    private void inviteUser(long userId) {
+        // Send friend request to user
+        ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
+
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_add_friend);
+        // Set action bar color to main color
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.add_friend, menu);
+        mSearchBar = (SearchView) menu.findItem(R.id.add_friend_activity_searchBar).getActionView();
+        this.setSearchBarListener();
+        MenuItem searchMenuItem = menu.findItem(R.id.add_friend_activity_searchBar);
+        searchMenuItem.expandActionView();
+        return true;
+    }
+
+    @Override
+    protected void onListItemClick(ListView listView, View view, int position, long id) {
+        long userId = ((FriendViewHolder) view.getTag()).getUserId();
+        RelativeLayout rl = (RelativeLayout) view;
+        TextView tv = (TextView) rl.getChildAt(1);
+        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
+        String name = tv.getText().toString();
+        this.displayConfirmationDialog(name, userId);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.add_friend_activity_searchBar) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setSearchBarListener() {
+        mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                ServiceContainer.getSearchEngine().findStrangerByQuery(newText, new FindFriendsCallback());
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String newText) {
+                ServiceContainer.getSearchEngine().findStrangerByQuery(newText, new FindFriendsCallback());
+                return true;
+            }
+        });
     }
 }
