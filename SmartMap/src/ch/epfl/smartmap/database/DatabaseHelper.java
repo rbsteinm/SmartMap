@@ -297,7 +297,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             mDatabase.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
 
-        if (!cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
             values.put(KEY_USER_ID, id);
 
