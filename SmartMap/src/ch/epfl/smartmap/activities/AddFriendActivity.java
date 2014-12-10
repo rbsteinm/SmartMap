@@ -70,7 +70,7 @@ public class AddFriendActivity extends ListActivity {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                    Toast.makeText(AddFriendActivity.this,
                         AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
                         Toast.LENGTH_LONG).show();
                 }
@@ -82,7 +82,7 @@ public class AddFriendActivity extends ListActivity {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                    Toast.makeText(AddFriendActivity.this,
                         AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
                         Toast.LENGTH_LONG).show();
                 }
@@ -118,7 +118,7 @@ public class AddFriendActivity extends ListActivity {
                     AddFriendActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                            Toast.makeText(AddFriendActivity.this,
                                 AddFriendActivity.this.getResources().getString(R.string.add_friend_request_not_sent),
                                 Toast.LENGTH_SHORT).show();
                         }
@@ -130,7 +130,7 @@ public class AddFriendActivity extends ListActivity {
                     AddFriendActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(AddFriendActivity.this.getBaseContext(),
+                            Toast.makeText(AddFriendActivity.this,
                                 AddFriendActivity.this.getResources().getString(R.string.add_friend_request_sent),
                                 Toast.LENGTH_SHORT).show();
                         }

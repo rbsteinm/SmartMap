@@ -69,10 +69,10 @@ public class ModifyFilterActivity extends Activity {
                         if (mFriendsInside.contains(droppedItem)) {
                             mFriendsInside.remove(droppedItem);
                             mFriendsOutside.add(droppedItem);
-                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                                .getBaseContext(), mFriendsInside));
-                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                                .getBaseContext(), mFriendsOutside));
+                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
+                                mFriendsInside));
+                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
+                                mFriendsOutside));
                             return true;
                         }
 
@@ -128,10 +128,10 @@ public class ModifyFilterActivity extends Activity {
                         if (mFriendsOutside.contains(droppedItem)) {
                             mFriendsInside.add(droppedItem);
                             mFriendsOutside.remove(droppedItem);
-                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                                .getBaseContext(), mFriendsInside));
-                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this
-                                .getBaseContext(), mFriendsOutside));
+                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
+                                mFriendsInside));
+                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
+                                mFriendsOutside));
 
                             return true;
                         }
@@ -314,10 +314,10 @@ public class ModifyFilterActivity extends Activity {
 
         this.setTitle(mFilter.getName());
 
-        FriendListItemAdapter insideAdapter = new FriendListItemAdapter(this.getBaseContext(), mFriendsInside);
+        FriendListItemAdapter insideAdapter = new FriendListItemAdapter(this, mFriendsInside);
         mListViewInside.setAdapter(insideAdapter);
 
-        FriendListItemAdapter outsideAdapter = new FriendListItemAdapter(this.getBaseContext(), mFriendsOutside);
+        FriendListItemAdapter outsideAdapter = new FriendListItemAdapter(this, mFriendsOutside);
         mListViewOutside.setAdapter(outsideAdapter);
 
     }
@@ -340,7 +340,7 @@ public class ModifyFilterActivity extends Activity {
                 mCache.putFilter(new ImmutableFilter(mFilter.getId(), newName, mFilter.getFriendIds(), mFilter
                     .isActive()));
 
-                Toast.makeText(ModifyFilterActivity.this.getBaseContext(), "New name saved", Toast.LENGTH_LONG).show();
+                Toast.makeText(ModifyFilterActivity.this, "New name saved", Toast.LENGTH_LONG).show();
                 ModifyFilterActivity.this.setTitle(newName);
 
             }
@@ -373,7 +373,7 @@ public class ModifyFilterActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 ModifyFilterActivity.this.saveFilter();
-                Toast.makeText(ModifyFilterActivity.this.getBaseContext(), "Changes saved", Toast.LENGTH_LONG).show();
+                Toast.makeText(ModifyFilterActivity.this, "Changes saved", Toast.LENGTH_LONG).show();
 
             }
         });
