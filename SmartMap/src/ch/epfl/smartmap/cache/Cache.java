@@ -792,7 +792,7 @@ public class Cache {
                             usersToAdd.add(invitationInfo.getUserInfos());
                             invitationsToAdd.add(invitationInfo);
                         }
-                        // Ack to server
+                        // Acknowledge new friend
                         new AsyncTask<Long, Void, Void>() {
                             @Override
                             protected Void doInBackground(Long... params) {
@@ -812,7 +812,19 @@ public class Cache {
                             invitationsToAdd.add(invitationInfo);
                             eventsToAdd.add(invitationInfo.getEventInfos());
                         }
-                        // Ack
+                        // Acknowledge event invitation
+                        new AsyncTask<Long, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Long... params) {
+                                try {
+                                    Log.d(TAG, "Acknoledging event invitation");
+                                    ServiceContainer.getNetworkClient().ackEventInvitation(params[0]);
+                                } catch (SmartMapClientException e) {
+                                    Log.e(TAG, "Error while acknowledging event invitation : " + e);
+                                }
+                                return null;
+                            }
+                        }.execute(invitationInfo.getEventId());
                         break;
                     default:
                         assert false;
