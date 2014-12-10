@@ -173,8 +173,10 @@
     <!-- InviteFriendsActivity -->
     <string name="title_activity_invite_friends">Select friends</string>
     <string name="invite_friend_send_button">Invite</string>
+    <string name="invite_friend_success">Invitation sent!</string>
     <string name="invite_friends_success">Invitations sent!</string>
     <string name="invite_friends_no_items_selected">No invitations sent! Did you select any friends?</string>
+    <string name="invite_friend_failure">Error while inviting friend</string>
     <string name="invite_friends_failure">Error while inviting friends</string>
 
     <!-- FacebookFragment -->
