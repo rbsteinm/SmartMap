@@ -386,6 +386,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
+        // FIXME Don't retrieve removed Friends?
+
         return new NetworkFriendInvitationBag(inviters, newFriends, removedFriends);
 
     }

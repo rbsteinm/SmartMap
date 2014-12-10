@@ -58,6 +58,7 @@ public class ImmutableEvent {
         mParticipantIds = participantIds;
         mLocation = location;
         mLocationString = locationString;
+
     }
 
     public User getCreator() {

@@ -40,14 +40,20 @@ public class NetworkFriendInvitationBag implements InvitationBag {
         long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis();
 
         for (ImmutableUser user : invitingUsers) {
+
             invitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
-                timeStamp, Invitation.FRIEND_INVITATION));
+
+            timeStamp, Invitation.FRIEND_INVITATION));
         }
 
         for (ImmutableUser user : newFriends) {
+
             invitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
-                timeStamp, Invitation.ACCEPTED_FRIEND_INVITATION));
+
+            timeStamp, Invitation.ACCEPTED_FRIEND_INVITATION));
         }
+
+        // FIXME Don't retrieve removedFriends?
     }
 
     /*
