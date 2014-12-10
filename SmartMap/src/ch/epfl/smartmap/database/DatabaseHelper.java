@@ -177,37 +177,39 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         // We check if the event is already there
         if (!cursor.moveToFirst()) {
-            ContentValues values = new ContentValues();
-            values.put(KEY_ID, event.getId());
-            values.put(KEY_NAME, event.getName());
-            values.put(KEY_EVTDESC, event.getDescription());
-            values.put(KEY_USER_ID, event.getCreatorId());
-            if (event.getLocation() != null) {
-                values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
-                values.put(KEY_LATITUDE, event.getLocation().getLatitude());
-            }
-            if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
-                values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
-                values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
-            }
-            values.put(KEY_POSNAME, event.getLocationString());
+            this.addUser(event.getImmCreator());
 
-            mDatabase.insert(TABLE_EVENT, null, values);
+            // Doesn't add event if we can't store the user
+            if (this.getUser(event.getImmCreator().getId()) != null) {
+                ContentValues values = new ContentValues();
+                values.put(KEY_ID, event.getId());
+                values.put(KEY_NAME, event.getName());
+                values.put(KEY_EVTDESC, event.getDescription());
+                values.put(KEY_USER_ID, event.getCreatorId());
+                if (event.getLocation() != null) {
+                    values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
+                    values.put(KEY_LATITUDE, event.getLocation().getLatitude());
+                }
+                if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
+                    values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
+                    values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
+                }
+                values.put(KEY_POSNAME, event.getLocationString());
 
-            // Then we add the event-user pairs to another table
-            ContentValues pairValues = null;
-            for (long id : event.getParticipantIds()) {
-                pairValues = new ContentValues();
-                pairValues.put(KEY_EVENT_ID, event.getId());
-                pairValues.put(KEY_USER_ID, id);
-                mDatabase.insert(TABLE_EVENT_USER, null, pairValues);
+                mDatabase.insert(TABLE_EVENT, null, values);
+
+                // Then we add the event-user pairs to another table
+                ContentValues pairValues = null;
+                for (long id : event.getParticipantIds()) {
+                    pairValues = new ContentValues();
+                    pairValues.put(KEY_EVENT_ID, event.getId());
+                    pairValues.put(KEY_USER_ID, id);
+                    mDatabase.insert(TABLE_EVENT_USER, null, pairValues);
+                }
             }
         } else {
             this.updateEvent(event);
         }
-
-        Log.d(TAG, "Add event, put User #" + event.getImmCreator().getId());
-        this.addUser(event.getImmCreator());
 
         cursor.close();
 
@@ -248,34 +250,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      */
     public long addInvitation(ImmutableInvitation invitation) {
 
-        ContentValues values = new ContentValues();
-        values.put(KEY_USER_ID, invitation.getUserId());
-        values.put(KEY_EVENT_ID, invitation.getEventId());
-        values.put(KEY_STATUS, invitation.getStatus());
-        values.put(KEY_DATE, invitation.getTimeStamp());
-        values.put(KEY_TYPE, invitation.getType());
-
-        if (invitation.getType() == Invitation.FRIEND_INVITATION) {
-            Log.d(TAG, "NEW FRIEND INVITATION");
-
-            // Get user infos
-            ImmutableUser userInfo = invitation.getUserInfos();
-
-            // Get pending ids
-            Set<Long> pendingIds = this.getPendingFriends();
-
-            Log.d(TAG, "Pending ids before : " + pendingIds);
-
-            if (pendingIds.contains(userInfo.getId())) {
-                // Already stored
-                return Invitation.ALREADY_RECEIVED;
-            } else {
-                this.addPendingFriend(userInfo.getId());
-            }
-
-            Log.d(TAG, "Pending ids after : " + this.getPendingFriends());
-        }
-
         // Add invitation related infos in database
         if (invitation.getUserInfos() != null) {
             this.addUser(invitation.getUserInfos());
@@ -284,7 +258,41 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             this.addEvent(invitation.getEventInfos());
         }
 
-        return mDatabase.insert(TABLE_INVITATIONS, null, values);
+        // Doesn't store invitation if we can't store the values
+        if ((this.getUser(invitation.getUserInfos().getId()) != null)
+            || (this.getEvent(invitation.getEventInfos().getId()) != null)) {
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_ID, invitation.getUserId());
+            values.put(KEY_EVENT_ID, invitation.getEventId());
+            values.put(KEY_STATUS, invitation.getStatus());
+            values.put(KEY_DATE, invitation.getTimeStamp());
+            values.put(KEY_TYPE, invitation.getType());
+
+            if (invitation.getType() == Invitation.FRIEND_INVITATION) {
+
+                // Get user infos
+                ImmutableUser userInfo = invitation.getUserInfos();
+
+                // Get pending ids
+                Set<Long> pendingIds = this.getPendingFriends();
+
+                Log.d(TAG, "Pending ids before : " + pendingIds);
+
+                if (pendingIds.contains(userInfo.getId())) {
+                    // Already stored
+                    return Invitation.ALREADY_RECEIVED;
+                } else {
+                    this.addPendingFriend(userInfo.getId());
+                }
+
+                Log.d(TAG, "Pending ids after : " + this.getPendingFriends());
+            }
+
+            return mDatabase.insert(TABLE_INVITATIONS, null, values);
+        } else {
+            return Invitation.ALREADY_RECEIVED;
+        }
     }
 
     /**
@@ -907,18 +915,27 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         mDatabase.delete(TABLE_EVENT, null, null);
         mDatabase.delete(TABLE_EVENT_USER, null, null);
 
-        Set<User> friends = ServiceContainer.getCache().getAllFriends();
+        Set<User> users = ServiceContainer.getCache().getAllUsers();
         Set<Event> events = ServiceContainer.getCache().getMyEvents();
+        events.addAll(ServiceContainer.getCache().getParticipatingEvents());
         Set<Filter> filters = ServiceContainer.getCache().getAllFilters();
+        Set<Invitation> invitations = ServiceContainer.getCache().getAllInvitations();
 
-        for (User user : friends) {
+        for (User user : users) {
+            Log.d(TAG, "Store user " + user.getId());
             this.addUser(user.getImmutableCopy());
         }
         for (Event event : events) {
+            Log.d(TAG, "Store event " + event.getId());
             this.addEvent(event.getImmutableCopy());
         }
         for (Filter filter : filters) {
+            Log.d(TAG, "Store filter " + filter.getId());
             this.addFilter(filter.getImmutableCopy());
+        }
+        for (Invitation invitation : invitations) {
+            Log.d(TAG, "Store invitation " + invitation.getId());
+            this.addInvitation(invitation.getImmutableCopy());
         }
     }
 
