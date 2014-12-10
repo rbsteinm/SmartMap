@@ -297,7 +297,7 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * This runs in O(n), can we do better?
+     * TODO javadoc
      */
     private void updateCurrentList() {
 
