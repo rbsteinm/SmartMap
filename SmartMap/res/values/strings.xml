@@ -252,6 +252,13 @@
     <string name="activity_modify_filter_outside_title">Outside filter</string>
     <string name="action_save_filter_button">Save</string>
     <string name="action_rename_filter_button">Rename</string>
+    <string name="action_cancel_button">Rename</string>
+    <string name="rename_filter">Rename filter</string>
+     <string name="new_name_saved">New name saved</string>
+     <string name="save_changes">Save changes?</string>
+     <string name="changes_saved">Changes saved</string>
+     <string name="yes">Yes</string>
+     <string name="no">No</string>
 
     <!-- Settings -->
     <!-- NOTE: Each string value must be unique, as it is a key for one specific preference. -->
@@ -310,8 +317,7 @@
     <string name="near">near</string>
 
     <!-- ProfileActivity -->
-    <string name="title_activity_profile">ProfileActivity</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_profile">Your Profile</string>
     
     <!-- AddfriendActivity -->
     <string name="add">Add</string>

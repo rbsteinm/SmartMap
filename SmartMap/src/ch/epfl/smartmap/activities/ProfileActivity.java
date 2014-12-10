@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.activities;
 
 import android.app.Activity;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,8 @@ public class ProfileActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_profile);
+
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
 
         mNameView = (TextView) this.findViewById(R.id.profile_name);
         mSubtitlesView = (TextView) this.findViewById(R.id.profile_subtitles);
@@ -54,8 +57,8 @@ public class ProfileActivity extends Activity {
         super.onResume();
         mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
         mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
-        // TODO find a way to get user's own profile picture
-        // mPicture.setImageBitmap(ServiceContainer.getSettingsManager().getImage());
+        mPicture.setImageBitmap(ServiceContainer.getCache().getUser(ServiceContainer.getSettingsManager().getUserId())
+            .getImage());
 
     }
 }
