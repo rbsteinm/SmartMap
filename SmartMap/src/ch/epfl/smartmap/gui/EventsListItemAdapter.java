@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import android.content.Context;
-import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +35,7 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
      * @param context
      * @param itemsArrayList
      */
-    public EventsListItemAdapter(Context context, List<Event> itemsArrayList, Location location) {
+    public EventsListItemAdapter(Context context, List<Event> itemsArrayList) {
         super(context, R.layout.gui_event_list_item, itemsArrayList);
 
         mContext = context;

@@ -41,7 +41,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
     private static final String DATABASE_NAME = "SmartMapDB";
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
@@ -51,6 +51,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_FILTER = "filters";
     public static final String TABLE_FILTER_USER = "filter_users";
     public static final String TABLE_EVENT = "events";
+    public static final String TABLE_EVENT_USER = "event_users";
     public static final String TABLE_INVITATIONS = "invitations";
     public static final String TABLE_PENDING = "pending";
 
@@ -69,6 +70,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String KEY_ID = "id";
     private static final String KEY_FILTER_ID = "filterID";
+    private static final String KEY_ACTIVE = "isActive";
     private static final String KEY_STATUS = "status";
     private static final String KEY_TYPE = "type";
 
@@ -82,7 +84,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         KEY_LONGITUDE, KEY_LATITUDE, KEY_POSNAME, KEY_LASTSEEN, KEY_BLOCKED, KEY_FRIENDSHIP};
 
     // Columns for the Filter table
-    private static final String[] FILTER_COLUMNS = {KEY_ID, KEY_NAME};
+    private static final String[] FILTER_COLUMNS = {KEY_ID, KEY_NAME, KEY_ACTIVE};
 
     // Columns for the Filter/User table
     private static final String[] FILTER_USER_COLUMNS = {KEY_ID, KEY_FILTER_ID, KEY_USER_ID};
@@ -90,6 +92,9 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     // Columns for the Event table
     private static final String[] EVENT_COLUMNS = {KEY_ID, KEY_NAME, KEY_EVTDESC, KEY_USER_ID, KEY_LONGITUDE,
         KEY_LATITUDE, KEY_DATE, KEY_ENDDATE, KEY_POSNAME, KEY_COUNTRY_NAME};
+
+    // Columns for the Event-User table
+    private static final String[] EVENT_USER_COLUMNS = {KEY_ID, KEY_EVENT_ID, KEY_USER_ID};
 
     // Columns for the Invitations table
     private static final String[] INVITATION_COLUMNS = {KEY_ID, KEY_USER_ID, KEY_EVENT_ID, KEY_STATUS,
@@ -106,7 +111,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     // Table of filters
     private static final String CREATE_TABLE_FILTER = "CREATE TABLE IF NOT EXISTS " + TABLE_FILTER + "("
-        + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
+        + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_ACTIVE + " INTEGER" + ")";
 
     // Table that maps filters to users
     private static final String CREATE_TABLE_FILTER_USER = "CREATE TABLE IF NOT EXISTS " + TABLE_FILTER_USER
@@ -118,6 +123,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_EVTDESC + " TEXT," + KEY_USER_ID
         + " INTEGER," + KEY_LONGITUDE + " DOUBLE," + KEY_LATITUDE + " DOUBLE," + KEY_DATE + " INTEGER,"
         + KEY_ENDDATE + " INTEGER," + KEY_POSNAME + " TEXT," + KEY_COUNTRY_NAME + " TEXT" + ")";
+
+    // Table that maps events to attending users
+    private static final String CREATE_TABLE_EVENT_USER = "CREATE TABLE IF NOT EXISTS " + TABLE_EVENT_USER
+        + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EVENT_ID + " INTEGER," + KEY_USER_ID + " INTEGER"
+        + ")";
 
     // Table of invitations
     private static final String CREATE_TABLE_INVITATIONS = "CREATE TABLE IF NOT EXISTS " + TABLE_INVITATIONS
@@ -183,6 +193,15 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_POSNAME, event.getLocationString());
 
             mDatabase.insert(TABLE_EVENT, null, values);
+
+            // Then we add the event-user pairs to another table
+            ContentValues pairValues = null;
+            for (long id : event.getParticipantIds()) {
+                pairValues = new ContentValues();
+                pairValues.put(KEY_EVENT_ID, event.getId());
+                pairValues.put(KEY_USER_ID, id);
+                mDatabase.insert(TABLE_EVENT_USER, null, pairValues);
+            }
         } else {
             this.updateEvent(event);
         }
@@ -205,6 +224,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         // First we insert the filter in the table of lists
         ContentValues filterValues = new ContentValues();
         filterValues.put(KEY_NAME, filter.getName());
+        filterValues.put(KEY_ACTIVE, filter.isActive() ? 1 : 0);
         long filterID = mDatabase.insert(TABLE_FILTER, null, filterValues);
 
         // Then we add the filter-user pairs to another table
@@ -334,6 +354,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT_USER);
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
 
@@ -349,7 +370,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteEvent(long id) {
 
         mDatabase.delete(TABLE_EVENT, KEY_ID + " = ?", new String[]{String.valueOf(id)});
-
+        mDatabase.delete(TABLE_EVENT_USER, KEY_EVENT_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
     /**
@@ -501,8 +522,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      */
     public ImmutableEvent getEvent(long id) {
 
-        // SQLiteDatabase db = this.getReadableDatabase();
-
         Cursor cursor =
             mDatabase.query(TABLE_EVENT, EVENT_COLUMNS, KEY_ID + " = ?", new String[]{String.valueOf(id)},
                 null, null, null, null);
@@ -527,6 +546,21 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             event =
                 new ImmutableEvent(id, name, this.getUser(creatorId), description, startDate, endDate,
                     location, locationString, new HashSet<Long>());
+
+            // Second query to get the associated list of IDs
+            Set<Long> ids = new HashSet<Long>();
+
+            cursor =
+                mDatabase.query(TABLE_EVENT_USER, EVENT_USER_COLUMNS, KEY_EVENT_ID + " = ?",
+                    new String[]{String.valueOf(id)}, null, null, null, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    ids.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
+                } while (cursor.moveToNext());
+            }
+
+            event.setParticipantIds(ids);
         }
 
         cursor.close();
@@ -541,15 +575,13 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      * @return The filter as a FriendList object
      */
     public ImmutableFilter getFilter(long id) {
-
-        // SQLiteDatabase db = this.getWritableDatabase();
-
         // First query to get the filter's name
         Cursor cursor =
             mDatabase.query(TABLE_FILTER, FILTER_COLUMNS, KEY_ID + " = ?", new String[]{String.valueOf(id)},
                 null, null, null, null);
 
         String name = "";
+        boolean isActive = cursor.getInt(cursor.getColumnIndex(KEY_ACTIVE)) == 1;
 
         if (cursor != null) {
             cursor.moveToFirst();
@@ -569,7 +601,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
 
-        ImmutableFilter filter = new ImmutableFilter(id, name, ids, true);
+        ImmutableFilter filter = new ImmutableFilter(id, name, ids, isActive);
 
         cursor.close();
 
@@ -684,12 +716,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             String locationString = cursor.getString(cursor.getColumnIndex(KEY_POSNAME));
             Bitmap image = this.getPictureById(id);
             boolean isBlocked = cursor.getInt(cursor.getColumnIndex(KEY_BLOCKED)) == 1;
-            int status = cursor.getInt(cursor.getColumnIndex(KEY_FRIENDSHIP));
+            int friendship = cursor.getInt(cursor.getColumnIndex(KEY_FRIENDSHIP));
 
             cursor.close();
 
             return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image,
-                isBlocked, User.FRIEND);
+                isBlocked, friendship);
         }
 
         return null;
@@ -701,31 +733,10 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_FILTER);
         db.execSQL(CREATE_TABLE_FILTER_USER);
         db.execSQL(CREATE_TABLE_EVENT);
+        db.execSQL(CREATE_TABLE_EVENT_USER);
         db.execSQL(CREATE_TABLE_INVITATIONS);
         db.execSQL(CREATE_TABLE_PENDING);
     }
-
-    /**
-     * Uses listFriendsPos() to update the entire friends database with updated
-     * positions
-     * 
-     * @return The number of rows (i.e. friends) that were updated
-     */
-    // public int refreshFriendsPos() {
-    // int updatedRows = 0;
-    // try {
-    // List<User> updatedUsers =
-    // NetworkSmartMapClient.getInstance().listFriendsPos();
-    //
-    // for (User user : updatedUsers) {
-    // this.updateUser(user);
-    // updatedRows++;
-    // }
-    // } catch (SmartMapClientException e) {
-    // e.printStackTrace();
-    // }
-    // return updatedRows;
-    // }
 
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -733,6 +744,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
         this.onCreate(db);
@@ -744,6 +756,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_INVITATIONS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING);
         this.onCreate(db);
@@ -794,6 +807,20 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
         values.put(KEY_ENDDATE, event.getEndDate().getTimeInMillis());
 
+        if (event.getParticipantIds() != null) {
+
+            // Remove and re-add the event-user pairs
+            mDatabase.delete(TABLE_EVENT_USER, KEY_EVENT_ID + "=" + event.getId(), null);
+
+            ContentValues pairValues = null;
+            for (long id : event.getParticipantIds()) {
+                pairValues = new ContentValues();
+                pairValues.put(KEY_EVENT_ID, event.getId());
+                pairValues.put(KEY_USER_ID, id);
+                mDatabase.insert(TABLE_EVENT_USER, null, pairValues);
+            }
+        }
+
         return mDatabase.update(TABLE_EVENT, values, KEY_ID + " = ?",
             new String[]{String.valueOf(event.getId())});
     }
@@ -805,9 +832,26 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The updated filter
      */
     public void updateFilter(ImmutableFilter filter) {
+        ContentValues filterValues = new ContentValues();
+        filterValues.put(KEY_NAME, filter.getName());
+        filterValues.put(KEY_ACTIVE, filter.isActive() ? 1 : 0);
 
-        this.deleteFilter(filter.getId());
-        this.addFilter(filter);
+        mDatabase.update(TABLE_FILTER, filterValues, KEY_ID + " = ?",
+            new String[]{String.valueOf(filter.getId())});
+
+        if (filter.getIds() != null) {
+
+            // Remove and re-add the event-user pairs
+            mDatabase.delete(TABLE_FILTER_USER, KEY_FILTER_ID + "=" + filter.getId(), null);
+
+            ContentValues pairValues = null;
+            for (long id : filter.getIds()) {
+                pairValues = new ContentValues();
+                pairValues.put(KEY_FILTER_ID, filter.getId());
+                pairValues.put(KEY_USER_ID, id);
+                mDatabase.insert(TABLE_FILTER_USER, null, pairValues);
+            }
+        }
     }
 
     /**
@@ -860,6 +904,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         mDatabase.delete(TABLE_FILTER, null, null);
         mDatabase.delete(TABLE_FILTER_USER, null, null);
         mDatabase.delete(TABLE_EVENT, null, null);
+        mDatabase.delete(TABLE_EVENT_USER, null, null);
 
         Set<User> friends = ServiceContainer.getCache().getAllFriends();
         Set<Event> events = ServiceContainer.getCache().getMyEvents();

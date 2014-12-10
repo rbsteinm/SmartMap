@@ -1168,6 +1168,19 @@ public class Cache {
             // Phone notification
             Notifications.acceptedFriendNotification(ServiceContainer.getSettingsManager().getContext(),
                 newInvitation.getUserInfos());
+            // Ack to server
+            new AsyncTask<Long, Void, Void>() {
+                @Override
+                protected Void doInBackground(Long... params) {
+                    try {
+                        Log.d(TAG, "Acknoledging accpeted invitation");
+                        ServiceContainer.getNetworkClient().ackAcceptedInvitation(params[0]);
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Error while acknowledging accpeted invitation : " + e);
+                    }
+                    return null;
+                }
+            }.execute(newInvitation.getUserId());
         }
         return new GenericInvitation(newInvitation);
     }
@@ -1200,19 +1213,6 @@ public class Cache {
             // Phone notification
             Notifications.newFriendNotification(ServiceContainer.getSettingsManager().getContext(),
                 newInvitation.getUserInfos());
-            // Ack to server
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    try {
-                        Log.d(TAG, "Ack server");
-                        ServiceContainer.getNetworkClient().ackAcceptedInvitation(newInvitation.getUserId());
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Client exception : " + e);
-                    }
-                    return null;
-                }
-            }.execute();
         }
         return new GenericInvitation(newInvitation);
     }

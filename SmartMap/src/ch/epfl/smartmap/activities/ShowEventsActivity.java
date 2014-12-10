@@ -62,7 +62,7 @@ public class ShowEventsActivity extends ListActivity {
         this.initializeGUI();
 
         // Create custom Adapter and pass it to the Activity
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList);
         this.setListAdapter(adapter);
     }
 
@@ -289,7 +289,7 @@ public class ShowEventsActivity extends ListActivity {
             mEventsList.retainAll(ServiceContainer.getCache().getLiveEvents());
         }
 
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
+        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList);
         this.setListAdapter(adapter);
     }
 
