@@ -207,9 +207,12 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/show_event_info_show_on_map_button"
+            android:layout_marginBottom="5dp"
             android:layout_centerInParent="true"
             android:onClick="inviteFriendsToEvent"
-            android:text="@string/show_event_info_invite_friends_button" />
+            android:text="@string/show_event_info_invite_friends_button"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_shape" />
 
         <Button
             android:id="@+id/show_event_info_show_on_map_button"
@@ -218,7 +221,9 @@
             android:layout_alignParentBottom="true"
             android:layout_centerInParent="true"
             android:onClick="openMapAtEventLocation"
-            android:text="@string/show_event_on_the_map_button" />
+            android:text="@string/show_event_on_the_map_button"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_shape" />
     </RelativeLayout>
 
 </RelativeLayout>
