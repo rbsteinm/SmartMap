@@ -46,7 +46,6 @@ public class Cache {
     private final Set<Long> mFilterIds;
 
     private final Set<Long> mInvitationIds;
-    private final Set<Long> mInvitingFriendsIds;
 
     private final Set<Long> mFriendIds;
 
@@ -70,7 +69,6 @@ public class Cache {
         mEventIds = new HashSet<Long>();
         mFilterIds = new HashSet<Long>();
         mInvitationIds = new HashSet<Long>();
-        mInvitingFriendsIds = new HashSet<Long>();
 
         nextFilterId = 1;
 
@@ -545,9 +543,13 @@ public class Cache {
         Log.d(TAG, "CACHE STATE : Friends : " + mFriendIds);
         Log.d(TAG, "CACHE STATE : Events : " + mEventIds);
         Log.d(TAG, "CACHE STATE : Filters : " + mFilterIds);
-        Log.d(TAG, "CACHE STATE : Invits : " + mInvitationIds);
-        Log.d(TAG, "Me : " + this.getSelf().getName() + ", " + this.getSelf().getLocation() + ", "
-            + ((this.getSelf().getImage() == User.NO_IMAGE) ? "no image" : "image"));
+        Set<Long> invitingUsers = new HashSet<Long>();
+        for (long id : mInvitationIds) {
+            if (this.getInvitation(id).getUser() != null) {
+                invitingUsers.add(this.getInvitation(id).getUser().getId());
+            }
+        }
+        Log.d(TAG, "CACHE STATE : Invits : " + invitingUsers);
     }
 
     /**
@@ -852,12 +854,14 @@ public class Cache {
                 return item.getStatus() == Invitation.UNREAD;
             }
         });
-        Log.d(TAG, unreadInvitations.toString());
+
+        Set<ImmutableInvitation> readInvitations = new HashSet<ImmutableInvitation>();
+
         for (Invitation invitation : unreadInvitations) {
-            // TODO should we set it in the network client or store it in
-            // database?
-            invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
+            readInvitations.add(invitation.getImmutableCopy().setStatus(Invitation.READ));
         }
+
+        this.updateInvitations(readInvitations);
     }
 
     /**
@@ -1149,6 +1153,7 @@ public class Cache {
             @Override
             protected Void doInBackground(Long... params) {
                 try {
+                    Log.d(TAG, "need to update user " + params[0]);
                     ImmutableUser userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
                     userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
                     Cache.this.updateUser(userInfos);

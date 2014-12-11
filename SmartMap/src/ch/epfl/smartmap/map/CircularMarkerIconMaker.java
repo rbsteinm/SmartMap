@@ -226,14 +226,6 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         long timeoutInMillis = this.minutesToMilliseconds(TIMEOUT_COLOR);
 
         Canvas canvas = new Canvas(mCurrentMarkerShape);
-        // ColorMatrix cm = new ColorMatrix();
-        // if (elapsedTime < timeoutInMillis) {
-        // cm.setSaturation((((SATURATION_BEGIN * timeoutInMillis) - elapsedTime) + (SATURATION_END *
-        // elapsedTime))
-        // / timeoutInMillis);
-        // } else {
-        // cm.setSaturation(SATURATION_END);
-        // }
 
         int green =
             ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_green);
