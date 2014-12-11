@@ -53,6 +53,18 @@
             android:layout_below="@id/user_info_subtitles"
             android:layout_toRightOf="@id/user_info_picture"
             android:textColor="@color/wallet_secondary_text_holo_dark" />
+        
+        <Button
+            android:id="@+id/user_info_add_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/user_info_distance"
+            android:background="@drawable/remove_friend_button_shape"
+            android:onClick="displayDeleteConfirmationDialog"
+            android:text="@string/add_friend_button_text"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:drawableLeft="@drawable/ic_action_discard_white" />
 
         <Switch
             android:id="@+id/user_info_show_on_map_switch"
