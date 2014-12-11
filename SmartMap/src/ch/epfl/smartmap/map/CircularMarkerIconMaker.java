@@ -50,9 +50,9 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
 
     public static final float CIRCLE_CENTER_INCREMENT = 0.7f;
     public static final float CIRCLE_RADIUS_INCREMENT = 0.1f;
-    public static final int SHAPE_BORDER_WIDTH = 115;
-    public static final float SCALE_MARKER = 0.22f;
-    public static final int SHAPE_TAIL_LENGTH = 53;
+    public static final int SHAPE_BORDER_WIDTH = 57;
+    public static final float SCALE_MARKER = 0.44f;
+    public static final int SHAPE_TAIL_LENGTH = 26;
     public static final float SATURATION_BEGIN = 2f;
     public static final float SATURATION_END = -0.08f;
     public static final long TIMEOUT_COLOR = 30; // minutes
@@ -157,7 +157,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @param context
      */
     private void initializeMarkerShape(Context context) {
-        int idForm = R.drawable.marker_form_2;
+        int idForm = R.drawable.marker_form_2_half;
         mBaseMarkerShape = BitmapFactory.decodeResource(context.getResources(), idForm);
         mCurrentMarkerShape = mBaseMarkerShape.copy(mBaseMarkerShape.getConfig(), true);
         mCanvasCurrentShape = new Canvas(mCurrentMarkerShape);
