@@ -128,7 +128,7 @@
     <string name="event_info_by_text">Created by</string>
     <string name="event_info_description_text">Description</string>
     <string name="event_info_where_text">Where</string>
-    <string name="event_info_going_text">Going</string>
+    <string name="event_info_going_text">Attending</string>
     <string name="event_info_participants_text">Participants</string>
     <string name="title_activity_show_event_information">Show event</string>
     <string name="show_event_info_invite_friends_button">Invite friends</string>

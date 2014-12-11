@@ -116,6 +116,7 @@ public class ShowEventsActivity extends ListActivity {
 
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
+                    Log.d(TAG, "Event clicked");
                     Intent showEventIntent = new Intent(ShowEventsActivity.this, EventInformationActivity.class);
                     showEventIntent.putExtra("EVENT", event.getId());
                     ShowEventsActivity.this.startActivity(showEventIntent);
