@@ -62,6 +62,12 @@ public class UserInformationActivity extends Activity {
         // Defensive case, should never happen
         if (mUser == null) {
             mNameView.setText("Unknown user");
+
+            mShowOnMapSwitch.setVisibility(View.INVISIBLE);
+            mBlockSwitch.setVisibility(View.INVISIBLE);
+            mDistanceView.setVisibility(View.INVISIBLE);
+
+            this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
         } else {
             // Ugly instanceof, case classes would be helpful
             if (mUser instanceof Friend) {

@@ -47,6 +47,7 @@ public class NetworkFriendInvitationBag implements InvitationBag {
         }
 
         for (ImmutableUser user : newFriends) {
+
             user.setFriendship(User.FRIEND);
             invitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
                 timeStamp, Invitation.ACCEPTED_FRIEND_INVITATION));
