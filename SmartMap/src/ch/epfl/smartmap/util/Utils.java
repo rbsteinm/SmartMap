@@ -67,9 +67,8 @@ public final class Utils {
     /**
      * 
      * @param location
-     * @return a String
-     * 
-     * @author SpicyCH
+     * @return a String of the city associated with the given coordinates, the country name if city not found,
+     *         <code>NO_LOCATION_STRING</code> if nothing could be found.
      */
     public static String getCityFromLocation(Location location) {
         if (location == null) {
@@ -116,6 +115,11 @@ public final class Utils {
         }
     }
 
+    /**
+     * 
+     * @param location
+     * @return the country associated to the coordinates or <code>NO_LOCATION_STRING</code>.
+     */
     public static String getCountryFromLocation(Location location) {
         if (location == null) {
             return Displayable.NO_LOCATION_STRING;
@@ -136,6 +140,12 @@ public final class Utils {
         }
     }
 
+    /**
+     * Gets a human readable String fromt the given date.
+     * 
+     * @param calendar
+     * @return a String of the form "Today", "25.12.2014", etc...
+     */
     public static String getDateString(Calendar calendar) {
 
         Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
@@ -163,11 +173,17 @@ public final class Utils {
                         + calendar.get(Calendar.YEAR);
             }
         } else {
-            return formatForClock(calendar.get(Calendar.DAY_OF_MONTH)) + "."
-                    + formatForClock(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
+            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "."
+                    + formatForDisplay(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
         }
     }
 
+    /**
+     * 
+     * @param calendar
+     * @return A String representing the time since we last saw the user on SmartMap. For example "Now" or
+     *         "1 minute ago".
+     */
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
         long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
@@ -218,7 +234,7 @@ public final class Utils {
     }
 
     public static String getTimeString(Calendar calendar) {
-        return formatForClock(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + formatForClock(calendar.get(Calendar.MINUTE));
+        return formatForDisplay(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + formatForDisplay(calendar.get(Calendar.MINUTE));
     }
 
     /**
@@ -266,7 +282,7 @@ public final class Utils {
      * @return the time prefixed with 0 if it was < 10
      * @author SpicyCH
      */
-    private static String formatForClock(int time) {
+    private static String formatForDisplay(int time) {
         String hourOfDayString = "";
         if (time < TEN) {
             hourOfDayString += "0" + time;
