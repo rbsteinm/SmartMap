@@ -1061,15 +1061,6 @@ public class Cache {
         return isListModified;
     }
 
-    public synchronized void retainEvents(List<Long> ids) {
-        for (long id : mEventIds) {
-            if (!ids.contains(id)) {
-                mEventIds.remove(id);
-                mEventInstances.remove(id);
-            }
-        }
-    }
-
     private synchronized boolean updateEvent(ImmutableEvent eventInfo) {
         Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
         singleton.add(eventInfo);
