@@ -245,9 +245,14 @@ public class UserInformationActivity extends Activity {
          */
         @Override
         public void onUserListUpdate() {
-            User user = ServiceContainer.getCache().getUser(mUserId);
+            UserInformationActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    User user = ServiceContainer.getCache().getUser(mUserId);
 
-            UserInformationActivity.this.updateInformations(user);
+                    UserInformationActivity.this.updateInformations(user);
+                }
+            });
         }
 
     }
