@@ -517,6 +517,6 @@ public class JsonSmartMapParser implements SmartMapParser {
             location.setTime(this.parseDate(lastSeenString).getTimeInMillis());
         }
 
-        return new ImmutableUser(id, name, phoneNumber, email, null, null, null, false, friendship);
+        return new ImmutableUser(id, name, phoneNumber, email, location, null, null, false, friendship);
     }
 }

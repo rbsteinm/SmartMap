@@ -17,6 +17,9 @@ import ch.epfl.smartmap.background.ServiceContainer;
  */
 public class ProfileActivity extends Activity {
 
+    @SuppressWarnings("unused")
+    private static final String TAG = ProfileActivity.class.getSimpleName();
+
     private TextView mNameView;
     private TextView mSubtitlesView;
     private ImageView mPicture;
@@ -26,22 +29,11 @@ public class ProfileActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_profile);
 
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
 
         mNameView = (TextView) this.findViewById(R.id.profile_name);
         mSubtitlesView = (TextView) this.findViewById(R.id.profile_subtitles);
         mPicture = (ImageView) this.findViewById(R.id.profile_picture);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
-        mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
-        mPicture.setImageBitmap(ServiceContainer.getCache()
-            .getUser(ServiceContainer.getSettingsManager().getUserId()).getImage());
-
     }
 
     @Override
@@ -61,5 +53,15 @@ public class ProfileActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
+        mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
+        // TODO fix pls
+        // mPicture.setImageBitmap(ServiceContainer.getCache().getUser(2).getImage());
+        mPicture.setImageBitmap(ServiceContainer.getCache().getSelf().getImage());
     }
 }

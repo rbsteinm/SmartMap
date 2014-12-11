@@ -28,8 +28,7 @@ import ch.epfl.smartmap.gui.FriendPickerListAdapter.ViewHolder;
 import ch.epfl.smartmap.util.Utils;
 
 /**
- * This activity shows an event in a complete screens. It display in addition
- * two buttons: one to invite friends, and
+ * This activity shows an event in a complete screens. It display in addition two buttons: one to invite friends, and
  * one to see the event on the map.
  * 
  * @author SpicyCH
@@ -54,11 +53,15 @@ public class EventInformationActivity extends ListActivity {
     private TextView mPlaceNameAndCountry;
 
     /**
-     * Used to get the event id the getExtra of the starting intent, and to pass
-     * the retrieved event from doInBackground
+     * Used to get the event id the getExtra of the starting intent, and to pass the retrieved event from doInBackground
      * to onPostExecute.
      */
     private static final String EVENT_KEY = "EVENT";
+
+    /**
+     * For the moment we don't offer a way to delete created events.
+     */
+    private static final boolean DELETE_EVENTS_ENABLE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +105,7 @@ public class EventInformationActivity extends ListActivity {
     }
 
     /**
-     * Triggered when going checkbox is clicked. Updates the displayed list of
-     * participants.
+     * Triggered when going checkbox is clicked. Updates the displayed list of participants.
      * 
      * @param v
      *            the checkbox whose status changed
@@ -121,69 +123,69 @@ public class EventInformationActivity extends ListActivity {
             case R.id.event_info_going_checkbox:
                 if (checkBox.isChecked()) {
                     ServiceContainer.getCache().addParticipantsToEvent(
-                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())),
-                        mEvent, new NetworkRequestCallback() {
-                            @Override
-                            public void onFailure() {
-                                EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(
-                                            EventInformationActivity.this,
-                                            EventInformationActivity.this
-                                                .getString(R.string.event_going_failure), Toast.LENGTH_SHORT)
-                                            .show();
-                                    }
-                                });
+                            new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())),
+                            mEvent, new NetworkRequestCallback() {
+                                @Override
+                                public void onFailure() {
+                                    EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(
+                                                    EventInformationActivity.this,
+                                                    EventInformationActivity.this
+                                                            .getString(R.string.event_going_failure),
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
 
-                            }
+                                }
 
-                            @Override
-                            public void onSuccess() {
-                                EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(
-                                            EventInformationActivity.this,
-                                            EventInformationActivity.this
-                                                .getString(R.string.event_going_success), Toast.LENGTH_SHORT)
-                                            .show();
-                                    }
-                                });
-                            }
-                        });
+                                @Override
+                                public void onSuccess() {
+                                    EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(
+                                                    EventInformationActivity.this,
+                                                    EventInformationActivity.this
+                                                            .getString(R.string.event_going_success),
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            });
                 } else {
                     ServiceContainer.getCache().removeParticipantsFromEvent(
-                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())),
-                        mEvent, new NetworkRequestCallback() {
-                            @Override
-                            public void onFailure() {
-                                EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(
-                                            EventInformationActivity.this,
-                                            EventInformationActivity.this
-                                                .getString(R.string.event_quit_failure), Toast.LENGTH_SHORT)
-                                            .show();
-                                    }
-                                });
-                            }
+                            new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())),
+                            mEvent, new NetworkRequestCallback() {
+                                @Override
+                                public void onFailure() {
+                                    EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(
+                                                    EventInformationActivity.this,
+                                                    EventInformationActivity.this
+                                                            .getString(R.string.event_quit_failure), Toast.LENGTH_SHORT)
+                                                    .show();
+                                        }
+                                    });
+                                }
 
-                            @Override
-                            public void onSuccess() {
-                                EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(
-                                            EventInformationActivity.this,
-                                            EventInformationActivity.this
-                                                .getString(R.string.event_quit_success), Toast.LENGTH_SHORT)
-                                            .show();
-                                    }
-                                });
-                            }
-                        });
+                                @Override
+                                public void onSuccess() {
+                                    EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(
+                                                    EventInformationActivity.this,
+                                                    EventInformationActivity.this
+                                                            .getString(R.string.event_quit_success), Toast.LENGTH_SHORT)
+                                                    .show();
+                                        }
+                                    });
+                                }
+                            });
                 }
                 break;
             default:
@@ -199,7 +201,7 @@ public class EventInformationActivity extends ListActivity {
         this.getMenuInflater().inflate(R.menu.show_event_information, menu);
 
         // Disable the delete event button if we are not the creator
-        if (!mEvent.isOwn()) {
+        if (!mEvent.isOwn() || !DELETE_EVENTS_ENABLE) {
             MenuItem item = menu.findItem(R.id.event_info_delete_button);
             item.setVisible(false);
         }
@@ -248,16 +250,14 @@ public class EventInformationActivity extends ListActivity {
         } else {
             Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
             Toast.makeText(EventInformationActivity.this,
-                EventInformationActivity.this.getString(R.string.error_client_side), Toast.LENGTH_SHORT)
-                .show();
+                    EventInformationActivity.this.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
             this.finish();
         }
 
     }
 
     /**
-     * Triggered when the button 'Shop on the map' is pressed. Opens the map at
-     * the location of the event.
+     * Triggered when the button 'Shop on the map' is pressed. Opens the map at the location of the event.
      * 
      * @author SpicyCH
      */
@@ -313,7 +313,7 @@ public class EventInformationActivity extends ListActivity {
 
         mPlaceNameAndCountry = (TextView) this.findViewById(R.id.show_event_info_town_and_country);
         mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", "
-            + Utils.getCountryFromLocation(mEvent.getLocation()));
+                + Utils.getCountryFromLocation(mEvent.getLocation()));
     }
 
     /**
@@ -331,51 +331,46 @@ public class EventInformationActivity extends ListActivity {
     private void updateCurrentList() {
 
         mParticipantIdsList = ServiceContainer.getCache().getEvent(mEvent.getId()).getParticipantIds();
-        ServiceContainer.getSearchEngine().findUserByIds(mParticipantIdsList,
-            new SearchRequestCallback<Set<User>>() {
-                @Override
-                public void onNetworkError() {
-                    EventInformationActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(
-                                EventInformationActivity.this,
-                                EventInformationActivity.this
-                                    .getString(R.string.refresh_participants_network_error),
+        ServiceContainer.getSearchEngine().findUserByIds(mParticipantIdsList, new SearchRequestCallback<Set<User>>() {
+            @Override
+            public void onNetworkError() {
+                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(EventInformationActivity.this,
+                                EventInformationActivity.this.getString(R.string.refresh_participants_network_error),
                                 Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+                    }
+                });
+            }
 
-                @Override
-                public void onNotFound() {
-                    EventInformationActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(
-                                EventInformationActivity.this,
-                                EventInformationActivity.this
-                                    .getString(R.string.refresh_participants_not_found), Toast.LENGTH_SHORT)
-                                .show();
-                        }
-                    });
+            @Override
+            public void onNotFound() {
+                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(EventInformationActivity.this,
+                                EventInformationActivity.this.getString(R.string.refresh_participants_not_found),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-                }
+            }
 
-                @Override
-                public void onResult(Set<User> result) {
-                    mParticipantsList = new ArrayList<User>(result);
+            @Override
+            public void onResult(Set<User> result) {
+                mParticipantsList = new ArrayList<User>(result);
 
-                    EventInformationActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            FriendPickerListAdapter adapter =
-                                new FriendPickerListAdapter(EventInformationActivity.this, mParticipantsList);
-                            EventInformationActivity.this.setListAdapter(adapter);
-                        }
-                    });
-                }
-            });
+                EventInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        FriendPickerListAdapter adapter = new FriendPickerListAdapter(EventInformationActivity.this,
+                                mParticipantsList);
+                        EventInformationActivity.this.setListAdapter(adapter);
+                    }
+                });
+            }
+        });
 
     }
 }
