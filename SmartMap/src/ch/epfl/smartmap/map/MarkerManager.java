@@ -70,6 +70,15 @@ public interface MarkerManager {
     Marker removeMarker(Displayable item);
 
     /**
+     * A method that reset all markers icon to the initial icon (obtained from the method
+     * {@code getMarkerIcon} of the Displayable object.
+     * snippet attribute of the marker
+     * 
+     * @param context
+     */
+    void resetMarkersIcon(Context context);
+
+    /**
      * This method updates the markers on the map with the given list of items
      * 
      * @param context
@@ -79,14 +88,5 @@ public interface MarkerManager {
      *            the updated friends
      */
     void updateMarkers(Context context, Set<Displayable> itemsToDisplay);
-
-    /**
-     * A method that reset all markers icon to the initial icon (obtained from the method
-     * {@code getMarkerIcon} of the Displayable object.
-     * snippet attribute of the marker
-     * 
-     * @param context
-     */
-    void resetMarkersIcon(Context context);
 
 }

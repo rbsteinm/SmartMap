@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.cache;
 
-
 /**
  * Static Database
  * 

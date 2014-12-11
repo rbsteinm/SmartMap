@@ -13,4 +13,10 @@
         android:showAsAction="always"
         android:title="@string/action_rename_filter_button"/>
 
+    <ImageButton
+        android:id="@+id/action_remove_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_discard_white" />
+
 </menu>

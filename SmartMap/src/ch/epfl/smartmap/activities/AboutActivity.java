@@ -35,8 +35,7 @@ import ch.epfl.smartmap.util.SystemUiHider;
  */
 public class AboutActivity extends Activity {
     /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
+     * Whether or not the system UI should be auto-hidden after {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
      */
     private static final boolean AUTO_HIDE = true;
 
@@ -87,86 +86,6 @@ public class AboutActivity extends Activity {
 
     private TextView mVersion;
     private TextView mCopyright;
-
-    /**
-     * Schedules a call to hide() in [delay] milliseconds, canceling any
-     * previously scheduled calls.
-     */
-    private void delayedHide(int delayMillis) {
-        mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, delayMillis);
-    }
-
-    /**
-     * Add each item of the list as a TextView children of the given
-     * LinearLayout.
-     * 
-     * @param teamMembers
-     * @param linearLayout
-     * @author SpicyCH
-     */
-    private void displayListInLayout(List<String> teamMembers, LinearLayout linearLayout) {
-        for (String s : teamMembers) {
-            TextView textView = new TextView(this);
-            textView.setText(s);
-
-            LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-
-            linearLayout.addView(textView, lp);
-        }
-    }
-
-    /**
-     * Initilizes the GUI.
-     * 
-     * @author SpicyCH
-     */
-    private void initializeGUI() {
-        mVersion = (TextView) this.findViewById(R.id.about_version);
-        mCopyright = (TextView) this.findViewById(R.id.about_copyright);
-
-        // Display version of this package (to change it, edit
-        // versionCode/versionName in the manifest
-        try {
-            PackageInfo manager = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
-            mVersion.setText(this.getString(R.string.about_version) + " " + manager.versionName + ", "
-                + this.getString(R.string.about_release) + " " + manager.versionCode);
-
-        } catch (NameNotFoundException e) {
-            Log.d(TAG, "Couldn't retrieve package version: " + e);
-            mVersion.setText(this.getString(R.string.about_version) + " "
-                + this.getString(R.string.about_unkown_version));
-        }
-
-        // Display the copyright
-        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
-        String year = Integer.toString(now.get(Calendar.YEAR));
-        String copyrightMsg = "\u00a9 " + year;
-
-        // Infinite copyright ((c) 2014 - YYYY)
-        if (!year.equals(APP_BORN_YEAR)) {
-            copyrightMsg = "\u00a9 " + AboutActivity.APP_BORN_YEAR + " - " + year;
-        }
-        mCopyright.setText(copyrightMsg);
-
-        // Display team members in a random order.
-        List<String> teamMembers = Arrays.asList(this.getResources().getStringArray(R.array.app_authors));
-
-        Collections.shuffle(teamMembers, new Random(System.nanoTime()));
-
-        LinearLayout teamMembersHolder = (LinearLayout) this.findViewById(R.id.about_team_members_holder);
-        teamMembersHolder.setGravity(Gravity.CENTER);
-
-        this.displayListInLayout(teamMembers, teamMembersHolder);
-
-        // Display thanks list (in non-random order)
-        List<String> thanksTo = Arrays.asList(this.getResources().getStringArray(R.array.app_special_thanks));
-
-        LinearLayout thanksHolder = (LinearLayout) this.findViewById(R.id.about_thanks_holder);
-        thanksHolder.setGravity(Gravity.CENTER);
-
-        this.displayListInLayout(thanksTo, thanksHolder);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,5 +148,86 @@ public class AboutActivity extends Activity {
         // that he
         // can still access android menus by swiping top to down.
         this.delayedHide(HIDE_DELAY_MILLIS);
+    }
+
+    /**
+     * Schedules a call to hide() in [delay] milliseconds, canceling any
+     * previously scheduled calls.
+     */
+    private void delayedHide(int delayMillis) {
+        mHideHandler.removeCallbacks(mHideRunnable);
+        mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    /**
+     * Add each item of the list as a TextView children of the given
+     * LinearLayout.
+     * 
+     * @param teamMembers
+     * @param linearLayout
+     * @author SpicyCH
+     */
+    private void displayListInLayout(List<String> teamMembers, LinearLayout linearLayout) {
+        for (String s : teamMembers) {
+            TextView textView = new TextView(this);
+            textView.setText(s);
+
+            LayoutParams lp =
+                new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+
+            linearLayout.addView(textView, lp);
+        }
+    }
+
+    /**
+     * Initilizes the GUI.
+     * 
+     * @author SpicyCH
+     */
+    private void initializeGUI() {
+        mVersion = (TextView) this.findViewById(R.id.about_version);
+        mCopyright = (TextView) this.findViewById(R.id.about_copyright);
+
+        // Display version of this package (to change it, edit
+        // versionCode/versionName in the manifest
+        try {
+            PackageInfo manager = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+            mVersion.setText(this.getString(R.string.about_version) + " " + manager.versionName + ", "
+                + this.getString(R.string.about_release) + " " + manager.versionCode);
+
+        } catch (NameNotFoundException e) {
+            Log.d(TAG, "Couldn't retrieve package version: " + e);
+            mVersion.setText(this.getString(R.string.about_version) + " "
+                + this.getString(R.string.about_unkown_version));
+        }
+
+        // Display the copyright
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        String year = Integer.toString(now.get(Calendar.YEAR));
+        String copyrightMsg = "\u00a9 " + year;
+
+        // Infinite copyright ((c) 2014 - YYYY)
+        if (!year.equals(APP_BORN_YEAR)) {
+            copyrightMsg = "\u00a9 " + AboutActivity.APP_BORN_YEAR + " - " + year;
+        }
+        mCopyright.setText(copyrightMsg);
+
+        // Display team members in a random order.
+        List<String> teamMembers = Arrays.asList(this.getResources().getStringArray(R.array.app_authors));
+
+        Collections.shuffle(teamMembers, new Random(System.nanoTime()));
+
+        LinearLayout teamMembersHolder = (LinearLayout) this.findViewById(R.id.about_team_members_holder);
+        teamMembersHolder.setGravity(Gravity.CENTER);
+
+        this.displayListInLayout(teamMembers, teamMembersHolder);
+
+        // Display thanks list (in non-random order)
+        List<String> thanksTo = Arrays.asList(this.getResources().getStringArray(R.array.app_special_thanks));
+
+        LinearLayout thanksHolder = (LinearLayout) this.findViewById(R.id.about_thanks_holder);
+        thanksHolder.setGravity(Gravity.CENTER);
+
+        this.displayListInLayout(thanksTo, thanksHolder);
     }
 }

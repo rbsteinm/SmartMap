@@ -317,19 +317,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     @Override
-    public void onUserListUpdate() {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mFriendMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(
-                    ServiceContainer.getCache().getAllVisibleFriends()));
-                // MainActivity.this.zoomAccordingToAllMarkers();
-                MainActivity.this.updateItemMenu();
-            }
-        });
-    }
-
-    @Override
     public void onInvitationListUpdate() {
         // Update LayerDrawable's BadgeDrawable
         MainActivity.this.runOnUiThread(new Runnable() {
@@ -389,6 +376,19 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                 assert false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onUserListUpdate() {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mFriendMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(
+                    ServiceContainer.getCache().getAllVisibleFriends()));
+                // MainActivity.this.zoomAccordingToAllMarkers();
+                MainActivity.this.updateItemMenu();
+            }
+        });
     }
 
     /**
@@ -525,17 +525,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         });
     }
 
-    private void zoomAccordingToAllMarkers() {
-
-        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
-        allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
-
-        Intent startingIntent = this.getIntent();
-        if (startingIntent.getParcelableExtra(AddEventActivity.LOCATION_EXTRA) == null) {
-            mMapZoomer.zoomAccordingToMarkers(allMarkers);
-        }
-    }
-
     private void initializeMarkers() {
         if ((mFriendMarkerManager != null) && (mEventMarkerManager != null)) {
             // TODO an assertion would be better to ensure that the marker managers are not null?
@@ -549,6 +538,17 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         }
     }
 
+    private void zoomAccordingToAllMarkers() {
+
+        List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
+        allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
+
+        Intent startingIntent = this.getIntent();
+        if (startingIntent.getParcelableExtra(AddEventActivity.LOCATION_EXTRA) == null) {
+            mMapZoomer.zoomAccordingToMarkers(allMarkers);
+        }
+    }
+
     /**
      * Types of Menu that can be displayed on this activity
      * 
@@ -558,6 +558,29 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         MAP,
         SEARCH,
         ITEM;
+    }
+
+    /**
+     * A listener that reset events markers colors and info panel when clicking on map
+     * 
+     * @author hugo-S
+     */
+    private class ResetMarkerColorAndInfoPannelOnMapClick implements OnMapClickListener {
+
+        /*
+         * (non-Javadoc)
+         * @see
+         * com.google.android.gms.maps.GoogleMap.OnMapClickListener#onMapClick(com.google.android.gms.maps
+         * .model.LatLng)
+         */
+        @Override
+        public void onMapClick(LatLng arg0) {
+
+            MainActivity.this.setMainMenu();
+            mEventMarkerManager.resetMarkersIcon(MainActivity.this);
+
+        }
+
     }
 
     /**
@@ -586,28 +609,5 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             }
             return false;
         }
-    }
-
-    /**
-     * A listener that reset events markers colors and info panel when clicking on map
-     * 
-     * @author hugo-S
-     */
-    private class ResetMarkerColorAndInfoPannelOnMapClick implements OnMapClickListener {
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * com.google.android.gms.maps.GoogleMap.OnMapClickListener#onMapClick(com.google.android.gms.maps
-         * .model.LatLng)
-         */
-        @Override
-        public void onMapClick(LatLng arg0) {
-
-            MainActivity.this.setMainMenu();
-            mEventMarkerManager.resetMarkersIcon(MainActivity.this);
-
-        }
-
     }
 }
