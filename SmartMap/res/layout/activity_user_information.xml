@@ -57,14 +57,15 @@
         <Button
             android:id="@+id/user_info_add_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/user_info_distance"
+            android:layout_height="30dp"
+            android:layout_alignLeft="@id/user_info_name"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/user_info_picture"
             android:background="@drawable/remove_friend_button_shape"
-            android:onClick="displayDeleteConfirmationDialog"
+            android:onClick="displayConfirmationDialog"
             android:text="@string/add_friend_button_text"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:drawableLeft="@drawable/ic_action_discard_white" />
+            android:textSize="20sp" />
 
         <Switch
             android:id="@+id/user_info_show_on_map_switch"

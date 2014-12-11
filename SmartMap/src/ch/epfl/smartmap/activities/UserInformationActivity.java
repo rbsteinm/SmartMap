@@ -80,6 +80,39 @@ public class UserInformationActivity extends Activity {
         });
     }
 
+    /**
+     * Display a confirmation dialog
+     * 
+     * @param name
+     * @param userId
+     */
+    public void displayConfirmationDialog(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(this.getResources().getString(R.string.add) + " " + mUser.getName() + " "
+            + this.getResources().getString(R.string.as_a_friend));
+
+        // Add positive button
+        builder.setPositiveButton(this.getResources().getString(R.string.add),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // invite friend
+                    UserInformationActivity.this.inviteUser(mUserId);
+                }
+            });
+
+        // Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
+    }
+
     public void displayDeleteConfirmationDialog(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(this.getString(R.string.remove) + " " + mUser.getName() + " "
@@ -165,39 +198,6 @@ public class UserInformationActivity extends Activity {
     }
 
     /**
-     * Display a confirmation dialog
-     * 
-     * @param name
-     * @param userId
-     */
-    private void displayConfirmationDialog(String name, final long userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(this.getResources().getString(R.string.add) + name + " "
-            + this.getResources().getString(R.string.as_a_friend));
-
-        // Add positive button
-        builder.setPositiveButton(this.getResources().getString(R.string.add),
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    // invite friend
-                    UserInformationActivity.this.inviteUser(userId);
-                }
-            });
-
-        // Add negative button
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-
-        // display the AlertDialog
-        builder.create().show();
-    }
-
-    /**
      * Invites a user to be your friend. Displays a toast describing if the
      * invitation was sent or not.
      * 
@@ -235,6 +235,7 @@ public class UserInformationActivity extends Activity {
             mDistanceView.setVisibility(View.INVISIBLE);
 
             this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
+            this.findViewById(R.id.user_info_add_button).setVisibility(View.INVISIBLE);
         } else {
             // Ugly instanceof, case classes would be helpful
             if (user instanceof Friend) {
@@ -247,6 +248,8 @@ public class UserInformationActivity extends Activity {
                 mBlockSwitch.setChecked(friend.isBlocked());
                 mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
 
+                this.findViewById(R.id.user_info_add_button).setVisibility(View.INVISIBLE);
+                this.findViewById(R.id.user_info_remove_button).setVisibility(View.VISIBLE);
             } else {
                 mNameView.setText(user.getName());
                 mSubtitlesView.setText(user.getSubtitle());
