@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.background.Notifications;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
@@ -96,7 +97,8 @@ public class Cache {
      * @param invitation
      * @param callback
      */
-    public synchronized void acceptInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
+    public synchronized void acceptInvitation(final Invitation invitation,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -104,7 +106,9 @@ public class Cache {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
                             ImmutableUser newFriend =
-                                ServiceContainer.getNetworkClient().acceptInvitation(invitation.getUser().getId());
+                                ServiceContainer.getNetworkClient().acceptInvitation(
+                                    invitation.getUser().getId());
+                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
                             newFriend.setFriendship(User.FRIEND);
                             Cache.this.putUser(newFriend);
                             break;
@@ -148,7 +152,8 @@ public class Cache {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.addAll(ids);
 
-        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final ImmutableEvent newImmutableEvent =
+            event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -175,7 +180,8 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
+    public synchronized void createEvent(final ImmutableEvent createdEvent,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -201,7 +207,8 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void declineInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
+    public synchronized void declineInvitation(final Invitation invitation,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -209,7 +216,9 @@ public class Cache {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
                             // Decline online
-                            ServiceContainer.getNetworkClient().declineInvitation(invitation.getUser().getId());
+                            ServiceContainer.getNetworkClient().declineInvitation(
+                                invitation.getUser().getId());
+                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
                             break;
                         case Invitation.EVENT_INVITATION:
                             // No interaction needed here
@@ -516,7 +525,8 @@ public class Cache {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, new ArrayList<Long>(usersIds));
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId,
+                        new ArrayList<Long>(usersIds));
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Couldn't invite friends to event:" + e);
@@ -576,7 +586,8 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
+    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent,
+        final NetworkRequestCallback callback) {
         new AsyncTask<ImmutableEvent, Void, Void>() {
 
             @Override
@@ -614,7 +625,8 @@ public class Cache {
         Set<ImmutableEvent> eventsToAdd = new HashSet<ImmutableEvent>();
 
         for (final ImmutableEvent newEvent : newEvents) {
-            Log.d(TAG, "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getImmCreator());
+            Log.d(TAG,
+                "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getImmCreator());
             // Get id
             long eventId = newEvent.getId();
 
@@ -712,7 +724,8 @@ public class Cache {
             // Get Id
             if (invitationInfo.getId() == Invitation.NO_ID) {
                 // Get Id from database
-                invitationInfo.setId(ServiceContainer.getDatabase().addInvitation(invitationInfo));
+                long id = ServiceContainer.getDatabase().addInvitation(invitationInfo);
+                invitationInfo.setId(id);
             }
 
             if ((invitationInfo.getId() != Invitation.ALREADY_RECEIVED)
@@ -804,7 +817,13 @@ public class Cache {
 
             if (isSetCorrectly) {
                 mInvitationIds.add(invitationInfo.getId());
-                mInvitationInstances.put(invitationInfo.getId(), new GenericInvitation(invitationInfo));
+                long invitationId = invitationInfo.getId();
+                GenericInvitation invitation = new GenericInvitation(invitationInfo);
+                mInvitationInstances.put(invitationInfo.getId(), invitation);
+                if (invitationId != Invitation.ALREADY_RECEIVED) {
+                    Notifications.createNotification(invitation, ServiceContainer.getSettingsManager()
+                        .getContext());
+                }
             }
 
             needToCallListeners = true;
@@ -1025,7 +1044,8 @@ public class Cache {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.removeAll(ids);
 
-        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final ImmutableEvent newImmutableEvent =
+            event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -1116,8 +1136,8 @@ public class Cache {
         return isListModified;
     }
 
-    public synchronized void
-        updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
+    public synchronized void updateFromNetwork(final SmartMapClient networkClient,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1137,7 +1157,8 @@ public class Cache {
                     updatedUsers.add(self);
 
                     // Fetch friends via listFriendPos
-                    Set<ImmutableUser> listFriendPos = new HashSet<ImmutableUser>(networkClient.listFriendsPos());
+                    Set<ImmutableUser> listFriendPos =
+                        new HashSet<ImmutableUser>(networkClient.listFriendsPos());
 
                     for (ImmutableUser positionInfos : listFriendPos) {
                         // get id
@@ -1152,11 +1173,10 @@ public class Cache {
                         onlineInfos.setLocationString(positionInfos.getLocationString());
                         onlineInfos.setImage(image);
 
-                        Log.d(
-                            TAG,
-                            "Update(" + onlineInfos.getId() + ") : " + onlineInfos.getName() + ", "
-                                + self.getLocationString());
-                        Log.d(TAG, "Has " + ((onlineInfos.getImage() == User.NO_IMAGE) ? "no " : "") + "image");
+                        Log.d(TAG, "Update(" + onlineInfos.getId() + ") : " + onlineInfos.getName() + ", "
+                            + self.getLocationString());
+                        Log.d(TAG, "Has " + ((onlineInfos.getImage() == User.NO_IMAGE) ? "no " : "")
+                            + "image");
 
                         // Put friend in Set
                         updatedUsers.add(onlineInfos);
@@ -1164,8 +1184,9 @@ public class Cache {
 
                     // Get near Events
                     Set<Long> nearEventIds =
-                        new HashSet<Long>(networkClient.getPublicEvents(settingsManager.getLocation().getLatitude(),
-                            settingsManager.getLocation().getLongitude(), settingsManager.getNearEventsMaxDistance()));
+                        new HashSet<Long>(networkClient.getPublicEvents(settingsManager.getLocation()
+                            .getLatitude(), settingsManager.getLocation().getLongitude(), settingsManager
+                            .getNearEventsMaxDistance()));
 
                     // Update all cached event if needed
                     for (long id : mEventIds) {
