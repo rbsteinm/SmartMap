@@ -27,6 +27,7 @@ import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.User;
 
 /**
  * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider} to communicate with a SmartMap
@@ -593,6 +594,11 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         } catch (SmartMapParseException e) {
             throw new SmartMapClientException(e);
         }
+
+        for (ImmutableUser user : users) {
+            user.setFriendship(User.FRIEND);
+        }
+
         return users;
     }
 
