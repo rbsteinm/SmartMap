@@ -97,6 +97,7 @@ public class Cache {
                             ImmutableUser newFriend =
                                 ServiceContainer.getNetworkClient().acceptInvitation(
                                     invitation.getUser().getId());
+                            newFriend.setFriendship(User.FRIEND);
                             Cache.this.putUser(newFriend);
                             break;
                         case Invitation.EVENT_INVITATION:
@@ -782,8 +783,10 @@ public class Cache {
                         break;
                     case Invitation.ACCEPTED_FRIEND_INVITATION:
                         // Check that it contains all informations
-                        if (invitationInfo.getUserInfos() != null) {
-                            usersToAdd.add(invitationInfo.getUserInfos());
+                        ImmutableUser newFriend = invitationInfo.getUserInfos();
+                        if (newFriend != null) {
+                            newFriend.setFriendship(User.FRIEND);
+                            usersToAdd.add(newFriend);
                             invitationsToAdd.add(invitationInfo);
                         }
                         // Acknowledge new friend
@@ -1337,7 +1340,8 @@ public class Cache {
                     // Just update current instance
                     isListModified = isListModified || user.update(userInfo);
                 } else {
-                    // Need to remove and add user again to change the instance type
+                    // Need to remove and add user again to change the instance
+                    // type
                     Log.d(TAG,
                         "Detected type change, id : " + user.getId() + ", type : " + user.getFriendship());
                     usersWithNewTypeIds.add(userInfo.getId());
