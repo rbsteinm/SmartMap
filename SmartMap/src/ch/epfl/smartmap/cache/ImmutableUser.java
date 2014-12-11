@@ -36,7 +36,6 @@ public final class ImmutableUser {
      */
     public ImmutableUser(long id, String name, String phoneNumber, String email, Location location,
         String locationString, Bitmap image, boolean isBlocked, int friendship) {
-
         mId = id;
         mName = name;
         mPhoneNumber = phoneNumber;
@@ -86,6 +85,11 @@ public final class ImmutableUser {
 
     public ImmutableUser setEmail(String newEmail) {
         mEmail = newEmail;
+        return this;
+    }
+
+    public ImmutableUser setFriendship(int newFriendship) {
+        mFriendship = newFriendship;
         return this;
     }
 

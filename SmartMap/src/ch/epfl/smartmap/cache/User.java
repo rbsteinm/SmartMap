@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 
@@ -110,14 +111,19 @@ public abstract class User implements UserInterface {
         // TODO : Update hasChanged to work correctly
         boolean hasChanged = false;
 
-        if (user.getName() != null) {
-            mName = user.getName();
+        if (user.getId() == 12) {
+            Log.d("USER", "Update matt with new name " + user.getName());
         }
-        if (user.getImage() != null) {
+        if ((user.getName() != null) && (user.getName() != User.NO_NAME)) {
+            mName = user.getName();
+            hasChanged = true;
+        }
+        if ((user.getImage() != null) && (user.getImage() != User.NO_IMAGE)) {
             mImage = user.getImage();
+            hasChanged = true;
         }
 
-        return true;
+        return hasChanged;
     }
 
     public static User createFromContainer(ImmutableUser userInfos) {
