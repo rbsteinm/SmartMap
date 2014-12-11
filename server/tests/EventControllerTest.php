@@ -368,10 +368,10 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
         $this->mockEventRepo->expects($this->once())
              ->method('getEventsInRadius')
-             ->with($this->equalTo(1.02), $this->equalTo(5.23), $this->equalTo(100));
+             ->with($this->equalTo(1.02), $this->equalTo(5.23), $this->equalTo(10));
 
         $request = new Request($query = array(), $request = array(
-            'radius' => '100',
+            'radius' => '10000',
             'longitude' => '1.02',
             'latitude' => '5.23'
         ));
