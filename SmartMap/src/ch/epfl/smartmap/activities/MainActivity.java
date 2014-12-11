@@ -91,6 +91,62 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
     private LayerDrawable mIcon;
 
+    private FriendsPositionsThread mFriendsPosThread;
+
+    /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
+            // not available
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+            dialog.show();
+        } else {
+            // Google Play Services are available.
+            // Getting reference to the SupportMapFragment of activity_main.xml
+            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = mFragmentMap.getMap();
+            // Enabling MyLocation Layer of Google Map
+            mGoogleMap.setMyLocationEnabled(true);
+        }
+    }
+
+    public MenuTheme getMenuTheme() {
+        return mMenuTheme;
+    }
+
+    private void initializeMarkers() {
+        if ((mFriendMarkerManager != null) && (mEventMarkerManager != null)) {
+            // TODO an assertion would be better to ensure that the marker managers are not null?
+            mFriendMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
+                .getAllVisibleFriends()));
+            mEventMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
+                .getAllVisibleEvents()));
+            for (Marker marker : mEventMarkerManager.getDisplayedMarkers()) {
+                marker.setSnippet(DefaultMarkerManager.MarkerColor.ORANGE.toString());
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        switch (mMenuTheme) {
+            case MAP:
+                break;
+            case SEARCH:
+                break;
+            case ITEM:
+                this.setMainMenu();
+                mEventMarkerManager.resetMarkersIcon(this);
+                break;
+            default:
+                assert false;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,102 +193,10 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
         ServiceContainer.getCache().addOnCacheListener(this);
 
-        new FriendsPositionsThread().start();
+        mFriendsPosThread = new FriendsPositionsThread();
+        mFriendsPosThread.start();
         new UpdateDatabaseThread().start();
         new NearEventsThread().start();
-    }
-
-    @Override
-    protected void onDestroy() {
-        ServiceContainer.getDatabase().updateFromCache();
-        Log.d(TAG, "Updated Database");
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // startService(mUpdateServiceIntent);
-        // this.registerReceiver(mBroadcastReceiver, new
-        // IntentFilter(UpdateService.BROADCAST_POS));
-        if (mGoogleMap != null) {
-            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
-        }
-        // get Intent that started this Activity
-        Intent startingIntent = this.getIntent();
-        // get the value of the user string
-        Location eventLocation = startingIntent.getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
-        if (eventLocation != null) {
-            mMapZoomer
-                .zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
-            eventLocation = null;
-        }
-
-        // Set menu Style
-        switch (mMenuTheme) {
-            case SEARCH:
-                this.setSearchMenu();
-                break;
-            case ITEM:
-                this.setItemMenu(mCurrentItem);
-                break;
-            case MAP:
-                break;
-            default:
-                assert false;
-        }
-
-        if (mGoogleMap != null) {
-            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
-        }
-
-        this.zoomAccordingToAllMarkers();
-    }
-
-    /**
-     * Display the map with the current location
-     */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            // Enabling MyLocation Layer of Google Map
-            mGoogleMap.setMyLocationEnabled(true);
-        }
-    }
-
-    public MenuTheme getMenuTheme() {
-        return mMenuTheme;
-    }
-
-    @Override
-    public void onBackPressed() {
-        switch (mMenuTheme) {
-            case MAP:
-                break;
-            case SEARCH:
-                break;
-            case ITEM:
-                this.setMainMenu();
-                mEventMarkerManager.resetMarkersIcon(this);
-                break;
-            default:
-                assert false;
-        }
     }
 
     /*
@@ -292,6 +256,13 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.updateNotifCount();
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onDestroy() {
+        ServiceContainer.getDatabase().updateFromCache();
+        Log.d(TAG, "Updated Database");
+        super.onDestroy();
     }
 
     /*
@@ -376,6 +347,53 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                 assert false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mFriendsPosThread.disable();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mFriendsPosThread.enable();
+        // startService(mUpdateServiceIntent);
+        // this.registerReceiver(mBroadcastReceiver, new
+        // IntentFilter(UpdateService.BROADCAST_POS));
+        if (mGoogleMap != null) {
+            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
+        }
+        // get Intent that started this Activity
+        Intent startingIntent = this.getIntent();
+        // get the value of the user string
+        Location eventLocation = startingIntent.getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
+        if (eventLocation != null) {
+            mMapZoomer
+                .zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
+            eventLocation = null;
+        }
+
+        // Set menu Style
+        switch (mMenuTheme) {
+            case SEARCH:
+                this.setSearchMenu();
+                break;
+            case ITEM:
+                this.setItemMenu(mCurrentItem);
+                break;
+            case MAP:
+                break;
+            default:
+                assert false;
+        }
+
+        if (mGoogleMap != null) {
+            mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
+        }
+
+        this.zoomAccordingToAllMarkers();
     }
 
     @Override
@@ -523,19 +541,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                     }).size());
             }
         });
-    }
-
-    private void initializeMarkers() {
-        if ((mFriendMarkerManager != null) && (mEventMarkerManager != null)) {
-            // TODO an assertion would be better to ensure that the marker managers are not null?
-            mFriendMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
-                .getAllVisibleFriends()));
-            mEventMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
-                .getAllVisibleEvents()));
-            for (Marker marker : mEventMarkerManager.getDisplayedMarkers()) {
-                marker.setSnippet(DefaultMarkerManager.MarkerColor.ORANGE.toString());
-            }
-        }
     }
 
     private void zoomAccordingToAllMarkers() {

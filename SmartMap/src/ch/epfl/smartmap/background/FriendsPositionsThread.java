@@ -12,10 +12,22 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
 public class FriendsPositionsThread extends Thread {
 
     private static final String TAG = FriendsPositionsThread.class.getSimpleName();
+    private boolean mEnabled = true;
+
+    public void disable() {
+        mEnabled = false;
+    }
+
+    public void enable() {
+        if (!mEnabled) {
+            mEnabled = true;
+            run();
+        }
+    }
 
     @Override
     public void run() {
-        while (true) {
+        while (mEnabled) {
             if (!ServiceContainer.getSettingsManager().isOffline()) {
                 try {
                     Log.d(TAG, "Update Friends Positions");
