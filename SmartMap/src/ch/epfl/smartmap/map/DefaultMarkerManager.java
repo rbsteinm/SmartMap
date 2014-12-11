@@ -37,6 +37,11 @@ public class DefaultMarkerManager implements MarkerManager {
     public static final float MARKER_ANCHOR_Y = 1;
     public static final long HANDLER_DELAY = 16;
 
+    public enum MarkerColor {
+        RED,
+        ORANGE
+    }
+
     private final GoogleMap mGoogleMap;
     /**
      * A map that contains the displayed markers' ids, associated with the
@@ -68,6 +73,7 @@ public class DefaultMarkerManager implements MarkerManager {
                 .icon(item.getMarkerIcon(context)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
         mDisplayedItems.put(marker.getId(), item);
         mDictionnaryMarkers.put(marker.getId(), marker);
+        marker.setSnippet(MarkerColor.ORANGE.toString());
         return marker;
     }
 
@@ -272,6 +278,23 @@ public class DefaultMarkerManager implements MarkerManager {
 
                 this.removeMarker(item);
 
+            }
+        }
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.map.MarkerManager#resetMarkersIcon(java.lang.String)
+     * The marker attribute snippet is used to store the marker's color. The marker icon will be reset only if
+     * it's color was red
+     */
+    @Override
+    public void resetMarkersIcon(Context context) {
+        for (Marker marker : this.getDisplayedMarkers()) {
+            if (marker.getSnippet().equals(MarkerColor.RED.toString())) {
+                marker.setIcon(this.getItemForMarker(marker).getMarkerIcon(context));
+                marker.setSnippet(MarkerColor.ORANGE.toString());
             }
         }
 

@@ -12,7 +12,8 @@ import ch.epfl.smartmap.cache.Displayable;
 import com.google.android.gms.maps.model.Marker;
 
 /**
- * A generic manager for markers, that keeps track of the displayed markers
+ * A generic manager for markers, that keeps track of the displayed markers and associate each marker with the
+ * {@link Displayable} that it represents
  * 
  * @author hugo-S
  */
@@ -78,5 +79,14 @@ public interface MarkerManager {
      *            the updated friends
      */
     void updateMarkers(Context context, Set<Displayable> itemsToDisplay);
+
+    /**
+     * A method that reset all markers icon to the initial icon (obtained from the method
+     * {@code getMarkerIcon} of the Displayable object.
+     * snippet attribute of the marker
+     * 
+     * @param context
+     */
+    void resetMarkersIcon(Context context);
 
 }

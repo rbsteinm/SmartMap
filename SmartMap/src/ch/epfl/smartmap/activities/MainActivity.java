@@ -46,16 +46,16 @@ import ch.epfl.smartmap.util.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 /**
  * This Activity displays the core features of the App. It displays the map and
- * the whole menu. It is a
- * FriendsLocationListener to update the markers on the map when friends
- * positions change
+ * the whole menu.
  * 
  * @author jfperren
  * @author hugo-S
@@ -126,15 +126,13 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             mEventMarkerManager = new DefaultMarkerManager(mGoogleMap);
             mMapZoomer = new DefaultZoomManager(mFragmentMap);
             // Adds markers
-            mFriendMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
-                .getAllVisibleFriends()));
-            mEventMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
-                .getAllVisibleEvents()));
+            this.initializeMarkers();
             this.zoomAccordingToAllMarkers();
 
             // Add listeners to the GoogleMap
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
             mGoogleMap.setOnMarkerClickListener(new ShowInfoOnMarkerClick());
+            mGoogleMap.setOnMapClickListener(new ResetMarkerColorAndInfoPannelOnMapClick());
         }
 
         ServiceContainer.getCache().addOnCacheListener(this);
@@ -537,6 +535,19 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         }
     }
 
+    private void initializeMarkers() {
+        if ((mFriendMarkerManager != null) && (mEventMarkerManager != null)) {
+            // TODO an assertion would be better to ensure that the marker managers are not null?
+            mFriendMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
+                .getAllVisibleFriends()));
+            mEventMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
+                .getAllVisibleEvents()));
+            for (Marker marker : mEventMarkerManager.getDisplayedMarkers()) {
+                marker.setSnippet(DefaultMarkerManager.MarkerColor.ORANGE.toString());
+            }
+        }
+    }
+
     /**
      * Types of Menu that can be displayed on this activity
      * 
@@ -567,9 +578,30 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                 Displayable itemClicked = mEventMarkerManager.getItemForMarker(arg0);
                 mMapZoomer.centerOnLocation(arg0.getPosition());
                 MainActivity.this.setItemMenu(itemClicked);
+                mEventMarkerManager.resetMarkersIcon(MainActivity.this);
+                arg0.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                arg0.setSnippet(DefaultMarkerManager.MarkerColor.RED.toString());
                 return true;
             }
             return false;
         }
+    }
+
+    private class ResetMarkerColorAndInfoPannelOnMapClick implements OnMapClickListener {
+
+        /*
+         * (non-Javadoc)
+         * @see
+         * com.google.android.gms.maps.GoogleMap.OnMapClickListener#onMapClick(com.google.android.gms.maps
+         * .model.LatLng)
+         */
+        @Override
+        public void onMapClick(LatLng arg0) {
+
+            MainActivity.this.setMainMenu();
+            mEventMarkerManager.resetMarkersIcon(MainActivity.this);
+
+        }
+
     }
 }
