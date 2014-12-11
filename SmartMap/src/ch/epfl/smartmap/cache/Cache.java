@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.background.Notifications;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
@@ -95,6 +96,7 @@ public class Cache {
                             ImmutableUser newFriend =
                                 ServiceContainer.getNetworkClient().acceptInvitation(
                                     invitation.getUser().getId());
+                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
                             newFriend.setFriendship(User.FRIEND);
                             Cache.this.putUser(newFriend);
                             break;
@@ -203,6 +205,7 @@ public class Cache {
                             // Decline online
                             ServiceContainer.getNetworkClient().declineInvitation(
                                 invitation.getUser().getId());
+                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
                             break;
                         case Invitation.EVENT_INVITATION:
                             // No interaction needed here
@@ -722,7 +725,8 @@ public class Cache {
             // Get Id
             if (invitationInfo.getId() == Invitation.NO_ID) {
                 // Get Id from database
-                invitationInfo.setId(ServiceContainer.getDatabase().addInvitation(invitationInfo));
+                long id = ServiceContainer.getDatabase().addInvitation(invitationInfo);
+                invitationInfo.setId(id);
             }
 
             if ((invitationInfo.getId() != Invitation.ALREADY_RECEIVED)
@@ -814,7 +818,13 @@ public class Cache {
 
             if (isSetCorrectly) {
                 mInvitationIds.add(invitationInfo.getId());
-                mInvitationInstances.put(invitationInfo.getId(), new GenericInvitation(invitationInfo));
+                long invitationId = invitationInfo.getId();
+                GenericInvitation invitation = new GenericInvitation(invitationInfo);
+                mInvitationInstances.put(invitationInfo.getId(), invitation);
+                if (invitationId != Invitation.ALREADY_RECEIVED) {
+                    Notifications.createNotification(invitation, ServiceContainer.getSettingsManager()
+                        .getContext());
+                }
             }
 
             needToCallListeners = true;
