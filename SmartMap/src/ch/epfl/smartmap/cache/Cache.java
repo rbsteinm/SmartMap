@@ -617,6 +617,7 @@ public class Cache {
 
     public void logState() {
         Log.d(TAG, "CACHE STATE : Users : " + mUserIds);
+        Log.d(TAG, "CACHE STATE : Friends : " + mFriendIds);
         Log.d(TAG, "CACHE STATE : Events : " + mEventIds);
         Log.d(TAG, "CACHE STATE : Filters : " + mFilterIds);
         Log.d(TAG, "CACHE STATE : Invits : " + mInvitationIds);
@@ -890,9 +891,11 @@ public class Cache {
                 mFriendIds.add(newUser.getId());
             }
             if (mUserInstances.get(newUser.getId()) == null) {
-                // Need to add it
-                mUserInstances.put(newUser.getId(), User.createFromContainer(newUser));
-                needToCallListeners = true;
+                if ((newUser.getFriendship() == User.FRIEND) || (newUser.getFriendship() == User.STRANGER)
+                    || (newUser.getFriendship() == User.SELF)) {
+                    mUserInstances.put(newUser.getId(), User.createFromContainer(newUser));
+                    needToCallListeners = true;
+                }
             } else {
                 // Put in set for update
                 usersToUpdate.add(newUser);
@@ -1092,6 +1095,27 @@ public class Cache {
                 return null;
             }
         }.execute();
+    }
+
+    public synchronized boolean removeUsers(Set<Long> userIds) {
+        boolean isListModified = false;
+
+        for (long id : userIds) {
+            if (this.getUser(id) != null) {
+                mUserInstances.remove(id);
+                mUserIds.remove(id);
+                mFriendIds.remove(id);
+                isListModified = true;
+            }
+        }
+
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onUserListUpdate();
+            }
+        }
+
+        return isListModified;
     }
 
     public synchronized void retainEvents(List<Long> ids) {
@@ -1294,11 +1318,38 @@ public class Cache {
      */
     private synchronized boolean updateUsers(Set<ImmutableUser> userInfos) {
         boolean isListModified = false;
+
+        Set<Long> usersWithNewTypeIds = new HashSet<Long>();
+        Set<ImmutableUser> usersWithNewType = new HashSet<ImmutableUser>();
+
         for (ImmutableUser userInfo : userInfos) {
             User user = this.getUser(userInfo.getId());
-            if ((user != null) && user.update(userInfo)) {
-                isListModified = true;
+            if (user != null) {
+                Log.d(TAG, "trying to update user number " + userInfo.getId());
+                // Check if friendship has changed
+                if (userInfo.getId() == 12) {
+                    Log.d(TAG, "Matthieu is being updated, has friendship " + userInfo.getFriendship()
+                        + "in container and " + user.getFriendship() + " in cache");
+                }
+                if ((user.getFriendship() == userInfo.getFriendship())
+                    || (user.getFriendship() == User.DONT_KNOW) || (user.getFriendship() == User.NO_ID)
+                    || (user.getFriendship() == User.SELF)) {
+                    // Just update current instance
+                    isListModified = isListModified || user.update(userInfo);
+                } else {
+                    // Need to remove and add user again to change the instance type
+                    Log.d(TAG,
+                        "Detected type change, id : " + user.getId() + ", type : " + user.getFriendship());
+                    usersWithNewTypeIds.add(userInfo.getId());
+                    usersWithNewType.add(userInfo);
+                }
             }
+        }
+
+        // Remove and add again users with new type
+        if (!usersWithNewType.isEmpty()) {
+            this.removeUsers(usersWithNewTypeIds);
+            this.putUsers(usersWithNewType);
         }
 
         if (isListModified) {
