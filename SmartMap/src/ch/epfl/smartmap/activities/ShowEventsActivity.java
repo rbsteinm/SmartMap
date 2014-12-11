@@ -283,6 +283,7 @@ public class ShowEventsActivity extends ListActivity {
         mShowKilometers = (TextView) this.findViewById(R.id.showEventKilometers);
 
         mSeekBar = (SeekBar) this.findViewById(R.id.showEventSeekBar);
+        mSeekBar.setMax(ServiceContainer.getSettingsManager().getNearEventsMaxDistance() / METERS_IN_ONE_KM);
         mSeekBar.setEnabled(false);
         mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
 
