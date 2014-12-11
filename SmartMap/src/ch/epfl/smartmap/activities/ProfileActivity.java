@@ -26,11 +26,22 @@ public class ProfileActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_profile);
 
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
 
         mNameView = (TextView) this.findViewById(R.id.profile_name);
         mSubtitlesView = (TextView) this.findViewById(R.id.profile_subtitles);
         mPicture = (ImageView) this.findViewById(R.id.profile_picture);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
+        mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
+        mPicture.setImageBitmap(ServiceContainer.getCache()
+            .getUser(ServiceContainer.getSettingsManager().getUserId()).getImage());
+
     }
 
     @Override
@@ -50,15 +61,5 @@ public class ProfileActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
-        mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
-        mPicture.setImageBitmap(ServiceContainer.getCache().getUser(ServiceContainer.getSettingsManager().getUserId())
-            .getImage());
-
     }
 }

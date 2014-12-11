@@ -3,6 +3,11 @@
     tools:context="ch.epfl.smartmap.ChangeFilterActivity" >
 
     <item
+        android:id="@+id/action_remove_filter"
+        android:icon="@drawable/ic_action_discard_white"
+        android:showAsAction="collapseActionView|ifRoom"
+        android:title="@string/remove_filter"/>
+    <item
         android:id="@+id/action_save_filter"
         android:orderInCategory="100"
         android:showAsAction="always"

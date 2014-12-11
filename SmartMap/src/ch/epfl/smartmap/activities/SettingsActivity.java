@@ -21,6 +21,67 @@ import ch.epfl.smartmap.R;
 public class SettingsActivity extends PreferenceActivity {
 
     /**
+     * A preference value change listener that updates the preference's summary
+     * to reflect its new value.
+     */
+    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
+        new PreferenceListener();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setupActionBar();
+        this.getFragmentManager().beginTransaction()
+            .replace(android.R.id.content, new GeneralPreferenceFragment()).commit();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Set up the {@link android.app.ActionBar}, if the API is available.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void setupActionBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            // Show the Up button in the action bar.
+            this.getActionBar().setDisplayHomeAsUpEnabled(true);
+            // Set action bar color to main color
+            this.getActionBar().setBackgroundDrawable(
+                new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        }
+    }
+
+    /**
+     * Binds a preference's summary to its value. More specifically, when the
+     * preference's value is changed,
+     * its summary
+     * (line of text below the preference title) is updated to reflect the
+     * value. The summary is also
+     * immediately
+     * updated upon calling this method. The exact display format is dependent
+     * on the type of preference.
+     * 
+     * @see #sBindPreferenceSummaryToValueListener
+     */
+    private static void bindPreferenceSummaryToValue(Preference preference) {
+        // Set the listener to watch for value changes.
+        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+
+        // Trigger the listener immediately with the preference's
+        // current value.
+        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, PreferenceManager
+            .getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), ""));
+    }
+
+    /**
      * This fragment shows all the settings for simplicity's sake. We can add
      * some other ones if we have many
      * settings
@@ -33,8 +94,10 @@ public class SettingsActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             this.addPreferencesFromResource(R.xml.pref_general);
 
-            bindPreferenceSummaryToValue(this.findPreference(this.getString(R.string.settings_key_refresh_frequency)));
-            bindPreferenceSummaryToValue(this.findPreference(this.getString(R.string.settings_key_last_seen_max)));
+            bindPreferenceSummaryToValue(this.findPreference(this
+                .getString(R.string.settings_key_refresh_frequency)));
+            bindPreferenceSummaryToValue(this.findPreference(this
+                .getString(R.string.settings_key_last_seen_max)));
             bindPreferenceSummaryToValue(this.findPreference(this
                 .getString(R.string.settings_key_max_distance_fetch_events)));
         }
@@ -65,67 +128,6 @@ public class SettingsActivity extends PreferenceActivity {
                 preference.setSummary(stringValue);
             }
             return true;
-        }
-    }
-
-    /**
-     * A preference value change listener that updates the preference's summary
-     * to reflect its new value.
-     */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
-        new PreferenceListener();
-
-    /**
-     * Binds a preference's summary to its value. More specifically, when the
-     * preference's value is changed,
-     * its summary
-     * (line of text below the preference title) is updated to reflect the
-     * value. The summary is also
-     * immediately
-     * updated upon calling this method. The exact display format is dependent
-     * on the type of preference.
-     * 
-     * @see #sBindPreferenceSummaryToValueListener
-     */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
-        // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-
-        // Trigger the listener immediately with the preference's
-        // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, PreferenceManager
-            .getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), ""));
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setupActionBar();
-        this.getFragmentManager().beginTransaction().replace(android.R.id.content, new GeneralPreferenceFragment())
-            .commit();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void setupActionBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            // Show the Up button in the action bar.
-            this.getActionBar().setDisplayHomeAsUpEnabled(true);
-            // Set action bar color to main color
-            this.getActionBar().setBackgroundDrawable(
-                new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         }
     }
 }

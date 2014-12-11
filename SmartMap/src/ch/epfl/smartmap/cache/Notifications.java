@@ -64,7 +64,8 @@ public class Notifications {
 
         intent.putExtra("NOTIFICATION", true);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent =
+            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Add Big View Specific Configuration
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();

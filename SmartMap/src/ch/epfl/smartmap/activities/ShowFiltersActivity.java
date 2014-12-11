@@ -34,6 +34,47 @@ public class ShowFiltersActivity extends ListActivity {
     private List<Filter> mFilterList;
     private Cache mCache;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_show_filters);
+
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        mCache = ServiceContainer.getCache();
+        mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
+
+        // mock stuff, filter list should be taken from the cache (or database?)
+        // MockDB.fillFilters();
+        // mFilterList = MockDB.FILTER_LIST;
+
+        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
+        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onStart()
+     */
+    @Override
+    protected void onStart() {
+
+        super.onStart();
+        mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
+        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
+    }
+
     public void addNewFilterDialog(MenuItem item) {
         // inflate the alertDialog
         LayoutInflater inflater = this.getLayoutInflater();
@@ -46,10 +87,12 @@ public class ShowFiltersActivity extends ListActivity {
         builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                EditText editText = (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
+                EditText editText =
+                    (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                 String filterName = editText.getText().toString();
                 Long newFilterId =
-                    mCache.putFilter(new ImmutableFilter(Filter.NO_ID, filterName, new HashSet<Long>(), true));
+                    mCache
+                        .putFilter(new ImmutableFilter(Filter.NO_ID, filterName, new HashSet<Long>(), true));
                 // Start a new instance of ModifyFilterActivity passing it the
                 // new filter's name
                 Intent intent = new Intent(ShowFiltersActivity.this, ModifyFilterActivity.class);
@@ -68,22 +111,6 @@ public class ShowFiltersActivity extends ListActivity {
 
         // display the AlertDialog
         builder.create().show();
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_show_filters);
-
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-        mCache = ServiceContainer.getCache();
-        mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
-
-        // mock stuff, filter list should be taken from the cache (or database?)
-        // MockDB.fillFilters();
-        // mFilterList = MockDB.FILTER_LIST;
-
-        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
 
     @Override
@@ -112,30 +139,6 @@ public class ShowFiltersActivity extends ListActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onResume()
-     */
-    @Override
-    protected void onResume() {
-
-        super.onResume();
-        mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
-        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onStart()
-     */
-    @Override
-    protected void onStart() {
-
-        super.onStart();
-        mFilterList = new ArrayList<Filter>(mCache.getAllFilters());
-        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
 
 }

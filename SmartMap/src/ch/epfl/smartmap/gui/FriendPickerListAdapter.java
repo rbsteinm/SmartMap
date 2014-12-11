@@ -80,7 +80,7 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
         }
 
         public void setId(long newId) {
-            this.mId = newId;
+            mId = newId;
         }
     }
 }
