@@ -58,6 +58,8 @@ public class FriendInvitationListItemAdapter extends ArrayAdapter<Invitation> {
 
     }
 
+    private static final String TAG = FriendInvitationListItemAdapter.class.getSimpleName();
+
     private final Context mContext;
 
     private final List<Invitation> mItemsArrayList;
@@ -91,7 +93,7 @@ public class FriendInvitationListItemAdapter extends ArrayAdapter<Invitation> {
             viewHolder.setUserName((TextView) convertView.findViewById(R.id.activity_friends_inviter_name));
             viewHolder.setPicture((ImageView) convertView.findViewById(R.id.activity_friends_inviter_picture));
             viewHolder.setUserId(invitation.getUser().getId());
-            viewHolder.setInvitationId(invitation.getUser().getId());
+            viewHolder.setInvitationId(invitation.getId());
 
             convertView.setTag(viewHolder);
 

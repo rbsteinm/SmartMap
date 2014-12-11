@@ -60,10 +60,8 @@ public class ProfileActivity extends Activity {
         super.onResume();
         mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
         mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
-        // TODO why can't i get my image?
-        // Seems like getCache().getUser(6).getImage() doesn't give my image but
-        // for Robin (2) and Marion (11) it does.
-        mPicture.setImageBitmap(ServiceContainer.getCache().getUser(ServiceContainer.getSettingsManager().getUserId())
-            .getImage());
+        // TODO fix pls
+        // mPicture.setImageBitmap(ServiceContainer.getCache().getUser(2).getImage());
+        mPicture.setImageBitmap(ServiceContainer.getCache().getSelf().getImage());
     }
 }

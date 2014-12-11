@@ -436,7 +436,9 @@ public class Cache {
             @Override
             public boolean filter(Invitation item) {
                 int type = item.getType();
-                return (type == Invitation.READ) || (type == Invitation.UNREAD);
+                int status = item.getStatus();
+                return (type == Invitation.FRIEND_INVITATION)
+                    && ((status == Invitation.READ) || (status == Invitation.UNREAD));
             }
         });
     }
@@ -1044,15 +1046,6 @@ public class Cache {
         }
 
         return isListModified;
-    }
-
-    public synchronized void retainEvents(List<Long> ids) {
-        for (long id : mEventIds) {
-            if (!ids.contains(id)) {
-                mEventIds.remove(id);
-                mEventInstances.remove(id);
-            }
-        }
     }
 
     public synchronized void updateFromNetwork(final SmartMapClient networkClient,
