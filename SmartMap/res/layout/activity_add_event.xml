@@ -28,7 +28,7 @@
         android:layout_marginLeft="30dp"
         android:layout_toRightOf="@id/add_event_title_text"
         android:hint="@string/addEventEventName"
-        android:inputType="textMultiLine|textCapSentences"
+        android:inputType="textCapSentences"
         android:lines="1"
         android:maxLines="1"
         android:singleLine="true" />
