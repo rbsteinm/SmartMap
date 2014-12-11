@@ -82,7 +82,7 @@ public class Cache {
         mFilterIds = new HashSet<Long>();
         mInvitationIds = new HashSet<Long>();
 
-        nextFilterId = 1;
+        nextFilterId = Filter.DEFAULT_FILTER_ID + 1;
 
         mListeners = new ArrayList<CacheListener>();
     }
@@ -241,6 +241,13 @@ public class Cache {
         });
     }
 
+    public synchronized Set<Filter> getAllCustomFilters() {
+        Set<Long> customFilterIds = new HashSet<Long>(mFilterIds);
+        customFilterIds.remove(Filter.DEFAULT_FILTER_ID);
+        Log.d(TAG, "custom filters : " + customFilterIds);
+        return this.getFilters(customFilterIds);
+    }
+
     public synchronized Set<Event> getAllEvents() {
         return this.getEvents(mEventIds);
     }
@@ -279,7 +286,13 @@ public class Cache {
      */
     public synchronized Set<User> getAllVisibleFriends() {
         // Get all friends
-        Set<Long> allVisibleUsersId = new HashSet<Long>(mFriendIds);
+        Set<Long> allVisibleUsersId = new HashSet<Long>();
+        if (this.getDefaultFilter() != null) {
+            // Get all friends
+            allVisibleUsersId.addAll(this.getDefaultFilter().getFriendIds());
+        } else {
+            allVisibleUsersId.addAll(mFriendIds);
+        }
 
         // For each active filter, keep friends in it
         for (Long id : mFilterIds) {
@@ -291,6 +304,10 @@ public class Cache {
 
         // Return all friends that passed all filters
         return this.getUsers(allVisibleUsersId);
+    }
+
+    public synchronized Filter getDefaultFilter() {
+        return this.getFilter(Filter.DEFAULT_FILTER_ID);
     }
 
     /**
@@ -365,6 +382,10 @@ public class Cache {
         }
 
         return filters;
+    }
+
+    public synchronized Set<Long> getFriendIds() {
+        return mFriendIds;
     }
 
     public synchronized Invitation getInvitation(long id) {
@@ -669,11 +690,17 @@ public class Cache {
 
         for (ImmutableFilter newFilter : newFilters) {
             if (!mFilterIds.contains(newFilter.getId())) {
-                // New filter, need to add it
-                long filterId = nextFilterId++;
-                newFilter.setId(filterId);
+                long filterId = newFilter.getId();
+                // if not default
+                if (filterId != Filter.DEFAULT_FILTER_ID) {
+                    // Need to set an id
+                    filterId = nextFilterId++;
+                    newFilter.setId(filterId);
+                }
+
                 mFilterIds.add(filterId);
-                mFilterInstances.put(filterId, new DefaultFilter(newFilter));
+                mFilterInstances.put(filterId,
+                    new CustomFilter(newFilter.getId(), newFilter.getIds(), newFilter.getName(), newFilter.isActive()));
                 needToCallListeners = true;
             } else {
                 // Put in update set
@@ -1065,6 +1092,19 @@ public class Cache {
         }
 
         return isListModified;
+    }
+
+    private synchronized void setShowOnMap(long userId, boolean showOnMap) {
+        Filter defaultFilter = this.getDefaultFilter();
+        Set<Long> currentInvisibleFriendIds = defaultFilter.getFriendIds();
+
+        if (showOnMap) {
+            currentInvisibleFriendIds.remove(userId);
+        } else {
+            currentInvisibleFriendIds.add(userId);
+        }
+
+        this.updateFilter(defaultFilter.getImmutableCopy().setIds(currentInvisibleFriendIds));
     }
 
     private synchronized boolean updateEvent(ImmutableEvent eventInfo) {

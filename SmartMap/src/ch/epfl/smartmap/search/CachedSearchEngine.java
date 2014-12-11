@@ -15,7 +15,7 @@ import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.FilterInterface;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
@@ -33,8 +33,13 @@ public final class CachedSearchEngine implements SearchEngine {
 
     private static final String TAG = CachedSearchEngine.class.getSimpleName();
 
+    public static CachedSearchEngine getInstance() {
+        return ONE_INSTANCE;
+    }
+
     private final Map<String, Set<Long>> mPreviousOnlineStrangerSearches;
     private final List<Location> mPreviousOnlineEventSearchQueries;
+
     private final List<Set<Long>> mPreviousOnlineEventSearchResults;
 
     public CachedSearchEngine() {
@@ -397,8 +402,8 @@ public final class CachedSearchEngine implements SearchEngine {
                 }
                 break;
             case TAGS:
-                for (Filter f : ServiceContainer.getCache().getAllFilters()) {
-                    if (f.getName().toLowerCase(Locale.US).contains(query)) {
+                for (FilterInterface f : ServiceContainer.getCache().getAllCustomFilters()) {
+                    if ((f.getName() != null) && f.getName().toLowerCase(Locale.US).contains(query)) {
                         results.add(f);
                     }
                 }
@@ -408,9 +413,5 @@ public final class CachedSearchEngine implements SearchEngine {
                 break;
         }
         return results;
-    }
-
-    public static CachedSearchEngine getInstance() {
-        return ONE_INSTANCE;
     }
 }

@@ -17,7 +17,7 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.FilterInterface;
 import ch.epfl.smartmap.cache.ImmutableFilter;
 
 /**
@@ -25,16 +25,16 @@ import ch.epfl.smartmap.cache.ImmutableFilter;
  * 
  * @author hugo-S
  */
-public class FilterListItemAdapter extends ArrayAdapter<Filter> {
+public class FilterListItemAdapter extends ArrayAdapter<FilterInterface> {
 
     private final Context mContext;
-    private final List<Filter> mItemsArrayList;
+    private final List<FilterInterface> mItemsArrayList;
     private final Cache mCache;
 
-    public FilterListItemAdapter(Context context, List<Filter> filtersList) {
+    public FilterListItemAdapter(Context context, List<FilterInterface> filtersList) {
         super(context, R.layout.gui_friend_list_item, filtersList);
         mContext = context;
-        mItemsArrayList = new ArrayList<Filter>(filtersList);
+        mItemsArrayList = new ArrayList<FilterInterface>(filtersList);
         mCache = ServiceContainer.getCache();
     }
 
@@ -49,7 +49,7 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
         // Create inflater,get item to construct
         FilterViewHolder viewHolder;
-        final Filter filter = mItemsArrayList.get(position);
+        final FilterInterface filter = mItemsArrayList.get(position);
 
         if (convertView == null) {
             LayoutInflater inflater =

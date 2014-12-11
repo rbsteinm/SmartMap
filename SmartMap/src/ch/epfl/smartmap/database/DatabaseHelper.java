@@ -451,6 +451,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     public Set<ImmutableFilter> getAllFilters() {
 
         Set<ImmutableFilter> filters = new HashSet<ImmutableFilter>();
+        Set<Long> filterIds = new HashSet<Long>();
 
         String query = "SELECT  * FROM " + TABLE_FILTER;
 
@@ -461,6 +462,17 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 // using getFilter to add this row's filter to the list
                 filters.add(this.getFilter(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
             } while (cursor.moveToNext());
+        }
+
+        for (ImmutableFilter filter : filters) {
+            filterIds.add(filter.getId());
+        }
+
+        Log.d(TAG, "Database contains filter ids : " + filterIds);
+
+        if (!filterIds.contains(Filter.DEFAULT_FILTER_ID)) {
+            Log.d(TAG, "database contains no default filter");
+            filters.add(new ImmutableFilter(Filter.DEFAULT_FILTER_ID, "", new HashSet<Long>(), true));
         }
 
         cursor.close();
