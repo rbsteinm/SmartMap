@@ -588,6 +588,11 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         }
     }
 
+    /**
+     * A listener that reset events markers colors and info panel when clicking on map
+     * 
+     * @author hugo-S
+     */
     private class ResetMarkerColorAndInfoPannelOnMapClick implements OnMapClickListener {
 
         /*
