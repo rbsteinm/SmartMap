@@ -168,8 +168,10 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $response = $controller->listFriendsPos($request);
         
         $list = array(
-            array('id' => 1, 'longitude' => 1.0, 'latitude' => 2.0, 'lastUpdate' => '2014-11-12 13:33:45'),
-            array('id' => 2, 'longitude' => 3.0, 'latitude' => 4.0, 'lastUpdate' => '2014-11-13 01:56:22')
+            array('id' => 1, 'longitude' => 1.0, 'latitude' => 2.0,
+                'lastUpdate' => '2014-11-12 13:33:45', 'isFriend' => 1),
+            array('id' => 2, 'longitude' => 3.0, 'latitude' => 4.0,
+                'lastUpdate' => '2014-11-13 01:56:22', 'isFriend' => 1)
         );
         
         $validResponse = array('status' => 'Ok', 'message' => 'Fetched friends positions !', 'positions' => $list);
@@ -530,8 +532,8 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $response = $controller->getInvitations($request);
 
         $invitations = array(
-            array('id' => 1, 'name' => 'Toto'),
-            array('id' => 2, 'name' => 'Titi')
+            array('id' => 1, 'name' => 'Toto', 'isFriend' => 0),
+            array('id' => 2, 'name' => 'Titi', 'isFriend' => 0)
         );
 
         $newFriends = array(
@@ -539,7 +541,8 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
                 'name' => 'Tutu',
                 'longitude' => 5.0,
                 'latitude' => 6.0,
-                'lastUpdate' => '2014-11-12 13:33:45'
+                'lastUpdate' => '2014-11-12 13:33:45',
+                'isFriend' => 1
             ));
 
         $validResponse = array(
@@ -604,7 +607,8 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
             'name' => 'Toto',
             'longitude' => 1.0,
             'latitude' => 2.0,
-            'lastUpdate' => '2014-11-12 13:33:45'
+            'lastUpdate' => '2014-11-12 13:33:45',
+            'isFriend' => 1
         );
         
         $this->assertEquals($response->getContent(), json_encode($validResponse));
