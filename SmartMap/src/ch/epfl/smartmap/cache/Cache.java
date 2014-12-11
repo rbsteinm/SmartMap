@@ -645,7 +645,7 @@ public class Cache {
         Set<ImmutableFilter> filtersToUpdate = new HashSet<ImmutableFilter>();
 
         for (ImmutableFilter newFilter : newFilters) {
-            if (newFilter.getId() == Filter.NO_ID) {
+            if (!mFilterIds.contains(newFilter.getId())) {
                 // New filter, need to add it
                 long filterId = nextFilterId++;
                 newFilter.setId(filterId);
@@ -847,7 +847,8 @@ public class Cache {
         });
         Log.d(TAG, unreadInvitations.toString());
         for (Invitation invitation : unreadInvitations) {
-            Log.d(TAG, invitation.toString());
+            // TODO should we set it in the network client or store it in
+            // database?
             invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
         }
     }
