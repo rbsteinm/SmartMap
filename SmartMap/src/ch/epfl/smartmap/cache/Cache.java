@@ -544,6 +544,8 @@ public class Cache {
         Log.d(TAG, "CACHE STATE : Events : " + mEventIds);
         Log.d(TAG, "CACHE STATE : Filters : " + mFilterIds);
         Log.d(TAG, "CACHE STATE : Invits : " + mInvitationIds);
+        Log.d(TAG, "Me : " + this.getSelf().getName() + ", " + this.getSelf().getLocation() + ", "
+            + ((this.getSelf().getImage() == User.NO_IMAGE) ? "no image" : "image"));
     }
 
     /**
@@ -1069,9 +1071,7 @@ public class Cache {
 
                     // Update self informations
                     long myId = settingsManager.getUserId();
-                    Log.d(TAG, "trying to get self info with id " + myId);
                     ImmutableUser self = networkClient.getUserInfo(myId);
-                    Log.d(TAG, "trying to get self picture with id " + myId);
                     self.setImage(networkClient.getProfilePicture(myId));
                     updatedUsers.add(self);
 
@@ -1149,6 +1149,22 @@ public class Cache {
                 return null;
             }
         }.execute();
+    }
+
+    public synchronized void updateUserInfos(long id) {
+        new AsyncTask<Long, Void, Void>() {
+            @Override
+            protected Void doInBackground(Long... params) {
+                try {
+                    ImmutableUser userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
+                    userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
+                    Cache.this.updateUser(userInfos);
+                } catch (SmartMapClientException e) {
+                    Log.e(TAG, "SmartMapClientException : " + e);
+                }
+                return null;
+            }
+        }.execute(id);
     }
 
     private synchronized void keepOnlyTheseEvents(Set<ImmutableEvent> events) {
@@ -1259,22 +1275,11 @@ public class Cache {
         for (ImmutableUser userInfo : userInfos) {
             User user = this.getUser(userInfo.getId());
             if (user != null) {
-                Log.d(TAG, "trying to update user number " + userInfo.getId());
                 // Check if friendship has changed
-                if (userInfo.getId() == 12) {
-                    Log.d(TAG, "Matthieu is being updated, has friendship " + userInfo.getFriendship()
-                        + "in container and " + user.getFriendship() + " in cache");
-                }
-                if ((user.getFriendship() == userInfo.getFriendship())
-                    || (user.getFriendship() == User.DONT_KNOW) || (user.getFriendship() == User.NO_ID)
-                    || (user.getFriendship() == User.SELF)) {
-                    // Just update current instance
+                if (user.getFriendship() == userInfo.getFriendship()) {
                     isListModified = isListModified || user.update(userInfo);
                 } else {
-                    // Need to remove and add user again to change the instance
-                    // type
-                    Log.d(TAG,
-                        "Detected type change, id : " + user.getId() + ", type : " + user.getFriendship());
+                    // Need to remove and add user again to change the instance type
                     usersWithNewTypeIds.add(userInfo.getId());
                     usersWithNewType.add(userInfo);
                 }

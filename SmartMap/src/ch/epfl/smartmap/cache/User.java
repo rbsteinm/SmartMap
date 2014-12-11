@@ -45,6 +45,10 @@ public abstract class User implements UserInterface {
         mId = (id >= 0) ? id : User.NO_ID;
         mName = (name != null) ? name : User.NO_NAME;
         mImage = (image != null) ? Bitmap.createBitmap(image) : User.NO_IMAGE;
+
+        if ((mName == User.NO_NAME) || (mImage == User.NO_IMAGE)) {
+            ServiceContainer.getCache().updateUserInfos(id);
+        }
     }
 
     /*
