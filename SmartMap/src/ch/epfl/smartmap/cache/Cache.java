@@ -722,6 +722,7 @@ public class Cache {
         Set<ImmutableInvitation> invitationsToAdd = new HashSet<ImmutableInvitation>();
 
         for (final ImmutableInvitation invitationInfo : invitationInfos) {
+
             // Get Id
             if (invitationInfo.getId() == Invitation.NO_ID) {
                 // Get Id from database

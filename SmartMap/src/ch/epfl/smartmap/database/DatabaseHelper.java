@@ -283,7 +283,9 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                     // Already stored
                     return Invitation.ALREADY_RECEIVED;
                 } else {
-                    this.addPendingFriend(userInfo.getId());
+                    if (invitation.getStatus() == Invitation.UNREAD) {
+                        this.addPendingFriend(userInfo.getId());
+                    }
                 }
 
                 Log.d(TAG, "Pending ids after : " + this.getPendingFriends());
@@ -416,7 +418,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The invited user's id
      */
     public void deletePendingFriend(long id) {
-
         mDatabase.delete(TABLE_PENDING, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
