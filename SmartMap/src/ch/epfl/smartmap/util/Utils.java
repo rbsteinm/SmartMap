@@ -45,7 +45,7 @@ public final class Utils {
     private static final double TEN = 10.0;
 
     public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
-            .getString(R.string.utils_never_seen_on_smartmap);
+        .getString(R.string.utils_never_seen_on_smartmap);
     private static final String TAG = Utils.class.getSimpleName();
 
     /**
@@ -55,11 +55,23 @@ public final class Utils {
         super();
     }
 
+    /**
+     * @param latLng the coordinates of point P
+     * @return the distance between the user and P
+     * @author rbsteinm
+     */
     public static double distanceToMe(LatLng latLng) {
-        return Math.sqrt(Math.pow(latLng.latitude - ServiceContainer.getSettingsManager().getLocation().getLatitude(),
-                2) + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+        Location loc = new Location("");
+        loc.setLatitude(latLng.latitude);
+        loc.setLongitude(latLng.longitude);
+        return ServiceContainer.getSettingsManager().getLocation().distanceTo(loc);
     }
 
+    /**
+     * @param location the location of point P
+     * @return the distance between the user and P
+     * @author rbsteinm
+     */
     public static double distanceToMe(Location location) {
         return ServiceContainer.getSettingsManager().getLocation().distanceTo(location);
     }
@@ -155,10 +167,10 @@ public final class Utils {
         if (yearsDiff == 0) {
             if (daysDiff > DAYS_IN_A_WEEK) {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                        + calendar.get(Calendar.YEAR);
+                    + calendar.get(Calendar.YEAR);
             } else if (daysDiff > 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
-                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else if (daysDiff == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
             } else if (daysDiff == 0) {
@@ -167,14 +179,14 @@ public final class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else if (daysDiff > -DAYS_IN_A_WEEK) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
-                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                        + calendar.get(Calendar.YEAR);
+                    + calendar.get(Calendar.YEAR);
             }
         } else {
             return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "."
-                    + formatForDisplay(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
+                + formatForDisplay(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
         }
     }
 
@@ -187,7 +199,7 @@ public final class Utils {
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
         long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
-                - calendar.getTimeInMillis();
+            - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
             // Give time in seconds
@@ -199,7 +211,7 @@ public final class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
             } else {
                 return minutes + " "
-                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
             }
         } else if (diff < ONE_DAY) {
             // Give time hours
@@ -208,7 +220,7 @@ public final class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_hour_ago);
             } else {
                 return "" + hours + " "
-                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
             }
         } else if (diff < ONE_YEAR) {
             // Give time in days
@@ -217,7 +229,7 @@ public final class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else {
                 return "" + days + " "
-                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
             }
         } else {
             return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
@@ -250,11 +262,11 @@ public final class Utils {
             distance = distance / ONE_THOUSAND_METERS;
             distance = Math.round(distance * TEN) / TEN;
             textDistance = distance + " km "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you);
+                + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you);
         } else {
             distance = Math.round(distance);
             textDistance = ((int) distance) + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you);
+                + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you);
         }
         return textDistance;
     }

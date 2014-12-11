@@ -32,6 +32,8 @@ public abstract class User implements UserInterface {
 
     public static final User NOBODY = new Stranger(NO_ID, NO_NAME, NO_IMAGE);
 
+    public enum blockStatus {BLOCKED, UNBLOCKED, NOT_SET};
+
     public static final int IMAGE_QUALITY = 100;
     public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
     public static final int PICTURE_WIDTH = 50;
@@ -84,7 +86,8 @@ public abstract class User implements UserInterface {
 
     @Override
     public ImmutableUser getImmutableCopy() {
-        return new ImmutableUser(mId, mName, null, null, null, null, mImage, false, this.getFriendship());
+        return new ImmutableUser(mId, mName, null, null, null, null, mImage, User.blockStatus.UNBLOCKED,
+            this.getFriendship());
     }
 
     /*

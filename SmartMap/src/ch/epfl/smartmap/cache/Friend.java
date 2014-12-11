@@ -30,12 +30,12 @@ public final class Friend extends User {
     private String mEmail;
     private String mLocationString;
     private Location mLocation;
-    private boolean mIsBlocked;
+    private User.blockStatus mIsBlocked;
 
     private final MarkerIconMaker mMarkerIconMaker;
 
     protected Friend(long id, String name, Bitmap image, Location location, String locationString,
-        boolean isBlocked) {
+        User.blockStatus isBlocked) {
         super(id, name, image);
 
         if (locationString == null) {
@@ -70,7 +70,7 @@ public final class Friend extends User {
     @Override
     public ImmutableUser getImmutableCopy() {
         return super.getImmutableCopy().setPhoneNumber(mPhoneNumber).setEmail(mEmail).setLocation(mLocation)
-            .setLocationString(mLocationString);
+            .setLocationString(mLocationString).setBlocked(mIsBlocked);
     }
 
     public Calendar getLastSeen() {
@@ -132,7 +132,8 @@ public final class Friend extends User {
         return infos;
     }
 
-    public boolean isBlocked() {
+    @Override
+    public User.blockStatus isBlocked() {
         return mIsBlocked;
     }
 
@@ -152,6 +153,7 @@ public final class Friend extends User {
         mEmail = (user.getEmail() != null) ? user.getEmail() : mEmail;
         mLocationString = (user.getLocationString() != null) ? user.getLocationString() : mLocationString;
         mLocation = (user.getLocation() != null) ? new Location(user.getLocation()) : mLocation;
+        mIsBlocked = (user.isBlocked() != User.blockStatus.NOT_SET) ? user.isBlocked() : mIsBlocked;
 
         return true;
     }

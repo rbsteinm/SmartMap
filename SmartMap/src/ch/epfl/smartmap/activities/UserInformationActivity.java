@@ -16,6 +16,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.listeners.CacheListener;
@@ -61,9 +62,8 @@ public class UserInformationActivity extends Activity {
 
         // Set user informations
         mUserId = this.getIntent().getLongExtra("USER", User.NO_ID);
-        User user = ServiceContainer.getCache().getUser(mUserId);
-
-        this.updateInformations(user);
+        mUser = ServiceContainer.getCache().getUser(mUserId);
+        this.updateInformations(mUser);
 
         ServiceContainer.getCache().addOnCacheListener(new UserInformationCacheListener());
     }
@@ -166,20 +166,46 @@ public class UserInformationActivity extends Activity {
      * @param view
      */
     public void setBlockedStatus(View view) {
-        ServiceContainer.getCache().setBlockedStatus(
-            mUser.getImmutableCopy(), !mBlockSwitch.isChecked(), new NetworkRequestCallback() {
+        ImmutableUser modified = mUser.getImmutableCopy();
+        if (mBlockSwitch.isChecked()) {
+            modified.setBlocked(User.blockStatus.BLOCKED);
+        } else {
+            modified.setBlocked(User.blockStatus.UNBLOCKED);
+        }
 
-                @Override
-                public void onFailure() {
-                    mBlockSwitch.setChecked(!mBlockSwitch.isChecked());
-                }
+        ServiceContainer.getCache().setBlockedStatus(modified, new NetworkRequestCallback() {
 
-                @Override
-                public void onSuccess() {
-                    mShowOnMapSwitch.setEnabled(mUser.getImmutableCopy().isBlocked());
-                }
+            @Override
+            public void onFailure() {
+                UserInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mBlockSwitch.setChecked(UserInformationActivity.this.statusToBool(mUser.isBlocked()));
+                        Toast.makeText(UserInformationActivity.this,
+                            "Network error, couldn't (un)block friend", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
-            });
+            @Override
+            public void onSuccess() {
+                UserInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mShowOnMapSwitch.setEnabled(!UserInformationActivity.this.statusToBool(mUser
+                            .isBlocked()));
+                        if (UserInformationActivity.this.statusToBool(mUser.isBlocked())) {
+                            Toast.makeText(UserInformationActivity.this, "friend successfully blocked",
+                                Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(UserInformationActivity.this, "friend successfully unblocked",
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+
+        });
 
     }
 
@@ -198,7 +224,6 @@ public class UserInformationActivity extends Activity {
      * @param user
      */
     private void updateInformations(User user) {
-        mUser = user;
 
         // Defensive case, should never happen
         if (user == null) {
@@ -217,8 +242,9 @@ public class UserInformationActivity extends Activity {
                 mNameView.setText(friend.getName());
                 mSubtitlesView.setText(friend.getSubtitle());
                 mPictureView.setImageBitmap(friend.getImage());
+                mBlockSwitch.setChecked(this.statusToBool(friend.isBlocked()));
                 mShowOnMapSwitch.setChecked(friend.isVisible());
-                mBlockSwitch.setChecked(friend.isBlocked());
+                mShowOnMapSwitch.setEnabled(!this.statusToBool(mUser.isBlocked()));
                 mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
 
             } else {
@@ -232,6 +258,15 @@ public class UserInformationActivity extends Activity {
                 this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
             }
         }
+    }
+
+    /**
+     * @param status
+     *            blocked status
+     * @return true if the user is blocked,false if unblocked or unset
+     */
+    private boolean statusToBool(User.blockStatus status) {
+        return status == User.blockStatus.BLOCKED;
     }
 
     /**
@@ -279,9 +314,9 @@ public class UserInformationActivity extends Activity {
             UserInformationActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    User user = ServiceContainer.getCache().getUser(mUserId);
+                    mUser = ServiceContainer.getCache().getUser(mUserId);
 
-                    UserInformationActivity.this.updateInformations(user);
+                    UserInformationActivity.this.updateInformations(mUser);
                 }
             });
         }

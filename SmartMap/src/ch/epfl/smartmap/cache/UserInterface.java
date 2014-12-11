@@ -15,4 +15,6 @@ public interface UserInterface extends Displayable {
     String getName();
 
     boolean update(ImmutableUser user);
+
+    User.blockStatus isBlocked();
 }
