@@ -12,8 +12,8 @@ import android.location.Location;
 public final class ImmutableUser {
 
     // User informations
-    private long mId;
-    private String mName;
+    private final long mId;
+    private final String mName;
     private String mPhoneNumber;
     private String mEmail;
     private String mLocationString;
@@ -110,6 +110,11 @@ public final class ImmutableUser {
 
     public ImmutableUser setPhoneNumber(String newPhoneNumber) {
         mPhoneNumber = newPhoneNumber;
+        return this;
+    }
+
+    public ImmutableUser setBlocked(boolean newBlockedStatus) {
+        mIsBlocked = newBlockedStatus;
         return this;
     }
 }
