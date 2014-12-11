@@ -93,8 +93,8 @@ public class JsonSmartMapParser implements SmartMapParser {
     private void checkLastSeen(GregorianCalendar lastSeen) throws SmartMapParseException {
         GregorianCalendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
         if (lastSeen.getTimeInMillis() > (now.getTimeInMillis() + SERVER_TIME_DIFFERENCE_THRESHHOLD)) {
-            throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString() + " compared to "
-                + now.toString());
+            throw new SmartMapParseException("Invalid last seen date: " + lastSeen.toString()
+                + " compared to " + now.toString());
         }
     }
 
@@ -304,7 +304,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 
         ImmutableEvent event =
             new ImmutableEvent(id, name, creator, description, startingDate, endDate, location, positionName,
-                new HashSet(participants));
+                new HashSet<Long>(participants));
 
         return event;
     }
