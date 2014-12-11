@@ -30,7 +30,8 @@ import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider} to communicate with a SmartMap
+ * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider}
+ * to communicate with a SmartMap
  * server.
  * 
  * @author marion-S
@@ -389,8 +390,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         } catch (SmartMapParseException e) {
             throw new SmartMapClientException(e);
         }
-
-        // FIXME Don't retrieve removed Friends?
 
         return new NetworkFriendInvitationBag(inviters, newFriends, removedFriends);
 
