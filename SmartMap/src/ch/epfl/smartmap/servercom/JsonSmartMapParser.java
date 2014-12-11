@@ -453,7 +453,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 
         ImmutableEvent event =
             new ImmutableEvent(id, name, creator, description, startingDate, endDate, location, positionName,
-                new HashSet<Long>());
+                new HashSet<Long>(participants));
 
         return event;
     }

@@ -18,6 +18,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
+import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.util.Utils;
 
 /**
@@ -30,6 +31,7 @@ public class UserInformationActivity extends Activity {
     @SuppressWarnings("unused")
     private static final String TAG = UserInformationActivity.class.getSimpleName();
     private User mUser;
+    private long mUserId;
     private Switch mShowOnMapSwitch;
     private Switch mBlockSwitch;
     private TextView mSubtitlesView;
@@ -56,41 +58,14 @@ public class UserInformationActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
         // Set user informations
-        mUser = ServiceContainer.getCache().getUser(this.getIntent().getLongExtra("USER", User.NO_ID));
+        mUserId = this.getIntent().getLongExtra("USER", User.NO_ID);
+        User user = ServiceContainer.getCache().getUser(mUserId);
 
-        // Defensive case, should never happen
-        if (mUser == null) {
-            mNameView.setText("Unknown user");
+        this.updateInformations(user);
 
-            mShowOnMapSwitch.setVisibility(View.INVISIBLE);
-            mBlockSwitch.setVisibility(View.INVISIBLE);
-            mDistanceView.setVisibility(View.INVISIBLE);
-
-            this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
-        } else {
-            // Ugly instanceof, case classes would be helpful
-            if (mUser instanceof Friend) {
-                Friend friend = (Friend) mUser;
-
-                mNameView.setText(friend.getName());
-                mSubtitlesView.setText(friend.getSubtitle());
-                mPictureView.setImageBitmap(friend.getImage());
-                mShowOnMapSwitch.setChecked(friend.isVisible());
-                mBlockSwitch.setChecked(friend.isBlocked());
-                mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
-
-            } else {
-                mNameView.setText(mUser.getName());
-                mSubtitlesView.setText(mUser.getSubtitle());
-                mPictureView.setImageBitmap(mUser.getImage());
-                mShowOnMapSwitch.setVisibility(View.INVISIBLE);
-                mBlockSwitch.setVisibility(View.INVISIBLE);
-                mDistanceView.setVisibility(View.INVISIBLE);
-                // We do not display the remove button as we are not friends yet
-                this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
-            }
-        }
+        ServiceContainer.getCache().addOnCacheListener(new UserInformationCacheListener());
     }
 
     public void displayDeleteConfirmationDialog(View view) {
@@ -184,5 +159,96 @@ public class UserInformationActivity extends Activity {
         if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
             this.startActivity(new Intent(this, MainActivity.class));
         }
+    }
+
+    /**
+     * Updates the information displayed with a new user
+     * 
+     * @param user
+     */
+    private void updateInformations(User user) {
+        mUser = user;
+
+        // Defensive case, should never happen
+        if (user == null) {
+            mNameView.setText("Unknown user");
+
+            mShowOnMapSwitch.setVisibility(View.INVISIBLE);
+            mBlockSwitch.setVisibility(View.INVISIBLE);
+            mDistanceView.setVisibility(View.INVISIBLE);
+
+            this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
+        } else {
+            // Ugly instanceof, case classes would be helpful
+            if (user instanceof Friend) {
+                Friend friend = (Friend) user;
+
+                mNameView.setText(friend.getName());
+                mSubtitlesView.setText(friend.getSubtitle());
+                mPictureView.setImageBitmap(friend.getImage());
+                mShowOnMapSwitch.setChecked(friend.isVisible());
+                mBlockSwitch.setChecked(friend.isBlocked());
+                mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
+
+            } else {
+                mNameView.setText(user.getName());
+                mSubtitlesView.setText(user.getSubtitle());
+                mPictureView.setImageBitmap(user.getImage());
+                mShowOnMapSwitch.setVisibility(View.INVISIBLE);
+                mBlockSwitch.setVisibility(View.INVISIBLE);
+                mDistanceView.setVisibility(View.INVISIBLE);
+                // We do not display the remove button as we are not friends yet
+                this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    /**
+     * This class is a CacheListener that updates the displayed user when it's
+     * info are changed.
+     * 
+     * @author Pamoi
+     */
+    private class UserInformationCacheListener implements CacheListener {
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.listeners.CacheListener#onEventListUpdate()
+         */
+        @Override
+        public void onEventListUpdate() {
+            // Nothing to do
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
+         */
+        @Override
+        public void onFilterListUpdate() {
+            // Nothing to do
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see
+         * ch.epfl.smartmap.listeners.CacheListener#onInvitationListUpdate()
+         */
+        @Override
+        public void onInvitationListUpdate() {
+            // Nothing to do
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.listeners.CacheListener#onUserListUpdate()
+         */
+        @Override
+        public void onUserListUpdate() {
+            User user = ServiceContainer.getCache().getUser(mUserId);
+
+            UserInformationActivity.this.updateInformations(user);
+        }
+
     }
 }
