@@ -261,7 +261,7 @@ public class ModifyFilterActivity extends Activity {
     private void setFilter() {
         mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
         for (long id : mFilter.getFriendIds()) {
-            mFriendsInside.add(mCache.getFriend(id));
+            mFriendsInside.add(mCache.getUser(id));
         }
         for (User friend : mCache.getAllFriends()) {
             if (!mFriendsInside.contains(friend)) {
@@ -299,7 +299,7 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mOutsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mCache.getFriend(droppedItemId);
+                        User droppedItem = mCache.getUser(droppedItemId);
                         if (mFriendsInside.contains(droppedItem)) {
                             mFriendsInside.remove(droppedItem);
                             mFriendsOutside.add(droppedItem);
@@ -358,7 +358,7 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mInsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mCache.getFriend(droppedItemId);
+                        User droppedItem = mCache.getUser(droppedItemId);
                         if (mFriendsOutside.contains(droppedItem)) {
                             mFriendsInside.add(droppedItem);
                             mFriendsOutside.remove(droppedItem);

@@ -132,7 +132,7 @@ public class DefaultFilter implements Filter {
     public String getSubtitle() {
         String subtitle = "";
         for (Long id : mIds) {
-            subtitle += ServiceContainer.getCache().getFriend(id).getName() + " ";
+            subtitle += ServiceContainer.getCache().getUser(id).getName() + " ";
         }
         return subtitle;
     }
