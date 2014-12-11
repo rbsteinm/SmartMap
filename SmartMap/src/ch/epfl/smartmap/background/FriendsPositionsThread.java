@@ -19,16 +19,13 @@ public class FriendsPositionsThread extends Thread {
     }
 
     public void enable() {
-        if (!mEnabled) {
-            mEnabled = true;
-            run();
-        }
+        mEnabled = true;
     }
 
     @Override
     public void run() {
-        while (mEnabled) {
-            if (!ServiceContainer.getSettingsManager().isOffline()) {
+        while (true) {
+            if (!ServiceContainer.getSettingsManager().isOffline() && mEnabled) {
                 try {
                     Log.d(TAG, "Update Friends Positions");
                     ServiceContainer.getCache().putUsers(
