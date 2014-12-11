@@ -590,11 +590,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 null, null, null, null);
 
         String name = "";
-        boolean isActive = cursor.getInt(cursor.getColumnIndex(KEY_ACTIVE)) == 1;
+        boolean isActive = false;
 
         if (cursor != null) {
             cursor.moveToFirst();
             name = cursor.getString(cursor.getColumnIndex(KEY_NAME));
+            isActive = cursor.getInt(cursor.getColumnIndex(KEY_ACTIVE)) == 1;
         }
 
         // Second query to get the associated list of IDs

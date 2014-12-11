@@ -12,7 +12,8 @@ import ch.epfl.smartmap.cache.Displayable;
 import com.google.android.gms.maps.model.Marker;
 
 /**
- * A generic manager for markers, that keeps track of the displayed markers
+ * A generic manager for markers, that keeps track of the displayed markers and associate each marker with the
+ * {@link Displayable} that it represents
  * 
  * @author hugo-S
  */
@@ -67,6 +68,15 @@ public interface MarkerManager {
      *            the item for which we want to remove a marker
      */
     Marker removeMarker(Displayable item);
+
+    /**
+     * A method that reset all markers icon to the initial icon (obtained from the method
+     * {@code getMarkerIcon} of the Displayable object.
+     * snippet attribute of the marker
+     * 
+     * @param context
+     */
+    void resetMarkersIcon(Context context);
 
     /**
      * This method updates the markers on the map with the given list of items

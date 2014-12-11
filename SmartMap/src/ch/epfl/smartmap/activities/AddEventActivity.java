@@ -5,7 +5,6 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.TimeZone;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.location.Location;
@@ -24,6 +23,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
@@ -75,7 +75,7 @@ public class AddEventActivity extends FragmentActivity {
                         AddEventActivity.this.getString(R.string.add_event_toast_event_created), Toast.LENGTH_SHORT)
                         .show();
 
-                    mActivity.finish();
+                    AddEventActivity.this.finish();
                 }
             });
         }
@@ -137,7 +137,6 @@ public class AddEventActivity extends FragmentActivity {
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
     private LatLng mEventPosition;
-    private Activity mActivity;
     private EditText mDescription;
     private EditText mEventName;
     private EditText mPickEndDate;
@@ -248,11 +247,12 @@ public class AddEventActivity extends FragmentActivity {
             location.setLatitude(mEventPosition.latitude);
             location.setLongitude(mEventPosition.longitude);
             SettingsManager setMng = ServiceContainer.getSettingsManager();
+            Cache cache = ServiceContainer.getCache();
 
             ImmutableEvent event =
-                new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), setMng.getSelf()
-                    .getImmutableCopy(), mDescription.getText().toString(), startDate, endDate, location, mPlaceName
-                    .getText().toString(), new HashSet<Long>());
+                new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(), cache
+                    .getUser(setMng.getUserId()).getImmutableCopy(), mDescription.getText().toString(), startDate,
+                    endDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
 
             ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
         }

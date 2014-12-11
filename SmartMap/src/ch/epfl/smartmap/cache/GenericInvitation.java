@@ -81,6 +81,7 @@ public class GenericInvitation implements Invitation, Comparable {
             && (this.getId() == ((GenericInvitation) that).getId());
     }
 
+    @Override
     public Event getEvent() {
         return mEvent;
     }

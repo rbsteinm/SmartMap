@@ -106,9 +106,10 @@
     <string name="show_event_on_the_map_loading">Opening event on the map…</string>
     <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
     <string name="show_event_details_button">See details</string>
-    <string name="show_event_server_error">Couldn\'t fetch wished content from our server, sorry :(</string>
+    <string name="show_event_server_error">Couldn\'t fetch wished content from our server</string>
     <string name="show_event_loading_info">Loading informations…</string>
     <string name="show_events_menu_refresh">Refresh</string>
+    <string name="ten_letters">aaaaaaaaaa</string>
 
     <!-- EventsListItemAdapter -->
     <string name="events_list_item_adapter_event_live">Event is live!</string>
@@ -121,7 +122,7 @@
     <string name="events_list_item_adapter_from">from</string>
     <string name="events_list_item_adapter_to">to</string>
 
-    <!-- ShowEventInformationActivity -->
+    <!-- EventInformationActivity -->
     <string name="event_info_title_text">Title</string>
     <string name="event_info_when_text">When</string>
     <string name="event_info_by_text">Created by</string>
@@ -142,6 +143,7 @@
     <string name="event_going_failure">Error while trying to join event</string>
     <string name="refresh_participants_network_error">Network Error while getting participants</string>
     <string name="refresh_participants_not_found">Couldn\'t find participants</string>
+    <string name="event_info_delete_button">Delete event</string>
 
     <!-- Error Messages -->
     <string name="error_client_side">An error occurred on our side, sorry :(</string>
@@ -259,6 +261,8 @@
      <string name="changes_saved">Changes saved</string>
      <string name="yes">Yes</string>
      <string name="no">No</string>
+     <string name="remove_filter">Remove filter?</string>
+     <string name="removed_filter">Removed filter</string>
 
     <!-- Settings -->
     <!-- NOTE: Each string value must be unique, as it is a key for one specific preference. -->
@@ -312,6 +316,7 @@
     <string name="utils_hours_ago">hours ago</string>
     <string name="utils_days_ago">days ago</string>
     <string name="utils_away_from_you">away from you</string>
+    <string name="utils_meters_away_from_you">meters away from you</string>
     
     <!-- SettingsManager -->
     <string name="near">near</string>

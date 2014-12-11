@@ -36,6 +36,21 @@ public class SetLocationActivity extends FragmentActivity {
     private SupportMapFragment mFragmentMap;
     private LatLng mEventPosition;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_set_location);
+
+        // Makes the logo clickable (clicking it returns to previous activity)
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        // Maybe set it longer, how?
+        Toast.makeText(this, this.getString(R.string.set_location_toast), Toast.LENGTH_LONG).show();
+
+        this.displayMap();
+    }
+
     /**
      * Display the map with the current location
      */
@@ -80,21 +95,6 @@ public class SetLocationActivity extends FragmentActivity {
                 }
             });
         }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_set_location);
-
-        // Makes the logo clickable (clicking it returns to previous activity)
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
-        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        // Maybe set it longer, how?
-        Toast.makeText(this, this.getString(R.string.set_location_toast), Toast.LENGTH_LONG).show();
-
-        this.displayMap();
     }
 
     @Override

@@ -951,6 +951,9 @@ public class Cache {
 
         for (long id : ids) {
             if (mEventIds.contains(id)) {
+                // TODO remove event in networkClient
+                // ServiceContainer.getNetworkClient().
+
                 // Remove id from sets
                 mEventIds.remove(id);
 
@@ -1037,7 +1040,7 @@ public class Cache {
                             ServiceContainer.getNetworkClient().removeFriend(params[0]);
                             callback.onSuccess();
                         } catch (SmartMapClientException e) {
-                            Log.e(TAG, "Error while inviting friend: " + e);
+                            Log.e(TAG, "Error while removing friend: " + e);
                             callback.onFailure();
                         }
                         return null;

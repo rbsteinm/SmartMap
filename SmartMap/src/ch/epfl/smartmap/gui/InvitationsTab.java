@@ -38,7 +38,8 @@ public class InvitationsTab extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
-        mInvitationList = new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
+        mInvitationList =
+            new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
 
         // Create custom Adapter and pass it to the Activity
         this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
@@ -84,7 +85,8 @@ public class InvitationsTab extends ListFragment {
     public void onResume() {
         super.onResume();
 
-        mInvitationList = new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
+        mInvitationList =
+            new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
         this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
     }
 
@@ -109,34 +111,39 @@ public class InvitationsTab extends ListFragment {
             + mContext.getString(R.string.as_a_friend));
 
         // Add positive button
-        builder.setPositiveButton(mContext.getString(R.string.yes_accept), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                // Accept invitation in Cache
-                ServiceContainer.getCache().acceptInvitation(invitation, new NetworkRequestCallback() {
-                    @Override
-                    public void onFailure() {
-                        ((Activity) mContext).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(mContext,
-                                    ((Activity) mContext).getString(R.string.accept_friend_network_error),
-                                    Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+        builder.setPositiveButton(mContext.getString(R.string.yes_accept),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // Accept invitation in Cache
+                    ServiceContainer.getCache().acceptInvitation(invitation, new NetworkRequestCallback() {
+                        @Override
+                        public void onFailure() {
+                            ((Activity) mContext).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast
+                                        .makeText(
+                                            mContext,
+                                            ((Activity) mContext)
+                                                .getString(R.string.accept_friend_network_error),
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
 
-                    @Override
-                    public void onSuccess() {
-                        // We need to get the invitation from the cache as it
-                        // has been modified
-                        Invitation updated = ServiceContainer.getCache().getInvitation(invitation.getId());
-                        // We run it's intent
-                        InvitationsTab.this.startActivity(updated.getIntent());
-                    }
-                });
-            }
-        });
+                        @Override
+                        public void onSuccess() {
+                            // We need to get the invitation from the cache as it
+                            // has been modified
+                            Invitation updated =
+                                ServiceContainer.getCache().getInvitation(invitation.getId());
+                            // We run it's intent
+                            InvitationsTab.this.startActivity(updated.getIntent());
+                        }
+                    });
+                }
+            });
 
         // Add negative button
         builder.setNegativeButton(R.string.no_decline, new DialogInterface.OnClickListener() {
@@ -163,8 +170,8 @@ public class InvitationsTab extends ListFragment {
                             public void run() {
                                 // Remove invitation from list
                                 mInvitationList.remove(invitation);
-                                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
-                                    mInvitationList));
+                                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(
+                                    mContext, mInvitationList));
 
                                 // Confirm decline
                                 Toast.makeText(mContext, mContext.getString(R.string.decline_confirm),

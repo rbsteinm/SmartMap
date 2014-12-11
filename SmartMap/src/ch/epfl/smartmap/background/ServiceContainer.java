@@ -8,8 +8,10 @@ import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 
 /**
- * This class is a container for the different services used by the SmartMap app. It's member must be manually set at
- * the starting of the app. It provides a common interface to get services and thus simplifies future changes. It also
+ * This class is a container for the different services used by the SmartMap app. It's member must be manually
+ * set at
+ * the starting of the app. It provides a common interface to get services and thus simplifies future changes.
+ * It also
  * allows to switch the returned instances for behavior modification and testing.
  * 
  * @author Pamoi
@@ -22,9 +24,7 @@ public class ServiceContainer {
     private static SettingsManager mSettingsManager;
 
     /**
-     * 
      * Private constructor that hides implicit public one.
-     * 
      */
     private ServiceContainer() {
         super();

@@ -197,6 +197,13 @@ public class EventInformationActivity extends ListActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.show_event_information, menu);
+
+        // Disable the delete event button if we are not the creator
+        if (!mEvent.isOwn()) {
+            MenuItem item = menu.findItem(R.id.event_info_delete_button);
+            item.setVisible(false);
+        }
+
         return true;
     }
 
@@ -208,6 +215,10 @@ public class EventInformationActivity extends ListActivity {
                 return true;
             case android.R.id.home:
                 this.onNotificationOpen();
+                this.finish();
+                break;
+            case R.id.event_info_delete_button:
+                ServiceContainer.getCache().removeEvent(mEvent.getId());
                 this.finish();
                 break;
             default:

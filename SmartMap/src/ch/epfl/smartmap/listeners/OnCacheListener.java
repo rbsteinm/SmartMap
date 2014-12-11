@@ -25,18 +25,18 @@ public class OnCacheListener implements CacheListener {
 
     }
 
+    @Override
+    public void onInvitationListUpdate() {
+        // TODO Auto-generated method stub
+
+    }
+
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.listeners.CacheListener#onFriendListUpdate()
      */
     @Override
     public void onUserListUpdate() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onInvitationListUpdate() {
         // TODO Auto-generated method stub
 
     }

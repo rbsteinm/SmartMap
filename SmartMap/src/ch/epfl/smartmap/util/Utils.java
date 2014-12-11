@@ -45,21 +45,20 @@ public class Utils {
     private static final double TEN = 10.0;
 
     public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
-            .getString(R.string.utils_never_seen_on_smartmap);
+        .getString(R.string.utils_never_seen_on_smartmap);
     private static final String TAG = Utils.class.getSimpleName();
 
     /**
-     * 
      * Private onstructor so that Utils cannot be instantiated
-     * 
      */
     private Utils() {
         super();
     }
 
     public static double distanceToMe(LatLng latLng) {
-        return Math.sqrt(Math.pow(latLng.latitude - ServiceContainer.getSettingsManager().getLocation().getLatitude(),
-                2) + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+        return Math.sqrt(Math.pow(latLng.latitude
+            - ServiceContainer.getSettingsManager().getLocation().getLatitude(), 2)
+            + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
     }
 
     public static double distanceToMe(Location location) {
@@ -71,10 +70,12 @@ public class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder =
+            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
                 return addresses.get(0).getLocality();
             } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
@@ -88,7 +89,8 @@ public class Utils {
         }
     }
 
-    public static int getColorInInterval(double value, double startValue, double endValue, int startColor, int endColor) {
+    public static int getColorInInterval(double value, double startValue, double endValue, int startColor,
+        int endColor) {
         if (startValue > endValue) {
             return getColorInInterval(value, endValue, startValue, endColor, startColor);
         } else {
@@ -98,9 +100,13 @@ public class Utils {
                 double percentageStart = (startValue - value) / intervalLength;
                 double percentageEnd = (value - endValue) / intervalLength;
 
-                int red = (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
-                int green = (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color.green(endColor)));
-                int blue = (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
+                int red =
+                    (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
+                int green =
+                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color
+                        .green(endColor)));
+                int blue =
+                    (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
 
                 return Color.rgb(red, green, blue);
             } else if (value < startValue) {
@@ -116,10 +122,12 @@ public class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder =
+            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {
@@ -140,10 +148,10 @@ public class Utils {
         if (yearsDiff == 0) {
             if (daysDiff > DAYS_IN_A_WEEK) {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                        + calendar.get(Calendar.YEAR);
+                    + calendar.get(Calendar.YEAR);
             } else if (daysDiff > 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
-                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next)
+                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else if (daysDiff == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
             } else if (daysDiff == 0) {
@@ -151,21 +159,22 @@ public class Utils {
             } else if (daysDiff == -1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else if (daysDiff > -DAYS_IN_A_WEEK) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
-                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last)
+                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                        + calendar.get(Calendar.YEAR);
+                    + calendar.get(Calendar.YEAR);
             }
         } else {
             return formatForClock(calendar.get(Calendar.DAY_OF_MONTH)) + "."
-                    + formatForClock(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
+                + formatForClock(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
         }
     }
 
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
-        long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
+        long diff =
+            GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
                 - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
@@ -177,17 +186,20 @@ public class Utils {
             if (minutes == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
             } else {
-                return minutes + " "
-                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
+                return minutes
+                    + " "
+                    + ServiceContainer.getSettingsManager().getContext()
+                        .getString(R.string.utils_minutes_ago);
             }
         } else if (diff < ONE_DAY) {
             // Give time hours
             int hours = (int) (diff / ONE_HOUR);
             if (hours == 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_hour_ago);
+                return ServiceContainer.getSettingsManager().getContext()
+                    .getString(R.string.utils_one_hour_ago);
             } else {
                 return "" + hours + " "
-                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
             }
         } else if (diff < ONE_YEAR) {
             // Give time in days
@@ -196,10 +208,11 @@ public class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else {
                 return "" + days + " "
-                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
             }
         } else {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
+            return ServiceContainer.getSettingsManager().getContext()
+                .getString(R.string.utils_never_seen_on_smartmap);
         }
     }
 
@@ -208,12 +221,13 @@ public class Utils {
         float g = Color.green(color) / MAX_COLOR;
         float b = Color.blue(color) / MAX_COLOR;
 
-        float[] src = { r, 0, 0, 0, 0, 0, g, 0, 0, 0, 0, 0, b, 0, 0, 0, 0, 0, 1, 0 };
+        float[] src = {r, 0, 0, 0, 0, 0, g, 0, 0, 0, 0, 0, b, 0, 0, 0, 0, 0, 1, 0};
         return new ColorMatrix(src);
     }
 
     public static String getTimeString(Calendar calendar) {
-        return formatForClock(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + formatForClock(calendar.get(Calendar.MINUTE));
+        return formatForClock(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
+            + formatForClock(calendar.get(Calendar.MINUTE));
     }
 
     /**
@@ -228,11 +242,18 @@ public class Utils {
         if (distance >= ONE_THOUSAND_METERS) {
             distance = distance / ONE_THOUSAND_METERS;
             distance = Math.round(distance * TEN) / TEN;
-            textDistance = distance + " km "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you);
+            textDistance =
+                distance
+                    + " km "
+                    + ServiceContainer.getSettingsManager().getContext()
+                        .getString(R.string.utils_away_from_you);
         } else {
             distance = Math.round(distance);
-            textDistance = ((int) distance) + " meters away from you";
+            textDistance =
+                ((int) distance)
+                    + " "
+                    + ServiceContainer.getSettingsManager().getContext()
+                        .getString(R.string.utils_meters_away_from_you);
         }
         return textDistance;
     }

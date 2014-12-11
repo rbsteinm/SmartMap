@@ -9,7 +9,7 @@ public interface CacheListener {
 
     void onFilterListUpdate();
 
-    void onUserListUpdate();
-
     void onInvitationListUpdate();
+
+    void onUserListUpdate();
 }
