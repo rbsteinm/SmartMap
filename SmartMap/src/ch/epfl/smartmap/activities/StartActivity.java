@@ -43,25 +43,53 @@ public class StartActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        ServiceContainer.initSmartMapServices(this);
-
-        // Displays the facebook app hash in LOG.d
-        try {
-            Log.d(TAG, "Retrieving sha1 app hash...");
-            PackageInfo info = this.getPackageManager().getPackageInfo("ch.epfl.smartmap",
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-            }
-        } catch (NameNotFoundException e) {
-            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
-        }
-
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_start);
+
+        ServiceContainer.initSmartMapServices(this);
+
+        this.printSha1InLogcat();
+
+        this.initializeGUI();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Set background color of activity
+     * 
+     * @param color
+     *            the color
+     */
+    public void setActivityBackgroundColor(int color) {
+        View view = this.getWindow().getDecorView();
+        view.setBackgroundColor(color);
+    }
+
+    /**
+     * Initilizes the user interface.
+     * 
+     * @author agpmilli
+     */
+    private void initializeGUI() {
 
         // Set background color of activity
         this.setActivityBackgroundColor(this.getResources().getColor(R.color.main_blue));
@@ -112,33 +140,25 @@ public class StartActivity extends FragmentActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     /**
-     * Set background color of activity
      * 
-     * @param color
-     *            the color
+     * Displays the facebook app hash in LOG.d. This hash must match the one defined in facebook and google developer.
+     * 
+     * @author SpicyCH
      */
-    public void setActivityBackgroundColor(int color) {
-        View view = this.getWindow().getDecorView();
-        view.setBackgroundColor(color);
+    private void printSha1InLogcat() {
+        try {
+            Log.d(TAG, "Retrieving sha1 app hash...");
+            PackageInfo info = this.getPackageManager().getPackageInfo("ch.epfl.smartmap",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+            }
+        } catch (NameNotFoundException e) {
+            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)" + e);
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)" + e);
+        }
     }
 }
