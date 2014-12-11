@@ -18,7 +18,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
-import ch.epfl.smartmap.listeners.CacheListener;
+import ch.epfl.smartmap.listeners.OnCacheListener;
 import ch.epfl.smartmap.util.Utils;
 
 /**
@@ -65,7 +65,19 @@ public class UserInformationActivity extends Activity {
 
         this.updateInformations(user);
 
-        ServiceContainer.getCache().addOnCacheListener(new UserInformationCacheListener());
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onUserListUpdate() {
+                UserInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        User user = ServiceContainer.getCache().getUser(mUserId);
+
+                        UserInformationActivity.this.updateInformations(user);
+                    }
+                });
+            }
+        });
     }
 
     public void displayDeleteConfirmationDialog(View view) {
@@ -153,6 +165,51 @@ public class UserInformationActivity extends Activity {
     }
 
     /**
+     * Display a confirmation dialog
+     * 
+     * @param name
+     * @param userId
+     */
+    private void displayConfirmationDialog(String name, final long userId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(this.getResources().getString(R.string.add) + name + " "
+            + this.getResources().getString(R.string.as_a_friend));
+
+        // Add positive button
+        builder.setPositiveButton(this.getResources().getString(R.string.add),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // invite friend
+                    UserInformationActivity.this.inviteUser(userId);
+                }
+            });
+
+        // Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
+    }
+
+    /**
+     * Invites a user to be your friend. Displays a toast describing if the
+     * invitation was sent or not.
+     * 
+     * @author agpmilli
+     */
+    private void inviteUser(long userId) {
+        // Send friend request to user
+        ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
+
+    }
+
+    /**
      * When this tab is open by a notification
      */
     private void onNotificationOpen() {
@@ -198,62 +255,42 @@ public class UserInformationActivity extends Activity {
                 mBlockSwitch.setVisibility(View.INVISIBLE);
                 mDistanceView.setVisibility(View.INVISIBLE);
                 // We do not display the remove button as we are not friends yet
+                this.findViewById(R.id.user_info_add_button).setVisibility(View.VISIBLE);
                 this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
             }
         }
     }
 
     /**
-     * This class is a CacheListener that updates the displayed user when it's
-     * info are changed.
+     * Callback that describes connection with network
      * 
-     * @author Pamoi
+     * @author agpmilli
      */
-    private class UserInformationCacheListener implements CacheListener {
-
-        /*
-         * (non-Javadoc)
-         * @see ch.epfl.smartmap.listeners.CacheListener#onEventListUpdate()
-         */
+    class AddFriendCallback implements NetworkRequestCallback {
         @Override
-        public void onEventListUpdate() {
-            // Nothing to do
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
-         */
-        @Override
-        public void onFilterListUpdate() {
-            // Nothing to do
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * ch.epfl.smartmap.listeners.CacheListener#onInvitationListUpdate()
-         */
-        @Override
-        public void onInvitationListUpdate() {
-            // Nothing to do
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see ch.epfl.smartmap.listeners.CacheListener#onUserListUpdate()
-         */
-        @Override
-        public void onUserListUpdate() {
+        public void onFailure() {
             UserInformationActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    User user = ServiceContainer.getCache().getUser(mUserId);
-
-                    UserInformationActivity.this.updateInformations(user);
+                    Toast.makeText(UserInformationActivity.this,
+                        UserInformationActivity.this.getString(R.string.invite_friend_failure),
+                        Toast.LENGTH_SHORT).show();
                 }
             });
         }
 
+        @Override
+        public void onSuccess() {
+            UserInformationActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(UserInformationActivity.this,
+                        UserInformationActivity.this.getString(R.string.invite_friend_success),
+                        Toast.LENGTH_SHORT).show();
+                    UserInformationActivity.this.finish();
+                }
+            });
+        }
     }
+
 }

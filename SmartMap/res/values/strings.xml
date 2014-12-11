@@ -110,6 +110,8 @@
     <string name="show_event_loading_info">Loading informations…</string>
     <string name="show_events_menu_refresh">Refresh</string>
     <string name="ten_letters">aaaaaaaaaa</string>
+    <string name="show_event_default_seekbar_text">45 km</string>
+    <string name="show_event_listview_description">listview</string>
 
     <!-- EventsListItemAdapter -->
     <string name="events_list_item_adapter_event_live">Event is live!</string>
@@ -238,6 +240,7 @@
 
     <!-- FriendInformationActivity -->
     <string name="remove_friend_button_text">Remove</string>
+    <string name="add_friend_button_text">Add</string>
     <string name="block_button_text">Block</string>
     <string name="show_on_map_switch">Show on map</string>
     <string name="block_switch">Block</string>
