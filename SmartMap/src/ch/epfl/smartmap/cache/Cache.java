@@ -1066,7 +1066,9 @@ public class Cache {
 
                     // Update self informations
                     long myId = settingsManager.getUserId();
+                    Log.d(TAG, "trying to get self info with id " + myId);
                     ImmutableUser self = networkClient.getUserInfo(myId);
+                    Log.d(TAG, "trying to get self picture with id " + myId);
                     self.setImage(networkClient.getProfilePicture(myId));
                     updatedUsers.add(self);
 
@@ -1079,12 +1081,18 @@ public class Cache {
                         long id = positionInfos.getId();
                         // Get other online info
                         ImmutableUser onlineInfos = networkClient.getUserInfo(id);
+                        Log.d(TAG, "onlineInfos has name " + onlineInfos.getName());
                         // Get picture
                         Bitmap image = networkClient.getProfilePicture(id);
                         // Put all inside container
                         onlineInfos.setLocation(positionInfos.getLocation());
                         onlineInfos.setLocationString(positionInfos.getLocationString());
                         onlineInfos.setImage(image);
+
+                        Log.d(TAG, "Update(" + onlineInfos.getId() + ") : " + onlineInfos.getName() + ", "
+                            + self.getLocationString());
+                        Log.d(TAG, "Has " + ((onlineInfos.getImage() == User.NO_IMAGE) ? "no " : "")
+                            + "image");
 
                         // Put friend in Set
                         updatedUsers.add(onlineInfos);
