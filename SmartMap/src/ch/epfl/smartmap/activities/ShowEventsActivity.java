@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -41,7 +42,11 @@ public class ShowEventsActivity extends ListActivity {
 
     private static final int METERS_IN_ONE_KM = 1000;
 
+    private static final double THREE_AND_A_HALF = 0.75;
+
     private SeekBar mSeekBar;
+
+    private Activity mActivity;
 
     private TextView mShowKilometers;
 
@@ -59,6 +64,15 @@ public class ShowEventsActivity extends ListActivity {
         // Makes the logo clickable (clicking it returns to previous activity)
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        mActivity = this;
+
+        if (ServiceContainer.getSettingsManager().getNearEventsMaxDistance() == 0) {
+            // The user has disabled events fetching in the settings, hence he has no chance to see events in this list.
+            // We warn him with an AlertDialog.
+
+            this.noEventsFetchedWarning();
+        }
 
         // Initialize the listener
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
@@ -152,7 +166,7 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Displays the AlertDialog.
+     * Displays the AlertDialog with events infos.
      * 
      * @param event
      *            the event to show a dialog for
@@ -166,43 +180,41 @@ public class ShowEventsActivity extends ListActivity {
         Calendar start = event.getStartDate();
         Calendar end = event.getEndDate();
 
-        final String message =
-            Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - " + Utils.getDateString(end)
-                + " " + Utils.getTimeString(end) + "\n"
+        final String message = Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - "
+                + Utils.getDateString(end) + " " + Utils.getTimeString(end) + "\n"
                 + ShowEventsActivity.this.getString(R.string.show_event_by) + " " + creatorName + "\n\n"
                 + event.getDescription();
 
         alertDialog.setTitle(event.getName() + " " + this.getResources().getString(R.string.near) + " "
-            + event.getLocationString());
+                + event.getLocationString());
 
         alertDialog.setMessage(message);
 
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-            ShowEventsActivity.this.getString(R.string.show_event_on_the_map_button),
-            new DialogInterface.OnClickListener() {
+                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_button),
+                new DialogInterface.OnClickListener() {
 
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    Toast.makeText(ShowEventsActivity.this,
-                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                        Toast.LENGTH_SHORT).show();
-                    Intent showEventIntent = new Intent(ShowEventsActivity.this, MainActivity.class);
-                    showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
-                    ShowEventsActivity.this.startActivity(showEventIntent);
-                }
-            });
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(ShowEventsActivity.this,
+                                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                                Toast.LENGTH_SHORT).show();
+                        Intent showEventIntent = new Intent(ShowEventsActivity.this, MainActivity.class);
+                        showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
+                        ShowEventsActivity.this.startActivity(showEventIntent);
+                    }
+                });
 
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
-            ShowEventsActivity.this.getString(R.string.show_event_details_button),
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    Intent showEventIntent =
-                        new Intent(ShowEventsActivity.this, EventInformationActivity.class);
-                    showEventIntent.putExtra("EVENT", event.getId());
-                    ShowEventsActivity.this.startActivity(showEventIntent);
-                }
-            });
+                ShowEventsActivity.this.getString(R.string.show_event_details_button),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent showEventIntent = new Intent(ShowEventsActivity.this, EventInformationActivity.class);
+                        showEventIntent.putExtra("EVENT", event.getId());
+                        ShowEventsActivity.this.startActivity(showEventIntent);
+                    }
+                });
         alertDialog.show();
     }
 
@@ -218,8 +230,8 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void displayInfoDialog(int position) {
 
-        Toast.makeText(ShowEventsActivity.this, this.getString(R.string.show_event_loading_info),
-            Toast.LENGTH_SHORT).show();
+        Toast.makeText(ShowEventsActivity.this, this.getString(R.string.show_event_loading_info), Toast.LENGTH_SHORT)
+                .show();
 
         final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
 
@@ -240,8 +252,7 @@ public class ShowEventsActivity extends ListActivity {
             Log.e(TAG, "The server returned a null event or creatorName");
 
             Toast.makeText(ShowEventsActivity.this,
-                ShowEventsActivity.this.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
-                .show();
+                    ShowEventsActivity.this.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT).show();
 
         } else {
 
@@ -276,15 +287,55 @@ public class ShowEventsActivity extends ListActivity {
                 mShowKilometers = (TextView) ShowEventsActivity.this.findViewById(R.id.showEventKilometers);
 
                 mSeekBar = (SeekBar) ShowEventsActivity.this.findViewById(R.id.showEventSeekBar);
-                mSeekBar.setMax(ServiceContainer.getSettingsManager().getNearEventsMaxDistance()
-                    / METERS_IN_ONE_KM);
+                int max = ServiceContainer.getSettingsManager().getNearEventsMaxDistance() / METERS_IN_ONE_KM;
+                mSeekBar.setMax(max);
                 mSeekBar.setEnabled(false);
                 mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
+
+                if (max > 0) {
+                    int defaultPosition = (int) Math.floor(THREE_AND_A_HALF * max);
+                    mSeekBar.setProgress(defaultPosition);
+                }
 
                 ShowEventsActivity.this.updateCurrentList();
             }
         });
 
+    }
+
+    /**
+     * Warn the user with an <code>AlertDialog</code> that he has disabled events fetching in the settings.
+     * 
+     * @author SpicyCH
+     */
+    private void noEventsFetchedWarning() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        // Set title
+        alertDialogBuilder.setTitle(this.getString(R.string.show_event_disabled_warning_title));
+
+        // Set dialog message
+        alertDialogBuilder
+                .setMessage(this.getString(R.string.show_event_disabled_warning_message))
+                .setCancelable(false)
+                .setPositiveButton(this.getString(R.string.show_event_disabled_warning_button_goto_settings),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Go to the settings
+                                ShowEventsActivity.this.startActivity(new Intent(mActivity, SettingsActivity.class));
+                            }
+                        })
+                .setNegativeButton(this.getString(R.string.show_event_disabled_warning_button_return_to_main),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                mActivity.finish();
+                            }
+                        });
+
+        // show alert dialog
+        alertDialogBuilder.create().show();
     }
 
     /**
@@ -327,8 +378,7 @@ public class ShowEventsActivity extends ListActivity {
             mEventsList.retainAll(ServiceContainer.getCache().getLiveEvents());
         }
 
-        ShowEventsActivity.this
-            .setListAdapter(new EventsListItemAdapter(ShowEventsActivity.this, mEventsList));
+        ShowEventsActivity.this.setListAdapter(new EventsListItemAdapter(ShowEventsActivity.this, mEventsList));
 
     }
 
