@@ -25,6 +25,7 @@ public class UtilsTest extends AndroidTestCase {
     private Calendar myBirthday;
     private Calendar morning;
     private Calendar afternoon;
+    private Calendar firstJan2015;
 
     private Location epfl;
 
@@ -47,7 +48,7 @@ public class UtilsTest extends AndroidTestCase {
         tenDaysAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
         tenDaysAgo.add(Calendar.DAY_OF_YEAR, -10);
 
-        myBirthday = new GregorianCalendar(1993, 9, 16);
+        myBirthday = new GregorianCalendar(1993, 8, 16);
 
         morning = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
         morning.set(Calendar.HOUR_OF_DAY, 8);
@@ -56,6 +57,11 @@ public class UtilsTest extends AndroidTestCase {
         afternoon = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
         afternoon.set(Calendar.HOUR_OF_DAY, 17);
         afternoon.set(Calendar.MINUTE, 7);
+
+        firstJan2015 = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        firstJan2015.set(Calendar.YEAR, 2015);
+        firstJan2015.set(Calendar.MONTH, 0);
+        firstJan2015.set(Calendar.DAY_OF_YEAR, 1);
 
         epfl = new Location("");
         epfl.setLatitude(46.519056);
@@ -85,6 +91,11 @@ public class UtilsTest extends AndroidTestCase {
 
         assertEquals(Displayable.NO_LOCATION_STRING, Utils.getCountryFromLocation(somewhereVeryLost));
 
+    }
+
+    public void testJanuary() {
+        // Regression test for #82
+        assertEquals("01.01.2015", Utils.getDateString(firstJan2015));
     }
 
     public void testLastSeen100Years() {
