@@ -104,7 +104,7 @@ public class Cache {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
                             ImmutableUser newFriend =
-                                ServiceContainer.getNetworkClient().acceptInvitation(invitation.getUser().getId());
+                            ServiceContainer.getNetworkClient().acceptInvitation(invitation.getUser().getId());
                             newFriend.setFriendship(User.FRIEND);
                             Cache.this.putUser(newFriend);
                             break;
@@ -170,6 +170,39 @@ public class Cache {
     }
 
     /**
+     * @param user the user we are trying to (un)block
+     * @param newBlockedStatus true if we're blocking the user, false otherwise
+     * @param callback
+     * @author rbsteinm
+     */
+    public synchronized void setBlockedStatus(final ImmutableUser user, final boolean newBlockedStatus,
+        final NetworkRequestCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (user.isBlocked() != newBlockedStatus) {
+                    try {
+                        if (user.isBlocked()) {
+                            ServiceContainer.getNetworkClient().unblockFriend(user.getId());
+                        } else {
+                            ServiceContainer.getNetworkClient().blockFriend(user.getId());
+                        }
+                        if (callback != null) {
+                            callback.onSuccess();
+                        }
+                    } catch (SmartMapClientException e) {
+                        Log.e("TAG", "Error while (un)blocking friend: " + e);
+                        if (callback != null) {
+                            callback.onFailure();
+                        }
+                    }
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
      * OK
      * 
      * @param createdEvent
@@ -191,7 +224,6 @@ public class Cache {
                     }
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Error while creating event: " + e);
-                    callback.onFailure();
                     if (callback != null) {
                         callback.onFailure();
                     }
@@ -1117,7 +1149,7 @@ public class Cache {
     }
 
     public synchronized void
-        updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
+    updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
