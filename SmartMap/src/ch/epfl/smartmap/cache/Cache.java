@@ -97,6 +97,7 @@ public class Cache {
                             ImmutableUser newFriend =
                                 ServiceContainer.getNetworkClient().acceptInvitation(
                                     invitation.getUser().getId());
+                            newFriend.setFriendship(User.FRIEND);
                             Cache.this.putUser(newFriend);
                             break;
                         case Invitation.EVENT_INVITATION:
@@ -245,7 +246,7 @@ public class Cache {
     }
 
     public synchronized Set<User> getAllFriends() {
-        return this.getFriends(mFriendIds);
+        return this.getUsers(mFriendIds);
     }
 
     public synchronized SortedSet<Invitation> getAllInvitations() {
@@ -276,19 +277,6 @@ public class Cache {
         // Get all friends
         Set<Long> allVisibleUsersId = new HashSet<Long>(mFriendIds);
 
-        for (long id : mFriendIds) {
-            User user = this.getUser(id);
-            if (user instanceof Friend) {
-                Log.d(TAG, "user number " + id + " is a FRIEND");
-            } else if (user instanceof Stranger) {
-                Log.d(TAG, "user number " + id + " is a STRANGER");
-            } else if (user instanceof Self) {
-                Log.d(TAG, "user number " + id + " is a SELF");
-            } else {
-                Log.d(TAG, "user number " + id + " is unknown");
-            }
-        }
-
         // For each active filter, keep friends in it
         for (Long id : mFilterIds) {
             Filter filter = this.getFilter(id);
@@ -298,7 +286,7 @@ public class Cache {
         }
 
         // Return all friends that passed all filters
-        return this.getFriends(allVisibleUsersId);
+        return this.getUsers(allVisibleUsersId);
     }
 
     /**
@@ -375,37 +363,6 @@ public class Cache {
         return filters;
     }
 
-    /**
-     * OK
-     * 
-     * @param id
-     * @return
-     */
-    public synchronized User getFriend(long id) {
-        if (mFriendIds.contains(id)) {
-            return mUserInstances.get(id);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * OK
-     * 
-     * @param ids
-     * @return
-     */
-    public synchronized Set<User> getFriends(Set<Long> ids) {
-        Set<User> friends = new HashSet<User>();
-        for (long id : ids) {
-            User friend = this.getFriend(id);
-            if (friend != null) {
-                friends.add(friend);
-            }
-        }
-        return friends;
-    }
-
     public synchronized Invitation getInvitation(long id) {
         return mInvitationInstances.get(id);
     }
@@ -470,35 +427,8 @@ public class Cache {
         });
     }
 
-    /**
-     * OK
-     * 
-     * @param id
-     * @return
-     */
-    public synchronized User getStranger(long id) {
-        if (!mFriendIds.contains(id)) {
-            return mUserInstances.get(id);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * OK
-     * 
-     * @param ids
-     * @return
-     */
-    public synchronized Set<User> getStrangers(Set<Long> ids) {
-        Set<User> strangers = new HashSet<User>();
-        for (long id : ids) {
-            User stranger = this.getStranger(id);
-            if (stranger != null) {
-                strangers.add(stranger);
-            }
-        }
-        return strangers;
+    public synchronized User getSelf() {
+        return mUserInstances.get(ServiceContainer.getSettingsManager().getUserId());
     }
 
     public synchronized SortedSet<Invitation> getUnansweredFriendInvitations() {
@@ -518,11 +448,7 @@ public class Cache {
      * @return
      */
     public synchronized User getUser(long id) {
-        User user = this.getFriend(id);
-        if (user == null) {
-            user = this.getStranger(id);
-        }
-        return user;
+        return mUserInstances.get(id);
     }
 
     /**
@@ -534,10 +460,7 @@ public class Cache {
     public synchronized Set<User> getUsers(Set<Long> ids) {
         Set<User> users = new HashSet<User>();
         for (long id : ids) {
-            User user = this.getFriend(id);
-            if (user == null) {
-                user = this.getStranger(id);
-            }
+            User user = this.getUser(id);
             if (user != null) {
                 users.add(user);
             }
@@ -782,8 +705,10 @@ public class Cache {
                         break;
                     case Invitation.ACCEPTED_FRIEND_INVITATION:
                         // Check that it contains all informations
-                        if (invitationInfo.getUserInfos() != null) {
-                            usersToAdd.add(invitationInfo.getUserInfos());
+                        ImmutableUser newFriend = invitationInfo.getUserInfos();
+                        if (newFriend != null) {
+                            newFriend.setFriendship(User.FRIEND);
+                            usersToAdd.add(newFriend);
                             invitationsToAdd.add(invitationInfo);
                         }
                         // Acknowledge new friend
@@ -925,7 +850,8 @@ public class Cache {
         });
         Log.d(TAG, unreadInvitations.toString());
         for (Invitation invitation : unreadInvitations) {
-            Log.d(TAG, invitation.toString());
+            // TODO should we set it in the network client or store it in
+            // database?
             invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
         }
     }
@@ -1337,7 +1263,8 @@ public class Cache {
                     // Just update current instance
                     isListModified = isListModified || user.update(userInfo);
                 } else {
-                    // Need to remove and add user again to change the instance type
+                    // Need to remove and add user again to change the instance
+                    // type
                     Log.d(TAG,
                         "Detected type change, id : " + user.getId() + ", type : " + user.getFriendship());
                     usersWithNewTypeIds.add(userInfo.getId());
