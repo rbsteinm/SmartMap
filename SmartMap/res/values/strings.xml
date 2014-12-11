@@ -261,6 +261,8 @@
      <string name="changes_saved">Changes saved</string>
      <string name="yes">Yes</string>
      <string name="no">No</string>
+     <string name="remove_filter">Remove filter?</string>
+     <string name="removed_filter">Removed filter</string>
 
     <!-- Settings -->
     <!-- NOTE: Each string value must be unique, as it is a key for one specific preference. -->

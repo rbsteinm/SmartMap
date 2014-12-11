@@ -3,6 +3,11 @@
     tools:context="ch.epfl.smartmap.ChangeFilterActivity" >
 
     <item
+        android:id="@+id/action_remove_filter"
+        android:icon="@drawable/ic_action_discard_white"
+        android:showAsAction="collapseActionView|ifRoom"
+        android:title="@string/remove_filter"/>
+    <item
         android:id="@+id/action_save_filter"
         android:orderInCategory="100"
         android:showAsAction="always"
@@ -12,11 +17,5 @@
         android:orderInCategory="100"
         android:showAsAction="always"
         android:title="@string/action_rename_filter_button"/>
-
-    <ImageButton
-        android:id="@+id/action_remove_filter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_action_discard_white" />
 
 </menu>

@@ -135,6 +135,8 @@ public class ModifyFilterActivity extends Activity {
             case R.id.action_rename_filter:
                 this.renameFilterDialog(item);
                 break;
+            case R.id.action_remove_filter:
+                this.removeFilterDialog();
             default:
                 // No other menu items!
                 break;
@@ -193,9 +195,36 @@ public class ModifyFilterActivity extends Activity {
         return idSet;
     }
 
-    private void saveFilter() {
-        mCache.putFilter(new ImmutableFilter(mFilter.getId(), mFilter.getName(), this
-            .friendListToIdSet(mFriendsInside), mFilter.isActive()));
+    private void removeFilterDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(this.getResources().getString(R.string.remove_filter));
+
+        // Add positive button
+        builder.setPositiveButton(this.getResources().getString(R.string.yes),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // TODO
+                    mCache.removeFilter(mFilter.getId());
+                    Toast.makeText(ModifyFilterActivity.this,
+                        ModifyFilterActivity.this.getResources().getString(R.string.removed_filter),
+                        Toast.LENGTH_LONG).show();
+
+                    ModifyFilterActivity.this.finish();
+                }
+            });
+
+        // Add negative button
+        builder.setNegativeButton(this.getResources().getString(R.string.no),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+
+        // display the AlertDialog
+        builder.create().show();
     }
 
     private void saveFilterDialog() {
@@ -207,7 +236,8 @@ public class ModifyFilterActivity extends Activity {
             new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
-                    ModifyFilterActivity.this.saveFilter();
+                    mCache.putFilter(new ImmutableFilter(mFilter.getId(), mFilter.getName(),
+                        ModifyFilterActivity.this.friendListToIdSet(mFriendsInside), mFilter.isActive()));
                     Toast.makeText(ModifyFilterActivity.this,
                         ModifyFilterActivity.this.getResources().getString(R.string.changes_saved),
                         Toast.LENGTH_LONG).show();
