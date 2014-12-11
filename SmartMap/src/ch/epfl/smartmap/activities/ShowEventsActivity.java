@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -41,7 +42,11 @@ public class ShowEventsActivity extends ListActivity {
 
     private static final int METERS_IN_ONE_KM = 1000;
 
+    private static final double THREE_AND_A_HALF = 0.75;
+
     private SeekBar mSeekBar;
+
+    private Activity mActivity;
 
     private TextView mShowKilometers;
 
@@ -60,22 +65,20 @@ public class ShowEventsActivity extends ListActivity {
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-        this.initializeGUI();
+        mActivity = this;
 
-        // Create custom Adapter and pass it to the Activity
-        this.setListAdapter(new EventsListItemAdapter(this, mEventsList));
+        if (ServiceContainer.getSettingsManager().getNearEventsMaxDistance() == 0) {
+            // The user has disabled events fetching in the settings, hence he has no chance to see events in this list.
+            // We warn him with an AlertDialog.
+
+            this.noEventsFetchedWarning();
+        }
 
         // Initialize the listener
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
             public void onEventListUpdate() {
-                ShowEventsActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ShowEventsActivity.this.setListAdapter(new EventsListItemAdapter(ShowEventsActivity.this,
-                                mEventsList));
-                    }
-                });
+                ShowEventsActivity.this.initializeGUI();
             }
         });
 
@@ -159,11 +162,11 @@ public class ShowEventsActivity extends ListActivity {
 
         // This is needed to show an update of the events' list after having
         // created one.
-        this.updateCurrentList();
+        this.initializeGUI();
     }
 
     /**
-     * Displays an AlertDialog with a button to see the event on the map, and another to see more details.
+     * Displays the AlertDialog with events infos.
      * 
      * @param event
      *            the event to show a dialog for
@@ -223,7 +226,6 @@ public class ShowEventsActivity extends ListActivity {
      * </p>
      * 
      * @param position
-     *            the position of the item that has been clicked
      * @author SpicyCH
      */
     private void displayInfoDialog(int position) {
@@ -275,19 +277,65 @@ public class ShowEventsActivity extends ListActivity {
         if (ServiceContainer.getSettingsManager() == null) {
             ServiceContainer.initSmartMapServices(this);
         }
+        ShowEventsActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMyEventsChecked = false;
+                mOngoingChecked = false;
+                mNearMeChecked = false;
 
-        mMyEventsChecked = false;
-        mOngoingChecked = false;
-        mNearMeChecked = false;
+                mShowKilometers = (TextView) ShowEventsActivity.this.findViewById(R.id.showEventKilometers);
 
-        mShowKilometers = (TextView) this.findViewById(R.id.showEventKilometers);
+                mSeekBar = (SeekBar) ShowEventsActivity.this.findViewById(R.id.showEventSeekBar);
+                int max = ServiceContainer.getSettingsManager().getNearEventsMaxDistance() / METERS_IN_ONE_KM;
+                mSeekBar.setMax(max);
+                mSeekBar.setEnabled(false);
+                mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
 
-        mSeekBar = (SeekBar) this.findViewById(R.id.showEventSeekBar);
-        mSeekBar.setMax(ServiceContainer.getSettingsManager().getNearEventsMaxDistance() / METERS_IN_ONE_KM);
-        mSeekBar.setEnabled(false);
-        mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
+                if (max > 0) {
+                    int defaultPosition = (int) Math.floor(THREE_AND_A_HALF * max);
+                    mSeekBar.setProgress(defaultPosition);
+                }
 
-        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllVisibleEvents());
+                ShowEventsActivity.this.updateCurrentList();
+            }
+        });
+
+    }
+
+    /**
+     * Warn the user with an <code>AlertDialog</code> that he has disabled events fetching in the settings.
+     * 
+     * @author SpicyCH
+     */
+    private void noEventsFetchedWarning() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        // Set title
+        alertDialogBuilder.setTitle(this.getString(R.string.show_event_disabled_warning_title));
+
+        // Set dialog message
+        alertDialogBuilder
+                .setMessage(this.getString(R.string.show_event_disabled_warning_message))
+                .setCancelable(false)
+                .setPositiveButton(this.getString(R.string.show_event_disabled_warning_button_goto_settings),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Go to the settings
+                                ShowEventsActivity.this.startActivity(new Intent(mActivity, SettingsActivity.class));
+                            }
+                        })
+                .setNegativeButton(this.getString(R.string.show_event_disabled_warning_button_return_to_main),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                mActivity.finish();
+                            }
+                        });
+
+        // show alert dialog
+        alertDialogBuilder.create().show();
     }
 
     /**
@@ -330,8 +378,8 @@ public class ShowEventsActivity extends ListActivity {
             mEventsList.retainAll(ServiceContainer.getCache().getLiveEvents());
         }
 
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList);
-        this.setListAdapter(adapter);
+        ShowEventsActivity.this.setListAdapter(new EventsListItemAdapter(ShowEventsActivity.this, mEventsList));
+
     }
 
     /**

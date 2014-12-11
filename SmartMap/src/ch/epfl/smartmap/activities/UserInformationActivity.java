@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -235,7 +237,6 @@ public class UserInformationActivity extends Activity {
             mDistanceView.setVisibility(View.INVISIBLE);
 
             this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
-            this.findViewById(R.id.user_info_add_button).setVisibility(View.INVISIBLE);
         } else {
             // Ugly instanceof, case classes would be helpful
             if (user instanceof Friend) {
@@ -248,8 +249,17 @@ public class UserInformationActivity extends Activity {
                 mBlockSwitch.setChecked(friend.isBlocked());
                 mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
 
-                this.findViewById(R.id.user_info_add_button).setVisibility(View.INVISIBLE);
-                this.findViewById(R.id.user_info_remove_button).setVisibility(View.VISIBLE);
+                Button button = (Button) this.findViewById(R.id.user_info_remove_button);
+                button.setVisibility(View.VISIBLE);
+                button.setOnClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        UserInformationActivity.this.displayDeleteConfirmationDialog(v);
+                    }
+                });
+                button.setText(this.getResources().getString(R.string.remove_friend_button_text));
+                button.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_action_discard_white, 0, 0, 0);
             } else {
                 mNameView.setText(user.getName());
                 mSubtitlesView.setText(user.getSubtitle());
@@ -258,8 +268,17 @@ public class UserInformationActivity extends Activity {
                 mBlockSwitch.setVisibility(View.INVISIBLE);
                 mDistanceView.setVisibility(View.INVISIBLE);
                 // We do not display the remove button as we are not friends yet
-                this.findViewById(R.id.user_info_add_button).setVisibility(View.VISIBLE);
-                this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
+                Button button = (Button) this.findViewById(R.id.user_info_remove_button);
+                button.setVisibility(View.VISIBLE);
+                button.setOnClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        UserInformationActivity.this.displayConfirmationDialog(v);
+                    }
+                });
+                button.setText(this.getResources().getString(R.string.add_friend_button_text));
+                button.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
             }
         }
     }

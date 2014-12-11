@@ -1,12 +1,12 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 
@@ -25,44 +25,31 @@ public abstract class Filter implements FilterInterface {
 
     public static final long NO_ID = -1;
 
-    public static final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer
-        .getSettingsManager().getContext().getResources(), R.drawable.ic_hashtag);
+    public static final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
+        .getContext().getResources(), R.drawable.ic_hashtag);
 
-    private Set<Long> mIds;
+    public static Filter createFromContainer(ImmutableFilter filterInfos) {
+        long id = filterInfos.getId();
+        Set<Long> ids = filterInfos.getIds();
+        Boolean isActive = filterInfos.isActive();
+        String name = filterInfos.getName();
+        Log.d(TAG, "create filter with id " + filterInfos.getId());
+        if (filterInfos.getId() == DEFAULT_FILTER_ID) {
+            return new DefaultFilter(ids);
+        } else if (filterInfos.getId() > 0) {
+            return new CustomFilter(id, ids, name, isActive);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
 
     private long mId;
 
-    protected Filter(long id, Set<Long> ids) {
+    protected Filter(long id) {
         if (id < 0) {
             throw new IllegalArgumentException();
         }
         mId = id;
-
-        mIds = new HashSet<Long>();
-        for (long userId : ids) {
-            if (id > 0) {
-                mIds.add(userId);
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Filter#addFriend(long)
-     */
-    @Override
-    public void addFriend(long newFriend) {
-        mIds.add(newFriend);
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Filter#getFriendIds()
-     */
-    @Override
-    public Set<Long> getFriendIds() {
-        return new HashSet<Long>(mIds);
     }
 
     /*
@@ -134,7 +121,7 @@ public abstract class Filter implements FilterInterface {
     @Override
     public String getSubtitle() {
         String subtitle = "";
-        for (Long id : mIds) {
+        for (Long id : this.getFriendIds()) {
             subtitle += ServiceContainer.getCache().getUser(id).getName() + " ";
         }
         return subtitle;
@@ -153,7 +140,7 @@ public abstract class Filter implements FilterInterface {
      * (non-Javadoc)
      * @see
      * ch.epfl.smartmap.cache.Filter#update(ch.epfl.smartmap.cache.ImmutableFilter
-     * )
+     * ()
      */
     @Override
     public boolean update(ImmutableFilter filter) {
@@ -164,28 +151,6 @@ public abstract class Filter implements FilterInterface {
             hasChanged = true;
         }
 
-        if (filter.getIds() != null) {
-            if (!filter.getIds().containsAll(mIds) || mIds.containsAll(filter.getIds())) {
-                mIds = new HashSet<Long>(filter.getIds());
-                hasChanged = true;
-            }
-        }
-
         return hasChanged;
     }
-
-    public static Filter createFromContainer(ImmutableFilter filterInfos) {
-        long id = filterInfos.getId();
-        Set<Long> ids = filterInfos.getIds();
-        Boolean isActive = filterInfos.isActive();
-        String name = filterInfos.getName();
-        if (filterInfos.getId() == DEFAULT_FILTER_ID) {
-            return new DefaultFilter(ids);
-        } else if (filterInfos.getId() > 0) {
-            return new CustomFilter(id, ids, name, isActive);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
 }

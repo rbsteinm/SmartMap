@@ -14,13 +14,14 @@ public class UpdateDatabaseThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            Log.d(TAG, "Update Database");
-            ServiceContainer.getDatabase().updateFromCache();
             try {
                 sleep(UPDATE_PERIOD);
             } catch (InterruptedException e) {
                 Log.e(TAG, "Can't sleep : " + e);
             }
+
+            Log.d(TAG, "Update Database");
+            ServiceContainer.getDatabase().updateFromCache();
         }
     }
 }

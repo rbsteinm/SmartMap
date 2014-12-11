@@ -17,7 +17,7 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.FilterInterface;
+import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.ImmutableFilter;
 
 /**
@@ -25,81 +25,13 @@ import ch.epfl.smartmap.cache.ImmutableFilter;
  * 
  * @author hugo-S
  */
-public class FilterListItemAdapter extends ArrayAdapter<FilterInterface> {
-
-    private final Context mContext;
-    private final List<FilterInterface> mItemsArrayList;
-    private final Cache mCache;
-
-    public FilterListItemAdapter(Context context, List<FilterInterface> filtersList) {
-        super(context, R.layout.gui_friend_list_item, filtersList);
-        mContext = context;
-        mItemsArrayList = new ArrayList<FilterInterface>(filtersList);
-        mCache = ServiceContainer.getCache();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-     * android.view.ViewGroup) callback function automatically called one time
-     * for each user in the list
-     */
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        // Create inflater,get item to construct
-        FilterViewHolder viewHolder;
-        final FilterInterface filter = mItemsArrayList.get(position);
-
-        if (convertView == null) {
-            LayoutInflater inflater =
-                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.gui_filter_list_item, parent, false);
-            viewHolder = new FilterViewHolder();
-
-            viewHolder.setFilterName((TextView) convertView.findViewById(R.id.activity_show_filters_name));
-            viewHolder.setFilterId(filter.getId());
-            viewHolder.setFollowSwitch((Switch) convertView
-                .findViewById(R.id.activity_show_filters_follow_switch));
-            viewHolder.setSubtitle((TextView) convertView.findViewById(R.id.activity_show_filters_subtitle));
-
-            convertView.setTag(viewHolder);
-
-        } else {
-            viewHolder = (FilterViewHolder) convertView.getTag();
-        }
-
-        if (filter != null) {
-            viewHolder.getFilterName().setText(filter.getName());
-
-            viewHolder.getSubtitle().setText(filter.getFriendIds().size() + " people inside this filter");
-
-            viewHolder.getFollowSwitch().setTextOn("YES");
-            viewHolder.getFollowSwitch().setTextOff("NO");
-            viewHolder.getFollowSwitch().setChecked(filter.isActive());
-
-            viewHolder.getFollowSwitch().setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            mCache.putFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter
-                                .getFriendIds(), true));
-                        } else {
-                            mCache.putFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter
-                                .getFriendIds(), false));
-                        }
-                    }
-                });
-        }
-
-        return convertView;
-    }
+public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
     /**
      * @author hugo-S
      *         ViewHolder pattern implementation for smoother scrolling
-     *         in lists populated by {@link ch.epfl.smartmap.gui.FilterListItemAdapter}
+     *         in lists populated by
+     *         {@link ch.epfl.smartmap.gui.FilterListItemAdapter}
      */
     public static class FilterViewHolder {
         private TextView mFilterName;
@@ -139,6 +71,73 @@ public class FilterListItemAdapter extends ArrayAdapter<FilterInterface> {
             mSubtitle = subtitle;
         }
 
+    }
+
+    private final Context mContext;
+    private final List<Filter> mItemsArrayList;
+
+    private final Cache mCache;
+
+    public FilterListItemAdapter(Context context, List<Filter> filtersList) {
+        super(context, R.layout.gui_friend_list_item, filtersList);
+        mContext = context;
+        mItemsArrayList = new ArrayList<Filter>(filtersList);
+        mCache = ServiceContainer.getCache();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
+     * android.view.ViewGroup) callback function automatically called one time
+     * for each user in the list
+     */
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        // Create inflater,get item to construct
+        FilterViewHolder viewHolder;
+        final Filter filter = mItemsArrayList.get(position);
+
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.gui_filter_list_item, parent, false);
+            viewHolder = new FilterViewHolder();
+
+            viewHolder.setFilterName((TextView) convertView.findViewById(R.id.activity_show_filters_name));
+            viewHolder.setFilterId(filter.getId());
+            viewHolder.setFollowSwitch((Switch) convertView.findViewById(R.id.activity_show_filters_follow_switch));
+            viewHolder.setSubtitle((TextView) convertView.findViewById(R.id.activity_show_filters_subtitle));
+
+            convertView.setTag(viewHolder);
+
+        } else {
+            viewHolder = (FilterViewHolder) convertView.getTag();
+        }
+
+        if (filter != null) {
+            viewHolder.getFilterName().setText(filter.getName());
+
+            viewHolder.getSubtitle().setText(filter.getFriendIds().size() + " people inside this filter");
+
+            viewHolder.getFollowSwitch().setTextOn("YES");
+            viewHolder.getFollowSwitch().setTextOff("NO");
+            viewHolder.getFollowSwitch().setChecked(filter.isActive());
+
+            viewHolder.getFollowSwitch().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        mCache.putFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter.getFriendIds(),
+                            true));
+                    } else {
+                        mCache.putFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter.getFriendIds(),
+                            false));
+                    }
+                }
+            });
+        }
+
+        return convertView;
     }
 
 }
