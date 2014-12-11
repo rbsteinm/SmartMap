@@ -23,8 +23,13 @@ public class DefaultFilter extends Filter {
      *            Whole database of friends referenced by the friendlist
      */
     protected DefaultFilter(Set<Long> excludedIds) {
-        super(Filter.DEFAULT_FILTER_ID, null);
+        super(Filter.DEFAULT_FILTER_ID);
         mExcludedIds = new HashSet<Long>(excludedIds);
+    }
+
+    @Override
+    public void addFriend(long newFriend) {
+
     }
 
     @Override
@@ -37,6 +42,7 @@ public class DefaultFilter extends Filter {
 
     @Override
     public String getName() {
+        Log.d("Filter", "Return default name");
         return "Default Filter (this shouldn't be displayed)";
     }
 
