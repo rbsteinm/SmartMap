@@ -151,7 +151,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/add_event_when_text"
         android:layout_below="@id/add_event_internal_relative"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         android:text="@string/add_event_what_text"
         android:textColor="@color/main_blue"
         android:textSize="20sp"
