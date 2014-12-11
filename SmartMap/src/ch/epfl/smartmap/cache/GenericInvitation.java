@@ -81,7 +81,7 @@ public class GenericInvitation implements Invitation, Comparable {
 
     @Override
     public int compareTo(Object that) {
-        return Long.valueOf(this.getId()).compareTo(Long.valueOf(((Invitation) that).getId()));
+        return Long.valueOf(Long.valueOf(((Invitation) that).getId())).compareTo(this.getId());
     }
 
     @Override

@@ -18,6 +18,7 @@ import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.InvitationBag;
+import ch.epfl.smartmap.servercom.NetworkFriendInvitationBag;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -135,9 +136,16 @@ public class InvitationsService extends Service {
                 @Override
                 protected Void doInBackground(Void... arg0) {
                     try {
-                        InvitationBag userInvitBag = ServiceContainer.getNetworkClient().getInvitations();
+                        NetworkFriendInvitationBag userInvitBag =
+                            (NetworkFriendInvitationBag) ServiceContainer.getNetworkClient().getInvitations();
                         InvitationBag eventInvitBag =
                             ServiceContainer.getNetworkClient().getEventInvitations();
+
+                        // Acknowledge removed friends
+                        for (Long id : userInvitBag.getRemovedFriendsIds()) {
+                            ServiceContainer.getNetworkClient().ackRemovedFriend(id);
+                        }
+
                         if (ServiceContainer.getCache() != null) {
                             // Get friends invitations
                             Log.d(TAG, "Friend invitations");
@@ -150,7 +158,7 @@ public class InvitationsService extends Service {
                                 "Successfully fetched invitations / users : " + userInvitBag.getInvitations()
                                     + " / events : " + eventInvitBag.getInvitations());
                         } else {
-                            backgroundNotifications(userInvitBag, eventInvitBag);
+                            InvitationsService.this.backgroundNotifications(userInvitBag, eventInvitBag);
                         }
                     } catch (SmartMapClientException e) {
                         Log.e(TAG, "Couldn't retrieve invitations due to a server error: " + e);

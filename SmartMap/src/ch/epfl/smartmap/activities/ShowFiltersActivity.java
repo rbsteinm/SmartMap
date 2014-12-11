@@ -18,10 +18,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.FilterInterface;
+import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.ImmutableFilter;
 import ch.epfl.smartmap.gui.FilterListItemAdapter;
+import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
  * An Activity that displays the different filters
@@ -31,8 +31,7 @@ import ch.epfl.smartmap.gui.FilterListItemAdapter;
  */
 public class ShowFiltersActivity extends ListActivity {
 
-    private List<FilterInterface> mFilterList;
-    private Cache mCache;
+    private List<Filter> mFilterList;
 
     public void addNewFilterDialog(MenuItem item) {
         // inflate the alertDialog
@@ -49,7 +48,8 @@ public class ShowFiltersActivity extends ListActivity {
                 EditText editText = (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                 String filterName = editText.getText().toString();
                 Long newFilterId =
-                    mCache.putFilter(new ImmutableFilter(FilterInterface.NO_ID, filterName, new HashSet<Long>(), true));
+                    ServiceContainer.getCache().putFilter(
+                        new ImmutableFilter(Filter.NO_ID, filterName, new HashSet<Long>(), true));
                 // Start a new instance of ModifyFilterActivity passing it the
                 // new filter's name
                 Intent intent = new Intent(ShowFiltersActivity.this, ModifyFilterActivity.class);
@@ -76,14 +76,15 @@ public class ShowFiltersActivity extends ListActivity {
         this.setContentView(R.layout.activity_show_filters);
 
         this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-        mCache = ServiceContainer.getCache();
-        mFilterList = new ArrayList<FilterInterface>(mCache.getAllCustomFilters());
 
-        // mock stuff, filter list should be taken from the cache (or database?)
-        // MockDB.fillFilters();
-        // mFilterList = MockDB.FILTER_LIST;
+        this.updateGUI();
 
-        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onFilterListUpdate() {
+                ShowFiltersActivity.this.updateGUI();
+            }
+        });
     }
 
     @Override
@@ -95,7 +96,7 @@ public class ShowFiltersActivity extends ListActivity {
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
-        FilterInterface filter = mFilterList.get(position);
+        Filter filter = mFilterList.get(position);
         Intent intent = new Intent(this.getBaseContext(), ModifyFilterActivity.class);
         intent.putExtra("FILTER", filter.getId());
         ShowFiltersActivity.this.startActivity(intent);
@@ -122,7 +123,7 @@ public class ShowFiltersActivity extends ListActivity {
     protected void onResume() {
 
         super.onResume();
-        mFilterList = new ArrayList<FilterInterface>(mCache.getAllCustomFilters());
+        mFilterList = new ArrayList<Filter>(ServiceContainer.getCache().getAllCustomFilters());
         this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
 
@@ -134,7 +135,12 @@ public class ShowFiltersActivity extends ListActivity {
     protected void onStart() {
 
         super.onStart();
-        mFilterList = new ArrayList<FilterInterface>(mCache.getAllCustomFilters());
+        mFilterList = new ArrayList<Filter>(ServiceContainer.getCache().getAllCustomFilters());
+        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
+    }
+
+    private void updateGUI() {
+        mFilterList = new ArrayList<Filter>(ServiceContainer.getCache().getAllCustomFilters());
         this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
 
