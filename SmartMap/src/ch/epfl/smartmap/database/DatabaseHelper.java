@@ -468,6 +468,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
+
         return filters;
     }
 

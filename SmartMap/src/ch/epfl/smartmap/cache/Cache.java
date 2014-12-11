@@ -722,7 +722,7 @@ public class Cache {
         Set<ImmutableFilter> filtersToUpdate = new HashSet<ImmutableFilter>();
 
         for (ImmutableFilter newFilter : newFilters) {
-            if (newFilter.getId() == Filter.NO_ID) {
+            if (!mFilterIds.contains(newFilter.getId())) {
                 // New filter, need to add it
                 long filterId = nextFilterId++;
                 newFilter.setId(filterId);
