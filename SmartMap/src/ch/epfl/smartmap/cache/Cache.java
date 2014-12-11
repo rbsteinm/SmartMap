@@ -20,11 +20,9 @@ import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
- * The Cache contains all instances of network objects that are used by the GUI.
- * Therefore, every request to
+ * The Cache contains all instances of network objects that are used by the GUI. Therefore, every request to
  * find an
- * user or an event should go through it. It will automatically fill itself with
- * the database on creation, and
+ * user or an event should go through it. It will automatically fill itself with the database on creation, and
  * then
  * updates the database as changes are made.
  * 
@@ -76,8 +74,7 @@ public class Cache {
     }
 
     /**
-     * Called when the user accepts an invitation. If it's a friend, it's added
-     * to the cache and if it's an
+     * Called when the user accepts an invitation. If it's a friend, it's added to the cache and if it's an
      * event the
      * user joins it and it's infos are re-updated
      * 
@@ -1300,8 +1297,7 @@ public class Cache {
     }
 
     /**
-     * Allows to search efficiently through the Cache, by providing a filtering
-     * method
+     * Allows to search efficiently through the Cache, by providing a filtering method
      * 
      * @param <T>
      *            Type of items searched

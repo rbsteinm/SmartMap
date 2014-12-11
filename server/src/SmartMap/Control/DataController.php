@@ -108,7 +108,8 @@ class DataController
                     'id' => $friend->getId(),
                     'longitude' => $friend->getLongitude(),
                     'latitude' => $friend->getLatitude(),
-                    'lastUpdate' => $friend->getLastUpdate()
+                    'lastUpdate' => $friend->getLastUpdate(),
+                    'isFriend' => 1
                 );
             }
         }
@@ -281,7 +282,7 @@ class DataController
         
         foreach ($inviters as $inviter)
         {
-            $invitersList[] = array('id' => $inviter->getId(), 'name' => $inviter->getName());
+            $invitersList[] = array('id' => $inviter->getId(), 'name' => $inviter->getName(), 'isFriend' => 0);
         }
         
         $friendsList = array();
@@ -293,7 +294,8 @@ class DataController
                 'name' => $friend->getName(),
                 'longitude' => $friend->getLongitude(),
                 'latitude' => $friend->getLatitude(),
-                'lastUpdate' => $friend->getLastUpdate()
+                'lastUpdate' => $friend->getLastUpdate(),
+                'isFriend' => 1
             );
         }
         
@@ -352,7 +354,8 @@ class DataController
             'name' => $user->getName(),
             'longitude' => $user->getLongitude(),
             'latitude' => $user->getLatitude(),
-            'lastUpdate' => $user->getLastUpdate()
+            'lastUpdate' => $user->getLastUpdate(),
+            'isFriend' => 1
         );
         
         return new JsonResponse($response);
