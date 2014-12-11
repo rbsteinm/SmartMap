@@ -146,10 +146,41 @@ public class UserInformationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * called when switching the "show on map" switch
+     * when ON, the concerned user does not appear on the map anymore
+     * no matter in which filters he is
+     * 
+     * @param view
+     */
     public void showOnMap(View view) {
         // TODO need superfiltre. Don't forget to check that the user is a
         // friend !
         // ServiceContainer.getCache().updateFilter(ServiceContainer.getCache().getFilter(SUPERFILTRE_ID));
+    }
+
+    /**
+     * called when switching the "block" switch
+     * blocks the concerned friend
+     * 
+     * @param view
+     */
+    public void setBlockedStatus(View view) {
+        ServiceContainer.getCache().setBlockedStatus(
+            mUser.getImmutableCopy(), !mBlockSwitch.isChecked(), new NetworkRequestCallback() {
+
+                @Override
+                public void onFailure() {
+                    mBlockSwitch.setChecked(!mBlockSwitch.isChecked());
+                }
+
+                @Override
+                public void onSuccess() {
+                    mShowOnMapSwitch.setEnabled(mUser.getImmutableCopy().isBlocked());
+                }
+
+            });
+
     }
 
     /**
