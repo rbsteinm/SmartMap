@@ -169,6 +169,12 @@ public class Cache {
         }.execute();
     }
 
+    /**
+     * @param user the user we are trying to (un)block
+     * @param newBlockedStatus true if we're blocking the user, false otherwise
+     * @param callback
+     * @author rbsteinm
+     */
     public synchronized void setBlockedStatus(final ImmutableUser user, final boolean newBlockedStatus,
         final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
