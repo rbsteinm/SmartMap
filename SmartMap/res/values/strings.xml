@@ -110,6 +110,8 @@
     <string name="show_event_loading_info">Loading informations…</string>
     <string name="show_events_menu_refresh">Refresh</string>
     <string name="ten_letters">aaaaaaaaaa</string>
+    <string name="show_event_default_seekbar_text">45 km</string>
+    <string name="show_event_listview_description">listview</string>
 
     <!-- EventsListItemAdapter -->
     <string name="events_list_item_adapter_event_live">Event is live!</string>

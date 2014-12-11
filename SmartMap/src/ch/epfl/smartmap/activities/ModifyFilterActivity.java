@@ -26,7 +26,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.FilterInterface;
 import ch.epfl.smartmap.cache.ImmutableFilter;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
@@ -47,7 +47,7 @@ public class ModifyFilterActivity extends Activity {
     private List<User> mFriendsInside;
     private List<User> mFriendsOutside;
 
-    private Filter mFilter;
+    private FilterInterface mFilter;
     private Cache mCache;
 
     private OnItemLongClickListener mOnInsideItemLongClickListener;
@@ -259,7 +259,7 @@ public class ModifyFilterActivity extends Activity {
     }
 
     private void setFilter() {
-        mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
+        mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", FilterInterface.NO_ID));
         for (long id : mFilter.getFriendIds()) {
             mFriendsInside.add(mCache.getUser(id));
         }

@@ -15,7 +15,8 @@ import ch.epfl.smartmap.cache.User;
  * @author Pamoi
  */
 public class NetworkFriendInvitationBag implements InvitationBag {
-    private final Set<ImmutableInvitation> invitations;
+    private final Set<ImmutableInvitation> mInvitations;
+    private final Set<Long> mRemovedFriendsIds;
 
     /**
      * The constructor takes List arguments for compliance with server
@@ -37,23 +38,23 @@ public class NetworkFriendInvitationBag implements InvitationBag {
             throw new IllegalArgumentException("removedFriendsIds list is null.");
         }
 
-        invitations = new HashSet<ImmutableInvitation>();
+        mInvitations = new HashSet<ImmutableInvitation>();
         long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis();
 
         for (ImmutableUser user : invitingUsers) {
             user.setFriendship(User.STRANGER);
-            invitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
+            mInvitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
                 timeStamp, Invitation.FRIEND_INVITATION));
         }
 
         for (ImmutableUser user : newFriends) {
 
             user.setFriendship(User.FRIEND);
-            invitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
+            mInvitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
                 timeStamp, Invitation.ACCEPTED_FRIEND_INVITATION));
         }
 
-        // FIXME Don't retrieve removedFriends?
+        mRemovedFriendsIds = new HashSet<Long>(removedFriendsIds);
     }
 
     /*
@@ -62,6 +63,15 @@ public class NetworkFriendInvitationBag implements InvitationBag {
      */
     @Override
     public Set<ImmutableInvitation> getInvitations() {
-        return new HashSet<ImmutableInvitation>(invitations);
+        return new HashSet<ImmutableInvitation>(mInvitations);
+    }
+
+    /**
+     * Returns a set of the ids of the friends that removed the user.
+     * 
+     * @return
+     */
+    public Set<Long> getRemovedFriendsIds() {
+        return new HashSet<Long>(mRemovedFriendsIds);
     }
 }

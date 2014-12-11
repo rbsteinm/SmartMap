@@ -11,7 +11,7 @@ public interface CacheInterface {
     /**
      * @return all Filters currently activated
      */
-    Set<Filter> getAllActivatedFilters();
+    Set<FilterInterface> getAllActivatedFilters();
 
     /**
      * @return all EventInvitations contained in the Cache
@@ -26,7 +26,7 @@ public interface CacheInterface {
     /**
      * @return all Filters contained in the Cache
      */
-    Set<Filter> getAllFilters();
+    Set<FilterInterface> getAllFilters();
 
     /**
      * @return all FriendInvitations contained in the Cache
@@ -84,14 +84,14 @@ public interface CacheInterface {
      * @return the Filter with corresponding id, {@code null} if it is not in
      *         Cache
      */
-    Filter getFilter(long id);
+    FilterInterface getFilter(long id);
 
     /**
      * @param ids
      *            Set containing Filter ids
      * @return a Set containing the corresponding found Filters
      */
-    Set<Filter> getFilters(Set<Long> ids);
+    Set<FilterInterface> getFilters(Set<Long> ids);
 
     /**
      * @param id
