@@ -43,6 +43,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      */
     private Bitmap mBaseMarkerShape;
     private Bitmap mCurrentMarkerShape;
+    private Bitmap mDefaultProfilePicture;
     private Bitmap mProfilePicture;
     private Bitmap mMarkerIcon; // the combined icon (marker shape + profile picture)
     private Canvas mCanvasCurrentShape;
@@ -61,6 +62,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
 
     public CircularMarkerIconMaker(Friend friend) {
         mFriend = friend;
+
     }
 
     /*
@@ -69,15 +71,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      */
     @Override
     public Bitmap getMarkerIcon(Context context) {
-        if ((mBaseMarkerShape == null) || (mCurrentMarkerShape == null)) {
-            this.initializeMarkerShape(context);
-        }
-        if (mProfilePicture == null) {
-            this.initializeProfilePicture();
-        }
-        if (mMarkerIcon == null) {
-            this.initializeMarkerIcon();
-        }
+        this.initializeIconComponents(context);
 
         long timeElapsed =
             GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
@@ -168,15 +162,26 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * circle form
      */
     private void initializeProfilePicture() {
-        mProfilePicture =
-            Bitmap.createScaledBitmap(mFriend.getImage(), User.PICTURE_WIDTH, User.PICTURE_HEIGHT, false);
 
         mProfilePicture =
-            Bitmap.createScaledBitmap(mProfilePicture, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
+            Bitmap.createScaledBitmap(mFriend.getImage(), mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
                 mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
 
         mProfilePicture = this.cropCircle(mProfilePicture, mProfilePicture.getWidth());
 
+    }
+
+    /**
+     * This function initializes the default profile picture (the one with User.NO_IMAGE), by retrieving it
+     * from resources and cropping it in a
+     * circle form
+     */
+    private void initializeDefaultProfilePicture() {
+        mDefaultProfilePicture =
+            Bitmap.createScaledBitmap(User.NO_IMAGE, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
+                mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
+
+        mDefaultProfilePicture = this.cropCircle(mDefaultProfilePicture, mDefaultProfilePicture.getWidth());
     }
 
     private long minutesToMilliseconds(long minutes) {
@@ -200,6 +205,28 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         canvas.drawBitmap(bmp2, cx, cy, null);
         return mBaseOverlay;
 
+    }
+
+    /**
+     * Initialize the icon components if needed
+     * 
+     * @param context
+     */
+    private void initializeIconComponents(Context context) {
+        if ((mBaseMarkerShape == null) || (mCurrentMarkerShape == null)) {
+            this.initializeMarkerShape(context);
+        }
+
+        if (mDefaultProfilePicture == null) {
+            this.initializeDefaultProfilePicture();
+        }
+
+        if ((mProfilePicture == null) || mProfilePicture.sameAs(mDefaultProfilePicture)) {
+            this.initializeProfilePicture();
+        }
+        if (mMarkerIcon == null) {
+            this.initializeMarkerIcon();
+        }
     }
 
     /**
