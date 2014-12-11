@@ -185,8 +185,10 @@ public final class Utils {
                     + calendar.get(Calendar.YEAR);
             }
         } else {
-            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "."
-                + formatForDisplay(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
+            // Do not forget that the first month in a GregorianCalendar is 0! bug #82
+            int month = calendar.get(Calendar.MONTH) + 1;
+            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
+            + calendar.get(Calendar.YEAR);
         }
     }
 
@@ -246,7 +248,8 @@ public final class Utils {
     }
 
     public static String getTimeString(Calendar calendar) {
-        return formatForDisplay(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + formatForDisplay(calendar.get(Calendar.MINUTE));
+        return formatForDisplay(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
+            + formatForDisplay(calendar.get(Calendar.MINUTE));
     }
 
     /**

@@ -9,7 +9,6 @@ import java.util.TimeZone;
 import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
-import ch.epfl.smartmap.cache.User;
 
 /**
  * @author Pamoi
@@ -42,14 +41,11 @@ public class NetworkFriendInvitationBag implements InvitationBag {
         long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis();
 
         for (ImmutableUser user : invitingUsers) {
-            user.setFriendship(User.STRANGER);
             mInvitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
                 timeStamp, Invitation.FRIEND_INVITATION));
         }
 
         for (ImmutableUser user : newFriends) {
-
-            user.setFriendship(User.FRIEND);
             mInvitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
                 timeStamp, Invitation.ACCEPTED_FRIEND_INVITATION));
         }

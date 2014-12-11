@@ -12,7 +12,7 @@
         <item>Hugo Sbai</item>
         <item>Marion Sbai</item>
     </string-array>
-    
+
     <!-- NOTE: The special thanks list is also shown in AboutActivity -->
     <string-array name="app_special_thanks">
         <item>Prof. James Larus</item>
@@ -110,7 +110,13 @@
     <string name="show_event_loading_info">Loading informations…</string>
     <string name="show_events_menu_refresh">Refresh</string>
     <string name="ten_letters">aaaaaaaaaa</string>
-
+    <string name="show_event_default_seekbar_text">45 km</string>
+    <string name="show_event_listview_description">listview</string>
+    <string name="show_event_disabled_warning_title">Events disabled</string>
+    <string name="show_event_disabled_warning_message">You have disabled events fetching in the settings.\nIf you want to see events, please set the max distance to fetch events to something else.</string>
+    <string name="show_event_disabled_warning_button_goto_settings">Take me to the settings</string>
+    <string name="show_event_disabled_warning_button_return_to_main">OK</string>
+    
     <!-- EventsListItemAdapter -->
     <string name="events_list_item_adapter_event_live">Event is live!</string>
     <string name="events_list_item_adapter_today">Today</string>
@@ -218,19 +224,18 @@
     <string name="notification_event_request_title">Event request from </string>
     <string name="notification_accepted_friend_title">accepted your invitation</string>
 
-    <!--  Invitation Titles -->
-    <string name ="invitation_want_to_be_your_friend"> wants to be your friend.</string>
-    <string name ="invitation_invites_your_to"> invites your to </string>
-    <string name ="invitation_accepted_your_friend_request"> accepted your friend request.</string>
-    
-    <!--  Invitation Subtitles -->
-    <string name ="invitation_click_here_to_open_your_list_of_invitations">Click here to open your list of invitations.</string>
-    <string name ="invitation_click_here_to_see_the_event">Click here to see the event.</string>
-    <string name ="invitation_click_here_for_informations">Click here for informations.</string>
-    <string name ="invitation_accepted">Accepted</string>
-    <string name ="invitation_declined">Declined</string>
-    
-    
+    <!-- Invitation Titles -->
+    <string name="invitation_want_to_be_your_friend"> wants to be your friend.</string>
+    <string name="invitation_invites_your_to"> invites your to </string>
+    <string name="invitation_accepted_your_friend_request"> accepted your friend request.</string>
+
+    <!-- Invitation Subtitles -->
+    <string name="invitation_click_here_to_open_your_list_of_invitations">Click here to open your list of invitations.</string>
+    <string name="invitation_click_here_to_see_the_event">Click here to see the event.</string>
+    <string name="invitation_click_here_for_informations">Click here for informations.</string>
+    <string name="invitation_accepted">Accepted</string>
+    <string name="invitation_declined">Declined</string>
+
     <!-- Set Location Activity -->
     <string name="title_activity_set_location">Set Location</string>
     <string name="set_location_toast">Drag Marker where your event will take place and press "Done"</string>
@@ -238,6 +243,7 @@
 
     <!-- FriendInformationActivity -->
     <string name="remove_friend_button_text">Remove</string>
+    <string name="add_friend_button_text">Add</string>
     <string name="block_button_text">Block</string>
     <string name="show_on_map_switch">Show on map</string>
     <string name="block_switch">Block</string>
@@ -256,13 +262,13 @@
     <string name="action_rename_filter_button">Rename</string>
     <string name="action_cancel_button">Rename</string>
     <string name="rename_filter">Rename filter</string>
-     <string name="new_name_saved">New name saved</string>
-     <string name="save_changes">Save changes?</string>
-     <string name="changes_saved">Changes saved</string>
-     <string name="yes">Yes</string>
-     <string name="no">No</string>
-     <string name="remove_filter">Remove filter?</string>
-     <string name="removed_filter">Removed filter</string>
+    <string name="new_name_saved">New name saved</string>
+    <string name="save_changes">Save changes?</string>
+    <string name="changes_saved">Changes saved</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="remove_filter">Remove filter?</string>
+    <string name="removed_filter">Removed filter</string>
 
     <!-- Settings -->
     <!-- NOTE: Each string value must be unique, as it is a key for one specific preference. -->
@@ -317,13 +323,13 @@
     <string name="utils_days_ago">days ago</string>
     <string name="utils_away_from_you">away from you</string>
     <string name="utils_meters_away_from_you">meters away from you</string>
-    
+
     <!-- SettingsManager -->
     <string name="near">near</string>
 
     <!-- ProfileActivity -->
     <string name="title_activity_profile">Your Profile</string>
-    
+
     <!-- AddfriendActivity -->
     <string name="add">Add</string>
     <string name="as_a_friend">as a friend ?</string>
@@ -332,14 +338,14 @@
     <string name="add_friend_not_found">No user found for this query</string>
     <string name="add_friend_request_not_sent">Friend request sent couldn\'t be sent</string>
     <string name="add_friend_request_sent">Friend request sent !</string>
-    
+
     <!-- InvitationsTab -->
     <string name="accept_friend_network_error">The invitation couldn\'t be accepted. Please try again later.</string>
     <string name="decline_friend_network_error">The invitation couldn\'t be declined. Please try again later.</string>
     <string name="yes_accept">Yes, accept</string>
     <string name="no_decline">No, decline</string>
     <string name="decline_confirm">Invitation declined.</string>
-    
+
     <!-- Nothing below this line! -->
 
 </resources>

@@ -414,8 +414,8 @@ class UserRepository
     /**
      * Sets the status of a friendship link.
      * 
-     * @param long $idUser
-     * @param long $idFriend
+     * @param int $idUser
+     * @param int $idFriend
      * @param string $status
      * @throws DatabaseException when the status is invalid, i.e. not ALLOWED, DISALLOWED or BLOCKED
      */
@@ -441,10 +441,10 @@ class UserRepository
     
     /**
      * Sets the status of a list of friendship links.
-     * @param long $idUser
+     * @param int $idUser
      * @param array $idsFriends
      * @param array $status
-     * @throws DatabaseException when either $status or $idsFreinds is invalid.
+     * @throws DatabaseException when either $status or $idsFriends is invalid.
      */
     public function setFriendshipsStatus($idUser, $idsFriends, $status)
     {
@@ -478,8 +478,8 @@ class UserRepository
     
     /**
      * Sets the follow status of a friendship link.
-     * @param long $idUser
-     * @param long $friendId
+     * @param int $idUser
+     * @param int $friendId
      * @param string $follow
      * @throws DatabaseException when $follow is invalid.
      */
@@ -499,7 +499,7 @@ class UserRepository
         }
         catch (\Exception $e)
         {
-            throw new DatabaseException('Error setting frienship follow status in setFreindshipFollow.', 1, $e);
+            throw new DatabaseException('Error setting friendship follow status in setFriendshipFollow.', 1, $e);
         }
     }
     

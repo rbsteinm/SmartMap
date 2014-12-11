@@ -147,14 +147,21 @@ public final class Friend extends User {
         // TODO : Update hasChanged to work correctly
         boolean hasChanged = false;
 
-        super.update(user);
+        // mPhoneNumber = (user.getPhoneNumber() != null) ? user.getPhoneNumber() : mPhoneNumber;
+        // mEmail = (user.getEmail() != null) ? user.getEmail() : mEmail;
 
-        mPhoneNumber = (user.getPhoneNumber() != null) ? user.getPhoneNumber() : mPhoneNumber;
-        mEmail = (user.getEmail() != null) ? user.getEmail() : mEmail;
-        mLocationString = (user.getLocationString() != null) ? user.getLocationString() : mLocationString;
-        mLocation = (user.getLocation() != null) ? new Location(user.getLocation()) : mLocation;
+        if ((user.getLocation() != null) && (user.getLocation() != User.NO_LOCATION)) {
+            mLocation = new Location(user.getLocation());
+            hasChanged = true;
+        }
+
+        if ((user.getLocationString() != null) && (user.getLocationString() != User.NO_LOCATION_STRING)) {
+            mLocationString = user.getLocationString();
+            hasChanged = true;
+        }
+
         mIsBlocked = (user.isBlocked() != User.blockStatus.NOT_SET) ? user.isBlocked() : mIsBlocked;
 
-        return true;
+        return super.update(user) || hasChanged;
     }
 }

@@ -48,50 +48,79 @@ public class Notifications {
      */
     public static void createNotification(Invitation invitation, Context context) {
 
-        // Get ID and the number of ongoing Event notifications
-        notificationID++;
+        boolean notificationAllowed =
+            ServiceContainer.getSettingsManager().notificationsEnabled()
+                && (invitation.getStatus() == Invitation.UNREAD);
 
-        // Prepare intent that redirect the user to EventActivity
-        Intent intent = invitation.getIntent();
-
-        if (invitation.getType() == Invitation.EVENT_INVITATION) {
-            intent.putExtra("EVENT", invitation.getEvent().getId());
-        } else if (invitation.getType() == Invitation.FRIEND_INVITATION) {
-            intent.putExtra("INVITATION", true);
-        } else if (invitation.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
-            intent.putExtra("USER", invitation.getUser().getId());
+        switch (invitation.getType()) {
+            case Invitation.EVENT_INVITATION:
+                notificationAllowed =
+                    notificationAllowed
+                        && ServiceContainer.getSettingsManager().notificationsForEventInvitations();
+                break;
+            case Invitation.FRIEND_INVITATION:
+                notificationAllowed =
+                    notificationAllowed
+                        && ServiceContainer.getSettingsManager().notificationsForFriendRequests();
+                break;
+            case Invitation.ACCEPTED_FRIEND_INVITATION:
+                notificationAllowed =
+                    notificationAllowed
+                        && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations();
+                break;
+            default:
+                assert false;
+                break;
         }
 
-        intent.putExtra("NOTIFICATION", true);
+        if (notificationAllowed) {
 
-        PendingIntent pendingIntent =
-            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            // Get ID and the number of ongoing Event notifications
+            notificationID++;
 
-        // Add Big View Specific Configuration
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+            // Prepare intent that redirect the user to EventActivity
+            Intent intent = invitation.getIntent();
 
-        String[] strings = new String[1];
-        strings[0] = invitation.getSubtitle();
+            if (invitation.getType() == Invitation.EVENT_INVITATION) {
+                intent.putExtra("EVENT", invitation.getEvent().getId());
+            } else if (invitation.getType() == Invitation.FRIEND_INVITATION) {
+                intent.putExtra("INVITATION", true);
+            } else if (invitation.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
+                intent.putExtra("USER", invitation.getUser().getId());
+            }
 
-        // Sets a title for the Inbox style big view
-        inboxStyle.setBigContentTitle(invitation.getTitle());
-        // Moves events into the big view
-        for (int i = 0; i < strings.length; i++) {
-            inboxStyle.addLine(strings[i]);
+            intent.putExtra("NOTIFICATION", true);
+
+            PendingIntent pendingIntent =
+                PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            // Add Big View Specific Configuration
+            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+            String[] strings = new String[1];
+            strings[0] = invitation.getSubtitle();
+
+            // Sets a title for the Inbox style big view
+            inboxStyle.setBigContentTitle(invitation.getTitle());
+            // Moves events into the big view
+            for (int i = 0; i < strings.length; i++) {
+                inboxStyle.addLine(strings[i]);
+            }
+
+            // Build notification
+            NotificationCompat.Builder noti =
+                new NotificationCompat.Builder(context)
+                    // Sets all notification's specifications in the builder
+                    .setStyle(inboxStyle).setAutoCancel(true).setContentTitle(invitation.getTitle())
+                    .setContentText(invitation.getSubtitle()).setSmallIcon(R.drawable.ic_launcher)
+                    .setTicker(invitation.getSubtitle()).setContentIntent(pendingIntent);
+            if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
+                noti.setVibrate(PATTERN);
+            }
+
+            displayNotification(context, noti.build(), notificationID);
+
         }
-
-        // Build notification
-        NotificationCompat.Builder noti =
-            new NotificationCompat.Builder(context)
-                // Sets all notification's specifications in the builder
-                .setStyle(inboxStyle).setAutoCancel(true).setContentTitle(invitation.getTitle())
-                .setContentText(invitation.getSubtitle()).setSmallIcon(R.drawable.ic_launcher)
-                .setTicker(invitation.getSubtitle()).setContentIntent(pendingIntent);
-        if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
-            noti.setVibrate(PATTERN);
-        }
-
-        displayNotification(context, noti.build(), notificationID);
     }
 
     /**

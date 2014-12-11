@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/activity_user_information_top_margin"
     tools:context="ch.epfl.smartmap.activities.UserInformationActivity" >
 
-    <RelativeLayout
+   <RelativeLayout
         android:id="@+id/user_info_header"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -53,6 +53,7 @@
             android:layout_below="@id/user_info_subtitles"
             android:layout_toRightOf="@id/user_info_picture"
             android:textColor="@color/wallet_secondary_text_holo_dark" />
+        
 
         <Switch
             android:id="@+id/user_info_show_on_map_switch"
@@ -99,12 +100,11 @@
             android:id="@+id/user_info_remove_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/remove_friend_button_shape"
+            android:background="@drawable/button_shape"
             android:onClick="displayDeleteConfirmationDialog"
             android:text="@string/remove_friend_button_text"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:drawableLeft="@drawable/ic_action_discard_white" />
+            android:textSize="20sp" />
         
     </LinearLayout>
 </RelativeLayout>

@@ -245,34 +245,32 @@ public class PublicEvent implements Event {
         // TODO Modify hasChanged to work correctly
         boolean hasChanged = false;
 
-        if ((event.getName() != null) && !event.getName().equals("") && (event.getName() != mName)) {
+        if ((event.getName() != null) && !event.getName().equals("") && (event.getName() != Event.NO_NAME)) {
             hasChanged = true;
             mName = event.getName();
         }
 
-        if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
+        if (event.getStartDate() != null) {
             mStartDate = (Calendar) event.getStartDate().clone();
+        }
+
+        if (event.getStartDate() != null) {
             mEndDate = (Calendar) event.getEndDate().clone();
         }
 
-        if ((event.getStartDate() != null) && (event.getEndDate() != null)) {
-            mStartDate = (Calendar) event.getStartDate().clone();
-            mEndDate = (Calendar) event.getEndDate().clone();
-        }
-
-        if (event.getLocation() != null) {
+        if ((event.getLocation() != null) && (event.getLocation() != Event.NO_LOCATION)) {
             mLocation = new Location(event.getLocation());
         }
 
-        if (event.getLocationString() != null) {
+        if ((event.getLocationString() != null) && (event.getLocationString() != Event.NO_LOCATION_STRING)) {
             mLocationString = event.getLocationString();
         }
 
-        if (event.getDescription() == null) {
+        if ((event.getDescription() == null) && (event.getDescription() != Event.NO_DESCRIPTION)) {
             mDescription = event.getDescription();
         }
 
-        if (event.getParticipantIds() != null) {
+        if ((event.getParticipantIds() != null) && (event.getParticipantIds() != Event.NO_PARTICIPANTIDS)) {
             mParticipantIds = event.getParticipantIds();
         }
 
