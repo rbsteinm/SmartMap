@@ -77,6 +77,13 @@ public class ShowEventsActivity extends ListActivity {
     private List<Event> mEventsList;
 
     /**
+     * Displays an AlertDialog with a button to see the event on the map, and
+     * another to see more details.
+     * 
+     * @param event
+     *            the event to show a dialog for
+     * @param creatorName
+     *            the creator of the event
      * @author SpicyCH
      */
     private void displayDialog(final Event event, String creatorName) {
@@ -91,7 +98,7 @@ public class ShowEventsActivity extends ListActivity {
                 + creatorName + "\n\n" + event.getDescription();
 
         alertDialog.setTitle(event.getName() + " " + this.getResources().getString(R.string.near) + " "
-            + event.getLocationString() + "\n" + Utils.distanceToMe(event.getLocation()));
+            + event.getLocationString());
 
         alertDialog.setMessage(message);
 
@@ -113,16 +120,13 @@ public class ShowEventsActivity extends ListActivity {
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
             ShowEventsActivity.this.getString(R.string.show_event_details_button),
             new DialogInterface.OnClickListener() {
-
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
-                    Log.d(TAG, "Event clicked");
                     Intent showEventIntent = new Intent(ShowEventsActivity.this, EventInformationActivity.class);
                     showEventIntent.putExtra("EVENT", event.getId());
                     ShowEventsActivity.this.startActivity(showEventIntent);
                 }
             });
-
         alertDialog.show();
     }
 
@@ -134,7 +138,7 @@ public class ShowEventsActivity extends ListActivity {
      * </p>
      * 
      * @param position
-     *            the position of item that has been clicked
+     *            the position of the item that has been clicked
      * @author SpicyCH
      */
     private void displayInfoDialog(int position) {
