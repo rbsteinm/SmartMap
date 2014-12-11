@@ -458,10 +458,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public ImmutableUser getUserInfo(long id) throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("user_id", Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/getUserInfo");
+        params.put("user_id", Long.toString(id));
         String response = this.sendViaPost(params, conn);
-
         SmartMapParser parser = null;
         ImmutableUser friend = null;
         try {

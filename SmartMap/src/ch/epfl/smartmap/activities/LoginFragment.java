@@ -253,7 +253,6 @@ public class LoginFragment extends Fragment {
 
                             @Override
                             public void onSuccess() {
-                                Log.d(TAG, "Successfully updated Cache from Network");
                                 LoginFragment.this.startMainActivity();
                             }
                         });
