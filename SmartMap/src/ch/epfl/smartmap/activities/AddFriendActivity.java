@@ -210,6 +210,7 @@ public class AddFriendActivity extends ListActivity {
                     Toast.makeText(AddFriendActivity.this,
                         AddFriendActivity.this.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT)
                         .show();
+                    AddFriendActivity.this.finish();
                 }
             });
         }
