@@ -6,7 +6,6 @@ import java.util.List;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -89,11 +88,6 @@ public class InvitationPanelActivity extends ListActivity {
         super.onResume();
         InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(InvitationPanelActivity.this,
             new ArrayList<Invitation>(ServiceContainer.getCache().getAllInvitations())));
-
-        // TODO enlever
-        for (Invitation inv : ServiceContainer.getCache().getAllInvitations()) {
-            Log.d(TAG, " " + inv.getStatus());
-        }
 
         ServiceContainer.getCache().readAllInvitations();
     }
