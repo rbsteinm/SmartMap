@@ -60,22 +60,11 @@ public class ShowEventsActivity extends ListActivity {
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-        this.initializeGUI();
-
-        // Create custom Adapter and pass it to the Activity
-        this.setListAdapter(new EventsListItemAdapter(this, mEventsList));
-
         // Initialize the listener
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
             public void onEventListUpdate() {
-                ShowEventsActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ShowEventsActivity.this.setListAdapter(new EventsListItemAdapter(ShowEventsActivity.this,
-                                mEventsList));
-                    }
-                });
+                ShowEventsActivity.this.initializeGUI();
             }
         });
 
@@ -159,7 +148,7 @@ public class ShowEventsActivity extends ListActivity {
 
         // This is needed to show an update of the events' list after having
         // created one.
-        this.updateCurrentList();
+        this.initializeGUI();
     }
 
     /**
@@ -177,41 +166,43 @@ public class ShowEventsActivity extends ListActivity {
         Calendar start = event.getStartDate();
         Calendar end = event.getEndDate();
 
-        final String message = Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - "
-                + Utils.getDateString(end) + " " + Utils.getTimeString(end) + "\n"
+        final String message =
+            Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - " + Utils.getDateString(end)
+                + " " + Utils.getTimeString(end) + "\n"
                 + ShowEventsActivity.this.getString(R.string.show_event_by) + " " + creatorName + "\n\n"
                 + event.getDescription();
 
         alertDialog.setTitle(event.getName() + " " + this.getResources().getString(R.string.near) + " "
-                + event.getLocationString());
+            + event.getLocationString());
 
         alertDialog.setMessage(message);
 
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_button),
-                new DialogInterface.OnClickListener() {
+            ShowEventsActivity.this.getString(R.string.show_event_on_the_map_button),
+            new DialogInterface.OnClickListener() {
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(ShowEventsActivity.this,
-                                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                                Toast.LENGTH_SHORT).show();
-                        Intent showEventIntent = new Intent(ShowEventsActivity.this, MainActivity.class);
-                        showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
-                        ShowEventsActivity.this.startActivity(showEventIntent);
-                    }
-                });
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    Toast.makeText(ShowEventsActivity.this,
+                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                        Toast.LENGTH_SHORT).show();
+                    Intent showEventIntent = new Intent(ShowEventsActivity.this, MainActivity.class);
+                    showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
+                    ShowEventsActivity.this.startActivity(showEventIntent);
+                }
+            });
 
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
-                ShowEventsActivity.this.getString(R.string.show_event_details_button),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent showEventIntent = new Intent(ShowEventsActivity.this, EventInformationActivity.class);
-                        showEventIntent.putExtra("EVENT", event.getId());
-                        ShowEventsActivity.this.startActivity(showEventIntent);
-                    }
-                });
+            ShowEventsActivity.this.getString(R.string.show_event_details_button),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    Intent showEventIntent =
+                        new Intent(ShowEventsActivity.this, EventInformationActivity.class);
+                    showEventIntent.putExtra("EVENT", event.getId());
+                    ShowEventsActivity.this.startActivity(showEventIntent);
+                }
+            });
         alertDialog.show();
     }
 
@@ -228,8 +219,8 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void displayInfoDialog(int position) {
 
-        Toast.makeText(ShowEventsActivity.this, this.getString(R.string.show_event_loading_info), Toast.LENGTH_SHORT)
-                .show();
+        Toast.makeText(ShowEventsActivity.this, this.getString(R.string.show_event_loading_info),
+            Toast.LENGTH_SHORT).show();
 
         final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
 
@@ -250,7 +241,8 @@ public class ShowEventsActivity extends ListActivity {
             Log.e(TAG, "The server returned a null event or creatorName");
 
             Toast.makeText(ShowEventsActivity.this,
-                    ShowEventsActivity.this.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT).show();
+                ShowEventsActivity.this.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
+                .show();
 
         } else {
 
@@ -275,19 +267,25 @@ public class ShowEventsActivity extends ListActivity {
         if (ServiceContainer.getSettingsManager() == null) {
             ServiceContainer.initSmartMapServices(this);
         }
+        ShowEventsActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMyEventsChecked = false;
+                mOngoingChecked = false;
+                mNearMeChecked = false;
 
-        mMyEventsChecked = false;
-        mOngoingChecked = false;
-        mNearMeChecked = false;
+                mShowKilometers = (TextView) ShowEventsActivity.this.findViewById(R.id.showEventKilometers);
 
-        mShowKilometers = (TextView) this.findViewById(R.id.showEventKilometers);
+                mSeekBar = (SeekBar) ShowEventsActivity.this.findViewById(R.id.showEventSeekBar);
+                mSeekBar.setMax(ServiceContainer.getSettingsManager().getNearEventsMaxDistance()
+                    / METERS_IN_ONE_KM);
+                mSeekBar.setEnabled(false);
+                mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
 
-        mSeekBar = (SeekBar) this.findViewById(R.id.showEventSeekBar);
-        mSeekBar.setMax(ServiceContainer.getSettingsManager().getNearEventsMaxDistance() / METERS_IN_ONE_KM);
-        mSeekBar.setEnabled(false);
-        mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
+                ShowEventsActivity.this.updateCurrentList();
+            }
+        });
 
-        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllVisibleEvents());
     }
 
     /**
@@ -330,8 +328,9 @@ public class ShowEventsActivity extends ListActivity {
             mEventsList.retainAll(ServiceContainer.getCache().getLiveEvents());
         }
 
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList);
-        this.setListAdapter(adapter);
+        ShowEventsActivity.this
+            .setListAdapter(new EventsListItemAdapter(ShowEventsActivity.this, mEventsList));
+
     }
 
     /**
