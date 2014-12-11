@@ -134,7 +134,8 @@ public class InvitationsTab extends ListFragment {
 
                         @Override
                         public void onSuccess() {
-                            // We need to get the invitation from the cache as it
+                            // We need to get the invitation from the cache as
+                            // it
                             // has been modified
                             Invitation updated =
                                 ServiceContainer.getCache().getInvitation(invitation.getId());
