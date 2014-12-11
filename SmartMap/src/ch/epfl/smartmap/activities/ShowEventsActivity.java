@@ -291,6 +291,25 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
+     * Remove from mEventsList the events that are further than the distance set in the <code>SeekBar</code>.
+     * 
+     * @author SpicyCH
+     */
+    private void removeEventsToofar() {
+
+        int maximumDistanceKM = mSeekBar.getProgress() * METERS_IN_ONE_KM;
+        Location myLocation = ServiceContainer.getSettingsManager().getLocation();
+
+        List<Event> copy = new ArrayList<Event>(mEventsList);
+
+        for (Event e : copy) {
+            if (e.getLocation().distanceTo(myLocation) > maximumDistanceKM) {
+                mEventsList.remove(e);
+            }
+        }
+    }
+
+    /**
      * Updates the list displayed to the user.
      */
     private void updateCurrentList() {
@@ -300,17 +319,7 @@ public class ShowEventsActivity extends ListActivity {
         mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllEvents());
 
         if (mNearMeChecked) {
-            int maximumDistanceKM = mSeekBar.getProgress() * METERS_IN_ONE_KM;
-            Location myLocation = ServiceContainer.getSettingsManager().getLocation();
-
-            Log.d(TAG, "My location: " + myLocation.getLatitude() + "/" + myLocation.getLongitude());
-            for (int i = 0; i < mEventsList.size(); i++) {
-                Log.d(TAG, "Event " + i + " has distance " + mEventsList.get(i).getLocation().distanceTo(myLocation)
-                        + " meters.");
-                if (mEventsList.get(i).getLocation().distanceTo(myLocation) > maximumDistanceKM) {
-                    mEventsList.remove(i);
-                }
-            }
+            this.removeEventsToofar();
         }
 
         if (mMyEventsChecked) {
