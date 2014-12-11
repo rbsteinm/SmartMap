@@ -32,20 +32,32 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class Cache {
 
-    static final public String TAG = Cache.class.getSimpleName();
+    /**
+     * Allows to search efficiently through the Cache, by providing a filtering
+     * method
+     * 
+     * @param <T>
+     *            Type of items searched
+     * @author jfperren
+     */
+    public interface SearchFilter<T> {
+        boolean filter(T item);
+    }
 
+    static final public String TAG = Cache.class.getSimpleName();
     private final LongSparseArray<User> mUserInstances;
     // SparseArrays containing live instances
     private final LongSparseArray<Event> mEventInstances;
     private final LongSparseArray<Filter> mFilterInstances;
-    private final LongSparseArray<Invitation> mInvitationInstances;
 
+    private final LongSparseArray<Invitation> mInvitationInstances;
     private final Set<Long> mUserIds;
     // These Sets are the keys for the LongSparseArrays
     private final Set<Long> mEventIds;
-    private final Set<Long> mFilterIds;
 
+    private final Set<Long> mFilterIds;
     private final Set<Long> mInvitationIds;
+
     private final Set<Long> mInvitingFriendsIds;
 
     private final Set<Long> mFriendIds;
@@ -86,8 +98,7 @@ public class Cache {
      * @param invitation
      * @param callback
      */
-    public synchronized void acceptInvitation(final Invitation invitation,
-        final NetworkRequestCallback callback) {
+    public synchronized void acceptInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -95,8 +106,7 @@ public class Cache {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
                             ImmutableUser newFriend =
-                                ServiceContainer.getNetworkClient().acceptInvitation(
-                                    invitation.getUser().getId());
+                                ServiceContainer.getNetworkClient().acceptInvitation(invitation.getUser().getId());
                             Cache.this.putUser(newFriend);
                             break;
                         case Invitation.EVENT_INVITATION:
@@ -139,8 +149,7 @@ public class Cache {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.addAll(ids);
 
-        final ImmutableEvent newImmutableEvent =
-            event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -167,8 +176,7 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void createEvent(final ImmutableEvent createdEvent,
-        final NetworkRequestCallback callback) {
+    public synchronized void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -194,8 +202,7 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void declineInvitation(final Invitation invitation,
-        final NetworkRequestCallback callback) {
+    public synchronized void declineInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -203,8 +210,7 @@ public class Cache {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
                             // Decline online
-                            ServiceContainer.getNetworkClient().declineInvitation(
-                                invitation.getUser().getId());
+                            ServiceContainer.getNetworkClient().declineInvitation(invitation.getUser().getId());
                             break;
                         case Invitation.EVENT_INVITATION:
                             // No interaction needed here
@@ -522,6 +528,7 @@ public class Cache {
         if (user == null) {
             user = this.getStranger(id);
         }
+
         return user;
     }
 
@@ -587,8 +594,7 @@ public class Cache {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId,
-                        new ArrayList<Long>(usersIds));
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, new ArrayList<Long>(usersIds));
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Couldn't invite friends to event:" + e);
@@ -615,6 +621,19 @@ public class Cache {
         }.execute(id);
     }
 
+    private synchronized void keepOnlyTheseEvents(Set<ImmutableEvent> events) {
+        mEventIds.clear();
+        mEventInstances.clear();
+        this.putEvents(events);
+    }
+
+    private synchronized void keepOnlyTheseUsers(Set<ImmutableUser> users) {
+        mFriendIds.clear();
+        mUserIds.clear();
+        mUserInstances.clear();
+        this.putUsers(users);
+    }
+
     public void logState() {
         Log.d(TAG, "CACHE STATE : Users : " + mUserIds);
         Log.d(TAG, "CACHE STATE : Events : " + mEventIds);
@@ -628,8 +647,7 @@ public class Cache {
      * @param createdEvent
      * @param callback
      */
-    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent,
-        final NetworkRequestCallback callback) {
+    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
         new AsyncTask<ImmutableEvent, Void, Void>() {
 
             @Override
@@ -667,8 +685,7 @@ public class Cache {
         Set<ImmutableEvent> eventsToAdd = new HashSet<ImmutableEvent>();
 
         for (final ImmutableEvent newEvent : newEvents) {
-            Log.d(TAG,
-                "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getImmCreator());
+            Log.d(TAG, "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getImmCreator());
             // Get id
             long eventId = newEvent.getId();
 
@@ -922,7 +939,8 @@ public class Cache {
         });
         Log.d(TAG, unreadInvitations.toString());
         for (Invitation invitation : unreadInvitations) {
-            Log.d(TAG, invitation.toString());
+            // TODO should we set it in the network client or store it in
+            // database?
             invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
         }
     }
@@ -1072,8 +1090,7 @@ public class Cache {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.removeAll(ids);
 
-        final ImmutableEvent newImmutableEvent =
-            event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -1101,109 +1118,6 @@ public class Cache {
                 mEventInstances.remove(id);
             }
         }
-    }
-
-    public synchronized void updateFromNetwork(final SmartMapClient networkClient,
-        final NetworkRequestCallback callback) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    // Get settings
-                    SettingsManager settingsManager = ServiceContainer.getSettingsManager();
-
-                    // Sets with new values (avoid calling multiple times the
-                    // listeners)
-                    Set<ImmutableUser> updatedUsers = new HashSet<ImmutableUser>();
-                    Set<ImmutableEvent> updatedEvents = new HashSet<ImmutableEvent>();
-
-                    // Update self informations
-                    long myId = settingsManager.getUserId();
-                    ImmutableUser self = networkClient.getUserInfo(myId);
-                    self.setImage(networkClient.getProfilePicture(myId));
-                    updatedUsers.add(self);
-
-                    // Fetch friends via listFriendPos
-                    Set<ImmutableUser> listFriendPos =
-                        new HashSet<ImmutableUser>(networkClient.listFriendsPos());
-
-                    for (ImmutableUser positionInfos : listFriendPos) {
-                        // get id
-                        long id = positionInfos.getId();
-                        // Get other online info
-                        ImmutableUser onlineInfos = networkClient.getUserInfo(id);
-                        // Get picture
-                        Bitmap image = networkClient.getProfilePicture(id);
-                        // Put all inside container
-                        onlineInfos.setLocation(positionInfos.getLocation());
-                        onlineInfos.setLocationString(positionInfos.getLocationString());
-                        onlineInfos.setImage(image);
-
-                        // Put friend in Set
-                        updatedUsers.add(onlineInfos);
-                    }
-
-                    // Get near Events
-                    Set<Long> nearEventIds =
-                        new HashSet<Long>(networkClient.getPublicEvents(settingsManager.getLocation()
-                            .getLatitude(), settingsManager.getLocation().getLongitude(), settingsManager
-                            .getNearEventsMaxDistance()));
-
-                    // Update all cached event if needed
-                    for (long id : mEventIds) {
-                        // Get event infos
-                        ImmutableEvent onlineInfos = networkClient.getEventInfo(id);
-                        // Check if event needs to be kept
-                        if (nearEventIds.contains(id) || (onlineInfos.getCreatorId() == myId)
-                            || onlineInfos.getParticipantIds().contains(myId)) {
-                            // if so, put it in Set
-                            updatedEvents.add(onlineInfos);
-                            updatedUsers.add(onlineInfos.getImmCreator());
-                        }
-                    }
-
-                    // Update users from invitations
-                    for (Invitation invitation : Cache.this.getAllInvitations()) {
-                        if (invitation.getType() == Invitation.FRIEND_INVITATION) {
-                            // get id
-                            long id = invitation.getUser().getId();
-                            // Get online info
-                            ImmutableUser onlineInfos = networkClient.getUserInfo(id);
-                            // Get picture
-                            Bitmap image = networkClient.getProfilePicture(id);
-                            // Put all inside container
-                            onlineInfos.setImage(image);
-
-                            // Put friend in Set
-                            updatedUsers.add(onlineInfos);
-                        }
-                    }
-
-                    // Put new values in cache
-                    Cache.this.keepOnlyTheseUsers(updatedUsers);
-                    Cache.this.keepOnlyTheseEvents(updatedEvents);
-
-                    callback.onSuccess();
-                } catch (SmartMapClientException e) {
-                    Log.e(TAG, "SmartMapClientException : " + e);
-                    callback.onFailure();
-                }
-                return null;
-            }
-        }.execute();
-    }
-
-    private synchronized void keepOnlyTheseEvents(Set<ImmutableEvent> events) {
-        mEventIds.clear();
-        mEventInstances.clear();
-        this.putEvents(events);
-    }
-
-    private synchronized void keepOnlyTheseUsers(Set<ImmutableUser> users) {
-        mFriendIds.clear();
-        mUserIds.clear();
-        mUserInstances.clear();
-        this.putUsers(users);
     }
 
     private synchronized boolean updateEvent(ImmutableEvent eventInfo) {
@@ -1253,6 +1167,94 @@ public class Cache {
         }
 
         return isListModified;
+    }
+
+    public synchronized void
+        updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    // Get settings
+                    SettingsManager settingsManager = ServiceContainer.getSettingsManager();
+
+                    // Sets with new values (avoid calling multiple times the
+                    // listeners)
+                    Set<ImmutableUser> updatedUsers = new HashSet<ImmutableUser>();
+                    Set<ImmutableEvent> updatedEvents = new HashSet<ImmutableEvent>();
+
+                    // Update self informations
+                    long myId = settingsManager.getUserId();
+                    ImmutableUser self = networkClient.getUserInfo(myId);
+                    self.setImage(networkClient.getProfilePicture(myId));
+                    updatedUsers.add(self);
+
+                    // Fetch friends via listFriendPos
+                    Set<ImmutableUser> listFriendPos = new HashSet<ImmutableUser>(networkClient.listFriendsPos());
+
+                    for (ImmutableUser positionInfos : listFriendPos) {
+                        // get id
+                        long id = positionInfos.getId();
+                        // Get other online info
+                        ImmutableUser onlineInfos = networkClient.getUserInfo(id);
+                        // Get picture
+                        Bitmap image = networkClient.getProfilePicture(id);
+                        // Put all inside container
+                        onlineInfos.setLocation(positionInfos.getLocation());
+                        onlineInfos.setLocationString(positionInfos.getLocationString());
+                        onlineInfos.setImage(image);
+
+                        // Put friend in Set
+                        updatedUsers.add(onlineInfos);
+                    }
+
+                    // Get near Events
+                    Set<Long> nearEventIds =
+                        new HashSet<Long>(networkClient.getPublicEvents(settingsManager.getLocation().getLatitude(),
+                            settingsManager.getLocation().getLongitude(), settingsManager.getNearEventsMaxDistance()));
+
+                    // Update all cached event if needed
+                    for (long id : mEventIds) {
+                        // Get event infos
+                        ImmutableEvent onlineInfos = networkClient.getEventInfo(id);
+                        // Check if event needs to be kept
+                        if (nearEventIds.contains(id) || (onlineInfos.getCreatorId() == myId)
+                            || onlineInfos.getParticipantIds().contains(myId)) {
+                            // if so, put it in Set
+                            updatedEvents.add(onlineInfos);
+                            updatedUsers.add(onlineInfos.getImmCreator());
+                        }
+                    }
+
+                    // Update users from invitations
+                    for (Invitation invitation : Cache.this.getAllInvitations()) {
+                        if (invitation.getType() == Invitation.FRIEND_INVITATION) {
+                            // get id
+                            long id = invitation.getUser().getId();
+                            // Get online info
+                            ImmutableUser onlineInfos = networkClient.getUserInfo(id);
+                            // Get picture
+                            Bitmap image = networkClient.getProfilePicture(id);
+                            // Put all inside container
+                            onlineInfos.setImage(image);
+
+                            // Put friend in Set
+                            updatedUsers.add(onlineInfos);
+                        }
+                    }
+
+                    // Put new values in cache
+                    Cache.this.keepOnlyTheseUsers(updatedUsers);
+                    Cache.this.keepOnlyTheseEvents(updatedEvents);
+
+                    callback.onSuccess();
+                } catch (SmartMapClientException e) {
+                    Log.e(TAG, "SmartMapClientException : " + e);
+                    callback.onFailure();
+                }
+                return null;
+            }
+        }.execute();
     }
 
     private boolean updateInvitation(ImmutableInvitation invitation) {
@@ -1308,17 +1310,5 @@ public class Cache {
         }
 
         return isListModified;
-    }
-
-    /**
-     * Allows to search efficiently through the Cache, by providing a filtering
-     * method
-     * 
-     * @param <T>
-     *            Type of items searched
-     * @author jfperren
-     */
-    public interface SearchFilter<T> {
-        boolean filter(T item);
     }
 }
