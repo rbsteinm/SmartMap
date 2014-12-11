@@ -165,6 +165,9 @@ class EventController {
 
         $radius = RequestUtils::getPostParam($request, 'radius');
 
+        // Radius is in meters on client side but kilometers on server side.
+        $radius = $radius/1000;
+
         try
         {
             $eventsIds = $this->mEventRepo->getEventsInRadius($longitude, $latitude, $radius);

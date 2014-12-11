@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.background.Notifications;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
@@ -105,6 +106,7 @@ public class Cache {
                         case Invitation.FRIEND_INVITATION:
                             ImmutableUser newFriend =
                                 ServiceContainer.getNetworkClient().acceptInvitation(invitation.getUser().getId());
+                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
                             newFriend.setFriendship(User.FRIEND);
                             Cache.this.putUser(newFriend);
                             break;
@@ -209,6 +211,7 @@ public class Cache {
                         case Invitation.FRIEND_INVITATION:
                             // Decline online
                             ServiceContainer.getNetworkClient().declineInvitation(invitation.getUser().getId());
+                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
                             break;
                         case Invitation.EVENT_INVITATION:
                             // No interaction needed here
@@ -743,7 +746,8 @@ public class Cache {
             // Get Id
             if (invitationInfo.getId() == Invitation.NO_ID) {
                 // Get Id from database
-                invitationInfo.setId(ServiceContainer.getDatabase().addInvitation(invitationInfo));
+                long id = ServiceContainer.getDatabase().addInvitation(invitationInfo);
+                invitationInfo.setId(id);
             }
 
             if ((invitationInfo.getId() != Invitation.ALREADY_RECEIVED)
@@ -835,7 +839,12 @@ public class Cache {
 
             if (isSetCorrectly) {
                 mInvitationIds.add(invitationInfo.getId());
-                mInvitationInstances.put(invitationInfo.getId(), new GenericInvitation(invitationInfo));
+                long invitationId = invitationInfo.getId();
+                GenericInvitation invitation = new GenericInvitation(invitationInfo);
+                mInvitationInstances.put(invitationInfo.getId(), invitation);
+                if (invitationId != Invitation.ALREADY_RECEIVED) {
+                    Notifications.createNotification(invitation, ServiceContainer.getSettingsManager().getContext());
+                }
             }
 
             needToCallListeners = true;
@@ -1133,19 +1142,6 @@ public class Cache {
         }.execute();
     }
 
-    private synchronized void setShowOnMap(long userId, boolean showOnMap) {
-        Filter defaultFilter = this.getDefaultFilter();
-        Set<Long> currentInvisibleFriendIds = defaultFilter.getFriendIds();
-
-        if (showOnMap) {
-            currentInvisibleFriendIds.remove(userId);
-        } else {
-            currentInvisibleFriendIds.add(userId);
-        }
-
-        this.updateFilter(defaultFilter.getImmutableCopy().setIds(currentInvisibleFriendIds));
-    }
-
     private synchronized boolean updateEvent(ImmutableEvent eventInfo) {
         Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
         singleton.add(eventInfo);
@@ -1153,10 +1149,15 @@ public class Cache {
     }
 
     private synchronized boolean updateEvents(Set<ImmutableEvent> eventInfos) {
+        Log.d(TAG, "updateEvents(" + eventInfos + ")");
         boolean isListModified = false;
         for (ImmutableEvent eventInfo : eventInfos) {
             Event event = this.getEvent(eventInfo.getId());
             if ((event != null) && event.update(eventInfo)) {
+                Log.d(
+                    TAG,
+                    "updateEvents successfully updated event " + event.getId() + " with participants "
+                        + event.getParticipantIds());
                 isListModified = true;
             }
         }
@@ -1180,7 +1181,6 @@ public class Cache {
         boolean isListModified = false;
 
         for (ImmutableFilter filterInfo : filterInfos) {
-            Log.d(TAG, "Update filter " + filterInfo.getId());
             Filter filter = this.getFilter(filterInfo.getId());
             if ((filter != null) && filter.update(filterInfo)) {
                 isListModified = true;

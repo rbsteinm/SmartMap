@@ -240,6 +240,7 @@
 
     <!-- FriendInformationActivity -->
     <string name="remove_friend_button_text">Remove</string>
+    <string name="add_friend_button_text">Add</string>
     <string name="block_button_text">Block</string>
     <string name="show_on_map_switch">Show on map</string>
     <string name="block_switch">Block</string>
