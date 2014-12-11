@@ -213,7 +213,7 @@ public final class CachedSearchEngine implements SearchEngine {
                                 ServiceContainer.getCache().putUser(networkResult);
                                 if (callback != null) {
 
-                                    callback.onResult(ServiceContainer.getCache().getStranger(id));
+                                    callback.onResult(ServiceContainer.getCache().getUser(id));
                                 }
                                 return null;
                             } else {
@@ -245,7 +245,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                 for (long id : ids) {
                     // Check for live instance
-                    User stranger = ServiceContainer.getCache().getStranger(id);
+                    User stranger = ServiceContainer.getCache().getUser(id);
 
                     if (stranger != null) {
                         // Found in cache, add to set of live instances
@@ -270,7 +270,7 @@ public final class CachedSearchEngine implements SearchEngine {
                 ServiceContainer.getCache().putUsers(immutableResult);
                 // Retrieve live instances from cache
                 for (ImmutableUser user : immutableResult) {
-                    result.add(ServiceContainer.getCache().getStranger(user.getId()));
+                    result.add(ServiceContainer.getCache().getUser(user.getId()));
                 }
 
                 // Give results to the caller
@@ -292,9 +292,12 @@ public final class CachedSearchEngine implements SearchEngine {
                     // Fetch in cache
                     Set<Long> localResult = mPreviousOnlineStrangerSearches.get(query);
                     for (Long id : localResult) {
-                        User cachedUser = ServiceContainer.getCache().getStranger(id);
+                        User cachedUser = ServiceContainer.getCache().getUser(id);
                         if (cachedUser != null) {
-                            result.add(cachedUser);
+                            if ((cachedUser.getFriendship() != User.FRIEND)
+                                && (cachedUser.getFriendship() != User.SELF)) {
+                                result.add(cachedUser);
+                            }
                         }
                     }
                 } else {
