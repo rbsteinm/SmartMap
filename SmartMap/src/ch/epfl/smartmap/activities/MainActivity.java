@@ -228,6 +228,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                 break;
             case ITEM:
                 this.setMainMenu();
+                mEventMarkerManager.resetMarkersIcon(this);
                 break;
             default:
                 assert false;
