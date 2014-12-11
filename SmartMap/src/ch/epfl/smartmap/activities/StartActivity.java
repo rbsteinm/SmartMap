@@ -19,17 +19,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.search.CachedSearchEngine;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 
 import com.facebook.Session;
 
 /**
- * This Activity displays the introduction to the app and the authentication if
- * you are not already logged in, in the
+ * This Activity displays the introduction to the app and the authentication if you are not already logged in, in the
  * other case it just loads mainActivity
  * 
  * @author agpmilli
@@ -49,22 +43,13 @@ public class StartActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Beware of the order in which services are created, Cache and
-        // InvitationManager depend on NetworkClient and DatabaseHelper in their
-        // constructors!
-        // TODO: This should be modified to allow complete switching or
-        // services, or be made explicit in their constructors.
-        ServiceContainer.setSettingsManager(new SettingsManager(this));
-        ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
-        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this));
-        ServiceContainer.setCache(new Cache());
-        ServiceContainer.setSearchEngine(new CachedSearchEngine());
+        ServiceContainer.initSmartMapServices(this);
 
         // Displays the facebook app hash in LOG.d
         try {
             Log.d(TAG, "Retrieving sha1 app hash...");
-            PackageInfo info =
-                this.getPackageManager().getPackageInfo("ch.epfl.smartmap", PackageManager.GET_SIGNATURES);
+            PackageInfo info = this.getPackageManager().getPackageInfo("ch.epfl.smartmap",
+                    PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
@@ -112,7 +97,7 @@ public class StartActivity extends FragmentActivity {
                 public void run() {
                     mFacebookFragment = new LoginFragment();
                     StartActivity.this.getSupportFragmentManager().beginTransaction()
-                        .add(android.R.id.content, mFacebookFragment).commit();
+                            .add(android.R.id.content, mFacebookFragment).commit();
                     Log.d(TAG, "facebook session is open");
                 }
             }, timeOut);
@@ -123,41 +108,8 @@ public class StartActivity extends FragmentActivity {
             mLogoImage.setVisibility(View.INVISIBLE);
 
             mFacebookFragment = new LoginFragment();
-            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment)
-                .commit();
+            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment).commit();
         }
-
-        // Beware of the order in which services are created, Cache and
-        // InvitationManager depend on NetworkClient and DatabaseHelper in their
-        // constructors!
-        // TODO: This should be modified to allow complete switching or
-        // services, or be made explicit in their constructors.
-        ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
-        ServiceContainer.setSettingsManager(new SettingsManager(this.getApplication()));
-        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplication()));
-        ServiceContainer.setCache(new Cache());
-        ServiceContainer.setSearchEngine(new CachedSearchEngine());
-    }
-
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
-        }
-
-        int auditErrors = 0;
-        // auditErrors += mSearchEngine.auditErrors(depth - 1);
-        // What are the rep invariants?
-
-        return auditErrors;
     }
 
     @Override
