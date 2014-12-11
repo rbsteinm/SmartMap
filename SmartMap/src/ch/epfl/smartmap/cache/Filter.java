@@ -21,28 +21,15 @@ public abstract class Filter implements FilterInterface {
     @SuppressWarnings("unused")
     private static final String TAG = Filter.class.getSimpleName();
 
-    public static final long DEFAULT_FILTER_ID = 0;
+    public static final long DEFAULT_FILTER_ID = 1;
 
     public static final long NO_ID = -1;
 
-    public static final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
-        .getContext().getResources(), R.drawable.ic_hashtag);
-
-    public static Filter createFromContainer(ImmutableFilter filterInfos) {
-        long id = filterInfos.getId();
-        Set<Long> ids = filterInfos.getIds();
-        Boolean isActive = filterInfos.isActive();
-        String name = filterInfos.getName();
-        if (filterInfos.getId() == DEFAULT_FILTER_ID) {
-            return new DefaultFilter(ids);
-        } else if (filterInfos.getId() > 0) {
-            return new CustomFilter(id, ids, name, isActive);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
+    public static final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer
+        .getSettingsManager().getContext().getResources(), R.drawable.ic_hashtag);
 
     private Set<Long> mIds;
+
     private long mId;
 
     protected Filter(long id, Set<Long> ids) {
@@ -185,6 +172,20 @@ public abstract class Filter implements FilterInterface {
         }
 
         return hasChanged;
+    }
+
+    public static Filter createFromContainer(ImmutableFilter filterInfos) {
+        long id = filterInfos.getId();
+        Set<Long> ids = filterInfos.getIds();
+        Boolean isActive = filterInfos.isActive();
+        String name = filterInfos.getName();
+        if (filterInfos.getId() == DEFAULT_FILTER_ID) {
+            return new DefaultFilter(ids);
+        } else if (filterInfos.getId() > 0) {
+            return new CustomFilter(id, ids, name, isActive);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
 }
