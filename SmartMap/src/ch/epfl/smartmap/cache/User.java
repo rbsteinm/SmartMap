@@ -14,6 +14,8 @@ import ch.epfl.smartmap.background.ServiceContainer;
  */
 public abstract class User implements UserInterface {
 
+    private static final String TAG = User.class.getSimpleName();
+
     public static final int STRANGER = 0;
     public static final int FRIEND = 1;
     public static final int SELF = 2;
@@ -46,7 +48,9 @@ public abstract class User implements UserInterface {
         mName = (name != null) ? name : User.NO_NAME;
         mImage = (image != null) ? Bitmap.createBitmap(image) : User.NO_IMAGE;
 
-        if ((mName == User.NO_NAME) || (mImage == User.NO_IMAGE)) {
+        Log.d(TAG, "Create new User Instance(" + id + ", " + "name, " + "image " + mImage);
+
+        if ((mId != User.NO_ID) && ((mName == User.NO_NAME) || (mImage == User.NO_IMAGE))) {
             ServiceContainer.getCache().updateUserInfos(id);
         }
     }
