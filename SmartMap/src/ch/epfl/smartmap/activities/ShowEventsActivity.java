@@ -163,7 +163,7 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Displays an AlertDialog with a button to see the event on the map, and another to see more details.
+     * Displays the AlertDialog.
      * 
      * @param event
      *            the event to show a dialog for
@@ -223,7 +223,6 @@ public class ShowEventsActivity extends ListActivity {
      * </p>
      * 
      * @param position
-     *            the position of the item that has been clicked
      * @author SpicyCH
      */
     private void displayInfoDialog(int position) {
