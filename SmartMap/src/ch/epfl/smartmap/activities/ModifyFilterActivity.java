@@ -370,7 +370,7 @@ public class ModifyFilterActivity extends Activity {
                     EditText editText = (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                     String newName = editText.getText().toString();
 
-                    mCache.putFilter(new ImmutableFilter(mFilter.getId(), newName, mFilter.getFriendIds(), mFilter
+                    mCache.putFilter(new ImmutableFilter(mFilter.getId(), newName, mFilter.getIds(), mFilter
                         .isActive()));
 
                     Toast.makeText(ModifyFilterActivity.this,
@@ -425,7 +425,7 @@ public class ModifyFilterActivity extends Activity {
 
     private void setFilter() {
         mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
-        for (long id : mFilter.getFriendIds()) {
+        for (long id : mFilter.getIds()) {
             mFriendsInside.add(mCache.getUser(id));
         }
         for (User friend : mCache.getAllFriends()) {

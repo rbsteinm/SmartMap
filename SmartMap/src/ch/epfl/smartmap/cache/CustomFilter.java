@@ -1,9 +1,6 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.HashSet;
 import java.util.Set;
-
-import android.util.Log;
 
 /**
  * Describes a clientside, custom friend list (e.g. friends, family, etc.)
@@ -16,7 +13,6 @@ public class CustomFilter extends Filter {
 
     private String mName;
     private boolean mIsActive;
-    private final Set<Long> mIds;
 
     /**
      * @param name
@@ -25,26 +21,23 @@ public class CustomFilter extends Filter {
      *            Whole database of friends referenced by the friendlist
      */
     protected CustomFilter(long id, Set<Long> ids, String name, boolean isActive) {
-        super(id);
-        mIds = ids;
+        super(id, ids);
         mName = name;
         mIsActive = isActive;
     }
 
     @Override
-    public void addFriend(long newFriend) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Set<Long> getFriendIds() {
-        return new HashSet<Long>(mIds);
-    }
-
-    @Override
     public String getName() {
         return mName;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FilterInterface#getVisibleFriends()
+     */
+    @Override
+    public Set<Long> getVisibleFriends() {
+        return this.getIds();
     }
 
     @Override
@@ -62,13 +55,6 @@ public class CustomFilter extends Filter {
         }
         if (filterInfos.isActive() != mIsActive) {
             mIsActive = filterInfos.isActive();
-            hasChanged = true;
-        }
-
-        if (filterInfos.getIds() != null) {
-            Log.d(TAG, "set ids : " + filterInfos.getIds());
-            mIds.clear();
-            mIds.addAll(filterInfos.getIds());
             hasChanged = true;
         }
 

@@ -10,17 +10,9 @@ import java.util.Set;
 public interface FilterInterface extends Displayable {
 
     /**
-     * Adds a user to the list
-     * 
-     * @param id
-     *            The user's ID
-     */
-    void addFriend(long newFriend);
-
-    /**
      * @return The whole list of IDs
      */
-    Set<Long> getFriendIds();
+    Set<Long> getIds();
 
     ImmutableFilter getImmutableCopy();
 
@@ -28,6 +20,8 @@ public interface FilterInterface extends Displayable {
      * @return The name of the list
      */
     String getName();
+
+    Set<Long> getVisibleFriends();
 
     boolean isActive();
 

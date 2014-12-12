@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
-import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 
@@ -131,23 +130,18 @@ public class GenericInvitation implements Invitation, Comparable {
         if (mType == ImmutableInvitation.FRIEND_INVITATION) {
             if ((mStatus == READ) || (mStatus == UNREAD)) {
                 intent = new Intent(context, FriendsPagerActivity.class);
-                intent.putExtra("INVITATION", true);
-            } else if (mStatus == ACCEPTED) {
+            } else if ((mStatus == ACCEPTED) || (mStatus == DECLINED)) {
                 intent = new Intent(context, UserInformationActivity.class);
                 intent.putExtra("USER", mUser.getId());
             }
         } else if (mType == ImmutableInvitation.EVENT_INVITATION) {
-            if (mStatus == READ) {
-                intent = new Intent(context, ShowEventsActivity.class);
-                intent.putExtra("invitation", true);
-            } else if (mStatus == ACCEPTED) {
-                intent = new Intent(context, EventInformationActivity.class);
-                intent.putExtra("EVENT", mEvent.getId());
-            }
+            intent = new Intent(context, EventInformationActivity.class);
+            intent.putExtra("EVENT", mEvent.getId());
         } else {
             intent = new Intent(context, UserInformationActivity.class);
             intent.putExtra("USER", mUser.getId());
         }
+        intent.putExtra("INVITATION", true);
         return intent;
     }
 

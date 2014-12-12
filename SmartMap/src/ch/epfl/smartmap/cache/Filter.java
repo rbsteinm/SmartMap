@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import android.content.Context;
@@ -18,38 +19,25 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public abstract class Filter implements FilterInterface {
 
-    @SuppressWarnings("unused")
     private static final String TAG = Filter.class.getSimpleName();
 
     public static final long DEFAULT_FILTER_ID = 1;
 
     public static final long NO_ID = -1;
 
-    public static final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
-        .getContext().getResources(), R.drawable.ic_hashtag);
-
-    public static Filter createFromContainer(ImmutableFilter filterInfos) {
-        long id = filterInfos.getId();
-        Set<Long> ids = filterInfos.getIds();
-        Boolean isActive = filterInfos.isActive();
-        String name = filterInfos.getName();
-        Log.d(TAG, "create filter with id " + filterInfos.getId());
-        if (filterInfos.getId() == DEFAULT_FILTER_ID) {
-            return new DefaultFilter(ids);
-        } else if (filterInfos.getId() > 0) {
-            return new CustomFilter(id, ids, name, isActive);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
+    public static final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer
+        .getSettingsManager().getContext().getResources(), R.drawable.ic_hashtag);
 
     private long mId;
 
-    protected Filter(long id) {
+    private Set<Long> mIds;
+
+    protected Filter(long id, Set<Long> ids) {
         if (id < 0) {
             throw new IllegalArgumentException();
         }
         mId = id;
+        mIds = new HashSet<Long>(ids);
     }
 
     /*
@@ -59,6 +47,11 @@ public abstract class Filter implements FilterInterface {
     @Override
     public long getId() {
         return mId;
+    }
+
+    @Override
+    public Set<Long> getIds() {
+        return new HashSet<Long>(mIds);
     }
 
     /*
@@ -72,7 +65,7 @@ public abstract class Filter implements FilterInterface {
 
     @Override
     public ImmutableFilter getImmutableCopy() {
-        return new ImmutableFilter(this.getId(), this.getName(), this.getFriendIds(), this.isActive());
+        return new ImmutableFilter(this.getId(), this.getName(), this.getIds(), this.isActive());
     }
 
     /*
@@ -121,7 +114,7 @@ public abstract class Filter implements FilterInterface {
     @Override
     public String getSubtitle() {
         String subtitle = "";
-        for (Long id : this.getFriendIds()) {
+        for (Long id : this.getIds()) {
             subtitle += ServiceContainer.getCache().getUser(id).getName() + " ";
         }
         return subtitle;
@@ -151,6 +144,28 @@ public abstract class Filter implements FilterInterface {
             hasChanged = true;
         }
 
+        if (filter.getIds() != null) {
+            Log.d(TAG, "set ids : " + filter.getIds());
+            mIds.clear();
+            mIds.addAll(filter.getIds());
+            hasChanged = true;
+        }
+
         return hasChanged;
+    }
+
+    public static Filter createFromContainer(ImmutableFilter filterInfos) {
+        long id = filterInfos.getId();
+        Set<Long> ids = filterInfos.getIds();
+        Boolean isActive = filterInfos.isActive();
+        String name = filterInfos.getName();
+        Log.d(TAG, "create filter with id " + filterInfos.getId());
+        if (filterInfos.getId() == DEFAULT_FILTER_ID) {
+            return new DefaultFilter(ids);
+        } else if (filterInfos.getId() > 0) {
+            return new CustomFilter(id, ids, name, isActive);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 }

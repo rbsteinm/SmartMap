@@ -55,6 +55,19 @@ public class UserInformationActivity extends Activity {
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onFilterListUpdate() {
+                User user = ServiceContainer.getCache().getUser(mUserId);
+                UserInformationActivity.this.updateInformations(user);
+            }
+
+            @Override
+            public void onUserListUpdate() {
+
+            }
+        });
     }
 
     @Override
@@ -66,20 +79,6 @@ public class UserInformationActivity extends Activity {
         User user = ServiceContainer.getCache().getUser(mUserId);
 
         this.updateInformations(user);
-
-        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
-            @Override
-            public void onUserListUpdate() {
-                UserInformationActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        User user = ServiceContainer.getCache().getUser(mUserId);
-
-                        UserInformationActivity.this.updateInformations(user);
-                    }
-                });
-            }
-        });
     }
 
     /**
@@ -225,62 +224,75 @@ public class UserInformationActivity extends Activity {
      * 
      * @param user
      */
-    private void updateInformations(User user) {
-        mUser = user;
+    private void updateInformations(final User user) {
 
-        // Defensive case, should never happen
-        if (user == null) {
-            mNameView.setText("Unknown user");
+        UserInformationActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mUser = user;
 
-            mShowOnMapSwitch.setVisibility(View.INVISIBLE);
-            mBlockSwitch.setVisibility(View.INVISIBLE);
-            mDistanceView.setVisibility(View.INVISIBLE);
+                // Defensive case, should never happen
+                if (user == null) {
+                    mNameView.setText("Unknown user");
 
-            this.findViewById(R.id.user_info_remove_button).setVisibility(View.INVISIBLE);
-        } else {
-            // Ugly instanceof, case classes would be helpful
-            if (user instanceof Friend) {
-                Friend friend = (Friend) user;
+                    mShowOnMapSwitch.setVisibility(View.INVISIBLE);
+                    mBlockSwitch.setVisibility(View.INVISIBLE);
+                    mDistanceView.setVisibility(View.INVISIBLE);
 
-                mNameView.setText(friend.getName());
-                mSubtitlesView.setText(friend.getSubtitle());
-                mPictureView.setImageBitmap(friend.getImage());
-                mShowOnMapSwitch.setChecked(friend.isVisible());
-                mBlockSwitch.setChecked(friend.isBlocked());
-                mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
+                    UserInformationActivity.this.findViewById(R.id.user_info_remove_button).setVisibility(
+                        View.INVISIBLE);
+                } else {
+                    // Ugly instanceof, case classes would be helpful
+                    if (user instanceof Friend) {
+                        Friend friend = (Friend) user;
 
-                Button button = (Button) this.findViewById(R.id.user_info_remove_button);
-                button.setVisibility(View.VISIBLE);
-                button.setOnClickListener(new OnClickListener() {
+                        mNameView.setText(friend.getName());
+                        mSubtitlesView.setText(friend.getSubtitle());
+                        mPictureView.setImageBitmap(friend.getImage());
+                        mShowOnMapSwitch.setChecked(ServiceContainer.getCache().getDefaultFilter()
+                            .getIds().contains(user.getId()));
+                        mBlockSwitch.setChecked(friend.isBlocked());
+                        mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
 
-                    @Override
-                    public void onClick(View v) {
-                        UserInformationActivity.this.displayDeleteConfirmationDialog(v);
+                        Button button =
+                            (Button) UserInformationActivity.this.findViewById(R.id.user_info_remove_button);
+                        button.setVisibility(View.VISIBLE);
+                        button.setOnClickListener(new OnClickListener() {
+
+                            @Override
+                            public void onClick(View v) {
+                                UserInformationActivity.this.displayDeleteConfirmationDialog(v);
+                            }
+                        });
+                        button.setText(UserInformationActivity.this.getResources().getString(
+                            R.string.remove_friend_button_text));
+                        button.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_action_discard_white, 0,
+                            0, 0);
+                    } else {
+                        mNameView.setText(user.getName());
+                        mSubtitlesView.setText(user.getSubtitle());
+                        mPictureView.setImageBitmap(user.getImage());
+                        mShowOnMapSwitch.setVisibility(View.INVISIBLE);
+                        mBlockSwitch.setVisibility(View.INVISIBLE);
+                        mDistanceView.setVisibility(View.INVISIBLE);
+                        // We do not display the remove button as we are not friends yet
+                        Button button =
+                            (Button) UserInformationActivity.this.findViewById(R.id.user_info_remove_button);
+                        button.setVisibility(View.VISIBLE);
+                        button.setOnClickListener(new OnClickListener() {
+
+                            @Override
+                            public void onClick(View v) {
+                                UserInformationActivity.this.displayConfirmationDialog(v);
+                            }
+                        });
+                        button.setText(UserInformationActivity.this.getResources().getString(
+                            R.string.add_friend_button_text));
+                        button.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                     }
-                });
-                button.setText(this.getResources().getString(R.string.remove_friend_button_text));
-                button.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_action_discard_white, 0, 0, 0);
-            } else {
-                mNameView.setText(user.getName());
-                mSubtitlesView.setText(user.getSubtitle());
-                mPictureView.setImageBitmap(user.getImage());
-                mShowOnMapSwitch.setVisibility(View.INVISIBLE);
-                mBlockSwitch.setVisibility(View.INVISIBLE);
-                mDistanceView.setVisibility(View.INVISIBLE);
-                // We do not display the remove button as we are not friends yet
-                Button button = (Button) this.findViewById(R.id.user_info_remove_button);
-                button.setVisibility(View.VISIBLE);
-                button.setOnClickListener(new OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        UserInformationActivity.this.displayConfirmationDialog(v);
-                    }
-                });
-                button.setText(this.getResources().getString(R.string.add_friend_button_text));
-                button.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                }
             }
-        }
+        });
     }
 
     /**

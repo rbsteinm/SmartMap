@@ -117,7 +117,7 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
         if (filter != null) {
             viewHolder.getFilterName().setText(filter.getName());
 
-            viewHolder.getSubtitle().setText(filter.getFriendIds().size() + " people inside this filter");
+            viewHolder.getSubtitle().setText(filter.getIds().size() + " people inside this filter");
 
             viewHolder.getFollowSwitch().setTextOn("YES");
             viewHolder.getFollowSwitch().setTextOff("NO");
@@ -127,10 +127,10 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
-                        mCache.putFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter.getFriendIds(),
+                        mCache.putFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter.getIds(),
                             true));
                     } else {
-                        mCache.putFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter.getFriendIds(),
+                        mCache.putFilter(new ImmutableFilter(filter.getId(), filter.getName(), filter.getIds(),
                             false));
                     }
                 }
