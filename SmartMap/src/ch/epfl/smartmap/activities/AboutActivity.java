@@ -23,12 +23,11 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.util.SystemUiHider;
+import ch.epfl.smartmap.util.Utils;
 
 /**
- * This full-screen activity displays the credits for SmartMap. The name of the
- * developers are sorted in random order
- * and it uses the version name and version code defined in the android
- * manifest.
+ * This full-screen activity displays the credits for SmartMap. The name of the developers are sorted in random order
+ * and it uses the version name and version code defined in the android manifest.
  * 
  * @see SystemUiHider
  * @author SpicyCH
@@ -40,8 +39,7 @@ public class AboutActivity extends Activity {
     private static final boolean AUTO_HIDE = true;
 
     /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system
+     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after user interaction before hiding the system
      * UI.
      */
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
@@ -52,8 +50,7 @@ public class AboutActivity extends Activity {
     private static final int HIDE_DELAY_MILLIS = 100;
 
     /**
-     * If set, will toggle the system UI visibility upon interaction. Otherwise,
-     * will show the system UI visibility upon
+     * If set, will toggle the system UI visibility upon interaction. Otherwise, will show the system UI visibility upon
      * interaction.
      */
     private static final boolean TOGGLE_ON_CLICK = true;
@@ -113,8 +110,8 @@ public class AboutActivity extends Activity {
             @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
             public void onVisibilityChange(boolean visible) {
                 if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) && (mShortAnimTime == 0)) {
-                    mShortAnimTime =
-                        AboutActivity.this.getResources().getInteger(android.R.integer.config_shortAnimTime);
+                    mShortAnimTime = AboutActivity.this.getResources().getInteger(
+                            android.R.integer.config_shortAnimTime);
                 }
 
                 if (visible && AUTO_HIDE) {
@@ -151,8 +148,7 @@ public class AboutActivity extends Activity {
     }
 
     /**
-     * Schedules a call to hide() in [delay] milliseconds, canceling any
-     * previously scheduled calls.
+     * Schedules a call to hide() in [delay] milliseconds, canceling any previously scheduled calls.
      */
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
@@ -160,8 +156,7 @@ public class AboutActivity extends Activity {
     }
 
     /**
-     * Add each item of the list as a TextView children of the given
-     * LinearLayout.
+     * Add each item of the list as a TextView children of the given LinearLayout.
      * 
      * @param teamMembers
      * @param linearLayout
@@ -172,8 +167,7 @@ public class AboutActivity extends Activity {
             TextView textView = new TextView(this);
             textView.setText(s);
 
-            LayoutParams lp =
-                new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
             linearLayout.addView(textView, lp);
         }
@@ -193,16 +187,16 @@ public class AboutActivity extends Activity {
         try {
             PackageInfo manager = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
             mVersion.setText(this.getString(R.string.about_version) + " " + manager.versionName + ", "
-                + this.getString(R.string.about_release) + " " + manager.versionCode);
+                    + this.getString(R.string.about_release) + " " + manager.versionCode);
 
         } catch (NameNotFoundException e) {
             Log.d(TAG, "Couldn't retrieve package version: " + e);
             mVersion.setText(this.getString(R.string.about_version) + " "
-                + this.getString(R.string.about_unkown_version));
+                    + this.getString(R.string.about_unkown_version));
         }
 
         // Display the copyright
-        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         String year = Integer.toString(now.get(Calendar.YEAR));
         String copyrightMsg = "\u00a9 " + year;
 

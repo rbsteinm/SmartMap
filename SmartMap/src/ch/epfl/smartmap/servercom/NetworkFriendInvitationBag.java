@@ -9,6 +9,7 @@ import java.util.TimeZone;
 import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * @author Pamoi
@@ -18,15 +19,14 @@ public class NetworkFriendInvitationBag implements InvitationBag {
     private final Set<Long> mRemovedFriendsIds;
 
     /**
-     * The constructor takes List arguments for compliance with server
-     * communication code.
+     * The constructor takes List arguments for compliance with server communication code.
      * 
      * @param invitingUsers
      * @param newFriends
      * @param removedFriendsIds
      */
     public NetworkFriendInvitationBag(List<ImmutableUser> invitingUsers, List<ImmutableUser> newFriends,
-        List<Long> removedFriendsIds) {
+            List<Long> removedFriendsIds) {
         if (invitingUsers == null) {
             throw new IllegalArgumentException("invitingUsers list is null.");
         }
@@ -38,16 +38,16 @@ public class NetworkFriendInvitationBag implements InvitationBag {
         }
 
         mInvitations = new HashSet<ImmutableInvitation>();
-        long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis();
+        long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis();
 
         for (ImmutableUser user : invitingUsers) {
-            mInvitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
-                timeStamp, Invitation.FRIEND_INVITATION));
+            mInvitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD, timeStamp,
+                    Invitation.FRIEND_INVITATION));
         }
 
         for (ImmutableUser user : newFriends) {
-            mInvitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD,
-                timeStamp, Invitation.ACCEPTED_FRIEND_INVITATION));
+            mInvitations.add(new ImmutableInvitation(Invitation.NO_ID, user, null, Invitation.UNREAD, timeStamp,
+                    Invitation.ACCEPTED_FRIEND_INVITATION));
         }
 
         mRemovedFriendsIds = new HashSet<Long>(removedFriendsIds);
@@ -55,6 +55,7 @@ public class NetworkFriendInvitationBag implements InvitationBag {
 
     /*
      * (non-Javadoc)
+     * 
      * @see ch.epfl.smartmap.servercom.NotificationBag#getInvitingUsers()
      */
     @Override

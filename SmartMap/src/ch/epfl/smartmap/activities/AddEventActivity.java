@@ -236,7 +236,7 @@ public class AddEventActivity extends FragmentActivity {
             GregorianCalendar end = this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText()
                     .toString());
 
-            Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+            Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
 
             // Needed to let the user click the default time without errors.
             now.add(GregorianCalendar.MINUTE, -1);
@@ -372,7 +372,7 @@ public class AddEventActivity extends FragmentActivity {
         mPickEndDate.addTextChangedListener(mTextChangedListener);
         mPickEndTime.addTextChangedListener(mTextChangedListener);
 
-        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
 
         mPickStartTime.setText(TimePickerFragment.formatForClock(now.get(Calendar.HOUR_OF_DAY)) + ":"
                 + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));

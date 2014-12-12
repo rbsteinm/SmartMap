@@ -67,14 +67,14 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
 
     /*
      * (non-Javadoc)
+     * 
      * @see ch.epfl.smartmap.map.MarkerIconMaker#getMarkerIcon(android.graphics.Bitmap)
      */
     @Override
     public Bitmap getMarkerIcon(Context context) {
         this.initializeIconComponents(context);
 
-        long timeElapsed =
-            GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
+        long timeElapsed = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis()
                 - mFriend.getLastSeen().getTimeInMillis();
         this.setColorOfMarkerShape(timeElapsed);
 
@@ -82,8 +82,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     }
 
     /**
-     * This function creates a bitmap with right dimensions, in preparation to be an overlay of the two given
-     * bitmaps
+     * This function creates a bitmap with right dimensions, in preparation to be an overlay of the two given bitmaps
      * 
      * @param bmp1
      * @param bmp2
@@ -127,13 +126,46 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(Color.parseColor("#BAB399"));
         canvas.drawCircle((preOut.getWidth() / 2) + CIRCLE_CENTER_INCREMENT, (preOut.getHeight() / 2)
-            + CIRCLE_CENTER_INCREMENT, (preOut.getWidth() / 2) + CIRCLE_RADIUS_INCREMENT, paint);
+                + CIRCLE_CENTER_INCREMENT, (preOut.getWidth() / 2) + CIRCLE_RADIUS_INCREMENT, paint);
         paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN)); // crop the image depending on the drawn //
                                                                 // object
         canvas.drawBitmap(preOut, rect, rect, paint);
 
         return output;
 
+    }
+
+    /**
+     * This function initializes the default profile picture (the one with User.NO_IMAGE), by retrieving it from
+     * resources and cropping it in a circle form
+     */
+    private void initializeDefaultProfilePicture() {
+        mDefaultProfilePicture = Bitmap.createScaledBitmap(User.NO_IMAGE, mBaseMarkerShape.getWidth()
+                - SHAPE_BORDER_WIDTH, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
+
+        mDefaultProfilePicture = this.cropCircle(mDefaultProfilePicture, mDefaultProfilePicture.getWidth());
+    }
+
+    /**
+     * Initialize the icon components if needed
+     * 
+     * @param context
+     */
+    private void initializeIconComponents(Context context) {
+        if ((mBaseMarkerShape == null) || (mCurrentMarkerShape == null)) {
+            this.initializeMarkerShape(context);
+        }
+
+        if (mDefaultProfilePicture == null) {
+            this.initializeDefaultProfilePicture();
+        }
+
+        if ((mProfilePicture == null) || mProfilePicture.sameAs(mDefaultProfilePicture)) {
+            this.initializeProfilePicture();
+        }
+        if (mMarkerIcon == null) {
+            this.initializeMarkerIcon();
+        }
     }
 
     /**
@@ -158,30 +190,15 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     }
 
     /**
-     * This function initializes the profile picture, by retrieving it from resources and cropping it in a
-     * circle form
+     * This function initializes the profile picture, by retrieving it from resources and cropping it in a circle form
      */
     private void initializeProfilePicture() {
 
-        mProfilePicture =
-            Bitmap.createScaledBitmap(mFriend.getImage(), mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
-                mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
+        mProfilePicture = Bitmap.createScaledBitmap(mFriend.getImage(), mBaseMarkerShape.getWidth()
+                - SHAPE_BORDER_WIDTH, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
 
         mProfilePicture = this.cropCircle(mProfilePicture, mProfilePicture.getWidth());
 
-    }
-
-    /**
-     * This function initializes the default profile picture (the one with User.NO_IMAGE), by retrieving it
-     * from resources and cropping it in a
-     * circle form
-     */
-    private void initializeDefaultProfilePicture() {
-        mDefaultProfilePicture =
-            Bitmap.createScaledBitmap(User.NO_IMAGE, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH,
-                mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
-
-        mDefaultProfilePicture = this.cropCircle(mDefaultProfilePicture, mDefaultProfilePicture.getWidth());
     }
 
     private long minutesToMilliseconds(long minutes) {
@@ -189,8 +206,8 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     }
 
     /**
-     * this function combines the center of the second image on the center of the first image, on the base on
-     * the already prepared base bitmap mBmOverlay
+     * this function combines the center of the second image on the center of the first image, on the base on the
+     * already prepared base bitmap mBmOverlay
      * 
      * @param bmp1
      * @param bmp2
@@ -205,28 +222,6 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         canvas.drawBitmap(bmp2, cx, cy, null);
         return mBaseOverlay;
 
-    }
-
-    /**
-     * Initialize the icon components if needed
-     * 
-     * @param context
-     */
-    private void initializeIconComponents(Context context) {
-        if ((mBaseMarkerShape == null) || (mCurrentMarkerShape == null)) {
-            this.initializeMarkerShape(context);
-        }
-
-        if (mDefaultProfilePicture == null) {
-            this.initializeDefaultProfilePicture();
-        }
-
-        if ((mProfilePicture == null) || mProfilePicture.sameAs(mDefaultProfilePicture)) {
-            this.initializeProfilePicture();
-        }
-        if (mMarkerIcon == null) {
-            this.initializeMarkerIcon();
-        }
     }
 
     /**
@@ -262,10 +257,8 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         // cm.setSaturation(SATURATION_END);
         // }
 
-        int green =
-            ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_green);
-        int blue =
-            ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_blue);
+        int green = ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_green);
+        int blue = ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_blue);
 
         int color = Utils.getColorInInterval(elapsedTime, 0, timeoutInMillis, green, blue);
         ColorMatrix cm = Utils.getMatrixForColor(color);

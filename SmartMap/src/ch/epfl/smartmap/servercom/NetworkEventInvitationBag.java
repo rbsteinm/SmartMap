@@ -9,6 +9,7 @@ import android.util.Log;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableInvitation;
 import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * @author jfperren
@@ -19,8 +20,7 @@ public class NetworkEventInvitationBag implements InvitationBag {
     private final Set<ImmutableInvitation> invitations;
 
     /**
-     * The constructor takes List arguments for compliance with server
-     * communication code.
+     * The constructor takes List arguments for compliance with server communication code.
      */
     public NetworkEventInvitationBag(HashSet<ImmutableEvent> hashSet) {
 
@@ -29,20 +29,19 @@ public class NetworkEventInvitationBag implements InvitationBag {
         }
 
         invitations = new HashSet<ImmutableInvitation>();
-        long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis();
+        long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis();
 
         for (ImmutableEvent event : hashSet) {
-            invitations.add(new ImmutableInvitation(Invitation.NO_ID, null, event, Invitation.UNREAD,
-                timeStamp, Invitation.EVENT_INVITATION));
-            Log.d(
-                TAG,
-                "Network send invitation bag with event #" + event.getId() + "created by "
-                    + event.getImmCreator());
+            invitations.add(new ImmutableInvitation(Invitation.NO_ID, null, event, Invitation.UNREAD, timeStamp,
+                    Invitation.EVENT_INVITATION));
+            Log.d(TAG,
+                    "Network send invitation bag with event #" + event.getId() + "created by " + event.getImmCreator());
         }
     }
 
     /*
      * (non-Javadoc)
+     * 
      * @see ch.epfl.smartmap.servercom.NotificationBag#getInvitingUsers()
      */
     @Override
