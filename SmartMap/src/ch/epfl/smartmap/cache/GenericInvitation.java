@@ -23,10 +23,10 @@ public class GenericInvitation implements Invitation, Comparable {
     private static final Bitmap ADD_PERSON_BITMAP = BitmapFactory.decodeResource(ServiceContainer
         .getSettingsManager().getContext().getResources(), R.drawable.ic_action_add_person);
 
-    private static final Bitmap ACCEPTED_FRIEND = BitmapFactory.decodeResource(ServiceContainer
+    private static final Bitmap ACCEPTED_FRIEND_BITMAP = BitmapFactory.decodeResource(ServiceContainer
         .getSettingsManager().getContext().getResources(), R.drawable.ic_accepted_friend_request);
 
-    private static final Bitmap NEW_EVENT = BitmapFactory.decodeResource(ServiceContainer
+    private static final Bitmap NEW_EVENT_BITMAP = BitmapFactory.decodeResource(ServiceContainer
         .getSettingsManager().getContext().getResources(), R.drawable.ic_action_event_request);
 
     private User mUser;
@@ -102,11 +102,11 @@ public class GenericInvitation implements Invitation, Comparable {
     @Override
     public Bitmap getImage() {
         if (this.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
-            return ACCEPTED_FRIEND;
+            return ACCEPTED_FRIEND_BITMAP;
         } else if (this.getType() == Invitation.FRIEND_INVITATION) {
             return ADD_PERSON_BITMAP;
         } else {
-            return NEW_EVENT;
+            return NEW_EVENT_BITMAP;
         }
     }
 
