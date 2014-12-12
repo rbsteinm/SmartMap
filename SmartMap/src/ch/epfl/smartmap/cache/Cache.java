@@ -607,6 +607,12 @@ public class Cache {
         }.execute(createdEvent);
     }
 
+    public synchronized void notifyEventListeners() {
+        for (CacheListener listener : mListeners) {
+            listener.onEventListUpdate();
+        }
+    }
+
     /**
      * OK
      * 

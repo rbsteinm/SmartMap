@@ -236,8 +236,7 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean isVisible() {
-        // TODO Implement Settings here
-        return true;
+        return ServiceContainer.getSettingsManager().showPublicEvents();
     }
 
     @Override
