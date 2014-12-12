@@ -305,8 +305,8 @@ public class UserInformationActivity extends Activity {
                         mNameView.setText(friend.getName());
                         mSubtitlesView.setText(friend.getSubtitle());
                         mPictureView.setImageBitmap(friend.getImage());
-                        mShowOnMapSwitch.setChecked(ServiceContainer.getCache().getDefaultFilter().getIds()
-                            .contains(user.getId()));
+                        mShowOnMapSwitch.setChecked(ServiceContainer.getCache().getDefaultFilter()
+                            .getVisibleFriends().contains(user.getId()));
                         mBlockSwitch.setChecked(friend.isBlocked() == User.blockStatus.UNBLOCKED);
                         mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
 
