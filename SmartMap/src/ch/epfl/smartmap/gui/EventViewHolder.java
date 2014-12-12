@@ -42,7 +42,7 @@ public class EventViewHolder {
         mEvent = id;
     }
 
-    public void setNameTextView(TextView v) {
+    public void setEventNameTextView(TextView v) {
         mEventName = v;
     }
 

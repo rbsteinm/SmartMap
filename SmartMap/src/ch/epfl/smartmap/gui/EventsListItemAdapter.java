@@ -59,9 +59,9 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
             viewHolder = new EventViewHolder();
 
             // Set the ViewHolder with the gui_event_list_item fields
-            viewHolder.setNameTextView((TextView) newConvertView.findViewById(R.id.eventName));
-            viewHolder.setPlaceNameTextView((TextView) newConvertView.findViewById(R.id.eventStartDate));
-            viewHolder.setDatesTextView((TextView) newConvertView.findViewById(R.id.eventEndDate));
+            viewHolder.setEventNameTextView((TextView) newConvertView.findViewById(R.id.event_list_item_event_name));
+            viewHolder.setPlaceNameTextView((TextView) newConvertView.findViewById(R.id.event_list_item_place_name));
+            viewHolder.setDatesTextView((TextView) newConvertView.findViewById(R.id.event_list_item_dates));
 
             // Needed by the code that makes each item clickable
             viewHolder.setEventId(event.getId());
@@ -81,7 +81,8 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         String startString = Utils.getDateString(start) + " " + Utils.getTimeString(start);
         String endString = Utils.getDateString(end) + " " + Utils.getTimeString(end);
 
-        String placeNameText = mContext.getString(R.string.near) + " " + event.getLocationString();
+        String placeNameText = mContext.getString(R.string.events_list_item_adapter_near_with_first_uppercase) + " "
+                + event.getLocationString();
         String startAndEndText = startString + " - " + endString;
 
         viewHolder.getPlaceNameTextView().setText(placeNameText);

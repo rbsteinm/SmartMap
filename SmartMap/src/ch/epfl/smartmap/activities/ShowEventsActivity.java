@@ -394,7 +394,8 @@ public class ShowEventsActivity extends ListActivity {
             if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
                 seekBar.setProgress(SEEK_BAR_MIN_VALUE);
             }
-            mShowKilometers.setText(mSeekBar.getProgress() + " km");
+            mShowKilometers.setText(mSeekBar.getProgress() + " "
+                    + ShowEventsActivity.this.getString(R.string.symbol_km));
             ShowEventsActivity.this.updateCurrentList();
         }
 
