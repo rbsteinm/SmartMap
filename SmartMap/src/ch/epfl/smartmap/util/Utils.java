@@ -259,6 +259,13 @@ public final class Utils {
         }
     }
 
+    /**
+     * TODO javadoc
+     * 
+     * @param color
+     * @return
+     * @author SpicyCH
+     */
     public static ColorMatrix getMatrixForColor(int color) {
         float r = Color.red(color) / MAX_COLOR;
         float g = Color.green(color) / MAX_COLOR;
@@ -268,6 +275,13 @@ public final class Utils {
         return new ColorMatrix(src);
     }
 
+    /**
+     * TODO JAVADOC
+     * 
+     * @param calendar
+     * @return
+     * @author SpicyCH
+     */
     public static String getTimeString(Calendar calendar) {
         return formatForDisplay(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
             + formatForDisplay(calendar.get(Calendar.MINUTE));
@@ -291,12 +305,20 @@ public final class Utils {
         } else {
             distance = Math.round(distance);
             textDistance =
-                ((int) distance) + " "
+                (((int) distance) + " ")
                     + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you);
         }
         return textDistance;
     }
 
+    /**
+     * TODO javadoc
+     * 
+     * @param context
+     * @param icon
+     * @param count
+     * @author SpicyCH
+     */
     public static void setBadgeCount(Context context, LayerDrawable icon, int count) {
 
         BadgeDrawable badge;
