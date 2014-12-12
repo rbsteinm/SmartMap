@@ -226,7 +226,7 @@
 
     <!-- Invitation Titles -->
     <string name="invitation_want_to_be_your_friend"> wants to be your friend.</string>
-    <string name="invitation_invites_your_to"> invites your to </string>
+    <string name="invitation_invites_your_to"> invites you to </string>
     <string name="invitation_accepted_your_friend_request"> accepted your friend request.</string>
 
     <!-- Invitation Subtitles -->
