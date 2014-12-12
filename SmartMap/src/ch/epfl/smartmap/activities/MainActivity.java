@@ -352,9 +352,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                         this.setMainMenu();
                         break;
                     case ITEM:
-
-                        mMapZoomer.zoomWithAnimation(mCurrentItem.getLatLng());
-
+                        this.setMainMenu();
                         break;
                     default:
                         assert false;
@@ -443,7 +441,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             // Set visibility of MenuItems
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).getActionView().clearFocus();
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).collapseActionView();
-            mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).setVisible(false);
+            mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).setVisible(true);
             mMenu.getItem(MENU_ITEM_NOTIFICATION_INDEX).setVisible(false);
             mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
             mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
