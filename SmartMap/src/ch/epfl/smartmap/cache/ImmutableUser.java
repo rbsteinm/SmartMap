@@ -84,6 +84,11 @@ public final class ImmutableUser {
         return mIsBlocked;
     }
 
+    public ImmutableUser setBlocked(blockStatus blockedStatus) {
+        mIsBlocked = blockedStatus;
+        return this;
+    }
+
     public ImmutableUser setEmail(String newEmail) {
         mEmail = newEmail;
         return this;
@@ -100,7 +105,7 @@ public final class ImmutableUser {
     }
 
     public ImmutableUser setLocation(Location newLocation) {
-        mLocation = new Location(newLocation);
+        mLocation = newLocation;
         return this;
     }
 
@@ -111,11 +116,6 @@ public final class ImmutableUser {
 
     public ImmutableUser setPhoneNumber(String newPhoneNumber) {
         mPhoneNumber = newPhoneNumber;
-        return this;
-    }
-
-    public ImmutableUser setBlocked(blockStatus blockedStatus) {
-        mIsBlocked = blockedStatus;
         return this;
     }
 }
