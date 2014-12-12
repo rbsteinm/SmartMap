@@ -10,7 +10,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.util.Log;
-import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.util.Utils;
 
@@ -41,8 +40,6 @@ public class PublicEvent implements Event {
 
     private final User mCreator;
 
-    public static final int DEFAULT_ICON = R.drawable.default_event;
-
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
 
@@ -62,13 +59,12 @@ public class PublicEvent implements Event {
         mLocation = (event.getLocation() != null) ? new Location(event.getLocation()) : NO_LOCATION;
         mLocationString = (event.getLocationString() != null) ? event.getLocationString() : NO_LOCATION_STRING;
         mDescription = (event.getDescription() != null) ? event.getDescription() : NO_DESCRIPTION;
-        mParticipantIds = (event.getParticipantIds() != null) ? new HashSet<Long>(event.getParticipantIds())
-                : NO_PARTICIPANTIDS;
+        mParticipantIds =
+            (event.getParticipantIds() != null) ? new HashSet<Long>(event.getParticipantIds()) : NO_PARTICIPANTIDS;
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -78,7 +74,6 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#getCreator()
      */
     @Override
@@ -103,18 +98,17 @@ public class PublicEvent implements Event {
 
     @Override
     public Bitmap getImage() {
-        return Event.DEFAULT_IMAGE;
+        return Event.DEFAULT_WHITE_IMAGE;
     }
 
     @Override
     public ImmutableEvent getImmutableCopy() {
         return new ImmutableEvent(mId, mName, mCreator.getImmutableCopy(), mDescription, mStartDate, mEndDate,
-                mLocation, mLocationString, mParticipantIds);
+            mLocation, mLocationString, mParticipantIds);
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Localisable#getLatLng()
      */
     @Override
@@ -129,7 +123,6 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Localisable#getLocationString()
      */
     @Override
@@ -149,12 +142,20 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#getParticipants()
      */
     @Override
     public Set<Long> getParticipantIds() {
         return mParticipantIds;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getSearchImage()
+     */
+    @Override
+    public Bitmap getSearchImage() {
+        return Event.DEFAULT_BLUE_IMAGE;
     }
 
     @Override
@@ -164,18 +165,16 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Displayable#getSubtitle()
      */
     @Override
     public String getSubtitle() {
         return Utils.getDateString(mStartDate) + " at " + Utils.getTimeString(mStartDate) + ", near "
-                + Utils.getCityFromLocation(mLocation);
+            + Utils.getCityFromLocation(mLocation);
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Displayable#getTitle()
      */
     @Override
@@ -185,7 +184,6 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -195,7 +193,6 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#isGoing()
      */
     @Override
@@ -205,7 +202,6 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#isLive()
      */
     @Override
@@ -217,7 +213,6 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#isNear()
      */
     @Override
@@ -228,19 +223,17 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#isOwn()
      */
     @Override
     public boolean isOwn() {
         Log.d(TAG, "creator id : " + mCreator.getId() + "  my id : "
-                + ServiceContainer.getSettingsManager().getUserId());
+            + ServiceContainer.getSettingsManager().getUserId());
         return mCreator.getId() == ServiceContainer.getSettingsManager().getUserId();
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Localisable#isShown()
      */
     @Override
