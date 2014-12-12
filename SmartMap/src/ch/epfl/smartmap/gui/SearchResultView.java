@@ -57,7 +57,7 @@ public class SearchResultView extends RelativeLayout {
         super(context);
 
         mItem = item;
-        mImage = item.getImage();
+        mImage = item.getSearchImage();
 
         // Layout Parameters
         this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));

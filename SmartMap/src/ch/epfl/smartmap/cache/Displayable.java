@@ -45,6 +45,8 @@ public interface Displayable extends Stockable {
 
     BitmapDescriptor getMarkerIcon(Context context);
 
+    Bitmap getSearchImage();
+
     /**
      * @return Text containing various information (description, last seen,
      *         etc.)

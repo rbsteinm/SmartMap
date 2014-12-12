@@ -2,6 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import java.util.Set;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
 
@@ -27,6 +28,16 @@ public class DefaultFilter extends Filter {
     public String getName() {
         Log.d("Filter", "Return default name");
         return "Default Filter (this shouldn't be displayed)";
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getSearchImage()
+     */
+    @Override
+    public Bitmap getSearchImage() {
+        // TODO
+        return null;
     }
 
     @Override

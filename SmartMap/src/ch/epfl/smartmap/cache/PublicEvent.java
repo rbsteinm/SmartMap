@@ -60,25 +60,26 @@ public class PublicEvent implements Event {
         mStartDate = (event.getStartDate() != null) ? (Calendar) event.getStartDate().clone() : NO_START_DATE;
         mEndDate = (event.getEndDate() != null) ? (Calendar) event.getEndDate().clone() : NO_END_DATE;
         mLocation = (event.getLocation() != null) ? new Location(event.getLocation()) : NO_LOCATION;
-        mLocationString = (event.getLocationString() != null) ? event.getLocationString() : NO_LOCATION_STRING;
+        mLocationString =
+            (event.getLocationString() != null) ? event.getLocationString() : NO_LOCATION_STRING;
         mDescription = (event.getDescription() != null) ? event.getDescription() : NO_DESCRIPTION;
-        mParticipantIds = (event.getParticipantIds() != null) ? new HashSet<Long>(event.getParticipantIds())
+        mParticipantIds =
+            (event.getParticipantIds() != null) ? new HashSet<Long>(event.getParticipantIds())
                 : NO_PARTICIPANTIDS;
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj != null) && (this.getClass() == obj.getClass()) && (this.getId() == ((PublicEvent) obj).getId());
+        return (obj != null) && (this.getClass() == obj.getClass())
+            && (this.getId() == ((PublicEvent) obj).getId());
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#getCreator()
      */
     @Override
@@ -108,13 +109,12 @@ public class PublicEvent implements Event {
 
     @Override
     public ImmutableEvent getImmutableCopy() {
-        return new ImmutableEvent(mId, mName, mCreator.getImmutableCopy(), mDescription, mStartDate, mEndDate,
-                mLocation, mLocationString, mParticipantIds);
+        return new ImmutableEvent(mId, mName, mCreator.getImmutableCopy(), mDescription, mStartDate,
+            mEndDate, mLocation, mLocationString, mParticipantIds);
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Localisable#getLatLng()
      */
     @Override
@@ -129,7 +129,6 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Localisable#getLocationString()
      */
     @Override
@@ -149,12 +148,21 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#getParticipants()
      */
     @Override
     public Set<Long> getParticipantIds() {
         return mParticipantIds;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getSearchImage()
+     */
+    @Override
+    public Bitmap getSearchImage() {
+        // TODO
+        return null;
     }
 
     @Override
@@ -164,18 +172,16 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Displayable#getSubtitle()
      */
     @Override
     public String getSubtitle() {
         return Utils.getDateString(mStartDate) + " at " + Utils.getTimeString(mStartDate) + ", near "
-                + Utils.getCityFromLocation(mLocation);
+            + Utils.getCityFromLocation(mLocation);
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Displayable#getTitle()
      */
     @Override
@@ -185,7 +191,6 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -195,7 +200,6 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#isGoing()
      */
     @Override
@@ -205,7 +209,6 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#isLive()
      */
     @Override
@@ -217,30 +220,28 @@ public class PublicEvent implements Event {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#isNear()
      */
     @Override
     public boolean isNear() {
         Location ourLocation = ServiceContainer.getSettingsManager().getLocation();
-        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager().getNearEventsMaxDistance();
+        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager()
+            .getNearEventsMaxDistance();
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Event#isOwn()
      */
     @Override
     public boolean isOwn() {
         Log.d(TAG, "creator id : " + mCreator.getId() + "  my id : "
-                + ServiceContainer.getSettingsManager().getUserId());
+            + ServiceContainer.getSettingsManager().getUserId());
         return mCreator.getId() == ServiceContainer.getSettingsManager().getUserId();
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.cache.Localisable#isShown()
      */
     @Override
