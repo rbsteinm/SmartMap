@@ -204,7 +204,6 @@ public class ModifyFilterActivity extends Activity {
             new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
-                    // TODO
                     mCache.removeFilter(mFilter.getId());
                     Toast.makeText(ModifyFilterActivity.this,
                         ModifyFilterActivity.this.getResources().getString(R.string.removed_filter),
