@@ -269,22 +269,9 @@ public final class SettingsManager {
 
     /**
      * A friendship confirmation happens when another user accepts your friend request.
-     * <<<<<<< HEAD <<<<<<< HEAD
      * 
      * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
-     *         user =======
-     *         <<<<<<< HEAD
-     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
-     *         user =======
-     * @return <code>true</code> if the user enabled the notifications for friendship confirmations and the
-     *         user >>>>>>>
-     *         39092ebfcd7ec3e217b3d3b2da359e53a13b9813 >>>>>>> ca50153cb0116b66bbf459435c04b7988e8acd96
-     *         activated the
-     *         notifications in general, <code>false</code> otherwise. =======
-     * @return <code>true</code> if the user enabled notifications for friendship confirmations and the user
-     *         activated
-     *         the notifications in general, <code>false</code> otherwise.
-     *         >>>>>>> 352eccea9a697a4803c9271400aa30c48e0b0282
+     *         user
      * @author SpicyCH
      */
     public boolean notificationsForFriendshipConfirmations() {
