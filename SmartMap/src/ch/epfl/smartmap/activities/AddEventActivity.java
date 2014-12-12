@@ -332,7 +332,7 @@ public class AddEventActivity extends FragmentActivity {
         assert this.isValidDate(dayMonthYear) : "The string dayMonthYear isn't in the expected format";
         assert this.isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
 
-        String[] s1 = dayMonthYear.split("/");
+        String[] s1 = dayMonthYear.split(".");
         String[] s2 = hourMinute.split(":");
 
         final int month = Integer.parseInt(s1[INDEX_MONTH]) - 1;
@@ -374,8 +374,7 @@ public class AddEventActivity extends FragmentActivity {
 
         Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
 
-        mPickStartTime.setText(TimePickerFragment.formatForClock(now.get(Calendar.HOUR_OF_DAY)) + ":"
-                + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));
+        mPickStartTime.setText(Utils.getTimeString(now));
 
         mPickStartTime.setOnClickListener(new OnClickListener() {
 
@@ -387,8 +386,7 @@ public class AddEventActivity extends FragmentActivity {
 
         });
 
-        mPickStartDate.setText(now.get(Calendar.DAY_OF_MONTH) + "/" + (now.get(Calendar.MONTH) + 1) + "/"
-                + now.get(Calendar.YEAR));
+        mPickStartDate.setText(Utils.getDateString(now));
 
         mPickStartDate.setOnClickListener(new OnClickListener() {
 
@@ -420,7 +418,7 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     private boolean isValidDate(String s) {
-        String[] sArray = s.split("/");
+        String[] sArray = s.split(".");
         return sArray.length == ELEMENTS_JJ_DD_YYYY;
     }
 

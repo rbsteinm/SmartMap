@@ -4,6 +4,7 @@
 package ch.epfl.smartmap.gui;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -11,11 +12,12 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import ch.epfl.smartmap.util.Utils;
 
 /**
- * A simple date picker. Used in {@link ch.epfl.smartmap.activities.AddEventActivity}. When the date is set,
- * the associated EditText is modified accordingly and a tag containing an int
- * array of year, month, day is linked to this EditText.
+ * A simple date picker. Used in {@link ch.epfl.smartmap.activities.AddEventActivity}. When the date is set, the
+ * associated EditText is modified accordingly and a tag containing an int array of year, month, day is linked to this
+ * EditText.
  * 
  * @author SpicyCH
  */
@@ -47,9 +49,9 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        mPickDate.setText(TimePickerFragment.formatForClock(day) + "/"
-            + TimePickerFragment.formatForClock(month + 1) + "/" + year);
-        mPickDate.setTag(new int[]{year, month, day});
+        Calendar dateSet = new GregorianCalendar(year, month, day);
+        mPickDate.setText(Utils.getDateString(dateSet));
+        mPickDate.setTag(new int[] { year, month, day });
     }
 
 }
