@@ -116,6 +116,7 @@
     <string name="show_event_disabled_warning_message">You have disabled events fetching in the settings.\nIf you want to see events, please set the max distance to fetch events to something else.</string>
     <string name="show_event_disabled_warning_button_goto_settings">Take me to the settings</string>
     <string name="show_event_disabled_warning_button_return_to_main">OK</string>
+    <string name="symbol_km">km</string>
     
     <!-- EventsListItemAdapter -->
     <string name="events_list_item_adapter_event_live">Event is live!</string>
@@ -127,6 +128,7 @@
     <string name="events_list_item_adapter_ends">Ends</string>
     <string name="events_list_item_adapter_from">from</string>
     <string name="events_list_item_adapter_to">to</string>
+    <string name="events_list_item_adapter_near_with_first_uppercase">Near</string>
 
     <!-- EventInformationActivity -->
     <string name="event_info_title_text">Title</string>

@@ -8,44 +8,45 @@ import android.widget.TextView;
  * </p>
  * <p>
  * Used by {@linkplain ch.epfl.smartmap.gui.EventsListItemAdapter}
+ * </p>
  * 
  * @author SpicyCH
  */
 public class EventViewHolder {
     private long mEvent;
-    private TextView mNameTextView;
-    private TextView mStartTextView;
-    private TextView mEndTextView;
+    private TextView mEventName;
+    private TextView mPlaceName;
+    private TextView mDates;
 
-    public TextView getEndTextView() {
-        return mEndTextView;
+    public TextView getDatesTextView() {
+        return mDates;
     }
 
     public long getEventId() {
         return mEvent;
     }
 
-    public TextView getNameTextView() {
-        return mNameTextView;
+    public TextView getEventNameTextView() {
+        return mEventName;
     }
 
-    public TextView getStartTextView() {
-        return mStartTextView;
+    public TextView getPlaceNameTextView() {
+        return mPlaceName;
     }
 
-    public void setEndTextView(TextView v) {
-        mEndTextView = v;
+    public void setDatesTextView(TextView v) {
+        mDates = v;
     }
 
     public void setEventId(Long id) {
         mEvent = id;
     }
 
-    public void setNameTextView(TextView v) {
-        mNameTextView = v;
+    public void setEventNameTextView(TextView v) {
+        mEventName = v;
     }
 
-    public void setStarTextView(TextView v) {
-        mStartTextView = v;
+    public void setPlaceNameTextView(TextView v) {
+        mPlaceName = v;
     }
 }

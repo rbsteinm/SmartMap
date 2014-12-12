@@ -15,8 +15,7 @@ import ch.epfl.smartmap.util.Utils;
 
 /**
  * <p>
- * Adapter used to display the events in a list view. Used in
- * {@link ch.epfl.smartmap.activities.ShowEventsActivity}.
+ * Adapter used to display the events in a list view. Used in {@link ch.epfl.smartmap.activities.ShowEventsActivity}.
  * </p>
  * <p>
  * To make the scrolling smooth, we use the view adapter design pattern. <br />
@@ -60,9 +59,9 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
             viewHolder = new EventViewHolder();
 
             // Set the ViewHolder with the gui_event_list_item fields
-            viewHolder.setNameTextView((TextView) newConvertView.findViewById(R.id.eventName));
-            viewHolder.setStarTextView((TextView) newConvertView.findViewById(R.id.eventStartDate));
-            viewHolder.setEndTextView((TextView) newConvertView.findViewById(R.id.eventEndDate));
+            viewHolder.setEventNameTextView((TextView) newConvertView.findViewById(R.id.event_list_item_event_name));
+            viewHolder.setPlaceNameTextView((TextView) newConvertView.findViewById(R.id.event_list_item_place_name));
+            viewHolder.setDatesTextView((TextView) newConvertView.findViewById(R.id.event_list_item_dates));
 
             // Needed by the code that makes each item clickable
             viewHolder.setEventId(event.getId());
@@ -82,12 +81,14 @@ public class EventsListItemAdapter extends ArrayAdapter<Event> {
         String startString = Utils.getDateString(start) + " " + Utils.getTimeString(start);
         String endString = Utils.getDateString(end) + " " + Utils.getTimeString(end);
 
-        viewHolder.getStartTextView().setText(startString);
-        viewHolder.getEndTextView().setText(endString);
+        String placeNameText = mContext.getString(R.string.events_list_item_adapter_near_with_first_uppercase) + " "
+                + event.getLocationString();
+        String startAndEndText = startString + " - " + endString;
 
-        viewHolder.getNameTextView().setText(
-            event.getName() + " " + mContext.getResources().getString(R.string.near) + " "
-                + event.getLocationString());
+        viewHolder.getPlaceNameTextView().setText(placeNameText);
+        viewHolder.getDatesTextView().setText(startAndEndText);
+
+        viewHolder.getEventNameTextView().setText(event.getName());
 
         newConvertView.setId(position);
 
