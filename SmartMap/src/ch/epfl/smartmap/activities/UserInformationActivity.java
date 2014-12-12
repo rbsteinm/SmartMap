@@ -18,8 +18,10 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
+import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.listeners.OnCacheListener;
 import ch.epfl.smartmap.util.Utils;
 
@@ -76,9 +78,9 @@ public class UserInformationActivity extends Activity {
 
         // Set user informations
         mUserId = this.getIntent().getLongExtra("USER", User.NO_ID);
-        User user = ServiceContainer.getCache().getUser(mUserId);
+        mUser = ServiceContainer.getCache().getUser(mUserId);
+        this.updateInformations(mUser);
 
-        this.updateInformations(user);
     }
 
     /**
@@ -98,7 +100,7 @@ public class UserInformationActivity extends Activity {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
                     // invite friend
-                    UserInformationActivity.this.inviteUser(mUserId);
+                    // UserInformationActivity.this.inviteUser(mUserId);
                 }
             });
 
@@ -192,22 +194,67 @@ public class UserInformationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * called when switching the "block" switch
+     * blocks the concerned friend
+     * 
+     * @param view
+     */
+    public void setBlockedStatus(View view) {
+        ImmutableUser modified = mUser.getImmutableCopy();
+        if (mBlockSwitch.isChecked()) {
+            modified.setBlocked(User.blockStatus.BLOCKED);
+        } else {
+            modified.setBlocked(User.blockStatus.UNBLOCKED);
+        }
+
+        ServiceContainer.getCache().setBlockedStatus(modified, new NetworkRequestCallback() {
+
+            @Override
+            public void onFailure() {
+                UserInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mBlockSwitch.setChecked(UserInformationActivity.this.statusToBool(mUser.isBlocked()));
+                        Toast.makeText(UserInformationActivity.this,
+                            "Network error, couldn't (un)block friend", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onSuccess() {
+                UserInformationActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mShowOnMapSwitch.setEnabled(!UserInformationActivity.this.statusToBool(mUser
+                            .isBlocked()));
+                        if (UserInformationActivity.this.statusToBool(mUser.isBlocked())) {
+                            Toast.makeText(UserInformationActivity.this, "friend successfully blocked",
+                                Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(UserInformationActivity.this, "friend successfully unblocked",
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+
+        });
+
+    }
+
+    /**
+     * called when switching the "show on map" switch
+     * when ON, the concerned user does not appear on the map anymore
+     * no matter in which filters he is
+     * 
+     * @param view
+     */
     public void showOnMap(View view) {
         // TODO need superfiltre. Don't forget to check that the user is a
         // friend !
         // ServiceContainer.getCache().updateFilter(ServiceContainer.getCache().getFilter(SUPERFILTRE_ID));
-    }
-
-    /**
-     * Invites a user to be your friend. Displays a toast describing if the
-     * invitation was sent or not.
-     * 
-     * @author agpmilli
-     */
-    private void inviteUser(long userId) {
-        // Send friend request to user
-        ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
-
     }
 
     /**
@@ -217,6 +264,15 @@ public class UserInformationActivity extends Activity {
         if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
             this.startActivity(new Intent(this, MainActivity.class));
         }
+    }
+
+    /**
+     * @param status
+     *            blocked status
+     * @return true if the user is blocked,false if unblocked or unset
+     */
+    private boolean statusToBool(User.blockStatus status) {
+        return status == User.blockStatus.BLOCKED;
     }
 
     /**
@@ -249,16 +305,15 @@ public class UserInformationActivity extends Activity {
                         mNameView.setText(friend.getName());
                         mSubtitlesView.setText(friend.getSubtitle());
                         mPictureView.setImageBitmap(friend.getImage());
-                        mShowOnMapSwitch.setChecked(ServiceContainer.getCache().getDefaultFilter()
-                            .getIds().contains(user.getId()));
-                        mBlockSwitch.setChecked(friend.isBlocked());
+                        mShowOnMapSwitch.setChecked(ServiceContainer.getCache().getDefaultFilter().getIds()
+                            .contains(user.getId()));
+                        mBlockSwitch.setChecked(friend.isBlocked() == User.blockStatus.UNBLOCKED);
                         mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
 
                         Button button =
                             (Button) UserInformationActivity.this.findViewById(R.id.user_info_remove_button);
                         button.setVisibility(View.VISIBLE);
                         button.setOnClickListener(new OnClickListener() {
-
                             @Override
                             public void onClick(View v) {
                                 UserInformationActivity.this.displayDeleteConfirmationDialog(v);
@@ -296,35 +351,56 @@ public class UserInformationActivity extends Activity {
     }
 
     /**
-     * Callback that describes connection with network
+     * This class is a CacheListener that updates the displayed user when it's
+     * info are changed.
      * 
-     * @author agpmilli
+     * @author Pamoi
      */
-    class AddFriendCallback implements NetworkRequestCallback {
+    private class UserInformationCacheListener implements CacheListener {
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.listeners.CacheListener#onEventListUpdate()
+         */
         @Override
-        public void onFailure() {
+        public void onEventListUpdate() {
+            // Nothing to do
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
+         */
+        @Override
+        public void onFilterListUpdate() {
+            // Nothing to do
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see
+         * ch.epfl.smartmap.listeners.CacheListener#onInvitationListUpdate()
+         */
+        @Override
+        public void onInvitationListUpdate() {
+            // Nothing to do
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.listeners.CacheListener#onUserListUpdate()
+         */
+        @Override
+        public void onUserListUpdate() {
             UserInformationActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(UserInformationActivity.this,
-                        UserInformationActivity.this.getString(R.string.invite_friend_failure),
-                        Toast.LENGTH_SHORT).show();
+                    mUser = ServiceContainer.getCache().getUser(mUserId);
+
+                    UserInformationActivity.this.updateInformations(mUser);
                 }
             });
         }
 
-        @Override
-        public void onSuccess() {
-            UserInformationActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(UserInformationActivity.this,
-                        UserInformationActivity.this.getString(R.string.invite_friend_success),
-                        Toast.LENGTH_SHORT).show();
-                    UserInformationActivity.this.finish();
-                }
-            });
-        }
     }
-
 }

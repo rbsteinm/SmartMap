@@ -470,6 +470,7 @@ public class Cache {
      * @param id
      * @return
      */
+
     public synchronized User getUser(long id) {
         return mUserInstances.get(id);
     }
@@ -1106,16 +1107,57 @@ public class Cache {
      * @param callback
      * @author rbsteinm
      */
-    public synchronized void setBlockedStatus(final ImmutableUser user, final boolean newBlockedStatus,
-        final NetworkRequestCallback callback) {
+    public synchronized void
+        setBlockedStatus(final ImmutableUser user, final NetworkRequestCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    boolean changed = false;
+                    if (user.isBlocked() == User.blockStatus.UNBLOCKED) {
+                        ServiceContainer.getNetworkClient().unblockFriend(user.getId());
+                        changed = Cache.this.updateUser(user.setBlocked(User.blockStatus.UNBLOCKED));
+                    } else {
+                        ServiceContainer.getNetworkClient().blockFriend(user.getId());
+                        changed = Cache.this.updateUser(user.setBlocked(User.blockStatus.BLOCKED));
+                    }
+                    if (changed) {
+                        for (CacheListener listener : mListeners) {
+                            listener.onUserListUpdate();
+                        }
+                    }
+                    if (callback != null) {
+                        callback.onSuccess();
+                    }
+                } catch (SmartMapClientException e) {
+                    Log.e("TAG", "Error while (un)blocking friend: " + e);
+                    if (callback != null) {
+                        callback.onFailure();
+                    }
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * @param user
+     *            the user we are trying to (un)block
+     * @param newBlockedStatus
+     *            true if we're blocking the user, false otherwise
+     * @param callback
+     * @author rbsteinm
+     */
+    public synchronized void setBlockedStatus(final ImmutableUser user,
+        final User.blockStatus newBlockedStatus, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 if (user.isBlocked() != newBlockedStatus) {
                     try {
-                        if (user.isBlocked()) {
+                        if (user.isBlocked() == User.blockStatus.UNBLOCKED) {
                             ServiceContainer.getNetworkClient().unblockFriend(user.getId());
-                        } else {
+                        } else if (user.isBlocked() == User.blockStatus.BLOCKED) {
                             ServiceContainer.getNetworkClient().blockFriend(user.getId());
                         }
                         if (callback != null) {

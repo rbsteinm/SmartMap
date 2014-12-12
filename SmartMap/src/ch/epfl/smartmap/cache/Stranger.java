@@ -74,4 +74,9 @@ public class Stranger extends User {
     public String getSubtitle() {
         return "Add as Friend to see more informations";
     }
+
+    @Override
+    public User.blockStatus isBlocked() {
+        return User.blockStatus.UNBLOCKED;
+    }
 }

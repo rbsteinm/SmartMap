@@ -346,7 +346,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             }
 
             values.put(KEY_POSNAME, user.getLocationString());
-            values.put(KEY_BLOCKED, user.isBlocked() ? 1 : 0);
+            boolean blocked = false;
+            if (user.isBlocked() == User.blockStatus.BLOCKED) {
+                blocked = true;
+            }
+            values.put(KEY_BLOCKED, blocked ? 1 : 0);
             values.put(KEY_FRIENDSHIP, user.getFriendship());
 
             mDatabase.insert(TABLE_USER, null, values);
@@ -744,8 +748,10 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
             cursor.close();
 
-            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image,
-                isBlocked, friendship);
+            User.blockStatus status = isBlocked ? User.blockStatus.BLOCKED : User.blockStatus.UNBLOCKED;
+
+            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image, status,
+                friendship);
         }
 
         return null;
@@ -912,7 +918,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         values.put(KEY_FRIENDSHIP, friend.getFriendship());
-        values.put(KEY_BLOCKED, friend.isBlocked() ? 1 : 0);
+
+        boolean isBlocked = false;
+        if (friend.isBlocked() == User.blockStatus.BLOCKED) {
+            isBlocked = true;
+        }
+        values.put(KEY_BLOCKED, isBlocked ? 1 : 0);
 
         return mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",
             new String[]{String.valueOf(friend.getId())});

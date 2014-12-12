@@ -406,7 +406,8 @@ public class JsonSmartMapParser implements SmartMapParser {
             location.setTime(this.parseDate(lastSeenString).getTimeInMillis());
         }
 
-        return new ImmutableUser(id, name, phoneNumber, email, location, null, null, false, friendship);
+        return new ImmutableUser(id, name, phoneNumber, email, location, null, null, User.blockStatus.NOT_SET,
+            friendship);
     }
 
     /*
@@ -509,7 +510,8 @@ public class JsonSmartMapParser implements SmartMapParser {
                 String locationString = Utils.getCityFromLocation(location);
 
                 ImmutableUser user =
-                    new ImmutableUser(userId, null, null, null, location, locationString, null, false, -1);
+                    new ImmutableUser(userId, null, null, null, location, locationString, null,
+                        User.blockStatus.NOT_SET, -1);
 
                 users.add(user);
             }
