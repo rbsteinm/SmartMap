@@ -608,6 +608,7 @@ public class Cache {
     }
 
     public synchronized void notifyEventListeners() {
+        Log.d(TAG, "notifying event listeners");
         for (CacheListener listener : mListeners) {
             listener.onEventListUpdate();
         }
