@@ -33,6 +33,8 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public final class Utils {
 
+    public static final String GMT_SWITZERLAND = "GMT+01:00";
+
     public static final long ONE_SECOND = 1000;
     public static final long ONE_MINUTE = 60 * ONE_SECOND;
     public static final long ONE_HOUR = 60 * ONE_MINUTE;
@@ -40,13 +42,14 @@ public final class Utils {
     public static final long TEN_DAYS = 10 * ONE_DAY;
     public static final long ONE_YEAR = 365 * ONE_DAY;
     public static final int DAYS_IN_A_WEEK = 7;
+    public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
+            .getString(R.string.utils_never_seen_on_smartmap);
+
+    private static final String TAG = Utils.class.getSimpleName();
+
     private static final float MAX_COLOR = 255f;
     private static final double ONE_THOUSAND_METERS = 1000.0;
     private static final double TEN = 10.0;
-
-    public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
-        .getString(R.string.utils_never_seen_on_smartmap);
-    private static final String TAG = Utils.class.getSimpleName();
 
     /**
      * Private constructor so that Utils cannot be instantiated.
@@ -56,7 +59,8 @@ public final class Utils {
     }
 
     /**
-     * @param latLng the coordinates of point P
+     * @param latLng
+     *            the coordinates of point P
      * @return the distance between the user and P
      * @author rbsteinm
      */
@@ -68,7 +72,8 @@ public final class Utils {
     }
 
     /**
-     * @param location the location of point P
+     * @param location
+     *            the location of point P
      * @return the distance between the user and P
      * @author rbsteinm
      */
@@ -160,17 +165,17 @@ public final class Utils {
      */
     public static String getDateString(Calendar calendar) {
 
-        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(GMT_SWITZERLAND));
         int yearsDiff = calendar.get(Calendar.YEAR) - now.get(Calendar.YEAR);
         int daysDiff = calendar.get(Calendar.DAY_OF_YEAR) - now.get(Calendar.DAY_OF_YEAR);
 
         if (yearsDiff == 0) {
             if (daysDiff > DAYS_IN_A_WEEK) {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                    + calendar.get(Calendar.YEAR);
+                        + calendar.get(Calendar.YEAR);
             } else if (daysDiff > 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
-                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else if (daysDiff == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
             } else if (daysDiff == 0) {
@@ -179,16 +184,16 @@ public final class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else if (daysDiff > -DAYS_IN_A_WEEK) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
-                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                    + calendar.get(Calendar.YEAR);
+                        + calendar.get(Calendar.YEAR);
             }
         } else {
             // Do not forget that the first month in a GregorianCalendar is 0! bug #82
             int month = calendar.get(Calendar.MONTH) + 1;
             return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
-            + calendar.get(Calendar.YEAR);
+                    + calendar.get(Calendar.YEAR);
         }
     }
 
@@ -200,8 +205,8 @@ public final class Utils {
      */
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
-        long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
-            - calendar.getTimeInMillis();
+        long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone(GMT_SWITZERLAND)).getTimeInMillis()
+                - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
             // Give time in seconds
@@ -213,7 +218,7 @@ public final class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
             } else {
                 return minutes + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
+                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
             }
         } else if (diff < ONE_DAY) {
             // Give time hours
@@ -222,7 +227,7 @@ public final class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_hour_ago);
             } else {
                 return "" + hours + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
+                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
             }
         } else if (diff < ONE_YEAR) {
             // Give time in days
@@ -231,7 +236,7 @@ public final class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else {
                 return "" + days + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
+                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
             }
         } else {
             return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
@@ -249,7 +254,7 @@ public final class Utils {
 
     public static String getTimeString(Calendar calendar) {
         return formatForDisplay(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
-            + formatForDisplay(calendar.get(Calendar.MINUTE));
+                + formatForDisplay(calendar.get(Calendar.MINUTE));
     }
 
     /**
@@ -265,11 +270,11 @@ public final class Utils {
             distance = distance / ONE_THOUSAND_METERS;
             distance = Math.round(distance * TEN) / TEN;
             textDistance = distance + " km "
-                + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you);
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you);
         } else {
             distance = Math.round(distance);
             textDistance = ((int) distance) + " "
-                + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you);
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you);
         }
         return textDistance;
     }

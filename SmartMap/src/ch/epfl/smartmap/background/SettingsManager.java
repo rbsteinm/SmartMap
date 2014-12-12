@@ -14,8 +14,7 @@ import ch.epfl.smartmap.util.Utils;
  * Used to get and set settings and local info using SharedPreferences
  * 
  * @author ritterni
- * @author SpicyCH (add support for the user settings - we might want to change the design if my methods are
- *         bottlenecks)
+ * @author SpicyCH
  */
 
 public final class SettingsManager {
