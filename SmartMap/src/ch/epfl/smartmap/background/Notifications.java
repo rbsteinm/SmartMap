@@ -56,13 +56,11 @@ public class Notifications {
         switch (invitation.getType()) {
             case Invitation.EVENT_INVITATION:
                 notificationAllowed =
-                    notificationAllowed
-                        && ServiceContainer.getSettingsManager().notificationsForEventInvitations();
+                    notificationAllowed && ServiceContainer.getSettingsManager().notificationsForEventInvitations();
                 break;
             case Invitation.FRIEND_INVITATION:
                 notificationAllowed =
-                    notificationAllowed
-                        && ServiceContainer.getSettingsManager().notificationsForFriendRequests();
+                    notificationAllowed && ServiceContainer.getSettingsManager().notificationsForFriendRequests();
                 break;
             case Invitation.ACCEPTED_FRIEND_INVITATION:
                 notificationAllowed =
