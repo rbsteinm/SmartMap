@@ -1,0 +1,218 @@
+<html>
+    <head>
+        <title>SmartMap server access</title>
+    </head>
+    <style>
+    div.box {
+        border: 1px solid black;
+        padding: 0px 10px 10px 10px;
+        margin-bottom: 20px;
+        width: 800px;
+    }
+    </style>
+<body bgcolor="white">
+<h1>SmartMap Server access</h1>
+<p>
+You can use the fakeauth method to authenticate as any user with it's id as long as
+the server is in development mode.
+</p>
+
+<div class="box">
+<h3>Blocking</h3>
+<form action="http://smartmap.ddns.net/blockFriend" method="post">
+Block: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/unblockFriend" method="post">
+Unblock: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+</div>
+
+<div class="box">
+<h3>Authentication</h3>
+<form action="http://smartmap.ddns.net/fakeAuth" method="post">
+Fake auth: <input type="text" name="user_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/fakeAuth" method="post">
+Real auth:<br/>
+Name: <input type="text" name="name" /><br/>
+Facebook token: <input type="text" name="facebookToken" /><br/>
+Facebook id: <input type="text" name="facebookId" /><br/>
+<input type="submit" />
+</form>
+
+</div>
+<div class="box">
+    <h3>Events</h3>
+    Event creation:<br/>
+    <form action="http://smartmap.ddns.net/createEvent" method="post">
+        Starting date: <input name="starting" /><br/>
+        Ending date: <input name="ending" /><br/>
+        Longitude: <input name="longitude" /><br/>
+        Latitude: <input name="latitude" /><br/>
+        Position name: <input name="positionName" /><br/>
+        Name: <input name="name" /><br/>
+        Description: <input name="description" /><br/>
+        <input type="submit" />
+    </form>
+    
+    Event update:<br/>
+    <form action="http://smartmap.ddns.net/updateEvent" method="post">
+        Event id: <input name="eventId" /><br/>
+        Starting date: <input name="starting" /><br/>
+        Ending date: <input name="ending" /><br/>
+        Longitude: <input name="longitude" /><br/>
+        Latitude: <input name="latitude" /><br/>
+        Position name: <input name="positionName" /><br/>
+        Name: <input name="name" /><br/>
+        Description: <input name="description" /><br/>
+        <input type="submit" />
+    </form>
+    
+    Getting events:<br/>
+    <form action="http://smartmap.ddns.net/getPublicEvents" method="post">
+        Longitude: <input name="longitude" /><br/>
+        Latitude: <input name="latitude" /><br/>
+        Radius: <input name="radius" /><br/>
+        <input type="submit" />
+    </form>
+    
+    <form action="http://smartmap.ddns.net/inviteUsersToEvent" method="post">
+    invite users to events:<br/>
+        Event id: <input name="event_id" /><br/>
+        Users ids: <input name="users_ids" /><br/>
+        <input type="submit" />
+    </form>
+    
+    <form action="http://smartmap.ddns.net/getEventInvitations" method="post">
+    Get event invitations:
+        <input type="submit" />
+    </form>
+    
+    <form action="http://smartmap.ddns.net/getEventInfo" method="post">
+    Get event info: <input name="event_id" /><br/>
+        <input type="submit" />
+    </form>
+</div>
+
+<div class="box">
+<h3>Get user info</h3>
+<form action="http://smartmap.ddns.net/getUserInfo" method="post">
+Get user info: <input type="text" name="user_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/getProfilePicture" method="post">
+Get profile picture: <input type="text" name="user_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/getFriendsIds" method="post">
+Get friends ids: <input type="submit" />
+</form>
+</div>
+
+<div class="box">
+<h3>Friend management</h3>
+<form action="http://smartmap.ddns.net/inviteFriend" method="post">
+Invite friend: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/acceptInvitation" method="post">
+Accept invitation: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/declineInvitation" method="post">
+Decline invitation: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/removeFriend" method="post">
+Remove friend: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/ackAcceptedInvitation" method="post">
+Ack accpeted invitation: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/ackRemovedFriend" method="post">
+Ack removed friend: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/getInvitations" method="post">
+Get invitations
+<input type="submit" />
+</form>
+</div>
+
+<div class="box">
+<h3>Position updating and retrieving</h3>
+<form action="http://smartmap.ddns.net/updatePos" method="post">
+Update pos: <input type="text" name="longitude" /><input type="text" name="latitude" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/listFriendsPos" method="post">
+List friends pos
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/disallowFriend" method="post">
+Disallow friend: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+</div>
+
+<div class="box">
+<h3>Authorizations</h3>
+<form action="http://smartmap.ddns.net/allowFriend" method="post">
+Allow friend: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/followFriend" method="post">
+Follow friend: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/unfollowFriend" method="post">
+unfollow friend: <input type="text" name="friend_id" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/allowFriendList" method="post">
+Allow friend list: <input type="text" name="friend_ids" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/disallowFriendList" method="post">
+Disallow friend list: <input type="text" name="friend_ids" />
+<input type="submit" />
+</form>
+
+<form action="http://smartmap.ddns.net/setVisibility" method="post">
+Set visibility: <input type="text" name="visibility" />
+<input type="submit" />
+</form>
+</div>
+
+<div class="box">
+<h3>Autocompletion</h3>
+<form action="http://smartmap.ddns.net/findUsers" method="post">
+Find users: <input type="text" name="search_text" />
+<input type="submit" />
+</form>
+</div>
+
+</body>
+</html>

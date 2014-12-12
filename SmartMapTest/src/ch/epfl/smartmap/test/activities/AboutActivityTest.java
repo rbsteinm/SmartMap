@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.AboutActivity;
 
@@ -21,6 +22,7 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  */
 public class AboutActivityTest extends ActivityInstrumentationTestCase2<AboutActivity> {
 
+    private static final String TAG = AboutActivityTest.class.getSimpleName();
     private Context mContext;
 
     public AboutActivityTest() {
@@ -58,13 +60,11 @@ public class AboutActivityTest extends ActivityInstrumentationTestCase2<AboutAct
         try {
             PackageInfo manager = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
             versionAndRelease =
-                mContext.getString(R.string.about_version) + " " + manager.versionName + ", "
-                    + mContext.getString(R.string.about_release) + " " + manager.versionCode;
+                mContext.getString(R.string.about_version) + " " + manager.versionName + "."
+                    + manager.versionCode;
 
         } catch (NameNotFoundException e) {
-            versionAndRelease =
-                mContext.getString(R.string.about_version) + " "
-                    + mContext.getString(R.string.about_unkown_version);
+            Log.e(TAG, "Name not found: " + e);
         }
 
         onView(withId(R.id.about_version)).check(
