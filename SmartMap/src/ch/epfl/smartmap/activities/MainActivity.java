@@ -65,24 +65,89 @@ import com.google.android.gms.maps.model.Marker;
 
 public class MainActivity extends FragmentActivity implements CacheListener, OnInvitationListUpdateListener {
 
+    /**
+     * Types of Menu that can be displayed on this activity
+     * 
+     * @author jfperren
+     */
+    private enum MenuTheme {
+        MAP,
+        SEARCH,
+        ITEM;
+    }
+
+    /**
+     * A listener that reset events markers colors and info panel when clicking
+     * on map
+     * 
+     * @author hugo-S
+     */
+    private class ResetMarkerColorAndInfoPannelOnMapClick implements OnMapClickListener {
+
+        /*
+         * (non-Javadoc)
+         * @see
+         * com.google.android.gms.maps.GoogleMap.OnMapClickListener#onMapClick(com
+         * .google.android.gms.maps
+         * .model.LatLng)
+         */
+        @Override
+        public void onMapClick(LatLng arg0) {
+
+            MainActivity.this.setMainMenu();
+            mEventMarkerManager.resetMarkersIcon(MainActivity.this);
+
+        }
+
+    }
+
+    /**
+     * A listener that shows info in action bar when a marker is clicked on
+     * 
+     * @author hugo-S
+     */
+    private class ShowInfoOnMarkerClick implements OnMarkerClickListener {
+
+        @Override
+        public boolean onMarkerClick(Marker arg0) {
+
+            if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
+                Displayable itemClicked = mFriendMarkerManager.getItemForMarker(arg0);
+                mMapZoomer.centerOnLocation(arg0.getPosition());
+                MainActivity.this.setItemMenu(itemClicked);
+                return true;
+            } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
+                Displayable itemClicked = mEventMarkerManager.getItemForMarker(arg0);
+                mMapZoomer.centerOnLocation(arg0.getPosition());
+                MainActivity.this.setItemMenu(itemClicked);
+                mEventMarkerManager.resetMarkersIcon(MainActivity.this);
+                arg0.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                arg0.setSnippet(DefaultMarkerManager.MarkerColor.RED.toString());
+                return true;
+            }
+            return false;
+        }
+    }
+
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-
     private static final int MENU_ITEM_SEARCHBAR_INDEX = 0;
     private static final int MENU_ITEM_NOTIFICATION_INDEX = 1;
-
     private static final int MENU_ITEM_CLOSE_SEARCH_INDEX = 2;
     private static final int MENU_ITEM_OPEN_INFO_INDEX = 3;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private SideMenu mSideMenu;
+
     private GoogleMap mGoogleMap;
     private DefaultMarkerManager mFriendMarkerManager;
     private DefaultMarkerManager mEventMarkerManager;
 
     private DefaultZoomManager mMapZoomer;
+
     private SupportMapFragment mFragmentMap;
+
     private Menu mMenu;
 
     private MenuTheme mMenuTheme;
@@ -120,7 +185,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
     private void initializeMarkers() {
         if ((mFriendMarkerManager != null) && (mEventMarkerManager != null)) {
-            // TODO an assertion would be better to ensure that the marker managers are not null?
+            // TODO an assertion would be better to ensure that the marker
+            // managers are not null?
             mFriendMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
                 .getAllVisibleFriends()));
             mEventMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
@@ -156,10 +222,10 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.startService(new Intent(this, InvitationsService.class));
         this.startService(new Intent(this, OwnPositionService.class));
         // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         this.getActionBar().setHomeButtonEnabled(true);
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setHomeAsUpIndicator(this.getResources().getDrawable(R.drawable.ic_drawer));
         mMenuTheme = MenuTheme.MAP;
 
         // Get needed Views
@@ -275,8 +341,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             @Override
             public void run() {
 
-                mEventMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(
-                    ServiceContainer.getCache().getAllVisibleEvents()));
+                mEventMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(ServiceContainer
+                    .getCache().getAllVisibleEvents()));
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -317,9 +383,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                         this.setMainMenu();
                         break;
                     case ITEM:
-
-                        mMapZoomer.zoomWithAnimation(mCurrentItem.getLatLng());
-
+                        this.setMainMenu();
                         break;
                     default:
                         assert false;
@@ -370,8 +434,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         // get the value of the user string
         Location eventLocation = startingIntent.getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
         if (eventLocation != null) {
-            mMapZoomer
-                .zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
+            mMapZoomer.zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
             eventLocation = null;
         }
 
@@ -401,8 +464,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mFriendMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(
-                    ServiceContainer.getCache().getAllVisibleFriends()));
+                mFriendMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(ServiceContainer
+                    .getCache().getAllVisibleFriends()));
                 // MainActivity.this.zoomAccordingToAllMarkers();
                 MainActivity.this.updateItemMenu();
             }
@@ -455,7 +518,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             // Set visibility of MenuItems
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).getActionView().clearFocus();
             mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).collapseActionView();
-            mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).setVisible(false);
+            mMenu.getItem(MENU_ITEM_SEARCHBAR_INDEX).setVisible(true);
             mMenu.getItem(MENU_ITEM_NOTIFICATION_INDEX).setVisible(false);
             mMenu.getItem(MENU_ITEM_CLOSE_SEARCH_INDEX).setVisible(false);
             mMenu.getItem(MENU_ITEM_OPEN_INFO_INDEX).setVisible(true);
@@ -551,68 +614,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         Intent startingIntent = this.getIntent();
         if (startingIntent.getParcelableExtra(AddEventActivity.LOCATION_EXTRA) == null) {
             mMapZoomer.zoomAccordingToMarkers(allMarkers);
-        }
-    }
-
-    /**
-     * Types of Menu that can be displayed on this activity
-     * 
-     * @author jfperren
-     */
-    private enum MenuTheme {
-        MAP,
-        SEARCH,
-        ITEM;
-    }
-
-    /**
-     * A listener that reset events markers colors and info panel when clicking on map
-     * 
-     * @author hugo-S
-     */
-    private class ResetMarkerColorAndInfoPannelOnMapClick implements OnMapClickListener {
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * com.google.android.gms.maps.GoogleMap.OnMapClickListener#onMapClick(com.google.android.gms.maps
-         * .model.LatLng)
-         */
-        @Override
-        public void onMapClick(LatLng arg0) {
-
-            MainActivity.this.setMainMenu();
-            mEventMarkerManager.resetMarkersIcon(MainActivity.this);
-
-        }
-
-    }
-
-    /**
-     * A listener that shows info in action bar when a marker is clicked on
-     * 
-     * @author hugo-S
-     */
-    private class ShowInfoOnMarkerClick implements OnMarkerClickListener {
-
-        @Override
-        public boolean onMarkerClick(Marker arg0) {
-
-            if (mFriendMarkerManager.isDisplayedMarker(arg0)) {
-                Displayable itemClicked = mFriendMarkerManager.getItemForMarker(arg0);
-                mMapZoomer.centerOnLocation(arg0.getPosition());
-                MainActivity.this.setItemMenu(itemClicked);
-                return true;
-            } else if (mEventMarkerManager.isDisplayedMarker(arg0)) {
-                Displayable itemClicked = mEventMarkerManager.getItemForMarker(arg0);
-                mMapZoomer.centerOnLocation(arg0.getPosition());
-                MainActivity.this.setItemMenu(itemClicked);
-                mEventMarkerManager.resetMarkersIcon(MainActivity.this);
-                arg0.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                arg0.setSnippet(DefaultMarkerManager.MarkerColor.RED.toString());
-                return true;
-            }
-            return false;
         }
     }
 }
