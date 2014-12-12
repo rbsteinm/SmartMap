@@ -25,6 +25,7 @@ public class UtilsTest extends AndroidTestCase {
     private Calendar myBirthday;
     private Calendar morning;
     private Calendar afternoon;
+    private Calendar firstJan2015;
 
     private Location epfl;
 
@@ -33,29 +34,34 @@ public class UtilsTest extends AndroidTestCase {
         super.setUp();
         ServiceContainer.setSettingsManager(new SettingsManager(this.getContext()));
 
-        now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
 
-        yesterday = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        yesterday = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         yesterday.add(Calendar.DAY_OF_YEAR, -1);
 
-        tomorrow = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        tomorrow = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         tomorrow.add(Calendar.DAY_OF_YEAR, 1);
 
-        inTenDays = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        inTenDays = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         inTenDays.add(Calendar.DAY_OF_YEAR, 10);
 
-        tenDaysAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        tenDaysAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         tenDaysAgo.add(Calendar.DAY_OF_YEAR, -10);
 
-        myBirthday = new GregorianCalendar(1993, 9, 16);
+        myBirthday = new GregorianCalendar(1993, 8, 16);
 
-        morning = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        morning = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         morning.set(Calendar.HOUR_OF_DAY, 8);
         morning.set(Calendar.MINUTE, 5);
 
-        afternoon = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        afternoon = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         afternoon.set(Calendar.HOUR_OF_DAY, 17);
         afternoon.set(Calendar.MINUTE, 7);
+
+        firstJan2015 = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+        firstJan2015.set(Calendar.YEAR, 2015);
+        firstJan2015.set(Calendar.MONTH, 0);
+        firstJan2015.set(Calendar.DAY_OF_YEAR, 1);
 
         epfl = new Location("");
         epfl.setLatitude(46.519056);
@@ -87,8 +93,13 @@ public class UtilsTest extends AndroidTestCase {
 
     }
 
+    public void testJanuary() {
+        // Regression test for #82
+        assertEquals("01.01.2015", Utils.getDateString(firstJan2015));
+    }
+
     public void testLastSeen100Years() {
-        Calendar hundredYearsAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        Calendar hundredYearsAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         hundredYearsAgo.add(Calendar.YEAR, -100);
 
         assertEquals(
@@ -98,7 +109,7 @@ public class UtilsTest extends AndroidTestCase {
     }
 
     public void testLastSeenFiveMins() {
-        Calendar fiveMinsAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        Calendar fiveMinsAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         fiveMinsAgo.add(Calendar.MINUTE, -5);
 
         assertEquals(

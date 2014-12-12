@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.not;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.TimeZone;
 
 import android.app.ListActivity;
@@ -20,9 +19,7 @@ import android.view.View;
 import android.widget.SeekBar;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
-import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.ImmutableEvent;
-import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
+import ch.epfl.smartmap.util.Utils;
 
 import com.google.android.apps.common.testing.ui.espresso.UiController;
 import com.google.android.apps.common.testing.ui.espresso.ViewAction;
@@ -207,30 +204,31 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
          * dbHelper.addEvent(e3);
          */
 
-        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
-        Calendar inTenMins = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+        Calendar inTenMins = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         inTenMins.add(Calendar.MINUTE, 10);
 
         Location location = new Location("");
         location.setLatitude(20);
         location.setLongitude(20);
 
-        ImmutableEvent event =
-            new ImmutableEvent(1, "Test event", 2, "Description.......", now, inTenMins, location,
-                "Somewhere", new HashSet<Long>());
-
-        ServiceContainer.getCache().createEvent(event, new NetworkRequestCallback() {
-
-            @Override
-            public void onFailure() {
-                // Nothing
-            }
-
-            @Override
-            public void onSuccess() {
-                // Nothing
-            }
-        });
+        /*
+         * ImmutableEvent event =
+         * new ImmutableEvent(1, "Test event", 2, "Description.......", now,
+         * inTenMins, location,
+         * "Somewhere", new HashSet<Long>());
+         * ServiceContainer.getCache().createEvent(event, new
+         * NetworkRequestCallback() {
+         * @Override
+         * public void onFailure() {
+         * // Nothing
+         * }
+         * @Override
+         * public void onSuccess() {
+         * // Nothing
+         * }
+         * });
+         */
 
     }
 

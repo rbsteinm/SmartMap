@@ -11,10 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.Notifications;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.GenericInvitation;
 import ch.epfl.smartmap.cache.Invitation;
-import ch.epfl.smartmap.cache.Notifications;
 import ch.epfl.smartmap.gui.InvitationListItemAdapter;
 import ch.epfl.smartmap.listeners.OnCacheListener;
 
@@ -57,8 +57,11 @@ public class InvitationPanelActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
+
         Intent invitationIntent = ((GenericInvitation) l.getItemAtPosition(position)).getIntent();
-        InvitationPanelActivity.this.startActivity(invitationIntent);
+        if (invitationIntent != null) {
+            InvitationPanelActivity.this.startActivity(invitationIntent);
+        }
 
         super.onListItemClick(l, v, position, id);
     }
@@ -71,7 +74,6 @@ public class InvitationPanelActivity extends ListActivity {
                 .getAllInvitations())));
 
         ServiceContainer.getCache().readAllInvitations();
-
     }
 
     @Override

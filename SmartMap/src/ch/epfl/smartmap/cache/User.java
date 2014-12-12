@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 
@@ -12,6 +13,8 @@ import ch.epfl.smartmap.background.ServiceContainer;
  * @author jfperren
  */
 public abstract class User implements UserInterface {
+
+    private static final String TAG = User.class.getSimpleName();
 
     public static final int STRANGER = 0;
     public static final int FRIEND = 1;
@@ -29,6 +32,8 @@ public abstract class User implements UserInterface {
 
     public static final User NOBODY = new Stranger(NO_ID, NO_NAME, NO_IMAGE);
 
+    public enum blockStatus {BLOCKED, UNBLOCKED, NOT_SET};
+
     public static final int IMAGE_QUALITY = 100;
     public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
     public static final int PICTURE_WIDTH = 50;
@@ -44,6 +49,12 @@ public abstract class User implements UserInterface {
         mId = (id >= 0) ? id : User.NO_ID;
         mName = (name != null) ? name : User.NO_NAME;
         mImage = (image != null) ? Bitmap.createBitmap(image) : User.NO_IMAGE;
+
+        Log.d(TAG, "Create new User Instance(" + id + ", " + "name, " + "image " + mImage);
+
+        if ((mId != User.NO_ID) && ((mName == User.NO_NAME) || (mImage == User.NO_IMAGE))) {
+            ServiceContainer.getCache().updateUserInfos(id);
+        }
     }
 
     /*
@@ -75,7 +86,8 @@ public abstract class User implements UserInterface {
 
     @Override
     public ImmutableUser getImmutableCopy() {
-        return new ImmutableUser(mId, mName, null, null, null, null, mImage, false, this.getFriendship());
+        return new ImmutableUser(mId, mName, null, null, null, null, mImage, User.blockStatus.UNBLOCKED,
+            this.getFriendship());
     }
 
     /*
@@ -110,14 +122,19 @@ public abstract class User implements UserInterface {
         // TODO : Update hasChanged to work correctly
         boolean hasChanged = false;
 
-        if (user.getName() != null) {
-            mName = user.getName();
+        if (user.getId() == 12) {
+            Log.d("USER", "Update matt with new name " + user.getName());
         }
-        if (user.getImage() != null) {
+        if ((user.getName() != null) && (user.getName() != User.NO_NAME)) {
+            mName = user.getName();
+            hasChanged = true;
+        }
+        if ((user.getImage() != null) && (user.getImage() != User.NO_IMAGE)) {
             mImage = user.getImage();
+            hasChanged = true;
         }
 
-        return true;
+        return hasChanged;
     }
 
     public static User createFromContainer(ImmutableUser userInfos) {

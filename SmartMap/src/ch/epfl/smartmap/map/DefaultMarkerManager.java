@@ -139,6 +139,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker getMarkerForItem(Displayable item) {
+
         for (Entry<String, Displayable> entry : mDisplayedItems.entrySet()) {
             if (entry.getValue().equals(item)) {
                 return mDictionnaryMarkers.get(entry.getKey());
@@ -209,6 +210,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public void updateMarkers(Context context, Set<Displayable> itemsToDisplay) {
+
         Log.d(TAG, "updateMarkers");
         // In the list friendsToDisplay, search if each friend s already
         // displayed
@@ -220,7 +222,6 @@ public class DefaultMarkerManager implements MarkerManager {
                 marker = this.getMarkerForItem(item);
             } else {
                 marker = this.addMarker(item, context);
-
             }
 
             // Log.d("markers", "marker's position for " + item.getTitle() +

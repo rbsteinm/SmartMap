@@ -178,9 +178,8 @@ public class OwnPositionService extends Service {
                 // Creates a Criteria, used to chose LocationManager settings
                 Criteria criteria = new Criteria();
                 criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                Log.d(TAG, "Avant de get une fois notre position");
+
                 mLocManager.requestSingleUpdate(criteria, new MyLocationListener(), null);
-                Log.d(TAG, "Après de get une fois notre position");
                 // Try to run LocationManager with Network Provider
                 if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                     mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_TIME,

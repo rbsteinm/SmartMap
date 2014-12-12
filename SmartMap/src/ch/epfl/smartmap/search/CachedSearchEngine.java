@@ -15,7 +15,7 @@ import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.Filter;
+import ch.epfl.smartmap.cache.FilterInterface;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
@@ -33,8 +33,13 @@ public final class CachedSearchEngine implements SearchEngine {
 
     private static final String TAG = CachedSearchEngine.class.getSimpleName();
 
+    public static CachedSearchEngine getInstance() {
+        return ONE_INSTANCE;
+    }
+
     private final Map<String, Set<Long>> mPreviousOnlineStrangerSearches;
     private final List<Location> mPreviousOnlineEventSearchQueries;
+
     private final List<Set<Long>> mPreviousOnlineEventSearchResults;
 
     public CachedSearchEngine() {
@@ -213,7 +218,7 @@ public final class CachedSearchEngine implements SearchEngine {
                                 ServiceContainer.getCache().putUser(networkResult);
                                 if (callback != null) {
 
-                                    callback.onResult(ServiceContainer.getCache().getStranger(id));
+                                    callback.onResult(ServiceContainer.getCache().getUser(id));
                                 }
                                 return null;
                             } else {
@@ -245,7 +250,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                 for (long id : ids) {
                     // Check for live instance
-                    User stranger = ServiceContainer.getCache().getStranger(id);
+                    User stranger = ServiceContainer.getCache().getUser(id);
 
                     if (stranger != null) {
                         // Found in cache, add to set of live instances
@@ -270,7 +275,7 @@ public final class CachedSearchEngine implements SearchEngine {
                 ServiceContainer.getCache().putUsers(immutableResult);
                 // Retrieve live instances from cache
                 for (ImmutableUser user : immutableResult) {
-                    result.add(ServiceContainer.getCache().getStranger(user.getId()));
+                    result.add(ServiceContainer.getCache().getUser(user.getId()));
                 }
 
                 // Give results to the caller
@@ -292,9 +297,12 @@ public final class CachedSearchEngine implements SearchEngine {
                     // Fetch in cache
                     Set<Long> localResult = mPreviousOnlineStrangerSearches.get(query);
                     for (Long id : localResult) {
-                        User cachedUser = ServiceContainer.getCache().getStranger(id);
+                        User cachedUser = ServiceContainer.getCache().getUser(id);
                         if (cachedUser != null) {
-                            result.add(cachedUser);
+                            if ((cachedUser.getFriendship() != User.FRIEND)
+                                && (cachedUser.getFriendship() != User.SELF)) {
+                                result.add(cachedUser);
+                            }
                         }
                     }
                 } else {
@@ -394,8 +402,8 @@ public final class CachedSearchEngine implements SearchEngine {
                 }
                 break;
             case TAGS:
-                for (Filter f : ServiceContainer.getCache().getAllFilters()) {
-                    if (f.getName().toLowerCase(Locale.US).contains(query)) {
+                for (FilterInterface f : ServiceContainer.getCache().getAllCustomFilters()) {
+                    if ((f.getName() != null) && f.getName().toLowerCase(Locale.US).contains(query)) {
                         results.add(f);
                     }
                 }
@@ -405,9 +413,5 @@ public final class CachedSearchEngine implements SearchEngine {
                 break;
         }
         return results;
-    }
-
-    public static CachedSearchEngine getInstance() {
-        return ONE_INSTANCE;
     }
 }

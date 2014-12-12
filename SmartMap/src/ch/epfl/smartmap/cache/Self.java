@@ -76,4 +76,9 @@ public class Self extends User {
     public String getSubtitle() {
         return "You are near " + ServiceContainer.getSettingsManager().getLocationName();
     }
+
+    @Override
+    public User.blockStatus isBlocked() {
+        return User.blockStatus.UNBLOCKED;
+    }
 }

@@ -130,7 +130,7 @@ public class ModifyFilterActivity extends Activity {
                 this.finish();
                 break;
             case R.id.action_save_filter:
-                this.saveFilterDialog();
+                this.saveFilter();
                 break;
             case R.id.action_rename_filter:
                 this.renameFilterDialog(item);
@@ -162,8 +162,8 @@ public class ModifyFilterActivity extends Activity {
                         (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                     String newName = editText.getText().toString();
 
-                    mCache.putFilter(new ImmutableFilter(mFilter.getId(), newName, mFilter.getFriendIds(),
-                        mFilter.isActive()));
+                    mCache.putFilter(new ImmutableFilter(mFilter.getId(), newName, mFilter.getIds(), mFilter
+                        .isActive()));
 
                     Toast.makeText(ModifyFilterActivity.this,
                         ModifyFilterActivity.this.getResources().getString(R.string.new_name_saved),
@@ -187,6 +187,14 @@ public class ModifyFilterActivity extends Activity {
         builder.create().show();
     }
 
+    public void saveFilter() {
+        mCache.putFilter(new ImmutableFilter(mFilter.getId(), mFilter.getName(), ModifyFilterActivity.this
+            .friendListToIdSet(mFriendsInside), mFilter.isActive()));
+        Toast.makeText(ModifyFilterActivity.this,
+            ModifyFilterActivity.this.getResources().getString(R.string.changes_saved), Toast.LENGTH_LONG)
+            .show();
+    }
+
     private Set<Long> friendListToIdSet(List<User> friendList) {
         Set<Long> idSet = new HashSet<Long>();
         for (User friend : friendList) {
@@ -204,6 +212,7 @@ public class ModifyFilterActivity extends Activity {
             new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
+                    // TODO
                     mCache.removeFilter(mFilter.getId());
                     Toast.makeText(ModifyFilterActivity.this,
                         ModifyFilterActivity.this.getResources().getString(R.string.removed_filter),
@@ -226,41 +235,10 @@ public class ModifyFilterActivity extends Activity {
         builder.create().show();
     }
 
-    private void saveFilterDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(this.getResources().getString(R.string.save_changes));
-
-        // Add positive button
-        builder.setPositiveButton(this.getResources().getString(R.string.yes),
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    mCache.putFilter(new ImmutableFilter(mFilter.getId(), mFilter.getName(),
-                        ModifyFilterActivity.this.friendListToIdSet(mFriendsInside), mFilter.isActive()));
-                    Toast.makeText(ModifyFilterActivity.this,
-                        ModifyFilterActivity.this.getResources().getString(R.string.changes_saved),
-                        Toast.LENGTH_LONG).show();
-
-                }
-            });
-
-        // Add negative button
-        builder.setNegativeButton(this.getResources().getString(R.string.no),
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-
-                }
-            });
-
-        // display the AlertDialog
-        builder.create().show();
-    }
-
     private void setFilter() {
         mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
-        for (long id : mFilter.getFriendIds()) {
-            mFriendsInside.add(mCache.getFriend(id));
+        for (long id : mFilter.getIds()) {
+            mFriendsInside.add(mCache.getUser(id));
         }
         for (User friend : mCache.getAllFriends()) {
             if (!mFriendsInside.contains(friend)) {
@@ -298,7 +276,7 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mOutsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mCache.getFriend(droppedItemId);
+                        User droppedItem = mCache.getUser(droppedItemId);
                         if (mFriendsInside.contains(droppedItem)) {
                             mFriendsInside.remove(droppedItem);
                             mFriendsOutside.add(droppedItem);
@@ -357,7 +335,7 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mInsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mCache.getFriend(droppedItemId);
+                        User droppedItem = mCache.getUser(droppedItemId);
                         if (mFriendsOutside.contains(droppedItem)) {
                             mFriendsInside.add(droppedItem);
                             mFriendsOutside.remove(droppedItem);

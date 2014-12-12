@@ -2,6 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import android.graphics.Bitmap;
 import android.location.Location;
+import ch.epfl.smartmap.cache.User.blockStatus;
 
 /**
  * Immutable implementation of User, which serves only as container purposes, therefore all set methods are
@@ -12,14 +13,14 @@ import android.location.Location;
 public final class ImmutableUser {
 
     // User informations
-    private long mId;
-    private String mName;
+    private final long mId;
+    private final String mName;
     private String mPhoneNumber;
     private String mEmail;
     private String mLocationString;
     private Location mLocation;
     private Bitmap mImage;
-    private boolean mIsBlocked;
+    private User.blockStatus mIsBlocked;
     private int mFriendship;
 
     /**
@@ -35,8 +36,7 @@ public final class ImmutableUser {
      * @param image
      */
     public ImmutableUser(long id, String name, String phoneNumber, String email, Location location,
-        String locationString, Bitmap image, boolean isBlocked, int friendship) {
-
+        String locationString, Bitmap image, User.blockStatus isBlocked, int friendship) {
         mId = id;
         mName = name;
         mPhoneNumber = phoneNumber;
@@ -80,12 +80,22 @@ public final class ImmutableUser {
         return mPhoneNumber;
     }
 
-    public Boolean isBlocked() {
+    public User.blockStatus isBlocked() {
         return mIsBlocked;
+    }
+
+    public ImmutableUser setBlocked(blockStatus blockedStatus) {
+        mIsBlocked = blockedStatus;
+        return this;
     }
 
     public ImmutableUser setEmail(String newEmail) {
         mEmail = newEmail;
+        return this;
+    }
+
+    public ImmutableUser setFriendship(int newFriendship) {
+        mFriendship = newFriendship;
         return this;
     }
 
@@ -95,7 +105,7 @@ public final class ImmutableUser {
     }
 
     public ImmutableUser setLocation(Location newLocation) {
-        mLocation = new Location(newLocation);
+        mLocation = newLocation;
         return this;
     }
 

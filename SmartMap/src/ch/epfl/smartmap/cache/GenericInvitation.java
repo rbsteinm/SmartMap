@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
-import ch.epfl.smartmap.activities.ShowEventsActivity;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 
@@ -20,6 +19,15 @@ public class GenericInvitation implements Invitation, Comparable {
 
     @SuppressWarnings("unused")
     private static final String TAG = GenericInvitation.class.getSimpleName();
+
+    private static final Bitmap ADD_PERSON_BITMAP = BitmapFactory.decodeResource(ServiceContainer
+        .getSettingsManager().getContext().getResources(), R.drawable.ic_action_add_person);
+
+    private static final Bitmap ACCEPTED_FRIEND = BitmapFactory.decodeResource(ServiceContainer
+        .getSettingsManager().getContext().getResources(), R.drawable.ic_accepted_friend_request);
+
+    private static final Bitmap NEW_EVENT = BitmapFactory.decodeResource(ServiceContainer
+        .getSettingsManager().getContext().getResources(), R.drawable.ic_action_event_request);
 
     private User mUser;
     private Event mEvent;
@@ -72,7 +80,7 @@ public class GenericInvitation implements Invitation, Comparable {
 
     @Override
     public int compareTo(Object that) {
-        return Long.valueOf(this.getId()).compareTo(Long.valueOf(((Invitation) that).getId()));
+        return Long.valueOf(Long.valueOf(((Invitation) that).getId())).compareTo(this.getId());
     }
 
     @Override
@@ -94,15 +102,11 @@ public class GenericInvitation implements Invitation, Comparable {
     @Override
     public Bitmap getImage() {
         if (this.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
-            return BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
-                .getResources(), R.drawable.ic_accepted_friend_request);
+            return ACCEPTED_FRIEND;
         } else if (this.getType() == Invitation.FRIEND_INVITATION) {
-            return BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
-                .getResources(), R.drawable.ic_action_add_person);
+            return ADD_PERSON_BITMAP;
         } else {
-            // TODO change
-            return BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
-                .getResources(), R.drawable.ic_action_add_person);
+            return NEW_EVENT;
         }
     }
 
@@ -126,23 +130,18 @@ public class GenericInvitation implements Invitation, Comparable {
         if (mType == ImmutableInvitation.FRIEND_INVITATION) {
             if ((mStatus == READ) || (mStatus == UNREAD)) {
                 intent = new Intent(context, FriendsPagerActivity.class);
-                intent.putExtra("INVITATION", true);
-            } else if (mStatus == ACCEPTED) {
+            } else if ((mStatus == ACCEPTED) || (mStatus == DECLINED)) {
                 intent = new Intent(context, UserInformationActivity.class);
                 intent.putExtra("USER", mUser.getId());
             }
         } else if (mType == ImmutableInvitation.EVENT_INVITATION) {
-            if (mStatus == READ) {
-                intent = new Intent(context, ShowEventsActivity.class);
-                intent.putExtra("invitation", true);
-            } else if (mStatus == ACCEPTED) {
-                intent = new Intent(context, EventInformationActivity.class);
-                intent.putExtra("EVENT", mEvent.getId());
-            }
+            intent = new Intent(context, EventInformationActivity.class);
+            intent.putExtra("EVENT", mEvent.getId());
         } else {
             intent = new Intent(context, UserInformationActivity.class);
             intent.putExtra("USER", mUser.getId());
         }
+        intent.putExtra("INVITATION", true);
         return intent;
     }
 

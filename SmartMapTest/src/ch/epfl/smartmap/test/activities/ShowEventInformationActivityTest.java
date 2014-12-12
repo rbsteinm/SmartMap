@@ -11,6 +11,7 @@ import android.location.Location;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ShowEventsActivity;
+import ch.epfl.smartmap.util.Utils;
 
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
@@ -36,30 +37,6 @@ public class ShowEventInformationActivityTest extends ActivityInstrumentationTes
 
     public ShowEventInformationActivityTest() {
         super(ShowEventsActivity.class);
-    }
-
-    private void addMockEventsInDB() {
-
-        Calendar timeE3 = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
-        timeE3.add(GregorianCalendar.MINUTE, 5);
-        Calendar timeEndE3 = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
-        timeEndE3.add(GregorianCalendar.MINUTE, 10);
-        Location verbier = new Location("Verbier");
-        verbier.setLatitude(46.096076);
-        verbier.setLongitude(7.228875);
-
-        /*
-         * PublicEvent e3 = new PublicEvent(EVENT_NAME, 1, CREATOR_NAME, timeE3,
-         * timeEndE3, verbier);
-         * e3.setID(3);
-         * e3.setPositionName("Verbier");
-         * String descrE3 = DESCRIPTION;
-         * e3.setDescription(descrE3);
-         * DatabaseHelper dbHelper = DatabaseHelper.getInstance();
-         * dbHelper.clearAll();
-         * dbHelper.addEvent(e3);
-         */
-
     }
 
     // The standard JUnit 3 setUp method run for for every test
@@ -90,9 +67,11 @@ public class ShowEventInformationActivityTest extends ActivityInstrumentationTes
 
         onView(ViewMatchers.withId(android.R.id.button3)).perform(ViewActions.click());
 
-        onView(withId(R.id.show_event_info_end_date)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withId(R.id.show_event_info_end_date)).check(
+            ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
-        onView(withId(R.id.show_event_info_end_hour)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withId(R.id.show_event_info_end_hour)).check(
+            ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
     }
 
@@ -100,15 +79,16 @@ public class ShowEventInformationActivityTest extends ActivityInstrumentationTes
         onView(withId(0)).perform(ViewActions.click());
         onView(ViewMatchers.withId(android.R.id.button3)).perform(ViewActions.click());
 
-        onView(withId(R.id.show_event_info_event_name))
-            .check(ViewAssertions.matches(ViewMatchers.withText(EVENT_NAME)));
+        onView(withId(R.id.show_event_info_event_name)).check(
+            ViewAssertions.matches(ViewMatchers.withText(EVENT_NAME)));
     }
 
     public void testStartDisplayedCorrectly() {
         onView(withId(0)).perform(ViewActions.click());
         onView(ViewMatchers.withId(android.R.id.button3)).perform(ViewActions.click());
 
-        onView(withId(R.id.show_event_info_start_date)).check(ViewAssertions.matches(ViewMatchers.withText("Today")));
+        onView(withId(R.id.show_event_info_start_date)).check(
+            ViewAssertions.matches(ViewMatchers.withText("Today")));
     }
 
     public void testTownAndCitiyDisplayedCorrectly() {
@@ -117,6 +97,30 @@ public class ShowEventInformationActivityTest extends ActivityInstrumentationTes
 
         onView(withId(R.id.show_event_info_town_and_country)).check(
             ViewAssertions.matches(ViewMatchers.withText("Verbier, Switzerland")));
+    }
+
+    private void addMockEventsInDB() {
+
+        Calendar timeE3 = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+        timeE3.add(GregorianCalendar.MINUTE, 5);
+        Calendar timeEndE3 = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+        timeEndE3.add(GregorianCalendar.MINUTE, 10);
+        Location verbier = new Location("Verbier");
+        verbier.setLatitude(46.096076);
+        verbier.setLongitude(7.228875);
+
+        /*
+         * PublicEvent e3 = new PublicEvent(EVENT_NAME, 1, CREATOR_NAME, timeE3,
+         * timeEndE3, verbier);
+         * e3.setID(3);
+         * e3.setPositionName("Verbier");
+         * String descrE3 = DESCRIPTION;
+         * e3.setDescription(descrE3);
+         * DatabaseHelper dbHelper = DatabaseHelper.getInstance();
+         * dbHelper.clearAll();
+         * dbHelper.addEvent(e3);
+         */
+
     }
 
 }

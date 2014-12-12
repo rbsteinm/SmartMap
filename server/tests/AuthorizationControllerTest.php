@@ -467,4 +467,96 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
 
         $controller->setVisibility($request);
     }
+
+    public function testBlockFriend()
+    {
+        $this->mockRepo->expects($this->once())
+             ->method('setFriendshipStatus')
+             ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('DISALLOWED'));
+
+        $this->mockRepo->expects($this->once())
+             ->method('setFriendshipFollow')
+             ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('UNFOLLOWED'));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $response = $controller->blockFriend($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Blocked friend.');
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in blockFriend.
+     */
+    public function testBlockFriendDBException()
+    {
+        $this->mockRepo
+             ->method('setFriendshipStatus')
+             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $controller->blockFriend($request);
+    }
+
+    public function testUnblockFriend()
+    {
+        $this->mockRepo->expects($this->once())
+            ->method('setFriendshipStatus')
+            ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('ALLOWED'));
+
+        $this->mockRepo->expects($this->once())
+            ->method('setFriendshipFollow')
+            ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('FOLLOWED'));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $response = $controller->unblockFriend($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Unblocked friend.');
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in unblockFriend.
+     */
+    public function testUnblockFriendDBException()
+    {
+        $this->mockRepo
+            ->method('setFriendshipStatus')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $controller->unblockFriend($request);
+    }
 }

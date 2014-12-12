@@ -31,7 +31,9 @@ import com.google.android.gms.maps.model.LatLng;
  * @author SpicyCH
  * @author rbsteinm
  */
-public class Utils {
+public final class Utils {
+
+    public static final String GMT_SWITZERLAND = "GMT+01:00";
 
     public static final long ONE_SECOND = 1000;
     public static final long ONE_MINUTE = 60 * ONE_SECOND;
@@ -40,31 +42,50 @@ public class Utils {
     public static final long TEN_DAYS = 10 * ONE_DAY;
     public static final long ONE_YEAR = 365 * ONE_DAY;
     public static final int DAYS_IN_A_WEEK = 7;
+    public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
+        .getString(R.string.utils_never_seen_on_smartmap);
+
+    private static final String TAG = Utils.class.getSimpleName();
+
     private static final float MAX_COLOR = 255f;
     private static final double ONE_THOUSAND_METERS = 1000.0;
     private static final double TEN = 10.0;
 
-    public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
-        .getString(R.string.utils_never_seen_on_smartmap);
-    private static final String TAG = Utils.class.getSimpleName();
-
     /**
-     * Private onstructor so that Utils cannot be instantiated
+     * Private constructor so that Utils cannot be instantiated.
      */
     private Utils() {
         super();
     }
 
+    /**
+     * @param latLng
+     *            the coordinates of point P
+     * @return the distance between the user and P
+     * @author rbsteinm
+     */
     public static double distanceToMe(LatLng latLng) {
-        return Math.sqrt(Math.pow(latLng.latitude
-            - ServiceContainer.getSettingsManager().getLocation().getLatitude(), 2)
-            + Math.pow(latLng.longitude, ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+        Location loc = new Location("");
+        loc.setLatitude(latLng.latitude);
+        loc.setLongitude(latLng.longitude);
+        return ServiceContainer.getSettingsManager().getLocation().distanceTo(loc);
     }
 
+    /**
+     * @param location
+     *            the location of point P
+     * @return the distance between the user and P
+     * @author rbsteinm
+     */
     public static double distanceToMe(Location location) {
         return ServiceContainer.getSettingsManager().getLocation().distanceTo(location);
     }
 
+    /**
+     * @param location
+     * @return a String of the city associated with the given coordinates, the country name if city not found,
+     *         <code>NO_LOCATION_STRING</code> if nothing could be found.
+     */
     public static String getCityFromLocation(Location location) {
         if (location == null) {
             return Displayable.NO_LOCATION_STRING;
@@ -97,8 +118,8 @@ public class Utils {
             if ((startValue < value) && (value < endValue)) {
                 // Compute a mix of the two colors
                 double intervalLength = endValue - startValue;
-                double percentageStart = (startValue - value) / intervalLength;
-                double percentageEnd = (value - endValue) / intervalLength;
+                double percentageStart = -(startValue - value) / intervalLength;
+                double percentageEnd = -(value - endValue) / intervalLength;
 
                 int red =
                     (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
@@ -108,6 +129,8 @@ public class Utils {
                 int blue =
                     (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
 
+                Log.d(TAG, "start : " + percentageStart + "end : " + percentageEnd);
+                Log.d(TAG, "Middle color/ R : " + red + " B : " + blue + " G : " + green);
                 return Color.rgb(red, green, blue);
             } else if (value < startValue) {
                 return startColor;
@@ -117,6 +140,10 @@ public class Utils {
         }
     }
 
+    /**
+     * @param location
+     * @return the country associated to the coordinates or <code>NO_LOCATION_STRING</code>.
+     */
     public static String getCountryFromLocation(Location location) {
         if (location == null) {
             return Displayable.NO_LOCATION_STRING;
@@ -139,9 +166,15 @@ public class Utils {
         }
     }
 
+    /**
+     * Gets a human readable String fromt the given date.
+     * 
+     * @param calendar
+     * @return a String of the form "Today", "25.12.2014", etc...
+     */
     public static String getDateString(Calendar calendar) {
 
-        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(GMT_SWITZERLAND));
         int yearsDiff = calendar.get(Calendar.YEAR) - now.get(Calendar.YEAR);
         int daysDiff = calendar.get(Calendar.DAY_OF_YEAR) - now.get(Calendar.DAY_OF_YEAR);
 
@@ -166,15 +199,22 @@ public class Utils {
                     + calendar.get(Calendar.YEAR);
             }
         } else {
-            return formatForClock(calendar.get(Calendar.DAY_OF_MONTH)) + "."
-                + formatForClock(calendar.get(Calendar.MONTH)) + "." + calendar.get(Calendar.YEAR);
+            // Do not forget that the first month in a GregorianCalendar is 0! bug #82
+            int month = calendar.get(Calendar.MONTH) + 1;
+            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month)
+                + "." + calendar.get(Calendar.YEAR);
         }
     }
 
+    /**
+     * @param calendar
+     * @return A String representing the time since we last saw the user on SmartMap. For example "Now" or
+     *         "1 minute ago".
+     */
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
         long diff =
-            GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis()
+            GregorianCalendar.getInstance(TimeZone.getTimeZone(GMT_SWITZERLAND)).getTimeInMillis()
                 - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
@@ -226,8 +266,8 @@ public class Utils {
     }
 
     public static String getTimeString(Calendar calendar) {
-        return formatForClock(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
-            + formatForClock(calendar.get(Calendar.MINUTE));
+        return formatForDisplay(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
+            + formatForDisplay(calendar.get(Calendar.MINUTE));
     }
 
     /**
@@ -281,7 +321,7 @@ public class Utils {
      * @return the time prefixed with 0 if it was < 10
      * @author SpicyCH
      */
-    private static String formatForClock(int time) {
+    private static String formatForDisplay(int time) {
         String hourOfDayString = "";
         if (time < TEN) {
             hourOfDayString += "0" + time;

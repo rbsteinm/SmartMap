@@ -19,17 +19,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.database.DatabaseHelper;
-import ch.epfl.smartmap.search.CachedSearchEngine;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 
 import com.facebook.Session;
 
 /**
- * This Activity displays the introduction to the app and the authentication if
- * you are not already logged in, in the
+ * This Activity displays the introduction to the app and the authentication if you are not already logged in, in the
  * other case it just loads mainActivity
  * 
  * @author agpmilli
@@ -49,34 +43,53 @@ public class StartActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Beware of the order in which services are created, Cache and
-        // InvitationManager depend on NetworkClient and DatabaseHelper in their
-        // constructors!
-        // TODO: This should be modified to allow complete switching or
-        // services, or be made explicit in their constructors.
-        ServiceContainer.setSettingsManager(new SettingsManager(this));
-        ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
-        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this));
-        ServiceContainer.setCache(new Cache());
-        ServiceContainer.setSearchEngine(new CachedSearchEngine());
-
-        // Displays the facebook app hash in LOG.d
-        try {
-            Log.d(TAG, "Retrieving sha1 app hash...");
-            PackageInfo info =
-                this.getPackageManager().getPackageInfo("ch.epfl.smartmap", PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-            }
-        } catch (NameNotFoundException e) {
-            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
-        }
-
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_start);
+
+        ServiceContainer.initSmartMapServices(this);
+
+        this.printSha1InLogcat();
+
+        this.initializeGUI();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Set background color of activity
+     * 
+     * @param color
+     *            the color
+     */
+    public void setActivityBackgroundColor(int color) {
+        View view = this.getWindow().getDecorView();
+        view.setBackgroundColor(color);
+    }
+
+    /**
+     * Initilizes the user interface.
+     * 
+     * @author agpmilli
+     */
+    private void initializeGUI() {
 
         // Set background color of activity
         this.setActivityBackgroundColor(this.getResources().getColor(R.color.main_blue));
@@ -112,7 +125,7 @@ public class StartActivity extends FragmentActivity {
                 public void run() {
                     mFacebookFragment = new LoginFragment();
                     StartActivity.this.getSupportFragmentManager().beginTransaction()
-                        .add(android.R.id.content, mFacebookFragment).commit();
+                            .add(android.R.id.content, mFacebookFragment).commit();
                     Log.d(TAG, "facebook session is open");
                 }
             }, timeOut);
@@ -123,70 +136,29 @@ public class StartActivity extends FragmentActivity {
             mLogoImage.setVisibility(View.INVISIBLE);
 
             mFacebookFragment = new LoginFragment();
-            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment)
-                .commit();
+            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment).commit();
         }
-
-        // Beware of the order in which services are created, Cache and
-        // InvitationManager depend on NetworkClient and DatabaseHelper in their
-        // constructors!
-        // TODO: This should be modified to allow complete switching or
-        // services, or be made explicit in their constructors.
-        ServiceContainer.setNetworkClient(new NetworkSmartMapClient());
-        ServiceContainer.setSettingsManager(new SettingsManager(this.getApplication()));
-        ServiceContainer.setDatabaseHelper(new DatabaseHelper(this.getApplication()));
-        ServiceContainer.setCache(new Cache());
-        ServiceContainer.setSearchEngine(new CachedSearchEngine());
     }
 
     /**
-     * Checks that the Representation Invariant is not violated.
      * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
-        }
-
-        int auditErrors = 0;
-        // auditErrors += mSearchEngine.auditErrors(depth - 1);
-        // What are the rep invariants?
-
-        return auditErrors;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Set background color of activity
+     * Displays the facebook app hash in LOG.d. This hash must match the one defined in facebook and google developer.
      * 
-     * @param color
-     *            the color
+     * @author SpicyCH
      */
-    public void setActivityBackgroundColor(int color) {
-        View view = this.getWindow().getDecorView();
-        view.setBackgroundColor(color);
+    private void printSha1InLogcat() {
+        try {
+            Log.d(TAG, "Retrieving sha1 app hash...");
+            PackageInfo info = this.getPackageManager().getPackageInfo("ch.epfl.smartmap",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+            }
+        } catch (NameNotFoundException e) {
+            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)" + e);
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)" + e);
+        }
     }
 }

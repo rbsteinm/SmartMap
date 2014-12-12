@@ -27,9 +27,11 @@ import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.User;
 
 /**
- * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider} to communicate with a SmartMap
+ * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider}
+ * to communicate with a SmartMap
  * server.
  * 
  * @author marion-S
@@ -389,8 +391,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-        // FIXME Don't retrieve removed Friends?
-
         return new NetworkFriendInvitationBag(inviters, newFriends, removedFriends);
 
     }
@@ -457,10 +457,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     public ImmutableUser getUserInfo(long id) throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("user_id", Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/getUserInfo");
+        params.put("user_id", Long.toString(id));
         String response = this.sendViaPost(params, conn);
-
         SmartMapParser parser = null;
         ImmutableUser friend = null;
         try {
@@ -593,6 +592,11 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         } catch (SmartMapParseException e) {
             throw new SmartMapClientException(e);
         }
+
+        for (ImmutableUser user : users) {
+            user.setFriendship(User.FRIEND);
+        }
+
         return users;
     }
 

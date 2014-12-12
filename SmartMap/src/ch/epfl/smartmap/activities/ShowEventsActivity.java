@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -24,6 +26,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.gui.EventViewHolder;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
+import ch.epfl.smartmap.listeners.OnCacheListener;
 import ch.epfl.smartmap.util.Utils;
 
 /**
@@ -37,7 +40,13 @@ public class ShowEventsActivity extends ListActivity {
 
     private static final int SEEK_BAR_MIN_VALUE = 2;
 
+    private static final int METERS_IN_ONE_KM = 1000;
+
+    private static final double THREE_AND_A_HALF = 0.75;
+
     private SeekBar mSeekBar;
+
+    private Activity mActivity;
 
     private TextView mShowKilometers;
 
@@ -56,11 +65,23 @@ public class ShowEventsActivity extends ListActivity {
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-        this.initializeGUI();
+        mActivity = this;
 
-        // Create custom Adapter and pass it to the Activity
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList);
-        this.setListAdapter(adapter);
+        if (ServiceContainer.getSettingsManager().getNearEventsMaxDistance() == 0) {
+            // The user has disabled events fetching in the settings, hence he has no chance to see events in this list.
+            // We warn him with an AlertDialog.
+
+            this.noEventsFetchedWarning();
+        }
+
+        // Initialize the listener
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onEventListUpdate() {
+                ShowEventsActivity.this.initializeGUI();
+            }
+        });
+
     }
 
     @Override
@@ -71,8 +92,7 @@ public class ShowEventsActivity extends ListActivity {
     }
 
     /**
-     * Triggered when a checkbox is clicked. Updates the displayed list of
-     * events.
+     * Triggered when a checkbox is clicked. Updates the displayed list of events.
      * 
      * @param v
      *            the checkbox whose status changed
@@ -142,10 +162,16 @@ public class ShowEventsActivity extends ListActivity {
 
         // This is needed to show an update of the events' list after having
         // created one.
-        this.updateCurrentList();
+        this.initializeGUI();
     }
 
     /**
+     * Displays the AlertDialog with events infos.
+     * 
+     * @param event
+     *            the event to show a dialog for
+     * @param creatorName
+     *            the creator of the event
      * @author SpicyCH
      */
     private void displayDialog(final Event event, String creatorName) {
@@ -154,45 +180,41 @@ public class ShowEventsActivity extends ListActivity {
         Calendar start = event.getStartDate();
         Calendar end = event.getEndDate();
 
-        final String message =
-            Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - " + Utils.getDateString(end)
-                + " " + Utils.getTimeString(end) + "\n"
+        final String message = Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - "
+                + Utils.getDateString(end) + " " + Utils.getTimeString(end) + "\n"
                 + ShowEventsActivity.this.getString(R.string.show_event_by) + " " + creatorName + "\n\n"
                 + event.getDescription();
 
         alertDialog.setTitle(event.getName() + " " + this.getResources().getString(R.string.near) + " "
-            + event.getLocationString() + "\n" + Utils.distanceToMe(event.getLocation()));
+                + event.getLocationString());
 
         alertDialog.setMessage(message);
 
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-            ShowEventsActivity.this.getString(R.string.show_event_on_the_map_button),
-            new DialogInterface.OnClickListener() {
+                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_button),
+                new DialogInterface.OnClickListener() {
 
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    Toast.makeText(ShowEventsActivity.this,
-                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                        Toast.LENGTH_SHORT).show();
-                    Intent showEventIntent = new Intent(ShowEventsActivity.this, MainActivity.class);
-                    showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
-                    ShowEventsActivity.this.startActivity(showEventIntent);
-                }
-            });
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(ShowEventsActivity.this,
+                                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                                Toast.LENGTH_SHORT).show();
+                        Intent showEventIntent = new Intent(ShowEventsActivity.this, MainActivity.class);
+                        showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
+                        ShowEventsActivity.this.startActivity(showEventIntent);
+                    }
+                });
 
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
-            ShowEventsActivity.this.getString(R.string.show_event_details_button),
-            new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    Intent showEventIntent =
-                        new Intent(ShowEventsActivity.this, EventInformationActivity.class);
-                    showEventIntent.putExtra("EVENT", event.getId());
-                    ShowEventsActivity.this.startActivity(showEventIntent);
-                }
-            });
-
+                ShowEventsActivity.this.getString(R.string.show_event_details_button),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent showEventIntent = new Intent(ShowEventsActivity.this, EventInformationActivity.class);
+                        showEventIntent.putExtra("EVENT", event.getId());
+                        ShowEventsActivity.this.startActivity(showEventIntent);
+                    }
+                });
         alertDialog.show();
     }
 
@@ -204,13 +226,12 @@ public class ShowEventsActivity extends ListActivity {
      * </p>
      * 
      * @param position
-     *            the position of item that has been clicked
      * @author SpicyCH
      */
     private void displayInfoDialog(int position) {
 
-        Toast.makeText(ShowEventsActivity.this, this.getString(R.string.show_event_loading_info),
-            Toast.LENGTH_SHORT).show();
+        Toast.makeText(ShowEventsActivity.this, this.getString(R.string.show_event_loading_info), Toast.LENGTH_SHORT)
+                .show();
 
         final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
 
@@ -231,8 +252,7 @@ public class ShowEventsActivity extends ListActivity {
             Log.e(TAG, "The server returned a null event or creatorName");
 
             Toast.makeText(ShowEventsActivity.this,
-                ShowEventsActivity.this.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT)
-                .show();
+                    ShowEventsActivity.this.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT).show();
 
         } else {
 
@@ -247,23 +267,94 @@ public class ShowEventsActivity extends ListActivity {
 
     }
 
+    /**
+     * Initilizes the activity.
+     * 
+     * @author SpicyCH
+     */
     private void initializeGUI() {
 
         if (ServiceContainer.getSettingsManager() == null) {
             ServiceContainer.initSmartMapServices(this);
         }
+        ShowEventsActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMyEventsChecked = false;
+                mOngoingChecked = false;
+                mNearMeChecked = false;
 
-        mMyEventsChecked = false;
-        mOngoingChecked = false;
-        mNearMeChecked = false;
+                mShowKilometers = (TextView) ShowEventsActivity.this.findViewById(R.id.showEventKilometers);
 
-        mShowKilometers = (TextView) this.findViewById(R.id.showEventKilometers);
+                mSeekBar = (SeekBar) ShowEventsActivity.this.findViewById(R.id.showEventSeekBar);
+                int max = ServiceContainer.getSettingsManager().getNearEventsMaxDistance() / METERS_IN_ONE_KM;
+                mSeekBar.setMax(max);
+                mSeekBar.setEnabled(false);
+                mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
 
-        mSeekBar = (SeekBar) this.findViewById(R.id.showEventSeekBar);
-        mSeekBar.setEnabled(false);
-        mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
+                if (max > 0) {
+                    int defaultPosition = (int) Math.floor(THREE_AND_A_HALF * max);
+                    mSeekBar.setProgress(defaultPosition);
+                }
 
-        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllVisibleEvents());
+                ShowEventsActivity.this.updateCurrentList();
+            }
+        });
+
+    }
+
+    /**
+     * Warn the user with an <code>AlertDialog</code> that he has disabled events fetching in the settings.
+     * 
+     * @author SpicyCH
+     */
+    private void noEventsFetchedWarning() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        // Set title
+        alertDialogBuilder.setTitle(this.getString(R.string.show_event_disabled_warning_title));
+
+        // Set dialog message
+        alertDialogBuilder
+                .setMessage(this.getString(R.string.show_event_disabled_warning_message))
+                .setCancelable(false)
+                .setPositiveButton(this.getString(R.string.show_event_disabled_warning_button_goto_settings),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Go to the settings
+                                ShowEventsActivity.this.startActivity(new Intent(mActivity, SettingsActivity.class));
+                            }
+                        })
+                .setNegativeButton(this.getString(R.string.show_event_disabled_warning_button_return_to_main),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                mActivity.finish();
+                            }
+                        });
+
+        // show alert dialog
+        alertDialogBuilder.create().show();
+    }
+
+    /**
+     * Remove from mEventsList the events that are further than the distance set in the <code>SeekBar</code>.
+     * 
+     * @author SpicyCH
+     */
+    private void removeEventsToofar() {
+
+        int maximumDistanceKM = mSeekBar.getProgress() * METERS_IN_ONE_KM;
+        Location myLocation = ServiceContainer.getSettingsManager().getLocation();
+
+        List<Event> copy = new ArrayList<Event>(mEventsList);
+
+        for (Event e : copy) {
+            if (e.getLocation().distanceTo(myLocation) > maximumDistanceKM) {
+                mEventsList.remove(e);
+            }
+        }
     }
 
     /**
@@ -276,7 +367,7 @@ public class ShowEventsActivity extends ListActivity {
         mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllEvents());
 
         if (mNearMeChecked) {
-            mEventsList.retainAll(ServiceContainer.getCache().getNearEvents());
+            this.removeEventsToofar();
         }
 
         if (mMyEventsChecked) {
@@ -287,17 +378,16 @@ public class ShowEventsActivity extends ListActivity {
             mEventsList.retainAll(ServiceContainer.getCache().getLiveEvents());
         }
 
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList);
-        this.setListAdapter(adapter);
+        ShowEventsActivity.this.setListAdapter(new EventsListItemAdapter(ShowEventsActivity.this, mEventsList));
+
     }
 
     /**
-     * Listens for the progress change of the Seekbar and updates the list
-     * accordingly.
+     * Listens for the progress change of the Seekbar and updates the list accordingly.
      * 
      * @author SpicyCH
      */
-    class SeekBarChangeListener implements OnSeekBarChangeListener {
+    private class SeekBarChangeListener implements OnSeekBarChangeListener {
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {

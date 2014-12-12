@@ -6,12 +6,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.activities.EventInformationActivity;
-import ch.epfl.smartmap.activities.FriendsPagerActivity;
-import ch.epfl.smartmap.activities.UserInformationActivity;
-import ch.epfl.smartmap.cache.GenericInvitation;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.Invitation;
 
 /**
  * This class creates different sort of notifications
@@ -19,6 +16,9 @@ import ch.epfl.smartmap.cache.User;
  * @author agpmilli
  */
 public class Notifications {
+
+    @SuppressWarnings("unused")
+    private static final String TAG = Notifications.class.getSimpleName();
 
     private static final int VIBRATE_NOTIFICATION_TIME = 500;
 
@@ -28,208 +28,118 @@ public class Notifications {
     private static long notificationID = 0;
 
     /**
-     * Create an accepted friend invitation notification and notify it
+     * Cancel (destroy) all notifications from the status bar
      * 
-     * @param view
-     *            The current view
      * @param context
-     *            The current activity
-     * @param user
-     *            The invited
+     *            the current context
      */
-    public static void acceptedFriendNotification(Context context, GenericInvitation invitation) {
-
-        // Get ID of notifications
-        notificationID++;
-
-        // Prepare intent that redirects the user to FriendActivity
-        Intent friendsInfoIntent = new Intent(context, UserInformationActivity.class);
-        friendsInfoIntent.putExtra("NOTIFICATION", true);
-        friendsInfoIntent.putExtra("USER", invitation.getUser().getId());
-        PendingIntent pFriendIntent =
-            PendingIntent.getActivity(context, 0, friendsInfoIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Add Big View Specific Configuration
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-
-        String[] events = new String[2];
-        events[0] =
-            new String(invitation.getUser().getName() + " "
-                + context.getString(R.string.notification_invitation_accepted));
-        events[1] = context.getString(R.string.notification_open_friend_list);
-
-        // Sets a title for the Inbox style big view
-        inboxStyle.setBigContentTitle(context.getString(R.string.notification_acceptedfriend_title));
-        // Moves events into the big view
-        for (int i = 0; i < events.length; i++) {
-            inboxStyle.addLine(events[i]);
-        }
-
-        // Build notification
-        NotificationCompat.Builder noti =
-            new NotificationCompat.Builder(context)
-                // Sets all notification's specifications in the builder
-                .setStyle(inboxStyle)
-                .setAutoCancel(true)
-                .setContentTitle(context.getString(R.string.notification_acceptedfriend_title))
-                .setContentText(
-                    invitation.getUser().getName() + " "
-                        + context.getString(R.string.notification_invitation_accepted) + "\n"
-                        + context.getString(R.string.notification_open_friend_list))
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setTicker(
-                    invitation.getUser().getName() + " "
-                        + context.getString(R.string.notification_invitation_accepted))
-                .setContentIntent(pFriendIntent);
-
-        if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
-            noti.setVibrate(PATTERN);
-        } else {
-            noti.setVibrate(null);
-        }
-
-        displayNotification(context, noti.build(), notificationID);
-
+    public static void cancelNotification(Context context) {
+        NotificationManager notificationManager =
+            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
     }
 
     /**
-     * Create an event invitation notification and notify it
+     * Create a notification in status bar from an invitation
      * 
-     * @param view
-     *            The current View
-     * @param activity
-     *            The current activity
-     * @param event
-     *            the Event
-     */
-    public static void newEventNotification(Context context, GenericInvitation invitation) {
-
-        // Get ID and the number of ongoing Event notifications
-        notificationID++;
-
-        // Prepare intent that redirect the user to EventActivity
-        Intent showEventIntent = new Intent(context, EventInformationActivity.class);
-        showEventIntent.putExtra("NOTIFICATION", true);
-        showEventIntent.putExtra("EVENT", invitation.getEvent().getId());
-        PendingIntent pEventIntent =
-            PendingIntent.getActivity(context, 0, showEventIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Add Big View Specific Configuration
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-
-        String[] events = new String[2];
-        events[0] =
-            new String(invitation.getUser().getName() + " "
-                + context.getString(R.string.notification_event_invitation) + " "
-                + invitation.getEvent().getName());
-        events[1] = context.getString(R.string.notification_open_event_list);
-
-        // Sets a title for the Inbox style big view
-        inboxStyle.setBigContentTitle(context.getString(R.string.notification_inviteevent_title));
-        // Moves events into the big view
-        for (int i = 0; i < events.length; i++) {
-            inboxStyle.addLine(events[i]);
-        }
-
-        // Build notification
-        NotificationCompat.Builder noti =
-            new NotificationCompat.Builder(context)
-                // Sets all notification's specifications in the builder
-                .setStyle(inboxStyle)
-                .setAutoCancel(true)
-                .setContentTitle(context.getString(R.string.notification_inviteevent_title))
-                .setContentText(
-                    invitation.getUser().getName() + " "
-                        + context.getString(R.string.notification_event_invitation)
-                        + invitation.getEvent().getName() + "\n"
-                        + context.getString(R.string.notification_open_event_list))
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setTicker(
-                    invitation.getUser().getName() + " "
-                        + context.getString(R.string.notification_event_invitation)
-                        + invitation.getEvent().getName()).setContentIntent(pEventIntent);
-        if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
-            noti.setVibrate(PATTERN);
-        } else {
-            noti.setVibrate(null);
-        }
-
-        displayNotification(context, noti.build(), notificationID);
-    }
-
-    /**
-     * Create a friend invitation notification and notify it
-     * 
-     * @param view
-     *            The current view
+     * @param invitation
+     *            invitation on which notification is based on
      * @param context
-     *            The current activity
-     * @param user
-     *            The inviter
+     *            current context
      */
-    public static void newFriendNotification(Context context, User user) {
+    public static void createNotification(Invitation invitation, Context context) {
 
-        // Get ID and the number of ongoing Friend notifications
-        notificationID++;
+        boolean notificationAllowed =
+            ServiceContainer.getSettingsManager().notificationsEnabled()
+                && (invitation.getStatus() == Invitation.UNREAD);
 
-        // Prepare intent that redirects the user to FriendActivity
-        Intent showFriendIntent = new Intent(context, FriendsPagerActivity.class);
-        showFriendIntent.putExtra("INVITATION", true);
-        showFriendIntent.putExtra("NOTIFICATION", true);
-        PendingIntent pFriendIntent =
-            PendingIntent.getActivity(context, 0, showFriendIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Add Big View Specific Configuration
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-
-        String[] events = new String[2];
-        events[0] = user.getName() + " " + context.getString(R.string.notification_friend_invitation);
-        events[1] = context.getString(R.string.notification_open_friend_list);
-
-        // Sets a title for the Inbox style big view
-        inboxStyle.setBigContentTitle(context.getString(R.string.notification_invitefriend_title));
-        // Moves events into the big view
-        for (int i = 0; i < events.length; i++) {
-            inboxStyle.addLine(events[i]);
+        switch (invitation.getType()) {
+            case Invitation.EVENT_INVITATION:
+                notificationAllowed =
+                    notificationAllowed
+                        && ServiceContainer.getSettingsManager().notificationsForEventInvitations();
+                break;
+            case Invitation.FRIEND_INVITATION:
+                notificationAllowed =
+                    notificationAllowed
+                        && ServiceContainer.getSettingsManager().notificationsForFriendRequests();
+                break;
+            case Invitation.ACCEPTED_FRIEND_INVITATION:
+                notificationAllowed =
+                    notificationAllowed
+                        && ServiceContainer.getSettingsManager().notificationsForFriendshipConfirmations();
+                break;
+            default:
+                assert false;
+                break;
         }
 
-        // Build notification
-        NotificationCompat.Builder noti =
-            new NotificationCompat.Builder(context)
-                // Add all notification's specifications in the builder
-                .setStyle(inboxStyle)
-                .setAutoCancel(true)
-                .setContentIntent(pFriendIntent)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setTicker(user.getName() + " " + context.getString(R.string.notification_friend_invitation))
-                .setContentTitle(context.getString(R.string.notification_invitefriend_title))
-                .setContentText(
-                    user.getName() + " " + context.getString(R.string.notification_friend_invitation) + "\n"
-                        + context.getString(R.string.notification_open_friend_list));
+        if (notificationAllowed) {
 
-        if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
-            noti.setVibrate(PATTERN);
-        } else {
-            noti.setVibrate(null);
+            // Get ID and the number of ongoing Event notifications
+            notificationID++;
+
+            // Prepare intent that redirect the user to EventActivity
+            Intent intent = invitation.getIntent();
+
+            Log.d(TAG, "intent : " + intent);
+
+            if (invitation.getType() == Invitation.EVENT_INVITATION) {
+                intent.putExtra("EVENT", invitation.getEvent().getId());
+            } else if (invitation.getType() == Invitation.FRIEND_INVITATION) {
+                intent.putExtra("INVITATION", true);
+            } else if (invitation.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
+                intent.putExtra("USER", invitation.getUser().getId());
+            }
+
+            intent.putExtra("NOTIFICATION", true);
+
+            PendingIntent pendingIntent =
+                PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            // Add Big View Specific Configuration
+            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+            String[] strings = new String[1];
+            strings[0] = invitation.getSubtitle();
+
+            // Sets a title for the Inbox style big view
+            inboxStyle.setBigContentTitle(invitation.getTitle());
+            // Moves events into the big view
+            for (int i = 0; i < strings.length; i++) {
+                inboxStyle.addLine(strings[i]);
+            }
+
+            // Build notification
+            NotificationCompat.Builder noti =
+                new NotificationCompat.Builder(context)
+                    // Sets all notification's specifications in the builder
+                    .setStyle(inboxStyle).setAutoCancel(true).setContentTitle(invitation.getTitle())
+                    .setContentText(invitation.getSubtitle()).setSmallIcon(R.drawable.ic_launcher)
+                    .setTicker(invitation.getSubtitle()).setContentIntent(pendingIntent);
+            if (ServiceContainer.getSettingsManager().notificationsVibrate()) {
+                noti.setVibrate(PATTERN);
+            }
+
+            displayNotification(context, noti.build(), notificationID);
+
         }
-
-        displayNotification(context, noti.build(), notificationID);
-
     }
 
     /**
-     * Build the notification and notify it with notification manager.
+     * Display notification in status bar using notification manager
      * 
-     * @param activity
-     *            current activity
+     * @param context
+     *            the current context
      * @param notification
-     *            notification to notify
+     *            th notification to display
      * @param notificationId
-     *            id of current notification
+     *            the notification id
      */
     private static void displayNotification(Context context, Notification notification, long notificationId) {
         NotificationManager notificationManager =
             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify((int) notificationId, notification);
     }
+
 }

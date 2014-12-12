@@ -226,6 +226,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     public long addFilter(ImmutableFilter filter) {
         // First we insert the filter in the table of lists
         ContentValues filterValues = new ContentValues();
+        filterValues.put(KEY_ID, filter.getId());
         filterValues.put(KEY_NAME, filter.getName());
         filterValues.put(KEY_ACTIVE, filter.isActive() ? 1 : 0);
         long filterID = mDatabase.insert(TABLE_FILTER, null, filterValues);
@@ -259,8 +260,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         // Doesn't store invitation if we can't store the values
-        if ((this.getUser(invitation.getUserInfos().getId()) != null)
-            || (this.getEvent(invitation.getEventInfos().getId()) != null)) {
+        if ((invitation.getUserInfos() != null) || (invitation.getEventInfos() != null)) {
 
             ContentValues values = new ContentValues();
             values.put(KEY_USER_ID, invitation.getUserId());
@@ -283,7 +283,9 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                     // Already stored
                     return Invitation.ALREADY_RECEIVED;
                 } else {
-                    this.addPendingFriend(userInfo.getId());
+                    if (invitation.getStatus() == Invitation.UNREAD) {
+                        this.addPendingFriend(userInfo.getId());
+                    }
                 }
 
                 Log.d(TAG, "Pending ids after : " + this.getPendingFriends());
@@ -344,7 +346,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             }
 
             values.put(KEY_POSNAME, user.getLocationString());
-            values.put(KEY_BLOCKED, user.isBlocked() ? 1 : 0);
+            boolean blocked = false;
+            if (user.isBlocked() == User.blockStatus.BLOCKED) {
+                blocked = true;
+            }
+            values.put(KEY_BLOCKED, blocked ? 1 : 0);
             values.put(KEY_FRIENDSHIP, user.getFriendship());
 
             mDatabase.insert(TABLE_USER, null, values);
@@ -416,7 +422,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The invited user's id
      */
     public void deletePendingFriend(long id) {
-
         mDatabase.delete(TABLE_PENDING, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
@@ -455,6 +460,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     public Set<ImmutableFilter> getAllFilters() {
 
         Set<ImmutableFilter> filters = new HashSet<ImmutableFilter>();
+        Set<Long> filterIds = new HashSet<Long>();
 
         String query = "SELECT  * FROM " + TABLE_FILTER;
 
@@ -467,7 +473,19 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
 
+        for (ImmutableFilter filter : filters) {
+            filterIds.add(filter.getId());
+        }
+
+        Log.d(TAG, "Database contains filter ids : " + filterIds);
+
+        if (!filterIds.contains(Filter.DEFAULT_FILTER_ID)) {
+            Log.d(TAG, "database contains no default filter");
+            filters.add(new ImmutableFilter(Filter.DEFAULT_FILTER_ID, "", new HashSet<Long>(), true));
+        }
+
         cursor.close();
+
         return filters;
     }
 
@@ -590,11 +608,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 null, null, null, null);
 
         String name = "";
-        boolean isActive = cursor.getInt(cursor.getColumnIndex(KEY_ACTIVE)) == 1;
+        boolean isActive = false;
 
         if (cursor != null) {
             cursor.moveToFirst();
             name = cursor.getString(cursor.getColumnIndex(KEY_NAME));
+            isActive = cursor.getInt(cursor.getColumnIndex(KEY_ACTIVE)) == 1;
         }
 
         // Second query to get the associated list of IDs
@@ -729,8 +748,10 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
             cursor.close();
 
-            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image,
-                isBlocked, friendship);
+            User.blockStatus status = isBlocked ? User.blockStatus.BLOCKED : User.blockStatus.UNBLOCKED;
+
+            return new ImmutableUser(id, name, phoneNumber, email, location, locationString, image, status,
+                friendship);
         }
 
         return null;
@@ -897,7 +918,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         values.put(KEY_FRIENDSHIP, friend.getFriendship());
-        values.put(KEY_BLOCKED, friend.isBlocked() ? 1 : 0);
+
+        boolean isBlocked = false;
+        if (friend.isBlocked() == User.blockStatus.BLOCKED) {
+            isBlocked = true;
+        }
+        values.put(KEY_BLOCKED, isBlocked ? 1 : 0);
 
         return mDatabase.update(TABLE_USER, values, KEY_USER_ID + " = ?",
             new String[]{String.valueOf(friend.getId())});
@@ -914,6 +940,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         mDatabase.delete(TABLE_FILTER_USER, null, null);
         mDatabase.delete(TABLE_EVENT, null, null);
         mDatabase.delete(TABLE_EVENT_USER, null, null);
+        mDatabase.delete(TABLE_INVITATIONS, null, null);
 
         Set<User> users = ServiceContainer.getCache().getAllUsers();
         Set<Event> events = ServiceContainer.getCache().getMyEvents();

@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LongSparseArray;
+import ch.epfl.smartmap.background.Notifications;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
@@ -46,7 +47,6 @@ public class Cache {
     private final Set<Long> mFilterIds;
 
     private final Set<Long> mInvitationIds;
-    private final Set<Long> mInvitingFriendsIds;
 
     private final Set<Long> mFriendIds;
 
@@ -70,9 +70,8 @@ public class Cache {
         mEventIds = new HashSet<Long>();
         mFilterIds = new HashSet<Long>();
         mInvitationIds = new HashSet<Long>();
-        mInvitingFriendsIds = new HashSet<Long>();
 
-        nextFilterId = 1;
+        nextFilterId = Filter.DEFAULT_FILTER_ID + 1;
 
         mListeners = new ArrayList<CacheListener>();
     }
@@ -97,6 +96,8 @@ public class Cache {
                             ImmutableUser newFriend =
                                 ServiceContainer.getNetworkClient().acceptInvitation(
                                     invitation.getUser().getId());
+                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
+                            newFriend.setFriendship(User.FRIEND);
                             Cache.this.putUser(newFriend);
                             break;
                         case Invitation.EVENT_INVITATION:
@@ -184,7 +185,6 @@ public class Cache {
                     }
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Error while creating event: " + e);
-                    callback.onFailure();
                     if (callback != null) {
                         callback.onFailure();
                     }
@@ -205,6 +205,7 @@ public class Cache {
                             // Decline online
                             ServiceContainer.getNetworkClient().declineInvitation(
                                 invitation.getUser().getId());
+                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
                             break;
                         case Invitation.EVENT_INVITATION:
                             // No interaction needed here
@@ -236,6 +237,13 @@ public class Cache {
         });
     }
 
+    public synchronized Set<Filter> getAllCustomFilters() {
+        Set<Long> customFilterIds = new HashSet<Long>(mFilterIds);
+        customFilterIds.remove(Filter.DEFAULT_FILTER_ID);
+        Log.d(TAG, "custom filters : " + customFilterIds);
+        return this.getFilters(customFilterIds);
+    }
+
     public synchronized Set<Event> getAllEvents() {
         return this.getEvents(mEventIds);
     }
@@ -245,7 +253,7 @@ public class Cache {
     }
 
     public synchronized Set<User> getAllFriends() {
-        return this.getFriends(mFriendIds);
+        return this.getUsers(mFriendIds);
     }
 
     public synchronized SortedSet<Invitation> getAllInvitations() {
@@ -274,31 +282,28 @@ public class Cache {
      */
     public synchronized Set<User> getAllVisibleFriends() {
         // Get all friends
-        Set<Long> allVisibleUsersId = new HashSet<Long>(mFriendIds);
-
-        for (long id : mFriendIds) {
-            User user = this.getUser(id);
-            if (user instanceof Friend) {
-                Log.d(TAG, "user number " + id + " is a FRIEND");
-            } else if (user instanceof Stranger) {
-                Log.d(TAG, "user number " + id + " is a STRANGER");
-            } else if (user instanceof Self) {
-                Log.d(TAG, "user number " + id + " is a SELF");
-            } else {
-                Log.d(TAG, "user number " + id + " is unknown");
-            }
+        Set<Long> allVisibleUsersId = new HashSet<Long>();
+        if (this.getDefaultFilter() != null) {
+            // Get all friends
+            allVisibleUsersId.addAll(this.getDefaultFilter().getVisibleFriends());
+        } else {
+            allVisibleUsersId.addAll(mFriendIds);
         }
 
         // For each active filter, keep friends in it
         for (Long id : mFilterIds) {
             Filter filter = this.getFilter(id);
             if (filter.isActive()) {
-                allVisibleUsersId.retainAll(filter.getFriendIds());
+                allVisibleUsersId.retainAll(filter.getVisibleFriends());
             }
         }
 
         // Return all friends that passed all filters
-        return this.getFriends(allVisibleUsersId);
+        return this.getUsers(allVisibleUsersId);
+    }
+
+    public synchronized Filter getDefaultFilter() {
+        return this.getFilter(Filter.DEFAULT_FILTER_ID);
     }
 
     /**
@@ -375,35 +380,8 @@ public class Cache {
         return filters;
     }
 
-    /**
-     * OK
-     * 
-     * @param id
-     * @return
-     */
-    public synchronized User getFriend(long id) {
-        if (mFriendIds.contains(id)) {
-            return mUserInstances.get(id);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * OK
-     * 
-     * @param ids
-     * @return
-     */
-    public synchronized Set<User> getFriends(Set<Long> ids) {
-        Set<User> friends = new HashSet<User>();
-        for (long id : ids) {
-            User friend = this.getFriend(id);
-            if (friend != null) {
-                friends.add(friend);
-            }
-        }
-        return friends;
+    public synchronized Set<Long> getFriendIds() {
+        return mFriendIds;
     }
 
     public synchronized Invitation getInvitation(long id) {
@@ -470,35 +448,8 @@ public class Cache {
         });
     }
 
-    /**
-     * OK
-     * 
-     * @param id
-     * @return
-     */
-    public synchronized User getStranger(long id) {
-        if (!mFriendIds.contains(id)) {
-            return mUserInstances.get(id);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * OK
-     * 
-     * @param ids
-     * @return
-     */
-    public synchronized Set<User> getStrangers(Set<Long> ids) {
-        Set<User> strangers = new HashSet<User>();
-        for (long id : ids) {
-            User stranger = this.getStranger(id);
-            if (stranger != null) {
-                strangers.add(stranger);
-            }
-        }
-        return strangers;
+    public synchronized User getSelf() {
+        return mUserInstances.get(ServiceContainer.getSettingsManager().getUserId());
     }
 
     public synchronized SortedSet<Invitation> getUnansweredFriendInvitations() {
@@ -506,7 +457,9 @@ public class Cache {
             @Override
             public boolean filter(Invitation item) {
                 int type = item.getType();
-                return (type == Invitation.READ) || (type == Invitation.UNREAD);
+                int status = item.getStatus();
+                return (type == Invitation.FRIEND_INVITATION)
+                    && ((status == Invitation.READ) || (status == Invitation.UNREAD));
             }
         });
     }
@@ -517,12 +470,9 @@ public class Cache {
      * @param id
      * @return
      */
+
     public synchronized User getUser(long id) {
-        User user = this.getFriend(id);
-        if (user == null) {
-            user = this.getStranger(id);
-        }
-        return user;
+        return mUserInstances.get(id);
     }
 
     /**
@@ -534,10 +484,7 @@ public class Cache {
     public synchronized Set<User> getUsers(Set<Long> ids) {
         Set<User> users = new HashSet<User>();
         for (long id : ids) {
-            User user = this.getFriend(id);
-            if (user == null) {
-                user = this.getStranger(id);
-            }
+            User user = this.getUser(id);
             if (user != null) {
                 users.add(user);
             }
@@ -617,9 +564,21 @@ public class Cache {
 
     public void logState() {
         Log.d(TAG, "CACHE STATE : Users : " + mUserIds);
+        Log.d(TAG, "CACHE STATE : Friends : " + mFriendIds);
         Log.d(TAG, "CACHE STATE : Events : " + mEventIds);
-        Log.d(TAG, "CACHE STATE : Filters : " + mFilterIds);
-        Log.d(TAG, "CACHE STATE : Invits : " + mInvitationIds);
+        Set<String> filters = new HashSet<String>();
+        for (long id : mFilterIds) {
+            filters.add("" + this.getFilter(id).getName() + "(" + this.getFilter(id).getVisibleFriends()
+                + ")" + this.getFilter(id).getId() + this.getFilter(id).isActive());
+        }
+        Log.d(TAG, "CACHE STATE : Filters : " + filters);
+        Set<Long> invitingUsers = new HashSet<Long>();
+        for (long id : mInvitationIds) {
+            if (this.getInvitation(id).getUser() != null) {
+                invitingUsers.add(this.getInvitation(id).getUser().getId());
+            }
+        }
+        Log.d(TAG, "CACHE STATE : Invits : " + invitingUsers);
     }
 
     /**
@@ -646,6 +605,13 @@ public class Cache {
             }
 
         }.execute(createdEvent);
+    }
+
+    public synchronized void notifyEventListeners() {
+        Log.d(TAG, "notifying event listeners");
+        for (CacheListener listener : mListeners) {
+            listener.onEventListUpdate();
+        }
     }
 
     /**
@@ -722,12 +688,18 @@ public class Cache {
         Set<ImmutableFilter> filtersToUpdate = new HashSet<ImmutableFilter>();
 
         for (ImmutableFilter newFilter : newFilters) {
-            if (newFilter.getId() == Filter.NO_ID) {
-                // New filter, need to add it
-                long filterId = nextFilterId++;
-                newFilter.setId(filterId);
+            Log.d(TAG, "Put filter " + newFilter.getId() + " in Cache");
+            if (!mFilterIds.contains(newFilter.getId())) {
+                long filterId = newFilter.getId();
+                // if not default
+                if (filterId != Filter.DEFAULT_FILTER_ID) {
+                    // Need to set an id
+                    filterId = nextFilterId++;
+                    newFilter.setId(filterId);
+                }
+
                 mFilterIds.add(filterId);
-                mFilterInstances.put(filterId, new DefaultFilter(newFilter));
+                mFilterInstances.put(filterId, Filter.createFromContainer(newFilter));
                 needToCallListeners = true;
             } else {
                 // Put in update set
@@ -763,10 +735,12 @@ public class Cache {
         Set<ImmutableInvitation> invitationsToAdd = new HashSet<ImmutableInvitation>();
 
         for (final ImmutableInvitation invitationInfo : invitationInfos) {
+
             // Get Id
             if (invitationInfo.getId() == Invitation.NO_ID) {
                 // Get Id from database
-                invitationInfo.setId(ServiceContainer.getDatabase().addInvitation(invitationInfo));
+                long id = ServiceContainer.getDatabase().addInvitation(invitationInfo);
+                invitationInfo.setId(id);
             }
 
             if ((invitationInfo.getId() != Invitation.ALREADY_RECEIVED)
@@ -781,8 +755,10 @@ public class Cache {
                         break;
                     case Invitation.ACCEPTED_FRIEND_INVITATION:
                         // Check that it contains all informations
-                        if (invitationInfo.getUserInfos() != null) {
-                            usersToAdd.add(invitationInfo.getUserInfos());
+                        ImmutableUser newFriend = invitationInfo.getUserInfos();
+                        if (newFriend != null) {
+                            newFriend.setFriendship(User.FRIEND);
+                            usersToAdd.add(newFriend);
                             invitationsToAdd.add(invitationInfo);
                         }
                         // Acknowledge new friend
@@ -845,7 +821,7 @@ public class Cache {
                 case Invitation.EVENT_INVITATION:
                     Log.d(TAG, "Invitation tries to put event " + invitationInfo.getEventInfos().getId());
                     invitationInfo.setEvent(this.getEvent(invitationInfo.getEventInfos().getId()));
-                    isSetCorrectly = invitationInfo.getEvent() != null;
+                    isSetCorrectly = (invitationInfo.getEvent() != null);
                     break;
                 default:
                     assert false;
@@ -856,7 +832,17 @@ public class Cache {
 
             if (isSetCorrectly) {
                 mInvitationIds.add(invitationInfo.getId());
-                mInvitationInstances.put(invitationInfo.getId(), new GenericInvitation(invitationInfo));
+                long invitationId = invitationInfo.getId();
+                GenericInvitation invitation = new GenericInvitation(invitationInfo);
+                mInvitationInstances.put(invitationInfo.getId(), invitation);
+                if (invitationId != Invitation.ALREADY_RECEIVED) {
+                    Log.d(TAG, "Invitation event " + invitation.getEvent());
+                    if (invitation.getEvent() != null) {
+                        Log.d(TAG, "Invitation event id " + invitation.getEvent().getId());
+                    }
+                    Notifications.createNotification(invitation, ServiceContainer.getSettingsManager()
+                        .getContext());
+                }
             }
 
             needToCallListeners = true;
@@ -890,9 +876,11 @@ public class Cache {
                 mFriendIds.add(newUser.getId());
             }
             if (mUserInstances.get(newUser.getId()) == null) {
-                // Need to add it
-                mUserInstances.put(newUser.getId(), User.createFromContainer(newUser));
-                needToCallListeners = true;
+                if ((newUser.getFriendship() == User.FRIEND) || (newUser.getFriendship() == User.STRANGER)
+                    || (newUser.getFriendship() == User.SELF)) {
+                    mUserInstances.put(newUser.getId(), User.createFromContainer(newUser));
+                    needToCallListeners = true;
+                }
             } else {
                 // Put in set for update
                 usersToUpdate.add(newUser);
@@ -920,11 +908,14 @@ public class Cache {
                 return item.getStatus() == Invitation.UNREAD;
             }
         });
-        Log.d(TAG, unreadInvitations.toString());
+
+        Set<ImmutableInvitation> readInvitations = new HashSet<ImmutableInvitation>();
+
         for (Invitation invitation : unreadInvitations) {
-            Log.d(TAG, invitation.toString());
-            invitation.update(invitation.getImmutableCopy().setStatus(Invitation.READ));
+            readInvitations.add(invitation.getImmutableCopy().setStatus(Invitation.READ));
         }
+
+        this.updateInvitations(readInvitations);
     }
 
     /**
@@ -1094,13 +1085,101 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void retainEvents(List<Long> ids) {
-        for (long id : mEventIds) {
-            if (!ids.contains(id)) {
-                mEventIds.remove(id);
-                mEventInstances.remove(id);
+    public synchronized boolean removeUsers(Set<Long> userIds) {
+        boolean isListModified = false;
+
+        for (long id : userIds) {
+            if (this.getUser(id) != null) {
+                mUserInstances.remove(id);
+                mUserIds.remove(id);
+                mFriendIds.remove(id);
+                isListModified = true;
             }
         }
+
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onUserListUpdate();
+            }
+        }
+
+        return isListModified;
+    }
+
+    /**
+     * @param user
+     *            the user we are trying to (un)block
+     * @param newBlockedStatus
+     *            true if we're blocking the user, false otherwise
+     * @param callback
+     * @author rbsteinm
+     */
+    public synchronized void
+        setBlockedStatus(final ImmutableUser user, final NetworkRequestCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    boolean changed = false;
+                    if (user.isBlocked() == User.blockStatus.UNBLOCKED) {
+                        ServiceContainer.getNetworkClient().unblockFriend(user.getId());
+                        changed = Cache.this.updateUser(user.setBlocked(User.blockStatus.UNBLOCKED));
+                    } else {
+                        ServiceContainer.getNetworkClient().blockFriend(user.getId());
+                        changed = Cache.this.updateUser(user.setBlocked(User.blockStatus.BLOCKED));
+                    }
+                    if (changed) {
+                        for (CacheListener listener : mListeners) {
+                            listener.onUserListUpdate();
+                        }
+                    }
+                    if (callback != null) {
+                        callback.onSuccess();
+                    }
+                } catch (SmartMapClientException e) {
+                    Log.e("TAG", "Error while (un)blocking friend: " + e);
+                    if (callback != null) {
+                        callback.onFailure();
+                    }
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * @param user
+     *            the user we are trying to (un)block
+     * @param newBlockedStatus
+     *            true if we're blocking the user, false otherwise
+     * @param callback
+     * @author rbsteinm
+     */
+    public synchronized void setBlockedStatus(final ImmutableUser user,
+        final User.blockStatus newBlockedStatus, final NetworkRequestCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (user.isBlocked() != newBlockedStatus) {
+                    try {
+                        if (user.isBlocked() == User.blockStatus.UNBLOCKED) {
+                            ServiceContainer.getNetworkClient().unblockFriend(user.getId());
+                        } else if (user.isBlocked() == User.blockStatus.BLOCKED) {
+                            ServiceContainer.getNetworkClient().blockFriend(user.getId());
+                        }
+                        if (callback != null) {
+                            callback.onSuccess();
+                        }
+                    } catch (SmartMapClientException e) {
+                        Log.e("TAG", "Error while (un)blocking friend: " + e);
+                        if (callback != null) {
+                            callback.onFailure();
+                        }
+                    }
+                }
+                return null;
+            }
+        }.execute();
     }
 
     public synchronized void updateFromNetwork(final SmartMapClient networkClient,
@@ -1132,12 +1211,18 @@ public class Cache {
                         long id = positionInfos.getId();
                         // Get other online info
                         ImmutableUser onlineInfos = networkClient.getUserInfo(id);
+                        Log.d(TAG, "onlineInfos has name " + onlineInfos.getName());
                         // Get picture
                         Bitmap image = networkClient.getProfilePicture(id);
                         // Put all inside container
                         onlineInfos.setLocation(positionInfos.getLocation());
                         onlineInfos.setLocationString(positionInfos.getLocationString());
                         onlineInfos.setImage(image);
+
+                        Log.d(TAG, "Update(" + onlineInfos.getId() + ") : " + onlineInfos.getName() + ", "
+                            + self.getLocationString());
+                        Log.d(TAG, "Has " + ((onlineInfos.getImage() == User.NO_IMAGE) ? "no " : "")
+                            + "image");
 
                         // Put friend in Set
                         updatedUsers.add(onlineInfos);
@@ -1193,6 +1278,23 @@ public class Cache {
         }.execute();
     }
 
+    public synchronized void updateUserInfos(long id) {
+        new AsyncTask<Long, Void, Void>() {
+            @Override
+            protected Void doInBackground(Long... params) {
+                try {
+                    Log.d(TAG, "need to update user " + params[0]);
+                    ImmutableUser userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
+                    userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
+                    Cache.this.updateUser(userInfos);
+                } catch (SmartMapClientException e) {
+                    Log.e(TAG, "SmartMapClientException : " + e);
+                }
+                return null;
+            }
+        }.execute(id);
+    }
+
     private synchronized void keepOnlyTheseEvents(Set<ImmutableEvent> events) {
         mEventIds.clear();
         mEventInstances.clear();
@@ -1213,10 +1315,13 @@ public class Cache {
     }
 
     private synchronized boolean updateEvents(Set<ImmutableEvent> eventInfos) {
+        Log.d(TAG, "updateEvents(" + eventInfos + ")");
         boolean isListModified = false;
         for (ImmutableEvent eventInfo : eventInfos) {
             Event event = this.getEvent(eventInfo.getId());
             if ((event != null) && event.update(eventInfo)) {
+                Log.d(TAG, "updateEvents successfully updated event " + event.getId() + " with participants "
+                    + event.getParticipantIds());
                 isListModified = true;
             }
         }
@@ -1294,11 +1399,29 @@ public class Cache {
      */
     private synchronized boolean updateUsers(Set<ImmutableUser> userInfos) {
         boolean isListModified = false;
+
+        Set<Long> usersWithNewTypeIds = new HashSet<Long>();
+        Set<ImmutableUser> usersWithNewType = new HashSet<ImmutableUser>();
+
         for (ImmutableUser userInfo : userInfos) {
             User user = this.getUser(userInfo.getId());
-            if ((user != null) && user.update(userInfo)) {
-                isListModified = true;
+            if (user != null) {
+                // Check if friendship has changed
+                if (user.getFriendship() == userInfo.getFriendship()) {
+                    isListModified = user.update(userInfo) || isListModified;
+                } else {
+                    // Need to remove and add user again to change the instance
+                    // type
+                    usersWithNewTypeIds.add(userInfo.getId());
+                    usersWithNewType.add(userInfo);
+                }
             }
+        }
+
+        // Remove and add again users with new type
+        if (!usersWithNewType.isEmpty()) {
+            this.removeUsers(usersWithNewTypeIds);
+            this.putUsers(usersWithNewType);
         }
 
         if (isListModified) {
