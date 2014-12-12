@@ -53,6 +53,5 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         mCalendar.set(Calendar.MINUTE, minute);
 
         mPickTimeEditText.setText(Utils.getTimeString(timeSet));
-        mPickTimeEditText.setTag(new int[] { hourOfDay, minute });
     }
 }
