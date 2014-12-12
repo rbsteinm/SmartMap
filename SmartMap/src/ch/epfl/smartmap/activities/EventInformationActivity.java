@@ -346,6 +346,9 @@ public class EventInformationActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
+        Log.d(TAG, "Search Engine : " + ServiceContainer.getSearchEngine());
+        Log.d(TAG, "Event : " + mEvent);
+        Log.d(TAG, "Participants id : " + mEvent.getParticipantIds());
         ServiceContainer.getSearchEngine().findUserByIds(mEvent.getParticipantIds(),
             new SearchRequestCallback<Set<User>>() {
                 @Override
