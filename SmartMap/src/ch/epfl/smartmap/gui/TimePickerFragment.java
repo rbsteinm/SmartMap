@@ -23,9 +23,11 @@ import ch.epfl.smartmap.util.Utils;
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 
     private final EditText mPickTimeEditText;
+    private final Calendar mCalendar;
 
-    public TimePickerFragment(EditText e) {
+    public TimePickerFragment(EditText e, Calendar calendar) {
         mPickTimeEditText = e;
+        mCalendar = calendar;
     }
 
     @Override
@@ -45,6 +47,10 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         Calendar timeSet = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         timeSet.set(Calendar.HOUR_OF_DAY, hourOfDay);
         timeSet.set(Calendar.MINUTE, minute);
+
+        // We want these changes to have effect on the Calendar passed during construction.
+        mCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        mCalendar.set(Calendar.MINUTE, minute);
 
         mPickTimeEditText.setText(Utils.getTimeString(timeSet));
         mPickTimeEditText.setTag(new int[] { hourOfDay, minute });
