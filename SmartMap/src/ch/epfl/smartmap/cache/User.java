@@ -32,16 +32,15 @@ public abstract class User implements UserInterface {
 
     public static final User NOBODY = new Stranger(NO_ID, NO_NAME, NO_IMAGE);
 
-    public enum blockStatus {BLOCKED, UNBLOCKED, NOT_SET};
+    public static final int IMAGE_QUALITY = 100;;
 
-    public static final int IMAGE_QUALITY = 100;
     public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
     public static final int PICTURE_WIDTH = 50;
     public static final int PICTURE_HEIGHT = 50;
     public static final double NO_LATITUDE = 0.0;
     public static double NO_LONGITUDE = 0.0;
-
     private final long mId;
+
     private String mName;
     private Bitmap mImage;
 
@@ -101,6 +100,15 @@ public abstract class User implements UserInterface {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getSearchImage()
+     */
+    @Override
+    public Bitmap getSearchImage() {
+        return this.getImage();
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Displayable#getTitle()
      */
     @Override
@@ -149,5 +157,11 @@ public abstract class User implements UserInterface {
             default:
                 throw new IllegalArgumentException("Unknown type of user");
         }
+    }
+
+    public enum blockStatus {
+        BLOCKED,
+        UNBLOCKED,
+        NOT_SET
     }
 }
