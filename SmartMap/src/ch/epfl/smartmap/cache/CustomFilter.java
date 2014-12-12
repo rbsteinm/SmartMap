@@ -2,8 +2,6 @@ package ch.epfl.smartmap.cache;
 
 import java.util.Set;
 
-import android.graphics.Bitmap;
-
 /**
  * Describes a clientside, custom friend list (e.g. friends, family, etc.)
  * 
@@ -31,16 +29,6 @@ public class CustomFilter extends Filter {
     @Override
     public String getName() {
         return mName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getSearchImage()
-     */
-    @Override
-    public Bitmap getSearchImage() {
-        // TODO
-        return null;
     }
 
     /*

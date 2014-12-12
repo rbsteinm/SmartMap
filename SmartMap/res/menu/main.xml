@@ -23,7 +23,7 @@
         android:visible="false"/>
     <item
         android:id="@+id/action_item_more"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:icon="@drawable/ic_personal_white"
         android:showAsAction="always"
         android:title="Open Infos"
         android:visible="false"/>

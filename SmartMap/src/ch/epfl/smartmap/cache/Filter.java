@@ -25,12 +25,30 @@ public abstract class Filter implements FilterInterface {
 
     public static final long NO_ID = -1;
 
-    public static final Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer
-        .getSettingsManager().getContext().getResources(), R.drawable.ic_hashtag);
+    public static final Bitmap DEFAULT_WHITE_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
+        .getContext().getResources(), R.drawable.ic_filter_white);
+
+    public static final Bitmap DEFAULT_BLUE_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
+        .getContext().getResources(), R.drawable.ic_filter_blue);
+
+    public static Filter createFromContainer(ImmutableFilter filterInfos) {
+        long id = filterInfos.getId();
+        Set<Long> ids = filterInfos.getIds();
+        Boolean isActive = filterInfos.isActive();
+        String name = filterInfos.getName();
+        Log.d(TAG, "create filter with id " + filterInfos.getId());
+        if (filterInfos.getId() == DEFAULT_FILTER_ID) {
+            return new DefaultFilter(ids);
+        } else if (filterInfos.getId() > 0) {
+            return new CustomFilter(id, ids, name, isActive);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
 
     private long mId;
 
-    private Set<Long> mIds;
+    private final Set<Long> mIds;
 
     protected Filter(long id, Set<Long> ids) {
         if (id < 0) {
@@ -60,7 +78,7 @@ public abstract class Filter implements FilterInterface {
      */
     @Override
     public Bitmap getImage() {
-        return FilterInterface.DEFAULT_IMAGE;
+        return Filter.DEFAULT_WHITE_IMAGE;
     }
 
     @Override
@@ -109,6 +127,15 @@ public abstract class Filter implements FilterInterface {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getSearchImage()
+     */
+    @Override
+    public Bitmap getSearchImage() {
+        return DEFAULT_BLUE_IMAGE;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Displayable#getSubtitle()
      */
     @Override
@@ -152,20 +179,5 @@ public abstract class Filter implements FilterInterface {
         }
 
         return hasChanged;
-    }
-
-    public static Filter createFromContainer(ImmutableFilter filterInfos) {
-        long id = filterInfos.getId();
-        Set<Long> ids = filterInfos.getIds();
-        Boolean isActive = filterInfos.isActive();
-        String name = filterInfos.getName();
-        Log.d(TAG, "create filter with id " + filterInfos.getId());
-        if (filterInfos.getId() == DEFAULT_FILTER_ID) {
-            return new DefaultFilter(ids);
-        } else if (filterInfos.getId() > 0) {
-            return new CustomFilter(id, ids, name, isActive);
-        } else {
-            throw new IllegalArgumentException();
-        }
     }
 }

@@ -28,8 +28,11 @@ public interface Event extends Displayable {
     Calendar NO_START_DATE = GregorianCalendar.getInstance(TimeZone.getDefault());
     Calendar NO_END_DATE = GregorianCalendar.getInstance(TimeZone.getDefault());
 
-    Bitmap DEFAULT_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
-        .getResources(), R.drawable.default_event);
+    Bitmap DEFAULT_WHITE_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
+        .getResources(), R.drawable.ic_event_white);
+
+    Bitmap DEFAULT_BLUE_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager().getContext()
+        .getResources(), R.drawable.ic_event_blue);
 
     /**
      * @return The ID of the user who created the event

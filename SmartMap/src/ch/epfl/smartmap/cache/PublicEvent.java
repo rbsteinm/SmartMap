@@ -10,7 +10,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.util.Log;
-import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.util.Utils;
 
@@ -41,8 +40,6 @@ public class PublicEvent implements Event {
 
     private final User mCreator;
 
-    public static final int DEFAULT_ICON = R.drawable.default_event;
-
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
 
@@ -60,12 +57,10 @@ public class PublicEvent implements Event {
         mStartDate = (event.getStartDate() != null) ? (Calendar) event.getStartDate().clone() : NO_START_DATE;
         mEndDate = (event.getEndDate() != null) ? (Calendar) event.getEndDate().clone() : NO_END_DATE;
         mLocation = (event.getLocation() != null) ? new Location(event.getLocation()) : NO_LOCATION;
-        mLocationString =
-            (event.getLocationString() != null) ? event.getLocationString() : NO_LOCATION_STRING;
+        mLocationString = (event.getLocationString() != null) ? event.getLocationString() : NO_LOCATION_STRING;
         mDescription = (event.getDescription() != null) ? event.getDescription() : NO_DESCRIPTION;
         mParticipantIds =
-            (event.getParticipantIds() != null) ? new HashSet<Long>(event.getParticipantIds())
-                : NO_PARTICIPANTIDS;
+            (event.getParticipantIds() != null) ? new HashSet<Long>(event.getParticipantIds()) : NO_PARTICIPANTIDS;
     }
 
     /*
@@ -74,8 +69,7 @@ public class PublicEvent implements Event {
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj != null) && (this.getClass() == obj.getClass())
-            && (this.getId() == ((PublicEvent) obj).getId());
+        return (obj != null) && (this.getClass() == obj.getClass()) && (this.getId() == ((PublicEvent) obj).getId());
     }
 
     /*
@@ -104,13 +98,13 @@ public class PublicEvent implements Event {
 
     @Override
     public Bitmap getImage() {
-        return Event.DEFAULT_IMAGE;
+        return Event.DEFAULT_WHITE_IMAGE;
     }
 
     @Override
     public ImmutableEvent getImmutableCopy() {
-        return new ImmutableEvent(mId, mName, mCreator.getImmutableCopy(), mDescription, mStartDate,
-            mEndDate, mLocation, mLocationString, mParticipantIds);
+        return new ImmutableEvent(mId, mName, mCreator.getImmutableCopy(), mDescription, mStartDate, mEndDate,
+            mLocation, mLocationString, mParticipantIds);
     }
 
     /*
@@ -161,8 +155,7 @@ public class PublicEvent implements Event {
      */
     @Override
     public Bitmap getSearchImage() {
-        // TODO
-        return null;
+        return Event.DEFAULT_BLUE_IMAGE;
     }
 
     @Override
@@ -225,8 +218,7 @@ public class PublicEvent implements Event {
     @Override
     public boolean isNear() {
         Location ourLocation = ServiceContainer.getSettingsManager().getLocation();
-        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager()
-            .getNearEventsMaxDistance();
+        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager().getNearEventsMaxDistance();
     }
 
     /*
