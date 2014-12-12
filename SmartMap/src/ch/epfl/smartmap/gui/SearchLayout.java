@@ -140,9 +140,7 @@ public class SearchLayout extends LinearLayout {
                 new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
             searchParams.setMargins(0, 0, 0, MARGIN_BELOW_SEARCHVIEWGROUP);
             searchResultViewGroup.setLayoutParams(searchParams);
-            SearchOnlineButton searchOnlineButton = new SearchOnlineButton(this.getContext());
             scrollView.addView(searchResultViewGroup);
-            scrollView.addView(searchOnlineButton);
             // Add ViewGroup entry
             mSearchResultViewGroups.put(searchType, searchResultViewGroup);
 
