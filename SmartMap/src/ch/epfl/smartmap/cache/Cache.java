@@ -609,6 +609,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void initFromDatabase(DatabaseHelper database) {
+        Log.d(TAG, "init from database");
         // Clear previous values
         mEventInstances.clear();
         mUserInstances.clear();
@@ -1488,12 +1489,14 @@ public class Cache implements CacheInterface {
     }
 
     private synchronized void keepOnlyTheseEvents(Set<EventContainer> events) {
+        Log.d(TAG, "keep only these events");
         mEventIds.clear();
         mEventInstances.clear();
         this.putEvents(events);
     }
 
     private synchronized void keepOnlyTheseUsers(Set<UserContainer> users) {
+        Log.d(TAG, "keep only these users");
         mFriendIds.clear();
         mUserIds.clear();
         mUserInstances.clear();

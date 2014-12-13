@@ -8,9 +8,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.gui.PagerAdapter;
 
 /**
@@ -29,16 +31,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     private final static String[] TABS = {"Friends", "Invitations"};
     private final static int INVITATION_INDEX = 1;
 
-    public ViewPager getViewPager() {
-        return mPager;
-    }
-
-    @Override
-    public void onBackPressed() {
-        this.onNotificationOpen();
-        this.finish();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -49,7 +41,8 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         // Set action bar and tab color to main color
         mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-        mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this.getResources().getColor(
+            R.color.main_blue)));
 
         mPager = (ViewPager) this.findViewById(R.id.myViewPager);
         PagerAdapter pageAdapter = new PagerAdapter(this, this.getSupportFragmentManager());
@@ -57,12 +50,11 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
         mActionBar.setHomeButtonEnabled(true);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
         // Adding Tabs
         for (String tabName : TABS) {
             mActionBar.addTab(mActionBar.newTab().setText(tabName).setTabListener(this));
         }
-
+        Log.d(TAG, "5 : " + ServiceContainer.getCache().getFriendIds());
         /**
          * on swiping, the viewpager makes respective tab selected
          */
@@ -83,7 +75,24 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
                 mActionBar.setSelectedNavigationItem(position);
             }
         });
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (this.getIntent().getBooleanExtra("INVITATION", false) == true) {
+            mPager.setCurrentItem(INVITATION_INDEX);
+        }
+    }
+
+    public ViewPager getViewPager() {
+        return mPager;
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.onNotificationOpen();
+        this.finish();
     }
 
     @Override
@@ -91,15 +100,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.pager, menu);
         return true;
-    }
-
-    /**
-     * When this tab is open by a notification
-     */
-    private void onNotificationOpen() {
-        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
-            this.startActivity(new Intent(this, MainActivity.class));
-        }
     }
 
     @Override
@@ -125,14 +125,6 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (this.getIntent().getBooleanExtra("INVITATION", false) == true) {
-            mPager.setCurrentItem(INVITATION_INDEX);
-        }
-    }
-
-    @Override
     public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
         // nothing
     }
@@ -154,6 +146,15 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     public void startAddFriendActivity(MenuItem menu) {
         Intent displayActivityIntent = new Intent(this, AddFriendActivity.class);
         this.startActivity(displayActivityIntent);
+    }
+
+    /**
+     * When this tab is open by a notification
+     */
+    private void onNotificationOpen() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
     }
 
 }
