@@ -80,8 +80,9 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
 
     }
 
-    public void testOpenSetLocationWhenClickOnMap() {
+    public void testOpenSetLocationWhenClickOnMap() throws InterruptedException {
         onView(withId(R.id.add_event_map)).perform(click());
+        Thread.sleep(1000);
         onView(withId(R.id.set_location_activity)).check(matches(isDisplayed()));
     }
 }
