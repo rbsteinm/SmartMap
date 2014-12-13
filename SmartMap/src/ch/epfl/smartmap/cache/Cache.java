@@ -107,7 +107,7 @@ public class Cache implements CacheInterface {
                             break;
                     }
 
-                    Cache.this.updateInvitation(invitation.getImmutableCopy().setStatus(Invitation.ACCEPTED));
+                    Cache.this.updateInvitation(invitation.getContainerCopy().setStatus(Invitation.ACCEPTED));
 
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
@@ -221,7 +221,7 @@ public class Cache implements CacheInterface {
                             break;
                     }
 
-                    Cache.this.updateInvitation(invitation.getImmutableCopy().setStatus(Invitation.DECLINED));
+                    Cache.this.updateInvitation(invitation.getContainerCopy().setStatus(Invitation.DECLINED));
 
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
@@ -996,7 +996,7 @@ public class Cache implements CacheInterface {
             if (isSetCorrectly) {
                 mInvitationIds.add(invitationInfo.getId());
                 long invitationId = invitationInfo.getId();
-                GenericInvitation invitation = new GenericInvitation(invitationInfo);
+                Invitation invitation = Invitation.createFromContainer(invitationInfo);
                 mInvitationInstances.put(invitationInfo.getId(), invitation);
                 if (invitationId != Invitation.ALREADY_RECEIVED) {
                     Log.d(TAG, "Invitation event " + invitation.getEvent());
@@ -1090,7 +1090,7 @@ public class Cache implements CacheInterface {
         Set<InvitationContainer> readInvitations = new HashSet<InvitationContainer>();
 
         for (Invitation invitation : unreadInvitations) {
-            readInvitations.add(invitation.getImmutableCopy().setStatus(Invitation.READ));
+            readInvitations.add(invitation.getContainerCopy().setStatus(Invitation.READ));
         }
 
         this.updateInvitations(readInvitations);

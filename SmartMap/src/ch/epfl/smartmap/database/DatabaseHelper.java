@@ -962,7 +962,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
         for (Invitation invitation : invitations) {
             Log.d(TAG, "Store invitation " + invitation.getId());
-            this.addInvitation(invitation.getImmutableCopy());
+            this.addInvitation(invitation.getContainerCopy());
         }
     }
 
