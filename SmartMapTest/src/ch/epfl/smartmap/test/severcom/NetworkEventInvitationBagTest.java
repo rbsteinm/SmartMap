@@ -98,6 +98,9 @@ public class NetworkEventInvitationBagTest extends TestCase {
         assertEquals(0, result.size());
     }
     
+    /**
+     * Tests that the constructor creates the right invitations.
+     */
     @Test
     public void testGetInvitations_2() {
         long now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis();
