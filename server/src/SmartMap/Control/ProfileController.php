@@ -5,16 +5,19 @@ namespace SmartMap\Control;
 use Silex\Application;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
-use SmartMap\DBInterface\User;
-use SmartMap\DBInterface\UserRepository;
-use SmartMap\DBInterface\DatabaseException;
-
-class ProfileController
+class ProfileController implements ProfileControllerInterface
 {
     public static $PICTURES_PATH = '../pictures/';
-    
+
+    /**
+     * Get the profile picture of a user.
+     *
+     * @param Request $request
+     * @param Application $app
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @throws InvalidRequestException
+     */
     public function getProfilePicture(Request $request, Application $app)
     {
         // We check that we are authenticated.
