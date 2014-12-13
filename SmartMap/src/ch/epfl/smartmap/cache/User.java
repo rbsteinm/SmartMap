@@ -63,20 +63,20 @@ public abstract class User implements UserInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getID()
-     */
-    @Override
-    public long getId() {
-        return mId;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
      */
     @Override
     public Bitmap getActionImage() {
         return mImage;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getID()
+     */
+    @Override
+    public long getId() {
+        return mId;
     }
 
     @Override
