@@ -28,7 +28,7 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
 public class InvitationsTab extends ListFragment {
 
     private List<Invitation> mInvitationList;
-    private Context mContext;
+    private final Context mContext;
 
     public InvitationsTab(Context ctx) {
         mContext = ctx;
@@ -37,7 +37,7 @@ public class InvitationsTab extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
+        View view = inflater.inflate(R.layout.list_fragment_invitations_tab, container, false);
         mInvitationList =
             new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
 

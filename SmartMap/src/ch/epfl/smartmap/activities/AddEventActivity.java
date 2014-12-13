@@ -229,19 +229,17 @@ public class AddEventActivity extends FragmentActivity {
      */
     private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
 
+        Log.d(TAG, "Checking dates validity.\nmStartDate:\n" + mStartDate + "mEndDate:\n" + mEndDate);
+
         if (this.isValidDate(endDate.getText().toString()) && this.isValidTime(endTime.getText().toString())) {
             // The end of the event has been set by the user
-
-            Calendar start = this.getDateFromTextFormat(startDate.getText().toString(), startTime.getText().toString());
-
-            Calendar end = this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText().toString());
 
             Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
 
             // Needed to let the user click the default time without errors.
             now.add(GregorianCalendar.MINUTE, -1);
 
-            if (end.before(start)) {
+            if (mEndDate.before(mStartDate)) {
                 // The user is trying to create the end of the event before its
                 // start!
 
@@ -250,7 +248,7 @@ public class AddEventActivity extends FragmentActivity {
                 Toast.makeText(AddEventActivity.this,
                         this.getString(R.string.add_event_toast_event_cannot_end_before_starting), Toast.LENGTH_LONG)
                         .show();
-            } else if (end.before(now)) {
+            } else if (mEndDate.before(now)) {
                 // The user is trying to create an event in the past
 
                 this.resetFields(endDate, endTime);
@@ -313,36 +311,6 @@ public class AddEventActivity extends FragmentActivity {
         boolean descrLegal = descrSize < MAX_DESCRIPTION_SIZE;
 
         return eventNameLegal && placeNameLegal && descrLegal;
-    }
-
-    /**
-     * @param dayMonthYear
-     *            a String like "16/09/1993"
-     * @param hourMinute
-     *            a String like "17:03"
-     * @return a GregorianDate constructed from the given parameters
-     * @author SpicyCH
-     */
-    private Calendar getDateFromTextFormat(String dayMonthYear, String hourMinute) {
-
-        assert this.isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
-
-        if (!this.isValidDate(dayMonthYear)) {
-            // The string is not of the form dd.mm.yyyy
-            Calendar output = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
-            if (this.getString(R.string.utils_today).equals(dayMonthYear)) {
-                return output;
-            }
-        }
-
-        String[] s1 = dayMonthYear.split(".");
-        String[] s2 = hourMinute.split(":");
-
-        final int month = Integer.parseInt(s1[INDEX_MONTH]) - 1;
-
-        return new GregorianCalendar(Integer.parseInt(s1[INDEX_YEAR]), month, Integer.parseInt(s1[INDEX_DAY]),
-                Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
-
     }
 
     /**
