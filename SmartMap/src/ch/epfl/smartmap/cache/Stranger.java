@@ -8,17 +8,31 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Represents an online User which is not a Friend, therefore allowing less
- * informations. Every instanc is
- * unique and store in a local cache that can be accessed via static methods on
- * this class.
+ * Represents an {@code User} that is not your friend on SmartMap. You only have access to his id, name and
+ * profile picture. You should not instantiate a Stranger directly, but rather use
+ * {@code User.createFromContainer( ... )}.
  * 
  * @author jfperren
  */
 public class Stranger extends User {
 
+    /**
+     * Constructor
+     * 
+     * @param id
+     *            Stranger's id
+     * @param name
+     *            Stranger's name
+     * @param image
+     *            Stranger's profile picture
+     */
     protected Stranger(long id, String name, Bitmap image) {
         super(id, name, image);
+    }
+
+    @Override
+    public User.BlockStatus getBlockStatus() {
+        return User.NO_BLOCK_STATUS;
     }
 
     /*
@@ -36,7 +50,7 @@ public class Stranger extends User {
      */
     @Override
     public LatLng getLatLng() {
-        throw new UnsupportedOperationException();
+        return new LatLng(User.NO_LATITUDE, User.NO_LONGITUDE);
     }
 
     /*
@@ -54,7 +68,7 @@ public class Stranger extends User {
      */
     @Override
     public String getLocationString() {
-        throw new UnsupportedOperationException();
+        return User.NO_LOCATION_STRING;
     }
 
     /*
@@ -73,10 +87,5 @@ public class Stranger extends User {
     @Override
     public String getSubtitle() {
         return "Add as Friend to see more informations";
-    }
-
-    @Override
-    public User.BlockStatus getBlockStatus() {
-        return User.BlockStatus.UNBLOCKED;
     }
 }

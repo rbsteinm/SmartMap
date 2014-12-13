@@ -144,7 +144,7 @@ public class AddFriendActivity extends ListActivity {
     private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
 
         @Override
-        public void onNetworkError() {
+        public void onNetworkError(Exception e) {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

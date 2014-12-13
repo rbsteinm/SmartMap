@@ -15,10 +15,10 @@ import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.FilterInterface;
 import ch.epfl.smartmap.cache.EventContainer;
-import ch.epfl.smartmap.cache.UserContainer;
+import ch.epfl.smartmap.cache.FilterInterface;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -33,13 +33,9 @@ public final class CachedSearchEngine implements SearchEngine {
 
     private static final String TAG = CachedSearchEngine.class.getSimpleName();
 
-    public static CachedSearchEngine getInstance() {
-        return ONE_INSTANCE;
-    }
-
     private final Map<String, Set<Long>> mPreviousOnlineStrangerSearches;
-    private final List<Location> mPreviousOnlineEventSearchQueries;
 
+    private final List<Location> mPreviousOnlineEventSearchQueries;
     private final List<Set<Long>> mPreviousOnlineEventSearchResults;
 
     public CachedSearchEngine() {
@@ -231,7 +227,7 @@ public final class CachedSearchEngine implements SearchEngine {
                         } catch (SmartMapClientException e) {
                             Log.e(TAG, "Error while finding strangers by Ids" + e);
                             if (callback != null) {
-                                callback.onNetworkError();
+                                callback.onNetworkError(e);
                             }
                             return null;
                         }
@@ -319,7 +315,7 @@ public final class CachedSearchEngine implements SearchEngine {
                     } catch (SmartMapClientException e) {
                         Log.e(TAG, "Error while finding strangers by query" + e);
                         if (callback != null) {
-                            callback.onNetworkError();
+                            callback.onNetworkError(e);
                         }
                     }
                 }
@@ -358,7 +354,7 @@ public final class CachedSearchEngine implements SearchEngine {
                         Log.e(TAG, "Error while getting all near events by Ids" + e);
                         if (callback != null) {
                             if (callback != null) {
-                                callback.onNetworkError();
+                                callback.onNetworkError(e);
                             }
                         }
                     }
@@ -413,5 +409,9 @@ public final class CachedSearchEngine implements SearchEngine {
                 break;
         }
         return results;
+    }
+
+    public static CachedSearchEngine getInstance() {
+        return ONE_INSTANCE;
     }
 }
