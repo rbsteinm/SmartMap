@@ -39,7 +39,8 @@ public class AddFriendActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_add_friend);
         // Set action bar color to main color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
@@ -87,13 +88,14 @@ public class AddFriendActivity extends ListActivity {
             + this.getResources().getString(R.string.as_a_friend));
 
         // Add positive button
-        builder.setPositiveButton(this.getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                // invite friend
-                AddFriendActivity.this.inviteUser(userId);
-            }
-        });
+        builder.setPositiveButton(this.getResources().getString(R.string.add),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // invite friend
+                    AddFriendActivity.this.inviteUser(userId);
+                }
+            });
 
         // Add negative button
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -182,9 +184,9 @@ public class AddFriendActivity extends ListActivity {
      * 
      * @author agpmilli
      */
-    class AddFriendCallback implements NetworkRequestCallback {
+    class AddFriendCallback implements NetworkRequestCallback<Void> {
         @Override
-        public void onFailure() {
+        public void onFailure(Exception e) {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -196,7 +198,7 @@ public class AddFriendActivity extends ListActivity {
         }
 
         @Override
-        public void onSuccess() {
+        public void onSuccess(Void result) {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

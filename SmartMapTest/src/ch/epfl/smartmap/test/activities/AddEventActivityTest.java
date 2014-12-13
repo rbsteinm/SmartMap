@@ -5,7 +5,6 @@ import static com.google.android.apps.common.testing.ui.espresso.action.ViewActi
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
-import static org.hamcrest.Matchers.not;
 import android.location.Location;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
@@ -53,8 +52,9 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
 
         String name = "SmartMap SwEng";
 
+        // TODO this line throw IllegalArgException
         ServiceContainer.getCache().putUser(
-            new UserContainer(2, name, "123", "abc@abc.com", loc, "Mock lockation", User.NO_IMAGE,
+            new UserContainer(1, name, "123", "abc@abc.com", loc, "Mock lockation", User.NO_IMAGE,
                 User.BlockStatus.UNBLOCKED, User.SELF));
 
         ServiceContainer.getNetworkClient().authServer(name, facebookId, token);
@@ -116,7 +116,7 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
 
         this.getActivity();
 
-        onView(withId(R.id.addEventDescription)).check(
-            ViewAssertions.matches(not(ViewMatchers.isDisplayed())));
+        onView(withId(R.id.show_event_info_invite_friends_button)).check(
+            ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 }
