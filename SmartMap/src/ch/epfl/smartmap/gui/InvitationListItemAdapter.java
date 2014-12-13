@@ -24,6 +24,8 @@ public class InvitationListItemAdapter extends ArrayAdapter<Invitation> {
     private final List<Invitation> mItemsArrayList;
 
     /**
+     * Adapter used to display the invitations in a list view
+     * 
      * @param context
      *            Context of the Activity where we want to display the user list
      * @param userList
