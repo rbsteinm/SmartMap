@@ -25,9 +25,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.ImmutableFilter;
+import ch.epfl.smartmap.cache.FilterContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 
@@ -48,7 +47,6 @@ public class ModifyFilterActivity extends Activity {
     private List<User> mFriendsOutside;
 
     private Filter mFilter;
-    private Cache mCache;
 
     private OnItemLongClickListener mOnInsideItemLongClickListener;
     private OnItemLongClickListener mOnOutsideItemLongClickListener;
@@ -61,8 +59,6 @@ public class ModifyFilterActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_modify_filter);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        mCache = ServiceContainer.getCache();
 
         mInsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_inside_layout);
         mOutsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_outside_layout);
@@ -86,7 +82,6 @@ public class ModifyFilterActivity extends Activity {
 
         mListViewOutside.setOnDragListener(mFromOutsideDragListener);
         mInsideFilterLayout.setOnDragListener(mFromOutsideDragListener);
-
     }
 
     /*
@@ -162,8 +157,8 @@ public class ModifyFilterActivity extends Activity {
                         (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                     String newName = editText.getText().toString();
 
-                    mCache.putFilter(new ImmutableFilter(mFilter.getId(), newName, mFilter.getIds(), mFilter
-                        .isActive()));
+                    ServiceContainer.getCache().putFilter(
+                        new FilterContainer(mFilter.getId(), newName, mFilter.getIds(), mFilter.isActive()));
 
                     Toast.makeText(ModifyFilterActivity.this,
                         ModifyFilterActivity.this.getResources().getString(R.string.new_name_saved),
@@ -188,8 +183,9 @@ public class ModifyFilterActivity extends Activity {
     }
 
     public void saveFilter() {
-        mCache.putFilter(new ImmutableFilter(mFilter.getId(), mFilter.getName(), ModifyFilterActivity.this
-            .friendListToIdSet(mFriendsInside), mFilter.isActive()));
+        ServiceContainer.getCache().putFilter(
+            new FilterContainer(mFilter.getId(), mFilter.getName(), ModifyFilterActivity.this
+                .friendListToIdSet(mFriendsInside), mFilter.isActive()));
         Toast.makeText(ModifyFilterActivity.this,
             ModifyFilterActivity.this.getResources().getString(R.string.changes_saved), Toast.LENGTH_LONG)
             .show();
@@ -213,7 +209,7 @@ public class ModifyFilterActivity extends Activity {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
                     // TODO
-                    mCache.removeFilter(mFilter.getId());
+                    ServiceContainer.getCache().removeFilter(mFilter.getId());
                     Toast.makeText(ModifyFilterActivity.this,
                         ModifyFilterActivity.this.getResources().getString(R.string.removed_filter),
                         Toast.LENGTH_LONG).show();
@@ -236,11 +232,12 @@ public class ModifyFilterActivity extends Activity {
     }
 
     private void setFilter() {
-        mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
+        mFilter =
+            ServiceContainer.getCache().getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
         for (long id : mFilter.getIds()) {
-            mFriendsInside.add(mCache.getUser(id));
+            mFriendsInside.add(ServiceContainer.getCache().getUser(id));
         }
-        for (User friend : mCache.getAllFriends()) {
+        for (User friend : ServiceContainer.getCache().getAllFriends()) {
             if (!mFriendsInside.contains(friend)) {
                 mFriendsOutside.add(friend);
             }
@@ -276,7 +273,7 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mOutsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mCache.getUser(droppedItemId);
+                        User droppedItem = ServiceContainer.getCache().getUser(droppedItemId);
                         if (mFriendsInside.contains(droppedItem)) {
                             mFriendsInside.remove(droppedItem);
                             mFriendsOutside.add(droppedItem);
@@ -335,7 +332,7 @@ public class ModifyFilterActivity extends Activity {
                     // If apply only if drop on buttonTarget
                     if (v.equals(mInsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mCache.getUser(droppedItemId);
+                        User droppedItem = ServiceContainer.getCache().getUser(droppedItemId);
                         if (mFriendsOutside.contains(droppedItem)) {
                             mFriendsInside.add(droppedItem);
                             mFriendsOutside.remove(droppedItem);

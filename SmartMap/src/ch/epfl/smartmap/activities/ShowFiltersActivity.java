@@ -19,7 +19,7 @@ import android.widget.ListView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.ImmutableFilter;
+import ch.epfl.smartmap.cache.FilterContainer;
 import ch.epfl.smartmap.gui.FilterListItemAdapter;
 import ch.epfl.smartmap.listeners.OnCacheListener;
 
@@ -49,7 +49,7 @@ public class ShowFiltersActivity extends ListActivity {
                 String filterName = editText.getText().toString();
                 Long newFilterId =
                     ServiceContainer.getCache().putFilter(
-                        new ImmutableFilter(Filter.NO_ID, filterName, new HashSet<Long>(), true));
+                        new FilterContainer(Filter.NO_ID, filterName, new HashSet<Long>(), true));
                 // Start a new instance of ModifyFilterActivity passing it the
                 // new filter's name
                 Intent intent = new Intent(ShowFiltersActivity.this, ModifyFilterActivity.class);

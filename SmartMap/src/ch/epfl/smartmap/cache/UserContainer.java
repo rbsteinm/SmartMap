@@ -10,7 +10,7 @@ import ch.epfl.smartmap.cache.User.blockStatus;
  * 
  * @author jfperren
  */
-public final class ImmutableUser {
+public final class UserContainer {
 
     // User informations
     private final long mId;
@@ -35,7 +35,7 @@ public final class ImmutableUser {
      * @param locationString
      * @param image
      */
-    public ImmutableUser(long id, String name, String phoneNumber, String email, Location location,
+    public UserContainer(long id, String name, String phoneNumber, String email, Location location,
         String locationString, Bitmap image, User.blockStatus isBlocked, int friendship) {
         mId = id;
         mName = name;
@@ -84,37 +84,37 @@ public final class ImmutableUser {
         return mIsBlocked;
     }
 
-    public ImmutableUser setBlocked(blockStatus blockedStatus) {
+    public UserContainer setBlocked(blockStatus blockedStatus) {
         mIsBlocked = blockedStatus;
         return this;
     }
 
-    public ImmutableUser setEmail(String newEmail) {
+    public UserContainer setEmail(String newEmail) {
         mEmail = newEmail;
         return this;
     }
 
-    public ImmutableUser setFriendship(int newFriendship) {
+    public UserContainer setFriendship(int newFriendship) {
         mFriendship = newFriendship;
         return this;
     }
 
-    public ImmutableUser setImage(Bitmap newImage) {
+    public UserContainer setImage(Bitmap newImage) {
         mImage = newImage;
         return this;
     }
 
-    public ImmutableUser setLocation(Location newLocation) {
+    public UserContainer setLocation(Location newLocation) {
         mLocation = newLocation;
         return this;
     }
 
-    public ImmutableUser setLocationString(String newLocationString) {
+    public UserContainer setLocationString(String newLocationString) {
         mLocationString = newLocationString;
         return this;
     }
 
-    public ImmutableUser setPhoneNumber(String newPhoneNumber) {
+    public UserContainer setPhoneNumber(String newPhoneNumber) {
         mPhoneNumber = newPhoneNumber;
         return this;
     }

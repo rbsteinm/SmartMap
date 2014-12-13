@@ -13,8 +13,8 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.util.Log;
-import ch.epfl.smartmap.cache.ImmutableEvent;
-import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.util.Utils;
 
@@ -249,7 +249,7 @@ public class JsonSmartMapParser implements SmartMapParser {
     }
 
     @Override
-    public ImmutableEvent parseEvent(String s) throws SmartMapParseException {
+    public EventContainer parseEvent(String s) throws SmartMapParseException {
         JSONObject jsonObject = null;
         JSONObject eventJsonObject = null;
         try {
@@ -261,9 +261,9 @@ public class JsonSmartMapParser implements SmartMapParser {
         return this.parseEventFromJSON(eventJsonObject);
     }
 
-    private ImmutableEvent parseEventFromJSON(JSONObject jsonObject) throws SmartMapParseException {
+    private EventContainer parseEventFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = -1;
-        ImmutableUser creator = null;
+        UserContainer creator = null;
         GregorianCalendar startingDate = null;
         GregorianCalendar endDate = null;
         double latitude = UNITIALIZED_LATITUDE;
@@ -302,16 +302,16 @@ public class JsonSmartMapParser implements SmartMapParser {
         location.setLatitude(latitude);
         location.setLongitude(longitude);
 
-        ImmutableEvent event =
-            new ImmutableEvent(id, name, creator, description, startingDate, endDate, location, positionName,
+        EventContainer event =
+            new EventContainer(id, name, creator, description, startingDate, endDate, location, positionName,
                 new HashSet<Long>(participants));
 
         return event;
     }
 
     @Override
-    public List<ImmutableEvent> parseEventList(String s) throws SmartMapParseException {
-        List<ImmutableEvent> events = new ArrayList<ImmutableEvent>();
+    public List<EventContainer> parseEventList(String s) throws SmartMapParseException {
+        List<EventContainer> events = new ArrayList<EventContainer>();
 
         try {
             JSONObject jsonObject = new JSONObject(s);
@@ -320,7 +320,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 
             for (int i = 0; i < eventsArray.length(); i++) {
                 JSONObject eventJSON = eventsArray.getJSONObject(i);
-                ImmutableEvent event = this.parseEventFromJSON(eventJSON);
+                EventContainer event = this.parseEventFromJSON(eventJSON);
                 events.add(event);
                 Log.d("events", event.getName());
             }
@@ -337,7 +337,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      * ch.epfl.smartmap.servercom.SmartMapParser#parseFriend(java.lang.String)
      */
     @Override
-    public ImmutableUser parseFriend(String s) throws SmartMapParseException {
+    public UserContainer parseFriend(String s) throws SmartMapParseException {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(s);
@@ -354,7 +354,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      * @return a friend
      * @throws SmartMapParseException
      */
-    private ImmutableUser parseFriendFromJSON(JSONObject jsonObject) throws SmartMapParseException {
+    private UserContainer parseFriendFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = 0;
         String name = null;
         String phoneNumber = User.NO_PHONE_NUMBER;
@@ -406,7 +406,7 @@ public class JsonSmartMapParser implements SmartMapParser {
             location.setTime(this.parseDate(lastSeenString).getTimeInMillis());
         }
 
-        return new ImmutableUser(id, name, phoneNumber, email, location, null, null, User.blockStatus.NOT_SET,
+        return new UserContainer(id, name, phoneNumber, email, location, null, null, User.blockStatus.NOT_SET,
             friendship);
     }
 
@@ -416,9 +416,9 @@ public class JsonSmartMapParser implements SmartMapParser {
      * ch.epfl.smartmap.servercom.SmartMapParser#parseFriends(java.lang.String)
      */
     @Override
-    public List<ImmutableUser> parseFriends(String s, String key) throws SmartMapParseException {
+    public List<UserContainer> parseFriends(String s, String key) throws SmartMapParseException {
 
-        List<ImmutableUser> friends = new ArrayList<ImmutableUser>();
+        List<UserContainer> friends = new ArrayList<UserContainer>();
 
         try {
             JSONObject jsonObject = new JSONObject(s);
@@ -427,7 +427,7 @@ public class JsonSmartMapParser implements SmartMapParser {
 
             for (int i = 0; i < usersArray.length(); i++) {
                 JSONObject userJSON = usersArray.getJSONObject(i);
-                ImmutableUser friend = this.parseFriendFromJSON(userJSON);
+                UserContainer friend = this.parseFriendFromJSON(userJSON);
                 friends.add(friend);
             }
         } catch (JSONException e) {
@@ -482,9 +482,9 @@ public class JsonSmartMapParser implements SmartMapParser {
     }
 
     @Override
-    public List<ImmutableUser> parsePositions(String s) throws SmartMapParseException {
+    public List<UserContainer> parsePositions(String s) throws SmartMapParseException {
 
-        List<ImmutableUser> users = new ArrayList<ImmutableUser>();
+        List<UserContainer> users = new ArrayList<UserContainer>();
 
         try {
             JSONObject jsonObject = new JSONObject(s);
@@ -509,8 +509,8 @@ public class JsonSmartMapParser implements SmartMapParser {
                 location.setLongitude(longitude);
                 String locationString = Utils.getCityFromLocation(location);
 
-                ImmutableUser user =
-                    new ImmutableUser(userId, null, null, null, location, locationString, null,
+                UserContainer user =
+                    new UserContainer(userId, null, null, null, location, locationString, null,
                         User.blockStatus.NOT_SET, -1);
 
                 users.add(user);

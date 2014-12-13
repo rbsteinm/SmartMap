@@ -31,31 +31,19 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * 
  * @author jfperren
  */
-public class Cache {
-
-    /**
-     * Allows to search efficiently through the Cache, by providing a filtering
-     * method
-     * 
-     * @param <T>
-     *            Type of items searched
-     * @author jfperren
-     */
-    public interface SearchFilter<T> {
-        boolean filter(T item);
-    }
+public class Cache implements CacheInterface {
 
     static final public String TAG = Cache.class.getSimpleName();
+
     private final LongSparseArray<User> mUserInstances;
     // SparseArrays containing live instances
     private final LongSparseArray<Event> mEventInstances;
     private final LongSparseArray<Filter> mFilterInstances;
-
     private final LongSparseArray<Invitation> mInvitationInstances;
+
     private final Set<Long> mUserIds;
     // These Sets are the keys for the LongSparseArrays
     private final Set<Long> mEventIds;
-
     private final Set<Long> mFilterIds;
 
     private final Set<Long> mInvitationIds;
@@ -88,24 +76,23 @@ public class Cache {
         mListeners = new ArrayList<CacheListener>();
     }
 
-    /**
-     * Called when the user accepts an invitation. If it's a friend, it's added
-     * to the cache and if it's an
-     * event the
-     * user joins it and it's infos are re-updated
-     * 
-     * @param invitation
-     * @param callback
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#acceptInvitation(ch.epfl.smartmap.cache.Invitation,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
-    public synchronized void acceptInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
+    @Override
+    public synchronized void acceptInvitation(final Invitation invitation,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
-                            ImmutableUser newFriend =
-                                ServiceContainer.getNetworkClient().acceptInvitation(invitation.getUser().getId());
+                            UserContainer newFriend =
+                                ServiceContainer.getNetworkClient().acceptInvitation(
+                                    invitation.getUser().getId());
                             ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
                             newFriend.setFriendship(User.FRIEND);
                             Cache.this.putUser(newFriend);
@@ -133,24 +120,28 @@ public class Cache {
         }.execute();
     }
 
-    /**
-     * OK
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#addOnCacheListener(ch.epfl.smartmap.listeners.CacheListener)
      */
+    @Override
     public synchronized void addOnCacheListener(CacheListener listener) {
         mListeners.add(listener);
     }
 
-    /**
-     * @param ids
-     * @param event
-     * @param callback
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#addParticipantsToEvent(java.util.Set,
+     * ch.epfl.smartmap.cache.Event, ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
+    @Override
     public synchronized void addParticipantsToEvent(Set<Long> ids, final Event event,
         final NetworkRequestCallback callback) {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.addAll(ids);
 
-        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final EventContainer newImmutableEvent =
+            event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -171,13 +162,14 @@ public class Cache {
         }.execute();
     }
 
-    /**
-     * OK
-     * 
-     * @param createdEvent
-     * @param callback
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#createEvent(ch.epfl.smartmap.cache.ImmutableEvent,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
-    public synchronized void createEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
+    @Override
+    public synchronized void createEvent(final EventContainer createdEvent,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -202,7 +194,14 @@ public class Cache {
         }.execute();
     }
 
-    public synchronized void declineInvitation(final Invitation invitation, final NetworkRequestCallback callback) {
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#declineInvitation(ch.epfl.smartmap.cache.Invitation,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
+     */
+    @Override
+    public synchronized void declineInvitation(final Invitation invitation,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -210,7 +209,8 @@ public class Cache {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
                             // Decline online
-                            ServiceContainer.getNetworkClient().declineInvitation(invitation.getUser().getId());
+                            ServiceContainer.getNetworkClient().declineInvitation(
+                                invitation.getUser().getId());
                             ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
                             break;
                         case Invitation.EVENT_INVITATION:
@@ -234,6 +234,11 @@ public class Cache {
         }.execute();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getAllActiveFilters()
+     */
+    @Override
     public synchronized Set<Filter> getAllActiveFilters() {
         return this.getFilters(new SearchFilter<Filter>() {
             @Override
@@ -243,6 +248,11 @@ public class Cache {
         });
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getAllCustomFilters()
+     */
+    @Override
     public synchronized Set<Filter> getAllCustomFilters() {
         Set<Long> customFilterIds = new HashSet<Long>(mFilterIds);
         customFilterIds.remove(Filter.DEFAULT_FILTER_ID);
@@ -250,26 +260,56 @@ public class Cache {
         return this.getFilters(customFilterIds);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getAllEvents()
+     */
+    @Override
     public synchronized Set<Event> getAllEvents() {
         return this.getEvents(mEventIds);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getAllFilters()
+     */
+    @Override
     public synchronized Set<Filter> getAllFilters() {
         return this.getFilters(mFilterIds);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getAllFriends()
+     */
+    @Override
     public synchronized Set<User> getAllFriends() {
         return this.getUsers(mFriendIds);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getAllInvitations()
+     */
+    @Override
     public synchronized SortedSet<Invitation> getAllInvitations() {
         return this.getInvitations(mInvitationIds);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getAllUsers()
+     */
+    @Override
     public synchronized Set<User> getAllUsers() {
         return this.getUsers(mUserIds);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getAllVisibleEvents()
+     */
+    @Override
     public synchronized Set<Event> getAllVisibleEvents() {
         Set<Event> allVisibleEvents = new HashSet<Event>();
         for (Event event : this.getAllEvents()) {
@@ -281,11 +321,11 @@ public class Cache {
         return this.getEvents(mEventIds);
     }
 
-    /**
-     * OK
-     * 
-     * @return
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getAllVisibleFriends()
      */
+    @Override
     public synchronized Set<User> getAllVisibleFriends() {
         // Get all friends
         Set<Long> allVisibleUsersId = new HashSet<Long>();
@@ -308,20 +348,29 @@ public class Cache {
         return this.getUsers(allVisibleUsersId);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getDefaultFilter()
+     */
+    @Override
     public synchronized Filter getDefaultFilter() {
         return this.getFilter(Filter.DEFAULT_FILTER_ID);
     }
 
-    /**
-     * OK
-     * 
-     * @param id
-     * @return
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getEvent(long)
      */
+    @Override
     public synchronized Event getEvent(long id) {
         return mEventInstances.get(id);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getEvents(ch.epfl.smartmap.cache.Cache.SearchFilter)
+     */
+    @Override
     public synchronized Set<Event> getEvents(SearchFilter<Event> filter) {
         Set<Event> events = new HashSet<Event>();
         for (long id : mEventIds) {
@@ -333,12 +382,11 @@ public class Cache {
         return events;
     }
 
-    /**
-     * OK
-     * 
-     * @param ids
-     * @return
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getEvents(java.util.Set)
      */
+    @Override
     public synchronized Set<Event> getEvents(Set<Long> ids) {
         Set<Event> events = new HashSet<Event>();
         for (long id : ids) {
@@ -350,16 +398,20 @@ public class Cache {
         return events;
     }
 
-    /**
-     * OK
-     * 
-     * @param id
-     * @return
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getFilter(long)
      */
+    @Override
     public synchronized Filter getFilter(long id) {
         return mFilterInstances.get(id);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getFilters(ch.epfl.smartmap.cache.Cache.SearchFilter)
+     */
+    @Override
     public synchronized Set<Filter> getFilters(SearchFilter<Filter> searchFilter) {
         Set<Filter> filters = new HashSet<Filter>();
 
@@ -373,6 +425,11 @@ public class Cache {
         return filters;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getFilters(java.util.Set)
+     */
+    @Override
     public synchronized Set<Filter> getFilters(Set<Long> ids) {
         Set<Filter> filters = new HashSet<Filter>();
 
@@ -386,14 +443,29 @@ public class Cache {
         return filters;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getFriendIds()
+     */
+    @Override
     public synchronized Set<Long> getFriendIds() {
         return mFriendIds;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getInvitation(long)
+     */
+    @Override
     public synchronized Invitation getInvitation(long id) {
         return mInvitationInstances.get(id);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getInvitations(ch.epfl.smartmap.cache.Cache.SearchFilter)
+     */
+    @Override
     public synchronized SortedSet<Invitation> getInvitations(SearchFilter<Invitation> filter) {
         SortedSet<Invitation> invitations = new TreeSet<Invitation>();
 
@@ -407,6 +479,11 @@ public class Cache {
         return invitations;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getInvitations(java.util.Set)
+     */
+    @Override
     public synchronized SortedSet<Invitation> getInvitations(Set<Long> ids) {
         SortedSet<Invitation> invitations = new TreeSet<Invitation>();
         for (long id : ids) {
@@ -418,6 +495,11 @@ public class Cache {
         return invitations;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getLiveEvents()
+     */
+    @Override
     public synchronized Set<Event> getLiveEvents() {
         return this.getEvents(new SearchFilter<Event>() {
             @Override
@@ -427,6 +509,11 @@ public class Cache {
         });
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getMyEvents()
+     */
+    @Override
     public synchronized Set<Event> getMyEvents() {
         return this.getEvents(new SearchFilter<Event>() {
             @Override
@@ -436,6 +523,11 @@ public class Cache {
         });
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getNearEvents()
+     */
+    @Override
     public synchronized Set<Event> getNearEvents() {
         return this.getEvents(new SearchFilter<Event>() {
             @Override
@@ -445,6 +537,11 @@ public class Cache {
         });
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getParticipatingEvents()
+     */
+    @Override
     public synchronized Set<Event> getParticipatingEvents() {
         return this.getEvents(new SearchFilter<Event>() {
             @Override
@@ -454,10 +551,20 @@ public class Cache {
         });
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getSelf()
+     */
+    @Override
     public synchronized User getSelf() {
         return mUserInstances.get(ServiceContainer.getSettingsManager().getUserId());
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getUnansweredFriendInvitations()
+     */
+    @Override
     public synchronized SortedSet<Invitation> getUnansweredFriendInvitations() {
         return this.getInvitations(new SearchFilter<Invitation>() {
             @Override
@@ -470,23 +577,21 @@ public class Cache {
         });
     }
 
-    /**
-     * OK
-     * 
-     * @param id
-     * @return
-     */
-
+    @Override
     public synchronized User getUser(long id) {
         return mUserInstances.get(id);
     }
 
-    /**
-     * OK
-     * 
-     * @param ids
-     * @return
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getUser(long)
      */
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#getUsers(java.util.Set)
+     */
+    @Override
     public synchronized Set<User> getUsers(Set<Long> ids) {
         Set<User> users = new HashSet<User>();
         for (long id : ids) {
@@ -498,6 +603,11 @@ public class Cache {
         return users;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#initFromDatabase(ch.epfl.smartmap.database.DatabaseHelper)
+     */
+    @Override
     public synchronized void initFromDatabase(DatabaseHelper database) {
         // Clear previous values
         mEventInstances.clear();
@@ -533,6 +643,12 @@ public class Cache {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#inviteFriendsToEvent(long, java.util.Set,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
+     */
+    @Override
     public synchronized void inviteFriendsToEvent(final long eventId, final Set<Long> usersIds,
         final NetworkRequestCallback callback) {
 
@@ -540,7 +656,8 @@ public class Cache {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, new ArrayList<Long>(usersIds));
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId,
+                        new ArrayList<Long>(usersIds));
                     callback.onSuccess();
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Couldn't invite friends to event:" + e);
@@ -551,6 +668,12 @@ public class Cache {
         }.execute();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#inviteUser(long,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
+     */
+    @Override
     public synchronized void inviteUser(long id, final NetworkRequestCallback callback) {
         new AsyncTask<Long, Void, Void>() {
             @Override
@@ -567,27 +690,19 @@ public class Cache {
         }.execute(id);
     }
 
-    private synchronized void keepOnlyTheseEvents(Set<ImmutableEvent> events) {
-        mEventIds.clear();
-        mEventInstances.clear();
-        this.putEvents(events);
-    }
-
-    private synchronized void keepOnlyTheseUsers(Set<ImmutableUser> users) {
-        mFriendIds.clear();
-        mUserIds.clear();
-        mUserInstances.clear();
-        this.putUsers(users);
-    }
-
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#logState()
+     */
+    @Override
     public void logState() {
         Log.d(TAG, "CACHE STATE : Users : " + mUserIds);
         Log.d(TAG, "CACHE STATE : Friends : " + mFriendIds);
         Log.d(TAG, "CACHE STATE : Events : " + mEventIds);
         Set<String> filters = new HashSet<String>();
         for (long id : mFilterIds) {
-            filters.add("" + this.getFilter(id).getName() + "(" + this.getFilter(id).getVisibleFriends() + ")"
-                + this.getFilter(id).getId() + this.getFilter(id).isActive());
+            filters.add("" + this.getFilter(id).getName() + "(" + this.getFilter(id).getVisibleFriends()
+                + ")" + this.getFilter(id).getId() + this.getFilter(id).isActive());
         }
         Log.d(TAG, "CACHE STATE : Filters : " + filters);
         Set<Long> invitingUsers = new HashSet<Long>();
@@ -599,17 +714,18 @@ public class Cache {
         Log.d(TAG, "CACHE STATE : Invits : " + invitingUsers);
     }
 
-    /**
-     * OK
-     * 
-     * @param createdEvent
-     * @param callback
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#modifyOwnEvent(ch.epfl.smartmap.cache.ImmutableEvent,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
-    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent, final NetworkRequestCallback callback) {
-        new AsyncTask<ImmutableEvent, Void, Void>() {
+    @Override
+    public synchronized void modifyOwnEvent(final EventContainer createdEvent,
+        final NetworkRequestCallback callback) {
+        new AsyncTask<EventContainer, Void, Void>() {
 
             @Override
-            protected Void doInBackground(ImmutableEvent... params) {
+            protected Void doInBackground(EventContainer... params) {
                 try {
                     ServiceContainer.getNetworkClient().updateEvent(params[0]);
                     Cache.this.updateEvent(params[0]);
@@ -624,6 +740,11 @@ public class Cache {
         }.execute(createdEvent);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#notifyEventListeners()
+     */
+    @Override
     public synchronized void notifyEventListeners() {
         Log.d(TAG, "notifying event listeners");
         for (CacheListener listener : mListeners) {
@@ -631,26 +752,32 @@ public class Cache {
         }
     }
 
-    /**
-     * OK
-     * 
-     * @param id
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#putEvent(ch.epfl.smartmap.cache.ImmutableEvent)
      */
-    public synchronized void putEvent(ImmutableEvent newEvent) {
-        Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
+    @Override
+    public synchronized void putEvent(EventContainer newEvent) {
+        Set<EventContainer> singleton = new HashSet<EventContainer>();
         singleton.add(newEvent);
         this.putEvents(singleton);
     }
 
-    public synchronized void putEvents(Set<ImmutableEvent> newEvents) {
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#putEvents(java.util.Set)
+     */
+    @Override
+    public synchronized void putEvents(Set<EventContainer> newEvents) {
         boolean needToCallListeners = false;
 
-        Set<ImmutableUser> usersToAdd = new HashSet<ImmutableUser>();
-        Set<ImmutableEvent> eventsToUpdate = new HashSet<ImmutableEvent>();
-        Set<ImmutableEvent> eventsToAdd = new HashSet<ImmutableEvent>();
+        Set<UserContainer> usersToAdd = new HashSet<UserContainer>();
+        Set<EventContainer> eventsToUpdate = new HashSet<EventContainer>();
+        Set<EventContainer> eventsToAdd = new HashSet<EventContainer>();
 
-        for (final ImmutableEvent newEvent : newEvents) {
-            Log.d(TAG, "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getImmCreator());
+        for (final EventContainer newEvent : newEvents) {
+            Log.d(TAG,
+                "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getImmCreator());
             // Get id
             long eventId = newEvent.getId();
 
@@ -669,7 +796,7 @@ public class Cache {
             this.putUsers(usersToAdd);
 
             // Add user to Container for new Events & Add to SparseArray
-            for (ImmutableEvent eventInfo : eventsToAdd) {
+            for (EventContainer eventInfo : eventsToAdd) {
                 needToCallListeners = true;
                 eventInfo.setCreator(this.getUser(eventInfo.getCreatorId()));
                 mEventIds.add(eventInfo.getId());
@@ -691,19 +818,29 @@ public class Cache {
         }
     }
 
-    public synchronized long putFilter(ImmutableFilter newFilter) {
-        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#putFilter(ch.epfl.smartmap.cache.ImmutableFilter)
+     */
+    @Override
+    public synchronized long putFilter(FilterContainer newFilter) {
+        Set<FilterContainer> singleton = new HashSet<FilterContainer>();
         singleton.add(newFilter);
         this.putFilters(singleton);
         return nextFilterId - 1;
     }
 
-    public synchronized void putFilters(Set<ImmutableFilter> newFilters) {
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#putFilters(java.util.Set)
+     */
+    @Override
+    public synchronized void putFilters(Set<FilterContainer> newFilters) {
         boolean needToCallListeners = false;
 
-        Set<ImmutableFilter> filtersToUpdate = new HashSet<ImmutableFilter>();
+        Set<FilterContainer> filtersToUpdate = new HashSet<FilterContainer>();
 
-        for (ImmutableFilter newFilter : newFilters) {
+        for (FilterContainer newFilter : newFilters) {
             Log.d(TAG, "Put filter " + newFilter.getId() + " in Cache");
             if (!mFilterIds.contains(newFilter.getId())) {
                 long filterId = newFilter.getId();
@@ -736,21 +873,31 @@ public class Cache {
         this.logState();
     }
 
-    public synchronized void putInvitation(ImmutableInvitation invitationInfo) {
-        Set<ImmutableInvitation> singleton = new HashSet<ImmutableInvitation>();
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#putInvitation(ch.epfl.smartmap.cache.ImmutableInvitation)
+     */
+    @Override
+    public synchronized void putInvitation(InvitationContainer invitationInfo) {
+        Set<InvitationContainer> singleton = new HashSet<InvitationContainer>();
         singleton.add(invitationInfo);
         this.putInvitations(singleton);
     }
 
-    public synchronized void putInvitations(Set<ImmutableInvitation> invitationInfos) {
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#putInvitations(java.util.Set)
+     */
+    @Override
+    public synchronized void putInvitations(Set<InvitationContainer> invitationInfos) {
         boolean needToCallListeners = false;
 
         // Contains values to add later all at once
-        Set<ImmutableUser> usersToAdd = new HashSet<ImmutableUser>();
-        Set<ImmutableEvent> eventsToAdd = new HashSet<ImmutableEvent>();
-        Set<ImmutableInvitation> invitationsToAdd = new HashSet<ImmutableInvitation>();
+        Set<UserContainer> usersToAdd = new HashSet<UserContainer>();
+        Set<EventContainer> eventsToAdd = new HashSet<EventContainer>();
+        Set<InvitationContainer> invitationsToAdd = new HashSet<InvitationContainer>();
 
-        for (final ImmutableInvitation invitationInfo : invitationInfos) {
+        for (final InvitationContainer invitationInfo : invitationInfos) {
 
             // Get Id
             if (invitationInfo.getId() == Invitation.NO_ID) {
@@ -771,7 +918,7 @@ public class Cache {
                         break;
                     case Invitation.ACCEPTED_FRIEND_INVITATION:
                         // Check that it contains all informations
-                        ImmutableUser newFriend = invitationInfo.getUserInfos();
+                        UserContainer newFriend = invitationInfo.getUserInfos();
                         if (newFriend != null) {
                             newFriend.setFriendship(User.FRIEND);
                             usersToAdd.add(newFriend);
@@ -825,7 +972,7 @@ public class Cache {
         this.putEvents(eventsToAdd);
 
         // Create and add live instances of Invitations
-        for (ImmutableInvitation invitationInfo : invitationsToAdd) {
+        for (InvitationContainer invitationInfo : invitationsToAdd) {
             boolean isSetCorrectly = false;
 
             switch (invitationInfo.getType()) {
@@ -856,7 +1003,8 @@ public class Cache {
                     if (invitation.getEvent() != null) {
                         Log.d(TAG, "Invitation event id " + invitation.getEvent().getId());
                     }
-                    Notifications.createNotification(invitation, ServiceContainer.getSettingsManager().getContext());
+                    Notifications.createNotification(invitation, ServiceContainer.getSettingsManager()
+                        .getContext());
                 }
             }
 
@@ -873,18 +1021,28 @@ public class Cache {
         this.logState();
     }
 
-    public synchronized void putUser(ImmutableUser newFriend) {
-        Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#putUser(ch.epfl.smartmap.cache.ImmutableUser)
+     */
+    @Override
+    public synchronized void putUser(UserContainer newFriend) {
+        Set<UserContainer> singleton = new HashSet<UserContainer>();
         singleton.add(newFriend);
         this.putUsers(singleton);
     }
 
-    public synchronized void putUsers(Set<ImmutableUser> newUsers) {
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#putUsers(java.util.Set)
+     */
+    @Override
+    public synchronized void putUsers(Set<UserContainer> newUsers) {
         boolean needToCallListeners = false;
 
-        Set<ImmutableUser> usersToUpdate = new HashSet<ImmutableUser>();
+        Set<UserContainer> usersToUpdate = new HashSet<UserContainer>();
 
-        for (ImmutableUser newUser : newUsers) {
+        for (UserContainer newUser : newUsers) {
             mUserIds.add(newUser.getId());
 
             if (newUser.getFriendship() == User.FRIEND) {
@@ -915,6 +1073,11 @@ public class Cache {
         this.logState();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#readAllInvitations()
+     */
+    @Override
     public synchronized void readAllInvitations() {
         SortedSet<Invitation> unreadInvitations = this.getInvitations(new Cache.SearchFilter<Invitation>() {
             @Override
@@ -924,7 +1087,7 @@ public class Cache {
             }
         });
 
-        Set<ImmutableInvitation> readInvitations = new HashSet<ImmutableInvitation>();
+        Set<InvitationContainer> readInvitations = new HashSet<InvitationContainer>();
 
         for (Invitation invitation : unreadInvitations) {
             readInvitations.add(invitation.getImmutableCopy().setStatus(Invitation.READ));
@@ -933,22 +1096,22 @@ public class Cache {
         this.updateInvitations(readInvitations);
     }
 
-    /**
-     * OK
-     * 
-     * @param id
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#removeEvent(long)
      */
+    @Override
     public synchronized void removeEvent(long id) {
         Set<Long> singleton = new HashSet<Long>();
         singleton.add(id);
         this.removeEvents(singleton);
     }
 
-    /**
-     * OK
-     * 
-     * @param ids
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#removeEvents(java.util.Set)
      */
+    @Override
     public synchronized void removeEvents(Set<Long> ids) {
         boolean isListModified = false;
 
@@ -975,22 +1138,22 @@ public class Cache {
         }
     }
 
-    /**
-     * OK
-     * 
-     * @param id
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#removeFilter(long)
      */
+    @Override
     public synchronized void removeFilter(long id) {
         Set<Long> singleton = new HashSet<Long>();
         singleton.add(id);
         this.removeFilters(singleton);
     }
 
-    /**
-     * OK
-     * 
-     * @param ids
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#removeFilters(java.util.Set)
      */
+    @Override
     public synchronized void removeFilters(Set<Long> ids) {
         boolean isListModified = false;
 
@@ -1015,23 +1178,24 @@ public class Cache {
         }
     }
 
-    /**
-     * OK
-     * 
-     * @param id
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#removeFriend(long,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
+    @Override
     public synchronized void removeFriend(long id, final NetworkRequestCallback callback) {
         Set<Long> singleton = new HashSet<Long>();
         singleton.add(id);
         this.removeFriends(singleton, callback);
     }
 
-    /**
-     * OK
-     * 
-     * @param ids
-     * @throws SmartMapClientException
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#removeFriends(java.util.Set,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
+    @Override
     public synchronized void removeFriends(Set<Long> ids, final NetworkRequestCallback callback) {
         boolean isListModified = false;
         for (long id : ids) {
@@ -1068,17 +1232,19 @@ public class Cache {
         }
     }
 
-    /**
-     * @param ids
-     * @param event
-     * @param callback
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#removeParticipantsFromEvent(java.util.Set,
+     * ch.epfl.smartmap.cache.Event, ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
+    @Override
     public synchronized void removeParticipantsFromEvent(Set<Long> ids, Event event,
         final NetworkRequestCallback callback) {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.removeAll(ids);
 
-        final ImmutableEvent newImmutableEvent = event.getImmutableCopy().setParticipantIds(newParticipantIds);
+        final EventContainer newImmutableEvent =
+            event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -1099,6 +1265,11 @@ public class Cache {
         }.execute();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#removeUsers(java.util.Set)
+     */
+    @Override
     public synchronized boolean removeUsers(Set<Long> userIds) {
         boolean isListModified = false;
 
@@ -1120,15 +1291,14 @@ public class Cache {
         return isListModified;
     }
 
-    /**
-     * @param user
-     *            the user we are trying to (un)block
-     * @param newBlockedStatus
-     *            true if we're blocking the user, false otherwise
-     * @param callback
-     * @author rbsteinm
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#setBlockedStatus(ch.epfl.smartmap.cache.ImmutableUser,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
-    public synchronized void setBlockedStatus(final ImmutableUser user, final NetworkRequestCallback callback) {
+    @Override
+    public synchronized void
+        setBlockedStatus(final UserContainer user, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1160,16 +1330,14 @@ public class Cache {
         }.execute();
     }
 
-    /**
-     * @param user
-     *            the user we are trying to (un)block
-     * @param newBlockedStatus
-     *            true if we're blocking the user, false otherwise
-     * @param callback
-     * @author rbsteinm
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#setBlockedStatus(ch.epfl.smartmap.cache.ImmutableUser,
+     * ch.epfl.smartmap.cache.User.blockStatus, ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
-    public synchronized void setBlockedStatus(final ImmutableUser user, final User.blockStatus newBlockedStatus,
-        final NetworkRequestCallback callback) {
+    @Override
+    public synchronized void setBlockedStatus(final UserContainer user,
+        final User.blockStatus newBlockedStatus, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1195,62 +1363,14 @@ public class Cache {
         }.execute();
     }
 
-    private synchronized boolean updateEvent(ImmutableEvent eventInfo) {
-        Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
-        singleton.add(eventInfo);
-        return this.updateEvents(singleton);
-    }
-
-    private synchronized boolean updateEvents(Set<ImmutableEvent> eventInfos) {
-        Log.d(TAG, "updateEvents(" + eventInfos + ")");
-        boolean isListModified = false;
-        for (ImmutableEvent eventInfo : eventInfos) {
-            Event event = this.getEvent(eventInfo.getId());
-            if ((event != null) && event.update(eventInfo)) {
-                Log.d(
-                    TAG,
-                    "updateEvents successfully updated event " + event.getId() + " with participants "
-                        + event.getParticipantIds());
-                isListModified = true;
-            }
-        }
-
-        if (isListModified) {
-            for (CacheListener listener : mListeners) {
-                listener.onEventListUpdate();
-            }
-        }
-
-        return isListModified;
-    }
-
-    private synchronized boolean updateFilter(ImmutableFilter filterInfo) {
-        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
-        singleton.add(filterInfo);
-        return this.updateFilters(singleton);
-    }
-
-    private synchronized boolean updateFilters(Set<ImmutableFilter> filterInfos) {
-        boolean isListModified = false;
-
-        for (ImmutableFilter filterInfo : filterInfos) {
-            Filter filter = this.getFilter(filterInfo.getId());
-            if ((filter != null) && filter.update(filterInfo)) {
-                isListModified = true;
-            }
-        }
-
-        if (isListModified) {
-            for (CacheListener listener : mListeners) {
-                listener.onFilterListUpdate();
-            }
-        }
-
-        return isListModified;
-    }
-
-    public synchronized void
-        updateFromNetwork(final SmartMapClient networkClient, final NetworkRequestCallback callback) {
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#updateFromNetwork(ch.epfl.smartmap.servercom.SmartMapClient,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
+     */
+    @Override
+    public synchronized void updateFromNetwork(final SmartMapClient networkClient,
+        final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1260,23 +1380,24 @@ public class Cache {
 
                     // Sets with new values (avoid calling multiple times the
                     // listeners)
-                    Set<ImmutableUser> updatedUsers = new HashSet<ImmutableUser>();
-                    Set<ImmutableEvent> updatedEvents = new HashSet<ImmutableEvent>();
+                    Set<UserContainer> updatedUsers = new HashSet<UserContainer>();
+                    Set<EventContainer> updatedEvents = new HashSet<EventContainer>();
 
                     // Update self informations
                     long myId = settingsManager.getUserId();
-                    ImmutableUser self = networkClient.getUserInfo(myId);
+                    UserContainer self = networkClient.getUserInfo(myId);
                     self.setImage(networkClient.getProfilePicture(myId));
                     updatedUsers.add(self);
 
                     // Fetch friends via listFriendPos
-                    Set<ImmutableUser> listFriendPos = new HashSet<ImmutableUser>(networkClient.listFriendsPos());
+                    Set<UserContainer> listFriendPos =
+                        new HashSet<UserContainer>(networkClient.listFriendsPos());
 
-                    for (ImmutableUser positionInfos : listFriendPos) {
+                    for (UserContainer positionInfos : listFriendPos) {
                         // get id
                         long id = positionInfos.getId();
                         // Get other online info
-                        ImmutableUser onlineInfos = networkClient.getUserInfo(id);
+                        UserContainer onlineInfos = networkClient.getUserInfo(id);
                         Log.d(TAG, "onlineInfos has name " + onlineInfos.getName());
                         // Get picture
                         Bitmap image = networkClient.getProfilePicture(id);
@@ -1285,11 +1406,10 @@ public class Cache {
                         onlineInfos.setLocationString(positionInfos.getLocationString());
                         onlineInfos.setImage(image);
 
-                        Log.d(
-                            TAG,
-                            "Update(" + onlineInfos.getId() + ") : " + onlineInfos.getName() + ", "
-                                + self.getLocationString());
-                        Log.d(TAG, "Has " + ((onlineInfos.getImage() == User.NO_IMAGE) ? "no " : "") + "image");
+                        Log.d(TAG, "Update(" + onlineInfos.getId() + ") : " + onlineInfos.getName() + ", "
+                            + self.getLocationString());
+                        Log.d(TAG, "Has " + ((onlineInfos.getImage() == User.NO_IMAGE) ? "no " : "")
+                            + "image");
 
                         // Put friend in Set
                         updatedUsers.add(onlineInfos);
@@ -1297,13 +1417,14 @@ public class Cache {
 
                     // Get near Events
                     Set<Long> nearEventIds =
-                        new HashSet<Long>(networkClient.getPublicEvents(settingsManager.getLocation().getLatitude(),
-                            settingsManager.getLocation().getLongitude(), settingsManager.getNearEventsMaxDistance()));
+                        new HashSet<Long>(networkClient.getPublicEvents(settingsManager.getLocation()
+                            .getLatitude(), settingsManager.getLocation().getLongitude(), settingsManager
+                            .getNearEventsMaxDistance()));
 
                     // Update all cached event if needed
                     for (long id : mEventIds) {
                         // Get event infos
-                        ImmutableEvent onlineInfos = networkClient.getEventInfo(id);
+                        EventContainer onlineInfos = networkClient.getEventInfo(id);
                         // Check if event needs to be kept
                         if (nearEventIds.contains(id) || (onlineInfos.getCreatorId() == myId)
                             || onlineInfos.getParticipantIds().contains(myId)) {
@@ -1319,7 +1440,7 @@ public class Cache {
                             // get id
                             long id = invitation.getUser().getId();
                             // Get online info
-                            ImmutableUser onlineInfos = networkClient.getUserInfo(id);
+                            UserContainer onlineInfos = networkClient.getUserInfo(id);
                             // Get picture
                             Bitmap image = networkClient.getProfilePicture(id);
                             // Put all inside container
@@ -1344,15 +1465,102 @@ public class Cache {
         }.execute();
     }
 
-    private boolean updateInvitation(ImmutableInvitation invitation) {
-        Set<ImmutableInvitation> singleton = new HashSet<ImmutableInvitation>();
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#updateUserInfos(long)
+     */
+    @Override
+    public synchronized void updateUserInfos(long id) {
+        new AsyncTask<Long, Void, Void>() {
+            @Override
+            protected Void doInBackground(Long... params) {
+                try {
+                    Log.d(TAG, "need to update user " + params[0]);
+                    UserContainer userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
+                    userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
+                    Cache.this.updateUser(userInfos);
+                } catch (SmartMapClientException e) {
+                    Log.e(TAG, "SmartMapClientException : " + e);
+                }
+                return null;
+            }
+        }.execute(id);
+    }
+
+    private synchronized void keepOnlyTheseEvents(Set<EventContainer> events) {
+        mEventIds.clear();
+        mEventInstances.clear();
+        this.putEvents(events);
+    }
+
+    private synchronized void keepOnlyTheseUsers(Set<UserContainer> users) {
+        mFriendIds.clear();
+        mUserIds.clear();
+        mUserInstances.clear();
+        this.putUsers(users);
+    }
+
+    private synchronized boolean updateEvent(EventContainer eventInfo) {
+        Set<EventContainer> singleton = new HashSet<EventContainer>();
+        singleton.add(eventInfo);
+        return this.updateEvents(singleton);
+    }
+
+    private synchronized boolean updateEvents(Set<EventContainer> eventInfos) {
+        Log.d(TAG, "updateEvents(" + eventInfos + ")");
+        boolean isListModified = false;
+        for (EventContainer eventInfo : eventInfos) {
+            Event event = this.getEvent(eventInfo.getId());
+            if ((event != null) && event.update(eventInfo)) {
+                Log.d(TAG, "updateEvents successfully updated event " + event.getId() + " with participants "
+                    + event.getParticipantIds());
+                isListModified = true;
+            }
+        }
+
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onEventListUpdate();
+            }
+        }
+
+        return isListModified;
+    }
+
+    private synchronized boolean updateFilter(FilterContainer filterInfo) {
+        Set<FilterContainer> singleton = new HashSet<FilterContainer>();
+        singleton.add(filterInfo);
+        return this.updateFilters(singleton);
+    }
+
+    private synchronized boolean updateFilters(Set<FilterContainer> filterInfos) {
+        boolean isListModified = false;
+
+        for (FilterContainer filterInfo : filterInfos) {
+            Filter filter = this.getFilter(filterInfo.getId());
+            if ((filter != null) && filter.update(filterInfo)) {
+                isListModified = true;
+            }
+        }
+
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onFilterListUpdate();
+            }
+        }
+
+        return isListModified;
+    }
+
+    private boolean updateInvitation(InvitationContainer invitation) {
+        Set<InvitationContainer> singleton = new HashSet<InvitationContainer>();
         singleton.add(invitation);
         return this.updateInvitations(singleton);
     }
 
-    private boolean updateInvitations(Set<ImmutableInvitation> invitations) {
+    private boolean updateInvitations(Set<InvitationContainer> invitations) {
         boolean isListModified = false;
-        for (ImmutableInvitation invitation : invitations) {
+        for (InvitationContainer invitation : invitations) {
             isListModified = isListModified || this.getInvitation(invitation.getId()).update(invitation);
         }
 
@@ -1370,27 +1578,10 @@ public class Cache {
      * 
      * @param userInfo
      */
-    private synchronized boolean updateUser(ImmutableUser userInfo) {
-        Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
+    private synchronized boolean updateUser(UserContainer userInfo) {
+        Set<UserContainer> singleton = new HashSet<UserContainer>();
         singleton.add(userInfo);
         return this.updateUsers(singleton);
-    }
-
-    public synchronized void updateUserInfos(long id) {
-        new AsyncTask<Long, Void, Void>() {
-            @Override
-            protected Void doInBackground(Long... params) {
-                try {
-                    Log.d(TAG, "need to update user " + params[0]);
-                    ImmutableUser userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
-                    userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
-                    Cache.this.updateUser(userInfos);
-                } catch (SmartMapClientException e) {
-                    Log.e(TAG, "SmartMapClientException : " + e);
-                }
-                return null;
-            }
-        }.execute(id);
     }
 
     /**
@@ -1398,13 +1589,13 @@ public class Cache {
      * 
      * @param userInfos
      */
-    private synchronized boolean updateUsers(Set<ImmutableUser> userInfos) {
+    private synchronized boolean updateUsers(Set<UserContainer> userInfos) {
         boolean isListModified = false;
 
         Set<Long> usersWithNewTypeIds = new HashSet<Long>();
-        Set<ImmutableUser> usersWithNewType = new HashSet<ImmutableUser>();
+        Set<UserContainer> usersWithNewType = new HashSet<UserContainer>();
 
-        for (ImmutableUser userInfo : userInfos) {
+        for (UserContainer userInfo : userInfos) {
             User user = this.getUser(userInfo.getId());
             if (user != null) {
                 // Check if friendship has changed
@@ -1432,5 +1623,17 @@ public class Cache {
         }
 
         return isListModified;
+    }
+
+    /**
+     * Allows to search efficiently through the Cache, by providing a filtering
+     * method
+     * 
+     * @param <T>
+     *            Type of items searched
+     * @author jfperren
+     */
+    public interface SearchFilter<T> {
+        boolean filter(T item);
     }
 }

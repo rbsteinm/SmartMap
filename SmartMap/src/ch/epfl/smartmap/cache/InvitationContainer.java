@@ -8,7 +8,7 @@ package ch.epfl.smartmap.cache;
  * 
  * @author agpmilli
  */
-public final class ImmutableInvitation {
+public final class InvitationContainer {
 
     public static final int FRIEND_INVITATION = 0;
     public static final int EVENT_INVITATION = 1;
@@ -20,8 +20,8 @@ public final class ImmutableInvitation {
     private long mTimeStamp;
     private int mType;
 
-    private final ImmutableUser mUserInfos;
-    private final ImmutableEvent mEventInfos;
+    private final UserContainer mUserInfos;
+    private final EventContainer mEventInfos;
 
     // These will be instanciated and put here by the Cache
     private Event mEvent;
@@ -32,7 +32,7 @@ public final class ImmutableInvitation {
      * want the value to be taken
      * into account.
      */
-    public ImmutableInvitation(long id, ImmutableUser userInfos, ImmutableEvent eventInfos, int status,
+    public InvitationContainer(long id, UserContainer userInfos, EventContainer eventInfos, int status,
         long timeStamp, int type) {
         mId = id;
         mUserInfos = userInfos;
@@ -50,7 +50,7 @@ public final class ImmutableInvitation {
         return mEventInfos != null ? mEventInfos.getId() : Event.NO_ID;
     }
 
-    public ImmutableEvent getEventInfos() {
+    public EventContainer getEventInfos() {
         return mEventInfos;
     }
 
@@ -82,36 +82,36 @@ public final class ImmutableInvitation {
         return mUserInfos != null ? mUserInfos.getId() : User.NO_ID;
     }
 
-    public ImmutableUser getUserInfos() {
+    public UserContainer getUserInfos() {
         return mUserInfos;
     }
 
-    public ImmutableInvitation setEvent(Event newEvent) {
+    public InvitationContainer setEvent(Event newEvent) {
         mEvent = newEvent;
         return this;
     }
 
-    public ImmutableInvitation setId(long newId) {
+    public InvitationContainer setId(long newId) {
         mId = newId;
         return this;
     }
 
-    public ImmutableInvitation setStatus(int newStatus) {
+    public InvitationContainer setStatus(int newStatus) {
         mStatus = newStatus;
         return this;
     }
 
-    public ImmutableInvitation setTimeStamp(long newTimeStamp) {
+    public InvitationContainer setTimeStamp(long newTimeStamp) {
         mTimeStamp = newTimeStamp;
         return this;
     }
 
-    public ImmutableInvitation setType(int newType) {
+    public InvitationContainer setType(int newType) {
         mType = newType;
         return this;
     }
 
-    public ImmutableInvitation setUser(User newUser) {
+    public InvitationContainer setUser(User newUser) {
         mUser = newUser;
         return this;
     }

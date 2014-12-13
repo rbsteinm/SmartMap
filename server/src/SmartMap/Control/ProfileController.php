@@ -19,8 +19,9 @@ class ProfileController
     {
         // We check that we are authenticated.
         RequestUtils::getIdFromRequest($request);
-        
-        $id =RequestUtils::getPostParam($request, 'user_id');
+
+        // We cast the value of the post parameter to int to avoid path injection
+        $id = (int) RequestUtils::getPostParam($request, 'user_id');
         
         $imagePath = self::$PICTURES_PATH . $id . '.jpg';
         if (!file_exists($imagePath))

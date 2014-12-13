@@ -31,7 +31,7 @@ public abstract class Filter implements FilterInterface {
     public static final Bitmap DEFAULT_BLUE_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
         .getContext().getResources(), R.drawable.ic_filter_blue);
 
-    public static Filter createFromContainer(ImmutableFilter filterInfos) {
+    public static Filter createFromContainer(FilterContainer filterInfos) {
         long id = filterInfos.getId();
         Set<Long> ids = filterInfos.getIds();
         Boolean isActive = filterInfos.isActive();
@@ -82,8 +82,8 @@ public abstract class Filter implements FilterInterface {
     }
 
     @Override
-    public ImmutableFilter getImmutableCopy() {
-        return new ImmutableFilter(this.getId(), this.getName(), this.getIds(), this.isActive());
+    public FilterContainer getImmutableCopy() {
+        return new FilterContainer(this.getId(), this.getName(), this.getIds(), this.isActive());
     }
 
     /*
@@ -163,7 +163,7 @@ public abstract class Filter implements FilterInterface {
      * ()
      */
     @Override
-    public boolean update(ImmutableFilter filter) {
+    public boolean update(FilterContainer filter) {
         boolean hasChanged = false;
 
         if ((filter.getId() >= 0) && (filter.getId() != mId)) {

@@ -84,8 +84,8 @@ public abstract class User implements UserInterface {
     }
 
     @Override
-    public ImmutableUser getImmutableCopy() {
-        return new ImmutableUser(mId, mName, null, null, null, null, mImage, User.blockStatus.UNBLOCKED,
+    public UserContainer getImmutableCopy() {
+        return new UserContainer(mId, mName, null, null, null, null, mImage, User.blockStatus.UNBLOCKED,
             this.getFriendship());
     }
 
@@ -126,7 +126,7 @@ public abstract class User implements UserInterface {
     }
 
     @Override
-    public boolean update(ImmutableUser user) {
+    public boolean update(UserContainer user) {
         // TODO : Update hasChanged to work correctly
         boolean hasChanged = false;
 
@@ -145,7 +145,7 @@ public abstract class User implements UserInterface {
         return hasChanged;
     }
 
-    public static User createFromContainer(ImmutableUser userInfos) {
+    public static User createFromContainer(UserContainer userInfos) {
         switch (userInfos.getFriendship()) {
             case User.FRIEND:
                 return new Friend(userInfos.getId(), userInfos.getName(), userInfos.getImage(),

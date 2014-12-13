@@ -23,7 +23,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.ImmutableEvent;
+import ch.epfl.smartmap.cache.EventContainer;
 import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.gui.DatePickerFragment;
@@ -274,7 +274,7 @@ public class AddEventActivity extends FragmentActivity {
             location.setLatitude(mEventPosition.latitude);
             location.setLongitude(mEventPosition.longitude);
 
-            ImmutableEvent event = new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(),
+            EventContainer event = new EventContainer(PublicEvent.NO_ID, mEventName.getText().toString(),
                     ServiceContainer.getCache().getSelf().getImmutableCopy(), mDescription.getText().toString(),
                     mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
 

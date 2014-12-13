@@ -49,7 +49,7 @@ public interface Event extends Displayable {
      */
     Calendar getEndDate();
 
-    ImmutableEvent getImmutableCopy();
+    EventContainer getImmutableCopy();
 
     String getName();
 
@@ -71,5 +71,5 @@ public interface Event extends Displayable {
 
     boolean isVisible();
 
-    boolean update(ImmutableEvent event);
+    boolean update(EventContainer event);
 }

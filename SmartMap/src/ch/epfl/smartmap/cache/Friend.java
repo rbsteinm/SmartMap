@@ -68,7 +68,7 @@ public final class Friend extends User {
     }
 
     @Override
-    public ImmutableUser getImmutableCopy() {
+    public UserContainer getImmutableCopy() {
         return super.getImmutableCopy().setPhoneNumber(mPhoneNumber).setEmail(mEmail).setLocation(mLocation)
             .setLocationString(mLocationString).setBlocked(mIsBlocked);
     }
@@ -143,7 +143,7 @@ public final class Friend extends User {
     }
 
     @Override
-    public boolean update(ImmutableUser user) {
+    public boolean update(UserContainer user) {
         // TODO : Update hasChanged to work correctly
         boolean hasChanged = false;
 

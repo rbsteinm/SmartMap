@@ -36,6 +36,7 @@ public class FriendsTab extends ListFragment {
 
     public FriendsTab(Context context) {
         mContext = context;
+        ServiceContainer.initSmartMapServices(context);
     }
 
     @Override

@@ -43,7 +43,7 @@ public class PublicEvent implements Event {
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
 
-    protected PublicEvent(ImmutableEvent event) {
+    protected PublicEvent(EventContainer event) {
         // Set id
         if (event.getId() >= 0) {
             mId = event.getId();
@@ -102,8 +102,8 @@ public class PublicEvent implements Event {
     }
 
     @Override
-    public ImmutableEvent getImmutableCopy() {
-        return new ImmutableEvent(mId, mName, mCreator.getImmutableCopy(), mDescription, mStartDate, mEndDate,
+    public EventContainer getImmutableCopy() {
+        return new EventContainer(mId, mName, mCreator.getImmutableCopy(), mDescription, mStartDate, mEndDate,
             mLocation, mLocationString, mParticipantIds);
     }
 
@@ -242,7 +242,7 @@ public class PublicEvent implements Event {
     }
 
     @Override
-    public boolean update(ImmutableEvent event) {
+    public boolean update(EventContainer event) {
         // TODO Modify hasChanged to work correctly
         boolean hasChanged = false;
 
