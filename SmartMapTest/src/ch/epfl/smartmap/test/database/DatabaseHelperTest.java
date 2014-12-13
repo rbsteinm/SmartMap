@@ -9,9 +9,12 @@ import java.util.Set;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
+import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.EventContainer;
@@ -211,11 +214,26 @@ public class DatabaseHelperTest extends AndroidTestCase {
     }
 
     @Test
+    public void testSetUserPicture() {
+        Bitmap pic = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.ic_default_user);
+        dbh.setUserPicture(pic, 0);
+        assertTrue(dbh.getPictureById(0).sameAs(pic));
+    }
+
+    @Test
     public void testUpdateEvent() {
         dbh.addEvent(event);
         event.setName(name);
         long rows = dbh.updateEvent(event);
         assertTrue(dbh.getEvent(event.getId()).getName().equals(name) && (rows == 1));
+    }
+
+    @Test
+    public void testUpdateFilter() {
+        dbh.addFilter(filter);
+        filter.setName("New Name");
+        dbh.updateFilter(filter);
+        assertTrue(dbh.getFilter(filter.getId()).getName().equals("New Name"));
     }
 
     @Test
