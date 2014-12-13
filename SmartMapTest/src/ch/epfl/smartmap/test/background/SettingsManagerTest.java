@@ -1,4 +1,4 @@
-package ch.epfl.smartmap.test.cache;
+package ch.epfl.smartmap.test.background;
 
 import org.junit.Test;
 

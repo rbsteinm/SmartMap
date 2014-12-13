@@ -38,7 +38,7 @@ public abstract class User implements UserInterface {
     public static final int PICTURE_WIDTH = 50;
     public static final int PICTURE_HEIGHT = 50;
     public static final double NO_LATITUDE = 0.0;
-    public static double NO_LONGITUDE = 0.0;
+    public static final double NO_LONGITUDE = 0.0;
     private final long mId;
 
     private String mName;
