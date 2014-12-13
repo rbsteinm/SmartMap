@@ -971,7 +971,9 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_ID, invitation.getId());
-        values.put(KEY_USER_ID, invitation.getUser().getId());
+        if (invitation.getUser() != null) {
+            values.put(KEY_USER_ID, invitation.getUser().getId());
+        }
         values.put(KEY_EVENT_ID, invitation.getEventId());
         values.put(KEY_STATUS, invitation.getStatus());
         values.put(KEY_DATE, invitation.getTimeStamp());

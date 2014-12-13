@@ -3,6 +3,7 @@ package ch.epfl.smartmap.test.database;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -193,11 +194,37 @@ public class DatabaseHelperTest extends AndroidTestCase {
     }
 
     @Test
+    public void testGetFiltersIds() {
+        dbh.addFilter(filter);
+        dbh.addFilter(filter2);
+        List<Long> ids = dbh.getFilterIds();
+        assertTrue(ids.size() == 2 && ids.contains(filter.getId()) && ids.contains(filter2.getId()));
+    }
+
+    @Test
+    public void testGetFriendsIds() {
+        dbh.addUser(a);
+        dbh.addUser(b);
+        List<Long> ids = dbh.getFriendIds();
+        // a isn't a friend
+        assertTrue(ids.size() == 1 && ids.contains(b.getId()));
+    }
+
+    @Test
     public void testUpdateEvent() {
         dbh.addEvent(event);
         event.setName(name);
         long rows = dbh.updateEvent(event);
         assertTrue(dbh.getEvent(event.getId()).getName().equals(name) && (rows == 1));
+    }
+
+    @Test
+    public void testUpdateInvitation() {
+        long id = dbh.addInvitation(invitA);
+        dbh.updateInvitation(new InvitationContainer(id, invitA.getUserInfos(), invitA.getEventInfos(),
+            Invitation.ACCEPTED, invitA.getTimeStamp(), invitA.getType()));
+        InvitationContainer invit = (InvitationContainer) dbh.getAllInvitations().toArray()[0];
+        assertTrue(invit.getId() == id && invit.getStatus() == Invitation.ACCEPTED);
     }
 
     @Test
