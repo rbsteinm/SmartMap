@@ -86,6 +86,9 @@ public class AddEventActivity extends FragmentActivity {
 
     private TextWatcher mTextChangedListener;
 
+    private Calendar mStartDate;
+    private Calendar mEndDate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -206,8 +209,7 @@ public class AddEventActivity extends FragmentActivity {
      * @author SpicyCH
      */
     private boolean allFieldsSetByUser() {
-        boolean validEndDateTime = this.isValidDate(mPickEndDate.getText().toString())
-                && this.isValidTime(mPickEndTime.getText().toString());
+        boolean validEndDateTime = this.isValidTime(mPickEndTime.getText().toString());
 
         boolean validPosition = (mEventPosition.latitude != 0) && (mEventPosition.longitude != 0);
 
@@ -227,21 +229,17 @@ public class AddEventActivity extends FragmentActivity {
      */
     private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
 
+        Log.d(TAG, "Checking dates validity.\nmStartDate:\n" + mStartDate + "mEndDate:\n" + mEndDate);
+
         if (this.isValidDate(endDate.getText().toString()) && this.isValidTime(endTime.getText().toString())) {
             // The end of the event has been set by the user
-
-            GregorianCalendar start = this.getDateFromTextFormat(startDate.getText().toString(), startTime.getText()
-                    .toString());
-
-            GregorianCalendar end = this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText()
-                    .toString());
 
             Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
 
             // Needed to let the user click the default time without errors.
             now.add(GregorianCalendar.MINUTE, -1);
 
-            if (end.before(start)) {
+            if (mEndDate.before(mStartDate)) {
                 // The user is trying to create the end of the event before its
                 // start!
 
@@ -250,7 +248,7 @@ public class AddEventActivity extends FragmentActivity {
                 Toast.makeText(AddEventActivity.this,
                         this.getString(R.string.add_event_toast_event_cannot_end_before_starting), Toast.LENGTH_LONG)
                         .show();
-            } else if (end.before(now)) {
+            } else if (mEndDate.before(now)) {
                 // The user is trying to create an event in the past
 
                 this.resetFields(endDate, endTime);
@@ -285,18 +283,13 @@ public class AddEventActivity extends FragmentActivity {
                     Toast.LENGTH_LONG).show();
         } else {
 
-            GregorianCalendar startDate = this.getDateFromTextFormat(mPickStartDate.getText().toString(),
-                    mPickStartTime.getText().toString());
-            GregorianCalendar endDate = this.getDateFromTextFormat(mPickEndDate.getText().toString(), mPickEndTime
-                    .getText().toString());
-
             Location location = new Location("Location set by user");
             location.setLatitude(mEventPosition.latitude);
             location.setLongitude(mEventPosition.longitude);
 
             ImmutableEvent event = new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(),
                     ServiceContainer.getCache().getSelf().getImmutableCopy(), mDescription.getText().toString(),
-                    startDate, endDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
+                    mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
 
             ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
         }
@@ -318,28 +311,6 @@ public class AddEventActivity extends FragmentActivity {
         boolean descrLegal = descrSize < MAX_DESCRIPTION_SIZE;
 
         return eventNameLegal && placeNameLegal && descrLegal;
-    }
-
-    /**
-     * @param dayMonthYear
-     *            a String like "16/09/1993"
-     * @param hourMinute
-     *            a String like "17:03"
-     * @return a GregorianDate constructed from the given parameters
-     * @author SpicyCH
-     */
-    private GregorianCalendar getDateFromTextFormat(String dayMonthYear, String hourMinute) {
-        assert this.isValidDate(dayMonthYear) : "The string dayMonthYear isn't in the expected format";
-        assert this.isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
-
-        String[] s1 = dayMonthYear.split("/");
-        String[] s2 = hourMinute.split(":");
-
-        final int month = Integer.parseInt(s1[INDEX_MONTH]) - 1;
-
-        return new GregorianCalendar(Integer.parseInt(s1[INDEX_YEAR]), month, Integer.parseInt(s1[INDEX_DAY]),
-                Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
-
     }
 
     /**
@@ -372,29 +343,28 @@ public class AddEventActivity extends FragmentActivity {
         mPickEndDate.addTextChangedListener(mTextChangedListener);
         mPickEndTime.addTextChangedListener(mTextChangedListener);
 
-        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+        mStartDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+        mEndDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
 
-        mPickStartTime.setText(TimePickerFragment.formatForClock(now.get(Calendar.HOUR_OF_DAY)) + ":"
-                + TimePickerFragment.formatForClock(now.get(Calendar.MINUTE)));
+        mPickStartTime.setText(Utils.getTimeString(mStartDate));
 
         mPickStartTime.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                DialogFragment newFragment = new TimePickerFragment(mPickStartTime);
+                DialogFragment newFragment = new TimePickerFragment(mPickStartTime, mStartDate);
                 newFragment.show(AddEventActivity.this.getSupportFragmentManager(), TIME_PICKER_DESCR);
             }
 
         });
 
-        mPickStartDate.setText(now.get(Calendar.DAY_OF_MONTH) + "/" + (now.get(Calendar.MONTH) + 1) + "/"
-                + now.get(Calendar.YEAR));
+        mPickStartDate.setText(Utils.getDateString(mStartDate));
 
         mPickStartDate.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                DialogFragment newFragment = new DatePickerFragment(mPickStartDate);
+                DialogFragment newFragment = new DatePickerFragment(mPickStartDate, mStartDate);
                 newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER_DESCR);
             }
         });
@@ -403,7 +373,7 @@ public class AddEventActivity extends FragmentActivity {
 
             @Override
             public void onClick(View v) {
-                DialogFragment newFragment = new DatePickerFragment(mPickEndDate);
+                DialogFragment newFragment = new DatePickerFragment(mPickEndDate, mEndDate);
                 newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER_DESCR);
             }
         });
@@ -412,7 +382,7 @@ public class AddEventActivity extends FragmentActivity {
 
             @Override
             public void onClick(View v) {
-                DialogFragment newFragment = new TimePickerFragment(mPickEndTime);
+                DialogFragment newFragment = new TimePickerFragment(mPickEndTime, mEndDate);
                 newFragment.show(AddEventActivity.this.getSupportFragmentManager(), TIME_PICKER_DESCR);
             }
         });
@@ -420,7 +390,7 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     private boolean isValidDate(String s) {
-        String[] sArray = s.split("/");
+        String[] sArray = s.split(".");
         return sArray.length == ELEMENTS_JJ_DD_YYYY;
     }
 

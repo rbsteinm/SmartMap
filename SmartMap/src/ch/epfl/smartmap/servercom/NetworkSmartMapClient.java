@@ -62,6 +62,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     private static final String SERVER_URL = "http://smartmap.ddns.net";
     private static final NetworkProvider NETWORK_PROVIDER = new DefaultNetworkProvider();
     private static final int SERVER_RESPONSE_OK = 200;
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
     private static CookieManager mCookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
 
     public NetworkSmartMapClient() {
@@ -720,7 +722,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     private Map<String, String> getParamsForEvent(ImmutableEvent event) {
         Map<String, String> params = new HashMap<String, String>();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         String startingDate = dateFormat.format(event.getStartDate().getTime());
         String endDate = dateFormat.format(event.getEndDate().getTime());
 

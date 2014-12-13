@@ -83,8 +83,8 @@ public class AddFriendActivity extends ListActivity {
      */
     private void displayConfirmationDialog(String name, final long userId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(this.getResources().getString(R.string.add) + name + " "
-                + this.getResources().getString(R.string.as_a_friend));
+        builder.setMessage(this.getResources().getString(R.string.add) + " " + name + " "
+            + this.getResources().getString(R.string.as_a_friend));
 
         // Add positive button
         builder.setPositiveButton(this.getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
@@ -147,8 +147,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this,
-                            AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
-                            Toast.LENGTH_LONG).show();
+                        AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
+                        Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -159,8 +159,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this,
-                            AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
-                            Toast.LENGTH_LONG).show();
+                        AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
+                        Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -171,7 +171,7 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                            new ArrayList<User>(result)));
+                        new ArrayList<User>(result)));
                 }
             });
         }
@@ -189,8 +189,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this,
-                            AddFriendActivity.this.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT)
-                            .show();
+                        AddFriendActivity.this.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT)
+                        .show();
                 }
             });
         }
@@ -201,8 +201,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this,
-                            AddFriendActivity.this.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT)
-                            .show();
+                        AddFriendActivity.this.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT)
+                        .show();
                     AddFriendActivity.this.finish();
                 }
             });
