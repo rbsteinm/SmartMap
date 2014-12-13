@@ -336,7 +336,7 @@ public class SearchLayout extends LinearLayout {
         new AsyncTask<Void, Void, List<Displayable>>() {
             @Override
             public List<Displayable> doInBackground(Void... params) {
-                return ServiceContainer.getSearchEngine().sendQuery(mCurrentQuery, mCurrentSearchType);
+                return mSearchEngine.sendQuery(mCurrentQuery, mCurrentSearchType);
             }
 
             @Override
