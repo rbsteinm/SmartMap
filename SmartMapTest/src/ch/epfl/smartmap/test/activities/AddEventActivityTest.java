@@ -5,11 +5,14 @@ import static com.google.android.apps.common.testing.ui.espresso.action.ViewActi
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.not;
+import android.location.Location;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.AddEventActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserContainer;
 
 import com.google.android.apps.common.testing.ui.espresso.Espresso;
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
@@ -36,8 +39,30 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
     protected void setUp() throws Exception {
         super.setUp();
         this.getActivity();
-        this.getActivity();
-        ServiceContainer.setSettingsManager(new SettingsManager(this.getActivity()));
+
+        ServiceContainer.initSmartMapServices(this.getActivity());
+
+        Location loc = new Location("");
+        loc.setLatitude(46);
+        loc.setLongitude(6);
+
+        String token =
+            "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
+
+        long facebookId = 1482245642055847L;
+
+        String name = "SmartMap SwEng";
+
+        ServiceContainer.getCache().putUser(
+            new UserContainer(2, name, "123", "abc@abc.com", loc, "Mock lockation", User.NO_IMAGE,
+                User.BlockStatus.UNBLOCKED, User.SELF));
+
+        ServiceContainer.getNetworkClient().authServer(name, facebookId, token);
+
+        Thread.sleep(1000);
+
+        ServiceContainer.getSettingsManager().setLocation(loc);
+
     }
 
     public void testCannnotCreateEventWithoutPlaceName() {
@@ -83,11 +108,14 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         onView(withId(R.id.set_location_activity)).check(matches(isDisplayed()));
     }
 
-    public void testZCanCreateEventWithoutDescription() {
+    public void testZZZCanCreateEventWithoutDescription() throws InterruptedException {
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
 
         onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
 
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        this.getActivity();
+
+        onView(withId(R.id.addEventDescription)).check(
+            ViewAssertions.matches(not(ViewMatchers.isDisplayed())));
     }
 }

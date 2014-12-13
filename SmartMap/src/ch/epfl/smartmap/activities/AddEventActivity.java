@@ -3,9 +3,11 @@ package ch.epfl.smartmap.activities;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.TimeZone;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -23,6 +25,8 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.cache.Cache.SearchFilter;
+import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.EventContainer;
 import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
@@ -57,6 +61,8 @@ public class AddEventActivity extends FragmentActivity {
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
     static final int PICK_LOCATION_REQUEST = 1;
 
+    private static final int FIVE_MINUTES = 5;
+
     private static final int ELEMENTS_HH_MM = 2;
 
     private static final String TIME_PICKER_DESCR = "timePicker";
@@ -83,6 +89,8 @@ public class AddEventActivity extends FragmentActivity {
 
     private Calendar mStartDate;
     private Calendar mEndDate;
+
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,8 +228,6 @@ public class AddEventActivity extends FragmentActivity {
      */
     private void checkDatesValidity() {
 
-        Log.d(TAG, "Checking dates validity.\nmStartDate:\n" + mStartDate + "\nmEndDate:\n" + mEndDate);
-
         Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
 
         // Needed to let the user click the default time without errors.
@@ -266,19 +272,26 @@ public class AddEventActivity extends FragmentActivity {
                     + mEventPosition.longitude);
 
         } else if (!this.fieldsHaveLegalLength()) {
+
+            Log.d(TAG, "Event not created because some fileds had illegal length");
+
             Toast.makeText(AddEventActivity.this, this.getString(R.string.add_event_toast_fields_bad_size),
                     Toast.LENGTH_LONG).show();
         } else {
+
+            Log.d(TAG, "All fields are set and legal");
 
             Location location = new Location("Location set by user");
             location.setLatitude(mEventPosition.latitude);
             location.setLongitude(mEventPosition.longitude);
 
-            EventContainer event = new EventContainer(PublicEvent.NO_ID, mEventName.getText().toString(),
-                    ServiceContainer.getCache().getSelf().getContainerCopy(), mDescription.getText().toString(),
-                    mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
+            String eventName = mEventName.getText().toString();
 
-            ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
+            EventContainer event = new EventContainer(PublicEvent.NO_ID, eventName, ServiceContainer.getCache()
+                    .getSelf().getContainerCopy(), mDescription.getText().toString(), mStartDate, mEndDate, location,
+                    mPlaceName.getText().toString(), new HashSet<Long>());
+
+            ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback(eventName));
         }
     }
 
@@ -307,6 +320,8 @@ public class AddEventActivity extends FragmentActivity {
      * @author SpicyCH
      */
     private void initializeGUI() {
+
+        mContext = this.getApplicationContext();
 
         ServiceContainer.initSmartMapServices(this);
 
@@ -338,7 +353,7 @@ public class AddEventActivity extends FragmentActivity {
 
         mStartDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         mEndDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
-        mEndDate.add(Calendar.DAY_OF_MONTH, 1);
+        mEndDate.add(Calendar.MINUTE, FIVE_MINUTES);
 
         mPickStartTime.setText(Utils.getTimeString(mStartDate));
 
@@ -455,16 +470,32 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * Callback called after the respond responded to our event creation request.
+     * Callback called after the server responded to our event creation request.
      * 
      * @author SpicyCH
      */
     private class CreateEventNetworkCallback implements NetworkRequestCallback {
+
+        private final String mEventName;
+
+        /**
+         * 
+         * Constructor
+         * 
+         * @param eventName
+         */
+        public CreateEventNetworkCallback(String eventName) {
+            mEventName = eventName;
+        }
+
         @Override
         public void onFailure() {
             AddEventActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
+                    Log.e(TAG, "Server error");
+
                     Toast.makeText(AddEventActivity.this,
                             AddEventActivity.this.getString(R.string.add_event_toast_couldnt_create_event_server),
                             Toast.LENGTH_SHORT).show();
@@ -481,7 +512,27 @@ public class AddEventActivity extends FragmentActivity {
                             AddEventActivity.this.getString(R.string.add_event_toast_event_created), Toast.LENGTH_SHORT)
                             .show();
 
-                    AddEventActivity.this.finish();
+                    // See events details and invite friends
+                    Set<Event> matching = ServiceContainer.getCache().getEvents(new SearchFilter<Event>() {
+
+                        @Override
+                        public boolean filter(Event item) {
+                            return mEventName.equals(item.getName());
+                        }
+                    });
+
+                    if (matching.isEmpty()) {
+                        throw new IllegalStateException("No events matched the one just created");
+                    }
+
+                    for (Event e : matching) {
+                        // Take the first match
+                        Intent setLocationIntent = new Intent(mContext, EventInformationActivity.class);
+                        setLocationIntent.putExtra(EventInformationActivity.EVENT_KEY, e.getId());
+                        AddEventActivity.this.startActivityForResult(setLocationIntent, PICK_LOCATION_REQUEST);
+                        break;
+                    }
+
                 }
             });
         }

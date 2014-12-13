@@ -30,11 +30,11 @@ public class DatabaseHelperTest extends AndroidTestCase {
 
     private final String name = "test name";
     private final UserContainer a = new UserContainer(1, "dafdyx", "898909808", "toto@toto.to", new Location(
-        "testProvider"), "Ecublens", null, User.blockStatus.NOT_SET, User.STRANGER);
+        "testProvider"), "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER);
     private final UserContainer b = new UserContainer(678, "tfxhthsfe", "65423", "tata@toto.to",
-        new Location("testProvider"), "Lausanne", null, User.blockStatus.BLOCKED, User.FRIEND);
+        new Location("testProvider"), "Lausanne", null, User.BlockStatus.BLOCKED, User.FRIEND);
     private final UserContainer c = new UserContainer(54554, "hcjkehfkl", "48325", "titi@toto.to",
-        new Location("testProvider"), "Geneva", null, User.blockStatus.UNBLOCKED, User.FRIEND);
+        new Location("testProvider"), "Geneva", null, User.BlockStatus.UNBLOCKED, User.FRIEND);
     private final EventContainer event = new EventContainer(123, name, a, "description",
         new GregorianCalendar(), new GregorianCalendar(), new Location("testprovider"), "Lausanne",
         new HashSet<Long>());
@@ -60,7 +60,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         ServiceContainer.setSettingsManager(manager);
 
         // to avoid erasing the actual database
-        dbh = new DatabaseHelper(new RenamingDelegatingContext(getContext(), "test_"));
+        dbh = new DatabaseHelper(new RenamingDelegatingContext(this.getContext(), "test_"));
         dbh.clearAll();
 
         Set<Long> list1 = new HashSet<Long>();
@@ -107,7 +107,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(a);
         // testing that adding a user with the same id erases the first one
         dbh.addUser(new UserContainer(1, "other name", "898909808", "toto@toto.to", new Location(
-            "testProvider"), "Ecublens", null, User.blockStatus.NOT_SET, User.STRANGER));
+            "testProvider"), "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER));
         assertTrue((dbh.getUser(a.getId()).getId() == a.getId())
             && dbh.getUser(a.getId()).getName().equals("other name")
             && dbh.getUser(a.getId()).getPhoneNumber().equals(a.getPhoneNumber())
@@ -184,7 +184,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(b);
         int rows =
             dbh.updateFriend(new UserContainer(a.getId(), c.getName(), "898909808", "test email",
-                new Location("testProvider"), "Ecublens", null, User.blockStatus.NOT_SET, User.STRANGER));
+                new Location("testProvider"), "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER));
         assertTrue(dbh.getUser(a.getId()).getName().equals(c.getName())
             && dbh.getUser(a.getId()).getEmail().equals("test email") && (rows == 1));
     }
