@@ -12,6 +12,7 @@ import android.location.Location;
 import android.test.AndroidTestCase;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.cache.CacheInterface;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.ImmutableEvent;
 import ch.epfl.smartmap.cache.ImmutableFilter;
@@ -22,7 +23,7 @@ import ch.epfl.smartmap.cache.ImmutableUser;
  */
 public class CacheTest extends AndroidTestCase {
 
-    Cache mCache;
+    CacheInterface mCache;
 
     private static Calendar DATE_ONE;
     private static Calendar DATE_TWO;
