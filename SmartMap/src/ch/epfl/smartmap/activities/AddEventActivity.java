@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.TimeZone;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
+import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.EventContainer;
 import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
@@ -66,6 +68,9 @@ public class AddEventActivity extends FragmentActivity {
     private static final int MIN_NAME_SIZE = 2;
 
     private static final int MAX_DESCRIPTION_SIZE = 255;
+
+    private static final int FIVE_MINUTES = 5;
+
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
     private LatLng mEventPosition;
@@ -83,6 +88,8 @@ public class AddEventActivity extends FragmentActivity {
 
     private Calendar mStartDate;
     private Calendar mEndDate;
+
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -303,10 +310,11 @@ public class AddEventActivity extends FragmentActivity {
     /**
      * Initialize the views and attach the needed listeners.
      * 
-     * 
      * @author SpicyCH
      */
     private void initializeGUI() {
+
+        mContext = this.getApplicationContext();
 
         ServiceContainer.initSmartMapServices(this);
 
@@ -338,7 +346,7 @@ public class AddEventActivity extends FragmentActivity {
 
         mStartDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         mEndDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
-        mEndDate.add(Calendar.DAY_OF_MONTH, 1);
+        mEndDate.add(Calendar.MINUTE, FIVE_MINUTES);
 
         mPickStartTime.setText(Utils.getTimeString(mStartDate));
 
@@ -390,7 +398,6 @@ public class AddEventActivity extends FragmentActivity {
     /**
      * @param s
      * @return <code>true</code> if the string is a valid time.
-     * 
      * @author SpicyCH
      */
     private boolean isValidTime(String s) {
@@ -459,12 +466,14 @@ public class AddEventActivity extends FragmentActivity {
      * 
      * @author SpicyCH
      */
-    private class CreateEventNetworkCallback implements NetworkRequestCallback {
+    private class CreateEventNetworkCallback implements NetworkRequestCallback<Event> {
         @Override
-        public void onFailure() {
+        public void onFailure(final Exception e) {
             AddEventActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
+                    Log.d(TAG, "Server error: " + e);
                     Toast.makeText(AddEventActivity.this,
                             AddEventActivity.this.getString(R.string.add_event_toast_couldnt_create_event_server),
                             Toast.LENGTH_SHORT).show();
@@ -473,15 +482,27 @@ public class AddEventActivity extends FragmentActivity {
         }
 
         @Override
-        public void onSuccess() {
+        public void onSuccess(final Event result) {
             AddEventActivity.this.runOnUiThread(new Runnable() {
+
                 @Override
                 public void run() {
                     Toast.makeText(AddEventActivity.this,
                             AddEventActivity.this.getString(R.string.add_event_toast_event_created), Toast.LENGTH_SHORT)
                             .show();
 
-                    AddEventActivity.this.finish();
+                    // Display event details if we could retrieve it.
+                    if (null != result) {
+                        AddEventActivity.this.finish();
+                        Intent seeEvent = new Intent(mContext, EventInformationActivity.class);
+                        seeEvent.putExtra(EventInformationActivity.EVENT_KEY, result.getId());
+                        AddEventActivity.this.startActivity(seeEvent);
+                    } else {
+                        // And go back to the events list if we couldn't.
+                        Log.e(TAG, "The event returned by the Callback was null");
+                        AddEventActivity.this.finish();
+                    }
+
                 }
             });
         }

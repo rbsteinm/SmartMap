@@ -33,8 +33,8 @@ public final class Friend extends User {
     private User.BlockStatus mIsBlocked;
     private final MarkerIconMaker mMarkerIconMaker;
 
-    protected Friend(long id, String name, Bitmap image, Location location, String locationString,
-        User.BlockStatus isBlocked) {
+    protected Friend(long id, String name, String phoneNumber, String email, Bitmap image, Location location,
+        String locationString, User.BlockStatus isBlocked) {
         super(id, name, image);
 
         if (locationString == null) {
@@ -42,16 +42,34 @@ public final class Friend extends User {
         } else {
             mLocationString = locationString;
         }
+
         if (location == null) {
             mLocation = User.NO_LOCATION;
+            mLocation.setTime(User.NO_LAST_SEEN.getTimeInMillis());
+            mLocation.setLatitude(User.NO_LATITUDE);
+            mLocation.setLongitude(User.NO_LONGITUDE);
         } else {
             mLocation = new Location(location);
         }
 
-        mEmail = NO_EMAIL;
-        mPhoneNumber = NO_PHONE_NUMBER;
+        if (email == null) {
+            mEmail = NO_EMAIL;
+        } else {
+            mEmail = email;
+        }
 
-        mIsBlocked = isBlocked;
+        if (phoneNumber == null) {
+            mPhoneNumber = NO_PHONE_NUMBER;
+        } else {
+            mPhoneNumber = phoneNumber;
+        }
+
+        if ((isBlocked == BlockStatus.NOT_SET) || (isBlocked == null)) {
+            mIsBlocked = BlockStatus.BLOCKED;
+        } else {
+            mIsBlocked = isBlocked;
+        }
+
         mMarkerIconMaker = new CircularMarkerIconMaker(this);
     }
 
@@ -144,25 +162,44 @@ public final class Friend extends User {
     }
 
     @Override
-    public boolean update(UserContainer user) {
-        // TODO : Update hasChanged to work correctly
+    public boolean update(UserContainer newValues) {
         boolean hasChanged = false;
 
-        // mPhoneNumber = (user.getPhoneNumber() != null) ? user.getPhoneNumber() : mPhoneNumber;
-        // mEmail = (user.getEmail() != null) ? user.getEmail() : mEmail;
+        if ((newValues.getLocation() != null)
+            && (newValues.getLocation() != User.NO_LOCATION)
+            && ((newValues.getLocation().getLatitude() != mLocation.getLatitude())
+                || (newValues.getLocation().getLongitude() != mLocation.getLongitude()) || (newValues
+                .getLocation().getTime() != mLocation.getTime()))) {
+            mLocation = new Location(newValues.getLocation());
+            mLocation.setLatitude(newValues.getLocation().getLatitude());
+            mLocation.setLongitude(newValues.getLocation().getLongitude());
 
-        if ((user.getLocation() != null) && (user.getLocation() != User.NO_LOCATION)) {
-            mLocation = new Location(user.getLocation());
             hasChanged = true;
         }
 
-        if ((user.getLocationString() != null) && (user.getLocationString() != User.NO_LOCATION_STRING)) {
-            mLocationString = user.getLocationString();
+        if ((newValues.getLocationString() != null)
+            && (newValues.getLocationString() != User.NO_LOCATION_STRING)
+            && !newValues.getLocationString().equals(mLocationString)) {
+            mLocationString = newValues.getLocationString();
             hasChanged = true;
         }
 
-        mIsBlocked = (user.isBlocked() != User.BlockStatus.NOT_SET) ? user.isBlocked() : mIsBlocked;
+        if ((newValues.isBlocked() != null) && (newValues.isBlocked() != User.BlockStatus.NOT_SET)) {
+            mIsBlocked = newValues.isBlocked();
+            hasChanged = true;
+        }
 
-        return super.update(user) || hasChanged;
+        if ((newValues.getEmail() != null) && (newValues.getEmail() != User.NO_EMAIL)
+            && !newValues.getEmail().equals(mEmail)) {
+            mEmail = newValues.getEmail();
+            hasChanged = true;
+        }
+
+        if ((newValues.getPhoneNumber() != null) && (newValues.getPhoneNumber() != User.NO_PHONE_NUMBER)
+            && !newValues.getPhoneNumber().equals(mPhoneNumber)) {
+            mPhoneNumber = newValues.getPhoneNumber();
+        }
+
+        return super.update(newValues) || hasChanged;
     }
 }
