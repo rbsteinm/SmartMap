@@ -18,7 +18,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.listeners.CacheListener;
@@ -264,7 +264,7 @@ public class UserInformationActivity extends Activity {
      * @param view
      */
     public void setBlockedStatus(View view) {
-        ImmutableUser modified = mUser.getImmutableCopy();
+        UserContainer modified = mUser.getImmutableCopy();
         if (mBlockSwitch.isChecked()) {
             modified.setBlocked(User.blockStatus.BLOCKED);
         } else {

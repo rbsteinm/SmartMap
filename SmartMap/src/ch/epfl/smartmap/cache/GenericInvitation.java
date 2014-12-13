@@ -40,7 +40,7 @@ public class GenericInvitation implements Invitation, Comparable {
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
 
-    public GenericInvitation(ImmutableInvitation invitation) {
+    public GenericInvitation(InvitationContainer invitation) {
         if ((invitation.getUser() == null)
             && ((invitation.getType() == Invitation.FRIEND_INVITATION) || (invitation.getType() == Invitation.ACCEPTED_FRIEND_INVITATION))) {
             throw new IllegalArgumentException();
@@ -115,11 +115,11 @@ public class GenericInvitation implements Invitation, Comparable {
      * @see ch.epfl.smartmap.cache.Invitation#getImmutableCopy()
      */
     @Override
-    public ImmutableInvitation getImmutableCopy() {
-        ImmutableUser immUser = (mUser != null) ? mUser.getImmutableCopy() : null;
-        ImmutableEvent immEvent = (mEvent != null) ? mEvent.getImmutableCopy() : null;
+    public InvitationContainer getImmutableCopy() {
+        UserContainer immUser = (mUser != null) ? mUser.getImmutableCopy() : null;
+        EventContainer immEvent = (mEvent != null) ? mEvent.getImmutableCopy() : null;
 
-        return new ImmutableInvitation(this.getId(), immUser, immEvent, this.getStatus(),
+        return new InvitationContainer(this.getId(), immUser, immEvent, this.getStatus(),
             this.getTimeStamp(), this.getType());
     }
 
@@ -127,14 +127,14 @@ public class GenericInvitation implements Invitation, Comparable {
     public Intent getIntent() {
         Intent intent = null;
         Context context = ServiceContainer.getSettingsManager().getContext();
-        if (mType == ImmutableInvitation.FRIEND_INVITATION) {
+        if (mType == InvitationContainer.FRIEND_INVITATION) {
             if ((mStatus == READ) || (mStatus == UNREAD)) {
                 intent = new Intent(context, FriendsPagerActivity.class);
             } else if ((mStatus == ACCEPTED) || (mStatus == DECLINED)) {
                 intent = new Intent(context, UserInformationActivity.class);
                 intent.putExtra("USER", mUser.getId());
             }
-        } else if (mType == ImmutableInvitation.EVENT_INVITATION) {
+        } else if (mType == InvitationContainer.EVENT_INVITATION) {
             intent = new Intent(context, EventInformationActivity.class);
             intent.putExtra("EVENT", mEvent.getId());
         } else {
@@ -181,14 +181,14 @@ public class GenericInvitation implements Invitation, Comparable {
     @Override
     public String getTitle() {
         Context context = ServiceContainer.getSettingsManager().getContext();
-        if (mType == ImmutableInvitation.FRIEND_INVITATION) {
+        if (mType == InvitationContainer.FRIEND_INVITATION) {
             return mUser.getName() + " "
                 + context.getResources().getString(R.string.invitation_want_to_be_your_friend);
-        } else if (mType == ImmutableInvitation.EVENT_INVITATION) {
+        } else if (mType == InvitationContainer.EVENT_INVITATION) {
             return mEvent.getCreator().getName() + " "
                 + context.getResources().getString(R.string.invitation_invites_your_to) + " "
                 + mEvent.getName();
-        } else if (mType == ImmutableInvitation.ACCEPTED_FRIEND_INVITATION) {
+        } else if (mType == InvitationContainer.ACCEPTED_FRIEND_INVITATION) {
             return mUser.getName() + " "
                 + context.getResources().getString(R.string.invitation_accepted_your_friend_request);
         } else {
@@ -217,7 +217,7 @@ public class GenericInvitation implements Invitation, Comparable {
      * ImmutableInvitation)
      */
     @Override
-    public boolean update(ImmutableInvitation invitation) {
+    public boolean update(InvitationContainer invitation) {
         // TODO : Update hasChanged to work correctly
         boolean hasChanged = false;
 
@@ -235,9 +235,9 @@ public class GenericInvitation implements Invitation, Comparable {
         if (invitation.getTimeStamp() >= 0) {
             mTimeStamp = invitation.getTimeStamp();
         }
-        if ((invitation.getType() == ImmutableInvitation.ACCEPTED_FRIEND_INVITATION)
-            || (invitation.getType() == ImmutableInvitation.EVENT_INVITATION)
-            || (invitation.getType() == ImmutableInvitation.FRIEND_INVITATION)) {
+        if ((invitation.getType() == InvitationContainer.ACCEPTED_FRIEND_INVITATION)
+            || (invitation.getType() == InvitationContainer.EVENT_INVITATION)
+            || (invitation.getType() == InvitationContainer.FRIEND_INVITATION)) {
             mType = invitation.getType();
         }
 

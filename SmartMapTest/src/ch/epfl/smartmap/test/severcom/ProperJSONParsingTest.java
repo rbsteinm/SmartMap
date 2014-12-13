@@ -10,8 +10,8 @@ import android.annotation.SuppressLint;
 import android.location.Location;
 import android.test.AndroidTestCase;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.ImmutableEvent;
-import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.servercom.JsonSmartMapParser;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 import ch.epfl.smartmap.servercom.SmartMapParseException;
@@ -158,13 +158,13 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 
 	public void testParseEvent() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		ImmutableEvent event = parser.parseEvent(PROPER_EVENT_JSON);
+		EventContainer event = parser.parseEvent(PROPER_EVENT_JSON);
 		this.checkEvent1(event);
 	}
 
 	public void testParseEventList() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<ImmutableEvent> events = parser
+		List<EventContainer> events = parser
 				.parseEventList(PROPER_EVENT_LIST_JSON);
 		assertTrue("Did not parse the two pevents", events.size() == 2);
 		this.checkEvent1(events.get(0));
@@ -174,7 +174,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	public void testParseEventListWhenEmptyList() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
 
-		List<ImmutableEvent> events = parser
+		List<EventContainer> events = parser
 				.parseEventList(PROPER_EVENTS_EMPTY_LIST_JSON);
 		assertTrue("Did not parsed empty event list correctly",
 				events.isEmpty());
@@ -184,7 +184,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	@Test
 	public void testParseFriend() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		ImmutableUser friend = parser.parseFriend(PROPER_FRIEND_JSON);
+		UserContainer friend = parser.parseFriend(PROPER_FRIEND_JSON);
 
 		assertEquals("Friend's id does not match", 13, friend.getId());
 		assertEquals("Friend's name does not match", "Georges",
@@ -210,7 +210,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	@Test
 	public void testParseFriends() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<ImmutableUser> listFriends = parser.parseFriends(
+		List<UserContainer> listFriends = parser.parseFriends(
 				PROPER_FRIEND_LIST_JSON, "list");
 		assertEquals("First friend's id does not match", 13, listFriends.get(0)
 				.getId());
@@ -226,7 +226,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	@Test
 	public void testParseFriendsWhenEmptyList() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<ImmutableUser> friends = parser.parseFriends(
+		List<UserContainer> friends = parser.parseFriends(
 				PROPER_FRIEND_EMPTY_LIST_JSON, "list");
 
 		assertTrue("Did not parsed empty friends list correctly",
@@ -261,7 +261,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	public void testParsePositions() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
 
-		List<ImmutableUser> users =
+		List<UserContainer> users =
 				parser.parsePositions(PROPER_POSITIONS_LIST_JSON);
 		assertTrue("Did not parse the two positions", users.size() == 2);
 		assertEquals("First location's latitude does not match",
@@ -292,14 +292,14 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	@Test
 	public void testParsePositionsWhenEmptyList() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<ImmutableUser> users = parser
+		List<UserContainer> users = parser
 				.parsePositions(PROPER_POSITIONS_EMPTY_LIST_JSON);
 
 		assertTrue("Did not parsed empty positions list correctly",
 				users.isEmpty());
 	}
 
-	private void checkEvent1(ImmutableEvent immutableEvent) {
+	private void checkEvent1(EventContainer immutableEvent) {
 
 		assertEquals("creator id does not match", 3, immutableEvent.getCreatorId());
 		assertEquals("event id does not match", 13, immutableEvent.getId());
@@ -331,7 +331,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 
 	}
 
-	private void checkEvent2(ImmutableEvent event) {
+	private void checkEvent2(EventContainer event) {
 		assertEquals("creator id does not match", 1, event.getCreatorId());
 		assertEquals("event id does not match", 11, event.getId());
 		assertTrue("End date does not match",

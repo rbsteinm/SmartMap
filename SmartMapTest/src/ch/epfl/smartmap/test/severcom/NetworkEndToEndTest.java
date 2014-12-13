@@ -11,9 +11,9 @@ import android.location.Location;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.ImmutableEvent;
-import ch.epfl.smartmap.cache.ImmutableInvitation;
-import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.InvitationContainer;
+import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.servercom.InvitationBag;
 import ch.epfl.smartmap.servercom.ServerFeedbackException;
@@ -143,10 +143,10 @@ public class NetworkEndToEndTest extends AndroidTestCase {
     @Test
     public void testFindUsers() throws SmartMapClientException {
 
-        List<ImmutableUser> friends = networkClient.findUsers("s");
+        List<UserContainer> friends = networkClient.findUsers("s");
 
         assertTrue("Null list", friends != null);
-        for (ImmutableUser user : friends) {
+        for (UserContainer user : friends) {
             this.assertValidIdAndName(user);
         }
     }
@@ -154,7 +154,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
     // Follow friend is no longer supported by the server.
 
     public void testGetEventInfo() throws SmartMapClientException {
-        ImmutableEvent event = networkClient.getEventInfo(CREATED_EVENT_ID);
+        EventContainer event = networkClient.getEventInfo(CREATED_EVENT_ID);
         this.assertValidEvent(event);
     }
 
@@ -177,9 +177,9 @@ public class NetworkEndToEndTest extends AndroidTestCase {
     public void testGetInvitations() throws SmartMapClientException {
 
         InvitationBag invitationBag = networkClient.getInvitations();
-        Set<ImmutableInvitation> invitations = invitationBag.getInvitations();
+        Set<InvitationContainer> invitations = invitationBag.getInvitations();
         assertTrue("Null invitations set", invitations != null);
-        for (ImmutableInvitation invitation : invitations) {
+        for (InvitationContainer invitation : invitations) {
             this.assertValidInvitation(invitation);
         }
 
@@ -201,7 +201,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
     @Test
     public void testGetUserInfo() throws SmartMapClientException {
 
-        ImmutableUser friend = networkClient.getUserInfo(VALID_ID_1);
+        UserContainer friend = networkClient.getUserInfo(VALID_ID_1);
         this.assertValidIdAndName(friend);
 
     }
@@ -232,11 +232,11 @@ public class NetworkEndToEndTest extends AndroidTestCase {
     @Test
     public void testListFriendPos() throws SmartMapClientException {
 
-        List<ImmutableUser> users = networkClient.listFriendsPos();
+        List<UserContainer> users = networkClient.listFriendsPos();
 
         assertTrue("Null list", users != null);
 
-        for (ImmutableUser user : users) {
+        for (UserContainer user : users) {
 
             assertTrue("Invalid id", user.getId() > 0);
             this.assertValidLocation(user.getLocation());
@@ -265,7 +265,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
          * networkClient.updateEvent(update);
          */
 
-        ImmutableEvent modifiedEvent = networkClient.getEventInfo(CREATED_EVENT_ID);
+        EventContainer modifiedEvent = networkClient.getEventInfo(CREATED_EVENT_ID);
         assertEquals("Updated event name does not match", modifiedEvent.getName(), "Toto");
 
     }
@@ -275,7 +275,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
         networkClient.updatePos(LOCATION);
     }
 
-    private void assertValidEvent(ImmutableEvent event) {
+    private void assertValidEvent(EventContainer event) {
         assertTrue("Unexpected event id", event.getId() >= 0);
         assertTrue("Unexpected creator id", event.getCreatorId() >= 0);
         assertTrue("Unexpected end and start dates", event.getEndDate().after(event.getStartDate()));
@@ -292,12 +292,12 @@ public class NetworkEndToEndTest extends AndroidTestCase {
         }
     }
 
-    private void assertValidIdAndName(ImmutableUser user) {
+    private void assertValidIdAndName(UserContainer user) {
         assertTrue("Unexpected id", user.getId() >= 0);
         assertTrue("Unexpected name", (2 < user.getName().length()) && (user.getName().length() <= 60));
     }
 
-    private void assertValidInvitation(ImmutableInvitation invitation) {
+    private void assertValidInvitation(InvitationContainer invitation) {
         assertNotNull("Null TimeStamp", invitation.getTimeStamp());
         assertTrue("Unexpected invitation type",
             (invitation.getType() == Invitation.ACCEPTED_FRIEND_INVITATION)

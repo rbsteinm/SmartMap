@@ -14,9 +14,9 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.CacheInterface;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.ImmutableEvent;
-import ch.epfl.smartmap.cache.ImmutableFilter;
-import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.FilterContainer;
+import ch.epfl.smartmap.cache.UserContainer;
 
 /**
  * @author jfperren
@@ -30,16 +30,16 @@ public class CacheTest extends AndroidTestCase {
 
     private static Location LOCATION_ONE;
 
-    private static ImmutableEvent FOOTBALL_TOURNAMENT;
-    private static ImmutableEvent POLYLAN;
+    private static EventContainer FOOTBALL_TOURNAMENT;
+    private static EventContainer POLYLAN;
 
-    private static ImmutableUser JULIEN;
-    private static ImmutableUser ALAIN;
+    private static UserContainer JULIEN;
+    private static UserContainer ALAIN;
 
-    private static ImmutableFilter FAMILY;
-    private static ImmutableFilter ONLY_ME;
+    private static FilterContainer FAMILY;
+    private static FilterContainer ONLY_ME;
 
-    private static ImmutableEvent EVENT_WITH_NO_ID;
+    private static EventContainer EVENT_WITH_NO_ID;
 
     // private static ImmutableInvitation ACCEPTED_FRIEND_INVITATION = new
     // ImmutableInvitation(1, 2, Event.NO_ID,
@@ -88,8 +88,8 @@ public class CacheTest extends AndroidTestCase {
          * LOCATION_ONE, "Pully", UserInterface.NO_IMAGE, false);
          */
 
-        FAMILY = new ImmutableFilter(1, "Family", new HashSet<Long>(Arrays.asList((long) 1, (long) 2)), true);
-        ONLY_ME = new ImmutableFilter(2, "Myself", new HashSet<Long>(Arrays.asList((long) 1)), true);
+        FAMILY = new FilterContainer(1, "Family", new HashSet<Long>(Arrays.asList((long) 1, (long) 2)), true);
+        ONLY_ME = new FilterContainer(2, "Myself", new HashSet<Long>(Arrays.asList((long) 1)), true);
     }
 
     @Test

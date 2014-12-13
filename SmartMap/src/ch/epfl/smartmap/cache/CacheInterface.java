@@ -22,7 +22,7 @@ interface CacheInterface {
 
     void addParticipantsToEvent(Set<Long> ids, Event event, NetworkRequestCallback callback);
 
-    void createEvent(ImmutableEvent createdEvent, NetworkRequestCallback callback);
+    void createEvent(EventContainer createdEvent, NetworkRequestCallback callback);
 
     void declineInvitation(Invitation invitation, NetworkRequestCallback callback);
 
@@ -137,7 +137,7 @@ interface CacheInterface {
 
     void logState();
 
-    void modifyOwnEvent(ImmutableEvent createdEvent, NetworkRequestCallback callback);
+    void modifyOwnEvent(EventContainer createdEvent, NetworkRequestCallback callback);
 
     void notifyEventListeners();
 
@@ -149,7 +149,7 @@ interface CacheInterface {
      * @param newEvent
      *            Event's informations
      */
-    void putEvent(ImmutableEvent newEvent);
+    void putEvent(EventContainer newEvent);
 
     /**
      * Creates for each EventContainer a new live Event instance with
@@ -159,7 +159,7 @@ interface CacheInterface {
      * @param newEvents
      *            Set with Events' informations
      */
-    void putEvents(Set<ImmutableEvent> newEvents);
+    void putEvents(Set<EventContainer> newEvents);
 
     /**
      * Creates a live instance with values from the FilterContainer. Update
@@ -170,7 +170,7 @@ interface CacheInterface {
      * @param newFilter
      *            Filter's informations
      */
-    long putFilter(ImmutableFilter newFilter);
+    long putFilter(FilterContainer newFilter);
 
     /**
      * Creates for each FilterContainer a new live Filter instance with
@@ -181,15 +181,15 @@ interface CacheInterface {
      * @param newFilters
      *            Set with Filters' informations
      */
-    void putFilters(Set<ImmutableFilter> newFilters);
+    void putFilters(Set<FilterContainer> newFilters);
 
-    void putInvitation(ImmutableInvitation invitationInfo);
+    void putInvitation(InvitationContainer invitationInfo);
 
-    void putInvitations(Set<ImmutableInvitation> invitationInfos);
+    void putInvitations(Set<InvitationContainer> invitationInfos);
 
-    void putUser(ImmutableUser newFriend);
+    void putUser(UserContainer newFriend);
 
-    void putUsers(Set<ImmutableUser> newUsers);
+    void putUsers(Set<UserContainer> newUsers);
 
     void readAllInvitations();
 
@@ -209,9 +209,9 @@ interface CacheInterface {
 
     boolean removeUsers(Set<Long> userIds);
 
-    void setBlockedStatus(ImmutableUser user, NetworkRequestCallback callback);
+    void setBlockedStatus(UserContainer user, NetworkRequestCallback callback);
 
-    void setBlockedStatus(ImmutableUser user, User.blockStatus newBlockedStatus,
+    void setBlockedStatus(UserContainer user, User.blockStatus newBlockedStatus,
         NetworkRequestCallback callback);
 
     void updateFromNetwork(SmartMapClient networkClient, NetworkRequestCallback callback);

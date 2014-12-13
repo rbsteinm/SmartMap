@@ -10,11 +10,11 @@ public interface UserInterface extends Displayable {
 
     int getFriendship();
 
-    ImmutableUser getImmutableCopy();
+    UserContainer getImmutableCopy();
 
     String getName();
 
-    boolean update(ImmutableUser user);
+    boolean update(UserContainer user);
 
     User.blockStatus isBlocked();
 }

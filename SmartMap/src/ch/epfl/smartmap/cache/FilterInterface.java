@@ -14,7 +14,7 @@ public interface FilterInterface extends Displayable {
      */
     Set<Long> getIds();
 
-    ImmutableFilter getImmutableCopy();
+    FilterContainer getImmutableCopy();
 
     /**
      * @return The name of the list
@@ -25,5 +25,5 @@ public interface FilterInterface extends Displayable {
 
     boolean isActive();
 
-    boolean update(ImmutableFilter filterInfo);
+    boolean update(FilterContainer filterInfo);
 }

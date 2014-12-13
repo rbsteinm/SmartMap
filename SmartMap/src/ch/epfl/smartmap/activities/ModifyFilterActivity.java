@@ -26,7 +26,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.ImmutableFilter;
+import ch.epfl.smartmap.cache.FilterContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 
@@ -158,7 +158,7 @@ public class ModifyFilterActivity extends Activity {
                     String newName = editText.getText().toString();
 
                     ServiceContainer.getCache().putFilter(
-                        new ImmutableFilter(mFilter.getId(), newName, mFilter.getIds(), mFilter.isActive()));
+                        new FilterContainer(mFilter.getId(), newName, mFilter.getIds(), mFilter.isActive()));
 
                     Toast.makeText(ModifyFilterActivity.this,
                         ModifyFilterActivity.this.getResources().getString(R.string.new_name_saved),
@@ -184,7 +184,7 @@ public class ModifyFilterActivity extends Activity {
 
     public void saveFilter() {
         ServiceContainer.getCache().putFilter(
-            new ImmutableFilter(mFilter.getId(), mFilter.getName(), ModifyFilterActivity.this
+            new FilterContainer(mFilter.getId(), mFilter.getName(), ModifyFilterActivity.this
                 .friendListToIdSet(mFriendsInside), mFilter.isActive()));
         Toast.makeText(ModifyFilterActivity.this,
             ModifyFilterActivity.this.getResources().getString(R.string.changes_saved), Toast.LENGTH_LONG)

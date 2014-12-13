@@ -16,8 +16,8 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.FilterInterface;
-import ch.epfl.smartmap.cache.ImmutableEvent;
-import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -73,7 +73,7 @@ public final class CachedSearchEngine implements SearchEngine {
                     return null;
                 } else {
                     // If not found, check in database
-                    ImmutableEvent databaseResult = ServiceContainer.getDatabase().getEvent(id);
+                    EventContainer databaseResult = ServiceContainer.getDatabase().getEvent(id);
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache
@@ -84,7 +84,7 @@ public final class CachedSearchEngine implements SearchEngine {
                         return null;
                     } else {
                         // If not found, check on the server
-                        ImmutableEvent networkResult;
+                        EventContainer networkResult;
                         try {
                             networkResult = ServiceContainer.getNetworkClient().getEventInfo(id);
                         } catch (SmartMapClientException e) {
@@ -122,7 +122,7 @@ public final class CachedSearchEngine implements SearchEngine {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                Set<ImmutableEvent> immutableResult = new HashSet<ImmutableEvent>();
+                Set<EventContainer> immutableResult = new HashSet<EventContainer>();
                 Set<Event> result = new HashSet<Event>();
 
                 for (long id : ids) {
@@ -134,13 +134,13 @@ public final class CachedSearchEngine implements SearchEngine {
                         result.add(event);
                     } else {
                         // If not found, check in database
-                        ImmutableEvent databaseResult = ServiceContainer.getDatabase().getEvent(id);
+                        EventContainer databaseResult = ServiceContainer.getDatabase().getEvent(id);
 
                         if (databaseResult != null) {
                             immutableResult.add(databaseResult);
                         } else {
                             // If not found, check on the server
-                            ImmutableEvent networkResult;
+                            EventContainer networkResult;
                             try {
                                 Log.d(TAG, "Try to get event online");
                                 networkResult = ServiceContainer.getNetworkClient().getEventInfo(id);
@@ -164,7 +164,7 @@ public final class CachedSearchEngine implements SearchEngine {
                 // calls)
                 ServiceContainer.getCache().putEvents(immutableResult);
                 // Retrieve live instances from cache
-                for (ImmutableEvent event : immutableResult) {
+                for (EventContainer event : immutableResult) {
                     result.add(ServiceContainer.getCache().getEvent(event.getId()));
                 }
                 if (callback != null) {
@@ -199,7 +199,7 @@ public final class CachedSearchEngine implements SearchEngine {
                     return null;
                 } else {
                     // If not found, check in database
-                    ImmutableUser databaseResult = ServiceContainer.getDatabase().getUser(id);
+                    UserContainer databaseResult = ServiceContainer.getDatabase().getUser(id);
 
                     if (databaseResult != null) {
                         // Match in database, put it in cache
@@ -210,7 +210,7 @@ public final class CachedSearchEngine implements SearchEngine {
                         return null;
                     } else {
                         // If not found, check on the server
-                        ImmutableUser networkResult;
+                        UserContainer networkResult;
                         try {
                             networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
                             if (networkResult != null) {
@@ -245,7 +245,7 @@ public final class CachedSearchEngine implements SearchEngine {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                Set<ImmutableUser> immutableResult = new HashSet<ImmutableUser>();
+                Set<UserContainer> immutableResult = new HashSet<UserContainer>();
                 Set<User> result = new HashSet<User>();
 
                 for (long id : ids) {
@@ -257,7 +257,7 @@ public final class CachedSearchEngine implements SearchEngine {
                         result.add(stranger);
                     } else {
                         // If not found, check on the server
-                        ImmutableUser networkResult;
+                        UserContainer networkResult;
                         try {
                             networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
                         } catch (SmartMapClientException e) {
@@ -274,7 +274,7 @@ public final class CachedSearchEngine implements SearchEngine {
 
                 ServiceContainer.getCache().putUsers(immutableResult);
                 // Retrieve live instances from cache
-                for (ImmutableUser user : immutableResult) {
+                for (UserContainer user : immutableResult) {
                     result.add(ServiceContainer.getCache().getUser(user.getId()));
                 }
 
@@ -307,10 +307,10 @@ public final class CachedSearchEngine implements SearchEngine {
                     }
                 } else {
                     // Fetch online
-                    List<ImmutableUser> networkResult;
+                    List<UserContainer> networkResult;
                     try {
                         networkResult = ServiceContainer.getNetworkClient().findUsers(query);
-                        for (ImmutableUser user : networkResult) {
+                        for (UserContainer user : networkResult) {
                             if (user != null) {
                                 ServiceContainer.getCache().putUser(user);
                                 result.add(ServiceContainer.getCache().getUser(user.getId()));

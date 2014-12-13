@@ -17,7 +17,7 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.ImmutableFilter;
+import ch.epfl.smartmap.cache.FilterContainer;
 
 /**
  * Customized adapter that displays a list of filters in a target activity
@@ -82,11 +82,11 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
                             ServiceContainer.getCache().putFilter(
-                                new ImmutableFilter(filter.getId(), filter.getName(), filter.getIds(), true));
+                                new FilterContainer(filter.getId(), filter.getName(), filter.getIds(), true));
                         } else {
                             ServiceContainer.getCache()
                                 .putFilter(
-                                    new ImmutableFilter(filter.getId(), filter.getName(), filter.getIds(),
+                                    new FilterContainer(filter.getId(), filter.getName(), filter.getIds(),
                                         false));
                         }
                     }

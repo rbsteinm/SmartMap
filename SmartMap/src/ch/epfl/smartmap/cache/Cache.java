@@ -90,7 +90,7 @@ public class Cache implements CacheInterface {
                 try {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
-                            ImmutableUser newFriend =
+                            UserContainer newFriend =
                                 ServiceContainer.getNetworkClient().acceptInvitation(
                                     invitation.getUser().getId());
                             ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
@@ -140,7 +140,7 @@ public class Cache implements CacheInterface {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.addAll(ids);
 
-        final ImmutableEvent newImmutableEvent =
+        final EventContainer newImmutableEvent =
             event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
@@ -168,7 +168,7 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void createEvent(final ImmutableEvent createdEvent,
+    public synchronized void createEvent(final EventContainer createdEvent,
         final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -720,12 +720,12 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void modifyOwnEvent(final ImmutableEvent createdEvent,
+    public synchronized void modifyOwnEvent(final EventContainer createdEvent,
         final NetworkRequestCallback callback) {
-        new AsyncTask<ImmutableEvent, Void, Void>() {
+        new AsyncTask<EventContainer, Void, Void>() {
 
             @Override
-            protected Void doInBackground(ImmutableEvent... params) {
+            protected Void doInBackground(EventContainer... params) {
                 try {
                     ServiceContainer.getNetworkClient().updateEvent(params[0]);
                     Cache.this.updateEvent(params[0]);
@@ -757,8 +757,8 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#putEvent(ch.epfl.smartmap.cache.ImmutableEvent)
      */
     @Override
-    public synchronized void putEvent(ImmutableEvent newEvent) {
-        Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
+    public synchronized void putEvent(EventContainer newEvent) {
+        Set<EventContainer> singleton = new HashSet<EventContainer>();
         singleton.add(newEvent);
         this.putEvents(singleton);
     }
@@ -768,14 +768,14 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#putEvents(java.util.Set)
      */
     @Override
-    public synchronized void putEvents(Set<ImmutableEvent> newEvents) {
+    public synchronized void putEvents(Set<EventContainer> newEvents) {
         boolean needToCallListeners = false;
 
-        Set<ImmutableUser> usersToAdd = new HashSet<ImmutableUser>();
-        Set<ImmutableEvent> eventsToUpdate = new HashSet<ImmutableEvent>();
-        Set<ImmutableEvent> eventsToAdd = new HashSet<ImmutableEvent>();
+        Set<UserContainer> usersToAdd = new HashSet<UserContainer>();
+        Set<EventContainer> eventsToUpdate = new HashSet<EventContainer>();
+        Set<EventContainer> eventsToAdd = new HashSet<EventContainer>();
 
-        for (final ImmutableEvent newEvent : newEvents) {
+        for (final EventContainer newEvent : newEvents) {
             Log.d(TAG,
                 "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getImmCreator());
             // Get id
@@ -796,7 +796,7 @@ public class Cache implements CacheInterface {
             this.putUsers(usersToAdd);
 
             // Add user to Container for new Events & Add to SparseArray
-            for (ImmutableEvent eventInfo : eventsToAdd) {
+            for (EventContainer eventInfo : eventsToAdd) {
                 needToCallListeners = true;
                 eventInfo.setCreator(this.getUser(eventInfo.getCreatorId()));
                 mEventIds.add(eventInfo.getId());
@@ -823,8 +823,8 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#putFilter(ch.epfl.smartmap.cache.ImmutableFilter)
      */
     @Override
-    public synchronized long putFilter(ImmutableFilter newFilter) {
-        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
+    public synchronized long putFilter(FilterContainer newFilter) {
+        Set<FilterContainer> singleton = new HashSet<FilterContainer>();
         singleton.add(newFilter);
         this.putFilters(singleton);
         return nextFilterId - 1;
@@ -835,12 +835,12 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#putFilters(java.util.Set)
      */
     @Override
-    public synchronized void putFilters(Set<ImmutableFilter> newFilters) {
+    public synchronized void putFilters(Set<FilterContainer> newFilters) {
         boolean needToCallListeners = false;
 
-        Set<ImmutableFilter> filtersToUpdate = new HashSet<ImmutableFilter>();
+        Set<FilterContainer> filtersToUpdate = new HashSet<FilterContainer>();
 
-        for (ImmutableFilter newFilter : newFilters) {
+        for (FilterContainer newFilter : newFilters) {
             Log.d(TAG, "Put filter " + newFilter.getId() + " in Cache");
             if (!mFilterIds.contains(newFilter.getId())) {
                 long filterId = newFilter.getId();
@@ -878,8 +878,8 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#putInvitation(ch.epfl.smartmap.cache.ImmutableInvitation)
      */
     @Override
-    public synchronized void putInvitation(ImmutableInvitation invitationInfo) {
-        Set<ImmutableInvitation> singleton = new HashSet<ImmutableInvitation>();
+    public synchronized void putInvitation(InvitationContainer invitationInfo) {
+        Set<InvitationContainer> singleton = new HashSet<InvitationContainer>();
         singleton.add(invitationInfo);
         this.putInvitations(singleton);
     }
@@ -889,15 +889,15 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#putInvitations(java.util.Set)
      */
     @Override
-    public synchronized void putInvitations(Set<ImmutableInvitation> invitationInfos) {
+    public synchronized void putInvitations(Set<InvitationContainer> invitationInfos) {
         boolean needToCallListeners = false;
 
         // Contains values to add later all at once
-        Set<ImmutableUser> usersToAdd = new HashSet<ImmutableUser>();
-        Set<ImmutableEvent> eventsToAdd = new HashSet<ImmutableEvent>();
-        Set<ImmutableInvitation> invitationsToAdd = new HashSet<ImmutableInvitation>();
+        Set<UserContainer> usersToAdd = new HashSet<UserContainer>();
+        Set<EventContainer> eventsToAdd = new HashSet<EventContainer>();
+        Set<InvitationContainer> invitationsToAdd = new HashSet<InvitationContainer>();
 
-        for (final ImmutableInvitation invitationInfo : invitationInfos) {
+        for (final InvitationContainer invitationInfo : invitationInfos) {
 
             // Get Id
             if (invitationInfo.getId() == Invitation.NO_ID) {
@@ -918,7 +918,7 @@ public class Cache implements CacheInterface {
                         break;
                     case Invitation.ACCEPTED_FRIEND_INVITATION:
                         // Check that it contains all informations
-                        ImmutableUser newFriend = invitationInfo.getUserInfos();
+                        UserContainer newFriend = invitationInfo.getUserInfos();
                         if (newFriend != null) {
                             newFriend.setFriendship(User.FRIEND);
                             usersToAdd.add(newFriend);
@@ -972,7 +972,7 @@ public class Cache implements CacheInterface {
         this.putEvents(eventsToAdd);
 
         // Create and add live instances of Invitations
-        for (ImmutableInvitation invitationInfo : invitationsToAdd) {
+        for (InvitationContainer invitationInfo : invitationsToAdd) {
             boolean isSetCorrectly = false;
 
             switch (invitationInfo.getType()) {
@@ -1026,8 +1026,8 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#putUser(ch.epfl.smartmap.cache.ImmutableUser)
      */
     @Override
-    public synchronized void putUser(ImmutableUser newFriend) {
-        Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
+    public synchronized void putUser(UserContainer newFriend) {
+        Set<UserContainer> singleton = new HashSet<UserContainer>();
         singleton.add(newFriend);
         this.putUsers(singleton);
     }
@@ -1037,12 +1037,12 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#putUsers(java.util.Set)
      */
     @Override
-    public synchronized void putUsers(Set<ImmutableUser> newUsers) {
+    public synchronized void putUsers(Set<UserContainer> newUsers) {
         boolean needToCallListeners = false;
 
-        Set<ImmutableUser> usersToUpdate = new HashSet<ImmutableUser>();
+        Set<UserContainer> usersToUpdate = new HashSet<UserContainer>();
 
-        for (ImmutableUser newUser : newUsers) {
+        for (UserContainer newUser : newUsers) {
             mUserIds.add(newUser.getId());
 
             if (newUser.getFriendship() == User.FRIEND) {
@@ -1087,7 +1087,7 @@ public class Cache implements CacheInterface {
             }
         });
 
-        Set<ImmutableInvitation> readInvitations = new HashSet<ImmutableInvitation>();
+        Set<InvitationContainer> readInvitations = new HashSet<InvitationContainer>();
 
         for (Invitation invitation : unreadInvitations) {
             readInvitations.add(invitation.getImmutableCopy().setStatus(Invitation.READ));
@@ -1243,7 +1243,7 @@ public class Cache implements CacheInterface {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.removeAll(ids);
 
-        final ImmutableEvent newImmutableEvent =
+        final EventContainer newImmutableEvent =
             event.getImmutableCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
@@ -1298,7 +1298,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void
-        setBlockedStatus(final ImmutableUser user, final NetworkRequestCallback callback) {
+        setBlockedStatus(final UserContainer user, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1336,7 +1336,7 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.cache.User.blockStatus, ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void setBlockedStatus(final ImmutableUser user,
+    public synchronized void setBlockedStatus(final UserContainer user,
         final User.blockStatus newBlockedStatus, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -1380,24 +1380,24 @@ public class Cache implements CacheInterface {
 
                     // Sets with new values (avoid calling multiple times the
                     // listeners)
-                    Set<ImmutableUser> updatedUsers = new HashSet<ImmutableUser>();
-                    Set<ImmutableEvent> updatedEvents = new HashSet<ImmutableEvent>();
+                    Set<UserContainer> updatedUsers = new HashSet<UserContainer>();
+                    Set<EventContainer> updatedEvents = new HashSet<EventContainer>();
 
                     // Update self informations
                     long myId = settingsManager.getUserId();
-                    ImmutableUser self = networkClient.getUserInfo(myId);
+                    UserContainer self = networkClient.getUserInfo(myId);
                     self.setImage(networkClient.getProfilePicture(myId));
                     updatedUsers.add(self);
 
                     // Fetch friends via listFriendPos
-                    Set<ImmutableUser> listFriendPos =
-                        new HashSet<ImmutableUser>(networkClient.listFriendsPos());
+                    Set<UserContainer> listFriendPos =
+                        new HashSet<UserContainer>(networkClient.listFriendsPos());
 
-                    for (ImmutableUser positionInfos : listFriendPos) {
+                    for (UserContainer positionInfos : listFriendPos) {
                         // get id
                         long id = positionInfos.getId();
                         // Get other online info
-                        ImmutableUser onlineInfos = networkClient.getUserInfo(id);
+                        UserContainer onlineInfos = networkClient.getUserInfo(id);
                         Log.d(TAG, "onlineInfos has name " + onlineInfos.getName());
                         // Get picture
                         Bitmap image = networkClient.getProfilePicture(id);
@@ -1424,7 +1424,7 @@ public class Cache implements CacheInterface {
                     // Update all cached event if needed
                     for (long id : mEventIds) {
                         // Get event infos
-                        ImmutableEvent onlineInfos = networkClient.getEventInfo(id);
+                        EventContainer onlineInfos = networkClient.getEventInfo(id);
                         // Check if event needs to be kept
                         if (nearEventIds.contains(id) || (onlineInfos.getCreatorId() == myId)
                             || onlineInfos.getParticipantIds().contains(myId)) {
@@ -1440,7 +1440,7 @@ public class Cache implements CacheInterface {
                             // get id
                             long id = invitation.getUser().getId();
                             // Get online info
-                            ImmutableUser onlineInfos = networkClient.getUserInfo(id);
+                            UserContainer onlineInfos = networkClient.getUserInfo(id);
                             // Get picture
                             Bitmap image = networkClient.getProfilePicture(id);
                             // Put all inside container
@@ -1476,7 +1476,7 @@ public class Cache implements CacheInterface {
             protected Void doInBackground(Long... params) {
                 try {
                     Log.d(TAG, "need to update user " + params[0]);
-                    ImmutableUser userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
+                    UserContainer userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
                     userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
                     Cache.this.updateUser(userInfos);
                 } catch (SmartMapClientException e) {
@@ -1487,29 +1487,29 @@ public class Cache implements CacheInterface {
         }.execute(id);
     }
 
-    private synchronized void keepOnlyTheseEvents(Set<ImmutableEvent> events) {
+    private synchronized void keepOnlyTheseEvents(Set<EventContainer> events) {
         mEventIds.clear();
         mEventInstances.clear();
         this.putEvents(events);
     }
 
-    private synchronized void keepOnlyTheseUsers(Set<ImmutableUser> users) {
+    private synchronized void keepOnlyTheseUsers(Set<UserContainer> users) {
         mFriendIds.clear();
         mUserIds.clear();
         mUserInstances.clear();
         this.putUsers(users);
     }
 
-    private synchronized boolean updateEvent(ImmutableEvent eventInfo) {
-        Set<ImmutableEvent> singleton = new HashSet<ImmutableEvent>();
+    private synchronized boolean updateEvent(EventContainer eventInfo) {
+        Set<EventContainer> singleton = new HashSet<EventContainer>();
         singleton.add(eventInfo);
         return this.updateEvents(singleton);
     }
 
-    private synchronized boolean updateEvents(Set<ImmutableEvent> eventInfos) {
+    private synchronized boolean updateEvents(Set<EventContainer> eventInfos) {
         Log.d(TAG, "updateEvents(" + eventInfos + ")");
         boolean isListModified = false;
-        for (ImmutableEvent eventInfo : eventInfos) {
+        for (EventContainer eventInfo : eventInfos) {
             Event event = this.getEvent(eventInfo.getId());
             if ((event != null) && event.update(eventInfo)) {
                 Log.d(TAG, "updateEvents successfully updated event " + event.getId() + " with participants "
@@ -1527,16 +1527,16 @@ public class Cache implements CacheInterface {
         return isListModified;
     }
 
-    private synchronized boolean updateFilter(ImmutableFilter filterInfo) {
-        Set<ImmutableFilter> singleton = new HashSet<ImmutableFilter>();
+    private synchronized boolean updateFilter(FilterContainer filterInfo) {
+        Set<FilterContainer> singleton = new HashSet<FilterContainer>();
         singleton.add(filterInfo);
         return this.updateFilters(singleton);
     }
 
-    private synchronized boolean updateFilters(Set<ImmutableFilter> filterInfos) {
+    private synchronized boolean updateFilters(Set<FilterContainer> filterInfos) {
         boolean isListModified = false;
 
-        for (ImmutableFilter filterInfo : filterInfos) {
+        for (FilterContainer filterInfo : filterInfos) {
             Filter filter = this.getFilter(filterInfo.getId());
             if ((filter != null) && filter.update(filterInfo)) {
                 isListModified = true;
@@ -1552,15 +1552,15 @@ public class Cache implements CacheInterface {
         return isListModified;
     }
 
-    private boolean updateInvitation(ImmutableInvitation invitation) {
-        Set<ImmutableInvitation> singleton = new HashSet<ImmutableInvitation>();
+    private boolean updateInvitation(InvitationContainer invitation) {
+        Set<InvitationContainer> singleton = new HashSet<InvitationContainer>();
         singleton.add(invitation);
         return this.updateInvitations(singleton);
     }
 
-    private boolean updateInvitations(Set<ImmutableInvitation> invitations) {
+    private boolean updateInvitations(Set<InvitationContainer> invitations) {
         boolean isListModified = false;
-        for (ImmutableInvitation invitation : invitations) {
+        for (InvitationContainer invitation : invitations) {
             isListModified = isListModified || this.getInvitation(invitation.getId()).update(invitation);
         }
 
@@ -1578,8 +1578,8 @@ public class Cache implements CacheInterface {
      * 
      * @param userInfo
      */
-    private synchronized boolean updateUser(ImmutableUser userInfo) {
-        Set<ImmutableUser> singleton = new HashSet<ImmutableUser>();
+    private synchronized boolean updateUser(UserContainer userInfo) {
+        Set<UserContainer> singleton = new HashSet<UserContainer>();
         singleton.add(userInfo);
         return this.updateUsers(singleton);
     }
@@ -1589,13 +1589,13 @@ public class Cache implements CacheInterface {
      * 
      * @param userInfos
      */
-    private synchronized boolean updateUsers(Set<ImmutableUser> userInfos) {
+    private synchronized boolean updateUsers(Set<UserContainer> userInfos) {
         boolean isListModified = false;
 
         Set<Long> usersWithNewTypeIds = new HashSet<Long>();
-        Set<ImmutableUser> usersWithNewType = new HashSet<ImmutableUser>();
+        Set<UserContainer> usersWithNewType = new HashSet<UserContainer>();
 
-        for (ImmutableUser userInfo : userInfos) {
+        for (UserContainer userInfo : userInfos) {
             User user = this.getUser(userInfo.getId());
             if (user != null) {
                 // Check if friendship has changed

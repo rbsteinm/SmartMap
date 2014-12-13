@@ -43,7 +43,7 @@ public interface Invitation {
     /**
      * @return immutable copy of this invitation
      */
-    ImmutableInvitation getImmutableCopy();
+    InvitationContainer getImmutableCopy();
 
     /**
      * @return invitation's intent
@@ -84,5 +84,5 @@ public interface Invitation {
      * @param invitation
      *            the invitation to update
      */
-    boolean update(ImmutableInvitation invitation);
+    boolean update(InvitationContainer invitation);
 }
