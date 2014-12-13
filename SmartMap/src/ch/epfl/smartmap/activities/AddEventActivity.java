@@ -93,7 +93,7 @@ public class AddEventActivity extends FragmentActivity {
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-        this.initializeGUIComponents();
+        this.initializeGUI();
 
         mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
 
@@ -129,7 +129,9 @@ public class AddEventActivity extends FragmentActivity {
             // Google Play Services are not available
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
+
         } else {
+
             // Google Play Services are available.
             // Getting reference to the SupportMapFragment of activity_main.xml
             mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
@@ -179,12 +181,10 @@ public class AddEventActivity extends FragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
             case android.R.id.home:
                 this.finish();
                 break;
@@ -301,9 +301,12 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
+     * Initialize the views and attach the needed listeners.
+     * 
+     * 
      * @author SpicyCH
      */
-    private void initializeGUIComponents() {
+    private void initializeGUI() {
         mEventName = (EditText) this.findViewById(R.id.addEventEventName);
         mPickStartDate = (EditText) this.findViewById(R.id.addEventEventDate);
         mPickStartTime = (EditText) this.findViewById(R.id.addEventEventTime);
@@ -444,7 +447,7 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * Callback
+     * Callback called after the respond responded to our event creation request.
      * 
      * @author SpicyCH
      */
@@ -477,7 +480,7 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * Listener on the TextViews used to display the dates
+     * Listener on the TextViews that display the dates and the time.
      * 
      * @author SpicyCH
      */
