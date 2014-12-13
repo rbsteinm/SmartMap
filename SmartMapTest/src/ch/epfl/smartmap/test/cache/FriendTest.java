@@ -47,15 +47,8 @@ public class FriendTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         ServiceContainer.initSmartMapServices(this.getContext());
-        container =
-            new UserContainer(id, name, phoneNumber, email, location, locationString, image, blockStatus,
-                User.FRIEND);
-        otherContainer =
-            new UserContainer(id, otherName, otherPhoneNumber, otherEmail, otherLocation,
-                otherLocationString, otherImage, otherBlockStatus, User.FRIEND);
-        container.getLocation().setLatitude(latitude);
-        container.getLocation().setLongitude(longitude);
-        container.getLocation().setTime(lastSeen);
+
+        this.initContainers();
     }
 
     @After
@@ -63,15 +56,10 @@ public class FriendTest extends AndroidTestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
         // new container
-        ServiceContainer.setCache(new Cache());
-        UserContainer container =
-            new UserContainer(id, name, phoneNumber, email, location, locationString, image, blockStatus,
-                User.FRIEND);
-        container.getLocation().setLatitude(latitude);
-        container.getLocation().setLongitude(longitude);
-        container.getLocation().setTime(lastSeen);
+        this.initContainers();
         // new cache
         ServiceContainer.setCache(new Cache());
+
     }
 
     @Test
@@ -150,6 +138,7 @@ public class FriendTest extends AndroidTestCase {
         Friend friend = (Friend) ServiceContainer.getCache().getUser(id);
 
         UserContainer unsetParameters = User.NOBODY.getContainerCopy();
+        unsetParameters.setFriendship(User.DONT_KNOW);
         unsetParameters.setId(friend.getId());
 
         assertFalse(friend.update(unsetParameters));
@@ -177,5 +166,22 @@ public class FriendTest extends AndroidTestCase {
         } catch (IllegalArgumentException e) {
             // Success
         }
+    }
+
+    private void initContainers() {
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        location.setTime(lastSeen);
+
+        otherLocation.setLatitude(otherLatitude);
+        otherLocation.setLongitude(otherLongitude);
+        otherLocation.setTime(otherLastSeen);
+
+        container =
+            new UserContainer(id, name, phoneNumber, email, location, locationString, image, blockStatus,
+                User.FRIEND);
+        otherContainer =
+            new UserContainer(id, otherName, otherPhoneNumber, otherEmail, otherLocation,
+                otherLocationString, otherImage, otherBlockStatus, User.FRIEND);
     }
 }

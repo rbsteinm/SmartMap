@@ -129,20 +129,27 @@ public abstract class User implements UserInterface {
     }
 
     @Override
-    public boolean update(UserContainer user) {
+    public boolean update(UserContainer newValues) {
         boolean hasChanged = false;
 
-        if (user.getId() != mId) {
-            throw new IllegalArgumentException("Trying to update wrong user !");
+        if (newValues.getId() != mId) {
+            throw new IllegalArgumentException("Cannot change Id of an User.");
         }
 
-        if ((user.getName() != null) && (user.getName() != User.NO_NAME) && !user.getName().equals(mName)) {
-            mName = user.getName();
+        if ((newValues.getFriendship() != this.getFriendship())
+            && (newValues.getFriendship() != User.DONT_KNOW)) {
+            throw new IllegalArgumentException("Cannot change friendship, you need to create a new instance.");
+        }
+
+        if ((newValues.getName() != null) && (newValues.getName() != User.NO_NAME)
+            && !newValues.getName().equals(mName)) {
+            mName = newValues.getName();
             hasChanged = true;
         }
-        if ((user.getImage() != null) && (user.getImage() != User.NO_IMAGE)
-            && !user.getImage().sameAs(mImage)) {
-            mImage = user.getImage();
+
+        if ((newValues.getImage() != null) && (newValues.getImage() != User.NO_IMAGE)
+            && !newValues.getImage().sameAs(mImage)) {
+            mImage = newValues.getImage();
             hasChanged = true;
         }
 

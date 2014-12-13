@@ -163,7 +163,7 @@ public final class Friend extends User {
 
     @Override
     public boolean update(UserContainer newValues) {
-        boolean hasChanged = false;
+        boolean hasChanged = super.update(newValues);
 
         if ((newValues.getLocation() != null)
             && (newValues.getLocation() != User.NO_LOCATION)
@@ -184,7 +184,8 @@ public final class Friend extends User {
             hasChanged = true;
         }
 
-        if ((newValues.isBlocked() != null) && (newValues.isBlocked() != User.BlockStatus.NOT_SET)) {
+        if ((newValues.isBlocked() != null) && (newValues.isBlocked() != User.BlockStatus.NOT_SET)
+            && (newValues.isBlocked() != mIsBlocked)) {
             mIsBlocked = newValues.isBlocked();
             hasChanged = true;
         }
@@ -200,6 +201,6 @@ public final class Friend extends User {
             mPhoneNumber = newValues.getPhoneNumber();
         }
 
-        return super.update(newValues) || hasChanged;
+        return hasChanged;
     }
 }
