@@ -30,12 +30,11 @@ public final class Friend extends User {
     private String mEmail;
     private String mLocationString;
     private Location mLocation;
-    private User.blockStatus mIsBlocked;
-
+    private User.BlockStatus mIsBlocked;
     private final MarkerIconMaker mMarkerIconMaker;
 
     protected Friend(long id, String name, Bitmap image, Location location, String locationString,
-        User.blockStatus isBlocked) {
+        User.BlockStatus isBlocked) {
         super(id, name, image);
 
         if (locationString == null) {
@@ -49,9 +48,22 @@ public final class Friend extends User {
             mLocation = new Location(location);
         }
 
-        mIsBlocked = isBlocked;
+        mEmail = NO_EMAIL;
+        mPhoneNumber = NO_PHONE_NUMBER;
 
+        mIsBlocked = isBlocked;
         mMarkerIconMaker = new CircularMarkerIconMaker(this);
+    }
+
+    @Override
+    public User.BlockStatus getBlockStatus() {
+        return mIsBlocked;
+    }
+
+    @Override
+    public UserContainer getContainerCopy() {
+        return super.getContainerCopy().setPhoneNumber(mPhoneNumber).setEmail(mEmail).setLocation(mLocation)
+            .setLocationString(mLocationString).setBlocked(mIsBlocked);
     }
 
     public String getEmail() {
@@ -65,12 +77,6 @@ public final class Friend extends User {
     @Override
     public int getFriendship() {
         return User.FRIEND;
-    }
-
-    @Override
-    public UserContainer getImmutableCopy() {
-        return super.getImmutableCopy().setPhoneNumber(mPhoneNumber).setEmail(mEmail).setLocation(mLocation)
-            .setLocationString(mLocationString).setBlocked(mIsBlocked);
     }
 
     public Calendar getLastSeen() {
@@ -132,11 +138,6 @@ public final class Friend extends User {
         return infos;
     }
 
-    @Override
-    public User.blockStatus isBlocked() {
-        return mIsBlocked;
-    }
-
     public boolean isVisible() {
         return ServiceContainer.getCache().getAllActiveFilters().contains(this)
             && !mLocation.equals(NO_LOCATION);
@@ -160,7 +161,7 @@ public final class Friend extends User {
             hasChanged = true;
         }
 
-        mIsBlocked = (user.isBlocked() != User.blockStatus.NOT_SET) ? user.isBlocked() : mIsBlocked;
+        mIsBlocked = (user.isBlocked() != User.BlockStatus.NOT_SET) ? user.isBlocked() : mIsBlocked;
 
         return super.update(user) || hasChanged;
     }

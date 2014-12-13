@@ -7,11 +7,14 @@ import java.util.TimeZone;
 
 import android.util.Log;
 import ch.epfl.smartmap.cache.EventContainer;
-import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.util.Utils;
 
 /**
+ * THis class contains a list of events and returns the invitations for these
+ * events.
+ * 
  * @author jfperren
  */
 public class NetworkEventInvitationBag implements InvitationBag {
@@ -20,7 +23,8 @@ public class NetworkEventInvitationBag implements InvitationBag {
     private final Set<InvitationContainer> invitations;
 
     /**
-     * The constructor takes List arguments for compliance with server communication code.
+     * The constructor takes List arguments for compliance with server
+     * communication code.
      */
     public NetworkEventInvitationBag(HashSet<EventContainer> hashSet) {
 
@@ -29,19 +33,21 @@ public class NetworkEventInvitationBag implements InvitationBag {
         }
 
         invitations = new HashSet<InvitationContainer>();
-        long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis();
+        long timeStamp =
+            GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis();
 
         for (EventContainer event : hashSet) {
-            invitations.add(new InvitationContainer(Invitation.NO_ID, null, event, Invitation.UNREAD, timeStamp,
-                    Invitation.EVENT_INVITATION));
-            Log.d(TAG,
-                    "Network send invitation bag with event #" + event.getId() + "created by " + event.getImmCreator());
+            invitations.add(new InvitationContainer(Invitation.NO_ID, null, event, Invitation.UNREAD,
+                timeStamp, Invitation.EVENT_INVITATION));
+            Log.d(
+                TAG,
+                "Network send invitation bag with event #" + event.getId() + "created by "
+                    + event.getImmCreator());
         }
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.servercom.NotificationBag#getInvitingUsers()
      */
     @Override

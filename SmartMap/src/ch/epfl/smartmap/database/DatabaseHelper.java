@@ -23,14 +23,14 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.FilterContainer;
-import ch.epfl.smartmap.cache.InvitationContainer;
-import ch.epfl.smartmap.cache.UserContainer;
+import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserContainer;
 
 /**
  * SQLite helper
@@ -96,10 +96,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     // Columns for the Event-User table
     private static final String[] EVENT_USER_COLUMNS = {KEY_ID, KEY_EVENT_ID, KEY_USER_ID};
 
-    // Columns for the Invitations table
-    private static final String[] INVITATION_COLUMNS = {KEY_ID, KEY_USER_ID, KEY_EVENT_ID, KEY_STATUS,
-        KEY_DATE, KEY_TYPE};
-
     // Columns for the pending requests table
     private static final String[] PENDING_COLUMNS = {KEY_USER_ID, KEY_NAME};
 
@@ -137,8 +133,6 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     // Table of invitations
     private static final String CREATE_TABLE_PENDING = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING + "("
         + KEY_USER_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
-
-    private final Set<Long> receivedInvitationHashs = new HashSet<Long>();
 
     private final SQLiteDatabase mDatabase;
     private final Context mContext;
@@ -282,10 +276,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 if (pendingIds.contains(userInfo.getId())) {
                     // Already stored
                     return Invitation.ALREADY_RECEIVED;
-                } else {
-                    if (invitation.getStatus() == Invitation.UNREAD) {
-                        this.addPendingFriend(userInfo.getId());
-                    }
+                } else if (invitation.getStatus() == Invitation.UNREAD) {
+                    this.addPendingFriend(userInfo.getId());
                 }
 
                 Log.d(TAG, "Pending ids after : " + this.getPendingFriends());
@@ -347,7 +339,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
             values.put(KEY_POSNAME, user.getLocationString());
             boolean blocked = false;
-            if (user.isBlocked() == User.blockStatus.BLOCKED) {
+            if (user.isBlocked() == User.BlockStatus.BLOCKED) {
                 blocked = true;
             }
             values.put(KEY_BLOCKED, blocked ? 1 : 0);
@@ -636,9 +628,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return filter;
     }
 
+    /**
+     * @return a {@code List} containing the IDs of all stored filters
+     */
     public List<Long> getFilterIds() {
         List<Long> filterIds = new ArrayList<Long>();
-        // FIXME
         String query = "SELECT  * FROM " + TABLE_FILTER;
 
         Cursor cursor = mDatabase.rawQuery(query, null);
@@ -748,7 +742,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
             cursor.close();
 
-            User.blockStatus status = isBlocked ? User.blockStatus.BLOCKED : User.blockStatus.UNBLOCKED;
+            User.BlockStatus status = isBlocked ? User.BlockStatus.BLOCKED : User.BlockStatus.UNBLOCKED;
 
             return new UserContainer(id, name, phoneNumber, email, location, locationString, image, status,
                 friendship);
@@ -920,7 +914,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_FRIENDSHIP, friend.getFriendship());
 
         boolean isBlocked = false;
-        if (friend.isBlocked() == User.blockStatus.BLOCKED) {
+        if (friend.isBlocked() == User.BlockStatus.BLOCKED) {
             isBlocked = true;
         }
         values.put(KEY_BLOCKED, isBlocked ? 1 : 0);
@@ -950,7 +944,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         for (User user : users) {
             Log.d(TAG, "Store user " + user.getId());
-            this.addUser(user.getImmutableCopy());
+            this.addUser(user.getContainerCopy());
         }
         for (Event event : events) {
             Log.d(TAG, "Store event " + event.getId());
@@ -983,10 +977,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_DATE, invitation.getTimeStamp());
         values.put(KEY_TYPE, invitation.getType());
 
-        int rows =
-            mDatabase.update(TABLE_INVITATIONS, values, KEY_ID + " = ?",
-                new String[]{String.valueOf(invitation.getId())});
-
-        return rows;
+        return mDatabase.update(TABLE_INVITATIONS, values, KEY_ID + " = ?",
+            new String[]{String.valueOf(invitation.getId())});
     }
 }

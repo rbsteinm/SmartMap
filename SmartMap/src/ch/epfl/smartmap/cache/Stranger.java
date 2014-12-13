@@ -76,7 +76,7 @@ public class Stranger extends User {
     }
 
     @Override
-    public User.blockStatus isBlocked() {
-        return User.blockStatus.UNBLOCKED;
+    public User.BlockStatus getBlockStatus() {
+        return User.BlockStatus.UNBLOCKED;
     }
 }
