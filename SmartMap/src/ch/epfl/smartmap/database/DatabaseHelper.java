@@ -404,7 +404,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
      *            The inviter's id
      */
     public void deleteInvitation(long id) {
-        mDatabase.delete(TABLE_INVITATIONS, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
+        mDatabase.delete(TABLE_INVITATIONS, KEY_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
     /**

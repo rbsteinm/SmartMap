@@ -103,6 +103,14 @@ public class DatabaseHelperTest extends AndroidTestCase {
     }
 
     @Test
+    public void testAddInvitation() {
+        dbh.addInvitation(invitA);
+        InvitationContainer invit = (InvitationContainer) dbh.getAllInvitations().toArray()[0];
+        assertTrue(invitA.getStatus() == invit.getStatus() && invitA.getType() == invit.getType()
+            && invitA.getTimeStamp() == invit.getTimeStamp());
+    }
+
+    @Test
     public void testAddUser() {
         dbh.addUser(a);
         // testing that adding a user with the same id erases the first one
@@ -133,6 +141,21 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.deleteFilter(filter.getId());
         // accounting for default filter #1
         assertTrue(dbh.getAllFilters().size() == 1);
+    }
+
+    @Test
+    public void testDeleteInvitation() {
+        long id = dbh.addInvitation(invitA);
+        dbh.deleteInvitation(id);
+        assertTrue(dbh.getAllInvitations().size() == 0);
+    }
+
+    @Test
+    public void testDeletePending() {
+        dbh.addPendingFriend(1234);
+        long id = (long) dbh.getPendingFriends().toArray()[0];
+        dbh.deletePendingFriend(1234);
+        assertTrue(dbh.getPendingFriends().size() == 0 && id == 1234);
     }
 
     @Test
