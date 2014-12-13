@@ -9,6 +9,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import ch.epfl.smartmap.util.Utils;
@@ -22,14 +23,16 @@ import ch.epfl.smartmap.util.Utils;
  */
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
+    private static final String TAG = DatePickerFragment.class.getSimpleName();
     private final EditText mPickDate;
     private final Calendar mCalendar;
 
     /**
+     * 
      * Constructor
      * 
      * @param e
-     *            the EditText associated with this date
+     * @param calendar
      */
     public DatePickerFragment(EditText e, Calendar calendar) {
         mPickDate = e;
@@ -50,6 +53,8 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
+
+        Log.d(TAG, "OnDateSet: year " + year);
 
         // We want these changes to have effect on the Calendar passed during construction.
         mCalendar.set(Calendar.YEAR, year);

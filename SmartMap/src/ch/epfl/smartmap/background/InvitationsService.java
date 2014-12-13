@@ -14,7 +14,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.GenericInvitation;
-import ch.epfl.smartmap.cache.ImmutableInvitation;
+import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.InvitationBag;
@@ -93,16 +93,16 @@ public class InvitationsService extends Service {
      *            {@code InvitationBag} for event invitations
      */
     private void backgroundNotifications(InvitationBag userInvitBag, InvitationBag eventInvitBag) {
-        Set<ImmutableInvitation> friendInvitations = userInvitBag.getInvitations();
-        Set<ImmutableInvitation> eventInvitations = eventInvitBag.getInvitations();
-        for (ImmutableInvitation invite : friendInvitations) {
+        Set<InvitationContainer> friendInvitations = userInvitBag.getInvitations();
+        Set<InvitationContainer> eventInvitations = eventInvitBag.getInvitations();
+        for (InvitationContainer invite : friendInvitations) {
             ServiceContainer.getDatabase().addInvitation(invite);
             if (invite.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
                 ServiceContainer.getDatabase().addUser(invite.getUserInfos());
             }
             Notifications.createNotification(new GenericInvitation(invite), this);
         }
-        for (ImmutableInvitation invite : eventInvitations) {
+        for (InvitationContainer invite : eventInvitations) {
             ServiceContainer.getDatabase().addInvitation(invite);
             Notifications.createNotification(new GenericInvitation(invite), this);
         }

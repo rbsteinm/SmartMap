@@ -74,7 +74,7 @@ public class SearchResultViewGroup extends LinearLayout {
         mMoreResultsButton = new MoreResultsButton(context, this);
         // Create TextView that needs to be displayed when no result is found
         mEmptyListTextView = new TextView(context);
-        mEmptyListTextView.setText(R.string.no_search_result);
+        mEmptyListTextView.setText("");
         mEmptyListTextView.setTextColor(this.getResources().getColor(R.color.main_blue));
         mEmptyListTextView.setTextSize(NO_RESULT_VIEW_TEXT_SIZE);
         mEmptyListTextView.setPadding(0, NO_RESULT_VIEW_VERTICAL_PADDING, 0, NO_RESULT_VIEW_VERTICAL_PADDING);

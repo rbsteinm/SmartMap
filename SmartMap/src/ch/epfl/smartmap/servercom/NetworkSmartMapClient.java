@@ -25,8 +25,8 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.ImmutableEvent;
-import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.cache.User;
 
 /**
@@ -77,7 +77,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      * ch.epfl.smartmap.severcom.SmartMapInvitationsClient#acceptInvitation(int)
      */
     @Override
-    public ImmutableUser acceptInvitation(long id) throws SmartMapClientException {
+    public UserContainer acceptInvitation(long id) throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("friend_id", Long.toString(id));
@@ -85,7 +85,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
-        ImmutableUser acceptedUser = null;
+        UserContainer acceptedUser = null;
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
@@ -229,7 +229,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      * .cache.Event)
      */
     @Override
-    public long createPublicEvent(ImmutableEvent event) throws SmartMapClientException {
+    public long createPublicEvent(EventContainer event) throws SmartMapClientException {
 
         Map<String, String> params = this.getParamsForEvent(event);
         HttpURLConnection conn = this.getHttpURLConnection("/createEvent");
@@ -270,14 +270,14 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     }
 
     @Override
-    public List<ImmutableUser> findUsers(String text) throws SmartMapClientException {
+    public List<UserContainer> findUsers(String text) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("search_text", text);
         HttpURLConnection conn = this.getHttpURLConnection("/findUsers");
         String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
-        List<ImmutableUser> friends = null;
+        List<UserContainer> friends = null;
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
@@ -296,14 +296,14 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getUserInfo(int)
      */
     @Override
-    public ImmutableEvent getEventInfo(long eventId) throws SmartMapClientException {
+    public EventContainer getEventInfo(long eventId) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
         params.put("event_id", Long.toString(eventId));
         HttpURLConnection conn = this.getHttpURLConnection("/getEventInfo");
         String response = this.sendViaPost(params, conn);
 
         SmartMapParser parser = null;
-        ImmutableEvent event = null;
+        EventContainer event = null;
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
@@ -324,7 +324,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         HttpURLConnection conn = this.getHttpURLConnection("/getEventInvitations");
         String response = this.sendViaPost(new HashMap<String, String>(), conn);
 
-        List<ImmutableEvent> eventInvitations = new ArrayList<ImmutableEvent>();
+        List<EventContainer> eventInvitations = new ArrayList<EventContainer>();
 
         try {
             SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
@@ -338,7 +338,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-        return new NetworkEventInvitationBag(new HashSet<ImmutableEvent>(eventInvitations));
+        return new NetworkEventInvitationBag(new HashSet<EventContainer>(eventInvitations));
     }
 
     /*
@@ -377,8 +377,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         String response = this.sendViaPost(new HashMap<String, String>(), conn);
 
         SmartMapParser parser = null;
-        List<ImmutableUser> inviters = null;
-        List<ImmutableUser> newFriends = null;
+        List<UserContainer> inviters = null;
+        List<UserContainer> newFriends = null;
         List<Long> removedFriends = null;
 
         try {
@@ -456,14 +456,14 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      * @see ch.epfl.smartmap.servercom.SmartMapClient#getEventInvitations()
      */
     @Override
-    public ImmutableUser getUserInfo(long id) throws SmartMapClientException {
+    public UserContainer getUserInfo(long id) throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
         HttpURLConnection conn = this.getHttpURLConnection("/getUserInfo");
         params.put("user_id", Long.toString(id));
         String response = this.sendViaPost(params, conn);
         SmartMapParser parser = null;
-        ImmutableUser friend = null;
+        UserContainer friend = null;
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
@@ -578,13 +578,13 @@ final public class NetworkSmartMapClient implements SmartMapClient {
      */
     @SuppressLint("UseSparseArrays")
     @Override
-    public List<ImmutableUser> listFriendsPos() throws SmartMapClientException {
+    public List<UserContainer> listFriendsPos() throws SmartMapClientException {
 
         HttpURLConnection conn = this.getHttpURLConnection("/listFriendsPos");
         String response = this.sendViaPost(new HashMap<String, String>(), conn);
 
         SmartMapParser parser = null;
-        List<ImmutableUser> users = new ArrayList<ImmutableUser>();
+        List<UserContainer> users = new ArrayList<UserContainer>();
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
@@ -595,7 +595,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
             throw new SmartMapClientException(e);
         }
 
-        for (ImmutableUser user : users) {
+        for (UserContainer user : users) {
             user.setFriendship(User.FRIEND);
         }
 
@@ -645,7 +645,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
     }
 
     @Override
-    public void updateEvent(ImmutableEvent event) throws SmartMapClientException {
+    public void updateEvent(EventContainer event) throws SmartMapClientException {
 
         Map<String, String> params = this.getParamsForEvent(event);
         params.put("eventId", Long.toString(event.getId()));
@@ -719,7 +719,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         return connection;
     }
 
-    private Map<String, String> getParamsForEvent(ImmutableEvent event) {
+    private Map<String, String> getParamsForEvent(EventContainer event) {
         Map<String, String> params = new HashMap<String, String>();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);

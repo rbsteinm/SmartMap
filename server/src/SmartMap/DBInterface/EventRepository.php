@@ -367,7 +367,7 @@ class EventRepository
         }
         catch (\Exception $e)
         {
-            throw new DatabaseException('Error in getEventParticipants.', 1, $e);
+            throw new DatabaseException('Error in getEventInvitations.', 1, $e);
         }
 
         $eventsIds= array();

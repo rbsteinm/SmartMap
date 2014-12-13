@@ -23,7 +23,7 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.ImmutableEvent;
+import ch.epfl.smartmap.cache.EventContainer;
 import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.gui.DatePickerFragment;
@@ -58,11 +58,6 @@ public class AddEventActivity extends FragmentActivity {
     static final int PICK_LOCATION_REQUEST = 1;
 
     private static final int ELEMENTS_HH_MM = 2;
-    private static final int ELEMENTS_JJ_DD_YYYY = 3;
-    private static final int INDEX_YEAR = 2;
-
-    private static final int INDEX_MONTH = 1;
-    private static final int INDEX_DAY = 0;
 
     private static final String TIME_PICKER_DESCR = "timePicker";
     private static final String DATE_PICKER_DESCR = "datePicker";
@@ -221,41 +216,33 @@ public class AddEventActivity extends FragmentActivity {
      * Ensures the end of the event is after its start and end of the event is not in the past. Displays a toast and
      * reset the bad field set by the user if necessary.
      * 
-     * @param startDate
-     * @param startTime
-     * @param endDate
-     * @param endTime
      * @author SpicyCH
      */
-    private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
+    private void checkDatesValidity() {
 
-        Log.d(TAG, "Checking dates validity.\nmStartDate:\n" + mStartDate + "mEndDate:\n" + mEndDate);
+        Log.d(TAG, "Checking dates validity.\nmStartDate:\n" + mStartDate + "\nmEndDate:\n" + mEndDate);
 
-        if (this.isValidDate(endDate.getText().toString()) && this.isValidTime(endTime.getText().toString())) {
-            // The end of the event has been set by the user
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
 
-            Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+        // Needed to let the user click the default time without errors.
+        now.add(GregorianCalendar.MINUTE, -1);
 
-            // Needed to let the user click the default time without errors.
-            now.add(GregorianCalendar.MINUTE, -1);
+        if (mEndDate.before(mStartDate)) {
+            // The user is trying to create the end of the event before its
+            // start!
 
-            if (mEndDate.before(mStartDate)) {
-                // The user is trying to create the end of the event before its
-                // start!
+            this.resetEndDate();
 
-                this.resetFields(endDate, endTime);
+            Toast.makeText(AddEventActivity.this,
+                    this.getString(R.string.add_event_toast_event_cannot_end_before_starting), Toast.LENGTH_LONG)
+                    .show();
+        } else if (mEndDate.before(now)) {
+            // The user is trying to create an event in the past
 
-                Toast.makeText(AddEventActivity.this,
-                        this.getString(R.string.add_event_toast_event_cannot_end_before_starting), Toast.LENGTH_LONG)
-                        .show();
-            } else if (mEndDate.before(now)) {
-                // The user is trying to create an event in the past
+            this.resetEndDate();
 
-                this.resetFields(endDate, endTime);
-
-                Toast.makeText(AddEventActivity.this,
-                        this.getString(R.string.add_event_toast_event_end_cannot_be_in_past), Toast.LENGTH_LONG).show();
-            }
+            Toast.makeText(AddEventActivity.this, this.getString(R.string.add_event_toast_event_end_cannot_be_in_past),
+                    Toast.LENGTH_LONG).show();
         }
 
     }
@@ -287,7 +274,7 @@ public class AddEventActivity extends FragmentActivity {
             location.setLatitude(mEventPosition.latitude);
             location.setLongitude(mEventPosition.longitude);
 
-            ImmutableEvent event = new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(),
+            EventContainer event = new EventContainer(PublicEvent.NO_ID, mEventName.getText().toString(),
                     ServiceContainer.getCache().getSelf().getImmutableCopy(), mDescription.getText().toString(),
                     mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
 
@@ -389,26 +376,37 @@ public class AddEventActivity extends FragmentActivity {
         this.displayMap();
     }
 
-    private boolean isValidDate(String s) {
-        String[] sArray = s.split(".");
-        return sArray.length == ELEMENTS_JJ_DD_YYYY;
-    }
-
+    /**
+     * @param s
+     * @return <code>true</code> if the string is a valid time.
+     * 
+     * @author SpicyCH
+     */
     private boolean isValidTime(String s) {
         String[] sArray = s.split(":");
         return sArray.length == ELEMENTS_HH_MM;
     }
 
     /**
-     * Reset the two given EditTexts.
+     * Reset the end date to something possible.
      * 
      * @param first
      * @param second
      * @author SpicyCH
      */
-    private void resetFields(EditText first, EditText second) {
-        first.setText("");
-        second.setText("");
+    private void resetEndDate() {
+
+        mEndDate = (Calendar) mStartDate.clone();
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+
+        if (mStartDate.before(now)) {
+            mEndDate = (Calendar) now.clone();
+        }
+
+        mEndDate.add(Calendar.DAY_OF_MONTH, 1);
+
+        mPickEndDate.setText(Utils.getDateString(mEndDate));
+        mPickEndTime.setText(Utils.getTimeString(mEndDate));
     }
 
     /**
@@ -486,16 +484,15 @@ public class AddEventActivity extends FragmentActivity {
     private class DateChangedListener implements TextWatcher {
         @Override
         public void afterTextChanged(Editable s) {
-            // Remove the TextChangedListener to avoid useless calls
-            // triggered by the following code
+
             mPickEndDate.removeTextChangedListener(mTextChangedListener);
-            mPickStartDate.removeTextChangedListener(mTextChangedListener);
+            mPickEndTime.removeTextChangedListener(mTextChangedListener);
 
-            AddEventActivity.this.checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
+            AddEventActivity.this.checkDatesValidity();
 
-            // Reset the TextChangedListener
             mPickEndDate.addTextChangedListener(mTextChangedListener);
-            mPickStartDate.addTextChangedListener(mTextChangedListener);
+            mPickEndTime.addTextChangedListener(mTextChangedListener);
+
         }
 
         @Override

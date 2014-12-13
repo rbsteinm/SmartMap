@@ -4,8 +4,8 @@ import java.util.List;
 
 import android.graphics.Bitmap;
 import android.location.Location;
-import ch.epfl.smartmap.cache.ImmutableEvent;
-import ch.epfl.smartmap.cache.ImmutableUser;
+import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.UserContainer;
 
 /**
  * A client object to a SmartMap server that abstracts the underlying
@@ -25,7 +25,7 @@ public interface SmartMapClient {
      * @return the new Friend
      * @throws SmartMapClientException
      */
-    ImmutableUser acceptInvitation(long id) throws SmartMapClientException;
+    UserContainer acceptInvitation(long id) throws SmartMapClientException;
 
     /**
      * Confirm the server that the acceptation of the given friend was received
@@ -79,7 +79,7 @@ public interface SmartMapClient {
      * @return the event's id
      * @throws SmartMapClientException
      */
-    long createPublicEvent(ImmutableEvent event) throws SmartMapClientException;
+    long createPublicEvent(EventContainer event) throws SmartMapClientException;
 
     /**
      * Decline the invitation of the user with the given id
@@ -96,13 +96,13 @@ public interface SmartMapClient {
      * @return the list of friends
      * @throws SmartMapClientException
      */
-    List<ImmutableUser> findUsers(String text) throws SmartMapClientException;
+    List<UserContainer> findUsers(String text) throws SmartMapClientException;
 
     /**
      * @param eventId
      * @return the event for which we wanted informations
      */
-    ImmutableEvent getEventInfo(long eventId) throws SmartMapClientException;
+    EventContainer getEventInfo(long eventId) throws SmartMapClientException;
 
     /**
      * @return the events to which the user is invited.
@@ -146,7 +146,7 @@ public interface SmartMapClient {
     List<Long> getPublicEvents(double latitude, double longitude, double radius)
         throws SmartMapClientException;
 
-    ImmutableUser getUserInfo(long id) throws SmartMapClientException;
+    UserContainer getUserInfo(long id) throws SmartMapClientException;
 
     /**
      * Sends an invitation to the server for the friend with id "id"
@@ -186,7 +186,7 @@ public interface SmartMapClient {
      * @throws SmartMapClientException
      */
 
-    List<ImmutableUser> listFriendsPos() throws SmartMapClientException;
+    List<UserContainer> listFriendsPos() throws SmartMapClientException;
 
     /**
      * Asks the server to remove the given friend
@@ -209,7 +209,7 @@ public interface SmartMapClient {
      * @param event
      * @throws SmartMapClientException
      */
-    void updateEvent(ImmutableEvent event) throws SmartMapClientException;
+    void updateEvent(EventContainer event) throws SmartMapClientException;
 
     /**
      * Sends the latitude and longitude to the server

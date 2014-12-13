@@ -46,7 +46,7 @@ public class CustomFilter extends Filter {
     }
 
     @Override
-    public boolean update(ImmutableFilter filterInfos) {
+    public boolean update(FilterContainer filterInfos) {
         boolean hasChanged = false;
 
         if ((filterInfos.getName() != null) && !filterInfos.getName().equals(mName)) {

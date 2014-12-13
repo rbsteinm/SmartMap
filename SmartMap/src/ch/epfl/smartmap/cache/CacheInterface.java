@@ -1,22 +1,37 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+
+import ch.epfl.smartmap.cache.Cache.SearchFilter;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
+import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.listeners.CacheListener;
+import ch.epfl.smartmap.servercom.SmartMapClient;
 
 /**
+ * All methods that must be implemented by the Cache
+ * 
  * @author jfperren
  */
-public interface CacheInterface {
+interface CacheInterface {
+
+    void acceptInvitation(Invitation invitation, NetworkRequestCallback callback);
+
+    void addOnCacheListener(CacheListener listener);
+
+    void addParticipantsToEvent(Set<Long> ids, Event event, NetworkRequestCallback callback);
+
+    void createEvent(EventContainer createdEvent, NetworkRequestCallback callback);
+
+    void declineInvitation(Invitation invitation, NetworkRequestCallback callback);
 
     /**
      * @return all Filters currently activated
      */
-    Set<FilterInterface> getAllActivatedFilters();
+    Set<Filter> getAllActiveFilters();
 
-    /**
-     * @return all EventInvitations contained in the Cache
-     */
-    Set<GenericInvitation> getAllEventInvitations();
+    Set<Filter> getAllCustomFilters();
 
     /**
      * @return all Events contained in the Cache
@@ -26,12 +41,7 @@ public interface CacheInterface {
     /**
      * @return all Filters contained in the Cache
      */
-    Set<FilterInterface> getAllFilters();
-
-    /**
-     * @return all FriendInvitations contained in the Cache
-     */
-    Set<GenericInvitation> getAllFriendInvitations();
+    Set<Filter> getAllFilters();
 
     /**
      * @return all Friends contained in the Cache
@@ -39,34 +49,11 @@ public interface CacheInterface {
     Set<User> getAllFriends();
 
     /**
-     * @return all Events to which we are participating
-     */
-    Set<Event> getAllGoingEvents();
-
-    /**
      * @return all Invitations contained in the Cache
      */
     Set<Invitation> getAllInvitations();
 
-    /**
-     * @return a List where all Invitations are sorted in chronological order
-     */
-    List<Invitation> getAllInvitationsChronologically();
-
-    /**
-     * @return all Events that have invited us
-     */
-    Set<Event> getAllInvitingEvents();
-
-    /**
-     * @return all Events near our location
-     */
-    Set<Event> getAllNearEvents();
-
-    /**
-     * @return all Events that we created
-     */
-    Set<Event> getAllOwnEvents();
+    Set<User> getAllUsers();
 
     /**
      * @return all Events that should be displayed on the map
@@ -78,50 +65,50 @@ public interface CacheInterface {
      */
     Set<User> getAllVisibleFriends();
 
+    Filter getDefaultFilter();
+
+    Event getEvent(long id);
+
+    Set<Event> getEvents(SearchFilter<Event> filter);
+
+    Set<Event> getEvents(Set<Long> ids);
+
     /**
      * @param id
      *            Filter's id
      * @return the Filter with corresponding id, {@code null} if it is not in
      *         Cache
      */
-    FilterInterface getFilter(long id);
+    Filter getFilter(long id);
+
+    Set<Filter> getFilters(SearchFilter<Filter> searchFilter);
 
     /**
      * @param ids
      *            Set containing Filter ids
      * @return a Set containing the corresponding found Filters
      */
-    Set<FilterInterface> getFilters(Set<Long> ids);
+    Set<Filter> getFilters(Set<Long> ids);
 
-    /**
-     * @param id
-     *            Friend's id
-     * @return the Friend with corresponding id, {@code null} if it is not in
-     *         Cache
-     */
-    User getFriend(long id);
+    Set<Long> getFriendIds();
 
-    /**
-     * @param ids
-     *            Set containing Friend ids
-     * @return a Set containing the corresponding found Friends.
-     */
-    User getFriends(Set<Long> ids);
+    Invitation getInvitation(long id);
 
-    /**
-     * @param id
-     *            Stranger's id
-     * @return the Stranger with corresponding id, {@code null} if it is not in
-     *         Cache
-     */
-    User getStranger(long id);
+    SortedSet<Invitation> getInvitations(SearchFilter<Invitation> filter);
 
-    /**
-     * @param ids
-     *            Set containing Stranger ids
-     * @return a Set containing the corresponding found Strangers.
-     */
-    User getStrangers(Set<Long> ids);
+    SortedSet<Invitation> getInvitations(Set<Long> ids);
+
+    Set<Event> getLiveEvents();
+
+    Set<Event> getMyEvents();
+
+    Set<Event> getNearEvents();
+
+    Set<Event> getParticipatingEvents();
+
+    User getSelf();
+
+    SortedSet<Invitation> getUnansweredFriendInvitations();
 
     /**
      * @param id
@@ -136,13 +123,23 @@ public interface CacheInterface {
      *            Set containing User ids
      * @return a Set containing the corresponding found Users.
      */
-    User getUsers(Set<Long> ids);
+    Set<User> getUsers(Set<Long> ids);
 
     /**
      * Completely wipes values and fill the Cache with what is contained in the
      * database
      */
-    void initFromDatabase();
+    void initFromDatabase(DatabaseHelper database);
+
+    void inviteFriendsToEvent(long eventId, Set<Long> usersIds, NetworkRequestCallback callback);
+
+    void inviteUser(long id, NetworkRequestCallback callback);
+
+    void logState();
+
+    void modifyOwnEvent(EventContainer createdEvent, NetworkRequestCallback callback);
+
+    void notifyEventListeners();
 
     /**
      * Creates a live instance with values from the EventContainer. Update
@@ -152,7 +149,7 @@ public interface CacheInterface {
      * @param newEvent
      *            Event's informations
      */
-    void putEvent(ImmutableEvent newEvent);
+    void putEvent(EventContainer newEvent);
 
     /**
      * Creates for each EventContainer a new live Event instance with
@@ -162,7 +159,7 @@ public interface CacheInterface {
      * @param newEvents
      *            Set with Events' informations
      */
-    void putEvents(Set<ImmutableEvent> newEvents);
+    void putEvents(Set<EventContainer> newEvents);
 
     /**
      * Creates a live instance with values from the FilterContainer. Update
@@ -173,7 +170,7 @@ public interface CacheInterface {
      * @param newFilter
      *            Filter's informations
      */
-    void putFilter(ImmutableFilter newFilter);
+    long putFilter(FilterContainer newFilter);
 
     /**
      * Creates for each FilterContainer a new live Filter instance with
@@ -184,45 +181,40 @@ public interface CacheInterface {
      * @param newFilters
      *            Set with Filters' informations
      */
-    void putFilters(Set<ImmutableFilter> newFilters);
+    void putFilters(Set<FilterContainer> newFilters);
 
-    /**
-     * Creates a live instance with values from the UserContainer. Update
-     * previous instance if it was already
-     * in the Cache.
-     * 
-     * @param newFriend
-     *            Friend's informations
-     */
-    void putFriend(ImmutableUser newFriend);
+    void putInvitation(InvitationContainer invitationInfo);
 
-    /**
-     * Creates for each UserContainer a new live Friend instance with
-     * corresponding values. Update those
-     * that were already in the Cache.
-     * 
-     * @param newFriends
-     *            Set with Friends' informations
-     */
-    void putFriends(Set<ImmutableUser> newFriend);
+    void putInvitations(Set<InvitationContainer> invitationInfos);
 
-    /**
-     * Creates a live instance with values from the UserContainer. Update
-     * previous instance if it was already
-     * in the Cache.
-     * 
-     * @param newStranger
-     *            Stranger's informations
-     */
-    void putStranger(ImmutableUser newStranger);
+    void putUser(UserContainer newFriend);
 
-    /**
-     * Creates for each UserContainer a new live Stranger instance with
-     * corresponding values. Update those
-     * that were already in the Cache.
-     * 
-     * @param newFilters
-     *            Set with Strangers' informations
-     */
-    void putStrangers(Set<ImmutableUser> newStrangers);
+    void putUsers(Set<UserContainer> newUsers);
+
+    void readAllInvitations();
+
+    void removeEvent(long id);
+
+    void removeEvents(Set<Long> ids);
+
+    void removeFilter(long id);
+
+    void removeFilters(Set<Long> ids);
+
+    void removeFriend(long id, NetworkRequestCallback callback);
+
+    void removeFriends(Set<Long> ids, NetworkRequestCallback callback);
+
+    void removeParticipantsFromEvent(Set<Long> ids, Event event, NetworkRequestCallback callback);
+
+    boolean removeUsers(Set<Long> userIds);
+
+    void setBlockedStatus(UserContainer user, NetworkRequestCallback callback);
+
+    void setBlockedStatus(UserContainer user, User.blockStatus newBlockedStatus,
+        NetworkRequestCallback callback);
+
+    void updateFromNetwork(SmartMapClient networkClient, NetworkRequestCallback callback);
+
+    void updateUserInfos(long id);
 }
