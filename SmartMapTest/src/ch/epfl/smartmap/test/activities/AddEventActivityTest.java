@@ -27,8 +27,6 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
 
     private static final String TEST_NAME = "This is a test event";
 
-    private static final String PICKER_CONFIRM_BUTTON_TEXT = "Done";
-
     public AddEventActivityTest() {
         super(AddEventActivity.class);
     }
@@ -42,39 +40,9 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         ServiceContainer.setSettingsManager(new SettingsManager(this.getActivity()));
     }
 
-    public void testCanCreateEvent() {
+    public void testCannnotCreateEventWithoutPlaceName() {
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
-
-        // TODO
-    }
-
-    public void testCannotCreateEventWithEvNameAndEndDate() {
-        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
-
-        onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
-        onView(ViewMatchers.withText(PICKER_CONFIRM_BUTTON_TEXT)).perform(ViewActions.click());
-
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
-
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    }
-
-    public void testCannotCreateEventWithEvNameEndDateTime() {
-        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
-
-        onView(withId(R.id.addEventEndDate)).perform(ViewActions.click());
-        onView(ViewMatchers.withText(PICKER_CONFIRM_BUTTON_TEXT)).perform(ViewActions.click());
-
-        onView(withId(R.id.addEventEndTime)).perform(ViewActions.click());
-        onView(ViewMatchers.withText(PICKER_CONFIRM_BUTTON_TEXT)).perform(ViewActions.click());
-
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
-
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    }
-
-    public void testCannotCreateEventWithJustEvenName() {
-        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
+        onView(withId(R.id.addEventPlaceName)).perform(ViewActions.clearText());
 
         onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
 
@@ -88,6 +56,14 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         // hence the event couldn't be created.
         onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
+    }
+
+    public void testCannotCreateEventWithTooShortEventName() {
+        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText("s"));
+
+        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+
+        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     public void testOnlyDescription() throws InterruptedException {
@@ -105,5 +81,13 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
     public void testOpenSetLocationWhenClickOnMap() {
         onView(withId(R.id.add_event_map)).perform(click());
         onView(withId(R.id.set_location_activity)).check(matches(isDisplayed()));
+    }
+
+    public void testZCanCreateEventWithoutDescription() {
+        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
+
+        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+
+        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 }

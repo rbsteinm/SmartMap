@@ -48,7 +48,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class AddEventActivity extends FragmentActivity {
 
     /**
-     * Used as a key to pass LatLng through Intents
+     * Used as a key to pass LatLng through Intents.
      */
     public static final String LOCATION_EXTRA = "LOCATION";
 
@@ -307,6 +307,9 @@ public class AddEventActivity extends FragmentActivity {
      * @author SpicyCH
      */
     private void initializeGUI() {
+
+        ServiceContainer.initSmartMapServices(this);
+
         mEventName = (EditText) this.findViewById(R.id.addEventEventName);
         mPickStartDate = (EditText) this.findViewById(R.id.addEventEventDate);
         mPickStartTime = (EditText) this.findViewById(R.id.addEventEventTime);
@@ -335,6 +338,7 @@ public class AddEventActivity extends FragmentActivity {
 
         mStartDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         mEndDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+        mEndDate.add(Calendar.DAY_OF_MONTH, 1);
 
         mPickStartTime.setText(Utils.getTimeString(mStartDate));
 
@@ -359,6 +363,8 @@ public class AddEventActivity extends FragmentActivity {
             }
         });
 
+        mPickEndDate.setText(Utils.getDateString(mEndDate));
+
         mPickEndDate.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -367,6 +373,8 @@ public class AddEventActivity extends FragmentActivity {
                 newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER_DESCR);
             }
         });
+
+        mPickEndTime.setText(Utils.getTimeString(mEndDate));
 
         mPickEndTime.setOnClickListener(new OnClickListener() {
 
