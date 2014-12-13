@@ -2,7 +2,7 @@ package ch.epfl.smartmap.cache;
 
 import android.graphics.Bitmap;
 import android.location.Location;
-import ch.epfl.smartmap.cache.User.blockStatus;
+import ch.epfl.smartmap.cache.User.BlockStatus;
 
 /**
  * Immutable implementation of User, which serves only as container purposes, therefore all set methods are
@@ -13,14 +13,14 @@ import ch.epfl.smartmap.cache.User.blockStatus;
 public final class UserContainer {
 
     // User informations
-    private final long mId;
-    private final String mName;
+    private long mId;
+    private String mName;
     private String mPhoneNumber;
     private String mEmail;
     private String mLocationString;
     private Location mLocation;
     private Bitmap mImage;
-    private User.blockStatus mIsBlocked;
+    private User.BlockStatus mIsBlocked;
     private int mFriendship;
 
     /**
@@ -36,7 +36,7 @@ public final class UserContainer {
      * @param image
      */
     public UserContainer(long id, String name, String phoneNumber, String email, Location location,
-        String locationString, Bitmap image, User.blockStatus isBlocked, int friendship) {
+        String locationString, Bitmap image, User.BlockStatus isBlocked, int friendship) {
         mId = id;
         mName = name;
         mPhoneNumber = phoneNumber;
@@ -80,11 +80,11 @@ public final class UserContainer {
         return mPhoneNumber;
     }
 
-    public User.blockStatus isBlocked() {
+    public User.BlockStatus isBlocked() {
         return mIsBlocked;
     }
 
-    public UserContainer setBlocked(blockStatus blockedStatus) {
+    public UserContainer setBlocked(BlockStatus blockedStatus) {
         mIsBlocked = blockedStatus;
         return this;
     }
@@ -96,6 +96,11 @@ public final class UserContainer {
 
     public UserContainer setFriendship(int newFriendship) {
         mFriendship = newFriendship;
+        return this;
+    }
+
+    public UserContainer setId(long newId) {
+        mId = newId;
         return this;
     }
 
@@ -111,6 +116,11 @@ public final class UserContainer {
 
     public UserContainer setLocationString(String newLocationString) {
         mLocationString = newLocationString;
+        return this;
+    }
+
+    public UserContainer setName(String newName) {
+        mName = newName;
         return this;
     }
 
