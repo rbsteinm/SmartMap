@@ -37,7 +37,37 @@ public class InvitationsService extends Service {
     // Handler for Runnables
     private final Handler mHandler = new Handler();
 
-    private final Runnable getInvitations = new InvitationsRunnable();
+    private final Runnable getInvitations = new Runnable() {
+        @Override
+        public void run() {
+            new AsyncInvitations().execute();
+            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
+        }
+    };
+
+    /**
+     * Makes notifications when there is no cache (the app is in background)
+     * 
+     * @param userInvitBag
+     *            {@code InvitationBag} for friend invitations
+     * @param eventInvitBag
+     *            {@code InvitationBag} for event invitations
+     */
+    private void backgroundNotifications(InvitationBag userInvitBag, InvitationBag eventInvitBag) {
+        Set<InvitationContainer> friendInvitations = userInvitBag.getInvitations();
+        Set<InvitationContainer> eventInvitations = eventInvitBag.getInvitations();
+        for (InvitationContainer invite : friendInvitations) {
+            ServiceContainer.getDatabase().addInvitation(invite);
+            if (invite.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
+                ServiceContainer.getDatabase().addUser(invite.getUserInfos());
+            }
+            Notifications.createNotification(Invitation.createFromContainer(invite), this);
+        }
+        for (InvitationContainer invite : eventInvitations) {
+            ServiceContainer.getDatabase().addInvitation(invite);
+            Notifications.createNotification(Invitation.createFromContainer(invite), this);
+        }
+    }
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -100,72 +130,40 @@ public class InvitationsService extends Service {
     }
 
     /**
-     * Makes notifications when there is no cache (the app is in background)
-     * 
-     * @param userInvitBag
-     *            {@code InvitationBag} for friend invitations
-     * @param eventInvitBag
-     *            {@code InvitationBag} for event invitations
-     */
-    private void backgroundNotifications(InvitationBag userInvitBag, InvitationBag eventInvitBag) {
-        Set<InvitationContainer> friendInvitations = userInvitBag.getInvitations();
-        Set<InvitationContainer> eventInvitations = eventInvitBag.getInvitations();
-        for (InvitationContainer invite : friendInvitations) {
-            ServiceContainer.getDatabase().addInvitation(invite);
-            if (invite.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
-                ServiceContainer.getDatabase().addUser(invite.getUserInfos());
-            }
-            Notifications.createNotification(Invitation.createFromContainer(invite), this);
-        }
-        for (InvitationContainer invite : eventInvitations) {
-            ServiceContainer.getDatabase().addInvitation(invite);
-            Notifications.createNotification(Invitation.createFromContainer(invite), this);
-        }
-    }
-
-    /**
-     * Retrieves and handles invitations
+     * Retrieves invitations
      * 
      * @author ritterni
      */
-    private class InvitationsRunnable implements Runnable {
+    private class AsyncInvitations extends AsyncTask<Void, Void, Void> {
         @Override
-        public void run() {
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... arg0) {
-                    try {
-                        NetworkFriendInvitationBag userInvitBag =
-                            (NetworkFriendInvitationBag) ServiceContainer.getNetworkClient().getInvitations();
-                        InvitationBag eventInvitBag =
-                            ServiceContainer.getNetworkClient().getEventInvitations();
+        protected Void doInBackground(Void... arg0) {
+            try {
+                NetworkFriendInvitationBag userInvitBag =
+                    (NetworkFriendInvitationBag) ServiceContainer.getNetworkClient().getInvitations();
+                InvitationBag eventInvitBag = ServiceContainer.getNetworkClient().getEventInvitations();
 
-                        // Acknowledge removed friends
-                        for (Long id : userInvitBag.getRemovedFriendsIds()) {
-                            ServiceContainer.getNetworkClient().ackRemovedFriend(id);
-                        }
-
-                        if (ServiceContainer.getCache() != null) {
-                            // Get friends invitations
-                            Log.d(TAG, "Friend invitations");
-                            ServiceContainer.getCache().putInvitations(userInvitBag.getInvitations());
-                            // Get event invitations
-                            Log.d(TAG, "Event invitations");
-
-                            ServiceContainer.getCache().putInvitations(eventInvitBag.getInvitations());
-                            Log.d(TAG,
-                                "Successfully fetched invitations / users : " + userInvitBag.getInvitations()
-                                    + " / events : " + eventInvitBag.getInvitations());
-                        } else {
-                            InvitationsService.this.backgroundNotifications(userInvitBag, eventInvitBag);
-                        }
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Couldn't retrieve invitations due to a server error: " + e);
-                    }
-                    return null;
+                // Acknowledge removed friends
+                for (Long id : userInvitBag.getRemovedFriendsIds()) {
+                    ServiceContainer.getNetworkClient().ackRemovedFriend(id);
                 }
-            }.execute();
-            mHandler.postDelayed(this, INVITE_UPDATE_DELAY);
+
+                if (ServiceContainer.getCache() != null) {
+                    // Get friends invitations
+                    Log.d(TAG, "Friend invitations");
+                    ServiceContainer.getCache().putInvitations(userInvitBag.getInvitations());
+                    // Get event invitations
+                    Log.d(TAG, "Event invitations");
+
+                    ServiceContainer.getCache().putInvitations(eventInvitBag.getInvitations());
+                    Log.d(TAG, "Successfully fetched invitations / users : " + userInvitBag.getInvitations()
+                        + " / events : " + eventInvitBag.getInvitations());
+                } else {
+                    InvitationsService.this.backgroundNotifications(userInvitBag, eventInvitBag);
+                }
+            } catch (SmartMapClientException e) {
+                Log.e(TAG, "Couldn't retrieve invitations due to a server error: " + e);
+            }
+            return null;
         }
     }
 }
