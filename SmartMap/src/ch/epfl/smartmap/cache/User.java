@@ -16,29 +16,25 @@ public abstract class User implements UserInterface {
 
     private static final String TAG = User.class.getSimpleName();
 
-    public static final int STRANGER = 0;
-    public static final int FRIEND = 1;
-    public static final int SELF = 2;
-    public static final int DONT_KNOW = -1;
-
+    // Default values
     public static final long NO_ID = -1;
     public static final String NO_NAME = "Unknown User";
     public static final Bitmap NO_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
         .getContext().getResources(), R.drawable.ic_default_user);
-
     public static final String NO_PHONE_NUMBER = "No phone Number";
     public static final String NO_EMAIL = "No email";
     public static final Calendar NO_LAST_SEEN = GregorianCalendar.getInstance();
 
     public static final User NOBODY = new Stranger(NO_ID, NO_NAME, NO_IMAGE);
 
+    public static final int STRANGER = 0;
+    public static final int FRIEND = 1;
+    public static final int SELF = 2;
+    public static final int DONT_KNOW = -1;
+
     public static final int IMAGE_QUALITY = 100;;
 
     public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
-    public static final int PICTURE_WIDTH = 50;
-    public static final int PICTURE_HEIGHT = 50;
-    public static final double NO_LATITUDE = 0.0;
-    public static double NO_LONGITUDE = 0.0;
     private final long mId;
 
     private String mName;
@@ -79,7 +75,7 @@ public abstract class User implements UserInterface {
      * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
      */
     @Override
-    public Bitmap getImage() {
+    public Bitmap getActionImage() {
         return mImage;
     }
 
@@ -104,7 +100,7 @@ public abstract class User implements UserInterface {
      */
     @Override
     public Bitmap getSearchImage() {
-        return this.getImage();
+        return this.getActionImage();
     }
 
     /*

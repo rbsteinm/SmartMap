@@ -123,7 +123,7 @@ public abstract class Event implements Displayable, EventInterface {
     }
 
     @Override
-    public Bitmap getImage() {
+    public Bitmap getActionImage() {
         return Event.DEFAULT_WHITE_IMAGE;
     }
 

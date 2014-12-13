@@ -72,7 +72,7 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         // Set fields with user attributes
         if (user != null) {
             viewHolder.getName().setText(user.getName());
-            viewHolder.getPicture().setImageBitmap(user.getImage());
+            viewHolder.getPicture().setImageBitmap(user.getActionImage());
             viewHolder.getLastSeen().setText(user.getSubtitle());
         }
 

@@ -120,8 +120,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         mSideMenu = new SideMenu(this);
         mSideMenu.initializeDrawerLayout();
 
-        final SearchLayout mSearchLayout = (SearchLayout) this.findViewById(R.id.search_layout);
-
         if (savedInstanceState == null) {
             this.displayMap();
         }
@@ -452,7 +450,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             final ActionBar actionBar = this.getActionBar();
             actionBar.setTitle(item.getTitle());
             actionBar.setSubtitle(item.getSubtitle());
-            actionBar.setIcon(new BitmapDrawable(this.getResources(), item.getImage()));
+            actionBar.setIcon(new BitmapDrawable(this.getResources(), item.getActionImage()));
             // ActionBar HomeIndicator
             actionBar.setHomeAsUpIndicator(null);
 
@@ -511,7 +509,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             ActionBar actionBar = this.getActionBar();
             actionBar.setTitle(mCurrentItem.getTitle());
             actionBar.setSubtitle(mCurrentItem.getSubtitle());
-            actionBar.setIcon(new BitmapDrawable(this.getResources(), mCurrentItem.getImage()));
+            actionBar.setIcon(new BitmapDrawable(this.getResources(), mCurrentItem.getActionImage()));
         }
     }
 

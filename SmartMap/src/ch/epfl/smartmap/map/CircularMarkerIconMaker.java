@@ -194,7 +194,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      */
     private void initializeProfilePicture() {
 
-        mProfilePicture = Bitmap.createScaledBitmap(mFriend.getImage(), mBaseMarkerShape.getWidth()
+        mProfilePicture = Bitmap.createScaledBitmap(mFriend.getActionImage(), mBaseMarkerShape.getWidth()
                 - SHAPE_BORDER_WIDTH, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
 
         mProfilePicture = this.cropCircle(mProfilePicture, mProfilePicture.getWidth());
