@@ -26,6 +26,7 @@ import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter;
 import ch.epfl.smartmap.gui.FriendPickerListAdapter.ViewHolder;
 import ch.epfl.smartmap.listeners.OnCacheListener;
+import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.util.Utils;
 
 /**
@@ -346,6 +347,9 @@ public class EventInformationActivity extends ListActivity {
      */
     private void updateCurrentList() {
 
+        if (ServiceContainer.getSearchEngine() == null) {
+            ServiceContainer.setSearchEngine(new CachedSearchEngine());
+        }
         Log.d(TAG, "Search Engine : " + ServiceContainer.getSearchEngine());
         Log.d(TAG, "Event : " + mEvent);
         Log.d(TAG, "Participants id : " + mEvent.getParticipantIds());

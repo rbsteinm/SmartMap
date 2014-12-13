@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -36,21 +37,6 @@ public class SetLocationActivity extends FragmentActivity {
     private SupportMapFragment mFragmentMap;
     private LatLng mEventPosition;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_set_location);
-
-        // Makes the logo clickable (clicking it returns to previous activity)
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
-        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        // Maybe set it longer, how?
-        Toast.makeText(this, this.getString(R.string.set_location_toast), Toast.LENGTH_LONG).show();
-
-        this.displayMap();
-    }
-
     /**
      * Display the map with the current location
      */
@@ -70,7 +56,14 @@ public class SetLocationActivity extends FragmentActivity {
             mGoogleMap = mFragmentMap.getMap();
             mGoogleMap.setMyLocationEnabled(true);
 
-            mEventPosition = this.getIntent().getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
+            if (this.getIntent().getParcelableExtra(AddEventActivity.LOCATION_EXTRA) == null) {
+                // Initialize it to (0,0) so it isn't null for test
+                mEventPosition = new LatLng(0, 0);
+            } else {
+                mEventPosition = this.getIntent().getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
+            }
+
+            Log.d(TAG, "Event position : " + mEventPosition);
 
             // Enabling MyLocation Layer of Google Map
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
@@ -95,6 +88,21 @@ public class SetLocationActivity extends FragmentActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_set_location);
+
+        // Makes the logo clickable (clicking it returns to previous activity)
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        // Maybe set it longer, how?
+        Toast.makeText(this, this.getString(R.string.set_location_toast), Toast.LENGTH_LONG).show();
+
+        this.displayMap();
     }
 
     @Override

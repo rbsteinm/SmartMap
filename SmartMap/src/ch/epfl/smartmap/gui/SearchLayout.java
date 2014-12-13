@@ -19,8 +19,6 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.search.CachedSearchEngine;
-import ch.epfl.smartmap.search.SearchEngine;
 import ch.epfl.smartmap.search.SearchEngine.Type;
 
 /**
@@ -150,7 +148,6 @@ public class SearchLayout extends LinearLayout {
     private final Map<Type, Integer> mSearchTypeIndexes;
     private final Map<Type, TextView> mTitleTextViews;
     private final List<Type> mActiveSearchTypes;
-    private SearchEngine mSearchEngine;
     // Extra views
     private final LinearLayout mTitleBar;
     // Information about current state
@@ -163,6 +160,7 @@ public class SearchLayout extends LinearLayout {
     public SearchLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        ServiceContainer.initSmartMapServices(context);
         // Layout relative informations
         this.setOrientation(VERTICAL);
         this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -171,7 +169,6 @@ public class SearchLayout extends LinearLayout {
         // Set default search query (needs to be done addSearchTypes)
         mCurrentQuery = DEFAULT_SEARCH_QUERY;
         // Initialize data structures
-        mSearchEngine = ServiceContainer.getSearchEngine();
         mScrollViews = new HashMap<Type, ScrollView>();
         mSearchResultViewGroups = new HashMap<Type, SearchResultViewGroup>();
         mSearchTypeIndexes = new HashMap<Type, Integer>();
@@ -246,7 +243,7 @@ public class SearchLayout extends LinearLayout {
         for (Type searchType : searchTypes) {
             this.addSearchResultScrollView(searchType);
         }
-    }
+    };
 
     /**
      * @return Next Search Type in the Layout
@@ -256,7 +253,7 @@ public class SearchLayout extends LinearLayout {
             (mSearchTypeIndexes.get(mCurrentSearchType).intValue() + 1) % mActiveSearchTypes.size();
         Type nextSearchType = mActiveSearchTypes.get(nextSearchTypeIndex);
         return nextSearchType;
-    };
+    }
 
     /**
      * Go to next View
@@ -295,15 +292,6 @@ public class SearchLayout extends LinearLayout {
     }
 
     /**
-     * Sets a new {@code SearchEngine} to this SearchLayout
-     * 
-     * @param searchEngine
-     */
-    public void setSearchEngine(SearchEngine searchEngine) {
-        mSearchEngine = searchEngine;
-    }
-
-    /**
      * Updates the current panel with the new search query.
      */
     public void setSearchQuery(String query) {
@@ -337,7 +325,7 @@ public class SearchLayout extends LinearLayout {
         new AsyncTask<Void, Void, List<Displayable>>() {
             @Override
             public List<Displayable> doInBackground(Void... params) {
-                return CachedSearchEngine.getInstance().sendQuery(mCurrentQuery, mCurrentSearchType);
+                return ServiceContainer.getSearchEngine().sendQuery(mCurrentQuery, mCurrentSearchType);
             }
 
             @Override
