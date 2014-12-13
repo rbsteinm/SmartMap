@@ -23,9 +23,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        $this->mockRepo = $this->getMockBuilder('SmartMap\DBInterface\UserRepository')
-                               ->disableOriginalConstructor()
-                               ->getMock();
+        $this->mockRepo = $this->getMock('SmartMap\DBInterface\UserRepositoryInterface');
     }
     
     public function testValidUpdatePos()

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use SmartMap\DBInterface\User;
-use SmartMap\DBInterface\UserRepository;
+use SmartMap\DBInterface\UserRepositoryInterface;
 
 use Facebook\FacebookSession;
 use Facebook\FacebookRedirectLoginHelper;
@@ -28,7 +28,7 @@ use Facebook\GraphUser;
  *        
  * @author Pamoi (code reviewed - 01.11.2014)
  */
-class AuthenticationController
+class AuthenticationController implements AuthenticationControllerInterface
 {
     private static $GRAPH_API_URL = 'http://graph.facebook.com/v2.2/';
     private static $PICTURE_REQUEST = '/picture?width=480&height=480';
@@ -37,7 +37,7 @@ class AuthenticationController
     private $mAppId;
     private $mRepo;
     
-    function __construct(UserRepository $repo, $appId, $appSecret) {
+    function __construct(UserRepositoryInterface $repo, $appId, $appSecret) {
         $this->mRepo = $repo;
         $this->mAppId = $appId;
         $this->mAppSecret = $appSecret;
