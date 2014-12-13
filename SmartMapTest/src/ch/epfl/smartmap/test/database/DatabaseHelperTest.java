@@ -3,14 +3,18 @@ package ch.epfl.smartmap.test.database;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
+import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.EventContainer;
@@ -103,6 +107,14 @@ public class DatabaseHelperTest extends AndroidTestCase {
     }
 
     @Test
+    public void testAddInvitation() {
+        dbh.addInvitation(invitA);
+        InvitationContainer invit = (InvitationContainer) dbh.getAllInvitations().toArray()[0];
+        assertTrue(invitA.getStatus() == invit.getStatus() && invitA.getType() == invit.getType()
+            && invitA.getTimeStamp() == invit.getTimeStamp());
+    }
+
+    @Test
     public void testAddUser() {
         dbh.addUser(a);
         // testing that adding a user with the same id erases the first one
@@ -133,6 +145,21 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.deleteFilter(filter.getId());
         // accounting for default filter #1
         assertTrue(dbh.getAllFilters().size() == 1);
+    }
+
+    @Test
+    public void testDeleteInvitation() {
+        long id = dbh.addInvitation(invitA);
+        dbh.deleteInvitation(id);
+        assertTrue(dbh.getAllInvitations().size() == 0);
+    }
+
+    @Test
+    public void testDeletePending() {
+        dbh.addPendingFriend(1234);
+        long id = (long) dbh.getPendingFriends().toArray()[0];
+        dbh.deletePendingFriend(1234);
+        assertTrue(dbh.getPendingFriends().size() == 0 && id == 1234);
     }
 
     @Test
@@ -170,11 +197,52 @@ public class DatabaseHelperTest extends AndroidTestCase {
     }
 
     @Test
+    public void testGetFiltersIds() {
+        dbh.addFilter(filter);
+        dbh.addFilter(filter2);
+        List<Long> ids = dbh.getFilterIds();
+        assertTrue(ids.size() == 2 && ids.contains(filter.getId()) && ids.contains(filter2.getId()));
+    }
+
+    @Test
+    public void testGetFriendsIds() {
+        dbh.addUser(a);
+        dbh.addUser(b);
+        List<Long> ids = dbh.getFriendIds();
+        // a isn't a friend
+        assertTrue(ids.size() == 1 && ids.contains(b.getId()));
+    }
+
+    @Test
+    public void testSetUserPicture() {
+        Bitmap pic = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.ic_default_user);
+        dbh.setUserPicture(pic, 0);
+        assertTrue(dbh.getPictureById(0).sameAs(pic));
+    }
+
+    @Test
     public void testUpdateEvent() {
         dbh.addEvent(event);
         event.setName(name);
         long rows = dbh.updateEvent(event);
         assertTrue(dbh.getEvent(event.getId()).getName().equals(name) && (rows == 1));
+    }
+
+    @Test
+    public void testUpdateFilter() {
+        dbh.addFilter(filter);
+        filter.setName("New Name");
+        dbh.updateFilter(filter);
+        assertTrue(dbh.getFilter(filter.getId()).getName().equals("New Name"));
+    }
+
+    @Test
+    public void testUpdateInvitation() {
+        long id = dbh.addInvitation(invitA);
+        dbh.updateInvitation(new InvitationContainer(id, invitA.getUserInfos(), invitA.getEventInfos(),
+            Invitation.ACCEPTED, invitA.getTimeStamp(), invitA.getType()));
+        InvitationContainer invit = (InvitationContainer) dbh.getAllInvitations().toArray()[0];
+        assertTrue(invit.getId() == id && invit.getStatus() == Invitation.ACCEPTED);
     }
 
     @Test

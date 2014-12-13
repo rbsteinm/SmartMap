@@ -48,9 +48,16 @@ public final class Friend extends User {
             mLocation = new Location(location);
         }
 
-        mIsBlocked = isBlocked;
+        mEmail = NO_EMAIL;
+        mPhoneNumber = NO_PHONE_NUMBER;
 
+        mIsBlocked = isBlocked;
         mMarkerIconMaker = new CircularMarkerIconMaker(this);
+    }
+
+    @Override
+    public User.BlockStatus getBlockStatus() {
+        return mIsBlocked;
     }
 
     @Override
@@ -129,11 +136,6 @@ public final class Friend extends User {
         }
 
         return infos;
-    }
-
-    @Override
-    public User.BlockStatus getBlockStatus() {
-        return mIsBlocked;
     }
 
     public boolean isVisible() {

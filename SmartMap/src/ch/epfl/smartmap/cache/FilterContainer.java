@@ -28,6 +28,11 @@ public class FilterContainer {
         mIsActive = isActive;
     }
 
+    public FilterContainer addId(long id) {
+        mIds.add(id);
+        return this;
+    }
+
     public long getId() {
         return mId;
     }
@@ -44,6 +49,11 @@ public class FilterContainer {
         return mIsActive;
     }
 
+    public FilterContainer removeId(long id) {
+        mIds.remove(id);
+        return this;
+    }
+
     public FilterContainer setActive(boolean isActive) {
         mIsActive = isActive;
         return this;
@@ -57,7 +67,6 @@ public class FilterContainer {
     public FilterContainer setIds(Set<Long> newIds) {
         mIds = new HashSet<Long>(newIds);
         return this;
-
     }
 
     public FilterContainer setName(String newName) {

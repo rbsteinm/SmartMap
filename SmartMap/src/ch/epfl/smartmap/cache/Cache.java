@@ -633,11 +633,6 @@ public class Cache implements CacheInterface {
         this.putFilters(database.getAllFilters());
         this.putInvitations(database.getAllInvitations());
 
-        // If self is not set, create it
-        if (this.getSelf() == null) {
-
-        }
-
         // Notify listeners
         for (CacheListener listener : mListeners) {
             listener.onEventListUpdate();
