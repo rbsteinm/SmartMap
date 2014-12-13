@@ -16,6 +16,10 @@ import ch.epfl.smartmap.servercom.SmartMapClient;
  */
 interface CacheInterface {
 
+    /**
+     * @param invitation
+     * @param callback
+     */
     void acceptInvitation(Invitation invitation, NetworkRequestCallback callback);
 
     void addOnCacheListener(CacheListener listener);
@@ -211,7 +215,7 @@ interface CacheInterface {
 
     void setBlockedStatus(UserContainer user, NetworkRequestCallback callback);
 
-    void setBlockedStatus(UserContainer user, User.blockStatus newBlockedStatus,
+    void setBlockedStatus(UserContainer user, User.BlockStatus newBlockedStatus,
         NetworkRequestCallback callback);
 
     void updateFromNetwork(SmartMapClient networkClient, NetworkRequestCallback callback);

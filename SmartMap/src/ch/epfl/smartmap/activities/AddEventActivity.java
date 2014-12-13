@@ -275,7 +275,7 @@ public class AddEventActivity extends FragmentActivity {
             location.setLongitude(mEventPosition.longitude);
 
             EventContainer event = new EventContainer(PublicEvent.NO_ID, mEventName.getText().toString(),
-                    ServiceContainer.getCache().getSelf().getImmutableCopy(), mDescription.getText().toString(),
+                    ServiceContainer.getCache().getSelf().getContainerCopy(), mDescription.getText().toString(),
                     mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
 
             ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
