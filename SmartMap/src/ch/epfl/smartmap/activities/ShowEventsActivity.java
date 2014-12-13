@@ -190,9 +190,6 @@ public class ShowEventsActivity extends ListActivity {
      */
     private void initializeGUI() {
 
-        if (ServiceContainer.getSettingsManager() == null) {
-            ServiceContainer.initSmartMapServices(this);
-        }
         ShowEventsActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -300,6 +297,10 @@ public class ShowEventsActivity extends ListActivity {
         // Makes the logo clickable (clicking it returns to previous activity)
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        if (ServiceContainer.getSettingsManager() == null) {
+            ServiceContainer.initSmartMapServices(this);
+        }
 
         if (ServiceContainer.getSettingsManager().getNearEventsMaxDistance() == 0) {
             // The user has disabled events fetching in the settings, hence he
