@@ -64,7 +64,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         ServiceContainer.setSettingsManager(manager);
 
         // to avoid erasing the actual database
-        dbh = new DatabaseHelper(new RenamingDelegatingContext(getContext(), "test_"));
+        dbh = new DatabaseHelper(new RenamingDelegatingContext(this.getContext(), "test_"));
         dbh.clearAll();
 
         Set<Long> list1 = new HashSet<Long>();

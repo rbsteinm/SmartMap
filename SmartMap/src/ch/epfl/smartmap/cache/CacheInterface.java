@@ -20,15 +20,15 @@ interface CacheInterface {
      * @param invitation
      * @param callback
      */
-    void acceptInvitation(Invitation invitation, NetworkRequestCallback callback);
+    void acceptInvitation(Invitation invitation, NetworkRequestCallback<Void> callback);
 
     void addOnCacheListener(CacheListener listener);
 
-    void addParticipantsToEvent(Set<Long> ids, Event event, NetworkRequestCallback callback);
+    void addParticipantsToEvent(Set<Long> ids, Event event, NetworkRequestCallback<Void> callback);
 
-    void createEvent(EventContainer createdEvent, NetworkRequestCallback callback);
+    void createEvent(EventContainer createdEvent, NetworkRequestCallback<Event> callback);
 
-    void declineInvitation(Invitation invitation, NetworkRequestCallback callback);
+    void declineInvitation(Invitation invitation, NetworkRequestCallback<Void> callback);
 
     /**
      * @return all Filters currently activated
@@ -135,13 +135,13 @@ interface CacheInterface {
      */
     void initFromDatabase(DatabaseHelper database);
 
-    void inviteFriendsToEvent(long eventId, Set<Long> usersIds, NetworkRequestCallback callback);
+    void inviteFriendsToEvent(long eventId, Set<Long> usersIds, NetworkRequestCallback<Void> callback);
 
-    void inviteUser(long id, NetworkRequestCallback callback);
+    void inviteUser(long id, NetworkRequestCallback<Void> callback);
 
     void logState();
 
-    void modifyOwnEvent(EventContainer createdEvent, NetworkRequestCallback callback);
+    void modifyOwnEvent(EventContainer createdEvent, NetworkRequestCallback<Void> callback);
 
     void notifyEventListeners();
 
@@ -205,20 +205,20 @@ interface CacheInterface {
 
     void removeFilters(Set<Long> ids);
 
-    void removeFriend(long id, NetworkRequestCallback callback);
+    void removeFriend(long id, NetworkRequestCallback<Void> callback);
 
-    void removeFriends(Set<Long> ids, NetworkRequestCallback callback);
+    void removeFriends(Set<Long> ids, NetworkRequestCallback<Void> callback);
 
-    void removeParticipantsFromEvent(Set<Long> ids, Event event, NetworkRequestCallback callback);
+    void removeParticipantsFromEvent(Set<Long> ids, Event event, NetworkRequestCallback<Void> callback);
 
     boolean removeUsers(Set<Long> userIds);
 
-    void setBlockedStatus(UserContainer user, NetworkRequestCallback callback);
+    void setBlockedStatus(UserContainer user, NetworkRequestCallback<Void> callback);
 
     void setBlockedStatus(UserContainer user, User.BlockStatus newBlockedStatus,
-        NetworkRequestCallback callback);
+        NetworkRequestCallback<Void> callback);
 
-    void updateFromNetwork(SmartMapClient networkClient, NetworkRequestCallback callback);
+    void updateFromNetwork(SmartMapClient networkClient, NetworkRequestCallback<Void> callback);
 
     void updateUserInfos(long id);
 }
