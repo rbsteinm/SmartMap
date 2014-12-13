@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
+import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.UserContainer;
-import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.util.Utils;
 
 /**
+ * This class contains the lists of friend requests, new friends and removed
+ * friends. It returns the corresponding invitations and ids.
+ * 
  * @author Pamoi
  */
 public class NetworkFriendInvitationBag implements InvitationBag {
@@ -19,14 +22,15 @@ public class NetworkFriendInvitationBag implements InvitationBag {
     private final Set<Long> mRemovedFriendsIds;
 
     /**
-     * The constructor takes List arguments for compliance with server communication code.
+     * The constructor takes List arguments for compliance with server
+     * communication code.
      * 
      * @param invitingUsers
      * @param newFriends
      * @param removedFriendsIds
      */
     public NetworkFriendInvitationBag(List<UserContainer> invitingUsers, List<UserContainer> newFriends,
-            List<Long> removedFriendsIds) {
+        List<Long> removedFriendsIds) {
         if (invitingUsers == null) {
             throw new IllegalArgumentException("invitingUsers list is null.");
         }
@@ -38,16 +42,17 @@ public class NetworkFriendInvitationBag implements InvitationBag {
         }
 
         mInvitations = new HashSet<InvitationContainer>();
-        long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis();
+        long timeStamp =
+            GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis();
 
         for (UserContainer user : invitingUsers) {
-            mInvitations.add(new InvitationContainer(Invitation.NO_ID, user, null, Invitation.UNREAD, timeStamp,
-                    Invitation.FRIEND_INVITATION));
+            mInvitations.add(new InvitationContainer(Invitation.NO_ID, user, null, Invitation.UNREAD,
+                timeStamp, Invitation.FRIEND_INVITATION));
         }
 
         for (UserContainer user : newFriends) {
-            mInvitations.add(new InvitationContainer(Invitation.NO_ID, user, null, Invitation.UNREAD, timeStamp,
-                    Invitation.ACCEPTED_FRIEND_INVITATION));
+            mInvitations.add(new InvitationContainer(Invitation.NO_ID, user, null, Invitation.UNREAD,
+                timeStamp, Invitation.ACCEPTED_FRIEND_INVITATION));
         }
 
         mRemovedFriendsIds = new HashSet<Long>(removedFriendsIds);
@@ -55,7 +60,6 @@ public class NetworkFriendInvitationBag implements InvitationBag {
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.servercom.NotificationBag#getInvitingUsers()
      */
     @Override
@@ -66,7 +70,7 @@ public class NetworkFriendInvitationBag implements InvitationBag {
     /**
      * Returns a set of the ids of the friends that removed the user.
      * 
-     * @return
+     * @return Set<Long>
      */
     public Set<Long> getRemovedFriendsIds() {
         return new HashSet<Long>(mRemovedFriendsIds);
