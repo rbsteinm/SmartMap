@@ -17,8 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.search.SearchEngine.Type;
 
 /**
@@ -233,7 +233,7 @@ public class SearchLayout extends LinearLayout {
         new AsyncTask<Void, Void, List<Displayable>>() {
             @Override
             public List<Displayable> doInBackground(Void... params) {
-                return CachedSearchEngine.getInstance().sendQuery(mCurrentQuery, mCurrentSearchType);
+                return ServiceContainer.getSearchEngine().sendQuery(mCurrentQuery, mCurrentSearchType);
             }
 
             @Override
