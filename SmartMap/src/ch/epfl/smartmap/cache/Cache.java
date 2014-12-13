@@ -800,7 +800,7 @@ public class Cache implements CacheInterface {
                 needToCallListeners = true;
                 eventInfo.setCreator(this.getUser(eventInfo.getCreatorId()));
                 mEventIds.add(eventInfo.getId());
-                mEventInstances.put(eventInfo.getId(), new PublicEvent(eventInfo));
+                mEventInstances.put(eventInfo.getId(), Event.createFromContainer(eventInfo));
             }
 
             // Update Events to need to be updated & put true if update didnt
