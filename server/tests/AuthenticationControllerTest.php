@@ -52,10 +52,8 @@ class AuthenticationControllerTest extends PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        $this->mockRepo = $this->getMockBuilder('SmartMap\DBInterface\UserRepository')
-             ->disableOriginalConstructor()
-             ->getMock();
-        
+        $this->mockRepo = $this->getMock('SmartMap\DBInterface\UserRepositoryInterface');
+
         $this->authController = new AuthenticationController($this->mockRepo, self::$APP_ID, self::$APP_SECRET);
         
         $this->validFbToken = 'CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7' .
