@@ -276,10 +276,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
                 if (pendingIds.contains(userInfo.getId())) {
                     // Already stored
                     return Invitation.ALREADY_RECEIVED;
-                } else {
-                    if (invitation.getStatus() == Invitation.UNREAD) {
-                        this.addPendingFriend(userInfo.getId());
-                    }
+                } else if (invitation.getStatus() == Invitation.UNREAD) {
+                    this.addPendingFriend(userInfo.getId());
                 }
 
                 Log.d(TAG, "Pending ids after : " + this.getPendingFriends());
@@ -979,10 +977,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_DATE, invitation.getTimeStamp());
         values.put(KEY_TYPE, invitation.getType());
 
-        int rows =
-            mDatabase.update(TABLE_INVITATIONS, values, KEY_ID + " = ?",
-                new String[]{String.valueOf(invitation.getId())});
-
-        return rows;
+        return mDatabase.update(TABLE_INVITATIONS, values, KEY_ID + " = ?",
+            new String[]{String.valueOf(invitation.getId())});
     }
 }
