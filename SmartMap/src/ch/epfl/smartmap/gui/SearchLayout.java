@@ -160,6 +160,7 @@ public class SearchLayout extends LinearLayout {
     public SearchLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        ServiceContainer.initSmartMapServices(context);
         // Layout relative informations
         this.setOrientation(VERTICAL);
         this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));

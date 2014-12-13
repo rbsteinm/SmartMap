@@ -8,53 +8,63 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Objects that can be displayed with image, title and subtitle.
+ * Objects that can be displayed in the ActionBar with image, title and subtitle, and eventually displayed on
+ * the map
  * 
- * @author ritterni
  * @author jfperren
+ * @author ritterni
  */
 public interface Displayable extends Stockable {
 
+    // Default values
     String NO_TITLE = "";
     String NO_SUBTITLE = "";
-    Bitmap DEFAULT_IMAGE = null;
-
-    String NO_LOCATION_STRING = "Unknown Location";
 
     String PROVIDER_NAME = "SmartMapServers";
-
+    double NO_LATITUDE = 0.0;
+    double NO_LONGITUDE = 0.0;
     Location NO_LOCATION = new Location(PROVIDER_NAME);
-
-    BitmapDescriptor NO_MARKER_ICON = null;
+    String NO_LOCATION_STRING = "Unknown Location";
 
     /**
-     * @param context
-     *            The application's context, needed to access the memory
-     * @return The object's picture
+     * @return the Bitmap image that will be displayed in the Action Bar
      */
-    Bitmap getImage();
+    Bitmap getActionImage();
 
+    /**
+     * @return a LatLng containing the latitude and longitude of the displayable object
+     */
     LatLng getLatLng();
 
     /**
-     * @return GoogleMap Location of the Displayable
+     * @return the GoogleMap Location of the Displayable
      */
     Location getLocation();
 
+    /**
+     * @return a String containing infos about the location of the displayable object
+     */
     String getLocationString();
 
+    /**
+     * @param context
+     *            Context in which it will be displayed
+     * @return a Descriptor containing informations about how to display the marker of the displayable object
+     */
     BitmapDescriptor getMarkerIcon(Context context);
 
+    /**
+     * @return the Bitmap image that will be displayed in Search Layout
+     */
     Bitmap getSearchImage();
 
     /**
-     * @return Text containing various information (description, last seen,
-     *         etc.)
+     * @return a String that will be displayed as subtitle for this object in ActionBar
      */
     String getSubtitle();
 
     /**
-     * @return A name for the panel (e.g. the username, event name, etc.)
+     * @return a String that will be displayed as title for this object in ActionBar
      */
     String getTitle();
 }

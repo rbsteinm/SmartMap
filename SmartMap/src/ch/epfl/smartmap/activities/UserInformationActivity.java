@@ -357,7 +357,7 @@ public class UserInformationActivity extends Activity {
 
                         mNameView.setText(friend.getName());
                         mSubtitlesView.setText(friend.getSubtitle());
-                        mPictureView.setImageBitmap(friend.getImage());
+                        mPictureView.setImageBitmap(friend.getActionImage());
                         // FIXME : boolean value must be checked
                         mShowOnMapSwitch.setChecked(true);
                         mBlockSwitch.setChecked(friend.isBlocked() == User.blockStatus.UNBLOCKED);
@@ -378,7 +378,7 @@ public class UserInformationActivity extends Activity {
                     } else {
                         mNameView.setText(user.getName());
                         mSubtitlesView.setText(user.getSubtitle());
-                        mPictureView.setImageBitmap(user.getImage());
+                        mPictureView.setImageBitmap(user.getActionImage());
                         mShowOnMapSwitch.setVisibility(View.INVISIBLE);
                         mBlockSwitch.setVisibility(View.INVISIBLE);
                         mDistanceView.setVisibility(View.INVISIBLE);
