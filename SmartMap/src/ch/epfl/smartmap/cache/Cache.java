@@ -85,7 +85,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void acceptInvitation(final Invitation invitation,
-        final NetworkRequestCallback callback) {
+        final NetworkRequestCallback<Void> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -111,10 +111,10 @@ public class Cache implements CacheInterface {
 
                     Cache.this.updateInvitation(invitation.getContainerCopy().setStatus(Invitation.ACCEPTED));
 
-                    callback.onSuccess();
+                    callback.onSuccess(null);
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Error while accepting invitation: " + e);
-                    callback.onFailure();
+                    callback.onFailure(e);
                 }
                 return null;
             }
@@ -138,7 +138,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void addParticipantsToEvent(Set<Long> ids, final Event event,
-        final NetworkRequestCallback callback) {
+        final NetworkRequestCallback<Void> callback) {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.addAll(ids);
 
@@ -152,11 +152,11 @@ public class Cache implements CacheInterface {
                     ServiceContainer.getNetworkClient().joinEvent(newImmutableEvent.getId());
                     ServiceContainer.getCache().updateEvent(newImmutableEvent);
                     if (callback != null) {
-                        callback.onSuccess();
+                        callback.onSuccess(null);
                     }
                 } catch (SmartMapClientException e) {
                     if (callback != null) {
-                        callback.onFailure();
+                        callback.onFailure(e);
                     }
                 }
                 return null;
@@ -171,7 +171,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void createEvent(final EventContainer createdEvent,
-        final NetworkRequestCallback callback) {
+        final NetworkRequestCallback<Event> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -183,12 +183,12 @@ public class Cache implements CacheInterface {
                     // Puts event in Cache
                     Cache.this.putEvent(createdEvent);
                     if (callback != null) {
-                        callback.onSuccess();
+                        callback.onSuccess(Cache.this.getEvent(eventId));
                     }
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Error while creating event: " + e);
                     if (callback != null) {
-                        callback.onFailure();
+                        callback.onFailure(e);
                     }
                 }
                 return null;
@@ -203,7 +203,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void declineInvitation(final Invitation invitation,
-        final NetworkRequestCallback callback) {
+        final NetworkRequestCallback<Void> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -225,10 +225,10 @@ public class Cache implements CacheInterface {
 
                     Cache.this.updateInvitation(invitation.getContainerCopy().setStatus(Invitation.DECLINED));
 
-                    callback.onSuccess();
+                    callback.onSuccess(null);
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Error while declining invitation: " + e);
-                    callback.onFailure();
+                    callback.onFailure(e);
                 }
                 return null;
             }
@@ -648,7 +648,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void inviteFriendsToEvent(final long eventId, final Set<Long> usersIds,
-        final NetworkRequestCallback callback) {
+        final NetworkRequestCallback<Void> callback) {
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -656,10 +656,10 @@ public class Cache implements CacheInterface {
                 try {
                     ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId,
                         new ArrayList<Long>(usersIds));
-                    callback.onSuccess();
+                    callback.onSuccess(null);
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Couldn't invite friends to event:" + e);
-                    callback.onFailure();
+                    callback.onFailure(e);
                 }
                 return null;
             }
@@ -672,16 +672,16 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void inviteUser(long id, final NetworkRequestCallback callback) {
+    public synchronized void inviteUser(long id, final NetworkRequestCallback<Void> callback) {
         new AsyncTask<Long, Void, Void>() {
             @Override
             protected Void doInBackground(Long... params) {
                 try {
                     ServiceContainer.getNetworkClient().inviteFriend(params[0]);
-                    callback.onSuccess();
+                    callback.onSuccess(null);
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "Error while inviting friend: " + e);
-                    callback.onFailure();
+                    callback.onFailure(e);
                 }
                 return null;
             }
@@ -719,7 +719,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void modifyOwnEvent(final EventContainer createdEvent,
-        final NetworkRequestCallback callback) {
+        final NetworkRequestCallback<Void> callback) {
         new AsyncTask<EventContainer, Void, Void>() {
 
             @Override
@@ -727,9 +727,9 @@ public class Cache implements CacheInterface {
                 try {
                     ServiceContainer.getNetworkClient().updateEvent(params[0]);
                     Cache.this.updateEvent(params[0]);
-                    callback.onSuccess();
+                    callback.onSuccess(null);
                 } catch (SmartMapClientException e) {
-                    callback.onFailure();
+                    callback.onFailure(e);
                     Log.e(TAG, "Error while modifying own event: " + e);
                 }
                 return null;
@@ -1185,7 +1185,7 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void removeFriend(long id, final NetworkRequestCallback callback) {
+    public synchronized void removeFriend(long id, final NetworkRequestCallback<Void> callback) {
         Set<Long> singleton = new HashSet<Long>();
         singleton.add(id);
         this.removeFriends(singleton, callback);
@@ -1197,7 +1197,7 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void removeFriends(Set<Long> ids, final NetworkRequestCallback callback) {
+    public synchronized void removeFriends(Set<Long> ids, final NetworkRequestCallback<Void> callback) {
         boolean isListModified = false;
         for (long id : ids) {
             if (mFriendIds.contains(id)) {
@@ -1206,10 +1206,10 @@ public class Cache implements CacheInterface {
                     protected Void doInBackground(Long... params) {
                         try {
                             ServiceContainer.getNetworkClient().removeFriend(params[0]);
-                            callback.onSuccess();
+                            callback.onSuccess(null);
                         } catch (SmartMapClientException e) {
                             Log.e(TAG, "Error while removing friend: " + e);
-                            callback.onFailure();
+                            callback.onFailure(e);
                         }
                         return null;
                     }
@@ -1240,7 +1240,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void removeParticipantsFromEvent(Set<Long> ids, Event event,
-        final NetworkRequestCallback callback) {
+        final NetworkRequestCallback<Void> callback) {
         Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
         newParticipantIds.removeAll(ids);
 
@@ -1254,11 +1254,11 @@ public class Cache implements CacheInterface {
                     ServiceContainer.getNetworkClient().leaveEvent(newImmutableEvent.getId());
                     ServiceContainer.getCache().updateEvent(newImmutableEvent);
                     if (callback != null) {
-                        callback.onSuccess();
+                        callback.onSuccess(null);
                     }
                 } catch (SmartMapClientException e) {
                     if (callback != null) {
-                        callback.onFailure();
+                        callback.onFailure(e);
                     }
                 }
                 return null;
@@ -1298,8 +1298,8 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void
-        setBlockedStatus(final UserContainer user, final NetworkRequestCallback callback) {
+    public synchronized void setBlockedStatus(final UserContainer user,
+        final NetworkRequestCallback<Void> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1318,12 +1318,12 @@ public class Cache implements CacheInterface {
                         }
                     }
                     if (callback != null) {
-                        callback.onSuccess();
+                        callback.onSuccess(null);
                     }
                 } catch (SmartMapClientException e) {
                     Log.e("TAG", "Error while (un)blocking friend: " + e);
                     if (callback != null) {
-                        callback.onFailure();
+                        callback.onFailure(e);
                     }
                 }
                 return null;
@@ -1338,7 +1338,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void setBlockedStatus(final UserContainer user,
-        final User.BlockStatus newBlockedStatus, final NetworkRequestCallback callback) {
+        final User.BlockStatus newBlockedStatus, final NetworkRequestCallback<Void> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1350,12 +1350,12 @@ public class Cache implements CacheInterface {
                             ServiceContainer.getNetworkClient().blockFriend(user.getId());
                         }
                         if (callback != null) {
-                            callback.onSuccess();
+                            callback.onSuccess(null);
                         }
                     } catch (SmartMapClientException e) {
                         Log.e("TAG", "Error while (un)blocking friend: " + e);
                         if (callback != null) {
-                            callback.onFailure();
+                            callback.onFailure(e);
                         }
                     }
                 }
@@ -1371,7 +1371,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void updateFromNetwork(final SmartMapClient networkClient,
-        final NetworkRequestCallback callback) {
+        final NetworkRequestCallback<Void> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -1456,10 +1456,10 @@ public class Cache implements CacheInterface {
                     Cache.this.keepOnlyTheseUsers(updatedUsers);
                     Cache.this.keepOnlyTheseEvents(updatedEvents);
 
-                    callback.onSuccess();
+                    callback.onSuccess(null);
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "SmartMapClientException : " + e);
-                    callback.onFailure();
+                    callback.onFailure(e);
                 }
                 return null;
             }

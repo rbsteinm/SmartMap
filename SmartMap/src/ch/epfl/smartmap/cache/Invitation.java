@@ -51,8 +51,8 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
             mTimeStamp = timeStamp;
         }
 
-        if ((status != Invitation.UNREAD)
-            && ((status != Invitation.READ) && (status != Invitation.DECLINED) && (status != Invitation.ACCEPTED))) {
+        if ((status != Invitation.UNREAD) && (status != Invitation.READ) && (status != Invitation.DECLINED)
+            && (status != Invitation.ACCEPTED)) {
             throw new IllegalArgumentException("Unknown status : " + status);
         } else {
             mStatus = status;

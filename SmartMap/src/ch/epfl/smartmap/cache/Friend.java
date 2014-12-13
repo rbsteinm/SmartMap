@@ -17,8 +17,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Represents a Friend, for each there is only one single instance that can be accessed via static method
- * {@code getFriendFromId(int id)}
+ * Represents an {@code User} that is listed on the server as your Friend. There is therefore more
+ * informations that are accessible. Friends should not be instanciated directly, but from the method
+ * {@code User.createFromContainer(...)}
  * 
  * @author jfperren
  * @author ritterni
@@ -33,8 +34,28 @@ public final class Friend extends User {
     private User.BlockStatus mIsBlocked;
     private final MarkerIconMaker mMarkerIconMaker;
 
-    protected Friend(long id, String name, Bitmap image, Location location, String locationString,
-        User.BlockStatus isBlocked) {
+    /**
+     * Constructor
+     * 
+     * @param id
+     *            Friend's id
+     * @param name
+     *            Friend's name
+     * @param phoneNumber
+     *            Friend's phone number
+     * @param email
+     *            Friend's email
+     * @param image
+     *            Friend's profile picture
+     * @param location
+     *            Friend's GoogleMap Location
+     * @param locationString
+     *            a String about the Location
+     * @param isBlocked
+     *            Block status of this Friend
+     */
+    protected Friend(long id, String name, String phoneNumber, String email, Bitmap image, Location location,
+        String locationString, User.BlockStatus isBlocked) {
         super(id, name, image);
 
         if (locationString == null) {
@@ -42,16 +63,34 @@ public final class Friend extends User {
         } else {
             mLocationString = locationString;
         }
+
         if (location == null) {
             mLocation = User.NO_LOCATION;
+            mLocation.setTime(User.NO_LAST_SEEN.getTimeInMillis());
+            mLocation.setLatitude(User.NO_LATITUDE);
+            mLocation.setLongitude(User.NO_LONGITUDE);
         } else {
             mLocation = new Location(location);
         }
 
-        mEmail = NO_EMAIL;
-        mPhoneNumber = NO_PHONE_NUMBER;
+        if (email == null) {
+            mEmail = NO_EMAIL;
+        } else {
+            mEmail = email;
+        }
 
-        mIsBlocked = isBlocked;
+        if (phoneNumber == null) {
+            mPhoneNumber = NO_PHONE_NUMBER;
+        } else {
+            mPhoneNumber = phoneNumber;
+        }
+
+        if ((isBlocked == BlockStatus.NOT_SET) || (isBlocked == null)) {
+            mIsBlocked = BlockStatus.BLOCKED;
+        } else {
+            mIsBlocked = isBlocked;
+        }
+
         mMarkerIconMaker = new CircularMarkerIconMaker(this);
     }
 
@@ -66,6 +105,9 @@ public final class Friend extends User {
             .setLocationString(mLocationString).setBlocked(mIsBlocked);
     }
 
+    /**
+     * @return Friend's email
+     */
     public String getEmail() {
         return mEmail;
     }
@@ -79,6 +121,9 @@ public final class Friend extends User {
         return User.FRIEND;
     }
 
+    /**
+     * @return a Calendar set to the Friend's last position timestamp
+     */
     public Calendar getLastSeen() {
         Calendar lastSeen = GregorianCalendar.getInstance(TimeZone.getDefault());
         lastSeen.setTimeInMillis(mLocation.getTime());
@@ -120,6 +165,9 @@ public final class Friend extends User {
         return BitmapDescriptorFactory.fromBitmap(mMarkerIconMaker.getMarkerIcon(context));
     }
 
+    /**
+     * @return Friend's phone number
+     */
     public String getPhoneNumber() {
         return mPhoneNumber;
     }
@@ -138,31 +186,54 @@ public final class Friend extends User {
         return infos;
     }
 
+    /**
+     * @return True if the Friend should be displayed on the Map
+     */
     public boolean isVisible() {
         return ServiceContainer.getCache().getAllActiveFilters().contains(this)
             && !mLocation.equals(NO_LOCATION);
     }
 
     @Override
-    public boolean update(UserContainer user) {
-        // TODO : Update hasChanged to work correctly
-        boolean hasChanged = false;
+    public boolean update(UserContainer newValues) {
+        boolean hasChanged = super.update(newValues);
 
-        // mPhoneNumber = (user.getPhoneNumber() != null) ? user.getPhoneNumber() : mPhoneNumber;
-        // mEmail = (user.getEmail() != null) ? user.getEmail() : mEmail;
+        if ((newValues.getLocation() != null)
+            && (newValues.getLocation() != User.NO_LOCATION)
+            && ((newValues.getLocation().getLatitude() != mLocation.getLatitude())
+                || (newValues.getLocation().getLongitude() != mLocation.getLongitude()) || (newValues
+                .getLocation().getTime() != mLocation.getTime()))) {
+            mLocation = new Location(newValues.getLocation());
+            mLocation.setLatitude(newValues.getLocation().getLatitude());
+            mLocation.setLongitude(newValues.getLocation().getLongitude());
 
-        if ((user.getLocation() != null) && (user.getLocation() != User.NO_LOCATION)) {
-            mLocation = new Location(user.getLocation());
             hasChanged = true;
         }
 
-        if ((user.getLocationString() != null) && (user.getLocationString() != User.NO_LOCATION_STRING)) {
-            mLocationString = user.getLocationString();
+        if ((newValues.getLocationString() != null)
+            && (newValues.getLocationString() != User.NO_LOCATION_STRING)
+            && !newValues.getLocationString().equals(mLocationString)) {
+            mLocationString = newValues.getLocationString();
             hasChanged = true;
         }
 
-        mIsBlocked = (user.isBlocked() != User.BlockStatus.NOT_SET) ? user.isBlocked() : mIsBlocked;
+        if ((newValues.isBlocked() != null) && (newValues.isBlocked() != User.BlockStatus.NOT_SET)
+            && (newValues.isBlocked() != mIsBlocked)) {
+            mIsBlocked = newValues.isBlocked();
+            hasChanged = true;
+        }
 
-        return super.update(user) || hasChanged;
+        if ((newValues.getEmail() != null) && (newValues.getEmail() != User.NO_EMAIL)
+            && !newValues.getEmail().equals(mEmail)) {
+            mEmail = newValues.getEmail();
+            hasChanged = true;
+        }
+
+        if ((newValues.getPhoneNumber() != null) && (newValues.getPhoneNumber() != User.NO_PHONE_NUMBER)
+            && !newValues.getPhoneNumber().equals(mPhoneNumber)) {
+            mPhoneNumber = newValues.getPhoneNumber();
+        }
+
+        return hasChanged;
     }
 }

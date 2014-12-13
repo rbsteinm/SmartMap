@@ -26,13 +26,9 @@ class EventControllerTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->mockEventRepo = $this->getMockBuilder('SmartMap\DBInterface\EventRepository')
-             ->disableOriginalConstructor()
-             ->getMock();
+        $this->mockEventRepo = $this->getMock('SmartMap\DBInterface\EventRepositoryInterface');
 
-        $this->mockUserRepo = $this->getMockBuilder('SmartMap\DBInterface\UserRepository')
-             ->disableOriginalConstructor()
-             ->getMock();
+        $this->mockUserRepo = $this->getMock('SmartMap\DBInterface\UserRepositoryInterface');
 
 
         $this->mValidEvent = new Event(

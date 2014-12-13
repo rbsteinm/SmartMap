@@ -11,11 +11,14 @@ import android.test.AndroidTestCase;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.cache.Friend;
+import ch.epfl.smartmap.cache.Stranger;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
 
-public class FriendTest extends AndroidTestCase {
+/**
+ * @author jfperren
+ */
+public class StrangerTest extends AndroidTestCase {
 
     long id = 3;
     String name = "Alain";
@@ -63,93 +66,84 @@ public class FriendTest extends AndroidTestCase {
     }
 
     @Test
-    public void testCreateFriendWithNullValues() {
+    public void testCreateStrangerWithNullValues() {
         container.setName(null);
         container.setImage(null);
         container.setEmail(null);
-        container.setPhoneNumber(null);
-        container.setBlocked(null);
-        container.setLocation(null);
-        container.setLocationString(null);
         ServiceContainer.getCache().putUser(container);
-        Friend friend = (Friend) ServiceContainer.getCache().getUser(id);
-        assertEquals(friend.getName(), User.NO_NAME);
-        assertEquals(friend.getSearchImage(), User.NO_IMAGE);
-        assertEquals(friend.getActionImage(), User.NO_IMAGE);
-        assertEquals(friend.getEmail(), User.NO_EMAIL);
-        assertEquals(friend.getPhoneNumber(), User.NO_PHONE_NUMBER);
-        assertEquals(friend.getLocation().getLatitude(), User.NO_LATITUDE);
-        assertEquals(friend.getLocation().getLongitude(), User.NO_LONGITUDE);
-        assertEquals(friend.getLastSeen(), User.NO_LAST_SEEN);
-        assertEquals(friend.getLocationString(), User.NO_LOCATION_STRING);
-        assertEquals(friend.getBlockStatus(), User.NO_BLOCK_STATUS);
+        Stranger stranger = (Stranger) ServiceContainer.getCache().getUser(id);
+        assertEquals(stranger.getName(), User.NO_NAME);
+        assertEquals(stranger.getSearchImage(), User.NO_IMAGE);
+        assertEquals(stranger.getActionImage(), User.NO_IMAGE);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateFriendWithWrongId() {
+    public void testCreateStrangerWithWrongId() {
         ServiceContainer.getCache().putUser(container.setId(-4));
     }
 
     @Test
     public void testGetValues() {
         ServiceContainer.getCache().putUser(container);
-        Friend friend = (Friend) ServiceContainer.getCache().getUser(id);
-        assertEquals(friend.getId(), id);
-        assertEquals(friend.getName(), name);
-        assertEquals(friend.getPhoneNumber(), phoneNumber);
-        assertEquals(friend.getEmail(), email);
-        assertEquals(friend.getLocation().getLatitude(), location.getLatitude());
-        assertEquals(friend.getLocation().getLongitude(), location.getLongitude());
-        assertEquals(friend.getLastSeen().getTimeInMillis(), lastSeen);
-        assertEquals(friend.getLocationString(), locationString);
-        assertEquals(friend.getLatLng().latitude, location.getLatitude());
-        assertEquals(friend.getLatLng().longitude, location.getLongitude());
-        assertEquals(friend.getFriendship(), User.FRIEND);
-        assertEquals(friend.getBlockStatus(), blockStatus);
+        Stranger stranger = (Stranger) ServiceContainer.getCache().getUser(id);
+        assertEquals(stranger.getId(), id);
+        assertEquals(stranger.getName(), name);
+        assertTrue(stranger.getActionImage().sameAs(image));
+        assertEquals(stranger.getFriendship(), User.STRANGER);
+    }
+
+    @Test
+    public void testUnsupportedOperationMarkerExceptions() {
+        ServiceContainer.getCache().putUser(container);
+        Stranger stranger = (Stranger) ServiceContainer.getCache().getUser(id);
+
+        try {
+            stranger.getMarkerIcon(this.getContext());
+            fail();
+        } catch (UnsupportedOperationException e) {
+            // Success
+        }
     }
 
     @Test
     public void testUpdateWithGoodParameters() {
         ServiceContainer.getCache().putUser(container);
-        Friend friend = (Friend) ServiceContainer.getCache().getUser(id);
-        friend.update(otherContainer);
+        Stranger stranger = (Stranger) ServiceContainer.getCache().getUser(id);
+        stranger.update(otherContainer);
 
-        assertEquals(otherName, friend.getName());
-        assertEquals(otherEmail, friend.getEmail());
-        assertEquals(otherPhoneNumber, friend.getPhoneNumber());
-        assertEquals(otherLatitude, friend.getLocation().getLatitude());
-        assertEquals(otherLongitude, friend.getLocation().getLongitude());
-        assertEquals(otherLastSeen, friend.getLastSeen().getTimeInMillis());
-        assertTrue(otherImage.sameAs(friend.getActionImage()));
-        assertEquals(otherLocationString, friend.getLocationString());
-        assertEquals(otherBlockStatus, friend.getBlockStatus());
+        assertEquals(otherName, stranger.getName());
+        assertEquals(User.NO_LATITUDE, stranger.getLocation().getLatitude());
+        assertEquals(User.NO_LONGITUDE, stranger.getLocation().getLongitude());
+        assertTrue(otherImage.sameAs(stranger.getActionImage()));
+        assertEquals(User.NO_LOCATION_STRING, stranger.getLocationString());
+        assertEquals(User.NO_BLOCK_STATUS, stranger.getBlockStatus());
     }
 
     @Test
     public void testUpdateWithSameParameters() {
         ServiceContainer.getCache().putUser(container);
-        Friend friend = (Friend) ServiceContainer.getCache().getUser(id);
-        assertFalse(friend.update(friend.getContainerCopy()));
+        Stranger stranger = (Stranger) ServiceContainer.getCache().getUser(id);
+        assertFalse(stranger.update(stranger.getContainerCopy()));
     }
 
     @Test
     public void testUpdateWithUnsetParameters() {
         ServiceContainer.getCache().putUser(container);
-        Friend friend = (Friend) ServiceContainer.getCache().getUser(id);
+        Stranger stranger = (Stranger) ServiceContainer.getCache().getUser(id);
 
         UserContainer unsetParameters = User.NOBODY.getContainerCopy();
         unsetParameters.setFriendship(User.DONT_KNOW);
-        unsetParameters.setId(friend.getId());
+        unsetParameters.setId(stranger.getId());
 
-        assertFalse(friend.update(unsetParameters));
+        assertFalse(stranger.update(unsetParameters));
     }
 
     @Test
-    public void testUpdateWithWrongId() {
+    public void testUpdateWithWrongFriendship() {
         ServiceContainer.getCache().putUser(container);
-        Friend friend = (Friend) ServiceContainer.getCache().getUser(id);
+        Stranger stranger = (Stranger) ServiceContainer.getCache().getUser(id);
         try {
-            friend.update(User.NOBODY.getContainerCopy());
+            stranger.update(stranger.getContainerCopy().setFriendship(User.FRIEND));
             fail();
         } catch (IllegalArgumentException e) {
             // Success
@@ -157,11 +151,11 @@ public class FriendTest extends AndroidTestCase {
     }
 
     @Test
-    public void testUpdateWithWrongType() {
+    public void testUpdateWithWrongId() {
         ServiceContainer.getCache().putUser(container);
-        Friend friend = (Friend) ServiceContainer.getCache().getUser(id);
+        Stranger stranger = (Stranger) ServiceContainer.getCache().getUser(id);
         try {
-            friend.update(friend.getContainerCopy().setFriendship(User.STRANGER));
+            stranger.update(User.NOBODY.getContainerCopy());
             fail();
         } catch (IllegalArgumentException e) {
             // Success
@@ -179,9 +173,9 @@ public class FriendTest extends AndroidTestCase {
 
         container =
             new UserContainer(id, name, phoneNumber, email, location, locationString, image, blockStatus,
-                User.FRIEND);
+                User.STRANGER);
         otherContainer =
             new UserContainer(id, otherName, otherPhoneNumber, otherEmail, otherLocation,
-                otherLocationString, otherImage, otherBlockStatus, User.FRIEND);
+                otherLocationString, otherImage, otherBlockStatus, User.STRANGER);
     }
 }

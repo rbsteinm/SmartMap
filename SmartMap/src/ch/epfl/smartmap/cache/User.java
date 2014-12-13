@@ -77,6 +77,10 @@ public abstract class User implements UserInterface {
         return mImage;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getContainerCopy()
+     */
     @Override
     public UserContainer getContainerCopy() {
         return new UserContainer(mId, mName, null, null, null, null, mImage, User.BlockStatus.UNBLOCKED,
@@ -129,15 +133,27 @@ public abstract class User implements UserInterface {
     }
 
     @Override
-    public boolean update(UserContainer user) {
+    public boolean update(UserContainer newValues) {
         boolean hasChanged = false;
 
-        if ((user.getName() != null) && (user.getName() != User.NO_NAME)) {
-            mName = user.getName();
+        if (newValues.getId() != mId) {
+            throw new IllegalArgumentException("Cannot change Id of an User.");
+        }
+
+        if ((newValues.getFriendship() != this.getFriendship())
+            && (newValues.getFriendship() != User.DONT_KNOW)) {
+            throw new IllegalArgumentException("Cannot change friendship, you need to create a new instance.");
+        }
+
+        if ((newValues.getName() != null) && (newValues.getName() != User.NO_NAME)
+            && !newValues.getName().equals(mName)) {
+            mName = newValues.getName();
             hasChanged = true;
         }
-        if ((user.getImage() != null) && (user.getImage() != User.NO_IMAGE)) {
-            mImage = user.getImage();
+
+        if ((newValues.getImage() != null) && (newValues.getImage() != User.NO_IMAGE)
+            && !newValues.getImage().sameAs(mImage)) {
+            mImage = newValues.getImage();
             hasChanged = true;
         }
 
@@ -154,7 +170,8 @@ public abstract class User implements UserInterface {
     public static User createFromContainer(UserContainer userContainer) {
         switch (userContainer.getFriendship()) {
             case User.FRIEND:
-                return new Friend(userContainer.getId(), userContainer.getName(), userContainer.getImage(),
+                return new Friend(userContainer.getId(), userContainer.getName(),
+                    userContainer.getPhoneNumber(), userContainer.getEmail(), userContainer.getImage(),
                     userContainer.getLocation(), userContainer.getLocationString(), userContainer.isBlocked());
             case User.STRANGER:
                 return new Stranger(userContainer.getId(), userContainer.getName(), userContainer.getImage());

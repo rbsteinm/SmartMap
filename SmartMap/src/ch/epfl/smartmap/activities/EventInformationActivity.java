@@ -31,13 +31,22 @@ import ch.epfl.smartmap.util.Utils;
 
 /**
  * This activity shows an event in a complete screens. It display in addition
- * two buttons: one to invite friends, and
+ * two buttons: one to invite
+ * friends, and
  * one to see the event on the map.
  * 
  * @author SpicyCH
  * @author agpmilli
  */
 public class EventInformationActivity extends ListActivity {
+
+    /**
+     * Used to get the event id the getExtra of the starting intent, and to pass
+     * the retrieved event from
+     * doInBackground
+     * to onPostExecute.
+     */
+    public static final String EVENT_KEY = "EVENT";
 
     private static final String TAG = EventInformationActivity.class.getSimpleName();
 
@@ -53,13 +62,6 @@ public class EventInformationActivity extends ListActivity {
     private boolean mGoingChecked;
     private List<User> mParticipantsList;
     private TextView mPlaceNameAndCountry;
-
-    /**
-     * Used to get the event id the getExtra of the starting intent, and to pass
-     * the retrieved event from doInBackground
-     * to onPostExecute.
-     */
-    private static final String EVENT_KEY = "EVENT";
 
     /**
      * For the moment we don't offer a way to delete created events.
@@ -167,9 +169,9 @@ public class EventInformationActivity extends ListActivity {
                 if (checkBox.isChecked()) {
                     ServiceContainer.getCache().addParticipantsToEvent(
                         new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
-                        new NetworkRequestCallback() {
+                        new NetworkRequestCallback<Void>() {
                             @Override
-                            public void onFailure() {
+                            public void onFailure(Exception e) {
                                 EventInformationActivity.this.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -182,7 +184,7 @@ public class EventInformationActivity extends ListActivity {
                             }
 
                             @Override
-                            public void onSuccess() {
+                            public void onSuccess(Void result) {
                                 EventInformationActivity.this.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -196,9 +198,9 @@ public class EventInformationActivity extends ListActivity {
                 } else {
                     ServiceContainer.getCache().removeParticipantsFromEvent(
                         new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
-                        new NetworkRequestCallback() {
+                        new NetworkRequestCallback<Void>() {
                             @Override
-                            public void onFailure() {
+                            public void onFailure(Exception e) {
                                 EventInformationActivity.this.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -210,7 +212,7 @@ public class EventInformationActivity extends ListActivity {
                             }
 
                             @Override
-                            public void onSuccess() {
+                            public void onSuccess(Void result) {
                                 EventInformationActivity.this.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -236,7 +238,6 @@ public class EventInformationActivity extends ListActivity {
         this.setContentView(R.layout.activity_show_event_information);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-        // Listen cache's event list and user list
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
             public void onEventListUpdate() {
@@ -357,7 +358,7 @@ public class EventInformationActivity extends ListActivity {
         ServiceContainer.getSearchEngine().findUserByIds(mEvent.getParticipantIds(),
             new SearchRequestCallback<Set<User>>() {
                 @Override
-                public void onNetworkError() {
+                public void onNetworkError(Exception e) {
                     EventInformationActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
