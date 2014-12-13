@@ -218,9 +218,16 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
+        if ((ServiceContainer.getSettingsManager() == null) || (ServiceContainer.getCache() == null)
+            || (ServiceContainer.getDatabase() == null) || (ServiceContainer.getNetworkClient() == null)
+            || (ServiceContainer.getSearchEngine() == null)) {
+            ServiceContainer.initSmartMapServices(this);
+        }
+
         // starting the background service
         this.startService(new Intent(this, InvitationsService.class));
         this.startService(new Intent(this, OwnPositionService.class));
+
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         this.getActionBar().setHomeButtonEnabled(true);
