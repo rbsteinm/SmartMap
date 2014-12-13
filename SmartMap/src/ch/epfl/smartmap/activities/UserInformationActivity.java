@@ -21,7 +21,6 @@ import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
-import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.listeners.OnCacheListener;
 import ch.epfl.smartmap.util.Utils;
 
@@ -86,7 +85,7 @@ public class UserInformationActivity extends Activity {
     }
 
     /**
-     * Display a confirmation dialog
+     * Display a confirmation dialog to send a friend request to a non-friend user
      * 
      * @param name
      * @param userId
@@ -118,6 +117,12 @@ public class UserInformationActivity extends Activity {
         builder.create().show();
     }
 
+    /**
+     * displays a confirmation dialog when the user tries to
+     * remove a friend from his friendlist
+     * 
+     * @param view
+     */
     public void displayDeleteConfirmationDialog(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(this.getString(R.string.remove) + " " + mUser.getName() + " "
@@ -198,7 +203,7 @@ public class UserInformationActivity extends Activity {
 
     /**
      * called when switching the "block" switch
-     * blocks the concerned friend
+     * blocks the concerned friend and disables the "show on map" button
      * 
      * @param view
      */
@@ -273,6 +278,7 @@ public class UserInformationActivity extends Activity {
      * @param status
      *            blocked status
      * @return true if the user is blocked,false if unblocked or unset
+     *         unset should never happen
      */
     private boolean statusToBool(User.BlockStatus status) {
         return status == User.BlockStatus.BLOCKED;
@@ -301,7 +307,7 @@ public class UserInformationActivity extends Activity {
                     UserInformationActivity.this.findViewById(R.id.user_info_remove_button).setVisibility(
                         View.INVISIBLE);
                 } else {
-                    // Ugly instanceof, case classes would be helpful
+                    // Ugly instanceof, case classes would be helpful TODO
                     if (user instanceof Friend) {
                         Friend friend = (Friend) user;
 
@@ -352,59 +358,5 @@ public class UserInformationActivity extends Activity {
                 }
             }
         });
-    }
-
-    /**
-     * This class is a CacheListener that updates the displayed user when it's
-     * info are changed.
-     * 
-     * @author Pamoi
-     */
-    private class UserInformationCacheListener implements CacheListener {
-
-        /*
-         * (non-Javadoc)
-         * @see ch.epfl.smartmap.listeners.CacheListener#onEventListUpdate()
-         */
-        @Override
-        public void onEventListUpdate() {
-            // Nothing to do
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
-         */
-        @Override
-        public void onFilterListUpdate() {
-            // Nothing to do
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * ch.epfl.smartmap.listeners.CacheListener#onInvitationListUpdate()
-         */
-        @Override
-        public void onInvitationListUpdate() {
-            // Nothing to do
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see ch.epfl.smartmap.listeners.CacheListener#onUserListUpdate()
-         */
-        @Override
-        public void onUserListUpdate() {
-            UserInformationActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mUser = ServiceContainer.getCache().getUser(mUserId);
-
-                    UserInformationActivity.this.updateInformations(mUser);
-                }
-            });
-        }
-
     }
 }

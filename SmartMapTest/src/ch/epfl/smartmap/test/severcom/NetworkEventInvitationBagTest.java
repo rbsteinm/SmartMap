@@ -72,6 +72,7 @@ public class NetworkEventInvitationBagTest extends TestCase {
         HashSet<EventContainer> hashSet = null;
 
         try {
+            @SuppressWarnings("unused")
             NetworkEventInvitationBag result = new NetworkEventInvitationBag(hashSet);
             fail();
         } catch (IllegalArgumentException e) {
@@ -93,7 +94,6 @@ public class NetworkEventInvitationBagTest extends TestCase {
 
         Set<InvitationContainer> result = fixture.getInvitations();
 
-        // add additional test code here
         assertNotNull(result);
         assertEquals(0, result.size());
     }

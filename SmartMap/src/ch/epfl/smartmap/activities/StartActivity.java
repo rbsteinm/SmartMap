@@ -23,7 +23,8 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import com.facebook.Session;
 
 /**
- * This Activity displays the introduction to the app and the authentication if you are not already logged in, in the
+ * This Activity displays the introduction to the app and the authentication if
+ * you are not already logged in, in the
  * other case it just loads mainActivity
  * 
  * @author agpmilli
@@ -33,61 +34,14 @@ public class StartActivity extends FragmentActivity {
 
     private static final String TAG = StartActivity.class.getSimpleName();
 
-    private LoginFragment mFacebookFragment;
     private ImageView mLogoImage;
     private TextView mWelcomeText;
     private ProgressBar mProgressBar;
     private TextView mProgressText;
     private com.facebook.widget.LoginButton mLoginButton;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_start);
-
-        ServiceContainer.initSmartMapServices(this);
-
-        this.printSha1InLogcat();
-
-        this.initializeGUI();
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     /**
-     * Set background color of activity
-     * 
-     * @param color
-     *            the color
-     */
-    public void setActivityBackgroundColor(int color) {
-        View view = this.getWindow().getDecorView();
-        view.setBackgroundColor(color);
-    }
-
-    /**
-     * Initilizes the user interface.
-     * 
-     * @author agpmilli
+     * Iniatilizes the user interface.
      */
     private void initializeGUI() {
 
@@ -123,10 +77,8 @@ public class StartActivity extends FragmentActivity {
             mWelcomeText.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mFacebookFragment = new LoginFragment();
                     StartActivity.this.getSupportFragmentManager().beginTransaction()
-                            .add(android.R.id.content, mFacebookFragment).commit();
-                    Log.d(TAG, "facebook session is open");
+                        .add(android.R.id.content, new LoginFragment()).commit();
                 }
             }, timeOut);
         } else {
@@ -135,22 +87,50 @@ public class StartActivity extends FragmentActivity {
             mWelcomeText.setVisibility(View.INVISIBLE);
             mLogoImage.setVisibility(View.INVISIBLE);
 
-            mFacebookFragment = new LoginFragment();
-            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment).commit();
+            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, new LoginFragment()).commit();
         }
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_start);
+
+        ServiceContainer.initSmartMapServices(this);
+        this.printSha1InLogcat();
+        this.initializeGUI();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
-     * 
-     * Displays the facebook app hash in LOG.d. This hash must match the one defined in facebook and google developer.
+     * Displays the facebook app hash in LOG.d. This hash must match the one
+     * defined in facebook and google developer.
      * 
      * @author SpicyCH
      */
     private void printSha1InLogcat() {
         try {
             Log.d(TAG, "Retrieving sha1 app hash...");
-            PackageInfo info = this.getPackageManager().getPackageInfo("ch.epfl.smartmap",
-                    PackageManager.GET_SIGNATURES);
+            PackageInfo info =
+                this.getPackageManager().getPackageInfo("ch.epfl.smartmap", PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
@@ -160,5 +140,16 @@ public class StartActivity extends FragmentActivity {
         } catch (NoSuchAlgorithmException e) {
             Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)" + e);
         }
+    }
+
+    /**
+     * Set background color of activity
+     * 
+     * @param color
+     *            the color
+     */
+    public void setActivityBackgroundColor(int color) {
+        View view = this.getWindow().getDecorView();
+        view.setBackgroundColor(color);
     }
 }
