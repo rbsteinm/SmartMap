@@ -90,9 +90,7 @@ public class AboutActivity extends Activity {
 
         this.setContentView(R.layout.activity_about);
 
-        // Hide action bar for true full screen. Only way to leave this activity
-        // is to physically use the
-        // pressback
+        // Hide action bar for true full screen. Only way to leave this activity is to physically use the pressback
         // button.
         this.getActionBar().hide();
 
