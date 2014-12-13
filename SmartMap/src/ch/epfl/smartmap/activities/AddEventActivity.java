@@ -48,7 +48,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class AddEventActivity extends FragmentActivity {
 
     /**
-     * Used as a key to pass LatLng through Intents
+     * Used as a key to pass LatLng through Intents.
      */
     public static final String LOCATION_EXTRA = "LOCATION";
 
@@ -93,7 +93,7 @@ public class AddEventActivity extends FragmentActivity {
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-        this.initializeGUIComponents();
+        this.initializeGUI();
 
         mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
 
@@ -129,7 +129,9 @@ public class AddEventActivity extends FragmentActivity {
             // Google Play Services are not available
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
+
         } else {
+
             // Google Play Services are available.
             // Getting reference to the SupportMapFragment of activity_main.xml
             mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
@@ -179,12 +181,10 @@ public class AddEventActivity extends FragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
             case android.R.id.home:
                 this.finish();
                 break;
@@ -275,7 +275,7 @@ public class AddEventActivity extends FragmentActivity {
             location.setLongitude(mEventPosition.longitude);
 
             EventContainer event = new EventContainer(PublicEvent.NO_ID, mEventName.getText().toString(),
-                    ServiceContainer.getCache().getSelf().getImmutableCopy(), mDescription.getText().toString(),
+                    ServiceContainer.getCache().getSelf().getContainerCopy(), mDescription.getText().toString(),
                     mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
 
             ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
@@ -301,9 +301,15 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
+     * Initialize the views and attach the needed listeners.
+     * 
+     * 
      * @author SpicyCH
      */
-    private void initializeGUIComponents() {
+    private void initializeGUI() {
+
+        ServiceContainer.initSmartMapServices(this);
+
         mEventName = (EditText) this.findViewById(R.id.addEventEventName);
         mPickStartDate = (EditText) this.findViewById(R.id.addEventEventDate);
         mPickStartTime = (EditText) this.findViewById(R.id.addEventEventTime);
@@ -332,6 +338,7 @@ public class AddEventActivity extends FragmentActivity {
 
         mStartDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         mEndDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+        mEndDate.add(Calendar.DAY_OF_MONTH, 1);
 
         mPickStartTime.setText(Utils.getTimeString(mStartDate));
 
@@ -356,6 +363,8 @@ public class AddEventActivity extends FragmentActivity {
             }
         });
 
+        mPickEndDate.setText(Utils.getDateString(mEndDate));
+
         mPickEndDate.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -364,6 +373,8 @@ public class AddEventActivity extends FragmentActivity {
                 newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER_DESCR);
             }
         });
+
+        mPickEndTime.setText(Utils.getTimeString(mEndDate));
 
         mPickEndTime.setOnClickListener(new OnClickListener() {
 
@@ -444,7 +455,7 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * Callback
+     * Callback called after the respond responded to our event creation request.
      * 
      * @author SpicyCH
      */
@@ -477,7 +488,7 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * Listener on the TextViews used to display the dates
+     * Listener on the TextViews that display the dates and the time.
      * 
      * @author SpicyCH
      */

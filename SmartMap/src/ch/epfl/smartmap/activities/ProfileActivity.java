@@ -62,6 +62,6 @@ public class ProfileActivity extends Activity {
         mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
         // TODO fix pls
         // mPicture.setImageBitmap(ServiceContainer.getCache().getUser(2).getImage());
-        mPicture.setImageBitmap(ServiceContainer.getCache().getSelf().getImage());
+        mPicture.setImageBitmap(ServiceContainer.getCache().getSelf().getActionImage());
     }
 }

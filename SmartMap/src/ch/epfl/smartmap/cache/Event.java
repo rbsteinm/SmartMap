@@ -123,13 +123,13 @@ public abstract class Event implements Displayable, EventInterface {
     }
 
     @Override
-    public Bitmap getImage() {
+    public Bitmap getActionImage() {
         return Event.DEFAULT_WHITE_IMAGE;
     }
 
     @Override
     public EventContainer getImmutableCopy() {
-        return new EventContainer(mId, mName, mCreator.getImmutableCopy(), mDescription, mStartDate,
+        return new EventContainer(mId, mName, mCreator.getContainerCopy(), mDescription, mStartDate,
             mEndDate, mLocation, mLocationString, mParticipantIds);
     }
 

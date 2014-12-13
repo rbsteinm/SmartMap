@@ -104,7 +104,7 @@ public class FriendInvitationListItemAdapter extends ArrayAdapter<Invitation> {
         if (invitation != null) {
             viewHolder.getUserName().setText(invitation.getUser().getName());
             viewHolder.getPicture().setImageBitmap(
-                ServiceContainer.getCache().getUser(invitation.getUser().getId()).getImage());
+                ServiceContainer.getCache().getUser(invitation.getUser().getId()).getActionImage());
         }
 
         return convertView;

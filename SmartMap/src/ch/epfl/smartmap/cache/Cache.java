@@ -35,36 +35,38 @@ public class Cache implements CacheInterface {
 
     static final public String TAG = Cache.class.getSimpleName();
 
-    private final LongSparseArray<User> mUserInstances;
     // SparseArrays containing live instances
+    private final LongSparseArray<User> mUserInstances;
     private final LongSparseArray<Event> mEventInstances;
     private final LongSparseArray<Filter> mFilterInstances;
     private final LongSparseArray<Invitation> mInvitationInstances;
 
+    // These sets are the keys for the LongSparseArrays
     private final Set<Long> mUserIds;
-    // These Sets are the keys for the LongSparseArrays
     private final Set<Long> mEventIds;
     private final Set<Long> mFilterIds;
-
     private final Set<Long> mInvitationIds;
 
+    // Contains the ids of the friends
     private final Set<Long> mFriendIds;
+    private long mSelfId;
 
-    // This Set contains the id of all our friends
+    // Id for the next filter to be added
     private long nextFilterId;
 
-    // These values are used when needing to assign a new local id
+    // Contains all listeners
     private final List<CacheListener> mListeners;
 
-    // Listeners
     public Cache() {
-        // Init data structures
+
+        // Init Data structures
         mUserInstances = new LongSparseArray<User>();
         mEventInstances = new LongSparseArray<Event>();
         mFilterInstances = new LongSparseArray<Filter>();
         mInvitationInstances = new LongSparseArray<Invitation>();
 
         mFriendIds = new HashSet<Long>();
+        mSelfId = ServiceContainer.getSettingsManager().getUserId();
 
         mUserIds = new HashSet<Long>();
         mEventIds = new HashSet<Long>();
@@ -557,7 +559,7 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized User getSelf() {
-        return mUserInstances.get(ServiceContainer.getSettingsManager().getUserId());
+        return mUserInstances.get(mSelfId);
     }
 
     /*
@@ -626,14 +628,9 @@ public class Cache implements CacheInterface {
         mFriendIds.clear();
 
         // Fill with database values
-        Log.d(TAG, "Init, put users : " + database.getAllUsers());
         this.putUsers(database.getAllUsers());
-
-        Log.d(TAG, "Init, put events : " + database.getAllEvents());
         this.putEvents(database.getAllEvents());
-        Log.d(TAG, "Init, put filters : " + database.getAllFilters());
         this.putFilters(database.getAllFilters());
-        Log.d(TAG, "Init, put invitations : " + database.getAllInvitations());
         this.putInvitations(database.getAllInvitations());
 
         // Notify listeners
@@ -1054,6 +1051,9 @@ public class Cache implements CacheInterface {
                     || (newUser.getFriendship() == User.SELF)) {
                     mUserInstances.put(newUser.getId(), User.createFromContainer(newUser));
                     needToCallListeners = true;
+                    if (newUser.getFriendship() == User.SELF) {
+                        mSelfId = newUser.getId();
+                    }
                 }
             } else {
                 // Put in set for update
@@ -1305,12 +1305,12 @@ public class Cache implements CacheInterface {
             protected Void doInBackground(Void... params) {
                 try {
                     boolean changed = false;
-                    if (user.isBlocked() == User.blockStatus.UNBLOCKED) {
+                    if (user.isBlocked() == User.BlockStatus.UNBLOCKED) {
                         ServiceContainer.getNetworkClient().unblockFriend(user.getId());
-                        changed = Cache.this.updateUser(user.setBlocked(User.blockStatus.UNBLOCKED));
+                        changed = Cache.this.updateUser(user.setBlocked(User.BlockStatus.UNBLOCKED));
                     } else {
                         ServiceContainer.getNetworkClient().blockFriend(user.getId());
-                        changed = Cache.this.updateUser(user.setBlocked(User.blockStatus.BLOCKED));
+                        changed = Cache.this.updateUser(user.setBlocked(User.BlockStatus.BLOCKED));
                     }
                     if (changed) {
                         for (CacheListener listener : mListeners) {
@@ -1338,15 +1338,15 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void setBlockedStatus(final UserContainer user,
-        final User.blockStatus newBlockedStatus, final NetworkRequestCallback callback) {
+        final User.BlockStatus newBlockedStatus, final NetworkRequestCallback callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 if (user.isBlocked() != newBlockedStatus) {
                     try {
-                        if (user.isBlocked() == User.blockStatus.UNBLOCKED) {
+                        if (user.isBlocked() == User.BlockStatus.UNBLOCKED) {
                             ServiceContainer.getNetworkClient().unblockFriend(user.getId());
-                        } else if (user.isBlocked() == User.blockStatus.BLOCKED) {
+                        } else if (user.isBlocked() == User.BlockStatus.BLOCKED) {
                             ServiceContainer.getNetworkClient().blockFriend(user.getId());
                         }
                         if (callback != null) {
