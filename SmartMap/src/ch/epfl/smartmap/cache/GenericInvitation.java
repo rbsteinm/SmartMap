@@ -15,7 +15,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
  * 
  * @author agpmilli
  */
-public class GenericInvitation implements Invitation, Comparable {
+public class GenericInvitation extends Invitation {
 
     @SuppressWarnings("unused")
     private static final String TAG = GenericInvitation.class.getSimpleName();
@@ -31,72 +31,45 @@ public class GenericInvitation implements Invitation, Comparable {
 
     private User mUser;
     private Event mEvent;
-    private int mStatus;
-    private final long mId;
-    private long mTimeStamp;
     private int mType;
 
     public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
     public static final int IMAGE_QUALITY = 100;
     public static final String PROVIDER_NAME = "SmartMapServers";
 
-    public GenericInvitation(InvitationContainer invitation) {
-        if ((invitation.getUser() == null)
-            && ((invitation.getType() == Invitation.FRIEND_INVITATION) || (invitation.getType() == Invitation.ACCEPTED_FRIEND_INVITATION))) {
+    public GenericInvitation(long id, long timeStamp, int status, User user, Event event, int type) {
+        super(id, timeStamp, status);
+
+        if ((user == null)
+            && ((type == Invitation.FRIEND_INVITATION) || (type == Invitation.ACCEPTED_FRIEND_INVITATION))) {
             throw new IllegalArgumentException();
         } else {
-            mUser = invitation.getUser();
-        }
-        if (invitation.getId() < 0) {
-            throw new IllegalArgumentException();
-        } else {
-            mId = invitation.getId();
-        }
-        if ((invitation.getType() == Invitation.EVENT_INVITATION) && (invitation.getEvent() == null)) {
-            throw new IllegalArgumentException();
-        } else {
-            mEvent = invitation.getEvent();
-        }
-        if ((invitation.getStatus() != Invitation.UNREAD)
-            && ((invitation.getStatus() != Invitation.READ)
-                && (invitation.getStatus() != Invitation.DECLINED) && (invitation.getStatus() != Invitation.ACCEPTED))) {
-            throw new IllegalArgumentException("Status is " + invitation.getStatus());
-        } else {
-            mStatus = invitation.getStatus();
-        }
-        if ((invitation.getType() != Invitation.ACCEPTED_FRIEND_INVITATION)
-            && ((invitation.getType() != Invitation.EVENT_INVITATION) && (invitation.getType() != Invitation.FRIEND_INVITATION))) {
-            throw new IllegalArgumentException();
-        } else {
-            mType = invitation.getType();
+            mUser = user;
         }
 
-        if (invitation.getTimeStamp() < 0) {
+        if ((type == Invitation.EVENT_INVITATION) && (event == null)) {
             throw new IllegalArgumentException();
         } else {
-            mTimeStamp = invitation.getTimeStamp();
+            mEvent = event;
         }
+
+        if ((type != Invitation.ACCEPTED_FRIEND_INVITATION)
+            && ((type != Invitation.EVENT_INVITATION) && (type != Invitation.FRIEND_INVITATION))) {
+            throw new IllegalArgumentException();
+        } else {
+            mType = type;
+        }
+
     }
 
     @Override
-    public int compareTo(Object that) {
-        return Long.valueOf(Long.valueOf(((Invitation) that).getId())).compareTo(this.getId());
-    }
-
-    @Override
-    public boolean equals(Object that) {
-        return (that != null) && (that instanceof GenericInvitation)
-            && (this.getId() == ((GenericInvitation) that).getId());
+    public InvitationContainer getContainerCopy() {
+        return super.getContainerCopy().setUser(mUser).setEvent(mEvent).setType(mType);
     }
 
     @Override
     public Event getEvent() {
         return mEvent;
-    }
-
-    @Override
-    public long getId() {
-        return mId;
     }
 
     @Override
@@ -110,27 +83,14 @@ public class GenericInvitation implements Invitation, Comparable {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Invitation#getImmutableCopy()
-     */
-    @Override
-    public InvitationContainer getImmutableCopy() {
-        UserContainer immUser = (mUser != null) ? mUser.getImmutableCopy() : null;
-        EventContainer immEvent = (mEvent != null) ? mEvent.getImmutableCopy() : null;
-
-        return new InvitationContainer(this.getId(), immUser, immEvent, this.getStatus(),
-            this.getTimeStamp(), this.getType());
-    }
-
     @Override
     public Intent getIntent() {
         Intent intent = null;
         Context context = ServiceContainer.getSettingsManager().getContext();
         if (mType == InvitationContainer.FRIEND_INVITATION) {
-            if ((mStatus == READ) || (mStatus == UNREAD)) {
+            if ((this.getStatus() == READ) || (this.getStatus() == UNREAD)) {
                 intent = new Intent(context, FriendsPagerActivity.class);
-            } else if ((mStatus == ACCEPTED) || (mStatus == DECLINED)) {
+            } else if ((this.getStatus() == ACCEPTED) || (this.getStatus() == DECLINED)) {
                 intent = new Intent(context, UserInformationActivity.class);
                 intent.putExtra("USER", mUser.getId());
             }
@@ -145,11 +105,6 @@ public class GenericInvitation implements Invitation, Comparable {
         return intent;
     }
 
-    @Override
-    public int getStatus() {
-        return mStatus;
-    }
-
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Invitation#getSubtitle()
@@ -157,9 +112,9 @@ public class GenericInvitation implements Invitation, Comparable {
     @Override
     public String getSubtitle() {
         Context context = ServiceContainer.getSettingsManager().getContext();
-        if (mStatus == DECLINED) {
+        if (this.getStatus() == DECLINED) {
             return context.getResources().getString(R.string.invitation_declined);
-        } else if (mStatus == ACCEPTED) {
+        } else if (this.getStatus() == ACCEPTED) {
             return context.getResources().getString(R.string.invitation_accepted);
         } else if (mType == FRIEND_INVITATION) {
             return context.getResources().getString(
@@ -171,11 +126,6 @@ public class GenericInvitation implements Invitation, Comparable {
         } else {
             return "";
         }
-    }
-
-    @Override
-    public long getTimeStamp() {
-        return mTimeStamp;
     }
 
     @Override
@@ -206,11 +156,6 @@ public class GenericInvitation implements Invitation, Comparable {
         return mUser;
     }
 
-    @Override
-    public int hashCode() {
-        return (int) this.getId();
-    }
-
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Invitation#update(ch.epfl.smartmap.cache.
@@ -218,29 +163,24 @@ public class GenericInvitation implements Invitation, Comparable {
      */
     @Override
     public boolean update(InvitationContainer invitation) {
-        // TODO : Update hasChanged to work correctly
         boolean hasChanged = false;
 
         if (invitation.getUser() != null) {
             mUser = invitation.getUser();
+            hasChanged = true;
         }
         if (invitation.getEvent() != null) {
             mEvent = invitation.getEvent();
+            hasChanged = true;
         }
-        if ((invitation.getStatus() == Invitation.ACCEPTED)
-            || (invitation.getStatus() == Invitation.DECLINED) || (invitation.getStatus() == Invitation.READ)
-            || (invitation.getStatus() == Invitation.UNREAD)) {
-            mStatus = invitation.getStatus();
-        }
-        if (invitation.getTimeStamp() >= 0) {
-            mTimeStamp = invitation.getTimeStamp();
-        }
+
         if ((invitation.getType() == InvitationContainer.ACCEPTED_FRIEND_INVITATION)
             || (invitation.getType() == InvitationContainer.EVENT_INVITATION)
             || (invitation.getType() == InvitationContainer.FRIEND_INVITATION)) {
             mType = invitation.getType();
+            hasChanged = true;
         }
 
-        return true;
+        return super.update(invitation) || hasChanged;
     }
 }
