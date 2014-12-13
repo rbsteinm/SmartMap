@@ -26,11 +26,11 @@ public class SystemUiHiderBase extends SystemUiHider {
 
     @Override
     public void hide() {
-        if ((mFlags & FLAG_FULLSCREEN) != 0) {
-            mActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        if ((getFlags() & FLAG_FULLSCREEN) != 0) {
+            super.getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
-        mOnVisibilityChangeListener.onVisibilityChange(false);
+        getOnVisibilityChangeListener().onVisibilityChange(false);
         mVisible = false;
     }
 
@@ -40,22 +40,22 @@ public class SystemUiHiderBase extends SystemUiHider {
     }
 
     @Override
-    public void setup() {
-        if ((mFlags & FLAG_LAYOUT_IN_SCREEN_OLDER_DEVICES) == 0) {
-            mActivity.getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+    public void setUp() {
+        if ((getFlags() & FLAG_LAYOUT_IN_SCREEN_OLDER_DEVICES) == 0) {
+            getActivity().getWindow().setFlags(
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                     | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                     | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         }
     }
 
     @Override
     public void show() {
-        if ((mFlags & FLAG_FULLSCREEN) != 0) {
-            mActivity.getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        if ((getFlags() & FLAG_FULLSCREEN) != 0) {
+            getActivity().getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
-        mOnVisibilityChangeListener.onVisibilityChange(true);
+        getOnVisibilityChangeListener().onVisibilityChange(true);
         mVisible = true;
     }
 }
