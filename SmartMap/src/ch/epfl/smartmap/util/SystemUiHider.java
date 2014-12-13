@@ -185,7 +185,7 @@ public abstract class SystemUiHider {
          * Called when the system UI visibility has changed.
          * 
          * @param visible
-         *            True if the system UI is visible.
+         *            <code>true</code> if the system UI is visible.
          */
         void onVisibilityChange(boolean visible);
     }
