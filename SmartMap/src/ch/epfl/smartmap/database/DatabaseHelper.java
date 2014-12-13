@@ -347,7 +347,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
             values.put(KEY_POSNAME, user.getLocationString());
             boolean blocked = false;
-            if (user.isBlocked() == User.blockStatus.BLOCKED) {
+            if (user.isBlocked() == User.BlockStatus.BLOCKED) {
                 blocked = true;
             }
             values.put(KEY_BLOCKED, blocked ? 1 : 0);
@@ -748,7 +748,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
             cursor.close();
 
-            User.blockStatus status = isBlocked ? User.blockStatus.BLOCKED : User.blockStatus.UNBLOCKED;
+            User.BlockStatus status = isBlocked ? User.BlockStatus.BLOCKED : User.BlockStatus.UNBLOCKED;
 
             return new UserContainer(id, name, phoneNumber, email, location, locationString, image, status,
                 friendship);
@@ -920,7 +920,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_FRIENDSHIP, friend.getFriendship());
 
         boolean isBlocked = false;
-        if (friend.isBlocked() == User.blockStatus.BLOCKED) {
+        if (friend.isBlocked() == User.BlockStatus.BLOCKED) {
             isBlocked = true;
         }
         values.put(KEY_BLOCKED, isBlocked ? 1 : 0);
@@ -950,7 +950,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
         for (User user : users) {
             Log.d(TAG, "Store user " + user.getId());
-            this.addUser(user.getImmutableCopy());
+            this.addUser(user.getContainerCopy());
         }
         for (Event event : events) {
             Log.d(TAG, "Store event " + event.getId());

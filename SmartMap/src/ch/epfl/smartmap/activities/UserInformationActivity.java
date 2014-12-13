@@ -264,11 +264,11 @@ public class UserInformationActivity extends Activity {
      * @param view
      */
     public void setBlockedStatus(View view) {
-        UserContainer modified = mUser.getImmutableCopy();
+        UserContainer modified = mUser.getContainerCopy();
         if (mBlockSwitch.isChecked()) {
-            modified.setBlocked(User.blockStatus.BLOCKED);
+            modified.setBlocked(User.BlockStatus.BLOCKED);
         } else {
-            modified.setBlocked(User.blockStatus.UNBLOCKED);
+            modified.setBlocked(User.BlockStatus.UNBLOCKED);
         }
 
         ServiceContainer.getCache().setBlockedStatus(modified, new NetworkRequestCallback() {
@@ -278,7 +278,7 @@ public class UserInformationActivity extends Activity {
                 UserInformationActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mBlockSwitch.setChecked(UserInformationActivity.this.statusToBool(mUser.isBlocked()));
+                        mBlockSwitch.setChecked(UserInformationActivity.this.statusToBool(mUser.getBlockStatus()));
                         Toast.makeText(UserInformationActivity.this, "Network error, couldn't (un)block friend",
                             Toast.LENGTH_SHORT).show();
                     }
@@ -290,8 +290,8 @@ public class UserInformationActivity extends Activity {
                 UserInformationActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mShowOnMapSwitch.setEnabled(!UserInformationActivity.this.statusToBool(mUser.isBlocked()));
-                        if (UserInformationActivity.this.statusToBool(mUser.isBlocked())) {
+                        mShowOnMapSwitch.setEnabled(!UserInformationActivity.this.statusToBool(mUser.getBlockStatus()));
+                        if (UserInformationActivity.this.statusToBool(mUser.getBlockStatus())) {
                             Toast.makeText(UserInformationActivity.this, "friend successfully blocked",
                                 Toast.LENGTH_SHORT).show();
                         } else {
@@ -324,8 +324,8 @@ public class UserInformationActivity extends Activity {
      *            blocked status
      * @return true if the user is blocked,false if unblocked or unset
      */
-    private boolean statusToBool(User.blockStatus status) {
-        return status == User.blockStatus.BLOCKED;
+    private boolean statusToBool(User.BlockStatus status) {
+        return status == User.BlockStatus.BLOCKED;
     }
 
     /**
@@ -360,7 +360,7 @@ public class UserInformationActivity extends Activity {
                         mPictureView.setImageBitmap(friend.getActionImage());
                         // FIXME : boolean value must be checked
                         mShowOnMapSwitch.setChecked(true);
-                        mBlockSwitch.setChecked(friend.isBlocked() == User.blockStatus.UNBLOCKED);
+                        mBlockSwitch.setChecked(friend.getBlockStatus() == User.BlockStatus.UNBLOCKED);
                         mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
 
                         Button button =

@@ -5,16 +5,15 @@ import java.util.GregorianCalendar;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
+ * Represents an User on the application SmartMap.
+ * 
  * @author jfperren
  */
 public abstract class User implements UserInterface {
-
-    private static final String TAG = User.class.getSimpleName();
 
     // Default values
     public static final long NO_ID = -1;
@@ -24,30 +23,38 @@ public abstract class User implements UserInterface {
     public static final String NO_PHONE_NUMBER = "No phone Number";
     public static final String NO_EMAIL = "No email";
     public static final Calendar NO_LAST_SEEN = GregorianCalendar.getInstance();
+    public static final BlockStatus NO_BLOCK_STATUS = BlockStatus.BLOCKED;
 
+    // Default User
     public static final User NOBODY = new Stranger(NO_ID, NO_NAME, NO_IMAGE);
 
+    // Possible type of friendship
     public static final int STRANGER = 0;
     public static final int FRIEND = 1;
     public static final int SELF = 2;
     public static final int DONT_KNOW = -1;
 
-    public static final int IMAGE_QUALITY = 100;;
-
-    public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
     private final long mId;
-
     private String mName;
     private Bitmap mImage;
 
+    /**
+     * Constructor
+     * 
+     * @param id
+     *            User's id
+     * @param name
+     *            User's name
+     * @param image
+     *            User's profile picture
+     */
     protected User(long id, String name, Bitmap image) {
         mId = (id >= 0) ? id : User.NO_ID;
         mName = (name != null) ? name : User.NO_NAME;
         mImage = (image != null) ? Bitmap.createBitmap(image) : User.NO_IMAGE;
 
-        Log.d(TAG, "Create new User Instance(" + id + ", " + "name, " + "image " + mImage);
-
         if ((mId != User.NO_ID) && ((mName == User.NO_NAME) || (mImage == User.NO_IMAGE))) {
+            // If missing informations, tell cache to ask the client
             ServiceContainer.getCache().updateUserInfos(id);
         }
     }
@@ -63,15 +70,6 @@ public abstract class User implements UserInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.User#getID()
-     */
-    @Override
-    public long getId() {
-        return mId;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
      */
     @Override
@@ -80,9 +78,18 @@ public abstract class User implements UserInterface {
     }
 
     @Override
-    public UserContainer getImmutableCopy() {
-        return new UserContainer(mId, mName, null, null, null, null, mImage, User.blockStatus.UNBLOCKED,
+    public UserContainer getContainerCopy() {
+        return new UserContainer(mId, mName, null, null, null, null, mImage, User.BlockStatus.UNBLOCKED,
             this.getFriendship());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getID()
+     */
+    @Override
+    public long getId() {
+        return mId;
     }
 
     /*
@@ -123,12 +130,8 @@ public abstract class User implements UserInterface {
 
     @Override
     public boolean update(UserContainer user) {
-        // TODO : Update hasChanged to work correctly
         boolean hasChanged = false;
 
-        if (user.getId() == 12) {
-            Log.d("USER", "Update matt with new name " + user.getName());
-        }
         if ((user.getName() != null) && (user.getName() != User.NO_NAME)) {
             mName = user.getName();
             hasChanged = true;
@@ -141,13 +144,20 @@ public abstract class User implements UserInterface {
         return hasChanged;
     }
 
-    public static User createFromContainer(UserContainer userInfos) {
-        switch (userInfos.getFriendship()) {
+    /**
+     * Does the conversion container -> live instance. DO NOT CALL THIS METHOD OUTSIDE CACHE.
+     * 
+     * @param userContainer
+     *            a Container that has all informations about the {@code User} you want to create.
+     * @return the {@code User} live instance.
+     */
+    public static User createFromContainer(UserContainer userContainer) {
+        switch (userContainer.getFriendship()) {
             case User.FRIEND:
-                return new Friend(userInfos.getId(), userInfos.getName(), userInfos.getImage(),
-                    userInfos.getLocation(), userInfos.getLocationString(), userInfos.isBlocked());
+                return new Friend(userContainer.getId(), userContainer.getName(), userContainer.getImage(),
+                    userContainer.getLocation(), userContainer.getLocationString(), userContainer.isBlocked());
             case User.STRANGER:
-                return new Stranger(userInfos.getId(), userInfos.getName(), userInfos.getImage());
+                return new Stranger(userContainer.getId(), userContainer.getName(), userContainer.getImage());
             case User.SELF:
                 return new Self();
             default:
@@ -155,7 +165,12 @@ public abstract class User implements UserInterface {
         }
     }
 
-    public enum blockStatus {
+    /**
+     * Possible Block values
+     * 
+     * @author rbsteinm
+     */
+    public enum BlockStatus {
         BLOCKED,
         UNBLOCKED,
         NOT_SET
