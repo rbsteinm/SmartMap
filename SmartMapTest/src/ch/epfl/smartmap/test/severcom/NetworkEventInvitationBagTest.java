@@ -124,4 +124,24 @@ public class NetworkEventInvitationBagTest extends TestCase {
         // Checking timestamp
         assertTrue(Math.abs(invit.getTimeStamp() - now) < 5000);
     }
+    
+    /**
+     * Test that getInvitations returns a defensive copy.
+     */
+    @Test
+    public void testGetInvitationsDefensiveCopy() {
+        NetworkEventInvitationBag fixture = new NetworkEventInvitationBag(new HashSet<EventContainer>());
+
+        Set<InvitationContainer> result = fixture.getInvitations();
+        
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        
+        result.add(new InvitationContainer(0, null, null, 0, 0, 0));
+        
+        Set<InvitationContainer> result2 = fixture.getInvitations();
+        
+        assertNotNull(result2);
+        assertEquals(0, result2.size());
+    }
 }
