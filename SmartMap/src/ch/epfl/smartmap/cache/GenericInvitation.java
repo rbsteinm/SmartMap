@@ -20,14 +20,14 @@ public class GenericInvitation extends Invitation {
     @SuppressWarnings("unused")
     private static final String TAG = GenericInvitation.class.getSimpleName();
 
-    private static final Bitmap ADD_PERSON_BITMAP = BitmapFactory.decodeResource(ServiceContainer
-        .getSettingsManager().getContext().getResources(), R.drawable.ic_action_add_person);
+    private static final Bitmap ADD_PERSON_BITMAP = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
+        .getContext().getResources(), R.drawable.ic_action_add_person);
 
     private static final Bitmap ACCEPTED_FRIEND_BITMAP = BitmapFactory.decodeResource(ServiceContainer
         .getSettingsManager().getContext().getResources(), R.drawable.ic_accepted_friend_request);
 
-    private static final Bitmap NEW_EVENT_BITMAP = BitmapFactory.decodeResource(ServiceContainer
-        .getSettingsManager().getContext().getResources(), R.drawable.ic_action_event_request);
+    private static final Bitmap NEW_EVENT_BITMAP = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
+        .getContext().getResources(), R.drawable.ic_action_event_request);
 
     private User mUser;
     private Event mEvent;
@@ -117,8 +117,7 @@ public class GenericInvitation extends Invitation {
         } else if (this.getStatus() == ACCEPTED) {
             return context.getResources().getString(R.string.invitation_accepted);
         } else if (mType == FRIEND_INVITATION) {
-            return context.getResources().getString(
-                R.string.invitation_click_here_to_open_your_list_of_invitations);
+            return context.getResources().getString(R.string.invitation_click_here_to_open_your_list_of_invitations);
         } else if (mType == EVENT_INVITATION) {
             return context.getResources().getString(R.string.invitation_click_here_to_see_the_event);
         } else if (mType == ACCEPTED_FRIEND_INVITATION) {
@@ -132,12 +131,10 @@ public class GenericInvitation extends Invitation {
     public String getTitle() {
         Context context = ServiceContainer.getSettingsManager().getContext();
         if (mType == InvitationContainer.FRIEND_INVITATION) {
-            return mUser.getName() + " "
-                + context.getResources().getString(R.string.invitation_want_to_be_your_friend);
+            return mUser.getName() + " " + context.getResources().getString(R.string.invitation_want_to_be_your_friend);
         } else if (mType == InvitationContainer.EVENT_INVITATION) {
             return mEvent.getCreator().getName() + " "
-                + context.getResources().getString(R.string.invitation_invites_your_to) + " "
-                + mEvent.getName();
+                + context.getResources().getString(R.string.invitation_invites_your_to) + " " + mEvent.getName();
         } else if (mType == InvitationContainer.ACCEPTED_FRIEND_INVITATION) {
             return mUser.getName() + " "
                 + context.getResources().getString(R.string.invitation_accepted_your_friend_request);

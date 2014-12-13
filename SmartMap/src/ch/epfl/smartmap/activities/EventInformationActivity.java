@@ -236,6 +236,7 @@ public class EventInformationActivity extends ListActivity {
         this.setContentView(R.layout.activity_show_event_information);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
+        // Listen cache's event list and user list
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
             public void onEventListUpdate() {
