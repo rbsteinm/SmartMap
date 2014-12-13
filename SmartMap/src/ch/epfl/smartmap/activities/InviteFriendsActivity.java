@@ -158,9 +158,9 @@ public class InviteFriendsActivity extends ListActivity {
      * 
      * @author SpicyCH
      */
-    class InviteFriendsCallback implements NetworkRequestCallback {
+    class InviteFriendsCallback implements NetworkRequestCallback<Void> {
         @Override
-        public void onFailure() {
+        public void onFailure(Exception e) {
             InviteFriendsActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -172,7 +172,7 @@ public class InviteFriendsActivity extends ListActivity {
         }
 
         @Override
-        public void onSuccess() {
+        public void onSuccess(Void result) {
             InviteFriendsActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

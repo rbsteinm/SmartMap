@@ -132,11 +132,16 @@ public abstract class User implements UserInterface {
     public boolean update(UserContainer user) {
         boolean hasChanged = false;
 
-        if ((user.getName() != null) && (user.getName() != User.NO_NAME)) {
+        if (user.getId() != mId) {
+            throw new IllegalArgumentException("Trying to update wrong user !");
+        }
+
+        if ((user.getName() != null) && (user.getName() != User.NO_NAME) && !user.getName().equals(mName)) {
             mName = user.getName();
             hasChanged = true;
         }
-        if ((user.getImage() != null) && (user.getImage() != User.NO_IMAGE)) {
+        if ((user.getImage() != null) && (user.getImage() != User.NO_IMAGE)
+            && !user.getImage().sameAs(mImage)) {
             mImage = user.getImage();
             hasChanged = true;
         }
@@ -154,7 +159,8 @@ public abstract class User implements UserInterface {
     public static User createFromContainer(UserContainer userContainer) {
         switch (userContainer.getFriendship()) {
             case User.FRIEND:
-                return new Friend(userContainer.getId(), userContainer.getName(), userContainer.getImage(),
+                return new Friend(userContainer.getId(), userContainer.getName(),
+                    userContainer.getPhoneNumber(), userContainer.getEmail(), userContainer.getImage(),
                     userContainer.getLocation(), userContainer.getLocationString(), userContainer.isBlocked());
             case User.STRANGER:
                 return new Stranger(userContainer.getId(), userContainer.getName(), userContainer.getImage());

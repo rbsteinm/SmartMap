@@ -244,15 +244,15 @@ public class LoginFragment extends Fragment {
                     // If all is ok, start filling Cache
                     ServiceContainer.getCache().initFromDatabase(ServiceContainer.getDatabase());
                     ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient(),
-                        new NetworkRequestCallback() {
+                        new NetworkRequestCallback<Void>() {
                             @Override
-                            public void onFailure() {
+                            public void onFailure(Exception e) {
                                 Log.e(TAG, "Cannot update Cache from Network");
                                 LoginFragment.this.startMainActivity();
                             }
 
                             @Override
-                            public void onSuccess() {
+                            public void onSuccess(Void result) {
                                 LoginFragment.this.startMainActivity();
                             }
                         });
