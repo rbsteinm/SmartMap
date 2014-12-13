@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.TimeZone;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -67,6 +68,9 @@ public class AddEventActivity extends FragmentActivity {
     private static final int MIN_NAME_SIZE = 2;
 
     private static final int MAX_DESCRIPTION_SIZE = 255;
+
+    private static final int FIVE_MINUTES = 5;
+
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
     private LatLng mEventPosition;
@@ -84,6 +88,8 @@ public class AddEventActivity extends FragmentActivity {
 
     private Calendar mStartDate;
     private Calendar mEndDate;
+
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,8 +141,7 @@ public class AddEventActivity extends FragmentActivity {
 
             // Google Play Services are available.
             // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap =
-                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
+            mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
@@ -151,9 +156,8 @@ public class AddEventActivity extends FragmentActivity {
 
             mPlaceName.setText(ServiceContainer.getSettingsManager().getLocationName());
 
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer
-                .getSettingsManager().getLocation().getLatitude(), ServiceContainer.getSettingsManager()
-                .getLocation().getLongitude()));
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer.getSettingsManager()
+                    .getLocation().getLatitude(), ServiceContainer.getSettingsManager().getLocation().getLongitude()));
 
         }
     }
@@ -169,8 +173,7 @@ public class AddEventActivity extends FragmentActivity {
                 // Google wasn't able to retrieve the location name associated
                 // to the coordinates
                 Toast.makeText(AddEventActivity.this,
-                    this.getString(R.string.add_event_toast_couldnt_retrieve_location), Toast.LENGTH_LONG)
-                    .show();
+                        this.getString(R.string.add_event_toast_couldnt_retrieve_location), Toast.LENGTH_LONG).show();
                 mPlaceName.setText("");
             }
         }
@@ -203,8 +206,7 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * @return <code>true</code> if all the fields (event name, event dates, etc...) are legally set and the
-     *         event is
+     * @return <code>true</code> if all the fields (event name, event dates, etc...) are legally set and the event is
      *         ready to be created.
      * @author SpicyCH
      */
@@ -214,12 +216,11 @@ public class AddEventActivity extends FragmentActivity {
         boolean validPosition = (mEventPosition.latitude != 0) && (mEventPosition.longitude != 0);
 
         return validEndDateTime && validPosition
-            && (!"".equals(mPlaceName.getText().toString()) && !"".equals(mEventName.getText().toString()));
+                && (!"".equals(mPlaceName.getText().toString()) && !"".equals(mEventName.getText().toString()));
     }
 
     /**
-     * Ensures the end of the event is after its start and end of the event is not in the past. Displays a
-     * toast and
+     * Ensures the end of the event is after its start and end of the event is not in the past. Displays a toast and
      * reset the bad field set by the user if necessary.
      * 
      * @author SpicyCH
@@ -240,16 +241,15 @@ public class AddEventActivity extends FragmentActivity {
             this.resetEndDate();
 
             Toast.makeText(AddEventActivity.this,
-                this.getString(R.string.add_event_toast_event_cannot_end_before_starting), Toast.LENGTH_LONG)
-                .show();
+                    this.getString(R.string.add_event_toast_event_cannot_end_before_starting), Toast.LENGTH_LONG)
+                    .show();
         } else if (mEndDate.before(now)) {
             // The user is trying to create an event in the past
 
             this.resetEndDate();
 
-            Toast.makeText(AddEventActivity.this,
-                this.getString(R.string.add_event_toast_event_end_cannot_be_in_past), Toast.LENGTH_LONG)
-                .show();
+            Toast.makeText(AddEventActivity.this, this.getString(R.string.add_event_toast_event_end_cannot_be_in_past),
+                    Toast.LENGTH_LONG).show();
         }
 
     }
@@ -263,28 +263,27 @@ public class AddEventActivity extends FragmentActivity {
 
         if (!this.allFieldsSetByUser()) {
 
-            Toast.makeText(AddEventActivity.this,
-                this.getString(R.string.add_event_toast_not_all_fields_set), Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddEventActivity.this, this.getString(R.string.add_event_toast_not_all_fields_set),
+                    Toast.LENGTH_SHORT).show();
 
             Log.d(TAG, "Couldn't create a new event because not all fields were set.\n" + "end date: "
-                + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
-                + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
-                + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
-                + mEventPosition.longitude);
+                    + mPickEndDate.getText().toString() + "\n" + "end time: " + mPickEndTime.getText().toString()
+                    + "\n" + "event name: " + mEventName.getText().toString() + "\n" + "event place name: "
+                    + mPlaceName.getText().toString() + "\n" + "event lat/long: " + mEventPosition.latitude + "/"
+                    + mEventPosition.longitude);
 
         } else if (!this.fieldsHaveLegalLength()) {
             Toast.makeText(AddEventActivity.this, this.getString(R.string.add_event_toast_fields_bad_size),
-                Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_LONG).show();
         } else {
 
             Location location = new Location("Location set by user");
             location.setLatitude(mEventPosition.latitude);
             location.setLongitude(mEventPosition.longitude);
 
-            EventContainer event =
-                new EventContainer(PublicEvent.NO_ID, mEventName.getText().toString(), ServiceContainer
-                    .getCache().getSelf().getContainerCopy(), mDescription.getText().toString(), mStartDate,
-                    mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
+            EventContainer event = new EventContainer(PublicEvent.NO_ID, mEventName.getText().toString(),
+                    ServiceContainer.getCache().getSelf().getContainerCopy(), mDescription.getText().toString(),
+                    mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
 
             ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
         }
@@ -315,6 +314,8 @@ public class AddEventActivity extends FragmentActivity {
      */
     private void initializeGUI() {
 
+        mContext = this.getApplicationContext();
+
         ServiceContainer.initSmartMapServices(this);
 
         mEventName = (EditText) this.findViewById(R.id.addEventEventName);
@@ -333,8 +334,7 @@ public class AddEventActivity extends FragmentActivity {
         }
 
         // Initialize mEventPosition to position of user
-        mEventPosition =
-            new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
+        mEventPosition = new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
                 .getSettingsManager().getLocation().getLongitude());
 
         mTextChangedListener = new DateChangedListener();
@@ -346,7 +346,7 @@ public class AddEventActivity extends FragmentActivity {
 
         mStartDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         mEndDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
-        mEndDate.add(Calendar.DAY_OF_MONTH, 1);
+        mEndDate.add(Calendar.MINUTE, FIVE_MINUTES);
 
         mPickStartTime.setText(Utils.getTimeString(mStartDate));
 
@@ -451,14 +451,13 @@ public class AddEventActivity extends FragmentActivity {
                 new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
             } else {
                 Toast.makeText(AddEventActivity.this,
-                    this.getString(R.string.add_event_toast_couldnt_retrieve_location_name),
-                    Toast.LENGTH_LONG).show();
+                        this.getString(R.string.add_event_toast_couldnt_retrieve_location_name), Toast.LENGTH_LONG)
+                        .show();
                 mPlaceName.setText("");
             }
         } else {
             Log.e(TAG, "No event position set (extras.getParcelable(LOCATION_EXTRA) was null)");
-            Toast.makeText(AddEventActivity.this, this.getString(R.string.error_client_side),
-                Toast.LENGTH_LONG).show();
+            Toast.makeText(AddEventActivity.this, this.getString(R.string.error_client_side), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -469,30 +468,41 @@ public class AddEventActivity extends FragmentActivity {
      */
     private class CreateEventNetworkCallback implements NetworkRequestCallback<Event> {
         @Override
-        public void onFailure(Exception e) {
+        public void onFailure(final Exception e) {
             AddEventActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast
-                        .makeText(
-                            AddEventActivity.this,
-                            AddEventActivity.this
-                                .getString(R.string.add_event_toast_couldnt_create_event_server),
+
+                    Log.d(TAG, "Server error: " + e);
+                    Toast.makeText(AddEventActivity.this,
+                            AddEventActivity.this.getString(R.string.add_event_toast_couldnt_create_event_server),
                             Toast.LENGTH_SHORT).show();
                 }
             });
         }
 
         @Override
-        public void onSuccess(Event result) {
+        public void onSuccess(final Event result) {
             AddEventActivity.this.runOnUiThread(new Runnable() {
+
                 @Override
                 public void run() {
                     Toast.makeText(AddEventActivity.this,
-                        AddEventActivity.this.getString(R.string.add_event_toast_event_created),
-                        Toast.LENGTH_SHORT).show();
+                            AddEventActivity.this.getString(R.string.add_event_toast_event_created), Toast.LENGTH_SHORT)
+                            .show();
 
-                    AddEventActivity.this.finish();
+                    // Display event details if we could retrieve it.
+                    if (null != result) {
+                        AddEventActivity.this.finish();
+                        Intent seeEvent = new Intent(mContext, EventInformationActivity.class);
+                        seeEvent.putExtra(EventInformationActivity.EVENT_KEY, result.getId());
+                        AddEventActivity.this.startActivity(seeEvent);
+                    } else {
+                        // And go back to the events list if we couldn't.
+                        Log.e(TAG, "The event returned by the Callback was null");
+                        AddEventActivity.this.finish();
+                    }
+
                 }
             });
         }
