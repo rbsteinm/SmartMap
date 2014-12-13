@@ -17,8 +17,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Represents a Friend, for each there is only one single instance that can be accessed via static method
- * {@code getFriendFromId(int id)}
+ * Represents an {@code User} that is listed on the server as your Friend. There is therefore more
+ * informations that are accessible. Friends should not be instanciated directly, but from the method
+ * {@code User.createFromContainer(...)}
  * 
  * @author jfperren
  * @author ritterni
@@ -33,6 +34,26 @@ public final class Friend extends User {
     private User.BlockStatus mIsBlocked;
     private final MarkerIconMaker mMarkerIconMaker;
 
+    /**
+     * Constructor
+     * 
+     * @param id
+     *            Friend's id
+     * @param name
+     *            Friend's name
+     * @param phoneNumber
+     *            Friend's phone number
+     * @param email
+     *            Friend's email
+     * @param image
+     *            Friend's profile picture
+     * @param location
+     *            Friend's GoogleMap Location
+     * @param locationString
+     *            a String about the Location
+     * @param isBlocked
+     *            Block status of this Friend
+     */
     protected Friend(long id, String name, String phoneNumber, String email, Bitmap image, Location location,
         String locationString, User.BlockStatus isBlocked) {
         super(id, name, image);
@@ -84,6 +105,9 @@ public final class Friend extends User {
             .setLocationString(mLocationString).setBlocked(mIsBlocked);
     }
 
+    /**
+     * @return Friend's email
+     */
     public String getEmail() {
         return mEmail;
     }
@@ -97,6 +121,9 @@ public final class Friend extends User {
         return User.FRIEND;
     }
 
+    /**
+     * @return a Calendar set to the Friend's last position timestamp
+     */
     public Calendar getLastSeen() {
         Calendar lastSeen = GregorianCalendar.getInstance(TimeZone.getDefault());
         lastSeen.setTimeInMillis(mLocation.getTime());
@@ -138,6 +165,9 @@ public final class Friend extends User {
         return BitmapDescriptorFactory.fromBitmap(mMarkerIconMaker.getMarkerIcon(context));
     }
 
+    /**
+     * @return Friend's phone number
+     */
     public String getPhoneNumber() {
         return mPhoneNumber;
     }
@@ -156,6 +186,9 @@ public final class Friend extends User {
         return infos;
     }
 
+    /**
+     * @return True if the Friend should be displayed on the Map
+     */
     public boolean isVisible() {
         return ServiceContainer.getCache().getAllActiveFilters().contains(this)
             && !mLocation.equals(NO_LOCATION);

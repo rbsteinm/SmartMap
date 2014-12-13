@@ -77,6 +77,10 @@ public abstract class User implements UserInterface {
         return mImage;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getContainerCopy()
+     */
     @Override
     public UserContainer getContainerCopy() {
         return new UserContainer(mId, mName, null, null, null, null, mImage, User.BlockStatus.UNBLOCKED,
