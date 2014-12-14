@@ -75,7 +75,6 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
             throw new IllegalArgumentException("null Friend");
         }
         mFriend = friend;
-
     }
 
     /*
@@ -146,8 +145,9 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
 
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(Color.parseColor("#BAB399"));
-        canvas.drawCircle((preOut.getWidth() / DOUBLE_RATIO) + CIRCLE_CENTER_INCREMENT, (preOut.getHeight() / DOUBLE_RATIO)
-            + CIRCLE_CENTER_INCREMENT, (preOut.getWidth() / DOUBLE_RATIO) + CIRCLE_RADIUS_INCREMENT, paint);
+        canvas.drawCircle((preOut.getWidth() / DOUBLE_RATIO) + CIRCLE_CENTER_INCREMENT,
+            (preOut.getHeight() / DOUBLE_RATIO) + CIRCLE_CENTER_INCREMENT, (preOut.getWidth() / DOUBLE_RATIO)
+                + CIRCLE_RADIUS_INCREMENT, paint);
         paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
         canvas.drawBitmap(preOut, rect, rect, paint);
 

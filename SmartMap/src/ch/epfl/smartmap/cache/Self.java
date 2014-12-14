@@ -1,6 +1,7 @@
 package ch.epfl.smartmap.cache;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.location.Location;
 import ch.epfl.smartmap.background.ServiceContainer;
 
@@ -17,9 +18,14 @@ public class Self extends User {
      * 
      * @param user
      */
-    public Self() {
+    protected Self(Bitmap image) {
         super(ServiceContainer.getSettingsManager().getUserId(), ServiceContainer.getSettingsManager()
-            .getUserName(), User.NO_IMAGE);
+            .getUserName(), image);
+    }
+
+    @Override
+    public User.BlockStatus getBlockStatus() {
+        return User.BlockStatus.UNBLOCKED;
     }
 
     /*
@@ -75,10 +81,5 @@ public class Self extends User {
     @Override
     public String getSubtitle() {
         return "You are near " + ServiceContainer.getSettingsManager().getLocationName();
-    }
-
-    @Override
-    public User.BlockStatus getBlockStatus() {
-        return User.BlockStatus.UNBLOCKED;
     }
 }
