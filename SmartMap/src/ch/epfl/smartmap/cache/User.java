@@ -32,7 +32,7 @@ public abstract class User implements UserInterface {
     public static final int STRANGER = 0;
     public static final int FRIEND = 1;
     public static final int SELF = 2;
-    public static final int DONT_KNOW = -1;
+    public static final int NO_FRIENDSHIP = -1;
 
     private final long mId;
     private String mName;
@@ -141,7 +141,7 @@ public abstract class User implements UserInterface {
         }
 
         if ((newValues.getFriendship() != this.getFriendship())
-            && (newValues.getFriendship() != User.DONT_KNOW)) {
+            && (newValues.getFriendship() != User.NO_FRIENDSHIP)) {
             throw new IllegalArgumentException("Cannot change friendship, you need to create a new instance.");
         }
 

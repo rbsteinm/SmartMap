@@ -538,7 +538,7 @@ public class JsonSmartMapParser implements SmartMapParser {
         double latitude = UNITIALIZED_LATITUDE;
         double longitude = UNITIALIZED_LONGITUDE;
         String lastSeenString = null;
-        int friendship = User.DONT_KNOW;
+        int friendship = User.NO_FRIENDSHIP;
 
         try {
             id = jsonObject.getLong("id");

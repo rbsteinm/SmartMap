@@ -30,11 +30,17 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
     public static final String TAG = DefaultZoomManager.class.getSimpleName();
 
     private static final int GMAP_ZOOM_LEVEL = 14;
-    private static final int PADDING = 35; // offset from edges of the map in
-    // pixels
+    private static final int PADDING = 35;
+
     private final View mMapView;
     private final GoogleMap mGoogleMap;
 
+    /**
+     * Constructor
+     * 
+     * @param fm
+     *            the map fragment if the map for which we need zooming methods
+     */
     public DefaultZoomManager(SupportMapFragment fm) {
         mMapView = fm.getView();
         mGoogleMap = fm.getMap();

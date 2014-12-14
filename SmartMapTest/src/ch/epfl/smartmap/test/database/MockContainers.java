@@ -96,7 +96,7 @@ public class MockContainers {
 
     static {
         NULL_USER_VALUES =
-            new UserContainer(User.NO_ID, null, null, null, null, null, null, null, User.DONT_KNOW);
+            new UserContainer(User.NO_ID, null, null, null, null, null, null, null, User.NO_FRIENDSHIP);
     }
 
     public static final UserContainer UNSET_USER_VALUES;
@@ -105,7 +105,7 @@ public class MockContainers {
         UNSET_USER_VALUES =
             new UserContainer(User.NO_ID, User.NO_NAME, User.NO_PHONE_NUMBER, User.NO_EMAIL,
                 User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, User.BlockStatus.NOT_SET,
-                User.DONT_KNOW);
+                User.NO_FRIENDSHIP);
     }
 
     public static final UserContainer WRONG_USER_VALUES;

@@ -21,7 +21,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -39,127 +38,19 @@ import com.facebook.widget.LoginButton;
  * {@linkplain ch.epfl.smartmap.activities.StartActivity} for screen 1.
  * </p>
  * <p>
- * On successful facebook login, we attempt to authenticate to the smartmap
- * server by sending the name, facebook id and facebook token.
+ * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name,
+ * facebook id and facebook token.
  * </p>
  * 
  * @author SpicyCH
  */
 public class LoginFragment extends Fragment {
 
-    /**
-     * This callback uses the retrieved facebook data to connect to our server.
-     * 
-     * @author SpicyCH
-     */
-    private class CustomGraphUserCallback implements Request.GraphUserCallback {
-        @Override
-        public void onCompleted(GraphUser user, Response response) {
-
-            if (user != null) {
-
-                // This portable token is used by the server
-                String facebookToken = Session.getActiveSession().getAccessToken();
-
-                // Send user's infos to SmartMap server
-                Map<String, String> params = new LinkedHashMap<String, String>();
-                params.put(FACEBOOK_ID_POST_NAME, user.getId());
-                params.put(FACEBOOK_NAME_POST_NAME, user.getName());
-                params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
-
-                // Displays the name, facebookId and facebookToken. When we
-                // upload the app on google play,
-                // we might
-                // want to remove these logcat messages.
-                Log.i(TAG, "user name: " + params.get(FACEBOOK_NAME_POST_NAME));
-                Log.i(TAG, "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
-                Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
-
-                if (!LoginFragment.this.sendDataToServer(params)) {
-                    Toast.makeText(mActivity,
-                        LoginFragment.this.getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
-                        Toast.LENGTH_LONG).show();
-                } else {
-                    // If all is ok, start filling Cache
-                    ServiceContainer.getCache().initFromDatabase(ServiceContainer.getDatabase());
-                    ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient(),
-                        new NetworkRequestCallback<Void>() {
-                            @Override
-                            public void onFailure(Exception e) {
-                                Log.e(TAG, "Cannot update Cache from Network");
-                                LoginFragment.this.startMainActivity();
-                            }
-
-                            @Override
-                            public void onSuccess(Void result) {
-                                LoginFragment.this.startMainActivity();
-                            }
-                        });
-                }
-
-            } else if (response.getError() != null) {
-                Log.e(TAG, "The user is null (authentication aborted?)");
-            }
-        }
-    }
-
-    /**
-     * An AsyncTask to send the facebook user data to the SmartMap server
-     * asynchronously
-     * 
-     * @author SpicyCH
-     */
-    private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
-
-        private static final int FACEBOOK_ID_RADIX = 10;
-        private final Map<String, String> mParams;
-
-        /**
-         * Constructor
-         * 
-         * @param params
-         *            the post parameters to send (must be
-         *            <code>FACEBOOK_NAME_POST_NAME</code>,
-         *            <code>FACEBOOK_ID_POST_NAME</code>,
-         *            <code>FACEBOOK_TOKEN_POST_NAME</code>.
-         */
-        public SendDataTask(Map<String, String> params) {
-            mParams = params;
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Boolean doInBackground(Void... params) {
-
-            SmartMapClient networkClient = ServiceContainer.getNetworkClient();
-
-            try {
-                networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
-                    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
-                    mParams.get(FACEBOOK_TOKEN_POST_NAME));
-            } catch (NumberFormatException e1) {
-                Log.e(TAG, "Couldn't parse to Long: " + e1);
-                return false;
-            } catch (SmartMapClientException e1) {
-                Log.e(TAG, "Couldn't authenticate : " + e1);
-                return false;
-            }
-
-            Log.i(TAG, "User' infos sent to SmartMap server");
-
-            return true;
-
-        }
-    }
-
     private static final String TAG = LoginFragment.class.getSimpleName();
+
     private static final String FACEBOOK_ID_POST_NAME = "facebookId";
 
     private static final String FACEBOOK_TOKEN_POST_NAME = "facebookToken";
-
     private static final String FACEBOOK_NAME_POST_NAME = "name";
 
     private UiLifecycleHelper mUiHelper;
@@ -293,7 +184,8 @@ public class LoginFragment extends Fragment {
         assert null != params.get(FACEBOOK_NAME_POST_NAME) : "Facebook name is null";
         assert !params.get(FACEBOOK_NAME_POST_NAME).isEmpty() : "Facebook name is empty";
 
-        ConnectivityManager connMgr = (ConnectivityManager) mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr =
+            (ConnectivityManager) mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if ((networkInfo != null) && networkInfo.isConnected()) {
             // Send data
@@ -315,5 +207,121 @@ public class LoginFragment extends Fragment {
         Intent intent = new Intent(mActivity, MainActivity.class);
         mActivity.finish();
         mActivity.startActivity(intent);
+    }
+
+    /**
+     * This callback uses the retrieved facebook data to connect to our server.
+     * 
+     * @author SpicyCH
+     */
+    private class CustomGraphUserCallback implements Request.GraphUserCallback {
+        @Override
+        public void onCompleted(GraphUser user, Response response) {
+
+            if (user != null) {
+
+                // This portable token is used by the server
+                String facebookToken = Session.getActiveSession().getAccessToken();
+
+                // Send user's infos to SmartMap server
+                Map<String, String> params = new LinkedHashMap<String, String>();
+                params.put(FACEBOOK_ID_POST_NAME, user.getId());
+                params.put(FACEBOOK_NAME_POST_NAME, user.getName());
+                params.put(FACEBOOK_TOKEN_POST_NAME, facebookToken);
+
+                // Displays the name, facebookId and facebookToken. When we
+                // upload the app on google play,
+                // we might
+                // want to remove these logcat messages.
+                Log.i(TAG, "user name: " + params.get(FACEBOOK_NAME_POST_NAME));
+                Log.i(TAG, "user facebookId: " + params.get(FACEBOOK_ID_POST_NAME));
+                Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
+
+                if (!LoginFragment.this.sendDataToServer(params)) {
+                    Toast.makeText(
+                        mActivity,
+                        LoginFragment.this
+                            .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
+                        Toast.LENGTH_LONG).show();
+                } else {
+                    // If all is ok, start filling Cache
+                    ServiceContainer.getCache().initFromDatabase(ServiceContainer.getDatabase());
+                    new UpdateCacheTask().execute();
+                }
+
+            } else if (response.getError() != null) {
+                Log.e(TAG, "The user is null (authentication aborted?)");
+            }
+        }
+    }
+
+    /**
+     * An AsyncTask to send the facebook user data to the SmartMap server
+     * asynchronously
+     * 
+     * @author SpicyCH
+     */
+    private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
+
+        private static final int FACEBOOK_ID_RADIX = 10;
+        private final Map<String, String> mParams;
+
+        /**
+         * Constructor
+         * 
+         * @param params
+         *            the post parameters to send (must be <code>FACEBOOK_NAME_POST_NAME</code>,
+         *            <code>FACEBOOK_ID_POST_NAME</code>, <code>FACEBOOK_TOKEN_POST_NAME</code>.
+         */
+        public SendDataTask(Map<String, String> params) {
+            mParams = params;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            SmartMapClient networkClient = ServiceContainer.getNetworkClient();
+
+            try {
+                networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
+                    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
+                    mParams.get(FACEBOOK_TOKEN_POST_NAME));
+            } catch (NumberFormatException e1) {
+                Log.e(TAG, "Couldn't parse to Long: " + e1);
+                return false;
+            } catch (SmartMapClientException e1) {
+                Log.e(TAG, "Couldn't authenticate : " + e1);
+                return false;
+            }
+
+            Log.i(TAG, "User' infos sent to SmartMap server");
+
+            return true;
+
+        }
+    }
+
+    /**
+     * Updates cache and launch MainActivity
+     * 
+     * @author jfperren
+     */
+    private class UpdateCacheTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient());
+                LoginFragment.this.startMainActivity();
+            } catch (SmartMapClientException e) {
+                Log.e(TAG, "Cannot update from network : " + e);
+                LoginFragment.this.startMainActivity();
+            }
+
+            return null;
+        }
     }
 }
