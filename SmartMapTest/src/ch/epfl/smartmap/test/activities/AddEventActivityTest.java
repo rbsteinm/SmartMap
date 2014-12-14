@@ -76,12 +76,12 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
     public void testCanCreateEventWithDescription() throws InterruptedException {
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
 
-        //Espresso.pressBack();
+        Espresso.pressBack();
         Thread.sleep(ESPRESSO_WAIT_DELAY);
 
         onView(withId(R.id.addEventDescription)).perform(ViewActions.typeText(TEST_NAME_HAS_DESCR));
 
-        //Espresso.pressBack();
+        Espresso.pressBack();
         Thread.sleep(ESPRESSO_WAIT_DELAY);
 
         onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
