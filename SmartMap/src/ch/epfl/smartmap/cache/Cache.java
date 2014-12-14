@@ -15,7 +15,7 @@ import ch.epfl.smartmap.background.Notifications;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
-import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.database.DatabaseHelperInterface;
 import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -58,7 +58,6 @@ public class Cache implements CacheInterface {
     private final List<CacheListener> mListeners;
 
     public Cache() {
-
         // Init Data structures
         mUserInstances = new LongSparseArray<User>();
         mEventInstances = new LongSparseArray<Event>();
@@ -610,7 +609,7 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#initFromDatabase(ch.epfl.smartmap.database.DatabaseHelper)
      */
     @Override
-    public synchronized void initFromDatabase(DatabaseHelper database) {
+    public synchronized void initFromDatabase(DatabaseHelperInterface database) {
         Log.d(TAG, "init from database");
         // Clear previous values
         mEventInstances.clear();
@@ -631,6 +630,7 @@ public class Cache implements CacheInterface {
         this.putUsers(database.getAllUsers());
         this.putEvents(database.getAllEvents());
         this.putFilters(database.getAllFilters());
+        Log.d(TAG, "Invits : " + database.getAllInvitations());
         this.putInvitations(database.getAllInvitations());
 
         // Notify listeners

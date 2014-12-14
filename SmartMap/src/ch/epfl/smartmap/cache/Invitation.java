@@ -125,6 +125,12 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
         return (int) this.getId();
     }
 
+    @Override
+    public String toString() {
+        return "Invitation[type(" + this.getType() + "), status(" + this.getStatus() + "), timestamp("
+            + this.getTimeStamp() + "), user(" + this.getUser() + "), event(" + this.getEvent() + ")]";
+    }
+
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Invitation#update(ch.epfl.smartmap.cache.

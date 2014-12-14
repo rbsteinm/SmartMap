@@ -3,6 +3,7 @@ package ch.epfl.smartmap.background;
 import android.content.Context;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.database.DatabaseHelperInterface;
 import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClient;
@@ -21,7 +22,7 @@ import ch.epfl.smartmap.servercom.SmartMapClient;
  */
 public class ServiceContainer {
     private static SmartMapClient mNetworkClient;
-    private static DatabaseHelper mDBHelper;
+    private static DatabaseHelperInterface mDBHelper;
     private static Cache mCache;
     private static CachedSearchEngine mSearchEngine;
     private static SettingsManager mSettingsManager;
@@ -40,7 +41,7 @@ public class ServiceContainer {
      * 
      * @return DatabaseHelper
      */
-    public static DatabaseHelper getDatabase() {
+    public static DatabaseHelperInterface getDatabase() {
         return mDBHelper;
     }
 
@@ -103,7 +104,7 @@ public class ServiceContainer {
      * 
      * @param db
      */
-    public static void setDatabaseHelper(DatabaseHelper db) {
+    public static void setDatabaseHelper(DatabaseHelperInterface db) {
         mDBHelper = db;
     }
 
