@@ -31,8 +31,7 @@ import ch.epfl.smartmap.util.Utils;
 
 /**
  * This activity shows an event in a complete screens. It display in addition
- * two buttons: one to invite
- * friends, and
+ * two buttons: one to invite friends, and
  * one to see the event on the map.
  * 
  * @author SpicyCH
@@ -42,8 +41,7 @@ public class EventInformationActivity extends ListActivity {
 
     /**
      * Used to get the event id the getExtra of the starting intent, and to pass
-     * the retrieved event from
-     * doInBackground
+     * the retrieved event from doInBackground
      * to onPostExecute.
      */
     public static final String EVENT_KEY = "EVENT";
@@ -74,57 +72,50 @@ public class EventInformationActivity extends ListActivity {
      * @author SpicyCH
      */
     private void initializeGUI() {
-        EventInformationActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                EventInformationActivity.this.setTitle(mEvent.getName());
+        EventInformationActivity.this.setTitle(mEvent.getName());
 
-                mEventTitle = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_event_name);
-                mEventTitle.setText(mEvent.getName());
+        mEventTitle = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_event_name);
+        mEventTitle.setText(mEvent.getName());
 
-                mEventCreator = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_creator);
-                mEventCreator.setText(mEvent.getCreator().getName());
+        mEventCreator = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_creator);
+        mEventCreator.setText(mEvent.getCreator().getName());
 
-                mStartDate = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_start_date);
-                mStartHour = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_start_hour);
-                mEndDate = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_end_date);
-                mEndHour = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_end_hour);
+        mStartDate = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_start_date);
+        mStartHour = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_start_hour);
+        mEndDate = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_end_date);
+        mEndHour = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_end_hour);
 
-                mGoingCheckBox = (CheckBox) EventInformationActivity.this.findViewById(R.id.event_info_going_checkbox);
+        mGoingCheckBox = (CheckBox) EventInformationActivity.this.findViewById(R.id.event_info_going_checkbox);
 
-                if (mEvent.isGoing()) {
-                    mGoingChecked = true;
-                    mGoingCheckBox.setChecked(mGoingChecked);
-                }
+        if (mEvent.isGoing()) {
+            mGoingChecked = true;
+            mGoingCheckBox.setChecked(mGoingChecked);
+        }
 
-                String startDate = Utils.getDateString(mEvent.getStartDate());
-                String startHour = Utils.getTimeString(mEvent.getStartDate());
-                String endDate = Utils.getDateString(mEvent.getEndDate());
-                String endHour = Utils.getTimeString(mEvent.getEndDate());
+        String startDate = Utils.getDateString(mEvent.getStartDate());
+        String startHour = Utils.getTimeString(mEvent.getStartDate());
+        String endDate = Utils.getDateString(mEvent.getEndDate());
+        String endHour = Utils.getTimeString(mEvent.getEndDate());
 
-                mStartDate.setText(startDate);
-                mStartHour.setText(startHour);
-                mEndDate.setText(endDate);
-                mEndHour.setText(endHour);
+        mStartDate.setText(startDate);
+        mStartHour.setText(startHour);
+        mEndDate.setText(endDate);
+        mEndHour.setText(endHour);
 
-                mEventDescription =
-                    (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_description);
-                if ((mEvent.getDescription() == null) || mEvent.getDescription().isEmpty()) {
-                    mEventDescription.setText(EventInformationActivity.this
-                        .getString(R.string.show_event_info_event_no_description));
-                } else {
-                    mEventDescription.setText(mEvent.getDescription());
-                }
+        mEventDescription = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_description);
+        if ((mEvent.getDescription() == null) || mEvent.getDescription().isEmpty()) {
+            mEventDescription.setText(EventInformationActivity.this
+                .getString(R.string.show_event_info_event_no_description));
+        } else {
+            mEventDescription.setText(mEvent.getDescription());
+        }
 
-                mPlaceNameAndCountry =
-                    (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_town_and_country);
-                mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", "
-                    + Utils.getCountryFromLocation(mEvent.getLocation()));
+        mPlaceNameAndCountry =
+            (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_town_and_country);
+        mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", "
+            + Utils.getCountryFromLocation(mEvent.getLocation()));
 
-                EventInformationActivity.this.updateCurrentList();
-            }
-        });
-
+        EventInformationActivity.this.updateCurrentList();
     }
 
     /**
@@ -149,8 +140,8 @@ public class EventInformationActivity extends ListActivity {
     }
 
     /**
-     * Triggered when going checkbox is clicked. Updates the displayed list of
-     * participants.
+     * Triggered when "Attending" checkbox is clicked. Updates the displayed
+     * list of participants.
      * 
      * @param v
      *            the checkbox whose status changed
@@ -164,71 +155,66 @@ public class EventInformationActivity extends ListActivity {
 
         CheckBox checkBox = (CheckBox) v;
 
-        switch (v.getId()) {
-            case R.id.event_info_going_checkbox:
-                if (checkBox.isChecked()) {
-                    ServiceContainer.getCache().addParticipantsToEvent(
-                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
-                        new NetworkRequestCallback<Void>() {
-                            @Override
-                            public void onFailure(Exception e) {
-                                EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(EventInformationActivity.this,
-                                            EventInformationActivity.this.getString(R.string.event_going_failure),
-                                            Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+        if (v.getId() == R.id.event_info_going_checkbox) {
+            if (checkBox.isChecked()) {
+                ServiceContainer.getCache().addParticipantsToEvent(
+                    new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
+                    new NetworkRequestCallback<Void>() {
+                        @Override
+                        public void onFailure(Exception e) {
+                            EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(EventInformationActivity.this,
+                                        EventInformationActivity.this.getString(R.string.event_going_failure),
+                                        Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
 
-                            }
+                        @Override
+                        public void onSuccess(Void result) {
+                            EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(EventInformationActivity.this,
+                                        EventInformationActivity.this.getString(R.string.event_going_success),
+                                        Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+            } else {
+                ServiceContainer.getCache().removeParticipantsFromEvent(
+                    new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
+                    new NetworkRequestCallback<Void>() {
+                        @Override
+                        public void onFailure(Exception e) {
+                            EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(EventInformationActivity.this,
+                                        EventInformationActivity.this.getString(R.string.event_quit_failure),
+                                        Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
 
-                            @Override
-                            public void onSuccess(Void result) {
-                                EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(EventInformationActivity.this,
-                                            EventInformationActivity.this.getString(R.string.event_going_success),
-                                            Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        });
-                } else {
-                    ServiceContainer.getCache().removeParticipantsFromEvent(
-                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
-                        new NetworkRequestCallback<Void>() {
-                            @Override
-                            public void onFailure(Exception e) {
-                                EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(EventInformationActivity.this,
-                                            EventInformationActivity.this.getString(R.string.event_quit_failure),
-                                            Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
+                        @Override
+                        public void onSuccess(Void result) {
+                            EventInformationActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(EventInformationActivity.this,
+                                        EventInformationActivity.this.getString(R.string.event_quit_success),
+                                        Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+            }
 
-                            @Override
-                            public void onSuccess(Void result) {
-                                EventInformationActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(EventInformationActivity.this,
-                                            EventInformationActivity.this.getString(R.string.event_quit_success),
-                                            Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        });
-                }
-                break;
-            default:
-                break;
         }
-
         this.updateCurrentList();
     }
 
@@ -241,12 +227,26 @@ public class EventInformationActivity extends ListActivity {
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
             public void onEventListUpdate() {
-                EventInformationActivity.this.initializeGUI();
+                EventInformationActivity.this.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        EventInformationActivity.this.initializeGUI();
+                    }
+
+                });
             }
 
             @Override
             public void onUserListUpdate() {
-                EventInformationActivity.this.initializeGUI();
+                EventInformationActivity.this.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        EventInformationActivity.this.initializeGUI();
+                    }
+
+                });
             }
 
         });
@@ -262,7 +262,6 @@ public class EventInformationActivity extends ListActivity {
             MenuItem item = menu.findItem(R.id.event_info_delete_button);
             item.setVisible(false);
         }
-
         return true;
     }
 
@@ -280,7 +279,8 @@ public class EventInformationActivity extends ListActivity {
     }
 
     /**
-     * When this tab is open by a notification
+     * Called when we want to quit this tab and if it was open by a
+     * notification.
      */
     private void onNotificationOpen() {
         if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
@@ -305,7 +305,6 @@ public class EventInformationActivity extends ListActivity {
             default:
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -345,16 +344,18 @@ public class EventInformationActivity extends ListActivity {
     }
 
     /**
-     * Update list of participant when we click on Going checkBox
+     * Update list of participant when we click on Going checkBox.
      */
     private void updateCurrentList() {
 
         if (ServiceContainer.getSearchEngine() == null) {
             ServiceContainer.setSearchEngine(new CachedSearchEngine());
         }
+
         Log.d(TAG, "Search Engine : " + ServiceContainer.getSearchEngine());
         Log.d(TAG, "Event : " + mEvent);
         Log.d(TAG, "Participants id : " + mEvent.getParticipantIds());
+
         ServiceContainer.getSearchEngine().findUserByIds(mEvent.getParticipantIds(),
             new SearchRequestCallback<Set<User>>() {
                 @Override

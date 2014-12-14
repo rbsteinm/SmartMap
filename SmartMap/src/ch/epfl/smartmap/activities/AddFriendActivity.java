@@ -88,15 +88,13 @@ public class AddFriendActivity extends ListActivity {
             + this.getResources().getString(R.string.as_a_friend));
 
         // Add positive button
-        builder.setPositiveButton(this.getResources().getString(R.string.add),
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    // invite friend
-                    AddFriendActivity.this.inviteUser(userId);
-                }
-            });
-
+        builder.setPositiveButton(this.getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // invite friend
+                ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
+            }
+        });
         // Add negative button
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -110,16 +108,9 @@ public class AddFriendActivity extends ListActivity {
     }
 
     /**
-     * Invites a user to be your friend. Displays a toast describing if the invitation was sent or not.
-     * 
-     * @author agpmilli
+     * sets a listener on the searchbar that updates the views (users) displayed
+     * every time the text chnanges or is submitted
      */
-    private void inviteUser(long userId) {
-        // Send friend request to user
-        ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
-
-    }
-
     private void setSearchBarListener() {
         mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
             @Override

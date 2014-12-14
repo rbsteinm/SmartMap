@@ -4,6 +4,10 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import org.junit.Test;
+
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
 import android.location.Location;
 import android.test.AndroidTestCase;
 import ch.epfl.smartmap.R;
@@ -68,10 +72,12 @@ public class UtilsTest extends AndroidTestCase {
         epfl.setLongitude(6.566758);
     }
 
+    @Test
     public void testCitiyForLocation() {
         assertEquals("Ecublens", Utils.getCityFromLocation(epfl));
     }
 
+    @Test
     public void testCountryForLocation() {
         String result = Utils.getCountryFromLocation(epfl);
 
@@ -82,6 +88,7 @@ public class UtilsTest extends AndroidTestCase {
         }
     }
 
+    @Test
     public void testGetDefaultValueForUnknownPlaces() {
         Location somewhereVeryLost = new Location("");
         somewhereVeryLost.setLatitude(0);
@@ -93,11 +100,13 @@ public class UtilsTest extends AndroidTestCase {
 
     }
 
+    @Test
     public void testJanuary() {
         // Regression test for #82
         assertEquals("01.01.2015", Utils.getDateString(firstJan2015));
     }
 
+    @Test
     public void testLastSeen100Years() {
         Calendar hundredYearsAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         hundredYearsAgo.add(Calendar.YEAR, -100);
@@ -108,6 +117,7 @@ public class UtilsTest extends AndroidTestCase {
             Utils.getLastSeenStringFromCalendar(hundredYearsAgo));
     }
 
+    @Test
     public void testLastSeenFiveMins() {
         Calendar fiveMinsAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         fiveMinsAgo.add(Calendar.MINUTE, -5);
@@ -117,41 +127,161 @@ public class UtilsTest extends AndroidTestCase {
             Utils.getLastSeenStringFromCalendar(fiveMinsAgo));
     }
 
+    @Test
     public void testLastSeenNow() {
         assertEquals(ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_now),
             Utils.getLastSeenStringFromCalendar(now));
     }
 
+    @Test
     public void testLastSeenTenDays() {
         assertEquals(
             "10 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago),
             Utils.getLastSeenStringFromCalendar(tenDaysAgo));
     }
 
+    @Test
     public void testMyBirthday() {
         assertEquals("16.09.1993", Utils.getDateString(myBirthday));
     }
 
+    @Test
     public void testTimeAfternoon() {
         assertEquals("17:07", Utils.getTimeString(afternoon));
     }
 
+    @Test
     public void testTimeMorning() {
         assertEquals("08:05", Utils.getTimeString(morning));
     }
 
+    @Test
     public void testToday() {
         assertEquals(ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today),
             Utils.getDateString(now));
     }
 
+    @Test
     public void testTomorrow() {
         assertEquals(ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow),
             Utils.getDateString(tomorrow));
     }
 
+    @Test
     public void testYesterday() {
         assertEquals(ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday),
             Utils.getDateString(yesterday));
+    }
+
+    @Test
+    public void testPrintDistanceToMeKm() {
+        Location me = new Location("");
+        me.setLongitude(6.6483783);
+        me.setLatitude(46.539441);
+
+        ServiceContainer.getSettingsManager().setLocation(me);
+
+        assertEquals("6.7 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km)
+            + " "
+            + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you),
+            Utils.printDistanceToMe(epfl));
+    }
+
+    @Test
+    public void testPrintDistanceToMeMeters() {
+        Location me = new Location("");
+        me.setLongitude(6.569116115570068);
+        me.setLatitude(46.520293125905276);
+
+        ServiceContainer.getSettingsManager().setLocation(me);
+
+        assertEquals(
+            "227 "
+                + ServiceContainer.getSettingsManager().getContext()
+                    .getString(R.string.utils_meters_away_from_you), Utils.printDistanceToMe(epfl));
+    }
+    
+    @Test
+    public void testGetColorInInterval1() {
+        double value = 0.0;
+        double startValue = 1.0;
+        double endValue = 2.0;
+        int startColor = Color.RED;
+        int endColor = Color.BLUE;
+        
+        assertEquals(Color.RED, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
+    }
+    
+    @Test
+    public void testGetColorInInterval2() {
+        double value = 3.0;
+        double startValue = 1.0;
+        double endValue = 2.0;
+        int startColor = Color.RED;
+        int endColor = Color.BLUE;
+        
+        assertEquals(Color.BLUE, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
+    }
+    
+    @Test
+    public void testGetColorInInterval3() {
+        double value = 0.0;
+        double startValue = 2.0;
+        double endValue = 1.0;
+        int startColor = Color.RED;
+        int endColor = Color.BLUE;
+        
+        assertEquals(Color.BLUE, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
+    }
+    
+    @Test
+    public void testGetColorInInterval4() {
+        double value = 1.0;
+        double startValue = 0.0;
+        double endValue = 2.0;
+        int startColor = Color.BLACK;
+        int endColor = Color.GRAY;
+        
+        assertEquals(0xff444444, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
+    }
+    
+    @Test
+    public void testGetMatrixForColor1() {
+        float[] correct = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
+        
+        ColorMatrix result = Utils.getMatrixForColor(Color.RED);
+        
+        assertTrue(floatArrayEquals(correct, result.getArray()));
+    }
+    
+    @Test
+    public void testGetMatrixForColor2() {
+        float[] correct = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0};
+        
+        ColorMatrix result = Utils.getMatrixForColor(Color.WHITE);
+        
+        assertTrue(floatArrayEquals(correct, result.getArray()));
+    }
+    
+    @Test
+    public void testGetMatrixForColor3() {
+        float[] correct = {0.2f, 0, 0, 0, 0, 0, 0.4f, 0, 0, 0, 0, 0, 0.8f, 0, 0, 0, 0, 0, 1, 0};
+        
+        ColorMatrix result = Utils.getMatrixForColor(Color.argb(1, 51, 102, 204));
+        
+        assertTrue(floatArrayEquals(correct, result.getArray()));
+    }
+    
+    private boolean floatArrayEquals(float[] a1, float[] a2) {
+        if (a1.length != a2.length) {
+            return false;
+        } else {
+            for (int i = 0; i < a1.length; i++) {
+                if (a1[i] != a2[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

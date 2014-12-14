@@ -6,7 +6,16 @@ package ch.epfl.smartmap.servercom;
  * @author marion-S
  * @author Pamoi (code reviewed : 9.11.2014)
  */
-public class SmartMapParserFactory {
+public final class SmartMapParserFactory {
+
+    public static final String JSON_CONTENT_TYPE = "application/json";
+
+    /**
+     * Constructor
+     */
+    private SmartMapParserFactory() {
+        super();
+    }
 
     /**
      * Obtains a parser for the given MIME type.
@@ -20,7 +29,7 @@ public class SmartMapParserFactory {
      */
     public static SmartMapParser parserForContentType(String contentType) throws NoSuchFormatException {
 
-        if (contentType.equals("application/json")) {
+        if (contentType.equals(JSON_CONTENT_TYPE)) {
             return new JsonSmartMapParser();
 
         } else {

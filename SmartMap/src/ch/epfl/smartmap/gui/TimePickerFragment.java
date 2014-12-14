@@ -15,9 +15,8 @@ import ch.epfl.smartmap.util.Utils;
 
 /**
  * A simple time picker. Used in {@link ch.epfl.smartmap.activities.AddEventActivity}. When the time is set, the
- * associated EditText is modified accordingly and a tag containing an int array of hour, minute is linked to this
- * EditText.
- * 
+ * associated EditText is modified accordingly and the associated <code>Calendar</code> is updated.
+ *
  * @author SpicyCH
  */
 public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {

@@ -15,7 +15,7 @@ import ch.epfl.smartmap.background.Notifications;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
-import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.database.DatabaseHelperInterface;
 import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -58,7 +58,6 @@ public class Cache implements CacheInterface {
     private final List<CacheListener> mListeners;
 
     public Cache() {
-
         // Init Data structures
         mUserInstances = new LongSparseArray<User>();
         mEventInstances = new LongSparseArray<Event>();
@@ -610,7 +609,7 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#initFromDatabase(ch.epfl.smartmap.database.DatabaseHelper)
      */
     @Override
-    public synchronized void initFromDatabase(DatabaseHelper database) {
+    public synchronized void initFromDatabase(DatabaseHelperInterface database) {
         Log.d(TAG, "init from database");
         // Clear previous values
         mEventInstances.clear();
@@ -631,6 +630,7 @@ public class Cache implements CacheInterface {
         this.putUsers(database.getAllUsers());
         this.putEvents(database.getAllEvents());
         this.putFilters(database.getAllFilters());
+        Log.d(TAG, "Invits : " + database.getAllInvitations());
         this.putInvitations(database.getAllInvitations());
 
         // Notify listeners
@@ -1390,6 +1390,9 @@ public class Cache implements CacheInterface {
                     self.setImage(networkClient.getProfilePicture(myId));
                     updatedUsers.add(self);
 
+                    // Fetch friend ids
+                    Set<Long> friendIds = new HashSet<Long>(networkClient.getFriendsIds());
+                    Set<Long> friendPosIds = new HashSet<Long>();
                     // Fetch friends via listFriendPos
                     Set<UserContainer> listFriendPos =
                         new HashSet<UserContainer>(networkClient.listFriendsPos());
@@ -1413,7 +1416,18 @@ public class Cache implements CacheInterface {
                             + "image");
 
                         // Put friend in Set
+                        friendPosIds.add(id);
                         updatedUsers.add(onlineInfos);
+                    }
+
+                    // For friends that blocked us, try to find a value in cache
+                    Set<Long> friendThatBlockedUsIds = friendIds;
+                    friendThatBlockedUsIds.removeAll(friendPosIds);
+                    for (long id : friendThatBlockedUsIds) {
+                        User cached = Cache.this.getUser(id);
+                        if (cached != null) {
+                            updatedUsers.add(cached.getContainerCopy());
+                        }
                     }
 
                     // Get near Events
