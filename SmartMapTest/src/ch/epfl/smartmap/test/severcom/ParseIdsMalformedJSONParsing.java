@@ -26,7 +26,7 @@ public class ParseIdsMalformedJSONParsing extends TestCase {
 	public void testParseIdsEmptyJson() {
 		SmartMapParser parser = new JsonSmartMapParser();
 		try {
-			parser.parseIds(new JSONObject().toString(), "friends");
+			parser.parseIdList(new JSONObject().toString(), "friends");
 			fail("parsed empty Json");
 		} catch (SmartMapParseException e) {
 			// success
@@ -40,7 +40,7 @@ public class ParseIdsMalformedJSONParsing extends TestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
-			parser.parseIds(jsonObject.toString(), "friends");
+			parser.parseIdList(jsonObject.toString(), "friends");
 			fail("missing friends");
 		} catch (SmartMapParseException e) {
 			// success
@@ -55,7 +55,7 @@ public class ParseIdsMalformedJSONParsing extends TestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 
 		try {
-			parser.parseIds(jsonObject.toString(), "friends");
+			parser.parseIdList(jsonObject.toString(), "friends");
 			fail("parsed wrong id");
 		} catch (SmartMapParseException e) {
 			// success

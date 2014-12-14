@@ -5,8 +5,7 @@ namespace SmartMap\Control;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use SmartMap\DBInterface\UserRepository;
-use SmartMap\DBInterface\User;
+use SmartMap\DBInterface\UserRepositoryInterface;
 use SmartMap\DBInterface\DatabaseException;
 
 /**
@@ -16,11 +15,11 @@ use SmartMap\DBInterface\DatabaseException;
  * 
  * @author SpicyCH (code reviewed - 02.11.2014) : code looks fine, just added javadoc
  */
-class AuthorizationController
+class AuthorizationController implements AuthorizationControllerInterface
 {
     private $mRepo;
     
-    function __construct(UserRepository $repo)
+    function __construct(UserRepositoryInterface $repo)
     {
         $this->mRepo = $repo;
     }
@@ -199,6 +198,14 @@ class AuthorizationController
         return new JsonResponse($response);
     }
 
+    /**
+     * Set the visibility of the user.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
     public function setVisibility(Request $request)
     {
         $userId = RequestUtils::getIdFromRequest($request);

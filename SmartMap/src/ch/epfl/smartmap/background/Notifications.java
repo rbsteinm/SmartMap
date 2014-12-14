@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.Invitation;
 
@@ -16,9 +15,6 @@ import ch.epfl.smartmap.cache.Invitation;
  * @author agpmilli
  */
 public class Notifications {
-
-    @SuppressWarnings("unused")
-    private static final String TAG = Notifications.class.getSimpleName();
 
     private static final int VIBRATE_NOTIFICATION_TIME = 500;
 
@@ -56,13 +52,11 @@ public class Notifications {
         switch (invitation.getType()) {
             case Invitation.EVENT_INVITATION:
                 notificationAllowed =
-                    notificationAllowed
-                        && ServiceContainer.getSettingsManager().notificationsForEventInvitations();
+                    notificationAllowed && ServiceContainer.getSettingsManager().notificationsForEventInvitations();
                 break;
             case Invitation.FRIEND_INVITATION:
                 notificationAllowed =
-                    notificationAllowed
-                        && ServiceContainer.getSettingsManager().notificationsForFriendRequests();
+                    notificationAllowed && ServiceContainer.getSettingsManager().notificationsForFriendRequests();
                 break;
             case Invitation.ACCEPTED_FRIEND_INVITATION:
                 notificationAllowed =
@@ -81,8 +75,6 @@ public class Notifications {
 
             // Prepare intent that redirect the user to EventActivity
             Intent intent = invitation.getIntent();
-
-            Log.d(TAG, "intent : " + intent);
 
             if (invitation.getType() == Invitation.EVENT_INVITATION) {
                 intent.putExtra("EVENT", invitation.getEvent().getId());
@@ -132,7 +124,7 @@ public class Notifications {
      * @param context
      *            the current context
      * @param notification
-     *            th notification to display
+     *            the notification to display
      * @param notificationId
      *            the notification id
      */

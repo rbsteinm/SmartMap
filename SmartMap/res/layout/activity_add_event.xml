@@ -31,6 +31,7 @@
         android:inputType="textCapSentences"
         android:lines="1"
         android:maxLines="1"
+        android:maxLength="60"
         android:singleLine="true" />
 
     <TextView
@@ -168,6 +169,7 @@
         android:layout_toRightOf="@id/add_event_what_text"
         android:hint="@string/addEventDescription"
         android:inputType="textMultiLine|textCapSentences"
+        android:maxLength="255"
         android:lines="5" />
 
   

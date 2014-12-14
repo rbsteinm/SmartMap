@@ -18,10 +18,9 @@ import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.ImmutableUser;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
-import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.listeners.OnCacheListener;
 import ch.epfl.smartmap.util.Utils;
 
@@ -34,6 +33,7 @@ public class UserInformationActivity extends Activity {
 
     @SuppressWarnings("unused")
     private static final String TAG = UserInformationActivity.class.getSimpleName();
+
     private User mUser;
     private long mUserId;
     private Switch mShowOnMapSwitch;
@@ -67,7 +67,8 @@ public class UserInformationActivity extends Activity {
 
             @Override
             public void onUserListUpdate() {
-
+                User user = ServiceContainer.getCache().getUser(mUserId);
+                UserInformationActivity.this.updateInformations(user);
             }
         });
     }
@@ -84,7 +85,7 @@ public class UserInformationActivity extends Activity {
     }
 
     /**
-     * Display a confirmation dialog
+     * Display a confirmation dialog to send a friend request to a non-friend user
      * 
      * @param name
      * @param userId
@@ -116,6 +117,12 @@ public class UserInformationActivity extends Activity {
         builder.create().show();
     }
 
+    /**
+     * displays a confirmation dialog when the user tries to
+     * remove a friend from his friendlist
+     * 
+     * @param view
+     */
     public void displayDeleteConfirmationDialog(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(this.getString(R.string.remove) + " " + mUser.getName() + " "
@@ -125,9 +132,9 @@ public class UserInformationActivity extends Activity {
         builder.setPositiveButton(this.getString(R.string.remove), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                ServiceContainer.getCache().removeFriend(mUser.getId(), new NetworkRequestCallback() {
+                ServiceContainer.getCache().removeFriend(mUser.getId(), new NetworkRequestCallback<Void>() {
                     @Override
-                    public void onFailure() {
+                    public void onFailure(Exception e) {
                         UserInformationActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -139,7 +146,7 @@ public class UserInformationActivity extends Activity {
                     }
 
                     @Override
-                    public void onSuccess() {
+                    public void onSuccess(Void result) {
                         UserInformationActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -196,26 +203,27 @@ public class UserInformationActivity extends Activity {
 
     /**
      * called when switching the "block" switch
-     * blocks the concerned friend
+     * blocks the concerned friend and disables the "show on map" button
      * 
      * @param view
      */
     public void setBlockedStatus(View view) {
-        ImmutableUser modified = mUser.getImmutableCopy();
+        UserContainer modified = mUser.getContainerCopy();
         if (mBlockSwitch.isChecked()) {
-            modified.setBlocked(User.blockStatus.BLOCKED);
+            modified.setBlocked(User.BlockStatus.BLOCKED);
         } else {
-            modified.setBlocked(User.blockStatus.UNBLOCKED);
+            modified.setBlocked(User.BlockStatus.UNBLOCKED);
         }
 
-        ServiceContainer.getCache().setBlockedStatus(modified, new NetworkRequestCallback() {
+        ServiceContainer.getCache().setBlockedStatus(modified, new NetworkRequestCallback<Void>() {
 
             @Override
-            public void onFailure() {
+            public void onFailure(Exception e) {
                 UserInformationActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mBlockSwitch.setChecked(UserInformationActivity.this.statusToBool(mUser.isBlocked()));
+                        mBlockSwitch.setChecked(UserInformationActivity.this.statusToBool(mUser
+                            .getBlockStatus()));
                         Toast.makeText(UserInformationActivity.this,
                             "Network error, couldn't (un)block friend", Toast.LENGTH_SHORT).show();
                     }
@@ -223,13 +231,13 @@ public class UserInformationActivity extends Activity {
             }
 
             @Override
-            public void onSuccess() {
+            public void onSuccess(Void result) {
                 UserInformationActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mShowOnMapSwitch.setEnabled(!UserInformationActivity.this.statusToBool(mUser
-                            .isBlocked()));
-                        if (UserInformationActivity.this.statusToBool(mUser.isBlocked())) {
+                            .getBlockStatus()));
+                        if (UserInformationActivity.this.statusToBool(mUser.getBlockStatus())) {
                             Toast.makeText(UserInformationActivity.this, "friend successfully blocked",
                                 Toast.LENGTH_SHORT).show();
                         } else {
@@ -270,9 +278,10 @@ public class UserInformationActivity extends Activity {
      * @param status
      *            blocked status
      * @return true if the user is blocked,false if unblocked or unset
+     *         unset should never happen
      */
-    private boolean statusToBool(User.blockStatus status) {
-        return status == User.blockStatus.BLOCKED;
+    private boolean statusToBool(User.BlockStatus status) {
+        return status == User.BlockStatus.BLOCKED;
     }
 
     /**
@@ -298,16 +307,16 @@ public class UserInformationActivity extends Activity {
                     UserInformationActivity.this.findViewById(R.id.user_info_remove_button).setVisibility(
                         View.INVISIBLE);
                 } else {
-                    // Ugly instanceof, case classes would be helpful
+                    // Ugly instanceof, case classes would be helpful TODO
                     if (user instanceof Friend) {
                         Friend friend = (Friend) user;
 
                         mNameView.setText(friend.getName());
                         mSubtitlesView.setText(friend.getSubtitle());
-                        mPictureView.setImageBitmap(friend.getImage());
-                        mShowOnMapSwitch.setChecked(ServiceContainer.getCache().getDefaultFilter()
-                            .getVisibleFriends().contains(user.getId()));
-                        mBlockSwitch.setChecked(friend.isBlocked() == User.blockStatus.UNBLOCKED);
+                        mPictureView.setImageBitmap(friend.getActionImage());
+                        // FIXME : boolean value must be checked
+                        mShowOnMapSwitch.setChecked(true);
+                        mBlockSwitch.setChecked(friend.getBlockStatus() == User.BlockStatus.UNBLOCKED);
                         mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
 
                         Button button =
@@ -326,11 +335,12 @@ public class UserInformationActivity extends Activity {
                     } else {
                         mNameView.setText(user.getName());
                         mSubtitlesView.setText(user.getSubtitle());
-                        mPictureView.setImageBitmap(user.getImage());
+                        mPictureView.setImageBitmap(user.getActionImage());
                         mShowOnMapSwitch.setVisibility(View.INVISIBLE);
                         mBlockSwitch.setVisibility(View.INVISIBLE);
                         mDistanceView.setVisibility(View.INVISIBLE);
-                        // We do not display the remove button as we are not friends yet
+                        // We do not display the remove button as we are not
+                        // friends yet
                         Button button =
                             (Button) UserInformationActivity.this.findViewById(R.id.user_info_remove_button);
                         button.setVisibility(View.VISIBLE);
@@ -348,59 +358,5 @@ public class UserInformationActivity extends Activity {
                 }
             }
         });
-    }
-
-    /**
-     * This class is a CacheListener that updates the displayed user when it's
-     * info are changed.
-     * 
-     * @author Pamoi
-     */
-    private class UserInformationCacheListener implements CacheListener {
-
-        /*
-         * (non-Javadoc)
-         * @see ch.epfl.smartmap.listeners.CacheListener#onEventListUpdate()
-         */
-        @Override
-        public void onEventListUpdate() {
-            // Nothing to do
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see ch.epfl.smartmap.listeners.CacheListener#onFilterListUpdate()
-         */
-        @Override
-        public void onFilterListUpdate() {
-            // Nothing to do
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * ch.epfl.smartmap.listeners.CacheListener#onInvitationListUpdate()
-         */
-        @Override
-        public void onInvitationListUpdate() {
-            // Nothing to do
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see ch.epfl.smartmap.listeners.CacheListener#onUserListUpdate()
-         */
-        @Override
-        public void onUserListUpdate() {
-            UserInformationActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mUser = ServiceContainer.getCache().getUser(mUserId);
-
-                    UserInformationActivity.this.updateInformations(mUser);
-                }
-            });
-        }
-
     }
 }

@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.map.DefaultZoomManager;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -20,21 +21,79 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * This activity lets the user select a new position on the map
+ * This activity lets the user select a new position for the event on the map
  * 
  * @author agpmilli
  */
 public class SetLocationActivity extends FragmentActivity {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = SetLocationActivity.class.getSimpleName();
-
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
-    static final int PICK_LOCATION_REQUEST = 1;
 
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
     private LatLng mEventPosition;
+
+    /**
+     * Display the map with the current location
+     */
+    public void displayMap() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
+
+        // Showing status
+        if (status != ConnectionResult.SUCCESS) {
+            // Google Play Services are not available
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
+            dialog.show();
+        } else {
+            // Google Play Services are available.
+
+            mFragmentMap =
+                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.set_location_map);
+
+            // Getting GoogleMap object from the fragment
+            mGoogleMap = mFragmentMap.getMap();
+
+            // Enabling MyLocation Layer of Google Map
+            mGoogleMap.setMyLocationEnabled(true);
+
+            if (this.getIntent().getParcelableExtra(AddEventActivity.LOCATION_EXTRA) == null) {
+                // Initialize Event position to my current Position so it isn't
+                // null for test
+                mEventPosition =
+                    new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
+                        .getSettingsManager().getLocation().getLongitude());
+            } else {
+                mEventPosition = this.getIntent().getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
+            }
+
+            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
+
+            mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition).draggable(true));
+
+            mGoogleMap.setOnMarkerDragListener(new OnMarkerDragListener() {
+
+                @Override
+                public void onMarkerDrag(Marker marker) {
+                    // nothing
+                }
+
+                @Override
+                public void onMarkerDragEnd(Marker marker) {
+                    mEventPosition = marker.getPosition();
+                }
+
+                @Override
+                public void onMarkerDragStart(Marker marker) {
+                    // nothing
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,52 +108,6 @@ public class SetLocationActivity extends FragmentActivity {
         Toast.makeText(this, this.getString(R.string.set_location_toast), Toast.LENGTH_LONG).show();
 
         this.displayMap();
-    }
-
-    /**
-     * Display the map with the current location
-     */
-    public void displayMap() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
-        // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
-            dialog.show();
-        } else {
-            // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
-            mFragmentMap =
-                (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.set_location_map);
-            // Getting GoogleMap object from the fragment
-            mGoogleMap = mFragmentMap.getMap();
-            mGoogleMap.setMyLocationEnabled(true);
-
-            mEventPosition = this.getIntent().getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
-
-            // Enabling MyLocation Layer of Google Map
-            new DefaultZoomManager(mFragmentMap).zoomWithAnimation(mEventPosition);
-
-            mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition).draggable(true));
-
-            mGoogleMap.setOnMarkerDragListener(new OnMarkerDragListener() {
-
-                @Override
-                public void onMarkerDrag(Marker marker) {
-                    mEventPosition = marker.getPosition();
-                }
-
-                @Override
-                public void onMarkerDragEnd(Marker marker) {
-                    mEventPosition = marker.getPosition();
-                }
-
-                @Override
-                public void onMarkerDragStart(Marker marker) {
-                    mEventPosition = marker.getPosition();
-                }
-            });
-        }
     }
 
     @Override

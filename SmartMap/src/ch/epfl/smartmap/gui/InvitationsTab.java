@@ -28,7 +28,7 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
 public class InvitationsTab extends ListFragment {
 
     private List<Invitation> mInvitationList;
-    private Context mContext;
+    private final Context mContext;
 
     public InvitationsTab(Context ctx) {
         mContext = ctx;
@@ -37,7 +37,7 @@ public class InvitationsTab extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
+        View view = inflater.inflate(R.layout.list_fragment_invitations_tab, container, false);
         mInvitationList =
             new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
 
@@ -116,33 +116,33 @@ public class InvitationsTab extends ListFragment {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
                     // Accept invitation in Cache
-                    ServiceContainer.getCache().acceptInvitation(invitation, new NetworkRequestCallback() {
-                        @Override
-                        public void onFailure() {
-                            ((Activity) mContext).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast
-                                        .makeText(
+                    ServiceContainer.getCache().acceptInvitation(invitation,
+                        new NetworkRequestCallback<Void>() {
+                            @Override
+                            public void onFailure(Exception e) {
+                                ((Activity) mContext).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(
                                             mContext,
                                             ((Activity) mContext)
                                                 .getString(R.string.accept_friend_network_error),
                                             Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
+                                    }
+                                });
+                            }
 
-                        @Override
-                        public void onSuccess() {
-                            // We need to get the invitation from the cache as
-                            // it
-                            // has been modified
-                            Invitation updated =
-                                ServiceContainer.getCache().getInvitation(invitation.getId());
-                            // We run it's intent
-                            InvitationsTab.this.startActivity(updated.getIntent());
-                        }
-                    });
+                            @Override
+                            public void onSuccess(Void result) {
+                                // We need to get the invitation from the cache as
+                                // it
+                                // has been modified
+                                Invitation updated =
+                                    ServiceContainer.getCache().getInvitation(invitation.getId());
+                                // We run it's intent
+                                InvitationsTab.this.startActivity(updated.getIntent());
+                            }
+                        });
                 }
             });
 
@@ -151,9 +151,9 @@ public class InvitationsTab extends ListFragment {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 // Decline invitation in Cache
-                ServiceContainer.getCache().declineInvitation(invitation, new NetworkRequestCallback() {
+                ServiceContainer.getCache().declineInvitation(invitation, new NetworkRequestCallback<Void>() {
                     @Override
-                    public void onFailure() {
+                    public void onFailure(Exception e) {
                         ((Activity) mContext).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -165,7 +165,7 @@ public class InvitationsTab extends ListFragment {
                     }
 
                     @Override
-                    public void onSuccess() {
+                    public void onSuccess(Void result) {
                         ((Activity) mContext).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

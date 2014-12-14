@@ -14,7 +14,7 @@
         android:fromXDelta="0"
         android:toXDelta="0"
         android:fromYDelta="0"
-        android:toYDelta="-40%" 
+        android:toYDelta="-10%" 
         android:startOffset="@integer/alpha_duration"/>
 
 </set>

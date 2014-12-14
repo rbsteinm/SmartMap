@@ -17,7 +17,7 @@ import android.location.Location;
  * 
  * @author jfperren
  */
-public class ImmutableEvent {
+public class EventContainer {
 
     private long mId;
     private String mName;
@@ -29,7 +29,7 @@ public class ImmutableEvent {
     private Set<Long> mParticipantIds;
 
     // An event contains informations about his creator
-    private ImmutableUser mImmCreator;
+    private UserContainer mImmCreator;
 
     // These will be set by the cache
     private User mCreator;
@@ -48,7 +48,7 @@ public class ImmutableEvent {
      * @param locationString
      * @param participants
      */
-    public ImmutableEvent(long id, String name, ImmutableUser creator, String description,
+    public EventContainer(long id, String name, UserContainer creator, String description,
         Calendar startDate, Calendar endDate, Location location, String locationString,
         Set<Long> participantIds) {
 
@@ -84,7 +84,7 @@ public class ImmutableEvent {
         return mId;
     }
 
-    public ImmutableUser getImmCreator() {
+    public UserContainer getImmCreator() {
         return mImmCreator;
     }
 
@@ -112,52 +112,52 @@ public class ImmutableEvent {
         return mStartDate;
     }
 
-    public ImmutableEvent setCreator(User newCreator) {
+    public EventContainer setCreator(User newCreator) {
         mCreator = newCreator;
         return this;
     }
 
-    public ImmutableEvent setDescription(String newDescription) {
+    public EventContainer setDescription(String newDescription) {
         mDescription = newDescription;
         return this;
     }
 
-    public ImmutableEvent setEndDate(GregorianCalendar newEndDate) {
+    public EventContainer setEndDate(GregorianCalendar newEndDate) {
         mEndDate = newEndDate;
         return this;
     }
 
-    public ImmutableEvent setId(long newId) {
+    public EventContainer setId(long newId) {
         mId = newId;
         return this;
     }
 
-    public ImmutableEvent setImmutableCreator(ImmutableUser newCreator) {
+    public EventContainer setImmutableCreator(UserContainer newCreator) {
         mImmCreator = newCreator;
         return this;
     }
 
-    public ImmutableEvent setLocation(Location newLocation) {
+    public EventContainer setLocation(Location newLocation) {
         mLocation = newLocation;
         return this;
     }
 
-    public ImmutableEvent setLocationString(String newLocationString) {
+    public EventContainer setLocationString(String newLocationString) {
         mLocationString = newLocationString;
         return this;
     }
 
-    public ImmutableEvent setName(String newName) {
+    public EventContainer setName(String newName) {
         mName = newName;
         return this;
     }
 
-    public ImmutableEvent setParticipantIds(Set<Long> newParticipantIds) {
+    public EventContainer setParticipantIds(Set<Long> newParticipantIds) {
         mParticipantIds = newParticipantIds;
         return this;
     }
 
-    public ImmutableEvent setStartDate(GregorianCalendar newStartDate) {
+    public EventContainer setStartDate(GregorianCalendar newStartDate) {
         mStartDate = newStartDate;
         return this;
     }

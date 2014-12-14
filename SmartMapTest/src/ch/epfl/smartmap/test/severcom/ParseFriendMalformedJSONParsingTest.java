@@ -15,9 +15,9 @@ import ch.epfl.smartmap.servercom.SmartMapParser;
 
 public class ParseFriendMalformedJSONParsingTest extends TestCase {
 
-	private static final String FRIEND_JSON = "{\n" + " \"id\" : \"13\", \n" + " \"name\" : \"Georges\", \n"
-			+ " \"email\" : \"georges@gmail.com\", \n" + " \"latitude\" : \"20.03\", \n"
-			+ " \"longitude\" : \"26.85\", \n" + " \"phoneNumber\" : \"0782678654\" \n" + "}\n";
+	private static final String FRIEND_JSON = "{\n" + " \"id\" : \"13\", \n"
+			+ " \"name\" : \"Georges\", \n" + " \"latitude\" : \"20.03\", \n"
+			+ " \"longitude\" : \"26.85\" \n" + "}\n";
 
 	private List<String> friendJsonFields;
 
@@ -28,37 +28,7 @@ public class ParseFriendMalformedJSONParsingTest extends TestCase {
 		friendJsonFields = new ArrayList<String>();
 		friendJsonFields.add("id");
 		friendJsonFields.add("name");
-		friendJsonFields.add("email");
-		friendJsonFields.add("phoneNumber");
 
-	}
-
-	@Test
-	public void ignoredTestParseFriendWrongEmail() throws JSONException {
-		JSONObject jsonObject = new JSONObject(FRIEND_JSON);
-		jsonObject.put("email", "wrong email");
-		SmartMapParser parser = new JsonSmartMapParser();
-
-		try {
-			parser.parseFriend(jsonObject.toString());
-			fail("parsed wrong email");
-		} catch (SmartMapParseException e) {
-			// success
-		}
-	}
-
-	@Test
-	public void ignoredTestParseFriendWrongPhoneNumber() throws JSONException {
-		JSONObject jsonObject = new JSONObject(FRIEND_JSON);
-		jsonObject.put("phone number", "021");
-		SmartMapParser parser = new JsonSmartMapParser();
-
-		try {
-			parser.parseFriend(jsonObject.toString());
-			fail("parsed wrong phone number");
-		} catch (SmartMapParseException e) {
-			// success
-		}
 	}
 
 	@Test
@@ -113,14 +83,11 @@ public class ParseFriendMalformedJSONParsingTest extends TestCase {
 		}
 	}
 
-
-
 	@Test
 	public void testParseFriendTooLongName() throws JSONException {
 		JSONObject jsonObject = new JSONObject(FRIEND_JSON);
 		jsonObject
-		.put(
-				"name",
+		.put("name",
 				"egrhgpiergbpwifbowiegforwgtoiedfbéwgfboéwagrfowéargforwgfowaugfowiegfowaifgoawéietgéwagprigfsgfgjkaegoirgorigéraoigpwrgoéwigaowigfvbrofgroivrhtoghroufgvborthgoéaiegéorifgoga");
 		SmartMapParser parser = new JsonSmartMapParser();
 

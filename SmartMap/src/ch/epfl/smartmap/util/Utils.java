@@ -24,7 +24,7 @@ import ch.epfl.smartmap.gui.BadgeDrawable;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Class that count the redraw badge on app icon
+ * Offers different static utility methods.
  * 
  * @author agpmilli
  * @author jfperren
@@ -43,7 +43,7 @@ public final class Utils {
     public static final long ONE_YEAR = 365 * ONE_DAY;
     public static final int DAYS_IN_A_WEEK = 7;
     public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
-        .getString(R.string.utils_never_seen_on_smartmap);
+            .getString(R.string.utils_never_seen_on_smartmap);
 
     private static final String TAG = Utils.class.getSimpleName();
 
@@ -91,12 +91,10 @@ public final class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder =
-            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses =
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
                 return addresses.get(0).getLocality();
             } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
@@ -110,24 +108,19 @@ public final class Utils {
         }
     }
 
-    public static int getColorInInterval(double value, double startValue, double endValue, int startColor,
-        int endColor) {
+    public static int getColorInInterval(double value, double startValue, double endValue, int startColor, int endColor) {
         if (startValue > endValue) {
             return getColorInInterval(value, endValue, startValue, endColor, startColor);
         } else {
             if ((startValue < value) && (value < endValue)) {
                 // Compute a mix of the two colors
                 double intervalLength = endValue - startValue;
-                double percentageStart = -(startValue - value) / intervalLength;
-                double percentageEnd = -(value - endValue) / intervalLength;
+                double percentageEnd = -(startValue - value) / intervalLength;
+                double percentageStart = -(value - endValue) / intervalLength;
 
-                int red =
-                    (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
-                int green =
-                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color
-                        .green(endColor)));
-                int blue =
-                    (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
+                int red = (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
+                int green = (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color.green(endColor)));
+                int blue = (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
 
                 Log.d(TAG, "start : " + percentageStart + "end : " + percentageEnd);
                 Log.d(TAG, "Middle color/ R : " + red + " B : " + blue + " G : " + green);
@@ -149,12 +142,10 @@ public final class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder =
-            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses =
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {
@@ -181,10 +172,10 @@ public final class Utils {
         if (yearsDiff == 0) {
             if (daysDiff > DAYS_IN_A_WEEK) {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                    + calendar.get(Calendar.YEAR);
+                        + calendar.get(Calendar.YEAR);
             } else if (daysDiff > 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next)
-                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
+                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else if (daysDiff == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
             } else if (daysDiff == 0) {
@@ -192,17 +183,18 @@ public final class Utils {
             } else if (daysDiff == -1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else if (daysDiff > -DAYS_IN_A_WEEK) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last)
-                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
+                        + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
             } else {
                 return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                    + calendar.get(Calendar.YEAR);
+                        + calendar.get(Calendar.YEAR);
             }
         } else {
-            // Do not forget that the first month in a GregorianCalendar is 0! bug #82
+            // Do not forget that the first month in a GregorianCalendar is 0!
+            // bug #82
             int month = calendar.get(Calendar.MONTH) + 1;
-            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month)
-                + "." + calendar.get(Calendar.YEAR);
+            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
+                    + calendar.get(Calendar.YEAR);
         }
     }
 
@@ -213,8 +205,7 @@ public final class Utils {
      */
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
-        long diff =
-            GregorianCalendar.getInstance(TimeZone.getTimeZone(GMT_SWITZERLAND)).getTimeInMillis()
+        long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone(GMT_SWITZERLAND)).getTimeInMillis()
                 - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
@@ -226,20 +217,17 @@ public final class Utils {
             if (minutes == 1) {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
             } else {
-                return minutes
-                    + " "
-                    + ServiceContainer.getSettingsManager().getContext()
-                        .getString(R.string.utils_minutes_ago);
+                return minutes + " "
+                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
             }
         } else if (diff < ONE_DAY) {
             // Give time hours
             int hours = (int) (diff / ONE_HOUR);
             if (hours == 1) {
-                return ServiceContainer.getSettingsManager().getContext()
-                    .getString(R.string.utils_one_hour_ago);
+                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_hour_ago);
             } else {
                 return "" + hours + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
+                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
             }
         } else if (diff < ONE_YEAR) {
             // Give time in days
@@ -248,26 +236,33 @@ public final class Utils {
                 return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
             } else {
                 return "" + days + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
+                        + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
             }
         } else {
-            return ServiceContainer.getSettingsManager().getContext()
-                .getString(R.string.utils_never_seen_on_smartmap);
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
         }
     }
 
+    /**
+     * TODO javadoc
+     * 
+     */
     public static ColorMatrix getMatrixForColor(int color) {
         float r = Color.red(color) / MAX_COLOR;
         float g = Color.green(color) / MAX_COLOR;
         float b = Color.blue(color) / MAX_COLOR;
 
-        float[] src = {r, 0, 0, 0, 0, 0, g, 0, 0, 0, 0, 0, b, 0, 0, 0, 0, 0, 1, 0};
+        float[] src = { r, 0, 0, 0, 0, 0, g, 0, 0, 0, 0, 0, b, 0, 0, 0, 0, 0, 1, 0 };
         return new ColorMatrix(src);
     }
 
+    /**
+     * TODO JAVADOC
+     * 
+     */
     public static String getTimeString(Calendar calendar) {
         return formatForDisplay(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
-            + formatForDisplay(calendar.get(Calendar.MINUTE));
+                + formatForDisplay(calendar.get(Calendar.MINUTE));
     }
 
     /**
@@ -282,22 +277,21 @@ public final class Utils {
         if (distance >= ONE_THOUSAND_METERS) {
             distance = distance / ONE_THOUSAND_METERS;
             distance = Math.round(distance * TEN) / TEN;
-            textDistance =
-                distance
-                    + " km "
-                    + ServiceContainer.getSettingsManager().getContext()
-                        .getString(R.string.utils_away_from_you);
+            textDistance = distance + " "
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km) + " "
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you);
         } else {
             distance = Math.round(distance);
-            textDistance =
-                ((int) distance)
-                    + " "
-                    + ServiceContainer.getSettingsManager().getContext()
-                        .getString(R.string.utils_meters_away_from_you);
+            textDistance = (((int) distance) + " ")
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you);
         }
         return textDistance;
     }
 
+    /**
+     * TODO javadoc
+     * 
+     */
     public static void setBadgeCount(Context context, LayerDrawable icon, int count) {
 
         BadgeDrawable badge;

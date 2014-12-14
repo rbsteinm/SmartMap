@@ -8,11 +8,14 @@ import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 
 /**
- * This class is a container for the different services used by the SmartMap app. It's member must be manually
+ * This class is a container for the different services used by the SmartMap
+ * app. It's member must be manually
  * set at
- * the starting of the app. It provides a common interface to get services and thus simplifies future changes.
+ * the starting of the app. It provides a common interface to get services and
+ * thus simplifies future changes.
  * It also
- * allows to switch the returned instances for behavior modification and testing.
+ * allows to switch the returned instances for behavior modification and
+ * testing.
  * 
  * @author Pamoi
  */
@@ -22,13 +25,6 @@ public class ServiceContainer {
     private static Cache mCache;
     private static CachedSearchEngine mSearchEngine;
     private static SettingsManager mSettingsManager;
-
-    /**
-     * Private constructor that hides implicit public one.
-     */
-    private ServiceContainer() {
-        super();
-    }
 
     /**
      * Get the cache service.
@@ -76,11 +72,21 @@ public class ServiceContainer {
     }
 
     public static void initSmartMapServices(Context context) {
-        setSettingsManager(new SettingsManager(context));
-        setNetworkClient(new NetworkSmartMapClient());
-        setDatabaseHelper(new DatabaseHelper(context));
-        setCache(new Cache());
-        setSearchEngine(new CachedSearchEngine());
+        if (ServiceContainer.getSettingsManager() == null) {
+            setSettingsManager(new SettingsManager(context));
+        }
+        if (ServiceContainer.getNetworkClient() == null) {
+            setNetworkClient(new NetworkSmartMapClient());
+        }
+        if (ServiceContainer.getDatabase() == null) {
+            setDatabaseHelper(new DatabaseHelper(context));
+        }
+        if (ServiceContainer.getCache() == null) {
+            setCache(new Cache());
+        }
+        if (ServiceContainer.getSearchEngine() == null) {
+            setSearchEngine(new CachedSearchEngine());
+        }
     }
 
     /**
@@ -126,5 +132,12 @@ public class ServiceContainer {
      */
     public static void setSettingsManager(SettingsManager sm) {
         mSettingsManager = sm;
+    }
+
+    /**
+     * Private constructor that hides implicit public one.
+     */
+    private ServiceContainer() {
+        super();
     }
 }

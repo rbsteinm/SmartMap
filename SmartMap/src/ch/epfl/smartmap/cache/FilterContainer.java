@@ -14,18 +14,23 @@ import java.util.Set;
  * 
  * @author jfperren
  */
-public class ImmutableFilter {
+public class FilterContainer {
 
     private Set<Long> mIds;
     private String mName;
     private long mId;
     private boolean mIsActive;
 
-    public ImmutableFilter(long id, String name, Set<Long> ids, boolean isActive) {
+    public FilterContainer(long id, String name, Set<Long> ids, boolean isActive) {
         mId = id;
         mIds = new HashSet<Long>(ids);
         mName = name;
         mIsActive = isActive;
+    }
+
+    public FilterContainer addId(long id) {
+        mIds.add(id);
+        return this;
     }
 
     public long getId() {
@@ -44,23 +49,27 @@ public class ImmutableFilter {
         return mIsActive;
     }
 
-    public ImmutableFilter setActive(boolean isActive) {
+    public FilterContainer removeId(long id) {
+        mIds.remove(id);
+        return this;
+    }
+
+    public FilterContainer setActive(boolean isActive) {
         mIsActive = isActive;
         return this;
     }
 
-    public ImmutableFilter setId(long newId) {
+    public FilterContainer setId(long newId) {
         mId = newId;
         return this;
     }
 
-    public ImmutableFilter setIds(Set<Long> newIds) {
+    public FilterContainer setIds(Set<Long> newIds) {
         mIds = new HashSet<Long>(newIds);
         return this;
-
     }
 
-    public ImmutableFilter setName(String newName) {
+    public FilterContainer setName(String newName) {
         mName = newName;
         return this;
     }

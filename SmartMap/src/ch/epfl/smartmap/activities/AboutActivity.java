@@ -90,9 +90,7 @@ public class AboutActivity extends Activity {
 
         this.setContentView(R.layout.activity_about);
 
-        // Hide action bar for true full screen. Only way to leave this activity
-        // is to physically use the
-        // pressback
+        // Hide action bar for true full screen. Only way to leave this activity is to physically use the pressback
         // button.
         this.getActionBar().hide();
 
@@ -101,7 +99,7 @@ public class AboutActivity extends Activity {
         // Set up an instance of SystemUiHider to control the system UI for
         // this activity.
         mSystemUiHider = SystemUiHider.getInstance(this, contentView, HIDER_FLAGS);
-        mSystemUiHider.setup();
+        mSystemUiHider.setUp();
         mSystemUiHider.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
             // Cached values.
             private int mShortAnimTime;

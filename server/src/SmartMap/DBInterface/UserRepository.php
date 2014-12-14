@@ -12,7 +12,7 @@ use Doctrine\DBAL\Connection;
  * @author SpicyCH (code reviewed - 03.11.2014) : added javadoc, need to unit test, corrected a typo:
  * it was getLatitude, it is now getLongitude.
  */
-class UserRepository
+class UserRepository implements UserRepositoryInterface
 {
     private static $TABLE_USER = 'users';
     private static $TABLE_FRIENDSHIP = 'friendships';
