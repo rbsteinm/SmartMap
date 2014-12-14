@@ -32,10 +32,7 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  * For example if the checkbox vibrate is checked but the notifications checkbox
  * is unchecked, the value of the vibrate checkbox will be false.
  * </p>
- * <p>
- * Note: for some reason, using withId instead of withText makes espresso crash.
- * </p>
- * 
+ *
  * @author SpicyCH
  */
 public class SettingsActivityTest extends ActivityInstrumentationTestCase2<SettingsActivity> {
@@ -52,11 +49,6 @@ public class SettingsActivityTest extends ActivityInstrumentationTestCase2<Setti
         this.getActivity();
         mContext = this.getActivity().getApplicationContext();
         ServiceContainer.setSettingsManager(new SettingsManager(this.getActivity()));
-    }
-
-    @Override
-    protected void tearDown() {
-        this.getActivity().finish();
     }
 
     public void testActivateNotifications() {

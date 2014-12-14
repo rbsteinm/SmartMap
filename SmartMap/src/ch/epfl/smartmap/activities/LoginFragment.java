@@ -65,7 +65,7 @@ public class LoginFragment extends Fragment {
     };
 
     public LoginFragment() {
-        // We will need to access the user's friends list
+        // We will need to access the user's friends list in the future.
         mPermissions = Arrays.asList("user_status", "user_friends");
     }
 
