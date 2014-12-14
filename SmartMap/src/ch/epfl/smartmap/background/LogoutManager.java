@@ -30,7 +30,8 @@ public final class LogoutManager {
     }
 
     /**
-     * First shows an alert dialog to the user for confirmation, then logout user from SmartMap.
+     * First shows an alert dialog to the user for confirmation, then log him/she out from SmartMap if he confirms the
+     * action.
      *
      * @author SpicyCH
      */
@@ -68,16 +69,14 @@ public final class LogoutManager {
     }
 
     /**
-     * Reinitialize all services, disable FB session and return to the StartActivity. <br />
+     * Reinitialize all services, disable FB session and return to the StartActivity.<br />
      * Note: we don't need to destroy the PHP session on the server since we can re-auth with another login on top of
      * the previous one.
      *
      * @author SpicyCH
      */
     private void logout() {
-        // Clear cache and database. Note: the preferences set in the
-        // SettingsActivity will be kept since they
-        // are local
+        // Clear cache and database. Note: the preferences set in the SettingsActivity will be kept since they are local
         // to the device.
 
         ServiceContainer.initSmartMapServices(mContext);
