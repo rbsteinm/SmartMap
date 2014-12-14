@@ -48,33 +48,11 @@ public class InvitationTest extends AndroidTestCase {
     InvitationContainer otherUserInvitationContainer;
     InvitationContainer userInvitationContainer;
 
-    private void initContainers() {
-        location.setLatitude(latitude);
-        location.setLongitude(longitude);
-        location.setTime(lastSeen);
-
-        ADD_PERSON_BITMAP =
-            BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.ic_action_add_person);
-
-        userInvitationIntent = new Intent(this.getContext(), FriendsPagerActivity.class);
-        userInvitationIntent.putExtra("INVITATION", true);
-
-        userContainer =
-            new UserContainer(userId, userName, phoneNumber, email, location, locationString, userImage, blockStatus,
-                User.FRIEND);
-        userInvitationContainer =
-            new InvitationContainer(userInvitationId, userContainer, null, invitationStatus, userInvitationTimeStamp,
-                userInvitationType);
-        otherUserInvitationContainer =
-            new InvitationContainer(userInvitationId, userContainer, null, otherInvitationStatus,
-                otherUserInvitationTimeStamp, userInvitationType);
-    }
-
     @Before
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        ServiceContainer.initSmartMapServices(this.getContext());
+        ServiceContainer.forceInitSmartMapServices(this.getContext());
 
         this.initContainers();
     }
@@ -112,16 +90,16 @@ public class InvitationTest extends AndroidTestCase {
         assertEquals(invitation.getTimeStamp(), userInvitationTimeStamp);
         assertEquals(invitation.getType(), userInvitationType);
         assertEquals(invitation.getEvent(), Invitation.NO_EVENT);
-        assertEquals(invitation.getIntent().getExtras().get("INVITATION"),
-            userInvitationIntent.getExtras().get("INVITATION"));
+        assertEquals(invitation.getIntent().getExtras().get("INVITATION"), userInvitationIntent.getExtras()
+            .get("INVITATION"));
         assertEquals(invitation.getIntent().getAction(), userInvitationIntent.getAction());
         assertTrue(invitation.getImage().sameAs(ADD_PERSON_BITMAP));
-        assertEquals(invitation.getSubtitle(),
-            this.getContext().getResources().getString(R.string.invitation_click_here_to_open_your_list_of_invitations));
         assertEquals(
-            invitation.getTitle(),
-            userContainer.getName() + " "
-                + this.getContext().getResources().getString(R.string.invitation_want_to_be_your_friend));
+            invitation.getSubtitle(),
+            this.getContext().getResources()
+                .getString(R.string.invitation_click_here_to_open_your_list_of_invitations));
+        assertEquals(invitation.getTitle(), userContainer.getName() + " "
+            + this.getContext().getResources().getString(R.string.invitation_want_to_be_your_friend));
     }
 
     @Test
@@ -163,5 +141,27 @@ public class InvitationTest extends AndroidTestCase {
         } catch (IllegalArgumentException e) {
             // Success
         }
+    }
+
+    private void initContainers() {
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        location.setTime(lastSeen);
+
+        ADD_PERSON_BITMAP =
+            BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.ic_action_add_person);
+
+        userInvitationIntent = new Intent(this.getContext(), FriendsPagerActivity.class);
+        userInvitationIntent.putExtra("INVITATION", true);
+
+        userContainer =
+            new UserContainer(userId, userName, phoneNumber, email, location, locationString, userImage,
+                blockStatus, User.FRIEND);
+        userInvitationContainer =
+            new InvitationContainer(userInvitationId, userContainer, null, invitationStatus,
+                userInvitationTimeStamp, userInvitationType);
+        otherUserInvitationContainer =
+            new InvitationContainer(userInvitationId, userContainer, null, otherInvitationStatus,
+                otherUserInvitationTimeStamp, userInvitationType);
     }
 }

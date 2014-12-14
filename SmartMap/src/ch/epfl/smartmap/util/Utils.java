@@ -25,7 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Offers different static utility methods.
- * 
+ *
  * @author agpmilli
  * @author jfperren
  * @author SpicyCH
@@ -43,7 +43,7 @@ public final class Utils {
     public static final long ONE_YEAR = 365 * ONE_DAY;
     public static final int DAYS_IN_A_WEEK = 7;
     public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
-        .getString(R.string.utils_never_seen_on_smartmap);
+            .getString(R.string.utils_never_seen_on_smartmap);
 
     private static final String TAG = Utils.class.getSimpleName();
 
@@ -83,28 +83,22 @@ public final class Utils {
 
     /**
      * @param location
-     * @return a String of the city associated with the given coordinates, the
-     *         country name if city not found, <code>NO_LOCATION_STRING</code>
-     *         if nothing could be found.
+     * @return a String of the city associated with the given coordinates, the country name if city not found,
+     *         <code>NO_LOCATION_STRING</code> if nothing could be found.
      */
     public static String getCityFromLocation(Location location) {
+
         if (location == null) {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder =
-            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses =
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
-                return addresses.get(0).getLocality();
-            } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
-                return addresses.get(0).getCountryName();
-            } else {
-                return Displayable.NO_LOCATION_STRING;
-            }
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+
+            return cityOrCountryFromAddresses(addresses);
+
         } catch (IOException e) {
             Log.e(TAG, "Network error: " + e);
             return Displayable.NO_LOCATION_STRING;
@@ -112,9 +106,8 @@ public final class Utils {
     }
 
     /**
-     * Mixes startColor and endColor with value/(endValue - startValue) fraction
-     * of startColor.
-     * 
+     * Mixes startColor and endColor with value/(endValue - startValue) fraction of startColor.
+     *
      * @param value
      * @param startValue
      * @param endValue
@@ -123,7 +116,7 @@ public final class Utils {
      * @return the mixed colors
      */
     public static int getColorInInterval(double value, double startValue, double endValue, int startColor,
-        int endColor) {
+            int endColor) {
         if (startValue > endValue) {
             return getColorInInterval(value, endValue, startValue, endColor, startColor);
         } else {
@@ -133,13 +126,10 @@ public final class Utils {
                 double percentageEnd = -(startValue - value) / intervalLength;
                 double percentageStart = -(value - endValue) / intervalLength;
 
-                int red =
-                    (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
-                int green =
-                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color
-                        .green(endColor)));
-                int blue =
-                    (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
+                int red = (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
+                int green = (int) ((percentageStart * Color.green(startColor))
+                        + (percentageEnd * Color.green(endColor)));
+                int blue = (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
 
                 Log.d(TAG, "start : " + percentageStart + "end : " + percentageEnd);
                 Log.d(TAG, "Middle color/ R : " + red + " B : " + blue + " G : " + green);
@@ -154,20 +144,17 @@ public final class Utils {
 
     /**
      * @param location
-     * @return the country associated to the coordinates or
-     *         <code>NO_LOCATION_STRING</code>.
+     * @return the country associated to the coordinates or <code>NO_LOCATION_STRING</code>.
      */
     public static String getCountryFromLocation(Location location) {
         if (location == null) {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder =
-            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses =
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {
@@ -181,7 +168,7 @@ public final class Utils {
 
     /**
      * Gets a human readable String fromt the given date.
-     * 
+     *
      * @param calendar
      * @return a String of the form "Today", "25.12.2014", etc...
      */
@@ -192,44 +179,26 @@ public final class Utils {
         int daysDiff = calendar.get(Calendar.DAY_OF_YEAR) - now.get(Calendar.DAY_OF_YEAR);
 
         if (yearsDiff == 0) {
-            if (daysDiff > DAYS_IN_A_WEEK) {
-                return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                    + calendar.get(Calendar.YEAR);
-            } else if (daysDiff > 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next)
-                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-            } else if (daysDiff == 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
-            } else if (daysDiff == 0) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
-            } else if (daysDiff == -1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
-            } else if (daysDiff > -DAYS_IN_A_WEEK) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last)
-                    + " " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-            } else {
-                return calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "."
-                    + calendar.get(Calendar.YEAR);
-            }
+
+            return getDateStringForNoYearDiff(calendar, daysDiff);
+
         } else {
             // Do not forget that the first month in a GregorianCalendar is 0!
             // bug #82
             int month = calendar.get(Calendar.MONTH) + 1;
-            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month)
-                + "." + calendar.get(Calendar.YEAR);
+            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
+                    + calendar.get(Calendar.YEAR);
         }
     }
 
     /**
      * @param calendar
-     * @return A String representing the time since we last saw the user on
-     *         SmartMap. For example "Now" or
+     * @return A String representing the time since we last saw the user on SmartMap. For example "Now" or
      *         "1 minute ago".
      */
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
-        long diff =
-            GregorianCalendar.getInstance(TimeZone.getTimeZone(GMT_SWITZERLAND)).getTimeInMillis()
+        long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone(GMT_SWITZERLAND)).getTimeInMillis()
                 - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
@@ -237,44 +206,28 @@ public final class Utils {
             return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_now);
         } else if (diff < ONE_HOUR) {
             // Give time in minutes
-            int minutes = (int) (diff / ONE_MINUTE);
-            if (minutes == 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
-            } else {
-                return minutes
-                    + " "
-                    + ServiceContainer.getSettingsManager().getContext()
-                        .getString(R.string.utils_minutes_ago);
-            }
+
+            return timeInMinutes(diff);
+
         } else if (diff < ONE_DAY) {
             // Give time hours
-            int hours = (int) (diff / ONE_HOUR);
-            if (hours == 1) {
-                return ServiceContainer.getSettingsManager().getContext()
-                    .getString(R.string.utils_one_hour_ago);
-            } else {
-                return "" + hours + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
-            }
+
+            return timeInHours(diff);
+
         } else if (diff < ONE_YEAR) {
             // Give time in days
-            int days = (int) (diff / ONE_DAY);
-            if (days == 1) {
-                return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
-            } else {
-                return "" + days + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
-            }
+
+            return timeInDays(diff);
+
         } else {
-            return ServiceContainer.getSettingsManager().getContext()
-                .getString(R.string.utils_never_seen_on_smartmap);
+
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
         }
     }
 
     /**
-     * Creates a matrix for a given color to be used to transform a Bitmap's
-     * color.
-     * 
+     * Creates a matrix for a given color to be used to transform a Bitmap's color.
+     *
      * @param color
      * @return the matrix
      */
@@ -289,13 +242,13 @@ public final class Utils {
 
     /**
      * Get a string representation of the day's time of a Calendar
-     * 
+     *
      * @param calendar
      * @return
      */
     public static String getTimeString(Calendar calendar) {
         return formatForDisplay(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
-            + formatForDisplay(calendar.get(Calendar.MINUTE));
+                + formatForDisplay(calendar.get(Calendar.MINUTE));
     }
 
     /**
@@ -310,27 +263,20 @@ public final class Utils {
         if (distance >= ONE_THOUSAND_METERS) {
             distance = distance / ONE_THOUSAND_METERS;
             distance = Math.round(distance * TEN) / TEN;
-            textDistance =
-                distance
-                    + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km)
-                    + " "
-                    + ServiceContainer.getSettingsManager().getContext()
-                        .getString(R.string.utils_away_from_you);
+            textDistance = distance + " "
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km) + " "
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you);
         } else {
             distance = Math.round(distance);
-            textDistance =
-                (((int) distance) + " ")
-                    + ServiceContainer.getSettingsManager().getContext()
-                        .getString(R.string.utils_meters_away_from_you);
+            textDistance = (((int) distance) + " ")
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you);
         }
         return textDistance;
     }
 
     /**
-     * Set the badge count on a LayerDrawable (mainly the notification icon in
-     * main activity).
-     * 
+     * Set the badge count on a LayerDrawable (mainly the notification icon in main activity).
+     *
      * @param context
      * @param icon
      * @param count
@@ -353,6 +299,44 @@ public final class Utils {
     }
 
     /**
+     * @param addresses
+     * @return
+     *
+     * @author SpicyCH
+     */
+    private static String cityOrCountryFromAddresses(List<Address> addresses) {
+        if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
+            return addresses.get(0).getLocality();
+        } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
+            return addresses.get(0).getCountryName();
+        } else {
+            return Displayable.NO_LOCATION_STRING;
+        }
+    }
+
+    /**
+     * @param calendar
+     * @return
+     *
+     * @author SpicyCH
+     */
+    private static String customizedDateString(Calendar calendar, int daysDiff) {
+        if (daysDiff > 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
+                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        } else if (daysDiff == 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
+        } else if (daysDiff == 0) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
+        } else if (daysDiff == -1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
+        } else {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
+                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        }
+    }
+
+    /**
      * @param time
      *            a second, minute, hour, day or month
      * @return the time prefixed with 0 if it was < 10
@@ -367,5 +351,83 @@ public final class Utils {
         }
 
         return hourOfDayString;
+    }
+
+    /**
+     * @param calendar
+     * @return the date, in the form dd.mm.yyyy
+     *
+     * @author SpicyCH
+     */
+    private static String getCompleteDate(Calendar calendar) {
+        int month = calendar.get(Calendar.MONTH) + 1;
+
+        return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
+                + calendar.get(Calendar.YEAR);
+    }
+
+    /**
+     * @param calendar
+     * @param daysDiff
+     * @return
+     *
+     * @author SpicyCH
+     */
+    private static String getDateStringForNoYearDiff(Calendar calendar, int daysDiff) {
+
+        if ((daysDiff > -DAYS_IN_A_WEEK) && (daysDiff < DAYS_IN_A_WEEK)) {
+
+            return customizedDateString(calendar, daysDiff);
+
+        } else {
+            return getCompleteDate(calendar);
+        }
+    }
+
+    /**
+     * @param diff
+     * @return
+     *
+     * @author SpicyCH
+     */
+    private static String timeInDays(long diff) {
+        int days = (int) (diff / ONE_DAY);
+        if (days == 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
+        } else {
+            return days + " " + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
+        }
+    }
+
+    /**
+     * @param diff
+     * @return
+     *
+     * @author SpicyCH
+     */
+    private static String timeInHours(long diff) {
+        int hours = (int) (diff / ONE_HOUR);
+        if (hours == 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_hour_ago);
+        } else {
+            return "" + hours + " "
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
+        }
+    }
+
+    /**
+     * @param diff
+     * @return
+     *
+     * @author SpicyCH
+     */
+    private static String timeInMinutes(long diff) {
+        int minutes = (int) (diff / ONE_MINUTE);
+        if (minutes == 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
+        } else {
+            return minutes + " "
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
+        }
     }
 }

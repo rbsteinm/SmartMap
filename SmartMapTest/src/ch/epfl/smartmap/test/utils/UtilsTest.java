@@ -102,6 +102,13 @@ public class UtilsTest extends AndroidTestCase {
     }
 
     @Test
+    public void testFuture() {
+        Calendar inFarAwayFuture = new GregorianCalendar(2345, 7, 17);
+
+        assertEquals("17.08.2345", Utils.getDateString(inFarAwayFuture));
+    }
+
+    @Test
     public void testGetColorInInterval1() {
         double value = 0.0;
         double startValue = 1.0;
