@@ -273,6 +273,7 @@ public class AddEventActivity extends FragmentActivity {
         } else {
 
             if (!mCreatingEvent) {
+                // Handle the situation where the user is spamming the create button.
                 mCreatingEvent = true;
 
                 Location location = new Location("Location set by user");
