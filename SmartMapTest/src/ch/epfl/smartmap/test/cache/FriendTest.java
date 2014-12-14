@@ -153,7 +153,7 @@ public class FriendTest extends AndroidTestCase {
         Friend friend = (Friend) ServiceContainer.getCache().getUser(id);
 
         UserContainer unsetParameters = User.NOBODY.getContainerCopy();
-        unsetParameters.setFriendship(User.DONT_KNOW);
+        unsetParameters.setFriendship(User.NO_FRIENDSHIP);
         unsetParameters.setId(friend.getId());
 
         assertFalse(friend.update(unsetParameters));
