@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import android.content.Intent;
 import android.location.Location;
 import android.test.ServiceTestCase;
+import android.util.Log;
 import ch.epfl.smartmap.background.OwnPositionService;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
@@ -34,9 +35,27 @@ public class OwnPositionServiceTest extends ServiceTestCase<OwnPositionService> 
     }
 
     @Test
+    public void testOnTaskRemoved() {
+        testIntent = new Intent(this.getContext(), OwnPositionService.class);
+
+        // Not the same as Context.startService() !
+        this.startService(testIntent);
+
+        getService().onTaskRemoved(testIntent);
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            Log.e(OwnPositionServiceTest.class.getSimpleName(), "Thread interrupted: " + e);
+        }
+        // Check if the service is running
+        assertTrue(this.getContext().stopService(testIntent));
+    }
+
+    @Test
     public void testStartStop() {
         testIntent = new Intent(this.getContext(), OwnPositionService.class);
         this.getContext().startService(testIntent);
         assertTrue(this.getContext().stopService(testIntent));
     }
+
 }

@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.gui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,17 +37,17 @@ public class SideMenuAdapter extends ArrayAdapter<String> {
      * @see android.widget.ArrayAdapter#getView(int, android.view.View,
      * android.view.ViewGroup)
      */
+    //The sideMenu is populated only once when we launche the app, so viewHolder pattern is of no use here
+    @SuppressLint("ViewHolder")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Create inflater,get item to construct
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.drawer_list_item, parent, false);
 
-        // Get item field
+        //fill view
         TextView sideMenuView = (TextView) convertView.findViewById(R.id.side_menu_text_view);
-        // Set item field + id
         sideMenuView.setText(mListItems[position]);
-        // set tag to each View
         sideMenuView.setTag("side_menu_tag_" + position);
 
         return convertView;
