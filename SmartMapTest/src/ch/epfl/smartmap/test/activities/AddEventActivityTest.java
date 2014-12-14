@@ -119,13 +119,6 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
-    // Click on fragment doesn't do anything ?
-    public void testOpenSetLocationWhenClickOnMap() throws InterruptedException {
-        // onView(withId(R.id.add_event_map)).perform(ViewActions.click());
-        // Thread.sleep(ESPRESSO_WAIT_DELAY);
-        // onView(withId(R.id.set_location_map)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    }
-
     public void testZCanCreateEventWithDescription() throws InterruptedException {
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
 
