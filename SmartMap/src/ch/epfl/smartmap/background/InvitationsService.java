@@ -47,6 +47,7 @@ public class InvitationsService extends Service {
 
     /**
      * Makes notifications when there is no cache (the app is in background)
+     * (unused in current build, the cache always exists)
      * 
      * @param userInvitBag
      *            {@code InvitationBag} for friend invitations
@@ -56,6 +57,7 @@ public class InvitationsService extends Service {
     private void backgroundNotifications(InvitationBag userInvitBag, InvitationBag eventInvitBag) {
         Set<InvitationContainer> friendInvitations = userInvitBag.getInvitations();
         Set<InvitationContainer> eventInvitations = eventInvitBag.getInvitations();
+        Set<Long> removedFriends = ((NetworkFriendInvitationBag) userInvitBag).getRemovedFriendsIds();
         for (InvitationContainer invite : friendInvitations) {
             ServiceContainer.getDatabase().addInvitation(invite);
             if (invite.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
@@ -66,6 +68,9 @@ public class InvitationsService extends Service {
         for (InvitationContainer invite : eventInvitations) {
             ServiceContainer.getDatabase().addInvitation(invite);
             Notifications.createNotification(Invitation.createFromContainer(invite), this);
+        }
+        for (long id : removedFriends) {
+            // TODO
         }
     }
 
@@ -150,11 +155,15 @@ public class InvitationsService extends Service {
                 if (ServiceContainer.getCache() != null) {
                     // Get friends invitations
                     Log.d(TAG, "Friend invitations");
-                    ServiceContainer.getCache().putInvitations(userInvitBag.getInvitations());
+                    if (!userInvitBag.getInvitations().isEmpty()) {
+                        ServiceContainer.getCache().putInvitations(userInvitBag.getInvitations());
+                    }
                     // Get event invitations
-                    Log.d(TAG, "Event invitations");
 
-                    ServiceContainer.getCache().putInvitations(eventInvitBag.getInvitations());
+                    Log.d(TAG, "Event invitations");
+                    if (!eventInvitBag.getInvitations().isEmpty()) {
+                        ServiceContainer.getCache().putInvitations(eventInvitBag.getInvitations());
+                    }
                     Log.d(TAG, "Successfully fetched invitations / users : " + userInvitBag.getInvitations()
                         + " / events : " + eventInvitBag.getInvitations());
                 } else {

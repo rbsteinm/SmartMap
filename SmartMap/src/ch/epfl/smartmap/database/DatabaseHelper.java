@@ -37,7 +37,7 @@ import ch.epfl.smartmap.cache.UserContainer;
  * 
  * @author ritterni
  */
-public final class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperInterface {
+public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperInterface {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
