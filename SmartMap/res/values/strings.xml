@@ -219,6 +219,7 @@
     <string name="notification_open_event_list">Click here to open your list of events.</string>
 
     <!-- Invitation Activity -->
+    <string name="notification_list_description">notification list description</string>
     <string name="notification_img_content_description">Image of notification</string>
     <string name="title_activity_notifications">Invitations</string>
     <string name="notification_open_friend_invitation_list">Click here to open your list of invitations.</string>

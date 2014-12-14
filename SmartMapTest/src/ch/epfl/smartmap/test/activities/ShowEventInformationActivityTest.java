@@ -19,9 +19,10 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  * Test ShowEventInformationActivity. Since this activity needs a click on
  * ShowEventsActivity to be launched, we extend
  * ActivityInstrumentationTestCase2<ShowEventsActivity>. If the tests crash,
- * relaunch. Espresso sucks.
- *
+ * relaunch.
+ * 
  * @author SpicyCH
+ * @author agpmilli
  */
 public class ShowEventInformationActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
 
@@ -77,42 +78,36 @@ public class ShowEventInformationActivityTest extends ActivityInstrumentationTes
     }
 
     public void testCreatorDisplayed() {
-        onView(withId(R.id.show_event_info_creator)).check(
-            ViewAssertions.matches(ViewMatchers.withText(CREATOR_NAME)));
+        onView(withId(R.id.show_event_info_creator)).check(ViewAssertions.matches(ViewMatchers.withText(CREATOR_NAME)));
     }
 
     public void testDescriptionDisplayed() {
-        onView(withId(R.id.show_event_info_description)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withId(R.id.show_event_info_description)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     public void testEventEndDisplayed() {
 
-        onView(withId(R.id.show_event_info_end_date)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withId(R.id.show_event_info_end_date)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
-        onView(withId(R.id.show_event_info_end_hour)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withId(R.id.show_event_info_end_hour)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
     }
 
     public void testEventNameDisplayedCorrectly() {
 
-        onView(withId(R.id.show_event_info_event_name)).check(
-            ViewAssertions.matches(ViewMatchers.withText(EVENT_NAME)));
+        onView(withId(R.id.show_event_info_event_name))
+            .check(ViewAssertions.matches(ViewMatchers.withText(EVENT_NAME)));
     }
 
     public void testStartDisplayedCorrectly() {
 
         onView(withId(R.id.show_event_info_start_date)).check(
-            ViewAssertions.matches(ViewMatchers.withText(mContext
-                .getString(R.string.events_list_item_adapter_today))));
+            ViewAssertions.matches(ViewMatchers.withText(mContext.getString(R.string.events_list_item_adapter_today))));
     }
 
     public void testTownAndCitiyDisplayed() {
 
-        onView(withId(R.id.show_event_info_town_and_country)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withId(R.id.show_event_info_town_and_country)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     public void testZCanInviteFriends() {

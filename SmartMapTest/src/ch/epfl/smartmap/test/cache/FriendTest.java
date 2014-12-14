@@ -42,6 +42,22 @@ public class FriendTest extends AndroidTestCase {
     UserContainer container;
     UserContainer otherContainer;
 
+    private void initContainers() {
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        location.setTime(lastSeen);
+
+        otherLocation.setLatitude(otherLatitude);
+        otherLocation.setLongitude(otherLongitude);
+        otherLocation.setTime(otherLastSeen);
+
+        container =
+            new UserContainer(id, name, phoneNumber, email, location, locationString, image, blockStatus, User.FRIEND);
+        otherContainer =
+            new UserContainer(id, otherName, otherPhoneNumber, otherEmail, otherLocation, otherLocationString,
+                otherImage, otherBlockStatus, User.FRIEND);
+    }
+
     @Before
     @Override
     protected void setUp() throws Exception {
@@ -59,7 +75,6 @@ public class FriendTest extends AndroidTestCase {
         this.initContainers();
         // new cache
         ServiceContainer.setCache(new Cache());
-
     }
 
     @Test
@@ -166,22 +181,5 @@ public class FriendTest extends AndroidTestCase {
         } catch (IllegalArgumentException e) {
             // Success
         }
-    }
-
-    private void initContainers() {
-        location.setLatitude(latitude);
-        location.setLongitude(longitude);
-        location.setTime(lastSeen);
-
-        otherLocation.setLatitude(otherLatitude);
-        otherLocation.setLongitude(otherLongitude);
-        otherLocation.setTime(otherLastSeen);
-
-        container =
-            new UserContainer(id, name, phoneNumber, email, location, locationString, image, blockStatus,
-                User.FRIEND);
-        otherContainer =
-            new UserContainer(id, otherName, otherPhoneNumber, otherEmail, otherLocation,
-                otherLocationString, otherImage, otherBlockStatus, User.FRIEND);
     }
 }
