@@ -300,9 +300,7 @@ public class ShowEventsActivity extends ListActivity {
 
         mContext = this.getApplicationContext();
 
-        if (ServiceContainer.getSettingsManager() == null) {
-            ServiceContainer.initSmartMapServices(this);
-        }
+        ServiceContainer.initSmartMapServices(this);
 
         if (ServiceContainer.getSettingsManager().getNearEventsMaxDistance() == 0) {
             // The user has disabled events fetching in the settings, hence he
