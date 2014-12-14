@@ -28,7 +28,9 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/activity_show_filters_showOnMap"
         android:clickable="true"
-        android:focusable="false" />
+        android:focusable="false"
+        android:textOn="@string/switch_On"
+        android:textOff="@string/switch_Off" />
     
         <TextView
         android:id="@+id/activity_show_filters_subtitle"

@@ -256,6 +256,9 @@
     <string name="show_on_map">Activate</string>
     <string name="add_filter">Add new filter</string>
     <string name="new_filter_alert_dialog_text">Name </string>
+    <string name="switch_On">YES</string>
+    <string name="switch_Off">NO</string>
+    <string name="people_inside_filter">people inside this filter</string>
 
     <!-- ModifyFilterActivity -->
     <string name="title_activity_modify_filter">ModifyFilterActivity</string>
