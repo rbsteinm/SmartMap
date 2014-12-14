@@ -8,6 +8,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 
 import com.google.android.apps.common.testing.ui.espresso.Espresso;
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
+import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
 /**
@@ -28,9 +29,24 @@ public class LogoutManagerTest extends ActivityInstrumentationTestCase2<MainActi
 
     }
 
+    public void testCanActuallyLogout() {
+        // Relaunch test if espresso fails to click
+        Espresso.onView(ViewMatchers.withText(R.string.app_name)).perform(ViewActions.click());
+        Espresso.onView(ViewMatchers.withText(R.string.logout_text)).perform(ViewActions.click());
+
+        Espresso.onView(ViewMatchers.withText(R.string.logout_confirm)).perform(ViewActions.click());
+        assertTrue(null == ServiceContainer.getCache().getSelf());
+
+    }
+
     public void testCanDisplayLogoutDialog() throws InterruptedException {
         Espresso.onView(ViewMatchers.withText(R.string.app_name)).perform(ViewActions.click());
         Espresso.onView(ViewMatchers.withText(R.string.logout_text)).perform(ViewActions.click());
-        Thread.sleep(2000);
+
+        Espresso.onView(ViewMatchers.withText(R.string.cancel)).check(
+            ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        Espresso.onView(ViewMatchers.withText(R.string.logout_confirm)).check(
+            ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 }
