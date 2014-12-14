@@ -107,6 +107,10 @@ public class AddFriendActivity extends ListActivity {
         builder.create().show();
     }
 
+    /**
+     * sets a listener on the searchbar that updates the views (users) displayed
+     * every time the text chnanges or is submitted
+     */
     private void setSearchBarListener() {
         mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
