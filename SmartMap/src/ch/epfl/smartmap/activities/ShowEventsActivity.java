@@ -72,7 +72,6 @@ public class ShowEventsActivity extends ListActivity {
     private static final double THREE_AND_A_HALF = 0.75;
 
     private SeekBar mSeekBar;
-
     private TextView mShowKilometers;
 
     private boolean mMyEventsChecked;
@@ -87,7 +86,7 @@ public class ShowEventsActivity extends ListActivity {
      * @param event
      *            the event to show a dialog for
      * @param creatorName
-     *            the creator of the event
+     *            the name of the creator of the event
      * @author SpicyCH
      */
     private void displayDialog(final Event event, String creatorName) {
@@ -169,18 +168,11 @@ public class ShowEventsActivity extends ListActivity {
 
             Toast.makeText(ShowEventsActivity.this,
                 ShowEventsActivity.this.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT).show();
-
         } else {
-
             // Construct the dialog that display more detailed infos and
-            // offers to show event on the map
-            // or to
-            // show more details.
-
+            // offers to show event on the map or to show more details.
             this.displayDialog(event, creatorName);
-
         }
-
     }
 
     /**
@@ -209,7 +201,6 @@ public class ShowEventsActivity extends ListActivity {
                     int defaultPosition = (int) Math.floor(THREE_AND_A_HALF * max);
                     mSeekBar.setProgress(defaultPosition);
                 }
-
                 ShowEventsActivity.this.updateCurrentList();
             }
         });
@@ -306,10 +297,8 @@ public class ShowEventsActivity extends ListActivity {
             // The user has disabled events fetching in the settings, hence he
             // has no chance to see events in this list.
             // We warn him with an AlertDialog.
-
             this.noEventsFetchedWarning();
         }
-
         // Initialize the listener
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
@@ -390,11 +379,7 @@ public class ShowEventsActivity extends ListActivity {
      * Updates the list displayed to the user.
      */
     private void updateCurrentList() {
-
-        Log.d(TAG, "Updating event's list to match user choices");
-
         mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllEvents());
-
         if (mNearMeChecked) {
             this.removeEventsToofar();
         }
@@ -406,9 +391,7 @@ public class ShowEventsActivity extends ListActivity {
         if (mOngoingChecked) {
             mEventsList.retainAll(ServiceContainer.getCache().getLiveEvents());
         }
-
         ShowEventsActivity.this.setListAdapter(new EventsListItemAdapter(ShowEventsActivity.this, mEventsList));
-
     }
 
 }

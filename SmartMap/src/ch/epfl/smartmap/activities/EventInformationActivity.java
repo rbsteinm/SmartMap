@@ -116,7 +116,6 @@ public class EventInformationActivity extends ListActivity {
             + Utils.getCountryFromLocation(mEvent.getLocation()));
 
         EventInformationActivity.this.updateCurrentList();
-
     }
 
     /**
@@ -141,8 +140,8 @@ public class EventInformationActivity extends ListActivity {
     }
 
     /**
-     * Triggered when going checkbox is clicked. Updates the displayed list of
-     * participants.
+     * Triggered when "Attending" checkbox is clicked. Updates the displayed
+     * list of participants.
      * 
      * @param v
      *            the checkbox whose status changed
@@ -216,7 +215,6 @@ public class EventInformationActivity extends ListActivity {
             }
 
         }
-
         this.updateCurrentList();
     }
 
@@ -264,7 +262,6 @@ public class EventInformationActivity extends ListActivity {
             MenuItem item = menu.findItem(R.id.event_info_delete_button);
             item.setVisible(false);
         }
-
         return true;
     }
 
@@ -282,7 +279,8 @@ public class EventInformationActivity extends ListActivity {
     }
 
     /**
-     * When this tab is open by a notification.
+     * Called when we want to quit this tab and if it was open by a
+     * notification.
      */
     private void onNotificationOpen() {
         if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
@@ -307,7 +305,6 @@ public class EventInformationActivity extends ListActivity {
             default:
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

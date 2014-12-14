@@ -99,6 +99,10 @@ public class ShowEventInformationActivityTest extends ActivityInstrumentationTes
             .check(ViewAssertions.matches(ViewMatchers.withText(EVENT_NAME)));
     }
 
+    public void testParticipants() {
+
+    }
+
     public void testStartDisplayedCorrectly() {
 
         onView(withId(R.id.show_event_info_start_date)).check(
