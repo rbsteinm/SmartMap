@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
@@ -48,7 +49,7 @@ public class ShowEventsActivity extends ListActivity {
             if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
                 seekBar.setProgress(SEEK_BAR_MIN_VALUE);
             }
-            mShowKilometers.setText(mSeekBar.getProgress() + " km");
+            mShowKilometers.setText(mSeekBar.getProgress() + " " + mContext.getString(R.string.symbol_km));
             ShowEventsActivity.this.updateCurrentList();
         }
 
@@ -70,8 +71,8 @@ public class ShowEventsActivity extends ListActivity {
     private static final int METERS_IN_ONE_KM = 1000;
 
     private static final double THREE_AND_A_HALF = 0.75;
-
     private SeekBar mSeekBar;
+
     private TextView mShowKilometers;
 
     private boolean mMyEventsChecked;
@@ -79,6 +80,8 @@ public class ShowEventsActivity extends ListActivity {
     private boolean mNearMeChecked;
 
     private List<Event> mEventsList;
+
+    private Context mContext;
 
     /**
      * Displays the AlertDialog with events infos.
@@ -154,16 +157,22 @@ public class ShowEventsActivity extends ListActivity {
 
     }
 
+    /**
+     * Gets an event from its id.
+     * 
+     * @param eventId
+     * @author SpicyCH
+     */
     private void getEvent(long eventId) {
 
         Log.d(TAG, "Retrieving event...");
 
-        Event event = ServiceContainer.getCache().getEvent(eventId);
-        String creatorName = event.getCreator().getName();
+        Event evt = ServiceContainer.getCache().getEvent(eventId);
+        String creatorName = evt.getCreator().getName();
 
         Log.d(TAG, "Processing event...");
 
-        if ((event == null) || (creatorName == null)) {
+        if ((evt == null) || (creatorName == null)) {
             Log.e(TAG, "The server returned a null event or creatorName");
 
             Toast.makeText(ShowEventsActivity.this,
@@ -171,12 +180,12 @@ public class ShowEventsActivity extends ListActivity {
         } else {
             // Construct the dialog that display more detailed infos and
             // offers to show event on the map or to show more details.
-            this.displayDialog(event, creatorName);
+            this.displayDialog(evt, creatorName);
         }
     }
 
     /**
-     * Initilizes the activity.
+     * Initializes the activity.
      * 
      * @author SpicyCH
      */
@@ -289,6 +298,8 @@ public class ShowEventsActivity extends ListActivity {
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
+        mContext = this.getApplicationContext();
+
         if (ServiceContainer.getSettingsManager() == null) {
             ServiceContainer.initSmartMapServices(this);
         }
@@ -297,8 +308,10 @@ public class ShowEventsActivity extends ListActivity {
             // The user has disabled events fetching in the settings, hence he
             // has no chance to see events in this list.
             // We warn him with an AlertDialog.
+
             this.noEventsFetchedWarning();
         }
+
         // Initialize the listener
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override

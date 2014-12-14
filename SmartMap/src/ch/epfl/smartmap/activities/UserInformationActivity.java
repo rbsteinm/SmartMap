@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,17 +64,59 @@ public class UserInformationActivity extends Activity {
         }
     }
 
-    @SuppressWarnings("unused")
     private static final String TAG = UserInformationActivity.class.getSimpleName();
     private User mUser;
     private long mUserId;
+    private boolean mIsVisible;
     private Switch mShowOnMapSwitch;
     private Switch mBlockSwitch;
     private TextView mSubtitlesView;
     private TextView mNameView;
     private ImageView mPictureView;
-
     private TextView mDistanceView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_user_information);
+        // Get views
+        mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
+        mNameView = (TextView) this.findViewById(R.id.user_info_name);
+        mSubtitlesView = (TextView) this.findViewById(R.id.user_info_subtitles);
+        mShowOnMapSwitch = (Switch) this.findViewById(R.id.user_info_show_on_map_switch);
+        mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
+        mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
+        // Set actionbar color
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+
+        //add cache listener
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onFilterListUpdate() {
+                User user = ServiceContainer.getCache().getUser(mUserId);
+                UserInformationActivity.this.updateInformations(user);
+            }
+
+            @Override
+            public void onUserListUpdate() {
+                User user = ServiceContainer.getCache().getUser(mUserId);
+                UserInformationActivity.this.updateInformations(user);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Set user informations
+        mUserId = this.getIntent().getLongExtra("USER", User.NO_ID);
+        mUser = ServiceContainer.getCache().getUser(mUserId);
+        this.updateInformations(mUser);
+
+    }
+
 
     /**
      * Display a confirmation dialog to send a friend request to a non-friend
@@ -91,7 +134,6 @@ public class UserInformationActivity extends Activity {
         builder.setPositiveButton(this.getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                // invite friend
                 ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
             }
         });
@@ -114,7 +156,7 @@ public class UserInformationActivity extends Activity {
      * 
      * @param view
      */
-    public void displayDeleteConfirmationDialog(View view) {
+    public void displayRemoveFriendConfirmationDialog(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(this.getString(R.string.remove) + " " + mUser.getName() + " "
             + this.getString(R.string.from_your_friends));
@@ -171,35 +213,6 @@ public class UserInformationActivity extends Activity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_user_information);
-        // Get views
-        mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
-        mNameView = (TextView) this.findViewById(R.id.user_info_name);
-        mSubtitlesView = (TextView) this.findViewById(R.id.user_info_subtitles);
-        mShowOnMapSwitch = (Switch) this.findViewById(R.id.user_info_show_on_map_switch);
-        mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
-        mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
-        // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-
-        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
-            @Override
-            public void onFilterListUpdate() {
-                User user = ServiceContainer.getCache().getUser(mUserId);
-                UserInformationActivity.this.updateInformations(user);
-            }
-
-            @Override
-            public void onUserListUpdate() {
-                User user = ServiceContainer.getCache().getUser(mUserId);
-                UserInformationActivity.this.updateInformations(user);
-            }
-        });
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.user_information, menu);
@@ -230,16 +243,6 @@ public class UserInformationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Set user informations
-        mUserId = this.getIntent().getLongExtra("USER", User.NO_ID);
-        mUser = ServiceContainer.getCache().getUser(mUserId);
-        this.updateInformations(mUser);
-
-    }
 
     /**
      * called when switching the "block" switch
@@ -250,9 +253,11 @@ public class UserInformationActivity extends Activity {
     public void setBlockedStatus(View view) {
         UserContainer modified = mUser.getContainerCopy();
         if (mBlockSwitch.isChecked()) {
+            Log.d(TAG, "HERE IM BLOCKING");
             modified.setBlocked(User.BlockStatus.BLOCKED);
         } else {
             modified.setBlocked(User.BlockStatus.UNBLOCKED);
+            Log.d(TAG, "HERE IM UNBLOCKING");
         }
 
         ServiceContainer.getCache().setBlockedStatus(modified, new NetworkRequestCallback<Void>() {
@@ -294,13 +299,23 @@ public class UserInformationActivity extends Activity {
      * called when switching the "show on map" switch
      * when ON, the concerned user does not appear on the map anymore
      * no matter in which filters he is
+     * pay attention: the default filter works in a reverse-fashion
+     * compared to the other classical filters, which meansn
      * 
      * @param view
      */
     public void showOnMap(View view) {
-        // TODO need superfiltre. Don't forget to check that the user is a
-        // friend !
-        // ServiceContainer.getCache().updateFilter(ServiceContainer.getCache().getFilter(SUPERFILTRE_ID));
+        String toastString = "";
+        if (mIsVisible) {
+            ServiceContainer.getCache().putFilter(
+                ServiceContainer.getCache().getDefaultFilter().getContainerCopy().addId(mUserId));
+            toastString = "user not shown on map anymore";
+        } else {
+            ServiceContainer.getCache().putFilter(
+                ServiceContainer.getCache().getDefaultFilter().getContainerCopy().removeId(mUserId));
+            toastString = "user shown on map";
+        }
+        Toast.makeText(UserInformationActivity.this, toastString, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -314,7 +329,8 @@ public class UserInformationActivity extends Activity {
     }
 
     /**
-     * Updates the information displayed with a new user
+     * Updates the user's informations when we resume the activity
+     * called in the onResume() method
      * 
      * @param user
      */
@@ -344,8 +360,9 @@ public class UserInformationActivity extends Activity {
                         mSubtitlesView.setText(friend.getSubtitle());
                         mPictureView.setImageBitmap(friend.getActionImage());
                         // FIXME : boolean value must be checked
-                        mShowOnMapSwitch.setChecked(true);
-                        mBlockSwitch.setChecked(friend.getBlockStatus() == User.BlockStatus.UNBLOCKED);
+                        mIsVisible = ServiceContainer.getCache().getDefaultFilter().getVisibleFriends().contains(mUser);
+                        mShowOnMapSwitch.setChecked(mIsVisible);
+                        mBlockSwitch.setChecked(UserInformationActivity.this.statusToBool(friend.getBlockStatus()));
                         mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
 
                         Button button =
@@ -354,7 +371,7 @@ public class UserInformationActivity extends Activity {
                         button.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                UserInformationActivity.this.displayDeleteConfirmationDialog(v);
+                                UserInformationActivity.this.displayRemoveFriendConfirmationDialog(v);
                             }
                         });
                         button.setText(UserInformationActivity.this.getResources().getString(
