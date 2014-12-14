@@ -60,9 +60,15 @@ public class NetworkSmartMapClient implements SmartMapClient {
 
     private static final String SERVER_URL = "http://smartmap.ddns.net";
     private static final NetworkProvider NETWORK_PROVIDER = new DefaultNetworkProvider();
-    private final static int HTTP_SUCCESS_START = 200;
-    private final static int HTTP_SUCCESS_END = 299;
+
+    private static final int HTTP_SUCCESS_START = 200;
+    private static final int HTTP_SUCCESS_END = 299;
+
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String PARAM_FRIEND_ID = "friend_id";
+    private static final String PARAM_EVENT_ID = "event_id";
+    private static final String PARAM_LATITUDE = "latitude";
+    private static final String PARAM_LONGITUDE = "longitude";
 
     private static CookieManager mCookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
 
@@ -80,7 +86,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     public UserContainer acceptInvitation(long id) throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("friend_id", Long.toString(id));
+        params.put(PARAM_FRIEND_ID, Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/acceptInvitation");
         String response = this.sendViaPost(params, conn);
 
@@ -103,7 +109,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void ackAcceptedInvitation(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("friend_id", Long.toString(id));
+        params.put(PARAM_FRIEND_ID, Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/ackAcceptedInvitation");
         String response = this.sendViaPost(params, conn);
 
@@ -120,7 +126,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     public void ackEventInvitation(long eventId) throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("event_id", Long.toString(eventId));
+        params.put(PARAM_EVENT_ID, Long.toString(eventId));
         HttpURLConnection conn = this.getHttpURLConnection("/ackEventInvitation");
         String response = this.sendViaPost(params, conn);
 
@@ -136,7 +142,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void ackRemovedFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("friend_id", Long.toString(id));
+        params.put(PARAM_FRIEND_ID, Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/ackRemovedFriend");
         String response = this.sendViaPost(params, conn);
 
@@ -185,7 +191,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void blockFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("friend_id", Long.toString(id));
+        params.put(PARAM_FRIEND_ID, Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/blockFriend");
         String response = this.sendViaPost(params, conn);
 
@@ -226,7 +232,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void declineInvitation(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("friend_id", Long.toString(id));
+        params.put(PARAM_FRIEND_ID, Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/declineInvitation");
         String response = this.sendViaPost(params, conn);
 
@@ -264,7 +270,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public EventContainer getEventInfo(long eventId) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("event_id", Long.toString(eventId));
+        params.put(PARAM_EVENT_ID, Long.toString(eventId));
         HttpURLConnection conn = this.getHttpURLConnection("/getEventInfo");
         String response = this.sendViaPost(params, conn);
 
@@ -389,8 +395,8 @@ public class NetworkSmartMapClient implements SmartMapClient {
         throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("latitude", Double.toString(latitude));
-        params.put("longitude", Double.toString(longitude));
+        params.put(PARAM_LATITUDE, Double.toString(latitude));
+        params.put(PARAM_LONGITUDE, Double.toString(longitude));
         params.put("radius", Double.toString(radius));
 
         HttpURLConnection conn = this.getHttpURLConnection("/getPublicEvents");
@@ -427,7 +433,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
         try {
             friend = parser.parseFriend(response);
         } catch (SmartMapParseException e) {
-            throw new SmartMapClientException();
+            throw new SmartMapClientException(e);
         }
 
         return friend;
@@ -440,7 +446,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void inviteFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("friend_id", Long.toString(id));
+        params.put(PARAM_FRIEND_ID, Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/inviteFriend");
         String response = this.sendViaPost(params, conn);
 
@@ -458,7 +464,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     public void inviteUsersToEvent(long eventId, List<Long> usersIds) throws SmartMapClientException {
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("event_id", Long.toString(eventId));
+        params.put(PARAM_EVENT_ID, Long.toString(eventId));
         params.put("users_ids", this.longListToString(usersIds));
         HttpURLConnection conn = this.getHttpURLConnection("/inviteUsersToEvent");
         String response = this.sendViaPost(params, conn);
@@ -475,7 +481,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void joinEvent(long eventId) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("event_id", Long.toString(eventId));
+        params.put(PARAM_EVENT_ID, Long.toString(eventId));
         HttpURLConnection conn = this.getHttpURLConnection("/joinEvent");
         String response = this.sendViaPost(params, conn);
 
@@ -490,7 +496,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void leaveEvent(long eventId) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("event_id", Long.toString(eventId));
+        params.put(PARAM_EVENT_ID, Long.toString(eventId));
         HttpURLConnection conn = this.getHttpURLConnection("/leaveEvent");
         String response = this.sendViaPost(params, conn);
 
@@ -533,7 +539,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void removeFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("friend_id", Long.toString(id));
+        params.put(PARAM_FRIEND_ID, Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/removeFriend");
         String response = this.sendViaPost(params, conn);
 
@@ -549,7 +555,7 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void unblockFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("friend_id", Long.toString(id));
+        params.put(PARAM_FRIEND_ID, Long.toString(id));
         HttpURLConnection conn = this.getHttpURLConnection("/unblockFriend");
         String response = this.sendViaPost(params, conn);
 
@@ -584,8 +590,8 @@ public class NetworkSmartMapClient implements SmartMapClient {
     @Override
     public void updatePos(Location location) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("longitude", Double.toString(location.getLongitude()));
-        params.put("latitude", Double.toString(location.getLatitude()));
+        params.put(PARAM_LONGITUDE, Double.toString(location.getLongitude()));
+        params.put(PARAM_LATITUDE, Double.toString(location.getLatitude()));
 
         HttpURLConnection conn = this.getHttpURLConnection("/updatePos");
         String response = this.sendViaPost(params, conn);
@@ -675,8 +681,8 @@ public class NetworkSmartMapClient implements SmartMapClient {
 
         params.put("starting", startingDate);
         params.put("ending", endDate);
-        params.put("longitude", Double.toString(event.getLocation().getLongitude()));
-        params.put("latitude", Double.toString(event.getLocation().getLatitude()));
+        params.put(PARAM_LONGITUDE, Double.toString(event.getLocation().getLongitude()));
+        params.put(PARAM_LATITUDE, Double.toString(event.getLocation().getLatitude()));
         params.put("positionName", event.getLocationString());
         params.put("name", event.getName());
         params.put("description", event.getDescription());
@@ -717,11 +723,11 @@ public class NetworkSmartMapClient implements SmartMapClient {
      *             external to the application (network failure etc.)
      */
     private String getRequestResponse(HttpURLConnection connection) throws SmartMapClientException {
-        StringBuffer response = null;
+        StringBuilder response = null;
         try {
 
             String inputLine;
-            response = new StringBuffer();
+            response = new StringBuilder();
             BufferedReader in;
 
             in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
