@@ -82,8 +82,10 @@ public class BadgeDrawable extends Drawable {
         // do nothing
     }
 
-    /*
+    /**
      * Sets the count (i.e notifications) to display.
+     * 
+     * @param count
      */
     public void setCount(int count) {
         mCount = Integer.toString(count);

@@ -26,9 +26,9 @@ public class NetworkEventInvitationBag implements InvitationBag {
      * The constructor takes List arguments for compliance with server
      * communication code.
      */
-    public NetworkEventInvitationBag(HashSet<EventContainer> hashSet) {
+    public NetworkEventInvitationBag(Set<EventContainer> set) {
 
-        if (hashSet == null) {
+        if (set == null) {
             throw new IllegalArgumentException("invitingEvents is null");
         }
 
@@ -36,7 +36,7 @@ public class NetworkEventInvitationBag implements InvitationBag {
         long timeStamp =
             GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis();
 
-        for (EventContainer event : hashSet) {
+        for (EventContainer event : set) {
             invitations.add(new InvitationContainer(Invitation.NO_ID, null, event, Invitation.UNREAD,
                 timeStamp, Invitation.EVENT_INVITATION));
             Log.d(

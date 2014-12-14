@@ -3,8 +3,10 @@ package ch.epfl.smartmap.test.activities;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.allOf;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.StartActivity;
@@ -33,6 +35,15 @@ public class StartActivityTest extends ActivityInstrumentationTestCase2<StartAct
     }
 
     /**
+     * Welcome text should always be displayed (but sometimes with alpha 0.0
+     */
+    public void testAWelcomeApparence() {
+        if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
+            onView(withId(R.id.welcome)).check(matches(isDisplayed()));
+        }
+    }
+
+    /**
      * Click on startActivity shouldn't do anything
      * 
      * @throws Exception
@@ -52,8 +63,7 @@ public class StartActivityTest extends ActivityInstrumentationTestCase2<StartAct
     public void testFacebookButtonVisibility() throws InterruptedException {
         if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
             Thread.sleep(1000);
-            // Problem double view
-            // onView(withId(R.id.loginButton)).check(matches(isDisplayed()));
+            onView(allOf(withId(R.id.loginButton), isCompletelyDisplayed())).check(matches(isDisplayed()));
         } else {
             // no facebook button
         }
@@ -65,15 +75,6 @@ public class StartActivityTest extends ActivityInstrumentationTestCase2<StartAct
     public void testLogoClick() {
         if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
             onView(withId(R.id.logo)).check(matches(isDisplayed()));
-        }
-    }
-
-    /**
-     * Welcome text should always be displayed (but sometimes with alpha 0.0
-     */
-    public void testWelcomeApparence() {
-        if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
-            onView(withId(R.id.welcome)).check(matches(isDisplayed()));
         }
     }
 

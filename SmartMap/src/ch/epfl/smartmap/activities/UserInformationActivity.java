@@ -300,7 +300,8 @@ public class UserInformationActivity extends Activity {
      * when ON, the concerned user does not appear on the map anymore
      * no matter in which filters he is
      * pay attention: the default filter works in a reverse-fashion
-     * compared to the other classical filters, which meansn
+     * compared to the other classical filters, which means the users contained
+     * in it are NOT displayed on the map
      * 
      * @param view
      */
@@ -359,8 +360,8 @@ public class UserInformationActivity extends Activity {
                         mNameView.setText(friend.getName());
                         mSubtitlesView.setText(friend.getSubtitle());
                         mPictureView.setImageBitmap(friend.getActionImage());
-                        // FIXME : boolean value must be checked
-                        mIsVisible = ServiceContainer.getCache().getDefaultFilter().getVisibleFriends().contains(mUser);
+                        mIsVisible = !ServiceContainer.getCache().
+                            getDefaultFilter().getVisibleFriends().contains(mUser);
                         mShowOnMapSwitch.setChecked(mIsVisible);
                         mBlockSwitch.setChecked(UserInformationActivity.this.statusToBool(friend.getBlockStatus()));
                         mDistanceView.setText(Utils.printDistanceToMe(friend.getLocation()));
