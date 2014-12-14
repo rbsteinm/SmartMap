@@ -346,7 +346,7 @@ public class EventInformationActivity extends ListActivity {
     }
 
     /**
-     * When this tab is open by a notification
+     * When this tab is open by a notification.
      */
     private void onNotificationOpen() {
         if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
@@ -355,16 +355,18 @@ public class EventInformationActivity extends ListActivity {
     }
 
     /**
-     * Update list of participant when we click on Going checkBox
+     * Update list of participant when we click on Going checkBox.
      */
     private void updateCurrentList() {
 
         if (ServiceContainer.getSearchEngine() == null) {
             ServiceContainer.setSearchEngine(new CachedSearchEngine());
         }
+
         Log.d(TAG, "Search Engine : " + ServiceContainer.getSearchEngine());
         Log.d(TAG, "Event : " + mEvent);
         Log.d(TAG, "Participants id : " + mEvent.getParticipantIds());
+
         ServiceContainer.getSearchEngine().findUserByIds(mEvent.getParticipantIds(),
                 new SearchRequestCallback<Set<User>>() {
                     @Override
