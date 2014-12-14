@@ -28,7 +28,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * the database on creation, and
  * then
  * updates the database as changes are made.
- * 
+ *
  * @author jfperren
  */
 public class Cache implements CacheInterface {
@@ -1305,7 +1305,7 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#removeUsers(java.util.Set)
      */
     @Override
-    public synchronized boolean removeUsers(Set<Long> userIds) {
+    public synchronized void removeUsers(Set<Long> userIds) {
         boolean isListModified = false;
 
         for (long id : userIds) {
@@ -1323,7 +1323,6 @@ public class Cache implements CacheInterface {
             }
         }
 
-        return isListModified;
     }
 
     /*
@@ -1581,7 +1580,7 @@ public class Cache implements CacheInterface {
 
     /**
      * OK
-     * 
+     *
      * @param userInfo
      */
     private synchronized boolean updateUser(UserContainer userInfo) {
@@ -1592,7 +1591,7 @@ public class Cache implements CacheInterface {
 
     /**
      * OK
-     * 
+     *
      * @param userInfos
      */
     private synchronized boolean updateUsers(Set<UserContainer> userInfos) {
@@ -1634,7 +1633,7 @@ public class Cache implements CacheInterface {
     /**
      * Allows to search efficiently through the Cache, by providing a filtering
      * method
-     * 
+     *
      * @param <T>
      *            Type of items searched
      * @author jfperren

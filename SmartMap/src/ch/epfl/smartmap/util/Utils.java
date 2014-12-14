@@ -115,7 +115,8 @@ public final class Utils {
      * @param endColor
      * @return the mixed colors
      */
-    public static int getColorInInterval(double value, double startValue, double endValue, int startColor, int endColor) {
+    public static int getColorInInterval(double value, double startValue, double endValue, int startColor,
+            int endColor) {
         if (startValue > endValue) {
             return getColorInInterval(value, endValue, startValue, endColor, startColor);
         } else {
@@ -126,7 +127,8 @@ public final class Utils {
                 double percentageStart = -(value - endValue) / intervalLength;
 
                 int red = (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
-                int green = (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color.green(endColor)));
+                int green = (int) ((percentageStart * Color.green(startColor))
+                        + (percentageEnd * Color.green(endColor)));
                 int blue = (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
 
                 Log.d(TAG, "start : " + percentageStart + "end : " + percentageEnd);
@@ -328,7 +330,7 @@ public final class Utils {
             return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
         } else if (daysDiff == -1) {
             return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
-        } else  {
+        } else {
             return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
                     + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
         }
