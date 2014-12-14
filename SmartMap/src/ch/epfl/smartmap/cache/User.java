@@ -23,7 +23,6 @@ public abstract class User implements UserInterface {
     public static final String NO_PHONE_NUMBER = "No phone Number";
     public static final String NO_EMAIL = "No email";
     public static final Calendar NO_LAST_SEEN = GregorianCalendar.getInstance();
-    public static final BlockStatus NO_BLOCK_STATUS = BlockStatus.BLOCKED;
 
     // Default User
     public static final User NOBODY = new Stranger(NO_ID, NO_NAME, NO_IMAGE);
@@ -161,10 +160,12 @@ public abstract class User implements UserInterface {
     }
 
     /**
-     * Does the conversion container -> live instance. DO NOT CALL THIS METHOD OUTSIDE CACHE.
+     * Does the conversion container -> live instance. DO NOT CALL THIS METHOD
+     * OUTSIDE CACHE.
      * 
      * @param userContainer
-     *            a Container that has all informations about the {@code User} you want to create.
+     *            a Container that has all informations about the {@code User}
+     *            you want to create.
      * @return the {@code User} live instance.
      */
     public static User createFromContainer(UserContainer userContainer) {

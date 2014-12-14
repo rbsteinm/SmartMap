@@ -215,9 +215,6 @@ interface CacheInterface {
 
     void setBlockedStatus(UserContainer user, NetworkRequestCallback<Void> callback);
 
-    void setBlockedStatus(UserContainer user, User.BlockStatus newBlockedStatus,
-        NetworkRequestCallback<Void> callback);
-
     void updateFromNetwork(SmartMapClient networkClient, NetworkRequestCallback<Void> callback);
 
     void updateUserInfos(long id);
