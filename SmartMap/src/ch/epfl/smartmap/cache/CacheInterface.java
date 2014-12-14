@@ -8,6 +8,7 @@ import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.database.DatabaseHelperInterface;
 import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.servercom.SmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
  * All methods that must be implemented by the Cache
@@ -218,7 +219,7 @@ interface CacheInterface {
     void setBlockedStatus(UserContainer user, User.BlockStatus newBlockedStatus,
         NetworkRequestCallback<Void> callback);
 
-    void updateFromNetwork(SmartMapClient networkClient, NetworkRequestCallback<Void> callback);
+    void updateFromNetwork(SmartMapClient networkClient) throws SmartMapClientException;
 
     void updateUserInfos(long id);
 }

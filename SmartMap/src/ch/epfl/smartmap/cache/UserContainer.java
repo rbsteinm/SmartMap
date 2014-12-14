@@ -197,4 +197,10 @@ public final class UserContainer {
         mPhoneNumber = newPhoneNumber;
         return this;
     }
+
+    public static UserContainer newEmptyContainer() {
+        return new UserContainer(User.NO_ID, User.NO_NAME, User.NO_PHONE_NUMBER, User.NO_EMAIL,
+            User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, User.BlockStatus.NOT_SET,
+            User.NO_FRIENDSHIP);
+    }
 }

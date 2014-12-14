@@ -1118,9 +1118,6 @@ public class Cache implements CacheInterface {
 
         for (long id : ids) {
             if (mEventIds.contains(id)) {
-                // TODO remove event in networkClient
-                // ServiceContainer.getNetworkClient().
-
                 // Remove id from sets
                 mEventIds.remove(id);
 
@@ -1370,114 +1367,102 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void updateFromNetwork(final SmartMapClient networkClient,
-        final NetworkRequestCallback<Void> callback) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    // Get settings
-                    SettingsManager settingsManager = ServiceContainer.getSettingsManager();
+    public synchronized void updateFromNetwork(final SmartMapClient networkClient)
+        throws SmartMapClientException {
 
-                    // Sets with new values (avoid calling multiple times the
-                    // listeners)
-                    Set<UserContainer> updatedUsers = new HashSet<UserContainer>();
-                    Set<EventContainer> updatedEvents = new HashSet<EventContainer>();
+        // Get settings
+        SettingsManager settingsManager = ServiceContainer.getSettingsManager();
 
-                    // Update self informations
-                    long myId = settingsManager.getUserId();
-                    UserContainer self = networkClient.getUserInfo(myId);
-                    self.setImage(networkClient.getProfilePicture(myId));
-                    updatedUsers.add(self);
+        // Sets with new values (avoid calling multiple times the
+        // listeners)
+        Set<UserContainer> updatedUsers = new HashSet<UserContainer>();
+        Set<EventContainer> updatedEvents = new HashSet<EventContainer>();
 
-                    // Fetch friend ids
-                    Set<Long> friendIds = new HashSet<Long>(networkClient.getFriendsIds());
-                    Set<Long> friendPosIds = new HashSet<Long>();
-                    // Fetch friends via listFriendPos
-                    Set<UserContainer> listFriendPos =
-                        new HashSet<UserContainer>(networkClient.listFriendsPos());
+        // Update self informations
+        long myId = settingsManager.getUserId();
+        UserContainer self = networkClient.getUserInfo(myId);
+        self.setImage(networkClient.getProfilePicture(myId));
+        updatedUsers.add(self);
 
-                    for (UserContainer positionInfos : listFriendPos) {
-                        // get id
-                        long id = positionInfos.getId();
-                        // Get other online info
-                        UserContainer onlineInfos = networkClient.getUserInfo(id);
-                        Log.d(TAG, "onlineInfos has name " + onlineInfos.getName());
-                        // Get picture
-                        Bitmap image = networkClient.getProfilePicture(id);
-                        // Put all inside container
-                        onlineInfos.setLocation(positionInfos.getLocation());
-                        onlineInfos.setLocationString(positionInfos.getLocationString());
-                        onlineInfos.setImage(image);
+        // Fetch friend ids
+        Set<Long> friendIds = new HashSet<Long>(networkClient.getFriendsIds());
+        Set<Long> friendPosIds = new HashSet<Long>();
+        // Fetch friends via listFriendPos
+        Set<UserContainer> listFriendPos = new HashSet<UserContainer>(networkClient.listFriendsPos());
 
-                        Log.d(TAG, "Update(" + onlineInfos.getId() + ") : " + onlineInfos.getName() + ", "
-                            + self.getLocationString());
-                        Log.d(TAG, "Has " + ((onlineInfos.getImage() == User.NO_IMAGE) ? "no " : "")
-                            + "image");
+        for (UserContainer positionInfos : listFriendPos) {
+            // get id
+            long id = positionInfos.getId();
+            // Get other online info
+            UserContainer onlineInfos = networkClient.getUserInfo(id);
+            Log.d(TAG, "onlineInfos has name " + onlineInfos.getName());
+            // Get picture
+            Bitmap image = networkClient.getProfilePicture(id);
+            // Put all inside container
+            onlineInfos.setLocation(positionInfos.getLocation());
+            onlineInfos.setLocationString(positionInfos.getLocationString());
+            onlineInfos.setImage(image);
 
-                        // Put friend in Set
-                        friendPosIds.add(id);
-                        updatedUsers.add(onlineInfos);
-                    }
+            Log.d(
+                TAG,
+                "Update(" + onlineInfos.getId() + ") : " + onlineInfos.getName() + ", "
+                    + self.getLocationString());
+            Log.d(TAG, "Has " + ((onlineInfos.getImage() == User.NO_IMAGE) ? "no " : "") + "image");
 
-                    // For friends that blocked us, try to find a value in cache
-                    Set<Long> friendThatBlockedUsIds = friendIds;
-                    friendThatBlockedUsIds.removeAll(friendPosIds);
-                    for (long id : friendThatBlockedUsIds) {
-                        User cached = Cache.this.getUser(id);
-                        if (cached != null) {
-                            updatedUsers.add(cached.getContainerCopy());
-                        }
-                    }
+            // Put friend in Set
+            friendPosIds.add(id);
+            updatedUsers.add(onlineInfos);
+        }
 
-                    // Get near Events
-                    Set<Long> nearEventIds =
-                        new HashSet<Long>(networkClient.getPublicEvents(settingsManager.getLocation()
-                            .getLatitude(), settingsManager.getLocation().getLongitude(), settingsManager
-                            .getNearEventsMaxDistance()));
-
-                    // Update all cached event if needed
-                    for (long id : mEventIds) {
-                        // Get event infos
-                        EventContainer onlineInfos = networkClient.getEventInfo(id);
-                        // Check if event needs to be kept
-                        if (nearEventIds.contains(id) || (onlineInfos.getCreatorId() == myId)
-                            || onlineInfos.getParticipantIds().contains(myId)) {
-                            // if so, put it in Set
-                            updatedEvents.add(onlineInfos);
-                            updatedUsers.add(onlineInfos.getImmCreator());
-                        }
-                    }
-
-                    // Update users from invitations
-                    for (Invitation invitation : Cache.this.getAllInvitations()) {
-                        if (invitation.getType() == Invitation.FRIEND_INVITATION) {
-                            // get id
-                            long id = invitation.getUser().getId();
-                            // Get online info
-                            UserContainer onlineInfos = networkClient.getUserInfo(id);
-                            // Get picture
-                            Bitmap image = networkClient.getProfilePicture(id);
-                            // Put all inside container
-                            onlineInfos.setImage(image);
-
-                            // Put friend in Set
-                            updatedUsers.add(onlineInfos);
-                        }
-                    }
-
-                    // Put new values in cache
-                    Cache.this.keepOnlyTheseUsers(updatedUsers);
-                    Cache.this.keepOnlyTheseEvents(updatedEvents);
-
-                    callback.onSuccess(null);
-                } catch (SmartMapClientException e) {
-                    Log.e(TAG, "SmartMapClientException : " + e);
-                    callback.onFailure(e);
-                }
-                return null;
+        // For friends that blocked us, try to find a value in cache
+        Set<Long> friendThatBlockedUsIds = friendIds;
+        friendThatBlockedUsIds.removeAll(friendPosIds);
+        for (long id : friendThatBlockedUsIds) {
+            User cached = Cache.this.getUser(id);
+            if (cached != null) {
+                updatedUsers.add(cached.getContainerCopy());
             }
-        }.execute();
+        }
+
+        // Get near Events
+        Set<Long> nearEventIds =
+            new HashSet<Long>(networkClient.getPublicEvents(settingsManager.getLocation().getLatitude(),
+                settingsManager.getLocation().getLongitude(), settingsManager.getNearEventsMaxDistance()));
+
+        // Update all cached event if needed
+        for (long id : mEventIds) {
+            // Get event infos
+            EventContainer onlineInfos = networkClient.getEventInfo(id);
+            // Check if event needs to be kept
+            if (nearEventIds.contains(id) || (onlineInfos.getCreatorId() == myId)
+                || onlineInfos.getParticipantIds().contains(myId)) {
+                // if so, put it in Set
+                updatedEvents.add(onlineInfos);
+                updatedUsers.add(onlineInfos.getImmCreator());
+            }
+        }
+
+        // Update users from invitations
+        for (Invitation invitation : Cache.this.getAllInvitations()) {
+            if (invitation.getType() == Invitation.FRIEND_INVITATION) {
+                // get id
+                long id = invitation.getUser().getId();
+                // Get online info
+                UserContainer onlineInfos = networkClient.getUserInfo(id);
+                // Get picture
+                Bitmap image = networkClient.getProfilePicture(id);
+                // Put all inside container
+                onlineInfos.setImage(image);
+
+                // Put friend in Set
+                updatedUsers.add(onlineInfos);
+            }
+        }
+
+        // Put new values in cache
+        Cache.this.keepOnlyTheseUsers(updatedUsers);
+        Cache.this.keepOnlyTheseEvents(updatedEvents);
+
     }
 
     /*

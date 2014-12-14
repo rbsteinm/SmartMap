@@ -132,7 +132,7 @@ public class StrangerTest extends AndroidTestCase {
         Stranger stranger = (Stranger) ServiceContainer.getCache().getUser(id);
 
         UserContainer unsetParameters = User.NOBODY.getContainerCopy();
-        unsetParameters.setFriendship(User.DONT_KNOW);
+        unsetParameters.setFriendship(User.NO_FRIENDSHIP);
         unsetParameters.setId(stranger.getId());
 
         assertFalse(stranger.update(unsetParameters));
