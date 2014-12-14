@@ -23,6 +23,9 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
 import ch.epfl.smartmap.util.Utils;
 
 /**
+ * Service that uses geolocation to periodically update the user's position, send it to the server and store
+ * it on the internal memory
+ * 
  * @author jfperren
  * @author ritterni
  */
