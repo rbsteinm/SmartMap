@@ -79,7 +79,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#acceptInvitation(ch.epfl.smartmap.cache.Invitation,
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#acceptInvitation(ch.epfl.smartmap
+     * .cache.Invitation,
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
@@ -123,7 +125,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#addOnCacheListener(ch.epfl.smartmap.listeners.CacheListener)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#addOnCacheListener(ch.epfl.smartmap
+     * .listeners.CacheListener)
      */
     @Override
     public synchronized void addOnCacheListener(CacheListener listener) {
@@ -132,8 +136,11 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#addParticipantsToEvent(java.util.Set,
-     * ch.epfl.smartmap.cache.Event, ch.epfl.smartmap.callbacks.NetworkRequestCallback)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#addParticipantsToEvent(java.util
+     * .Set,
+     * ch.epfl.smartmap.cache.Event,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
     public synchronized void addParticipantsToEvent(Set<Long> ids, final Event event,
@@ -165,7 +172,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#createEvent(ch.epfl.smartmap.cache.ImmutableEvent,
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#createEvent(ch.epfl.smartmap.cache
+     * .ImmutableEvent,
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
@@ -197,7 +206,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#declineInvitation(ch.epfl.smartmap.cache.Invitation,
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#declineInvitation(ch.epfl.smartmap
+     * .cache.Invitation,
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
@@ -369,7 +380,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#getEvents(ch.epfl.smartmap.cache.Cache.SearchFilter)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#getEvents(ch.epfl.smartmap.cache
+     * .Cache.SearchFilter)
      */
     @Override
     public synchronized Set<Event> getEvents(SearchFilter<Event> filter) {
@@ -410,7 +423,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#getFilters(ch.epfl.smartmap.cache.Cache.SearchFilter)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#getFilters(ch.epfl.smartmap.cache
+     * .Cache.SearchFilter)
      */
     @Override
     public synchronized Set<Filter> getFilters(SearchFilter<Filter> searchFilter) {
@@ -464,7 +479,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#getInvitations(ch.epfl.smartmap.cache.Cache.SearchFilter)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#getInvitations(ch.epfl.smartmap
+     * .cache.Cache.SearchFilter)
      */
     @Override
     public synchronized SortedSet<Invitation> getInvitations(SearchFilter<Invitation> filter) {
@@ -563,7 +580,8 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#getUnansweredFriendInvitations()
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#getUnansweredFriendInvitations()
      */
     @Override
     public synchronized SortedSet<Invitation> getUnansweredFriendInvitations() {
@@ -606,7 +624,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#initFromDatabase(ch.epfl.smartmap.database.DatabaseHelper)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#initFromDatabase(ch.epfl.smartmap
+     * .database.DatabaseHelper)
      */
     @Override
     public synchronized void initFromDatabase(DatabaseHelperInterface database) {
@@ -643,7 +663,8 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#inviteFriendsToEvent(long, java.util.Set,
+     * @see ch.epfl.smartmap.cache.CacheInterface#inviteFriendsToEvent(long,
+     * java.util.Set,
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
@@ -714,7 +735,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#modifyOwnEvent(ch.epfl.smartmap.cache.ImmutableEvent,
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#modifyOwnEvent(ch.epfl.smartmap
+     * .cache.ImmutableEvent,
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
@@ -752,7 +775,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#putEvent(ch.epfl.smartmap.cache.ImmutableEvent)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#putEvent(ch.epfl.smartmap.cache
+     * .ImmutableEvent)
      */
     @Override
     public synchronized void putEvent(EventContainer newEvent) {
@@ -818,7 +843,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#putFilter(ch.epfl.smartmap.cache.ImmutableFilter)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#putFilter(ch.epfl.smartmap.cache
+     * .ImmutableFilter)
      */
     @Override
     public synchronized long putFilter(FilterContainer newFilter) {
@@ -873,7 +900,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#putInvitation(ch.epfl.smartmap.cache.ImmutableInvitation)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#putInvitation(ch.epfl.smartmap.
+     * cache.ImmutableInvitation)
      */
     @Override
     public synchronized void putInvitation(InvitationContainer invitationInfo) {
@@ -1021,7 +1050,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#putUser(ch.epfl.smartmap.cache.ImmutableUser)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#putUser(ch.epfl.smartmap.cache.
+     * ImmutableUser)
      */
     @Override
     public synchronized void putUser(UserContainer newFriend) {
@@ -1235,8 +1266,11 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#removeParticipantsFromEvent(java.util.Set,
-     * ch.epfl.smartmap.cache.Event, ch.epfl.smartmap.callbacks.NetworkRequestCallback)
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#removeParticipantsFromEvent(java
+     * .util.Set,
+     * ch.epfl.smartmap.cache.Event,
+     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
     public synchronized void removeParticipantsFromEvent(Set<Long> ids, Event event,
@@ -1294,7 +1328,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#setBlockedStatus(ch.epfl.smartmap.cache.ImmutableUser,
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#setBlockedStatus(ch.epfl.smartmap
+     * .cache.ImmutableUser,
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
@@ -1333,40 +1369,9 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#setBlockedStatus(ch.epfl.smartmap.cache.ImmutableUser,
-     * ch.epfl.smartmap.cache.User.blockStatus, ch.epfl.smartmap.callbacks.NetworkRequestCallback)
-     */
-    @Override
-    public synchronized void setBlockedStatus(final UserContainer user,
-        final User.BlockStatus newBlockedStatus, final NetworkRequestCallback<Void> callback) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                if (user.isBlocked() != newBlockedStatus) {
-                    try {
-                        if (user.isBlocked() == User.BlockStatus.UNBLOCKED) {
-                            ServiceContainer.getNetworkClient().unblockFriend(user.getId());
-                        } else if (user.isBlocked() == User.BlockStatus.BLOCKED) {
-                            ServiceContainer.getNetworkClient().blockFriend(user.getId());
-                        }
-                        if (callback != null) {
-                            callback.onSuccess(null);
-                        }
-                    } catch (SmartMapClientException e) {
-                        Log.e("TAG", "Error while (un)blocking friend: " + e);
-                        if (callback != null) {
-                            callback.onFailure(e);
-                        }
-                    }
-                }
-                return null;
-            }
-        }.execute();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#updateFromNetwork(ch.epfl.smartmap.servercom.SmartMapClient,
+     * @see
+     * ch.epfl.smartmap.cache.CacheInterface#updateFromNetwork(ch.epfl.smartmap
+     * .servercom.SmartMapClient,
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
