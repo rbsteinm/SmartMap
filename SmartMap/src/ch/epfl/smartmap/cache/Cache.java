@@ -1340,10 +1340,10 @@ public class Cache implements CacheInterface {
                     boolean changed = false;
                     if (user.isBlocked() == User.BlockStatus.UNBLOCKED) {
                         ServiceContainer.getNetworkClient().unblockFriend(user.getId());
-                        changed = Cache.this.updateUser(user.setBlocked(User.BlockStatus.UNBLOCKED));
+                        changed = Cache.this.updateUser(user);
                     } else {
                         ServiceContainer.getNetworkClient().blockFriend(user.getId());
-                        changed = Cache.this.updateUser(user.setBlocked(User.BlockStatus.BLOCKED));
+                        changed = Cache.this.updateUser(user);
                     }
                     if (changed) {
                         for (CacheListener listener : mListeners) {
