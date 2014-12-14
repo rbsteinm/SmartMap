@@ -66,7 +66,6 @@ ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 	public void testSwipeLeftLeadsToInvitationsTab() {
 		onView(withId(R.id.myViewPager)).perform(swipeLeft());
 		onView(withId(R.id.layout_invitations_tab)).check(matches(isDisplayed()));
-
 	}
 
 }

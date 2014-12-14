@@ -3,19 +3,21 @@
 namespace SmartMap\Control;
 
 use SmartMap\DBInterface\DatabaseException;
-use SmartMap\DBInterface\EventRepository;
+use SmartMap\DBInterface\EventRepositoryInterface;
 use SmartMap\DBInterface\Event;
-use SmartMap\DBInterface\UserRepository;
+use SmartMap\DBInterface\UserRepositoryInterface;
 use SmartMap\DBInterface\User;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class EventController {
+class EventController implements EventControllerInterface
+{
 
     private $mEventRepo;
+    private $mUserRepo;
 
-    public function __construct(EventRepository $eventRepo, UserRepository $userRepo)
+    public function __construct(EventRepositoryInterface $eventRepo, UserRepositoryInterface $userRepo)
     {
         $this->mEventRepo = $eventRepo;
         $this->mUserRepo = $userRepo;

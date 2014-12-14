@@ -3,14 +3,18 @@ package ch.epfl.smartmap.test.database;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
+import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.EventContainer;
@@ -20,6 +24,7 @@ import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.database.DatabaseHelperInterface;
 
 /**
  * Tests for the DatabaseHelper class
@@ -30,22 +35,20 @@ public class DatabaseHelperTest extends AndroidTestCase {
 
     private final String name = "test name";
     private final UserContainer a = new UserContainer(1, "dafdyx", "898909808", "toto@toto.to", new Location(
-        "testProvider"), "Ecublens", null, User.blockStatus.NOT_SET, User.STRANGER);
-    private final UserContainer b = new UserContainer(678, "tfxhthsfe", "65423", "tata@toto.to",
-        new Location("testProvider"), "Lausanne", null, User.blockStatus.BLOCKED, User.FRIEND);
-    private final UserContainer c = new UserContainer(54554, "hcjkehfkl", "48325", "titi@toto.to",
-        new Location("testProvider"), "Geneva", null, User.blockStatus.UNBLOCKED, User.FRIEND);
-    private final EventContainer event = new EventContainer(123, name, a, "description",
-        new GregorianCalendar(), new GregorianCalendar(), new Location("testprovider"), "Lausanne",
-        new HashSet<Long>());
-    private final EventContainer event2 = new EventContainer(1277, "name 2", b, "description",
-        new GregorianCalendar(), new GregorianCalendar(), new Location("testprovider"), "Lausanne",
-        new HashSet<Long>());
+        "testProvider"), "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER);
+    private final UserContainer b = new UserContainer(678, "tfxhthsfe", "65423", "tata@toto.to", new Location(
+        "testProvider"), "Lausanne", null, User.BlockStatus.BLOCKED, User.FRIEND);
+    private final UserContainer c = new UserContainer(54554, "hcjkehfkl", "48325", "titi@toto.to", new Location(
+        "testProvider"), "Geneva", null, User.BlockStatus.UNBLOCKED, User.FRIEND);
+    private final EventContainer event = new EventContainer(123, name, a, "description", new GregorianCalendar(),
+        new GregorianCalendar(), new Location("testprovider"), "Lausanne", new HashSet<Long>());
+    private final EventContainer event2 = new EventContainer(1277, "name 2", b, "description", new GregorianCalendar(),
+        new GregorianCalendar(), new Location("testprovider"), "Lausanne", new HashSet<Long>());
     private final InvitationContainer invitA = new InvitationContainer(2323, a, null, Invitation.UNREAD,
         new GregorianCalendar().getTimeInMillis(), Invitation.FRIEND_INVITATION);
-    private final InvitationContainer invitB = new InvitationContainer(2323, null, event,
-        Invitation.ACCEPTED, new GregorianCalendar().getTimeInMillis(), Invitation.EVENT_INVITATION);
-    private DatabaseHelper dbh;
+    private final InvitationContainer invitB = new InvitationContainer(2323, null, event, Invitation.ACCEPTED,
+        new GregorianCalendar().getTimeInMillis(), Invitation.EVENT_INVITATION);
+    private DatabaseHelperInterface dbh;
     private FilterContainer filter;
     private FilterContainer filter2;
     private final Location loc = new Location("");
@@ -60,7 +63,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         ServiceContainer.setSettingsManager(manager);
 
         // to avoid erasing the actual database
-        dbh = new DatabaseHelper(new RenamingDelegatingContext(getContext(), "test_"));
+        dbh = new DatabaseHelper(new RenamingDelegatingContext(this.getContext(), "test_"));
         dbh.clearAll();
 
         Set<Long> list1 = new HashSet<Long>();
@@ -90,8 +93,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Test
     public void testAddEvent() {
         dbh.addEvent(event);
-        assertTrue((dbh.getEvent(event.getId()).getStartDate().get(GregorianCalendar.MINUTE) == event
-            .getStartDate().get(GregorianCalendar.MINUTE))
+        assertTrue((dbh.getEvent(event.getId()).getStartDate().get(GregorianCalendar.MINUTE) == event.getStartDate()
+            .get(GregorianCalendar.MINUTE))
             && (dbh.getEvent(event.getId()).getLocation().getLatitude() == event.getLocation().getLatitude()));
     }
 
@@ -103,11 +106,19 @@ public class DatabaseHelperTest extends AndroidTestCase {
     }
 
     @Test
+    public void testAddInvitation() {
+        dbh.addInvitation(invitA);
+        InvitationContainer invit = (InvitationContainer) dbh.getAllInvitations().toArray()[0];
+        assertTrue((invitA.getStatus() == invit.getStatus()) && (invitA.getType() == invit.getType())
+            && (invitA.getTimeStamp() == invit.getTimeStamp()));
+    }
+
+    @Test
     public void testAddUser() {
         dbh.addUser(a);
         // testing that adding a user with the same id erases the first one
-        dbh.addUser(new UserContainer(1, "other name", "898909808", "toto@toto.to", new Location(
-            "testProvider"), "Ecublens", null, User.blockStatus.NOT_SET, User.STRANGER));
+        dbh.addUser(new UserContainer(1, "other name", "898909808", "toto@toto.to", new Location("testProvider"),
+            "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER));
         assertTrue((dbh.getUser(a.getId()).getId() == a.getId())
             && dbh.getUser(a.getId()).getName().equals("other name")
             && dbh.getUser(a.getId()).getPhoneNumber().equals(a.getPhoneNumber())
@@ -133,6 +144,23 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.deleteFilter(filter.getId());
         // accounting for default filter #1
         assertTrue(dbh.getAllFilters().size() == 1);
+    }
+
+    @Test
+    public void testDeleteInvitation() {
+        long id = dbh.addInvitation(invitA);
+        dbh.deleteInvitation(id);
+        assertTrue(dbh.getAllInvitations().size() == 0);
+    }
+
+    @Test
+    public void testDeletePending() {
+        dbh.addPendingFriend(1234);
+        // long id = (long) dbh.getPendingFriends().toArray()[0];
+        // by Robin, didnt compile sorry
+        long id = -1;
+        dbh.deletePendingFriend(1234);
+        assertTrue((dbh.getPendingFriends().size() == 0) && (id == 1234));
     }
 
     @Test
@@ -170,6 +198,30 @@ public class DatabaseHelperTest extends AndroidTestCase {
     }
 
     @Test
+    public void testGetFiltersIds() {
+        dbh.addFilter(filter);
+        dbh.addFilter(filter2);
+        List<Long> ids = dbh.getFilterIds();
+        assertTrue((ids.size() == 2) && ids.contains(filter.getId()) && ids.contains(filter2.getId()));
+    }
+
+    @Test
+    public void testGetFriendsIds() {
+        dbh.addUser(a);
+        dbh.addUser(b);
+        List<Long> ids = dbh.getFriendIds();
+        // a isn't a friend
+        assertTrue((ids.size() == 1) && ids.contains(b.getId()));
+    }
+
+    @Test
+    public void testSetUserPicture() {
+        Bitmap pic = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.ic_default_user);
+        dbh.setUserPicture(pic, 0);
+        assertTrue(dbh.getPictureById(0).sameAs(pic));
+    }
+
+    @Test
     public void testUpdateEvent() {
         dbh.addEvent(event);
         event.setName(name);
@@ -178,13 +230,30 @@ public class DatabaseHelperTest extends AndroidTestCase {
     }
 
     @Test
+    public void testUpdateFilter() {
+        dbh.addFilter(filter);
+        filter.setName("New Name");
+        dbh.updateFilter(filter);
+        assertTrue(dbh.getFilter(filter.getId()).getName().equals("New Name"));
+    }
+
+    @Test
+    public void testUpdateInvitation() {
+        long id = dbh.addInvitation(invitA);
+        dbh.updateInvitation(new InvitationContainer(id, invitA.getUserInfos(), invitA.getEventInfos(),
+            Invitation.ACCEPTED, invitA.getTimeStamp(), invitA.getType()));
+        InvitationContainer invit = (InvitationContainer) dbh.getAllInvitations().toArray()[0];
+        assertTrue((invit.getId() == id) && (invit.getStatus() == Invitation.ACCEPTED));
+    }
+
+    @Test
     public void testUpdateUser() {
         a.setEmail("test email");
         dbh.addUser(a);
         dbh.addUser(b);
         int rows =
-            dbh.updateFriend(new UserContainer(a.getId(), c.getName(), "898909808", "test email",
-                new Location("testProvider"), "Ecublens", null, User.blockStatus.NOT_SET, User.STRANGER));
+            dbh.updateFriend(new UserContainer(a.getId(), c.getName(), "898909808", "test email", new Location(
+                "testProvider"), "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER));
         assertTrue(dbh.getUser(a.getId()).getName().equals(c.getName())
             && dbh.getUser(a.getId()).getEmail().equals("test email") && (rows == 1));
     }

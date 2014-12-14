@@ -16,11 +16,20 @@ import java.util.Set;
  */
 public class FilterContainer {
 
+    // Filter informations
     private Set<Long> mIds;
     private String mName;
     private long mId;
     private boolean mIsActive;
 
+    /**
+     * Constructor, no check on any of the values
+     * 
+     * @param id
+     * @param name
+     * @param ids
+     * @param isActive
+     */
     public FilterContainer(long id, String name, Set<Long> ids, boolean isActive) {
         mId = id;
         mIds = new HashSet<Long>(ids);
@@ -28,47 +37,86 @@ public class FilterContainer {
         mIsActive = isActive;
     }
 
+    /**
+     * @param id
+     *            the id of the friend to add to the filter
+     * @return this
+     */
     public FilterContainer addId(long id) {
         mIds.add(id);
         return this;
     }
 
+    /**
+     * @return id field
+     */
     public long getId() {
         return mId;
     }
 
+    /**
+     * @return ids field
+     */
     public Set<Long> getIds() {
         return new HashSet<Long>(mIds);
     }
 
+    /**
+     * @return name field
+     */
     public String getName() {
         return mName;
     }
 
+    /**
+     * @return isActive field
+     */
     public boolean isActive() {
         return mIsActive;
     }
 
+    /**
+     * @param id
+     *            the id of the friend to remove from the filter
+     * @return this
+     */
     public FilterContainer removeId(long id) {
         mIds.remove(id);
         return this;
     }
 
+    /**
+     * @param isActive
+     *            the new isActive value
+     * @return this
+     */
     public FilterContainer setActive(boolean isActive) {
         mIsActive = isActive;
         return this;
     }
 
+    /**
+     * @param newId
+     * @return this
+     */
     public FilterContainer setId(long newId) {
         mId = newId;
         return this;
     }
 
+    /**
+     * @param newIds
+     * @return this
+     */
     public FilterContainer setIds(Set<Long> newIds) {
         mIds = new HashSet<Long>(newIds);
         return this;
     }
 
+    /**
+     * @param newName
+     * @return this
+     */
     public FilterContainer setName(String newName) {
         mName = newName;
         return this;

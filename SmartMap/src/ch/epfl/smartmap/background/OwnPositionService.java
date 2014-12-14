@@ -23,31 +23,32 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
 import ch.epfl.smartmap.util.Utils;
 
 /**
+ * Service that uses geolocation to periodically update the user's position, send it to the server and store
+ * it on the internal memory
+ * 
  * @author jfperren
+ * @author ritterni
  */
 public class OwnPositionService extends Service {
 
-    // minimum distance to update position
     private static final String TAG = OwnPositionService.class.getSimpleName();
 
-    // minimum distance before gps updates are requested
     private LocationManager mLocManager;
-
-    // Time between position updates on GPS
+    // Distance between position updates on network
     private static final float MIN_NETWORK_DISTANCE = 0;
-    // Time between position updates on Network
+    // Distance between position updates on GPS
     private static final float MIN_GPS_DISTANCE = 50;
-    // Time before restart
+    // Time between updates (milliseconds)
     private static final int GPS_UPDATE_TIME = 5 * 60 * 1000;
-    private static int NETWORK_UPDATE_TIME = 10000;
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Service#onBind(android.content.Intent)
-     */
+    private static final int DEFAULT_NETWORK_TIME = 10000;
+    private int mUpdateTime = DEFAULT_NETWORK_TIME;
+    // Time to wait before restarting the service
     private static final int RESTART_DELAY = 2000;
-
-    private float mCurrentAccuracy = 0;
+    // Accuracy (in meters) of the latest location update
+    private static final float INITIAL_ACCURACY = 1000;
+    private float mCurrentAccuracy = INITIAL_ACCURACY;
+    // Delay before trying to reconnect
+    private static final int RECONNECT_DELAY = 10 * 1000;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -78,7 +79,7 @@ public class OwnPositionService extends Service {
             ServiceContainer.setCache(new Cache());
         }
 
-        NETWORK_UPDATE_TIME = ServiceContainer.getSettingsManager().getRefreshFrequency();
+        mUpdateTime = ServiceContainer.getSettingsManager().getRefreshFrequency();
 
         new StartUp().execute();
 
@@ -160,7 +161,7 @@ public class OwnPositionService extends Service {
         @Override
         protected Boolean doInBackground(Void... arg0) {
             try {
-                // Authentify in order to communicate with NetworkClient
+                // Authenticate in order to communicate with NetworkClient
                 ServiceContainer.getNetworkClient().authServer(
                     ServiceContainer.getSettingsManager().getUserName(),
                     ServiceContainer.getSettingsManager().getFacebookID(),
@@ -182,7 +183,7 @@ public class OwnPositionService extends Service {
                 mLocManager.requestSingleUpdate(criteria, new MyLocationListener(), null);
                 // Try to run LocationManager with Network Provider
                 if (mLocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                    mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_TIME,
+                    mLocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, mUpdateTime,
                         MIN_NETWORK_DISTANCE, new MyLocationListener());
                 }
 
@@ -192,8 +193,13 @@ public class OwnPositionService extends Service {
                         MIN_GPS_DISTANCE, new MyLocationListener());
                 }
             } else {
-                // FIXME : Handle this case
-                // Shouldn't the service always be authentified when launched ?
+                // Retry connection
+                try {
+                    Thread.sleep(RECONNECT_DELAY);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "Thread interrupted: " + e);
+                }
+                new StartUp().execute();
             }
         }
     }

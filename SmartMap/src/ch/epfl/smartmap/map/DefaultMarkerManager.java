@@ -50,6 +50,9 @@ public class DefaultMarkerManager implements MarkerManager {
     private final Map<String, Marker> mDictionnaryMarkers;
 
     public DefaultMarkerManager(GoogleMap googleMap) {
+        if (googleMap == null) {
+            throw new IllegalArgumentException("Null GoogleMap");
+        }
         mGoogleMap = googleMap;
         mDisplayedItems = new HashMap<String, Displayable>();
         mDictionnaryMarkers = new HashMap<String, Marker>();
@@ -62,7 +65,12 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker addMarker(Displayable item, Context context) {
-
+        if (item == null) {
+            throw new IllegalArgumentException("Null Displayable item");
+        }
+        if (context == null) {
+            throw new IllegalArgumentException("Null context");
+        }
         Marker marker =
             mGoogleMap.addMarker(new MarkerOptions().position(item.getLatLng()).title(item.getTitle())
                 .icon(item.getMarkerIcon(context)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
@@ -139,7 +147,9 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker getMarkerForItem(Displayable item) {
-
+        if (item == null) {
+            throw new IllegalArgumentException("Null Displayable item");
+        }
         for (Entry<String, Displayable> entry : mDisplayedItems.entrySet()) {
             if (entry.getValue().equals(item)) {
                 return mDictionnaryMarkers.get(entry.getKey());
@@ -156,6 +166,9 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public boolean isDisplayedItem(Displayable item) {
+        if (item == null) {
+            throw new IllegalArgumentException("Null Displayable item");
+        }
         return mDisplayedItems.containsValue(item);
     }
 
@@ -167,6 +180,9 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public boolean isDisplayedMarker(Marker marker) {
+        if (marker == null) {
+            throw new IllegalArgumentException("Null marker");
+        }
         return mDisplayedItems.containsKey(marker.getId());
     }
 
@@ -178,6 +194,9 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker removeMarker(Displayable item) {
+        if (item == null) {
+            throw new IllegalArgumentException("Null Displayable item");
+        }
         Marker marker = this.getMarkerForItem(item);
         mDisplayedItems.remove(marker.getId());
         mDictionnaryMarkers.remove(marker.getId());
@@ -193,6 +212,9 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public void resetMarkersIcon(Context context) {
+        if (context == null) {
+            throw new IllegalArgumentException("Null context");
+        }
         for (Marker marker : this.getDisplayedMarkers()) {
             if (marker.getSnippet().equals(MarkerColor.RED.toString())) {
                 marker.setIcon(this.getItemForMarker(marker).getMarkerIcon(context));
@@ -210,7 +232,12 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public void updateMarkers(Context context, Set<Displayable> itemsToDisplay) {
-
+        if (context == null) {
+            throw new IllegalArgumentException("Null context");
+        }
+        if (itemsToDisplay == null) {
+            throw new IllegalArgumentException("Null list of items to display");
+        }
         Log.d(TAG, "updateMarkers");
         // In the list friendsToDisplay, search if each friend s already
         // displayed
@@ -224,22 +251,15 @@ public class DefaultMarkerManager implements MarkerManager {
                 marker = this.addMarker(item, context);
             }
 
-            // Log.d("markers", "marker's position for " + item.getTitle() +
-            // " is " + marker.getPosition());
             if ((marker.getPosition().latitude != item.getLatLng().latitude)
                 || (marker.getPosition().longitude != item.getLatLng().longitude)) {
 
                 this.animateMarker(marker, item.getLatLng(), false, item, context);
             }
-            // Log.d("markers", "final position of marker of " + item.getTitle()
-            // + " before setIcon is "
-            // + marker.getPosition());
+
+            // set the marker's icon
             marker.setIcon(item.getMarkerIcon(context));
-            // Log.d(
-            // "markers",
-            // "final position of marker of " + item.getTitle() +
-            // " after setIcon is "
-            // + marker.getPosition());
+
         }
 
         // remove the markers that are not longer in the list to display
@@ -296,6 +316,11 @@ public class DefaultMarkerManager implements MarkerManager {
 
     }
 
+    /**
+     * An enum that represents possible markers color for events
+     * 
+     * @author hugo-S
+     */
     public enum MarkerColor {
         RED,
         ORANGE

@@ -219,6 +219,7 @@
     <string name="notification_open_event_list">Click here to open your list of events.</string>
 
     <!-- Invitation Activity -->
+    <string name="notification_list_description">notification list description</string>
     <string name="notification_img_content_description">Image of notification</string>
     <string name="title_activity_notifications">Invitations</string>
     <string name="notification_open_friend_invitation_list">Click here to open your list of invitations.</string>
@@ -256,6 +257,9 @@
     <string name="show_on_map">Activate</string>
     <string name="add_filter">Add new filter</string>
     <string name="new_filter_alert_dialog_text">Name </string>
+    <string name="switch_On">YES</string>
+    <string name="switch_Off">NO</string>
+    <string name="people_inside_filter">people inside this filter</string>
 
     <!-- ModifyFilterActivity -->
     <string name="title_activity_modify_filter">ModifyFilterActivity</string>

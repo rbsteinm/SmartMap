@@ -34,14 +34,14 @@ import com.facebook.widget.LoginButton;
 
 /**
  * <p>
- * The fragment for the "Login with Facebook" button, used by
- * {@linkplain ch.epfl.smartmap.activities.StartActivity} for screen 1.
+ * The fragment for the "Login with Facebook" button, used by {@linkplain ch.epfl.smartmap.activities.StartActivity} for
+ * screen 1.
  * </p>
  * <p>
- * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name,
- * facebook id and facebook token.
+ * On successful facebook login, we attempt to authenticate to the smartmap server by sending the name, facebook id and
+ * facebook token.
  * </p>
- * 
+ *
  * @author SpicyCH
  */
 public class LoginFragment extends Fragment {
@@ -65,7 +65,7 @@ public class LoginFragment extends Fragment {
     };
 
     public LoginFragment() {
-        // We will need to access the user's friends list
+        // We will need to access the user's friends list in the future.
         mPermissions = Arrays.asList("user_status", "user_friends");
     }
 
@@ -163,12 +163,10 @@ public class LoginFragment extends Fragment {
 
     /**
      * Sends the params to the SmartMap server.
-     * 
+     *
      * @param params
-     *            a map with values for the keys name, facebookId and
-     *            facebookToken
-     * @return <code>true</code> if the internet connection is up and the data
-     *         is beeing processed by an asynctask
+     *            a map with values for the keys name, facebookId and facebookToken
+     * @return <code>true</code> if the internet connection is up and the data is beeing processed by an asynctask
      * @author SpicyCH
      */
     private boolean sendDataToServer(Map<String, String> params) {
@@ -180,8 +178,8 @@ public class LoginFragment extends Fragment {
         assert null != params.get(FACEBOOK_NAME_POST_NAME) : "Facebook name is null";
         assert !params.get(FACEBOOK_NAME_POST_NAME).isEmpty() : "Facebook name is empty";
 
-        ConnectivityManager connMgr =
-            (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr = (ConnectivityManager) this.getActivity().getSystemService(
+                Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if ((networkInfo != null) && networkInfo.isConnected()) {
             // Send data
@@ -191,9 +189,8 @@ public class LoginFragment extends Fragment {
         } else {
             // An error occured
             Log.e(TAG, "Could not send user's data to server. Net down?");
-            Toast.makeText(this.getActivity(),
-                this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet), Toast.LENGTH_LONG)
-                .show();
+            Toast.makeText(this.getActivity(), this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet),
+                    Toast.LENGTH_LONG).show();
             return false;
         }
 
@@ -207,8 +204,8 @@ public class LoginFragment extends Fragment {
     }
 
     /**
-     * This callback uses the retrived facebook data to connect to our server.
-     * 
+     * This callback uses the retrieved facebook data to connect to our server.
+     *
      * @author SpicyCH
      */
     private class CustomGraphUserCallback implements Request.GraphUserCallback {
@@ -235,27 +232,25 @@ public class LoginFragment extends Fragment {
                 Log.i(TAG, "user facebookToken: " + params.get(FACEBOOK_TOKEN_POST_NAME));
 
                 if (!LoginFragment.this.sendDataToServer(params)) {
-                    Toast.makeText(
-                        LoginFragment.this.getActivity(),
-                        LoginFragment.this
-                            .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
-                        Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginFragment.this.getActivity(),
+                            LoginFragment.this.getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
+                            Toast.LENGTH_LONG).show();
                 } else {
                     // If all is ok, start filling Cache
                     ServiceContainer.getCache().initFromDatabase(ServiceContainer.getDatabase());
                     ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient(),
-                        new NetworkRequestCallback() {
-                            @Override
-                            public void onFailure() {
-                                Log.e(TAG, "Cannot update Cache from Network");
-                                LoginFragment.this.startMainActivity();
-                            }
+                            new NetworkRequestCallback<Void>() {
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Log.e(TAG, "Cannot update Cache from Network");
+                                    LoginFragment.this.startMainActivity();
+                                }
 
-                            @Override
-                            public void onSuccess() {
-                                LoginFragment.this.startMainActivity();
-                            }
-                        });
+                                @Override
+                                public void onSuccess(Void result) {
+                                    LoginFragment.this.startMainActivity();
+                                }
+                            });
                 }
 
             } else if (response.getError() != null) {
@@ -265,9 +260,8 @@ public class LoginFragment extends Fragment {
     }
 
     /**
-     * An AsyncTask to send the facebook user data to the SmartMap server
-     * asynchronously
-     * 
+     * An AsyncTask to send the facebook user data to the SmartMap server asynchronously
+     *
      * @author SpicyCH
      */
     private class SendDataTask extends AsyncTask<Void, Void, Boolean> {
@@ -276,7 +270,12 @@ public class LoginFragment extends Fragment {
         private final Map<String, String> mParams;
 
         /**
+         *
+         * Constructor
+         *
          * @param params
+         *            the post parameters to send (must be <code>FACEBOOK_NAME_POST_NAME</code>,
+         *            <code>FACEBOOK_ID_POST_NAME</code>, <code>FACEBOOK_TOKEN_POST_NAME</code>.
          */
         public SendDataTask(Map<String, String> params) {
             mParams = params;
@@ -284,6 +283,7 @@ public class LoginFragment extends Fragment {
 
         /*
          * (non-Javadoc)
+         *
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
@@ -293,8 +293,8 @@ public class LoginFragment extends Fragment {
 
             try {
                 networkClient.authServer(mParams.get(FACEBOOK_NAME_POST_NAME),
-                    Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
-                    mParams.get(FACEBOOK_TOKEN_POST_NAME));
+                        Long.parseLong(mParams.get(FACEBOOK_ID_POST_NAME), FACEBOOK_ID_RADIX),
+                        mParams.get(FACEBOOK_TOKEN_POST_NAME));
             } catch (NumberFormatException e1) {
                 Log.e(TAG, "Couldn't parse to Long: " + e1);
                 return false;
@@ -304,6 +304,7 @@ public class LoginFragment extends Fragment {
             }
 
             Log.i(TAG, "User' infos sent to SmartMap server");
+
             return true;
 
         }

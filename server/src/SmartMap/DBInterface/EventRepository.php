@@ -3,14 +3,13 @@
 namespace SmartMap\DBInterface;
 
 use Doctrine\DBAL\Connection;
-use SmartMap\Control\RequestUtils;
 
 /**
  * Models the Event repo.
  *
  * @author Pamoi
  */
-class EventRepository
+class EventRepository implements EventRepositoryInterface
 {
     private static $TABLE_EVENT = 'events';
     private static $TABLE_EVENT_PARTICIPANTS = 'events_participants';

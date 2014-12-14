@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -33,6 +34,12 @@ public class ShowFiltersActivity extends ListActivity {
 
     private List<Filter> mFilterList;
 
+    /**
+     * Display a dialog that asks for a filter name and creates a new filter
+     * 
+     * @param item
+     */
+    @SuppressLint("InflateParams")
     public void addNewFilterDialog(MenuItem item) {
         // inflate the alertDialog
         LayoutInflater inflater = this.getLayoutInflater();
@@ -45,7 +52,8 @@ public class ShowFiltersActivity extends ListActivity {
         builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                EditText editText = (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
+                EditText editText =
+                    (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                 String filterName = editText.getText().toString();
                 Long newFilterId =
                     ServiceContainer.getCache().putFilter(
@@ -70,15 +78,21 @@ public class ShowFiltersActivity extends ListActivity {
         builder.create().show();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_show_filters);
 
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
 
         this.updateGUI();
 
+        // Add listener that updates the displayed filters list when it changes
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
             public void onFilterListUpdate() {
@@ -87,6 +101,10 @@ public class ShowFiltersActivity extends ListActivity {
         });
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -94,6 +112,11 @@ public class ShowFiltersActivity extends ListActivity {
         return true;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
+     * When clicking on a filter, open ModifyFilterActivity to allow to modify this filter
+     */
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         Filter filter = mFilterList.get(position);
@@ -103,6 +126,10 @@ public class ShowFiltersActivity extends ListActivity {
         super.onListItemClick(listView, view, position, id);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -121,7 +148,6 @@ public class ShowFiltersActivity extends ListActivity {
      */
     @Override
     protected void onResume() {
-
         super.onResume();
         mFilterList = new ArrayList<Filter>(ServiceContainer.getCache().getAllCustomFilters());
         this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
@@ -139,6 +165,9 @@ public class ShowFiltersActivity extends ListActivity {
         this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
 
+    /**
+     * Update the displayed filters
+     */
     private void updateGUI() {
         mFilterList = new ArrayList<Filter>(ServiceContainer.getCache().getAllCustomFilters());
         this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));

@@ -13,6 +13,12 @@ import android.graphics.Bitmap;
  */
 public interface MarkerIconMaker {
 
+    /**
+     * Returns the created marker icon
+     * 
+     * @param context
+     * @return the created marker icon
+     */
     Bitmap getMarkerIcon(Context context);
 
 }

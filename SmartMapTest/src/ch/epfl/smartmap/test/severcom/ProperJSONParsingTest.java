@@ -6,7 +6,6 @@ import java.util.TimeZone;
 
 import org.junit.Test;
 
-import android.annotation.SuppressLint;
 import android.location.Location;
 import android.test.AndroidTestCase;
 import ch.epfl.smartmap.background.ServiceContainer;
@@ -22,16 +21,14 @@ import ch.epfl.smartmap.servercom.SmartMapParser;
  * 
  * @author marion-S
  **/
-@SuppressLint("UseSparseArrays")
+
 public class ProperJSONParsingTest extends AndroidTestCase {
 
 	private static final String PROPER_FRIEND_JSON = "{\n"
 			+ " \"id\" : \"13\", \n" + " \"name\" : \"Georges\", \n"
-			+ " \"email\" : \"georges@gmail.com\", \n"
 			+ " \"latitude\" : \"20.03\", \n"
 			+ " \"longitude\" : \"26.85\", \n"
-			+ " \"lastUpdate\" : \"2014-12-03 20:21:22\", \n"
-			+ " \"phoneNumber\" : \"0782678654\" \n" + "}\n";
+			+ " \"lastUpdate\" : \"2014-12-03 20:21:22\" \n" + "}\n";
 
 	private static final String PROPER_SUCCESS_STATUS_JSON = "{\n"
 			+ " \"status\" : \"Ok\", \n" + " \"message\" : \"Success!\" \n"
@@ -72,9 +69,11 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 			+ " \"friends\" : [ ]" + "}\n";
 
 	private static final String PROPER_EVENT_JSON = "{\n" + "\"event\":"
-			+ "{\n" + " \"id\" : \"13\", \n" + " \"creatorId\" : \"3\", \n"
+			+ "{\n" + " \"id\" : \"13\", \n"
 			+ " \"startingDate\" : \"2014-10-23 05:07:54\", \n"
 			+ " \"endingDate\" : \"2014-11-12 23:54:22\", \n"
+			+ " \"creator\" : " + "{\n" + " \"id\" : \"3\", \n"
+			+ " \"name\" : \"Georges\"}\n , \n"
 			+ " \"longitude\" : \"26.85\", \n"
 			+ " \"latitude\" : \"20.03\", \n" + " \"name\" : \"MyEvent\", \n"
 			+ " \"description\" : \"description\", \n"
@@ -83,7 +82,8 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 
 	private static final String PROPER_EVENT_LIST_JSON = "{\n"
 			+ " \"events\" : [\n" + "{\n" + " \"id\" : \"13\", \n"
-			+ " \"creatorId\" : \"3\", \n"
+			+ " \"creator\" : " + "{\n" + " \"id\" : \"3\", \n"
+			+ " \"name\" : \"Georges\"}\n , \n"
 			+ " \"startingDate\" : \"2014-10-23 05:07:54\", \n"
 			+ " \"endingDate\" : \"2014-11-12 23:54:22\", \n"
 			+ " \"longitude\" : \"26.85\", \n"
@@ -92,7 +92,8 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 			+ " \"name\" : \"MyEvent\", \n"
 			+ " \"description\" : \"description\", \n"
 			+ " \"positionName\" : \"Tokyo\" \n" + "},\n" + "{\n"
-			+ " \"id\" : \"11\", \n" + " \"creatorId\" : \"1\", \n"
+			+ " \"id\" : \"11\", \n" + " \"creator\" : " + "{\n"
+			+ " \"id\" : \"1\", \n" + " \"name\" : \"Sabine\"}\n , \n"
 			+ " \"startingDate\" : \"2015-01-02 06:10:54\", \n"
 			+ " \"endingDate\" : \"2015-02-02 22:00:11\", \n"
 			+ " \"latitude\" : \"40.0\", \n" + " \"longitude\" : \"3.0\", \n"
@@ -166,7 +167,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 		SmartMapParser parser = new JsonSmartMapParser();
 		List<EventContainer> events = parser
 				.parseEventList(PROPER_EVENT_LIST_JSON);
-		assertTrue("Did not parse the two pevents", events.size() == 2);
+		assertTrue("Did not parse the two events", events.size() == 2);
 		this.checkEvent1(events.get(0));
 		this.checkEvent2(events.get(1));
 	}
@@ -189,18 +190,11 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 		assertEquals("Friend's id does not match", 13, friend.getId());
 		assertEquals("Friend's name does not match", "Georges",
 				friend.getName());
-		assertEquals("Friend's email does not match", "georges@gmail.com",
-				friend.getEmail());
-		assertEquals("Friend's phone number does not match", "0782678654",
-				friend.getPhoneNumber());
 		assertEquals("Friend's latitude does not match", 20.03, friend
 				.getLocation().getLatitude());
 		assertEquals("Friend's longitude does not match", 26.85, friend
 				.getLocation().getLongitude());
-		assertEquals("Friend's email does not match", "georges@gmail.com",
-				friend.getEmail());
-		assertEquals("Friend's phone number does not match", "0782678654",
-				friend.getPhoneNumber());
+
 		assertEquals("Friend's latitude does not match", 20.03, friend
 				.getLocation().getLatitude());
 		assertEquals("Friend's longitude does not match", 26.85, friend
@@ -210,7 +204,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	@Test
 	public void testParseFriends() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<UserContainer> listFriends = parser.parseFriends(
+		List<UserContainer> listFriends = parser.parseFriendList(
 				PROPER_FRIEND_LIST_JSON, "list");
 		assertEquals("First friend's id does not match", 13, listFriends.get(0)
 				.getId());
@@ -226,7 +220,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	@Test
 	public void testParseFriendsWhenEmptyList() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<UserContainer> friends = parser.parseFriends(
+		List<UserContainer> friends = parser.parseFriendList(
 				PROPER_FRIEND_EMPTY_LIST_JSON, "list");
 
 		assertTrue("Did not parsed empty friends list correctly",
@@ -241,7 +235,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 
 	public void testParseIds() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<Long> ids = parser.parseIds(PROPER_ID_LIST_JSON, "friends");
+		List<Long> ids = parser.parseIdList(PROPER_ID_LIST_JSON, "friends");
 		assertTrue("Did not parse the 3 ids", ids.size() == 3);
 		assertEquals("First Id do not match", Long.valueOf(3), ids.get(0));
 		assertEquals("Second Id do not match", Long.valueOf(4), ids.get(1));
@@ -252,7 +246,8 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	@Test
 	public void testParseIdsWhenEmptyList() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<Long> ids = parser.parseIds(PROPER_IDS_EMPTY_LIST_JSON, "friends");
+		List<Long> ids = parser.parseIdList(PROPER_IDS_EMPTY_LIST_JSON,
+				"friends");
 		assertTrue("Did not parsed empty positions list correctly",
 				ids.isEmpty());
 	}
@@ -261,31 +256,33 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	public void testParsePositions() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
 
-		List<UserContainer> users =
-				parser.parsePositions(PROPER_POSITIONS_LIST_JSON);
+		List<UserContainer> users = parser
+				.parsePositions(PROPER_POSITIONS_LIST_JSON);
 		assertTrue("Did not parse the two positions", users.size() == 2);
 		assertEquals("First location's latitude does not match",
-				location1.getLatitude(), users.get(0)
-				.getLocation().getLatitude());
+				location1.getLatitude(), users.get(0).getLocation()
+				.getLatitude());
 		assertEquals("First location's longitude does not match",
-				location1.getLongitude(), users.get(0)
-				.getLocation().getLongitude());
+				location1.getLongitude(), users.get(0).getLocation()
+				.getLongitude());
 		// GMT+01:00 conversion changes a few milliseconds in GregorainCalendar,
 		// so we cannot test for
 		// exact equality...
-		assertTrue("Last seen of first user does not match",
-				Math.abs(date1.getTimeInMillis() - users.get(0).getLocation().getTime()) <
-				1000);
+		assertTrue(
+				"Last seen of first user does not match",
+				Math.abs(date1.getTimeInMillis()
+						- users.get(0).getLocation().getTime()) < 1000);
 
 		assertEquals("Second location's latitude does not match",
-				location2.getLatitude(), users.get(1)
-				.getLocation().getLatitude());
+				location2.getLatitude(), users.get(1).getLocation()
+				.getLatitude());
 		assertEquals("Second location's longitude does not match",
-				location2.getLongitude(), users.get(1)
-				.getLocation().getLongitude());
-		assertTrue("Last seen of second user does not match",
-				Math.abs(date2.getTimeInMillis() - users.get(1).getLocation().getTime()) <
-				1000);
+				location2.getLongitude(), users.get(1).getLocation()
+				.getLongitude());
+		assertTrue(
+				"Last seen of second user does not match",
+				Math.abs(date2.getTimeInMillis()
+						- users.get(1).getLocation().getTime()) < 1000);
 
 	}
 
@@ -301,16 +298,18 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 
 	private void checkEvent1(EventContainer immutableEvent) {
 
-		assertEquals("creator id does not match", 3, immutableEvent.getCreatorId());
+		assertEquals("creator id does not match", 3,
+				immutableEvent.getCreatorId());
+
 		assertEquals("event id does not match", 13, immutableEvent.getId());
-		assertTrue("End date does not match",
-				Math.abs(date1.getTimeInMillis() -
-						immutableEvent.getEndDate().getTimeInMillis()) < 1000);
-		assertTrue("Start date does not match",
-				Math.abs(date2.getTimeInMillis() -
-						immutableEvent.getStartDate().getTimeInMillis()) < 1000);
-		//		Math.abs((date1.getTimeInMillis() -
-		//				immutableEvent.getEndDate().getTimeInMillis())) < 1000);
+		assertTrue(
+				"End date does not match",
+				Math.abs(date1.getTimeInMillis()
+						- immutableEvent.getEndDate().getTimeInMillis()) < 1000);
+		assertTrue(
+				"Start date does not match",
+				Math.abs(date2.getTimeInMillis()
+						- immutableEvent.getStartDate().getTimeInMillis()) < 1000);
 
 		assertEquals("latitude does not match", location1.getLatitude(),
 				immutableEvent.getLocation().getLatitude());
@@ -323,37 +322,33 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 		assertEquals("Event description does not match", "description",
 				immutableEvent.getDescription());
 
-		assertTrue("Did not parse the 3 participants",
-				immutableEvent.getParticipantIds().size() == 3);
-
-
-
+		assertTrue("Did not parse the 3 participants", immutableEvent
+				.getParticipantIds().size() == 3);
 
 	}
 
 	private void checkEvent2(EventContainer event) {
 		assertEquals("creator id does not match", 1, event.getCreatorId());
 		assertEquals("event id does not match", 11, event.getId());
-		assertTrue("End date does not match",
-				Math.abs(date4.getTimeInMillis() - event.getEndDate().getTimeInMillis()) <
-				1000);
-		assertTrue("Start date does not match",
-				Math.abs(date3.getTimeInMillis() - event.getStartDate().getTimeInMillis()) <
-				1000);
-		assertEquals("latitude does not match", location2.getLatitude(),
-				event.getLocation().getLatitude());
-		assertEquals("Friend's longitude does not match", location2.getLongitude(),
-				event.getLocation().getLongitude());
+		assertTrue(
+				"End date does not match",
+				Math.abs(date4.getTimeInMillis()
+						- event.getEndDate().getTimeInMillis()) < 1000);
+		assertTrue(
+				"Start date does not match",
+				Math.abs(date3.getTimeInMillis()
+						- event.getStartDate().getTimeInMillis()) < 1000);
+		assertEquals("latitude does not match", location2.getLatitude(), event
+				.getLocation().getLatitude());
+		assertEquals("Friend's longitude does not match",
+				location2.getLongitude(), event.getLocation().getLongitude());
 		assertEquals("Position name does not match", "London",
 				event.getLocationString());
 		assertEquals("Event name does not match", "YourEvent", event.getName());
 		assertEquals("Event description does not match", "description2",
 				event.getDescription());
-		assertTrue("Did not parse the participant", event.getParticipantIds().size() ==
-				1);
-
-		//		Math.abs((date4.getTimeInMillis() - event.getEndDate().getTimeInMillis())) <
-		//		1000);
+		assertTrue("Did not parse the participant", event.getParticipantIds()
+				.size() == 1);
 
 	}
 }
