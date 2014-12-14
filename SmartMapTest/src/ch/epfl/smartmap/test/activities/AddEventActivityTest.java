@@ -73,25 +73,6 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         super.tearDown();
     }
 
-    public void testCanCreateEventWithDescription() throws InterruptedException {
-        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
-
-        Espresso.pressBack();
-        Thread.sleep(ESPRESSO_WAIT_DELAY);
-
-        onView(withId(R.id.addEventDescription)).perform(ViewActions.typeText(TEST_NAME_HAS_DESCR));
-
-        Espresso.pressBack();
-        Thread.sleep(ESPRESSO_WAIT_DELAY);
-
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
-
-        this.getActivity();
-
-        onView(withId(R.id.show_event_info_invite_friends_button)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    }
-
     public void testCanCreateEventWithoutDescription() {
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
 
@@ -145,5 +126,24 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         onView(withId(R.id.add_event_map)).perform(click());
         Thread.sleep(ESPRESSO_WAIT_DELAY);
         onView(withId(R.id.set_location_map)).check(matches(isDisplayed()));
+    }
+
+    public void testZCanCreateEventWithDescription() throws InterruptedException {
+        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
+
+        Espresso.pressBack();
+        Thread.sleep(ESPRESSO_WAIT_DELAY);
+
+        onView(withId(R.id.addEventDescription)).perform(ViewActions.typeText(TEST_NAME_HAS_DESCR));
+
+        Espresso.pressBack();
+        Thread.sleep(ESPRESSO_WAIT_DELAY);
+
+        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+
+        this.getActivity();
+
+        onView(withId(R.id.show_event_info_invite_friends_button)).check(
+            ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 }
