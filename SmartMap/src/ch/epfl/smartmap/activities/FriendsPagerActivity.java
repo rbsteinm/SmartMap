@@ -19,7 +19,7 @@ import ch.epfl.smartmap.gui.PagerAdapter;
  * This activity displays your friends in one tab, and your friend request (both
  * sent and received) in another tab
  * 
- * @author rbsteinm
+ * @author marion-S
  */
 public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 
