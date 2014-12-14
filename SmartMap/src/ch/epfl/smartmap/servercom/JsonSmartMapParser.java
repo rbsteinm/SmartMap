@@ -261,7 +261,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      * @param minutes
      * @param seconds
      * @throws SmartMapParseException
-     *             if no valid parameters
+     *             if invalid parameters
      */
     private void checkDateParams(int day, int month, int hour, int minutes, int seconds)
         throws SmartMapParseException {
@@ -366,7 +366,8 @@ public class JsonSmartMapParser implements SmartMapParser {
      * @author Pamoi
      * @param date
      * @return
-     * @throws SmartMapClientException
+     * @throws SmartMapParseException
+     *             in case of invalid JSON format or invalid data
      */
     private GregorianCalendar parseDate(String date) throws SmartMapParseException {
 
@@ -414,6 +415,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      * @param jsonObject
      * @return the parsed event, encapsulated in an {@link EventContainer} Object
      * @throws SmartMapParseException
+     *             in case of invalid JSON format or invalid data
      */
     private EventContainer parseEventFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = -1;
@@ -469,6 +471,7 @@ public class JsonSmartMapParser implements SmartMapParser {
      * @param jsonObject
      * @return a friend
      * @throws SmartMapParseException
+     *             in case of invalid JSON format or invalid data
      */
     private UserContainer parseFriendFromJSON(JSONObject jsonObject) throws SmartMapParseException {
         long id = 0;

@@ -26,12 +26,11 @@ import android.location.Location;
 import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.EventContainer;
-import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserContainer;
 
 /**
- * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider}
- * to communicate with a SmartMap
+ * A {@link SmartMapClient} implementation that uses a {@link NetworkProvider} to communicate with a SmartMap
  * server.
  * 
  * @author marion-S
@@ -61,7 +60,8 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     private static final String SERVER_URL = "http://smartmap.ddns.net";
     private static final NetworkProvider NETWORK_PROVIDER = new DefaultNetworkProvider();
-    private static final int SERVER_RESPONSE_OK = 200;
+    private final static int HTTP_SUCCESS_START = 200;
+    private final static int HTTP_SUCCESS_END = 299;
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private static CookieManager mCookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
@@ -99,6 +99,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         return acceptedUser;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#ackAcceptedInvitation(long)
+     */
     @Override
     public void ackAcceptedInvitation(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
@@ -251,6 +255,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         return id;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#declineInvitation(long)
+     */
     @Override
     public void declineInvitation(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
@@ -269,6 +277,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#findUsers(java.lang.String)
+     */
     @Override
     public List<UserContainer> findUsers(String text) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
@@ -318,6 +330,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#getEventInvitations()
+     */
     @Override
     public InvitationBag getEventInvitations() throws SmartMapClientException {
 
@@ -423,6 +439,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         return profilePicture;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#getPublicEvents(double, double, double)
+     */
     @Override
     public List<Long> getPublicEvents(double latitude, double longitude, double radius)
         throws SmartMapClientException {
@@ -602,6 +622,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         return users;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#removeFriend(long)
+     */
     @Override
     public void removeFriend(long id) throws SmartMapClientException {
         Map<String, String> params = new HashMap<String, String>();
@@ -644,6 +668,10 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#updateEvent(ch.epfl.smartmap.cache.EventContainer)
+     */
     @Override
     public void updateEvent(EventContainer event) throws SmartMapClientException {
 
@@ -693,9 +721,18 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     }
 
+    /**
+     * Checks the HTTP response code
+     * 
+     * @param connection
+     *            : the connection whose the response code is checked
+     * @throws SmartMapClientException
+     *             if error code
+     */
     private void checkResponseCode(HttpURLConnection connection) throws SmartMapClientException {
         try {
-            if (connection.getResponseCode() != SERVER_RESPONSE_OK) {
+            int responseCode = connection.getResponseCode();
+            if ((responseCode < HTTP_SUCCESS_START) || (responseCode > HTTP_SUCCESS_END)) {
                 throw new SmartMapClientException("HTTP error with code " + connection.getResponseCode()
                     + " during communication with client.");
             }
@@ -704,6 +741,17 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         }
     }
 
+    /**
+     * Return a {@link HttpURLConnection} object for the given uri. The connection is obtained by a
+     * {@link NetworkProvider} object
+     * 
+     * @param uri
+     *            the uri to append to the base url of the SmartMap server
+     * @return an HttpURLConnection for the given uri
+     * @throws SmartMapClientException
+     *             in case the connection could not be retrieved for any reason
+     *             external to the application (network failure etc.)
+     */
     private HttpURLConnection getHttpURLConnection(String uri) throws SmartMapClientException {
         URL serverURL = null;
         HttpURLConnection connection = null;
@@ -719,6 +767,13 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         return connection;
     }
 
+    /**
+     * Prepare the parameters to send to the server for the given {@link EventContainer} object
+     * 
+     * @param event
+     *            the event for which parameters need to be prepared
+     * @return a map of strings to strings which represents the parameters to send
+     */
     private Map<String, String> getParamsForEvent(EventContainer event) {
         Map<String, String> params = new HashMap<String, String>();
 
@@ -738,10 +793,20 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     }
 
+    /**
+     * Gets the server's response for the given {@link HttpURLConnection} object
+     * 
+     * @param connection
+     *            the connection from which the response is given
+     * @return the request response in String format
+     * @throws SmartMapClientException
+     *             in case the response code could not be retrieved for any reason
+     *             external to the application (network failure etc.)
+     */
     private String getRequestResponse(HttpURLConnection connection) throws SmartMapClientException {
         StringBuffer response = null;
         try {
-            // Get response
+
             String inputLine;
             response = new StringBuffer();
             BufferedReader in;
@@ -759,6 +824,13 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         return response.toString();
     }
 
+    /**
+     * Converts a list of long to a string to match with the parameters format required by the SmartMap server
+     * 
+     * @param list
+     *            the list of long to convert to a string
+     * @return the String in the required format
+     */
     private String longListToString(List<Long> list) {
         String listString = "";
 
@@ -769,10 +841,21 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         return listString;
     }
 
+    /**
+     * Sends a request to the server with the given parameters, and via the gven {@link HttpURLConnection}
+     * object
+     * 
+     * @param params
+     *            a map of String to String representing the parameters to send with the request
+     * @param connection
+     * @throws SmartMapClientException
+     *             in case the request could not be sent for any reason
+     *             external to the application (network failure etc.)
+     */
     private void sendRequestWithParams(Map<String, String> params, HttpURLConnection connection)
         throws SmartMapClientException {
         try {
-            // Build the request
+
             StringBuilder postData = new StringBuilder();
             for (Map.Entry<String, String> param : params.entrySet()) {
                 if (postData.length() != 0) {
