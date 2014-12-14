@@ -91,7 +91,7 @@ public class AddFriendActivity extends ListActivity {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 // invite friend
-                AddFriendActivity.this.inviteUser(userId);
+                ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
             }
         });
 
@@ -105,17 +105,6 @@ public class AddFriendActivity extends ListActivity {
 
         // display the AlertDialog
         builder.create().show();
-    }
-
-    /**
-     * Invites a user to be your friend. Displays a toast describing if the invitation was sent or not.
-     * 
-     * @author agpmilli
-     */
-    private void inviteUser(long userId) {
-        // Send friend request to user
-        ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
-
     }
 
     private void setSearchBarListener() {
