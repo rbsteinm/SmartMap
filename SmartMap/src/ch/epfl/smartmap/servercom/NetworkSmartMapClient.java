@@ -359,31 +359,6 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.servercom.SmartMapClient#getFriendsIds()
-     */
-    @Override
-    public List<Long> getFriendsIds() throws SmartMapClientException {
-
-        List<Long> ids = new ArrayList<Long>();
-        HttpURLConnection conn = this.getHttpURLConnection("/getFriendsIds");
-        String response = this.sendViaPost(new HashMap<String, String>(), conn);
-
-        try {
-            SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
-            parser.checkServerError(response);
-            ids = parser.parseIdList(response, "friends");
-
-        } catch (NoSuchFormatException e) {
-            throw new SmartMapClientException(e);
-        } catch (SmartMapParseException e) {
-            throw new SmartMapClientException(e);
-        }
-
-        return ids;
-    }
-
-    /*
-     * (non-Javadoc)
      * @see ch.epfl.smartmap.severcom.SmartMapInvitationsClient#getInvitations()
      */
     @Override
@@ -411,6 +386,31 @@ final public class NetworkSmartMapClient implements SmartMapClient {
 
         return new NetworkFriendInvitationBag(inviters, newFriends, removedFriends);
 
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.servercom.SmartMapClient#getFriendsIds()
+     */
+    @Override
+    public List<Long> getFriendsIds() throws SmartMapClientException {
+
+        List<Long> ids = new ArrayList<Long>();
+        HttpURLConnection conn = this.getHttpURLConnection("/getFriendsIds");
+        String response = this.sendViaPost(new HashMap<String, String>(), conn);
+
+        try {
+            SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
+            parser.checkServerError(response);
+            ids = parser.parseIdList(response, "friends");
+
+        } catch (NoSuchFormatException e) {
+            throw new SmartMapClientException(e);
+        } catch (SmartMapParseException e) {
+            throw new SmartMapClientException(e);
+        }
+
+        return ids;
     }
 
     /*
