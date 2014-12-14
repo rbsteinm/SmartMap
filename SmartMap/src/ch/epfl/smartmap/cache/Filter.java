@@ -81,7 +81,7 @@ public abstract class Filter implements FilterInterface {
      * @see ch.epfl.smartmap.cache.FilterInterface#getImmutableCopy()
      */
     @Override
-    public FilterContainer getImmutableCopy() {
+    public FilterContainer getContainerCopy() {
         return new FilterContainer(this.getId(), this.getName(), this.getIds(), this.isActive());
     }
 
