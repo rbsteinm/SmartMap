@@ -15,6 +15,8 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
+ * Represents a filter in the application SmartMap
+ * 
  * @author agpmilli
  */
 public abstract class Filter implements FilterInterface {
@@ -23,18 +25,22 @@ public abstract class Filter implements FilterInterface {
 
     public static final long DEFAULT_FILTER_ID = 1;
 
+    // Default values
     public static final long NO_ID = -1;
-
     public static final Bitmap DEFAULT_WHITE_IMAGE = BitmapFactory.decodeResource(ServiceContainer
         .getSettingsManager().getContext().getResources(), R.drawable.ic_filter_white);
-
     public static final Bitmap DEFAULT_BLUE_IMAGE = BitmapFactory.decodeResource(ServiceContainer
         .getSettingsManager().getContext().getResources(), R.drawable.ic_filter_blue);
 
     private long mId;
-
     private final Set<Long> mIds;
 
+    /**
+     * Constructor
+     * 
+     * @param id
+     * @param ids
+     */
     protected Filter(long id, Set<Long> ids) {
         if (id < 0) {
             throw new IllegalArgumentException();
@@ -61,11 +67,19 @@ public abstract class Filter implements FilterInterface {
         return mId;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FilterInterface#getIds()
+     */
     @Override
     public Set<Long> getIds() {
         return new HashSet<Long>(mIds);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FilterInterface#getImmutableCopy()
+     */
     @Override
     public FilterContainer getImmutableCopy() {
         return new FilterContainer(this.getId(), this.getName(), this.getIds(), this.isActive());
@@ -77,8 +91,7 @@ public abstract class Filter implements FilterInterface {
      */
     @Override
     public LatLng getLatLng() {
-        // FIXME
-        return new LatLng(0, 0);
+        return new LatLng(Displayable.NO_LATITUDE, Displayable.NO_LONGITUDE);
     }
 
     /*
@@ -166,6 +179,13 @@ public abstract class Filter implements FilterInterface {
         return hasChanged;
     }
 
+    /**
+     * Does the conversion container -> live instance. DO NOT CALL THIS METHOD OUTSIDE CACHE.
+     * 
+     * @param filterInfos
+     *            a Container that has all informations about the {@code Filter} you want to create.
+     * @return the {@code Filter} live instance.
+     */
     public static Filter createFromContainer(FilterContainer filterInfos) {
         long id = filterInfos.getId();
         Set<Long> ids = filterInfos.getIds();
