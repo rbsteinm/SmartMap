@@ -21,7 +21,7 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 /**
  * Tests AddEventActivity. For some reason, espresso sometimes fail to click
  * on a view. Just relaunch the test if this happens.
- * 
+ *
  * @author SpicyCH
  */
 
@@ -45,8 +45,8 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         ServiceContainer.initSmartMapServices(this.getActivity());
 
         Location loc = new Location("");
-        loc.setLatitude(46);
-        loc.setLongitude(6);
+        loc.setLatitude(46.519056);
+        loc.setLongitude(6.566758);
 
         String token =
             "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
@@ -76,12 +76,12 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
     public void testCanCreateEventWithDescription() throws InterruptedException {
         onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
 
-        Espresso.pressBack();
+        //Espresso.pressBack();
         Thread.sleep(ESPRESSO_WAIT_DELAY);
 
         onView(withId(R.id.addEventDescription)).perform(ViewActions.typeText(TEST_NAME_HAS_DESCR));
 
-        Espresso.pressBack();
+        //Espresso.pressBack();
         Thread.sleep(ESPRESSO_WAIT_DELAY);
 
         onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
