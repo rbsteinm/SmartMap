@@ -8,8 +8,10 @@ import static com.google.android.apps.common.testing.ui.espresso.contrib.DrawerA
 import static com.google.android.apps.common.testing.ui.espresso.contrib.DrawerActions.openDrawer;
 import static com.google.android.apps.common.testing.ui.espresso.contrib.DrawerMatchers.isClosed;
 import static com.google.android.apps.common.testing.ui.espresso.contrib.DrawerMatchers.isOpen;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.hasFocus;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.not;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
@@ -55,8 +57,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.action_notifications)).perform(click());
         onView(withId(R.id.notification_activity)).check(matches(isDisplayed()));
         pressBack();
-        // onView(withId(R.id.notification_activity)).check(
-        // matches(not(hasFocus())));
+        onView(withId(R.id.notification_activity)).check(matches(not(hasFocus())));
     }
 
     public void testOpenAndCloseSideMenu() throws Exception {
@@ -78,6 +79,12 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     public void testOpenNotificationActivity() {
         onView(withId(R.id.action_notifications)).perform(click());
         onView(withId(R.id.notification_activity)).check(matches(isDisplayed()));
+    }
+
+    public void testOpenProfileMenu() {
+        openDrawer(R.id.drawer_layout);
+        onView(withText(R.string.profile_text)).perform(click());
+        onView(withId(R.id.profile_header)).check(matches(isDisplayed()));
     }
 
     public void testOpenSearchView() {
