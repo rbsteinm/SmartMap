@@ -331,11 +331,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
             }
 
             values.put(KEY_POSNAME, user.getLocationString());
-            boolean blocked = false;
+            int blocked = 0;
             if (user.isBlocked() == User.BlockStatus.BLOCKED) {
-                blocked = true;
+                blocked = 1;
             }
-            values.put(KEY_BLOCKED, blocked ? 1 : 0);
+            values.put(KEY_BLOCKED, blocked);
             values.put(KEY_FRIENDSHIP, user.getFriendship());
 
             mDatabase.insert(TABLE_USER, null, values);
@@ -735,7 +735,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
             cursor.close();
 
             User.BlockStatus status = isBlocked ? User.BlockStatus.BLOCKED : User.BlockStatus.UNBLOCKED;
-
             return new UserContainer(id, name, phoneNumber, email, location, locationString, image, status,
                 friendship);
         }
