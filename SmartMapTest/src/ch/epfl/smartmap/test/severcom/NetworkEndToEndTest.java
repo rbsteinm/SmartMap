@@ -176,7 +176,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
     @Test
     public void testGetInvitations() throws SmartMapClientException {
 
-        InvitationBag invitationBag = networkClient.getInvitations();
+        InvitationBag invitationBag = networkClient.getFriendInvitations();
         Set<InvitationContainer> invitations = invitationBag.getInvitations();
         assertTrue("Null invitations set", invitations != null);
         for (InvitationContainer invitation : invitations) {

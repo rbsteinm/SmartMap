@@ -1,7 +1,7 @@
 package ch.epfl.smartmap.servercom;
 
 /**
- * An exception thrown when a Friend (or an Event?) with an unknown format needs
+ * An exception thrown when a Friend or an Event with an unknown format needs
  * to be processed.
  * 
  * @author marion-S
