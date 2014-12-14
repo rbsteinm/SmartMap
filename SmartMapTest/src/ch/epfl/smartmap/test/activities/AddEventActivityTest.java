@@ -21,7 +21,7 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 /**
  * Tests AddEventActivity. For some reason, espresso sometimes fail to click
  * on a view. Just relaunch the test if this happens.
- * 
+ *
  * @author SpicyCH
  */
 
@@ -45,8 +45,8 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
         ServiceContainer.initSmartMapServices(this.getActivity());
 
         Location loc = new Location("");
-        loc.setLatitude(46);
-        loc.setLongitude(6);
+        loc.setLatitude(46.519056);
+        loc.setLongitude(6.566758);
 
         String token =
             "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
@@ -71,25 +71,6 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
     protected void tearDown() throws Exception {
         this.getActivity();
         super.tearDown();
-    }
-
-    public void testCanCreateEventWithDescription() throws InterruptedException {
-        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
-
-        Espresso.pressBack();
-        Thread.sleep(ESPRESSO_WAIT_DELAY);
-
-        onView(withId(R.id.addEventDescription)).perform(ViewActions.typeText(TEST_NAME_HAS_DESCR));
-
-        Espresso.pressBack();
-        Thread.sleep(ESPRESSO_WAIT_DELAY);
-
-        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
-
-        this.getActivity();
-
-        onView(withId(R.id.show_event_info_invite_friends_button)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     public void testCanCreateEventWithoutDescription() {
@@ -144,6 +125,25 @@ public class AddEventActivityTest extends ActivityInstrumentationTestCase2<AddEv
     public void testOpenSetLocationWhenClickOnMap() throws InterruptedException {
         onView(withId(R.id.add_event_map)).perform(click());
         Thread.sleep(ESPRESSO_WAIT_DELAY);
-        onView(withId(R.id.set_location_activity)).check(matches(isDisplayed()));
+        onView(withId(R.id.set_location_map)).check(matches(isDisplayed()));
+    }
+
+    public void testZCanCreateEventWithDescription() throws InterruptedException {
+        onView(withId(R.id.addEventEventName)).perform(ViewActions.typeText(TEST_NAME));
+
+        Espresso.pressBack();
+        Thread.sleep(ESPRESSO_WAIT_DELAY);
+
+        onView(withId(R.id.addEventDescription)).perform(ViewActions.typeText(TEST_NAME_HAS_DESCR));
+
+        Espresso.pressBack();
+        Thread.sleep(ESPRESSO_WAIT_DELAY);
+
+        onView(withId(R.id.addEventButtonCreateEvent)).perform(ViewActions.click());
+
+        this.getActivity();
+
+        onView(withId(R.id.show_event_info_invite_friends_button)).check(
+            ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 }

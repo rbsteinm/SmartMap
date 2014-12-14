@@ -22,8 +22,20 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
     public static final int EVENT_INVITATION = 1;
     public static final int ACCEPTED_FRIEND_INVITATION = 2;
 
+    public static Invitation createFromContainer(InvitationContainer container) {
+        long id = container.getId();
+        long timeStamp = container.getTimeStamp();
+        int status = container.getStatus();
+        User user = container.getUser();
+        Event event = container.getEvent();
+        int type = container.getType();
+
+        return new GenericInvitation(id, timeStamp, status, user, event, type);
+    }
+
     private int mStatus;
     private final long mId;
+
     private long mTimeStamp;
 
     public Invitation(long id, long timeStamp, int status) {
@@ -101,9 +113,8 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
     public boolean update(InvitationContainer invitation) {
         boolean hasChanged = false;
 
-        if ((invitation.getStatus() == Invitation.ACCEPTED)
-            || (invitation.getStatus() == Invitation.DECLINED) || (invitation.getStatus() == Invitation.READ)
-            || (invitation.getStatus() == Invitation.UNREAD)) {
+        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)
+            || (invitation.getStatus() == Invitation.READ) || (invitation.getStatus() == Invitation.UNREAD)) {
             mStatus = invitation.getStatus();
             hasChanged = true;
         }
@@ -113,16 +124,5 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
         }
 
         return hasChanged;
-    }
-
-    public static Invitation createFromContainer(InvitationContainer container) {
-        long id = container.getId();
-        long timeStamp = container.getTimeStamp();
-        int status = container.getStatus();
-        User user = container.getUser();
-        Event event = container.getEvent();
-        int type = container.getType();
-
-        return new GenericInvitation(id, timeStamp, status, user, event, type);
     }
 }

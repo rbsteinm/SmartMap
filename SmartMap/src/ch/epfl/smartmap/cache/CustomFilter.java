@@ -3,13 +3,12 @@ package ch.epfl.smartmap.cache;
 import java.util.Set;
 
 /**
- * Describes a clientside, custom friend list (e.g. friends, family, etc.)
+ * Describes a clientside, custom friend list (e.g. friends, family, etc.). Filters should not be instanciated
+ * directly, but from the method {@code Filter.createFromContainer(...)}
  * 
  * @author ritterni
  */
 public class CustomFilter extends Filter {
-
-    private static final String TAG = CustomFilter.class.getSimpleName();
 
     private String mName;
     private boolean mIsActive;
@@ -26,6 +25,10 @@ public class CustomFilter extends Filter {
         mIsActive = isActive;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FilterInterface#getName()
+     */
     @Override
     public String getName() {
         return mName;
@@ -40,11 +43,19 @@ public class CustomFilter extends Filter {
         return this.getIds();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FilterInterface#isActive()
+     */
     @Override
     public boolean isActive() {
         return mIsActive;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Filter#update(ch.epfl.smartmap.cache.FilterContainer)
+     */
     @Override
     public boolean update(FilterContainer filterInfos) {
         boolean hasChanged = false;

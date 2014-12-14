@@ -35,20 +35,18 @@ public class DatabaseHelperTest extends AndroidTestCase {
     private final String name = "test name";
     private final UserContainer a = new UserContainer(1, "dafdyx", "898909808", "toto@toto.to", new Location(
         "testProvider"), "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER);
-    private final UserContainer b = new UserContainer(678, "tfxhthsfe", "65423", "tata@toto.to",
-        new Location("testProvider"), "Lausanne", null, User.BlockStatus.BLOCKED, User.FRIEND);
-    private final UserContainer c = new UserContainer(54554, "hcjkehfkl", "48325", "titi@toto.to",
-        new Location("testProvider"), "Geneva", null, User.BlockStatus.UNBLOCKED, User.FRIEND);
-    private final EventContainer event = new EventContainer(123, name, a, "description",
-        new GregorianCalendar(), new GregorianCalendar(), new Location("testprovider"), "Lausanne",
-        new HashSet<Long>());
-    private final EventContainer event2 = new EventContainer(1277, "name 2", b, "description",
-        new GregorianCalendar(), new GregorianCalendar(), new Location("testprovider"), "Lausanne",
-        new HashSet<Long>());
+    private final UserContainer b = new UserContainer(678, "tfxhthsfe", "65423", "tata@toto.to", new Location(
+        "testProvider"), "Lausanne", null, User.BlockStatus.BLOCKED, User.FRIEND);
+    private final UserContainer c = new UserContainer(54554, "hcjkehfkl", "48325", "titi@toto.to", new Location(
+        "testProvider"), "Geneva", null, User.BlockStatus.UNBLOCKED, User.FRIEND);
+    private final EventContainer event = new EventContainer(123, name, a, "description", new GregorianCalendar(),
+        new GregorianCalendar(), new Location("testprovider"), "Lausanne", new HashSet<Long>());
+    private final EventContainer event2 = new EventContainer(1277, "name 2", b, "description", new GregorianCalendar(),
+        new GregorianCalendar(), new Location("testprovider"), "Lausanne", new HashSet<Long>());
     private final InvitationContainer invitA = new InvitationContainer(2323, a, null, Invitation.UNREAD,
         new GregorianCalendar().getTimeInMillis(), Invitation.FRIEND_INVITATION);
-    private final InvitationContainer invitB = new InvitationContainer(2323, null, event,
-        Invitation.ACCEPTED, new GregorianCalendar().getTimeInMillis(), Invitation.EVENT_INVITATION);
+    private final InvitationContainer invitB = new InvitationContainer(2323, null, event, Invitation.ACCEPTED,
+        new GregorianCalendar().getTimeInMillis(), Invitation.EVENT_INVITATION);
     private DatabaseHelper dbh;
     private FilterContainer filter;
     private FilterContainer filter2;
@@ -94,8 +92,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Test
     public void testAddEvent() {
         dbh.addEvent(event);
-        assertTrue((dbh.getEvent(event.getId()).getStartDate().get(GregorianCalendar.MINUTE) == event
-            .getStartDate().get(GregorianCalendar.MINUTE))
+        assertTrue((dbh.getEvent(event.getId()).getStartDate().get(GregorianCalendar.MINUTE) == event.getStartDate()
+            .get(GregorianCalendar.MINUTE))
             && (dbh.getEvent(event.getId()).getLocation().getLatitude() == event.getLocation().getLatitude()));
     }
 
@@ -118,8 +116,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
     public void testAddUser() {
         dbh.addUser(a);
         // testing that adding a user with the same id erases the first one
-        dbh.addUser(new UserContainer(1, "other name", "898909808", "toto@toto.to", new Location(
-            "testProvider"), "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER));
+        dbh.addUser(new UserContainer(1, "other name", "898909808", "toto@toto.to", new Location("testProvider"),
+            "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER));
         assertTrue((dbh.getUser(a.getId()).getId() == a.getId())
             && dbh.getUser(a.getId()).getName().equals("other name")
             && dbh.getUser(a.getId()).getPhoneNumber().equals(a.getPhoneNumber())
@@ -157,7 +155,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Test
     public void testDeletePending() {
         dbh.addPendingFriend(1234);
-        //long id = (long) dbh.getPendingFriends().toArray()[0];
+        // long id = (long) dbh.getPendingFriends().toArray()[0];
         // by Robin, didnt compile sorry
         long id = -1;
         dbh.deletePendingFriend(1234);
@@ -253,8 +251,8 @@ public class DatabaseHelperTest extends AndroidTestCase {
         dbh.addUser(a);
         dbh.addUser(b);
         int rows =
-            dbh.updateFriend(new UserContainer(a.getId(), c.getName(), "898909808", "test email",
-                new Location("testProvider"), "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER));
+            dbh.updateFriend(new UserContainer(a.getId(), c.getName(), "898909808", "test email", new Location(
+                "testProvider"), "Ecublens", null, User.BlockStatus.NOT_SET, User.STRANGER));
         assertTrue(dbh.getUser(a.getId()).getName().equals(c.getName())
             && dbh.getUser(a.getId()).getEmail().equals("test email") && (rows == 1));
     }

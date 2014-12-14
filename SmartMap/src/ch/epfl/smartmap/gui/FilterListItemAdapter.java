@@ -39,22 +39,22 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
     /*
      * (non-Javadoc)
      * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-     * android.view.ViewGroup) callback function automatically called one time
-     * for each user in the list
+     * android.view.ViewGroup)
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        // Create inflater,get item to construct
         FilterViewHolder viewHolder;
         final Filter filter = mItemsArrayList.get(position);
 
         if (convertView == null) {
+            // Create inflater,get item to construct
             LayoutInflater inflater =
                 (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.gui_filter_list_item, parent, false);
             viewHolder = new FilterViewHolder();
 
+            // set view holder attributes
             viewHolder.setFilterName((TextView) convertView.findViewById(R.id.activity_show_filters_name));
             viewHolder.setFilterId(filter.getId());
             viewHolder.setFollowSwitch((Switch) convertView
@@ -70,12 +70,10 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
         if (filter != null) {
             viewHolder.getFilterName().setText(filter.getName());
 
-            viewHolder.getSubtitle().setText(filter.getIds().size() + " people inside this filter");
+            viewHolder.getSubtitle().setText(
+                filter.getIds().size() + mContext.getResources().getString(R.string.people_inside_filter));
 
-            viewHolder.getFollowSwitch().setTextOn("YES");
-            viewHolder.getFollowSwitch().setTextOff("NO");
             viewHolder.getFollowSwitch().setChecked(filter.isActive());
-
             viewHolder.getFollowSwitch().setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
                     @Override

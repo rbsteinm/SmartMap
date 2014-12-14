@@ -952,7 +952,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
         for (Filter filter : filters) {
             Log.d(TAG, "Store filter " + filter.getId());
-            this.addFilter(filter.getImmutableCopy());
+            this.addFilter(filter.getContainerCopy());
         }
         for (Invitation invitation : invitations) {
             Log.d(TAG, "Store invitation " + invitation.getId());

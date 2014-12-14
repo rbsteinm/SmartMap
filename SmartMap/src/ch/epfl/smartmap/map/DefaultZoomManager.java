@@ -55,7 +55,12 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
 
         int auditErrors = 0;
 
-        // TODO
+        if (mGoogleMap == null) {
+            auditErrors++;
+        }
+        if (mMapView == null) {
+            auditErrors++;
+        }
 
         return auditErrors;
     }
@@ -92,9 +97,6 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
                     @Override
                     public void onGlobalLayout() {
 
-                        // LatLng centre = new LatLng(CENTER_LATTITUDE,
-                        // CENTER_LONGITUDE);
-
                         /*
                          * @author jfperren
                          * Did this quick fix to remove extreme values and have
@@ -128,7 +130,6 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
                         }
 
                         CameraUpdate camUpdate = CameraUpdateFactory.newLatLngBounds(bounds, PADDING);
-                        // mGoogleMap.moveCamera(camUpdate);
                         mGoogleMap.animateCamera(camUpdate);
 
                     }

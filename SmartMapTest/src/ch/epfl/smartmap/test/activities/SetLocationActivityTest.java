@@ -11,7 +11,6 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.AddEventActivity;
 
 public class SetLocationActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
-    private final static String TAG = SetLocationActivityTest.class.getSimpleName();
 
     public SetLocationActivityTest() {
         super(AddEventActivity.class);

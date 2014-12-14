@@ -139,7 +139,7 @@ public class InvitationsService extends Service {
         protected Void doInBackground(Void... arg0) {
             try {
                 NetworkFriendInvitationBag userInvitBag =
-                    (NetworkFriendInvitationBag) ServiceContainer.getNetworkClient().getInvitations();
+                    (NetworkFriendInvitationBag) ServiceContainer.getNetworkClient().getFriendInvitations();
                 InvitationBag eventInvitBag = ServiceContainer.getNetworkClient().getEventInvitations();
 
                 // Acknowledge removed friends
