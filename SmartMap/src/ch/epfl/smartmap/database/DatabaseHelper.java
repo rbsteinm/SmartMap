@@ -37,7 +37,7 @@ import ch.epfl.smartmap.cache.UserContainer;
  * 
  * @author ritterni
  */
-public final class DatabaseHelper extends SQLiteOpenHelper {
+public final class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperInterface {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
@@ -152,14 +152,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         this.onCreate(mDatabase);
     }
 
-    /**
-     * Stores an event in the database. If there's already an event with the
-     * same ID, updates that event instead
-     * The event must have an ID (given by the server)!
-     * 
-     * @param event
-     *            The event to store
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#addEvent(ch.epfl.smartmap.cache.EventContainer)
      */
+    @Override
     public void addEvent(EventContainer event) throws IllegalArgumentException {
         if (event.getId() < 0) {
             throw new IllegalArgumentException("Invalid event ID");
@@ -209,14 +206,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    /**
-     * Adds a filter/userlist/friendlist to the database, and gives an ID to the
-     * filter
-     * 
-     * @param filter
-     *            The filter/list to add
-     * @return The ID of the newly added filter in the filter database
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.database.DatabaseHelperInterface#addFilter(ch.epfl.smartmap.cache.FilterContainer)
      */
+    @Override
     public long addFilter(FilterContainer filter) {
         // First we insert the filter in the table of lists
         ContentValues filterValues = new ContentValues();
@@ -237,12 +232,13 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return filterID;
     }
 
-    /**
-     * Adds an invitation to the database
-     * 
-     * @param invitation
-     *            The {@code ImmutableInvitation} to add to the database
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.database.DatabaseHelperInterface#addInvitation(ch.epfl.smartmap.cache.InvitationContainer
+     * )
      */
+    @Override
     public long addInvitation(InvitationContainer invitation) {
 
         // Add invitation related infos in database
@@ -289,12 +285,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * Adds a pending friend who invited the user to the database.
-     * 
-     * @param user
-     *            The user who was sent a request
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#addPendingFriend(long)
      */
+    @Override
     public void addPendingFriend(long id) {
         Cursor cursor =
             mDatabase.query(TABLE_PENDING, PENDING_COLUMNS, KEY_USER_ID + " = ?",
@@ -309,13 +304,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    /**
-     * Adds a user to the internal database. If an user with the same ID already
-     * exists, updates that user instead.
-     * 
-     * @param user
-     *            The user to add to the database
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#addUser(ch.epfl.smartmap.cache.UserContainer)
      */
+    @Override
     public void addUser(UserContainer user) {
         Cursor cursor =
             mDatabase.query(TABLE_USER, USER_COLUMNS, KEY_USER_ID + " = ?",
@@ -353,9 +346,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    /**
-     * Clears the database. Mainly for testing purposes.
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#clearAll()
      */
+    @Override
     public void clearAll() {
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         mDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_FILTER);
@@ -368,24 +363,22 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         this.onCreate(mDatabase);
     }
 
-    /**
-     * Deletes an event from the database
-     * 
-     * @param event
-     *            The event to delete
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#deleteEvent(long)
      */
+    @Override
     public void deleteEvent(long id) {
 
         mDatabase.delete(TABLE_EVENT, KEY_ID + " = ?", new String[]{String.valueOf(id)});
         mDatabase.delete(TABLE_EVENT_USER, KEY_EVENT_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
-    /**
-     * Deletes a filter from the database
-     * 
-     * @param filter
-     *            The filter to delete
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#deleteFilter(long)
      */
+    @Override
     public void deleteFilter(long id) {
         // delete the filter from the table of filters
         mDatabase.delete(TABLE_FILTER, KEY_ID + " = ?", new String[]{String.valueOf(id)});
@@ -396,40 +389,38 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    /**
-     * Deletes an invitation from the database (call this when accepting or
-     * declining an invitation)
-     * 
-     * @param id
-     *            The inviter's id
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#deleteInvitation(long)
      */
+    @Override
     public void deleteInvitation(long id) {
         mDatabase.delete(TABLE_INVITATIONS, KEY_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
-    /**
-     * Deletes a pending friend request from the database
-     * 
-     * @param id
-     *            The invited user's id
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#deletePendingFriend(long)
      */
+    @Override
     public void deletePendingFriend(long id) {
         mDatabase.delete(TABLE_PENDING, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
-    /**
-     * Deletes a user from the database
-     * 
-     * @param id
-     *            The user's id
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#deleteUser(long)
      */
+    @Override
     public void deleteUser(long id) {
         mDatabase.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
-    /**
-     * @return the {@code List} of all events
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getAllEvents()
      */
+    @Override
     public Set<EventContainer> getAllEvents() {
         Set<EventContainer> events = new HashSet<EventContainer>();
 
@@ -446,9 +437,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return events;
     }
 
-    /**
-     * @return the {@code List} of all Filters
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getAllFilters()
      */
+    @Override
     public Set<FilterContainer> getAllFilters() {
 
         Set<FilterContainer> filters = new HashSet<FilterContainer>();
@@ -481,11 +474,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return filters;
     }
 
-    /**
-     * Returns all invitations (friend requests, event invitations, etc)
-     * 
-     * @return a {@code List} of {@code ImmutableInvitation}s, sorted by ID
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getAllInvitations()
      */
+    @Override
     public Set<InvitationContainer> getAllInvitations() {
         Set<InvitationContainer> invitations = new HashSet<InvitationContainer>();
 
@@ -514,9 +507,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return invitations;
     }
 
-    /**
-     * @return the {@code Set} of all users
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getAllUsers()
      */
+    @Override
     public Set<UserContainer> getAllUsers() {
         Set<UserContainer> users = new HashSet<UserContainer>();
 
@@ -534,11 +529,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return users;
     }
 
-    /**
-     * @param id
-     *            The event's ID
-     * @return The event associated to this ID
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getEvent(long)
      */
+    @Override
     public EventContainer getEvent(long id) {
 
         Cursor cursor =
@@ -586,13 +581,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return event;
     }
 
-    /**
-     * Gets a specific filter by its id
-     * 
-     * @param name
-     *            The filter's id
-     * @return The filter as a FriendList object
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getFilter(long)
      */
+    @Override
     public FilterContainer getFilter(long id) {
         // First query to get the filter's name
         Cursor cursor =
@@ -628,9 +621,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return filter;
     }
 
-    /**
-     * @return a {@code List} containing the IDs of all stored filters
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getFilterIds()
      */
+    @Override
     public List<Long> getFilterIds() {
         List<Long> filterIds = new ArrayList<Long>();
         String query = "SELECT  * FROM " + TABLE_FILTER;
@@ -647,9 +642,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return filterIds;
     }
 
-    /**
-     * @return the {@code List} containing all friend ids
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getFriendIds()
      */
+    @Override
     public List<Long> getFriendIds() {
         List<Long> friendIds = new ArrayList<Long>();
 
@@ -669,11 +666,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return friendIds;
     }
 
-    /**
-     * Returns a list of all pending friends
-     * 
-     * @return A list of users who were sent friend requests
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getPendingFriends()
      */
+    @Override
     public Set<Long> getPendingFriends() {
         Set<Long> friends = new HashSet<Long>();
 
@@ -691,14 +688,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return friends;
     }
 
-    /**
-     * Gets a user from the database
-     * 
-     * @param userId
-     *            The user's ID
-     * @return The user's profile picture if it exists, a default picture
-     *         otherwise
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getPictureById(long)
      */
+    @Override
     public Bitmap getPictureById(long userId) {
         File file = new File(mContext.getFilesDir(), userId + ".png");
         Bitmap pic = null;
@@ -711,13 +705,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         return pic;
     }
 
-    /**
-     * Gets a user from the database
-     * 
-     * @param id
-     *            The user's unique ID
-     * @return The user as a Friend object
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#getUser(long)
      */
+    @Override
     public UserContainer getUser(long id) {
 
         Cursor cursor =
@@ -786,14 +778,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-    /**
-     * Stores a profile picture
-     * 
-     * @param picture
-     *            The picture to store
-     * @param userId
-     *            The user's ID
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#setUserPicture(android.graphics.Bitmap, long)
      */
+    @Override
     public void setUserPicture(Bitmap picture, long userId) {
         File file = new File(mContext.getFilesDir(), userId + ".png");
 
@@ -812,13 +801,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * Updates an event
-     * 
-     * @param event
-     *            The event to update
-     * @return The number of rows that were affected
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.database.DatabaseHelperInterface#updateEvent(ch.epfl.smartmap.cache.EventContainer)
      */
+    @Override
     public int updateEvent(EventContainer event) {
 
         ContentValues values = new ContentValues();
@@ -849,12 +837,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             new String[]{String.valueOf(event.getId())});
     }
 
-    /**
-     * Updates a filter
-     * 
-     * @param filter
-     *            The updated filter
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.database.DatabaseHelperInterface#updateFilter(ch.epfl.smartmap.cache.FilterContainer)
      */
+    @Override
     public void updateFilter(FilterContainer filter) {
         ContentValues filterValues = new ContentValues();
         filterValues.put(KEY_NAME, filter.getName());
@@ -878,13 +866,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * Updates a user's values
-     * 
-     * @param friend
-     *            The user to update
-     * @return The number of rows that were updated
+    /*
+     * (non-Javadoc)
+     * @see
+     * ch.epfl.smartmap.database.DatabaseHelperInterface#updateFriend(ch.epfl.smartmap.cache.UserContainer)
      */
+    @Override
     public int updateFriend(UserContainer friend) {
         ContentValues values = new ContentValues();
 
@@ -923,9 +910,11 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
             new String[]{String.valueOf(friend.getId())});
     }
 
-    /**
-     * Updates the database contents to be up-to-date with the cache
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#updateFromCache()
      */
+    @Override
     public void updateFromCache() {
         Log.d(TAG, "Update Database from Cache");
 
@@ -960,13 +949,12 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * Updates a {@code ImmutableInvitation} in the database
-     * 
-     * @param invitation
-     *            The {@code ImmutableInvitation} to update
-     * @return The number of rows that were updated
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.database.DatabaseHelperInterface#updateInvitation(ch.epfl.smartmap.cache.
+     * InvitationContainer)
      */
+    @Override
     public int updateInvitation(InvitationContainer invitation) {
 
         ContentValues values = new ContentValues();

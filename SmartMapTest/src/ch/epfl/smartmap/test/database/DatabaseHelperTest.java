@@ -24,6 +24,7 @@ import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.database.DatabaseHelperInterface;
 
 /**
  * Tests for the DatabaseHelper class
@@ -47,7 +48,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
         new GregorianCalendar().getTimeInMillis(), Invitation.FRIEND_INVITATION);
     private final InvitationContainer invitB = new InvitationContainer(2323, null, event, Invitation.ACCEPTED,
         new GregorianCalendar().getTimeInMillis(), Invitation.EVENT_INVITATION);
-    private DatabaseHelper dbh;
+    private DatabaseHelperInterface dbh;
     private FilterContainer filter;
     private FilterContainer filter2;
     private final Location loc = new Location("");

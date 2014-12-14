@@ -5,7 +5,7 @@ import java.util.SortedSet;
 
 import ch.epfl.smartmap.cache.Cache.SearchFilter;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
-import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.database.DatabaseHelperInterface;
 import ch.epfl.smartmap.listeners.CacheListener;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 
@@ -133,7 +133,7 @@ interface CacheInterface {
      * Completely wipes values and fill the Cache with what is contained in the
      * database
      */
-    void initFromDatabase(DatabaseHelper database);
+    void initFromDatabase(DatabaseHelperInterface database);
 
     void inviteFriendsToEvent(long eventId, Set<Long> usersIds, NetworkRequestCallback<Void> callback);
 
