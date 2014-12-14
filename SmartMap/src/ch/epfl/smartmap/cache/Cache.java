@@ -1415,13 +1415,26 @@ public class Cache implements CacheInterface {
             updatedUsers.add(onlineInfos);
         }
 
-        // For friends that blocked us, try to find a value in cache
+        // For friends that blocked us or that we blocked, try to find a value
+        // in cache or database
         Set<Long> friendThatBlockedUsIds = friendIds;
         friendThatBlockedUsIds.removeAll(friendPosIds);
         for (long id : friendThatBlockedUsIds) {
             User cached = Cache.this.getUser(id);
             if (cached != null) {
                 updatedUsers.add(cached.getContainerCopy());
+            } else {
+                UserContainer friend = ServiceContainer.getDatabase().getUser(id);
+                if (friend != null) {
+                    UserContainer onlineValues = networkClient.getUserInfo(id);
+                    friend.setName(onlineValues.getName());
+                } else {
+                    friend = networkClient.getUserInfo(id);
+                }
+                Bitmap image = networkClient.getProfilePicture(id);
+                friend.setImage(image);
+                friend.setFriendship(User.FRIEND);
+                updatedUsers.add(friend);
             }
         }
 
