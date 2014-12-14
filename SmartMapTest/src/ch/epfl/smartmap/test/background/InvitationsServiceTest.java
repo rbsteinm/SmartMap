@@ -34,6 +34,7 @@ public class InvitationsServiceTest extends ServiceTestCase<InvitationsService> 
 
     private Cache cache = null;
     private SmartMapClient client = null;
+    private DatabaseHelper dbh = null;
 
     public InvitationsServiceTest() {
         super(InvitationsService.class);
@@ -57,7 +58,7 @@ public class InvitationsServiceTest extends ServiceTestCase<InvitationsService> 
         Mockito.when(manager.getUserId()).thenReturn((long) 0);
         ServiceContainer.setSettingsManager(manager);
 
-        DatabaseHelper dbh = Mockito.mock(DatabaseHelper.class);
+        dbh = Mockito.mock(DatabaseHelper.class);
         ServiceContainer.setDatabaseHelper(dbh);
 
         client = Mockito.mock(NetworkSmartMapClient.class);
@@ -67,20 +68,6 @@ public class InvitationsServiceTest extends ServiceTestCase<InvitationsService> 
 
         cache = Mockito.mock(Cache.class);
         ServiceContainer.setCache(cache);
-    }
-
-    @Test
-    public void testBackGroundNotifications() {
-        ServiceContainer.setCache(null);
-
-        testIntent = new Intent(this.getContext(), InvitationsService.class);
-        this.startService(testIntent);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Log.e(InvitationsServiceTest.class.getSimpleName(), "Thread interrupted: " + e);
-        }
-
     }
 
     @Test
