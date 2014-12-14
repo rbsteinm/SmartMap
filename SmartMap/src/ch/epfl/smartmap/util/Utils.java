@@ -234,7 +234,7 @@ public final class Utils {
         float g = Color.green(color) / MAX_COLOR;
         float b = Color.blue(color) / MAX_COLOR;
 
-        float[] src = { r, 0, 0, 0, 0, 0, g, 0, 0, 0, 0, 0, b, 0, 0, 0, 0, 0, 1, 0 };
+        float[] src = {r, 0, 0, 0, 0, 0, g, 0, 0, 0, 0, 0, b, 0, 0, 0, 0, 0, 1, 0};
         return new ColorMatrix(src);
     }
 
@@ -313,6 +313,28 @@ public final class Utils {
     }
 
     /**
+     * @param calendar
+     * @return
+     *
+     * @author SpicyCH
+     */
+    private static String customizedDateString(Calendar calendar, int daysDiff) {
+        if (daysDiff > 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
+                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        } else if (daysDiff == 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
+        } else if (daysDiff == 0) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
+        } else if (daysDiff == -1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
+        } else  {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
+                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        }
+    }
+
+    /**
      * @param time
      *            a second, minute, hour, day or month
      * @return the time prefixed with 0 if it was < 10
@@ -351,22 +373,10 @@ public final class Utils {
      */
     private static String getDateStringForNoYearDiff(Calendar calendar, int daysDiff) {
 
-        if (daysDiff > DAYS_IN_A_WEEK) {
+        if ((daysDiff > -DAYS_IN_A_WEEK) && (daysDiff < DAYS_IN_A_WEEK)) {
 
-            return getCompleteDate(calendar);
+            return customizedDateString(calendar, daysDiff);
 
-        } else if (daysDiff > 1) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
-                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-        } else if (daysDiff == 1) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
-        } else if (daysDiff == 0) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
-        } else if (daysDiff == -1) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
-        } else if (daysDiff > -DAYS_IN_A_WEEK) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
-                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
         } else {
             return getCompleteDate(calendar);
         }
