@@ -210,7 +210,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	@Test
 	public void testParseFriends() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<UserContainer> listFriends = parser.parseFriends(
+		List<UserContainer> listFriends = parser.parseFriendList(
 				PROPER_FRIEND_LIST_JSON, "list");
 		assertEquals("First friend's id does not match", 13, listFriends.get(0)
 				.getId());
@@ -226,7 +226,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	@Test
 	public void testParseFriendsWhenEmptyList() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<UserContainer> friends = parser.parseFriends(
+		List<UserContainer> friends = parser.parseFriendList(
 				PROPER_FRIEND_EMPTY_LIST_JSON, "list");
 
 		assertTrue("Did not parsed empty friends list correctly",
@@ -241,7 +241,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 
 	public void testParseIds() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<Long> ids = parser.parseIds(PROPER_ID_LIST_JSON, "friends");
+		List<Long> ids = parser.parseIdList(PROPER_ID_LIST_JSON, "friends");
 		assertTrue("Did not parse the 3 ids", ids.size() == 3);
 		assertEquals("First Id do not match", Long.valueOf(3), ids.get(0));
 		assertEquals("Second Id do not match", Long.valueOf(4), ids.get(1));
@@ -252,7 +252,7 @@ public class ProperJSONParsingTest extends AndroidTestCase {
 	@Test
 	public void testParseIdsWhenEmptyList() throws SmartMapParseException {
 		SmartMapParser parser = new JsonSmartMapParser();
-		List<Long> ids = parser.parseIds(PROPER_IDS_EMPTY_LIST_JSON, "friends");
+		List<Long> ids = parser.parseIdList(PROPER_IDS_EMPTY_LIST_JSON, "friends");
 		assertTrue("Did not parsed empty positions list correctly",
 				ids.isEmpty());
 	}

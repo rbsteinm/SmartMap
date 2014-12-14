@@ -281,7 +281,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
-            friends = parser.parseFriends(response, "list");
+            friends = parser.parseFriendList(response, "list");
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
         } catch (SmartMapParseException e) {
@@ -355,7 +355,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         try {
             SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
-            ids = parser.parseIds(response, "friends");
+            ids = parser.parseIdList(response, "friends");
 
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
@@ -384,9 +384,9 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         try {
             parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
-            inviters = parser.parseFriends(response, "invitations");
-            newFriends = parser.parseFriends(response, "newFriends");
-            removedFriends = parser.parseIds(response, "removedFriends");
+            inviters = parser.parseFriendList(response, "invitations");
+            newFriends = parser.parseFriendList(response, "newFriends");
+            removedFriends = parser.parseIdList(response, "removedFriends");
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);
         } catch (SmartMapParseException e) {
@@ -440,7 +440,7 @@ final public class NetworkSmartMapClient implements SmartMapClient {
         try {
             SmartMapParser parser = SmartMapParserFactory.parserForContentType(conn.getContentType());
             parser.checkServerError(response);
-            publicEvents = parser.parseIds(response, "events");
+            publicEvents = parser.parseIdList(response, "events");
 
         } catch (NoSuchFormatException e) {
             throw new SmartMapClientException(e);

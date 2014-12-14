@@ -16,9 +16,9 @@ import ch.epfl.smartmap.cache.InvitationContainer;
 public interface InvitationBag {
 
     /**
-     * Get a list of the users that sent an invitation request.
+     * Get a set of {@link InvitationContainer} objects
      * 
-     * @return a list of the inviting users.
+     * @return a set of InvitationContainer objects
      */
     Set<InvitationContainer> getInvitations();
 }

@@ -75,7 +75,7 @@ public interface SmartMapParser {
      *             if s does not represent a valid list of friends (according to
      *             the format that the parser supports)
      */
-    List<UserContainer> parseFriends(String s, String key) throws SmartMapParseException;
+    List<UserContainer> parseFriendList(String s, String key) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns the id
@@ -96,7 +96,7 @@ public interface SmartMapParser {
      * @return the list of ids
      * @throws SmartMapParseException
      */
-    List<Long> parseIds(String s, String key) throws SmartMapParseException;
+    List<Long> parseIdList(String s, String key) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns a map that maps id to positions
