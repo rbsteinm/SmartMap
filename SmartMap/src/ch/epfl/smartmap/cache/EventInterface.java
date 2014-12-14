@@ -27,7 +27,7 @@ public interface EventInterface extends Displayable {
      */
     Calendar getEndDate();
 
-    EventContainer getImmutableCopy();
+    EventContainer getContainerCopy();
 
     String getName();
 

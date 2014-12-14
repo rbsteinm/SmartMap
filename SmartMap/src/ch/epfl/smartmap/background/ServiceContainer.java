@@ -28,6 +28,21 @@ public class ServiceContainer {
     private static SettingsManager mSettingsManager;
 
     /**
+     * Private constructor that hides implicit public one.
+     */
+    private ServiceContainer() {
+        super();
+    }
+
+    public static void forceInitSmartMapServices(Context context) {
+        setSettingsManager(new SettingsManager(context));
+        setNetworkClient(new NetworkSmartMapClient());
+        setDatabaseHelper(new DatabaseHelper(context));
+        setCache(new Cache());
+        setSearchEngine(new CachedSearchEngine());
+    }
+
+    /**
      * Get the cache service.
      * 
      * @return Cache
@@ -133,12 +148,5 @@ public class ServiceContainer {
      */
     public static void setSettingsManager(SettingsManager sm) {
         mSettingsManager = sm;
-    }
-
-    /**
-     * Private constructor that hides implicit public one.
-     */
-    private ServiceContainer() {
-        super();
     }
 }

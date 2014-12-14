@@ -75,6 +75,9 @@ public class Cache implements CacheInterface {
         nextFilterId = Filter.DEFAULT_FILTER_ID + 1;
 
         mListeners = new ArrayList<CacheListener>();
+
+        this.putUser(UserContainer.newEmptyContainer().setId(mSelfId)
+            .setName(ServiceContainer.getSettingsManager().getUserName()));
     }
 
     /*
@@ -145,11 +148,11 @@ public class Cache implements CacheInterface {
     @Override
     public synchronized void addParticipantsToEvent(Set<Long> ids, final Event event,
         final NetworkRequestCallback<Void> callback) {
-        Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
+        Set<Long> newParticipantIds = event.getContainerCopy().getParticipantIds();
         newParticipantIds.addAll(ids);
 
         final EventContainer newImmutableEvent =
-            event.getImmutableCopy().setParticipantIds(newParticipantIds);
+            event.getContainerCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -1272,11 +1275,11 @@ public class Cache implements CacheInterface {
     @Override
     public synchronized void removeParticipantsFromEvent(Set<Long> ids, Event event,
         final NetworkRequestCallback<Void> callback) {
-        Set<Long> newParticipantIds = event.getImmutableCopy().getParticipantIds();
+        Set<Long> newParticipantIds = event.getContainerCopy().getParticipantIds();
         newParticipantIds.removeAll(ids);
 
         final EventContainer newImmutableEvent =
-            event.getImmutableCopy().setParticipantIds(newParticipantIds);
+            event.getContainerCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override

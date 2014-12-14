@@ -176,7 +176,7 @@ public abstract class User implements UserInterface {
             case User.STRANGER:
                 return new Stranger(userContainer.getId(), userContainer.getName(), userContainer.getImage());
             case User.SELF:
-                return new Self();
+                return new Self(userContainer.getImage());
             default:
                 throw new IllegalArgumentException("Unknown type of user");
         }

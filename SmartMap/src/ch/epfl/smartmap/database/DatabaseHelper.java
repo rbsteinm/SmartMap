@@ -936,7 +936,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
         }
         for (Event event : events) {
             Log.d(TAG, "Store event " + event.getId());
-            this.addEvent(event.getImmutableCopy());
+            this.addEvent(event.getContainerCopy());
         }
         for (Filter filter : filters) {
             Log.d(TAG, "Store filter " + filter.getId());
