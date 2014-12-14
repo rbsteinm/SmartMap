@@ -1,4 +1,4 @@
-package ch.epfl.smartmaptest.utils;
+package ch.epfl.smartmap.test.utils;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

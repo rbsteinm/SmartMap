@@ -49,6 +49,11 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     private final Map<String, Marker> mDictionnaryMarkers;
 
+    /**
+     * Constructor
+     * 
+     * @param googleMap
+     */
     public DefaultMarkerManager(GoogleMap googleMap) {
         if (googleMap == null) {
             throw new IllegalArgumentException("Null GoogleMap");
