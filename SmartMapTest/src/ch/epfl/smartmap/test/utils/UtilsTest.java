@@ -73,7 +73,7 @@ public class UtilsTest extends AndroidTestCase {
     }
 
     @Test
-    public void testCitiyForLocation() {
+    public void testCityForLocation() {
         assertEquals("Ecublens", Utils.getCityFromLocation(epfl));
     }
 
@@ -89,6 +89,57 @@ public class UtilsTest extends AndroidTestCase {
     }
 
     @Test
+    public void testFuture() {
+        Calendar inFarAwayFuture = new GregorianCalendar(2345, 7, 17);
+
+        assertEquals("17.08.2345", Utils.getDateString(inFarAwayFuture));
+    }
+
+    @Test
+    public void testGetColorInInterval1() {
+        double value = 0.0;
+        double startValue = 1.0;
+        double endValue = 2.0;
+        int startColor = Color.RED;
+        int endColor = Color.BLUE;
+
+        assertEquals(Color.RED, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
+    }
+
+    @Test
+    public void testGetColorInInterval2() {
+        double value = 3.0;
+        double startValue = 1.0;
+        double endValue = 2.0;
+        int startColor = Color.RED;
+        int endColor = Color.BLUE;
+
+        assertEquals(Color.BLUE, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
+    }
+
+    @Test
+    public void testGetColorInInterval3() {
+        double value = 0.0;
+        double startValue = 2.0;
+        double endValue = 1.0;
+        int startColor = Color.RED;
+        int endColor = Color.BLUE;
+
+        assertEquals(Color.BLUE, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
+    }
+
+    @Test
+    public void testGetColorInInterval4() {
+        double value = 1.0;
+        double startValue = 0.0;
+        double endValue = 2.0;
+        int startColor = Color.BLACK;
+        int endColor = Color.GRAY;
+
+        assertEquals(0xff444444, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
+    }
+
+    @Test
     public void testGetDefaultValueForUnknownPlaces() {
         Location somewhereVeryLost = new Location("");
         somewhereVeryLost.setLatitude(0);
@@ -98,6 +149,33 @@ public class UtilsTest extends AndroidTestCase {
 
         assertEquals(Displayable.NO_LOCATION_STRING, Utils.getCountryFromLocation(somewhereVeryLost));
 
+    }
+
+    @Test
+    public void testGetMatrixForColor1() {
+        float[] correct = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
+
+        ColorMatrix result = Utils.getMatrixForColor(Color.RED);
+
+        assertTrue(this.floatArrayEquals(correct, result.getArray()));
+    }
+
+    @Test
+    public void testGetMatrixForColor2() {
+        float[] correct = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0};
+
+        ColorMatrix result = Utils.getMatrixForColor(Color.WHITE);
+
+        assertTrue(this.floatArrayEquals(correct, result.getArray()));
+    }
+
+    @Test
+    public void testGetMatrixForColor3() {
+        float[] correct = {0.2f, 0, 0, 0, 0, 0, 0.4f, 0, 0, 0, 0, 0, 0.8f, 0, 0, 0, 0, 0, 1, 0};
+
+        ColorMatrix result = Utils.getMatrixForColor(Color.argb(1, 51, 102, 204));
+
+        assertTrue(this.floatArrayEquals(correct, result.getArray()));
     }
 
     @Test
@@ -146,6 +224,34 @@ public class UtilsTest extends AndroidTestCase {
     }
 
     @Test
+    public void testPrintDistanceToMeKm() {
+        Location me = new Location("");
+        me.setLongitude(6.6483783);
+        me.setLatitude(46.539441);
+
+        ServiceContainer.getSettingsManager().setLocation(me);
+
+        assertEquals("6.7 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km)
+            + " "
+            + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you),
+            Utils.printDistanceToMe(epfl));
+    }
+
+    @Test
+    public void testPrintDistanceToMeMeters() {
+        Location me = new Location("");
+        me.setLongitude(6.569116115570068);
+        me.setLatitude(46.520293125905276);
+
+        ServiceContainer.getSettingsManager().setLocation(me);
+
+        assertEquals(
+            "227 "
+                + ServiceContainer.getSettingsManager().getContext()
+                    .getString(R.string.utils_meters_away_from_you), Utils.printDistanceToMe(epfl));
+    }
+
+    @Test
     public void testTimeAfternoon() {
         assertEquals("17:07", Utils.getTimeString(afternoon));
     }
@@ -173,105 +279,6 @@ public class UtilsTest extends AndroidTestCase {
             Utils.getDateString(yesterday));
     }
 
-    @Test
-    public void testPrintDistanceToMeKm() {
-        Location me = new Location("");
-        me.setLongitude(6.6483783);
-        me.setLatitude(46.539441);
-
-        ServiceContainer.getSettingsManager().setLocation(me);
-
-        assertEquals("6.7 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km)
-            + " "
-            + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you),
-            Utils.printDistanceToMe(epfl));
-    }
-
-    @Test
-    public void testPrintDistanceToMeMeters() {
-        Location me = new Location("");
-        me.setLongitude(6.569116115570068);
-        me.setLatitude(46.520293125905276);
-
-        ServiceContainer.getSettingsManager().setLocation(me);
-
-        assertEquals(
-            "227 "
-                + ServiceContainer.getSettingsManager().getContext()
-                    .getString(R.string.utils_meters_away_from_you), Utils.printDistanceToMe(epfl));
-    }
-    
-    @Test
-    public void testGetColorInInterval1() {
-        double value = 0.0;
-        double startValue = 1.0;
-        double endValue = 2.0;
-        int startColor = Color.RED;
-        int endColor = Color.BLUE;
-        
-        assertEquals(Color.RED, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
-    }
-    
-    @Test
-    public void testGetColorInInterval2() {
-        double value = 3.0;
-        double startValue = 1.0;
-        double endValue = 2.0;
-        int startColor = Color.RED;
-        int endColor = Color.BLUE;
-        
-        assertEquals(Color.BLUE, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
-    }
-    
-    @Test
-    public void testGetColorInInterval3() {
-        double value = 0.0;
-        double startValue = 2.0;
-        double endValue = 1.0;
-        int startColor = Color.RED;
-        int endColor = Color.BLUE;
-        
-        assertEquals(Color.BLUE, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
-    }
-    
-    @Test
-    public void testGetColorInInterval4() {
-        double value = 1.0;
-        double startValue = 0.0;
-        double endValue = 2.0;
-        int startColor = Color.BLACK;
-        int endColor = Color.GRAY;
-        
-        assertEquals(0xff444444, Utils.getColorInInterval(value, startValue, endValue, startColor, endColor));
-    }
-    
-    @Test
-    public void testGetMatrixForColor1() {
-        float[] correct = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
-        
-        ColorMatrix result = Utils.getMatrixForColor(Color.RED);
-        
-        assertTrue(floatArrayEquals(correct, result.getArray()));
-    }
-    
-    @Test
-    public void testGetMatrixForColor2() {
-        float[] correct = {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0};
-        
-        ColorMatrix result = Utils.getMatrixForColor(Color.WHITE);
-        
-        assertTrue(floatArrayEquals(correct, result.getArray()));
-    }
-    
-    @Test
-    public void testGetMatrixForColor3() {
-        float[] correct = {0.2f, 0, 0, 0, 0, 0, 0.4f, 0, 0, 0, 0, 0, 0.8f, 0, 0, 0, 0, 0, 1, 0};
-        
-        ColorMatrix result = Utils.getMatrixForColor(Color.argb(1, 51, 102, 204));
-        
-        assertTrue(floatArrayEquals(correct, result.getArray()));
-    }
-    
     private boolean floatArrayEquals(float[] a1, float[] a2) {
         if (a1.length != a2.length) {
             return false;
