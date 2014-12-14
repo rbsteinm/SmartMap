@@ -36,114 +36,30 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  */
 public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<ShowEventsActivity> {
 
+    // from stackoverflow
+    public static ViewAction setProgress(final int progress) {
+        return new ViewAction() {
+            @Override
+            public org.hamcrest.Matcher<View> getConstraints() {
+                return ViewMatchers.isAssignableFrom(SeekBar.class);
+            }
+
+            @Override
+            public String getDescription() {
+                return "Set a progress";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                ((SeekBar) view).setProgress(progress);
+            }
+        };
+    }
+
     private ListActivity mActivity;
 
     public ShowEventsActivityTest() {
         super(ShowEventsActivity.class);
-    }
-
-    // The standard JUnit 3 setUp method run for for every test
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        mActivity = this.getActivity();
-
-        this.addMockEventsInDB();
-    }
-
-    @Override
-    protected void tearDown() {
-        this.getActivity().finish();
-    }
-
-    public void testCanClickOnAnEvent() throws InterruptedException {
-
-        // Clicks the first element of the list
-        onView(withId(0)).perform(ViewActions.click());
-        // Espresso.onData(anything()).inAdapterView(withContentDescription("listview")).atPosition(0)
-        // .perform(ViewActions.click());
-
-        // The dialog may need a network access that might take some time to be
-        // displayed
-        Thread.sleep(2000);
-
-        // If the AlertDialog has been opened, then the button2 must be
-        // displayed. Espresso sometimes cannot find this view, but relaunch the
-        // test if this happens, or make espresso functional.
-        onView(ViewMatchers.withId(android.R.id.button3)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
-
-    }
-
-    public void testCanOpenAddEventActivity() {
-        openActionBarOverflowOrOptionsMenu(this.getInstrumentation().getTargetContext());
-
-        onView(withText("Create a new event")).perform(ViewActions.click());
-
-        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-
-    }
-
-    public void testCheckingMyEventsChangesListSize() throws InterruptedException {
-        Thread.sleep(2000);
-        int initialSize = mActivity.getListView().getCount();
-        onView(withId(R.id.ShowEventsCheckBoxMyEv)).perform(ViewActions.click());
-        mActivity = this.getActivity();
-        int finalSize = mActivity.getListView().getCount();
-        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
-            finalSize < initialSize);
-    }
-
-    public void testCheckingNearMeChangesListSize() {
-        // FIXME this test fails sometimes for NO REASONS, wtf???
-        int initialSize = mActivity.getListView().getCount();
-        onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(ViewActions.click());
-        mActivity = this.getActivity();
-        int finalSize = mActivity.getListView().getCount();
-        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
-            finalSize < initialSize);
-    }
-
-    public void testCheckingOnGoingChangesListSize() {
-        int initialSize = mActivity.getListView().getCount();
-        onView(withId(R.id.ShowEventscheckBoxStatus)).perform(ViewActions.click());
-        mActivity = this.getActivity();
-        int finalSize = mActivity.getListView().getCount();
-        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
-            finalSize < initialSize);
-    }
-
-    public void testSeekBarCannotGoToZero() {
-        onView(withId(R.id.showEventSeekBar)).perform(setProgress(0));
-        onView(withId(R.id.showEventKilometers)).check(matches(not(ViewMatchers.withText("0 km"))));
-    }
-
-    public void testSeekBarChangesKilometersShown() {
-        onView(withId(R.id.showEventSeekBar)).perform(setProgress(10));
-        onView(withId(R.id.showEventKilometers)).check(matches(ViewMatchers.withText("10 km")));
-        onView(withId(R.id.showEventSeekBar)).perform(setProgress(15));
-        onView(withId(R.id.showEventKilometers)).check(matches(ViewMatchers.withText("15 km")));
-    }
-
-    public void testSeekBarChangesListSize() {
-        int initialSize = mActivity.getListView().getCount();
-        onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(ViewActions.click());
-        onView(withId(R.id.showEventSeekBar)).perform(setProgress(0));
-        mActivity = this.getActivity();
-        int finalSize = mActivity.getListView().getCount();
-        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
-            finalSize < initialSize);
-
-        onView(withId(R.id.showEventSeekBar)).perform(setProgress(100));
-        mActivity = this.getActivity();
-        int newFinalSize = mActivity.getListView().getCount();
-        assertTrue("finalSize: " + finalSize + " wasn't smaller than newFinalSize: " + initialSize,
-            finalSize < newFinalSize);
-    }
-
-    public void testSeekBarDisabledByDefault() {
-        onView(withId(R.id.showEventSeekBar)).check(matches(not(isEnabled())));
     }
 
     private void addMockEventsInDB() {
@@ -232,24 +148,106 @@ public class ShowEventsActivityTest extends ActivityInstrumentationTestCase2<Sho
 
     }
 
-    // from stackoverflow
-    public static ViewAction setProgress(final int progress) {
-        return new ViewAction() {
-            @Override
-            public org.hamcrest.Matcher<View> getConstraints() {
-                return ViewMatchers.isAssignableFrom(SeekBar.class);
-            }
+    // The standard JUnit 3 setUp method run for for every test
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
 
-            @Override
-            public String getDescription() {
-                return "Set a progress";
-            }
+        mActivity = this.getActivity();
 
-            @Override
-            public void perform(UiController uiController, View view) {
-                ((SeekBar) view).setProgress(progress);
-            }
-        };
+        this.addMockEventsInDB();
+    }
+
+    @Override
+    protected void tearDown() {
+        this.getActivity().finish();
+    }
+
+    public void testCanClickOnAnEvent() throws InterruptedException {
+
+        // Clicks the first element of the list
+        onView(withId(0)).perform(ViewActions.click());
+        // Espresso.onData(anything()).inAdapterView(withContentDescription("listview")).atPosition(0)
+        // .perform(ViewActions.click());
+
+        // The dialog may need a network access that might take some time to be
+        // displayed
+        Thread.sleep(2000);
+
+        // If the AlertDialog has been opened, then the button2 must be
+        // displayed. Espresso sometimes cannot find this view, but relaunch the
+        // test if this happens, or make espresso functional.
+        onView(ViewMatchers.withId(android.R.id.button3)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+    }
+
+    public void testCanOpenAddEventActivity() {
+        openActionBarOverflowOrOptionsMenu(this.getInstrumentation().getTargetContext());
+
+        onView(withText("Create a new event")).perform(ViewActions.click());
+
+        onView(withId(R.id.addEventDescription)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+    }
+
+    public void testCheckingMyEventsChangesListSize() throws InterruptedException {
+        int initialSize = mActivity.getListView().getCount();
+        onView(withId(R.id.ShowEventsCheckBoxMyEv)).perform(ViewActions.click());
+        mActivity = this.getActivity();
+        int finalSize = mActivity.getListView().getCount();
+        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
+            finalSize < initialSize);
+    }
+
+    public void testCheckingNearMeChangesListSize() {
+        // FIXME this test fails sometimes for NO REASONS, wtf???
+        int initialSize = mActivity.getListView().getCount();
+        onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(ViewActions.click());
+        mActivity = this.getActivity();
+        int finalSize = mActivity.getListView().getCount();
+        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
+            finalSize < initialSize);
+    }
+
+    public void testCheckingOnGoingChangesListSize() {
+        int initialSize = mActivity.getListView().getCount();
+        onView(withId(R.id.ShowEventscheckBoxStatus)).perform(ViewActions.click());
+        mActivity = this.getActivity();
+        int finalSize = mActivity.getListView().getCount();
+        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
+            finalSize < initialSize);
+    }
+
+    public void testSeekBarCannotGoToZero() {
+        onView(withId(R.id.showEventSeekBar)).perform(setProgress(0));
+        onView(withId(R.id.showEventKilometers)).check(matches(not(ViewMatchers.withText("0 km"))));
+    }
+
+    public void testSeekBarChangesKilometersShown() {
+        onView(withId(R.id.showEventSeekBar)).perform(setProgress(10));
+        onView(withId(R.id.showEventKilometers)).check(matches(ViewMatchers.withText("10 km")));
+        onView(withId(R.id.showEventSeekBar)).perform(setProgress(15));
+        onView(withId(R.id.showEventKilometers)).check(matches(ViewMatchers.withText("15 km")));
+    }
+
+    public void testSeekBarChangesListSize() {
+        int initialSize = mActivity.getListView().getCount();
+        onView(withId(R.id.ShowEventsCheckBoxNearMe)).perform(ViewActions.click());
+        onView(withId(R.id.showEventSeekBar)).perform(setProgress(0));
+        mActivity = this.getActivity();
+        int finalSize = mActivity.getListView().getCount();
+        assertTrue("finalSize: " + finalSize + " wasn't smaller than initialSize: " + initialSize,
+            finalSize < initialSize);
+
+        onView(withId(R.id.showEventSeekBar)).perform(setProgress(100));
+        mActivity = this.getActivity();
+        int newFinalSize = mActivity.getListView().getCount();
+        assertTrue("finalSize: " + finalSize + " wasn't smaller than newFinalSize: " + initialSize,
+            finalSize < newFinalSize);
+    }
+
+    public void testSeekBarDisabledByDefault() {
+        onView(withId(R.id.showEventSeekBar)).check(matches(not(isEnabled())));
     }
 
 }
