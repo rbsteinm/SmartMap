@@ -5,13 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.widget.Toast;
+import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.StartActivity;
 
 import com.facebook.Session;
 
 /**
  * Lets the user logout from SmartMap. This is a singleton, use LogoutManager.getInstance().
- * 
+ *
  * @author SpicyCH
  */
 public final class LogoutManager {
@@ -21,7 +22,7 @@ public final class LogoutManager {
 
     /**
      * Constructor
-     * 
+     *
      * @param context
      */
     private LogoutManager(Context context) {
@@ -30,26 +31,27 @@ public final class LogoutManager {
 
     /**
      * First shows an alert dialog to the user for confirmation, then logout user from SmartMap.
-     * 
+     *
      * @author SpicyCH
      */
     public void showConfirmationThenLogout() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
 
         // set title
-        alertDialogBuilder.setTitle("Logging out");
+        alertDialogBuilder.setTitle(mContext.getString(R.string.logout_dialog_title));
 
         // set dialog message
-        alertDialogBuilder.setMessage("Do you really want to logout from SmartMap?").setCancelable(false)
-                .setPositiveButton("Logout", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setMessage(mContext.getString(R.string.logout_dialog_message)).setCancelable(false)
+                .setPositiveButton(mContext.getString(R.string.logout_confirm), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // if this button is clicked, close
                         // current activity
-                        Toast.makeText(mContext, "Logging out...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.logout_toast_confirm), Toast.LENGTH_SHORT)
+                                .show();
                         LogoutManager.this.logout();
                     }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                }).setNegativeButton(mContext.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // if this button is clicked, just close
@@ -69,7 +71,7 @@ public final class LogoutManager {
      * Reinitialize all services, disable FB session and return to the StartActivity. <br />
      * Note: we don't need to destroy the PHP session on the server since we can re-auth with another login on top of
      * the previous one.
-     * 
+     *
      * @author SpicyCH
      */
     private void logout() {
@@ -95,7 +97,7 @@ public final class LogoutManager {
 
     /**
      * Gets an instance of <code>LogoutManager</code>.
-     * 
+     *
      * @param context
      * @return the unique instance
      * @author SpicyCH

@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
@@ -48,7 +49,7 @@ public class ShowEventsActivity extends ListActivity {
             if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
                 seekBar.setProgress(SEEK_BAR_MIN_VALUE);
             }
-            mShowKilometers.setText(mSeekBar.getProgress() + " km");
+            mShowKilometers.setText(mSeekBar.getProgress() + " " + mContext.getString(R.string.symbol_km));
             ShowEventsActivity.this.updateCurrentList();
         }
 
@@ -70,7 +71,6 @@ public class ShowEventsActivity extends ListActivity {
     private static final int METERS_IN_ONE_KM = 1000;
 
     private static final double THREE_AND_A_HALF = 0.75;
-
     private SeekBar mSeekBar;
 
     private TextView mShowKilometers;
@@ -81,13 +81,15 @@ public class ShowEventsActivity extends ListActivity {
 
     private List<Event> mEventsList;
 
+    private Context mContext;
+
     /**
      * Displays the AlertDialog with events infos.
      * 
      * @param event
      *            the event to show a dialog for
      * @param creatorName
-     *            the creator of the event
+     *            the name of the creator of the event
      * @author SpicyCH
      */
     private void displayDialog(final Event event, String creatorName) {
@@ -155,36 +157,35 @@ public class ShowEventsActivity extends ListActivity {
 
     }
 
+    /**
+     * Gets an event from its id.
+     * 
+     * @param eventId
+     * @author SpicyCH
+     */
     private void getEvent(long eventId) {
 
         Log.d(TAG, "Retrieving event...");
 
-        Event event = ServiceContainer.getCache().getEvent(eventId);
-        String creatorName = event.getCreator().getName();
+        Event evt = ServiceContainer.getCache().getEvent(eventId);
+        String creatorName = evt.getCreator().getName();
 
         Log.d(TAG, "Processing event...");
 
-        if ((event == null) || (creatorName == null)) {
+        if ((evt == null) || (creatorName == null)) {
             Log.e(TAG, "The server returned a null event or creatorName");
 
             Toast.makeText(ShowEventsActivity.this,
                 ShowEventsActivity.this.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT).show();
-
         } else {
-
             // Construct the dialog that display more detailed infos and
-            // offers to show event on the map
-            // or to
-            // show more details.
-
-            this.displayDialog(event, creatorName);
-
+            // offers to show event on the map or to show more details.
+            this.displayDialog(evt, creatorName);
         }
-
     }
 
     /**
-     * Initilizes the activity.
+     * Initializes the activity.
      * 
      * @author SpicyCH
      */
@@ -209,7 +210,6 @@ public class ShowEventsActivity extends ListActivity {
                     int defaultPosition = (int) Math.floor(THREE_AND_A_HALF * max);
                     mSeekBar.setProgress(defaultPosition);
                 }
-
                 ShowEventsActivity.this.updateCurrentList();
             }
         });
@@ -297,6 +297,8 @@ public class ShowEventsActivity extends ListActivity {
         // Makes the logo clickable (clicking it returns to previous activity)
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        mContext = this.getApplicationContext();
 
         if (ServiceContainer.getSettingsManager() == null) {
             ServiceContainer.initSmartMapServices(this);
@@ -390,11 +392,7 @@ public class ShowEventsActivity extends ListActivity {
      * Updates the list displayed to the user.
      */
     private void updateCurrentList() {
-
-        Log.d(TAG, "Updating event's list to match user choices");
-
         mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllEvents());
-
         if (mNearMeChecked) {
             this.removeEventsToofar();
         }
@@ -406,9 +404,7 @@ public class ShowEventsActivity extends ListActivity {
         if (mOngoingChecked) {
             mEventsList.retainAll(ServiceContainer.getCache().getLiveEvents());
         }
-
         ShowEventsActivity.this.setListAdapter(new EventsListItemAdapter(ShowEventsActivity.this, mEventsList));
-
     }
 
 }

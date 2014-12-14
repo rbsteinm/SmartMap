@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
@@ -11,15 +12,13 @@ import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
- * A class to represent the user's invitations
+ * A class to represent invitations
  * 
  * @author agpmilli
  */
 public class GenericInvitation extends Invitation {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = GenericInvitation.class.getSimpleName();
-
+    // We create the bitmaps once
     private static final Bitmap ADD_PERSON_BITMAP = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
         .getContext().getResources(), R.drawable.ic_action_add_person);
 
@@ -33,33 +32,43 @@ public class GenericInvitation extends Invitation {
     private Event mEvent;
     private int mType;
 
-    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
-    public static final int IMAGE_QUALITY = 100;
-    public static final String PROVIDER_NAME = "SmartMapServers";
-
+    /**
+     * Constructor
+     * 
+     * @param id
+     *            id of invitation
+     * @param timeStamp
+     *            timeStamp of invitation
+     * @param status
+     *            status of invitation
+     * @param user
+     *            user of invitation
+     * @param event
+     *            event of invitation
+     * @param type
+     *            type of invitation
+     */
     public GenericInvitation(long id, long timeStamp, int status, User user, Event event, int type) {
         super(id, timeStamp, status);
 
-        if ((user == null)
-            && ((type == Invitation.FRIEND_INVITATION) || (type == Invitation.ACCEPTED_FRIEND_INVITATION))) {
-            throw new IllegalArgumentException();
-        } else {
-            mUser = user;
-        }
-
-        if ((type == Invitation.EVENT_INVITATION) && (event == null)) {
-            throw new IllegalArgumentException();
-        } else {
-            mEvent = event;
-        }
-
         if ((type != Invitation.ACCEPTED_FRIEND_INVITATION)
             && ((type != Invitation.EVENT_INVITATION) && (type != Invitation.FRIEND_INVITATION))) {
-            throw new IllegalArgumentException();
+            mType = Invitation.NO_TYPE;
         } else {
             mType = type;
         }
 
+        if ((type == Invitation.FRIEND_INVITATION) || (type == Invitation.ACCEPTED_FRIEND_INVITATION)) {
+            mUser = user;
+        } else {
+            mUser = Invitation.NO_USER;
+        }
+
+        if (type == Invitation.EVENT_INVITATION) {
+            mEvent = event;
+        } else {
+            mEvent = Invitation.NO_EVENT;
+        }
     }
 
     @Override
@@ -83,11 +92,18 @@ public class GenericInvitation extends Invitation {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.InvitationInterface#getIntent()
+     * It depends on the type of invitation and on the status of it
+     */
     @Override
     public Intent getIntent() {
         Intent intent = null;
         Context context = ServiceContainer.getSettingsManager().getContext();
+        // Depends on type of invitation
         if (mType == InvitationContainer.FRIEND_INVITATION) {
+            // And on status of invitation
             if ((this.getStatus() == READ) || (this.getStatus() == UNREAD)) {
                 intent = new Intent(context, FriendsPagerActivity.class);
             } else if ((this.getStatus() == ACCEPTED) || (this.getStatus() == DECLINED)) {
@@ -108,6 +124,8 @@ public class GenericInvitation extends Invitation {
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Invitation#getSubtitle()
+     * It depends on the status (if accepted or declined) and then on the type
+     * of invitation
      */
     @Override
     public String getSubtitle() {
@@ -127,6 +145,11 @@ public class GenericInvitation extends Invitation {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.InvitationInterface#getTitle()
+     * It depends on the type of invitation
+     */
     @Override
     public String getTitle() {
         Context context = ServiceContainer.getSettingsManager().getContext();
@@ -160,24 +183,20 @@ public class GenericInvitation extends Invitation {
      */
     @Override
     public boolean update(InvitationContainer invitation) {
-        boolean hasChanged = false;
+        boolean hasChanged = super.update(invitation);
+        Log.d("INVITATION TEST", "mUser : " + mUser + " invitation.getUser() : " + invitation.getUser());
+        Log.d("INVITATION TEST", "mEvent : " + mEvent + " invitation.getEvent() : " + invitation.getEvent());
+        Log.d("INVITATION TEST", "mType : " + mType + " invitation.getType() : " + invitation.getType());
 
-        if (invitation.getUser() != null) {
+        if ((invitation.getUser() != null) && (invitation.getUser() != mUser)) {
             mUser = invitation.getUser();
             hasChanged = true;
         }
-        if (invitation.getEvent() != null) {
+        if ((invitation.getEvent() != null) && (invitation.getEvent() != mEvent)) {
             mEvent = invitation.getEvent();
             hasChanged = true;
         }
 
-        if ((invitation.getType() == InvitationContainer.ACCEPTED_FRIEND_INVITATION)
-            || (invitation.getType() == InvitationContainer.EVENT_INVITATION)
-            || (invitation.getType() == InvitationContainer.FRIEND_INVITATION)) {
-            mType = invitation.getType();
-            hasChanged = true;
-        }
-
-        return super.update(invitation) || hasChanged;
+        return hasChanged;
     }
 }

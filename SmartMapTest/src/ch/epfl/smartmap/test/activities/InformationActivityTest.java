@@ -2,6 +2,8 @@ package ch.epfl.smartmap.test.activities;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.not;
+import android.app.ListActivity;
 import android.content.Context;
 import android.location.Location;
 import android.test.ActivityInstrumentationTestCase2;
@@ -19,17 +21,19 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  * Test ShowEventInformationActivity. Since this activity needs a click on
  * ShowEventsActivity to be launched, we extend
  * ActivityInstrumentationTestCase2<ShowEventsActivity>. If the tests crash,
- * relaunch. Espresso sucks.
- *
+ * relaunch.
+ * 
  * @author SpicyCH
+ * @author agpmilli
  */
-public class ShowEventInformationActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
+public class InformationActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
 
     private static final String CREATOR_NAME = "SmartMap SwEng";
     private static final String EVENT_NAME = "Some other test event";
     private Context mContext;
+    private ListActivity mActivity;
 
-    public ShowEventInformationActivityTest() {
+    public InformationActivityTest() {
         super(AddEventActivity.class);
     }
 
@@ -37,8 +41,6 @@ public class ShowEventInformationActivityTest extends ActivityInstrumentationTes
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
-        this.getActivity();
 
         mContext = this.getInstrumentation().getTargetContext();
 
@@ -76,43 +78,42 @@ public class ShowEventInformationActivityTest extends ActivityInstrumentationTes
         super.tearDown();
     }
 
+    public void testClickingInAttending() {
+        onView(withId(R.id.event_info_going_checkbox)).perform(ViewActions.click());
+        onView(withId(R.id.event_info_going_checkbox)).check(ViewAssertions.matches(ViewMatchers.isChecked()));
+    }
+
+    public void testClickingInAttendingAndReclicking() {
+        onView(withId(R.id.event_info_going_checkbox)).perform(ViewActions.click());
+        onView(withId(R.id.event_info_going_checkbox)).perform(ViewActions.click());
+        onView(withId(R.id.event_info_going_checkbox)).check(ViewAssertions.matches(not(ViewMatchers.isChecked())));
+    }
+
     public void testCreatorDisplayed() {
-        onView(withId(R.id.show_event_info_creator)).check(
-            ViewAssertions.matches(ViewMatchers.withText(CREATOR_NAME)));
+        onView(withId(R.id.show_event_info_creator)).check(ViewAssertions.matches(ViewMatchers.withText(CREATOR_NAME)));
     }
 
     public void testDescriptionDisplayed() {
-        onView(withId(R.id.show_event_info_description)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withId(R.id.show_event_info_description)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     public void testEventEndDisplayed() {
-
-        onView(withId(R.id.show_event_info_end_date)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
-
-        onView(withId(R.id.show_event_info_end_hour)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
-
+        onView(withId(R.id.show_event_info_end_date)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withId(R.id.show_event_info_end_hour)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     public void testEventNameDisplayedCorrectly() {
-
-        onView(withId(R.id.show_event_info_event_name)).check(
-            ViewAssertions.matches(ViewMatchers.withText(EVENT_NAME)));
+        onView(withId(R.id.show_event_info_event_name))
+            .check(ViewAssertions.matches(ViewMatchers.withText(EVENT_NAME)));
     }
 
     public void testStartDisplayedCorrectly() {
-
         onView(withId(R.id.show_event_info_start_date)).check(
-            ViewAssertions.matches(ViewMatchers.withText(mContext
-                .getString(R.string.events_list_item_adapter_today))));
+            ViewAssertions.matches(ViewMatchers.withText(mContext.getString(R.string.events_list_item_adapter_today))));
     }
 
     public void testTownAndCitiyDisplayed() {
-
-        onView(withId(R.id.show_event_info_town_and_country)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withId(R.id.show_event_info_town_and_country)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     public void testZCanInviteFriends() {
