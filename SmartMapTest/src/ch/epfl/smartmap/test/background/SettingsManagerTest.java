@@ -5,7 +5,6 @@ import org.junit.Test;
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
-import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 
 public class SettingsManagerTest extends AndroidTestCase {
@@ -19,7 +18,13 @@ public class SettingsManagerTest extends AndroidTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mContext = new RenamingDelegatingContext(this.getContext(), "test_");
-        mManager = ServiceContainer.getSettingsManager();
+        mManager = new SettingsManager(mContext);
+    }
+
+    @Test
+    public void testGetCookie() {
+        mManager.setCookie("qwertzuiop");
+        assertTrue(mManager.getCookie().equals("qwertzuiop"));
     }
 
     @Test
@@ -30,14 +35,25 @@ public class SettingsManagerTest extends AndroidTestCase {
 
     @Test
     public void testGetFacebookID() {
-        // Checking if default values are returned
-        // assertTrue(mManager.getFacebookID() ==
-        // SettingsManager.DEFAULT_FB_ID);
+        mManager.setFacebookID(123456789);
+        assertEquals(mManager.getFacebookID(), 123456789);
+    }
+
+    @Test
+    public void testGetToken() {
+        mManager.setToken("123456");
+        assertTrue(mManager.getToken().equals("123456"));
     }
 
     @Test
     public void testGetUserID() {
         mManager.setUserID(mID);
-        assertTrue(mManager.getUserId() == mID);
+        assertEquals(mManager.getUserId(), mID);
+    }
+
+    @Test
+    public void testGetUserName() {
+        mManager.setUserName("New Name");
+        assertTrue(mManager.getUserName().equals("New Name"));
     }
 }
