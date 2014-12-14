@@ -25,11 +25,6 @@ public class InviteFriendsActivityTest extends ActivityInstrumentationTestCase2<
      */
     public InviteFriendsActivityTest() {
         super(InviteFriendsActivity.class);
-        /*
-         * Set<User> users = new HashSet<User>(); users.add(arg0)
-         * Cache mockCache = Mockito.mock(Cache.class);
-         * Mockito.when(mockCache.getAllFriends()).thenReturn(value);
-         */
     }
 
     @Override
@@ -41,7 +36,6 @@ public class InviteFriendsActivityTest extends ActivityInstrumentationTestCase2<
 
     public void testFriendsDisplayed() {
         int friendsSize = mActivity.getListAdapter().getCount();
-
         assertEquals(friendsSize, ServiceContainer.getCache().getAllFriends().size());
     }
 
