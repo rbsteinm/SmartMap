@@ -93,7 +93,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      */
 
     private Bitmap createDimensionedOverlay(Bitmap bmp1, Bitmap bmp2) {
-        assert ((bmp1 != null) && (bmp2 != null));
+        assert (bmp1 != null) && (bmp2 != null);
         int maxWidth = bmp1.getWidth() > bmp2.getWidth() ? bmp1.getWidth() : bmp2.getWidth();
         int maxHeight = bmp1.getHeight() > bmp2.getHeight() ? bmp1.getHeight() : bmp2.getHeight();
         return Bitmap.createBitmap(maxWidth, maxHeight, bmp1.getConfig());
@@ -107,7 +107,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @return the cropped image
      */
     private Bitmap cropCircle(Bitmap image, int radius) {
-        assert (image != null);
+        assert image != null;
         Paint color = new Paint();
         color.setColor(Color.BLACK);
         Bitmap preOut;
@@ -159,7 +159,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @param context
      */
     private void initializeIconComponents(Context context) {
-        assert (context != null);
+        assert context != null;
         if ((mBaseMarkerShape == null) || (mCurrentMarkerShape == null)) {
             this.initializeMarkerShape(context);
         }
@@ -191,7 +191,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @param context
      */
     private void initializeMarkerShape(Context context) {
-        assert (context != null);
+        assert context != null;
         int idForm = R.drawable.marker_form_2_38;
         mBaseMarkerShape = BitmapFactory.decodeResource(context.getResources(), idForm);
         mCurrentMarkerShape = mBaseMarkerShape.copy(mBaseMarkerShape.getConfig(), true);
@@ -223,10 +223,10 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @return the combined bitmap
      */
     private Bitmap overlay(Bitmap bmp1, Bitmap bmp2, Bitmap base) {
-        assert ((bmp1 != null) && (bmp2 != null) && (base != null));
+        assert (bmp1 != null) && (bmp2 != null) && (base != null);
         int maxWidth = bmp1.getWidth() > bmp2.getWidth() ? bmp1.getWidth() : bmp2.getWidth();
         int maxHeight = bmp1.getHeight() > bmp2.getHeight() ? bmp1.getHeight() : bmp2.getHeight();
-        assert ((base.getWidth() == maxWidth) && (base.getHeight() == maxHeight));
+        assert (base.getWidth() == maxWidth) && (base.getHeight() == maxHeight);
 
         Canvas canvas = new Canvas(base);
         canvas.drawBitmap(bmp1, 0, 0, null);
@@ -245,7 +245,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @return the scaled image
      */
     private Bitmap scaleMarker(Bitmap img, float coeff) {
-        assert ((img != null) && (coeff > 0));
+        assert (img != null) && (coeff > 0);
         int newWidth = Math.round(coeff * img.getWidth());
         int newHeight = Math.round(coeff * img.getHeight());
         return Bitmap.createScaledBitmap(img, newWidth, newHeight, true);
