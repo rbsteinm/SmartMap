@@ -1,10 +1,8 @@
 package ch.epfl.smartmap.activities;
 
-import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -18,7 +16,7 @@ import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
  * A {@link PreferenceActivity} to handle our settings.
- * 
+ *
  * @author SpicyCH
  */
 public class SettingsActivity extends PreferenceActivity {
@@ -26,9 +24,8 @@ public class SettingsActivity extends PreferenceActivity {
     /**
      * A preference value change listener that updates the preference's summary to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new PreferenceListener();
-
-    private static final String TAG = SettingsActivity.class.getSimpleName();
+    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
+            new PreferenceListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,24 +59,20 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
+     * Set up the {@link android.app.ActionBar}.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void setupActionBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            // Show the Up button in the action bar.
-            this.getActionBar().setDisplayHomeAsUpEnabled(true);
-            // Set action bar color to main color
-            this.getActionBar().setBackgroundDrawable(
-                    new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-        }
+        // Show the Up button in the action bar.
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        // Set action bar color to main color
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     /**
      * Binds a preference's summary to its value. More specifically, when the preference's value is changed, its summary
      * (line of text below the preference title) is updated to reflect the value. The summary is also immediately
      * updated upon calling this method. The exact display format is dependent on the type of preference.
-     * 
+     *
      * @see #sBindPreferenceSummaryToValueListener
      */
     private static void bindPreferenceSummaryToValue(Preference preference) {
@@ -96,7 +89,6 @@ public class SettingsActivity extends PreferenceActivity {
      * This fragment shows all the settings for simplicity's sake. We can add some other ones if we have many settings
      * in the future and want them to be split by headers.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class GeneralPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -112,7 +104,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     /**
      * A listener on the preferences that helps bind a summary to its value.
-     * 
+     *
      * @author SpicyCH
      */
     static class PreferenceListener implements Preference.OnPreferenceChangeListener {
