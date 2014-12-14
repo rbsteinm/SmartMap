@@ -83,6 +83,8 @@ public class AddEventActivity extends FragmentActivity {
     private Calendar mStartDate;
     private Calendar mEndDate;
 
+    private boolean mCreatingEvent = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -250,7 +252,9 @@ public class AddEventActivity extends FragmentActivity {
      *
      * @author SpicyCH
      */
-    private void createEvent() {
+    private synchronized void createEvent() {
+
+        Log.d(TAG, "Creating a new event...");
 
         if (!this.allFieldsSetByUser()) {
 
@@ -268,15 +272,22 @@ public class AddEventActivity extends FragmentActivity {
                     Toast.LENGTH_LONG).show();
         } else {
 
-            Location location = new Location("Location set by user");
-            location.setLatitude(mEventPosition.latitude);
-            location.setLongitude(mEventPosition.longitude);
+            if (!mCreatingEvent) {
+                mCreatingEvent = true;
 
-            EventContainer event = new EventContainer(PublicEvent.NO_ID, mEventName.getText().toString(),
-                    ServiceContainer.getCache().getSelf().getContainerCopy(), mDescription.getText().toString(),
-                    mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
+                Location location = new Location("Location set by user");
+                location.setLatitude(mEventPosition.latitude);
+                location.setLongitude(mEventPosition.longitude);
 
-            ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
+                EventContainer event = new EventContainer(PublicEvent.NO_ID, mEventName.getText().toString(),
+                        ServiceContainer.getCache().getSelf().getContainerCopy(), mDescription.getText().toString(),
+                        mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
+
+                ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
+            } else {
+                Log.e(TAG, "Trying to create the same event twice! Operation aborted.");
+            }
+
         }
     }
 
