@@ -631,6 +631,7 @@ public class Cache implements CacheInterface {
         this.putUsers(database.getAllUsers());
         this.putEvents(database.getAllEvents());
         this.putFilters(database.getAllFilters());
+        Log.d(TAG, "Invits : " + database.getAllInvitations());
         this.putInvitations(database.getAllInvitations());
 
         // Notify listeners
