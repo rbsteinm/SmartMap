@@ -31,6 +31,7 @@
     <string name="add_friend">Add a friend</string>
 
     <!-- Side menu Strings -->
+    <string name="logout_text">Logout</string>
     <string-array name="sideMenuElements">
         <item>Profile</item>
         <item>Friends</item>
@@ -38,7 +39,7 @@
         <item>Filters</item>
         <item>Settings</item>
         <item>About</item>
-        <item>Logout</item>
+        <item>@string/logout_text</item>
     </string-array>
 
     <string name="title_activity_pager">Friends</string>
