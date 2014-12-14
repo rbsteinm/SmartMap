@@ -1381,8 +1381,10 @@ public class Cache implements CacheInterface {
         // Update self informations
         long myId = settingsManager.getUserId();
         UserContainer self = networkClient.getUserInfo(myId);
-        self.setImage(networkClient.getProfilePicture(myId));
-        updatedUsers.add(self);
+        if (self != null) {
+            self.setImage(networkClient.getProfilePicture(myId));
+            updatedUsers.add(self);
+        }
 
         // Fetch friend ids
         Set<Long> friendIds = new HashSet<Long>(networkClient.getFriendsIds());
@@ -1402,12 +1404,6 @@ public class Cache implements CacheInterface {
             onlineInfos.setLocation(positionInfos.getLocation());
             onlineInfos.setLocationString(positionInfos.getLocationString());
             onlineInfos.setImage(image);
-
-            Log.d(
-                TAG,
-                "Update(" + onlineInfos.getId() + ") : " + onlineInfos.getName() + ", "
-                    + self.getLocationString());
-            Log.d(TAG, "Has " + ((onlineInfos.getImage() == User.NO_IMAGE) ? "no " : "") + "image");
 
             // Put friend in Set
             friendPosIds.add(id);
