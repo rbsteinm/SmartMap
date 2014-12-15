@@ -40,7 +40,8 @@ public class EventTest extends AndroidTestCase {
         long previousId = NULL_EVENT_VALUES.getId();
         UserContainer previousCreatorContainer = NULL_EVENT_VALUES.getCreatorContainer();
 
-        ServiceContainer.getCache().putEvent(NULL_EVENT_VALUES.setId(345).setCreatorContainer(JULIEN_CONTAINER));
+        ServiceContainer.getCache().putEvent(
+            NULL_EVENT_VALUES.setId(345).setCreatorContainer(JULIEN_CONTAINER));
         PublicEvent event = (PublicEvent) ServiceContainer.getCache().getEvent(345);
         assertEquals(event.getName(), Event.NO_NAME);
         assertEquals(event.getSearchImage(), Event.DEFAULT_BLUE_IMAGE);
@@ -79,7 +80,8 @@ public class EventTest extends AndroidTestCase {
         assertEquals(event.getCreator(), creator);
         assertEquals(event.getLocation().getLatitude(), POLYLAN_CONTAINER.getLocation().getLatitude());
         assertEquals(event.getLocation().getLongitude(), POLYLAN_CONTAINER.getLocation().getLongitude());
-        assertEquals(event.getStartDate().getTimeInMillis(), POLYLAN_CONTAINER.getStartDate().getTimeInMillis());
+        assertEquals(event.getStartDate().getTimeInMillis(), POLYLAN_CONTAINER.getStartDate()
+            .getTimeInMillis());
         assertEquals(event.getEndDate().getTimeInMillis(), POLYLAN_CONTAINER.getEndDate().getTimeInMillis());
         assertEquals(event.getLocationString(), POLYLAN_CONTAINER.getLocationString());
         assertEquals(event.getLatLng().latitude, POLYLAN_CONTAINER.getLocation().getLatitude());
@@ -97,9 +99,12 @@ public class EventTest extends AndroidTestCase {
 
         assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getName(), polylan.getName());
         assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getDescription(), polylan.getDescription());
-        assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getCreatorContainer().getId(), polylan.getCreator().getId());
-        assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getLocation().getLatitude(), polylan.getLocation().getLatitude());
-        assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getLocation().getLongitude(), polylan.getLocation().getLongitude());
+        assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getCreatorContainer().getId(), polylan.getCreator()
+            .getId());
+        assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getLocation().getLatitude(), polylan.getLocation()
+            .getLatitude());
+        assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getLocation().getLongitude(), polylan.getLocation()
+            .getLongitude());
         assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getStartDate().getTimeInMillis(), polylan.getStartDate()
             .getTimeInMillis());
         assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getEndDate().getTimeInMillis(), polylan.getEndDate()
@@ -107,13 +112,6 @@ public class EventTest extends AndroidTestCase {
         assertEquals(FOOTBALL_TOURNAMENT_CONTAINER.getLocationString(), polylan.getLocationString());
 
         FOOTBALL_TOURNAMENT_CONTAINER.setId(previousId);
-    }
-
-    @Test
-    public void testUpdateWithSameParameters() {
-        ServiceContainer.getCache().putEvent(POLYLAN_CONTAINER);
-        Event polylan = ServiceContainer.getCache().getEvent(POLYLAN_CONTAINER.getId());
-        assertFalse(polylan.update(POLYLAN_CONTAINER));
     }
 
     @Test
