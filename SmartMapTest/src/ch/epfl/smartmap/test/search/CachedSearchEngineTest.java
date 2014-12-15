@@ -91,6 +91,7 @@ public class CachedSearchEngineTest extends AndroidTestCase {
     @Override
     public void tearDown() {
         MockContainers.ALAIN_CONTAINER.setId(MockContainers.ALAIN_ID);
+        MockContainers.ALAIN_CONTAINER.setFriendship(MockContainers.ALAIN_FRIENDSHIP);
     }
 
     @Test
