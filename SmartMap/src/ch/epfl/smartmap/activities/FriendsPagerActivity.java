@@ -16,20 +16,19 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.gui.PagerAdapter;
 
 /**
- * This activity displays your friends in one tab, and your friend request (both
- * sent and received) in another tab
+ * This activity displays your friends in one tab, and your friend request in another tab
  * 
  * @author marion-S
+ * @author rbsteinm
  */
 public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 
-    @SuppressWarnings("unused")
     private static final String TAG = FriendsPagerActivity.class.getSimpleName();
 
     private ViewPager mPager;
     private ActionBar mActionBar;
-    private final static String[] TABS = {"Friends", "Invitations"};
-    private final static int INVITATION_INDEX = 1;
+    private static final String[] TABS = {"Friends", "Invitations"};
+    private static final int INVITATION_INDEX = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +61,12 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
             @Override
             public void onPageScrolled(int arg0, float arg1, int arg2) {
+                // nothing
             }
 
             @Override
             public void onPageScrollStateChanged(int arg0) {
+                // nothing
             }
 
             @Override
@@ -80,7 +81,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
     @Override
     protected void onResume() {
         super.onResume();
-        if (this.getIntent().getBooleanExtra("INVITATION", false) == true) {
+        if (this.getIntent().getBooleanExtra("INVITATION", false)) {
             mPager.setCurrentItem(INVITATION_INDEX);
         }
     }
