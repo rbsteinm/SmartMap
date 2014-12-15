@@ -72,7 +72,7 @@ public class PublicEventTest extends AndroidTestCase {
     public void testGetValues() {
         ServiceContainer.getCache().putEvent(POLYLAN);
         PublicEvent event = (PublicEvent) ServiceContainer.getCache().getEvent(POLYLAN.getId());
-        User creator = ServiceContainer.getCache().getUser(POLYLAN.getCreatorId());
+        User creator = ServiceContainer.getCache().getUser(POLYLAN.getCreatorContainer().getId());
         assertEquals(event.getId(), POLYLAN.getId());
         assertEquals(event.getName(), POLYLAN.getName());
         assertEquals(event.getDescription(), POLYLAN.getDescription());
@@ -97,7 +97,7 @@ public class PublicEventTest extends AndroidTestCase {
 
         assertEquals(FOOTBALL_TOURNAMENT.getName(), polylan.getName());
         assertEquals(FOOTBALL_TOURNAMENT.getDescription(), polylan.getDescription());
-        assertEquals(FOOTBALL_TOURNAMENT.getCreatorId(), polylan.getCreator().getId());
+        assertEquals(FOOTBALL_TOURNAMENT.getCreatorContainer().getId(), polylan.getCreator().getId());
         assertEquals(FOOTBALL_TOURNAMENT.getLocation().getLatitude(), polylan.getLocation().getLatitude());
         assertEquals(FOOTBALL_TOURNAMENT.getLocation().getLongitude(), polylan.getLocation().getLongitude());
         assertEquals(FOOTBALL_TOURNAMENT.getStartDate().getTimeInMillis(), polylan.getStartDate()
