@@ -306,7 +306,7 @@ public class NetworkEndToEndTest extends AndroidTestCase {
     private void initContainers() {
         Smartmap_Sweng =
             new UserContainer(SMARTMAP_SWENG_ID, SMARTMAP_SWENG_NAME, null, null, null, null, null,
-                User.NO_BLOCK_STATUS, User.FRIEND);
+                User.BlockStatus.BLOCKED, User.FRIEND);
         footballTournament =
             new EventContainer(0, "Football Tournament", Smartmap_Sweng, "Not a basketball tournament !",
                 new GregorianCalendar(2014, 11, 23), new GregorianCalendar(2014, 11, 27), LOCATION,

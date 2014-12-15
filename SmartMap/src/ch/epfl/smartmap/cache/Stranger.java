@@ -8,9 +8,10 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Represents an {@code User} that is not your friend on SmartMap. You only have access to his id, name and
- * profile picture. You should not instantiate a Stranger directly, but rather use
- * {@code User.createFromContainer( ... )}.
+ * Represents an {@code User} that is not your friend on SmartMap. You only have
+ * access to his id, name and
+ * profile picture. You should not instantiate a Stranger directly, but rather
+ * use {@code User.createFromContainer( ... )}.
  * 
  * @author jfperren
  */
@@ -32,7 +33,7 @@ public class Stranger extends User {
 
     @Override
     public User.BlockStatus getBlockStatus() {
-        return User.NO_BLOCK_STATUS;
+        return User.BlockStatus.UNBLOCKED;
     }
 
     /*
