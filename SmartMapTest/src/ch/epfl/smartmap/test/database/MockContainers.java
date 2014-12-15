@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 public class MockContainers {
 
     public static final UserContainer JULIEN;
-    public static final long JULIEN_ID = 5675675;
+    public static final long JULIEN_ID = 1;
     public static final String JULIEN_NAME = "Julien";
     public static final String JULIEN_EMAIL = "julien@epfl.ch";
     public static final String JULIEN_PHONE_NUMBER = "1234";
@@ -156,7 +156,7 @@ public class MockContainers {
     }
 
     public static final EventContainer FOOTBALL_TOURNAMENT;
-    public static final long FOOTBALL_TOURNAMENT_ID = 673;
+    public static final long FOOTBALL_TOURNAMENT_ID = 67098;
     public static final String FOOTBALL_TOURNAMENT_NAME = "Polylan";
     public static final String FOOTBALL_TOURNAMENT_DESCRIPTION = "This is Polylan";
     public static final long FOOTBALL_TOURNAMENT_START_TIME = 5809840;

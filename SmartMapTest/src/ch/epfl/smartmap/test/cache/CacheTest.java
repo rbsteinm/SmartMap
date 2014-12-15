@@ -4,17 +4,17 @@ import static ch.epfl.smartmap.test.database.MockContainers.ALAIN;
 import static ch.epfl.smartmap.test.database.MockContainers.FAMILY;
 import static ch.epfl.smartmap.test.database.MockContainers.FOOTBALL_TOURNAMENT;
 import static ch.epfl.smartmap.test.database.MockContainers.JULIEN;
-import static ch.epfl.smartmap.test.database.MockContainers.NULL_EVENT_VALUES;
 import static ch.epfl.smartmap.test.database.MockContainers.POLYLAN;
 import static ch.epfl.smartmap.test.database.MockContainers.POLYLAN_EVENT_INVITATION;
 import static ch.epfl.smartmap.test.database.MockContainers.ROBIN;
 import static ch.epfl.smartmap.test.database.MockContainers.ROBIN_FRIEND_INVITATION;
-import static ch.epfl.smartmap.test.database.MockContainers.WRONG_USER_VALUES;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -47,19 +47,24 @@ import com.google.common.collect.Sets;
 @RunWith(MockitoJUnitRunner.class)
 public class CacheTest extends AndroidTestCase {
 
-    private DatabaseHelper correctDB;
-    private DatabaseHelper incorrectDB;
-    private NetworkSmartMapClient correctClient;
-    private NetworkSmartMapClient incorrectClient;
-    private static final String TAG = CacheTest.class.getSimpleName();
+    private DatabaseHelper databaseForUsers;
+    private DatabaseHelper databaseForEvents;
+    private NetworkSmartMapClient clientForUsers;
+    private NetworkSmartMapClient clientForEvents;
+    private SettingsManager mockSettings;
 
+    private Cache cache;
+
+    @Before
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         ServiceContainer.forceInitSmartMapServices(this.getContext());
 
+        cache = new Cache();
+        ServiceContainer.setCache(cache);
         // Create mock Settings
-        SettingsManager mockSettings = Mockito.mock(SettingsManager.class);
+        mockSettings = Mockito.mock(SettingsManager.class);
         // Act as if julien is self
         Mockito.doReturn(JULIEN.getId()).when(mockSettings).getUserId();
         Mockito.doReturn(JULIEN.getName()).when(mockSettings).getUserName();
@@ -68,42 +73,66 @@ public class CacheTest extends AndroidTestCase {
         // Add as Service
         ServiceContainer.setSettingsManager(mockSettings);
 
+        // CLIENT FOR USERS ONLY
         // create Mock network client
-        correctClient = Mockito.mock(NetworkSmartMapClient.class);
-        // Return friend ids
-        Mockito.doReturn(Arrays.asList(ALAIN.getId())).when(correctClient).getFriendsIds();
-        // Return user infos
-        Mockito.doReturn(ALAIN).when(correctClient).getUserInfo(ALAIN.getId());
-        Mockito.doReturn(JULIEN).when(correctClient).getUserInfo(JULIEN.getId());
-        Mockito.doReturn(ROBIN).when(correctClient).getUserInfo(ROBIN.getId());
-        // Return listFriendPos
+        clientForUsers = Mockito.mock(NetworkSmartMapClient.class);
+        // Return friends/users
+        Mockito.doReturn(Arrays.asList(ALAIN.getId())).when(clientForUsers).getFriendsIds();
+        Mockito.doReturn(ALAIN).when(clientForUsers).getUserInfo(ALAIN.getId());
+        Mockito.doReturn(JULIEN).when(clientForUsers).getUserInfo(JULIEN.getId());
+        Mockito.doReturn(ROBIN).when(clientForUsers).getUserInfo(ROBIN.getId());
         Mockito
             .doReturn(
                 Arrays.asList(UserContainer.newEmptyContainer().setLocation(ALAIN.getLocation())
                     .setId(ALAIN.getId()).setName(ALAIN.getName()).setFriendship(ALAIN.getFriendship())))
-            .when(correctClient).listFriendsPos();
-        // Return image
-        Mockito.doReturn(Bitmap.createBitmap(1, 2, Config.ALPHA_8)).when(correctClient)
+            .when(clientForUsers).listFriendsPos();
+        // Return own profile picture (otherwise NullPointers)
+        Mockito.doReturn(Bitmap.createBitmap(1, 2, Config.ALPHA_8)).when(clientForUsers)
             .getProfilePicture(JULIEN.getId());
-        Mockito.doReturn(new ArrayList<Long>()).when(correctClient)
+        // Return no events
+        Mockito.doReturn(new ArrayList<Long>()).when(clientForUsers)
             .getPublicEvents(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong());
 
-        // create Mock incorrect network client
-        incorrectClient = Mockito.mock(NetworkSmartMapClient.class);
-        // Return friend ids
-        Mockito.doReturn(Arrays.asList(WRONG_USER_VALUES.getId())).when(correctClient).getFriendsIds();
-        // Return user infos
-        Mockito.doReturn(WRONG_USER_VALUES).when(correctClient).getUserInfo(WRONG_USER_VALUES.getId());
+        // CLIENT FOR EVENTS ONLY
+        // Return no friends
+        clientForEvents = Mockito.mock(NetworkSmartMapClient.class);
+        Mockito.doReturn(Arrays.asList()).when(clientForEvents).getFriendsIds();
+        Mockito.doReturn(Arrays.asList()).when(clientForEvents).listFriendsPos();
+        // Return our own profile picture (otherwise NullPointers)
+        Mockito.doReturn(Bitmap.createBitmap(1, 2, Config.ALPHA_8)).when(clientForEvents)
+            .getProfilePicture(JULIEN.getId());
+        // Return events
+        Mockito.doReturn(Arrays.asList(POLYLAN.getId(), FOOTBALL_TOURNAMENT.getId())).when(clientForEvents)
+            .getPublicEvents(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong());
+        Mockito.doReturn(POLYLAN).when(clientForEvents).getEventInfo(POLYLAN.getId());
+        Mockito.doReturn(FOOTBALL_TOURNAMENT).when(clientForEvents).getEventInfo(FOOTBALL_TOURNAMENT.getId());
 
-        // create Mock correct DB
-        correctDB = Mockito.mock(DatabaseHelper.class);
-        Mockito.doReturn(Sets.newHashSet(JULIEN, ALAIN, ROBIN)).when(correctDB).getAllUsers();
-        Mockito.doReturn(Sets.newHashSet(POLYLAN, FOOTBALL_TOURNAMENT)).when(correctDB).getAllEvents();
+        // DATABASE FOR USERS ONLY
+        databaseForUsers = Mockito.mock(DatabaseHelper.class);
+        Mockito.doReturn(Sets.newHashSet(JULIEN, ALAIN, ROBIN)).when(databaseForUsers).getAllUsers();
+        Mockito.doReturn(Sets.newHashSet()).when(databaseForUsers).getAllEvents();
+        Mockito.doReturn(Sets.newHashSet()).when(databaseForUsers).getAllInvitations();
+        Mockito.doReturn(Sets.newHashSet()).when(databaseForUsers).getAllFilters();
 
-        // create Mock incorrect DB
-        incorrectDB = Mockito.mock(DatabaseHelper.class);
-        Mockito.doReturn(Sets.newHashSet(WRONG_USER_VALUES)).when(incorrectDB).getAllUsers();
-        Mockito.doReturn(Sets.newHashSet(NULL_EVENT_VALUES)).when(incorrectDB).getAllEvents();
+        // DATABASE FOR EVENTS ONLY
+        databaseForEvents = Mockito.mock(DatabaseHelper.class);
+        Mockito.doReturn(Sets.newHashSet()).when(databaseForEvents).getAllUsers();
+        Mockito.doReturn(Sets.newHashSet(POLYLAN, FOOTBALL_TOURNAMENT)).when(databaseForEvents)
+            .getAllEvents();
+        Mockito.doReturn(Sets.newHashSet()).when(databaseForEvents).getAllInvitations();
+        Mockito.doReturn(Sets.newHashSet()).when(databaseForEvents).getAllFilters();
+
+    }
+
+    @After
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        // Clear cache
+        cache = new Cache();
+
+        // Reset values in containers
+        FAMILY.setId(Filter.NO_ID);
     }
 
     @Test
@@ -112,8 +141,6 @@ public class CacheTest extends AndroidTestCase {
         Mockito.doReturn(ROBIN).when(mockNetClient).acceptInvitation(ROBIN.getId());
 
         ServiceContainer.setNetworkClient(mockNetClient);
-
-        final Cache cache = new Cache();
 
         cache.putUser(ROBIN);
 
@@ -142,22 +169,18 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testGetExistingEventsReturnSetWithOnlyValidEvents() {
-        Cache cache = new Cache();
         cache.putEvent(POLYLAN);
         assertEquals(1, cache.getEvents(Sets.newHashSet(POLYLAN.getId(), User.NO_ID)).size());
     }
 
     @Test
     public void testGetExistingFiltersReturnSetWithOnlyValidUsers() {
-        Cache cache = new Cache();
         cache.putFilter(FAMILY);
         assertEquals(1, cache.getFilters(Sets.newHashSet(FAMILY.getId(), Filter.NO_ID)).size());
-        FAMILY.setId(Filter.NO_ID);
     }
 
     @Test
     public void testGetExistingInvitationsReturnSetWithOnlyValidInvitations() {
-        Cache cache = new Cache();
         cache.putInvitation(POLYLAN_EVENT_INVITATION);
         assertEquals(
             1,
@@ -167,91 +190,78 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testGetExistingUsersReturnSetWithOnlyValidUsers() {
-        Cache cache = new Cache();
         cache.putUser(JULIEN);
         assertEquals(1, cache.getUsers(Sets.newHashSet(JULIEN.getId(), User.NO_ID)).size());
     }
 
     @Test
     public void testGetNonExistingEventReturnsNull() {
-        assertNull(new Cache().getEvent(3));
+        assertNull(cache.getEvent(3));
     }
 
     @Test
     public void testGetNonExistingEventsReturnsEmptySet() {
-        assertTrue(new Cache().getEvents(Sets.newHashSet((long) 567, (long) 567)).isEmpty());
+        assertTrue(cache.getEvents(Sets.newHashSet((long) 567, (long) 567)).isEmpty());
     }
 
     @Test
     public void testGetNonExistingFilterReturnsNull() {
-        assertNull(new Cache().getInvitation(6));
+        assertNull(cache.getInvitation(6));
     }
 
     @Test
     public void testGetNonExistingFiltersReturnsEmptySet() {
-        assertTrue(new Cache().getFilters(Sets.newHashSet((long) 287, (long) 657)).isEmpty());
+        assertTrue(cache.getFilters(Sets.newHashSet((long) 287, (long) 657)).isEmpty());
     }
 
     @Test
     public void testGetNonExistingInvitationReturnsNull() {
-        assertNull(new Cache().getInvitation(6));
+        assertNull(cache.getInvitation(6));
     }
 
     @Test
     public void testGetNonExistingInvitationsReturnsEmptySet() {
-        assertTrue(new Cache().getInvitations(Sets.newHashSet((long) 5672, (long) 567)).isEmpty());
+        assertTrue(cache.getInvitations(Sets.newHashSet((long) 5672, (long) 567)).isEmpty());
     }
 
     @Test
     public void testGetNonExistingUserReturnsNull() {
-        assertNull(new Cache().getUser(3));
+        assertNull(cache.getUser(3));
     }
 
     @Test
     public void testGetNonExistingUsersReturnEmptySet() {
-        assertTrue(new Cache().getUsers(Sets.newHashSet((long) 5672, (long) 5674)).isEmpty());
+        assertTrue(cache.getUsers(Sets.newHashSet((long) 5672, (long) 5674)).isEmpty());
     }
 
     @Test
-    public void testInitFromCorrectDatabase() {
-        Cache cache = new Cache();
-        cache.initFromDatabase(correctDB);
+    public void testInitFromDatabaseWithCorrectEvents() {
+        cache.initFromDatabase(databaseForEvents);
 
-        assertEquals(3, cache.getAllUsers().size());
-        assertEquals(1, cache.getAllFriends().size());
-
-        assertNotNull(cache.getUser(JULIEN.getId()));
-        assertNotNull(cache.getUser(ALAIN.getId()));
-        assertNotNull(cache.getUser(ROBIN.getId()));
+        assertEquals(2, cache.getAllEvents().size());
 
         assertNotNull(cache.getEvent(POLYLAN.getId()));
         assertNotNull(cache.getEvent(FOOTBALL_TOURNAMENT.getId()));
-
-        assertNotNull(cache.getUser(POLYLAN.getCreatorContainer().getId()));
-        assertNotNull(cache.getUser(FOOTBALL_TOURNAMENT.getCreatorContainer().getId()));
 
         assertNotNull(cache.getSelf());
     }
 
     @Test
-    public void testInitFromDatabaseWithIncorrectEvent() {
-        Cache cache = new Cache();
-        cache.initFromDatabase(incorrectDB);
+    public void testInitFromDatabaseWithCorrectUsers() {
+        cache.initFromDatabase(databaseForUsers);
+        ServiceContainer.setDatabaseHelper(databaseForUsers);
+        ServiceContainer.setNetworkClient(clientForUsers);
+        assertEquals(3, cache.getAllUsers().size());
 
-        assertNull(cache.getEvent(NULL_EVENT_VALUES.getId()));
-    }
+        assertNotNull(cache.getUser(JULIEN.getId()));
+        assertNotNull(cache.getUser(ALAIN.getId()));
+        assertNotNull(cache.getUser(ROBIN.getId()));
 
-    @Test
-    public void testInitFromDatabaseWithIncorrectUser() {
-        Cache cache = new Cache();
-        cache.initFromDatabase(incorrectDB);
-
-        assertNull(cache.getUser(WRONG_USER_VALUES.getId()));
+        assertNotNull(cache.getSelf());
     }
 
     @Test
     public void testPutEventAlsoAddUser() {
-        Cache cache = new Cache();
         cache.putEvent(POLYLAN);
 
         assertNotNull(cache.getUser(POLYLAN.getCreatorContainer().getId()));
@@ -259,7 +269,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutEventCallListeners() {
-        Cache cache = new Cache();
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
         cache.putEvent(POLYLAN);
@@ -268,7 +277,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutEventDoesntReturnNull() {
-        Cache cache = new Cache();
         cache.putEvent(POLYLAN);
 
         assertNotNull(cache.getEvent(POLYLAN.getId()));
@@ -276,7 +284,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutEventOnlyCallListenersWhenNeeded() {
-        Cache cache = new Cache();
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
         cache.putEvent(POLYLAN);
@@ -286,7 +293,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutEventWithExistingEventCallsUpdate() {
-        Cache cache = new Cache();
         cache.putEvent(POLYLAN);
         assertEquals(cache.getEvent(POLYLAN.getId()).getName(), POLYLAN.getName());
         cache.putEvent(cache.getEvent(POLYLAN.getId()).getContainerCopy().setName("Foot"));
@@ -295,7 +301,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutFilterCallListeners() {
-        Cache cache = new Cache();
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
         cache.putFilter(FAMILY);
@@ -304,23 +309,18 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutFilterCorrectlyGivesNextId() {
-        Cache cache = new Cache();
         cache.putFilter(FAMILY);
         assertEquals(FAMILY.getId(), Filter.DEFAULT_FILTER_ID + 1);
-        FAMILY.setId(Filter.NO_ID);
     }
 
     @Test
     public void testPutFilterDoesntReturnNull() {
-        Cache cache = new Cache();
         cache.putFilter(FAMILY);
         assertNotNull(cache.getFilter(FAMILY.getId()));
-        FAMILY.setId(Filter.NO_ID);
     }
 
     @Test
     public void testPutFilterOnlyCallListenersWhenNeeded() {
-        Cache cache = new Cache();
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
         cache.putFilter(FAMILY);
@@ -330,7 +330,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutInvitationAlsoAddEvent() {
-        Cache cache = new Cache();
         cache.putInvitation(POLYLAN_EVENT_INVITATION);
 
         assertNotNull(cache.getEvent(POLYLAN_EVENT_INVITATION.getEventInfos().getId()));
@@ -338,7 +337,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutInvitationAlsoAddUser() {
-        Cache cache = new Cache();
         cache.putInvitation(ROBIN_FRIEND_INVITATION);
 
         assertNotNull(cache.getUser(ROBIN_FRIEND_INVITATION.getUserInfos().getId()));
@@ -346,7 +344,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutInvitationCallListeners() {
-        Cache cache = new Cache();
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
         cache.putInvitation(POLYLAN_EVENT_INVITATION);
@@ -355,7 +352,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutInvitationDoesntReturnNull() {
-        Cache cache = new Cache();
         cache.putInvitation(POLYLAN_EVENT_INVITATION);
 
         assertNotNull(cache.getInvitation(POLYLAN_EVENT_INVITATION.getId()));
@@ -363,7 +359,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutInvitationOnlyCallListenersWhenNeeded() {
-        Cache cache = new Cache();
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
         cache.putInvitation(POLYLAN_EVENT_INVITATION);
@@ -373,7 +368,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutUserCallListeners() {
-        Cache cache = new Cache();
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
         cache.putUser(ROBIN);
@@ -382,7 +376,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutUserDoesntReturnNull() {
-        Cache cache = new Cache();
         cache.putUser(ALAIN);
 
         assertNotNull(cache.getUser(ALAIN.getId()));
@@ -390,7 +383,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutUserOnlyCallListenersWhenNeeded() {
-        Cache cache = new Cache();
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
         cache.putUser(ROBIN);
@@ -400,7 +392,6 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutUserWithExistingUserCallsUpdate() {
-        Cache cache = new Cache();
         cache.putUser(ALAIN);
         assertEquals(cache.getUser(ALAIN.getId()).getName(), ALAIN.getName());
         cache.putUser(cache.getUser(ALAIN.getId()).getContainerCopy().setName("Robert"));
@@ -408,13 +399,11 @@ public class CacheTest extends AndroidTestCase {
     }
 
     @Test
-    public void testUpdateFromNetworkWithCorrectUsers() throws SmartMapClientException {
-        Cache cache = new Cache();
-        ServiceContainer.setNetworkClient(correctClient);
-        cache.updateFromNetwork(correctClient);
+    public void testUpdateFromNetworkWithCorrectEvents() throws SmartMapClientException {
+        ServiceContainer.setNetworkClient(clientForEvents);
+        cache.updateFromNetwork(clientForEvents);
 
-        assertEquals(2, cache.getAllUsers().size());
-        assertEquals(1, cache.getAllFriends().size());
+        assertEquals(1, cache.getAllEvents().size());
 
         assertNotNull(cache.getUser(JULIEN.getId()));
         assertNotNull(cache.getUser(ALAIN.getId()));
@@ -426,13 +415,19 @@ public class CacheTest extends AndroidTestCase {
     }
 
     @Test
-    public void testUpdateFromNetworkWithIncorrectUsers() throws SmartMapClientException {
-        Cache cache = new Cache();
-        cache.updateFromNetwork(incorrectClient);
+    public void testUpdateFromNetworkWithCorrectUsers() throws SmartMapClientException {
+        ServiceContainer.setNetworkClient(clientForUsers);
+        cache.updateFromNetwork(clientForUsers);
 
-        assertEquals(0, cache.getAllUsers().size());
-        assertEquals(0, cache.getAllFriends().size());
+        assertEquals(2, cache.getAllUsers().size());
+        assertEquals(1, cache.getAllFriends().size());
 
-        assertNull(cache.getUser(WRONG_USER_VALUES.getId()));
+        assertNotNull(cache.getUser(JULIEN.getId()));
+        assertNotNull(cache.getUser(ALAIN.getId()));
+        assertNull(cache.getUser(ROBIN.getId()));
+
+        assertFalse(cache.getSelf().getActionImage().sameAs(User.NO_IMAGE));
+
+        assertNotNull(cache.getSelf());
     }
 }

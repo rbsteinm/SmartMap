@@ -252,8 +252,6 @@ public abstract class Event implements Displayable, EventInterface {
      */
     @Override
     public boolean isOwn() {
-        Log.d(TAG, "creator id : " + mCreator.getId() + "  my id : "
-            + ServiceContainer.getSettingsManager().getUserId());
         return mCreator.getId() == ServiceContainer.getSettingsManager().getUserId();
     }
 
