@@ -31,6 +31,7 @@ import ch.epfl.smartmap.cache.MockGenerator;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.User.BlockStatus;
 import ch.epfl.smartmap.cache.UserContainer;
+import ch.epfl.smartmap.servercom.SmartMapClientException;
 import ch.epfl.smartmap.test.database.MockContainers;
 
 public class FriendsPagerActivityTest extends
@@ -107,8 +108,9 @@ ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 		onView(withId(R.id.myViewPager)).perform(swipeRight());
 	}
 
-	// FIXME : click is not performed?
-	public void ignoringtestClickOnInvitingUsersOpensDialog()
+	// FIXME : cannot click on invitation in invitation list whereas can click
+	// on friend in friend list by doing the same way
+	public void ignoredtestClickOnInvitingUsersOpensDialog()
 			throws InterruptedException {
 		onView(withId(R.id.myViewPager)).perform(swipeLeft());
 		onData(anything())
@@ -131,7 +133,7 @@ ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 		invitationSet.add(invitation);
 	}
 
-	private void createMockCache() {
+	private void createMockCache() throws SmartMapClientException {
 		Cache newCache = Mockito.mock(Cache.class);
 		Mockito.when(newCache.getAllFriends()).thenReturn(friendSet);
 		Mockito.when(newCache.getUnansweredFriendInvitations()).thenReturn(
