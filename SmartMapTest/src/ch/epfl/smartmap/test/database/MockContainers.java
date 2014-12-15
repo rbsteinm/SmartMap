@@ -10,6 +10,7 @@ import android.graphics.Bitmap.Config;
 import android.location.Location;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.FilterContainer;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.InvitationContainer;
@@ -200,13 +201,23 @@ public class MockContainers {
     }
 
     public static final FilterContainer FAMILY;
-    public static final long FAMILY_ID = 1;
+    public static final long FAMILY_ID = Filter.NO_ID;
     public static final String FAMILY_NAME = "Family";
     public static final Set<Long> FAMILY_IDS = Sets.newHashSet((long) 1, (long) 2);
     public static final boolean FAMILY_IS_VISIBLE = true;
 
     static {
         FAMILY = new FilterContainer(FAMILY_ID, FAMILY_NAME, FAMILY_IDS, FAMILY_IS_VISIBLE);
+    }
+
+    public static final FilterContainer DEFAULT;
+    public static final long DEFAULT_ID = Filter.DEFAULT_FILTER_ID;
+    public static final String DEFAULT_NAME = "Default";
+    public static final Set<Long> DEFAULT_IDS = Sets.newHashSet((long) 1, (long) 2);
+    public static final boolean DEFAULT_IS_VISIBLE = true;
+
+    static {
+        DEFAULT = new FilterContainer(DEFAULT_ID, DEFAULT_NAME, DEFAULT_IDS, DEFAULT_IS_VISIBLE);
     }
 
     public static final InvitationContainer ROBIN_FRIEND_INVITATION;

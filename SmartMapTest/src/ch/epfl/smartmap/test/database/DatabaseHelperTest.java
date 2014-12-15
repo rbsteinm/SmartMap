@@ -156,9 +156,7 @@ public class DatabaseHelperTest extends AndroidTestCase {
     @Test
     public void testDeletePending() {
         dbh.addPendingFriend(1234);
-        // long id = (long) dbh.getPendingFriends().toArray()[0];
-        // by Robin, didnt compile sorry
-        long id = -1;
+        long id = (Long) dbh.getPendingFriends().toArray()[0];
         dbh.deletePendingFriend(1234);
         assertTrue((dbh.getPendingFriends().size() == 0) && (id == 1234));
     }

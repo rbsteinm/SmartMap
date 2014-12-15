@@ -401,6 +401,7 @@ public class CacheTest extends AndroidTestCase {
     @Test
     public void testUpdateFromNetworkWithCorrectEvents() throws SmartMapClientException {
         ServiceContainer.setNetworkClient(clientForEvents);
+        ServiceContainer.setSettingsManager(mockSettings);
         cache.updateFromNetwork(clientForEvents);
 
         assertEquals(1, cache.getAllEvents().size());

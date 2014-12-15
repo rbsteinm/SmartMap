@@ -35,6 +35,7 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_friends_pager);
+        ServiceContainer.initSmartMapServices(this.getBaseContext());
 
         mActionBar = this.getActionBar();
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);

@@ -40,6 +40,15 @@ public class CustomFilter extends Filter {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FilterInterface#getType()
+     */
+    @Override
+    public int getType() {
+        return Filter.CUSTOM;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.FilterInterface#getVisibleFriends()
      */
     @Override

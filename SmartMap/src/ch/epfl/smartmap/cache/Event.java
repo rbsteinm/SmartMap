@@ -68,14 +68,13 @@ public abstract class Event implements Displayable, EventInterface {
      */
     public Event(long id, String name, User creator, Calendar startDate, Calendar endDate, Location location,
         String locationString, String description, Set<Long> participantIds) {
-        // Set id
-        if (id >= 0) {
-            mId = id;
-        } else {
+
+        if (id < 0) {
             throw new IllegalArgumentException("Trying to create an Event with incorrect Id");
         }
 
-        // Set other values
+        // Set values
+        mId = id;
         mName = (name != null) ? name : NO_NAME;
         mCreator = (creator != null) ? creator : User.NOBODY;
         mStartDate = (startDate != null) ? (Calendar) startDate.clone() : NO_START_DATE;
@@ -272,8 +271,8 @@ public abstract class Event implements Displayable, EventInterface {
             throw new IllegalArgumentException("Cannot update an Event with a different ID !");
         }
 
-        if ((event.getName() != null) && !event.getName().equals("") && (event.getName() != Event.NO_NAME)
-            && !event.getName().equals(mName)) {
+        if ((event.getName() != null) && !"".equals(event.getName())
+            && !(event.getName().equals(Event.NO_NAME)) && !event.getName().equals(mName)) {
             mName = event.getName();
             hasChanged = true;
         }
@@ -339,7 +338,8 @@ public abstract class Event implements Displayable, EventInterface {
 
     /**
      * Create a new Live instance of {@code Event} from the values inside the {@code EventContainer}. DO NOT
-     * CALL THIS OUTSIDE CACHE !
+     * CALL THIS
+     * OUTSIDE CACHE !
      * 
      * @param container
      *            Informations about the Event

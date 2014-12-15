@@ -34,6 +34,15 @@ public class DefaultFilter extends Filter {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FilterInterface#getType()
+     */
+    @Override
+    public int getType() {
+        return Filter.DEFAULT;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.FilterInterface#getVisibleFriends()
      */
     @Override

@@ -57,7 +57,7 @@ import com.google.android.gms.maps.model.Marker;
  * This Activity displays the core features of the App. It dispays the {@code GoogleMap}, contains the
  * {@code SideMenu}, as well as the {@code SearchLayout}. Starts {@code FriendsPositionsThread},
  * {@code NearEventsThread} and {@code UpdateDatabaseThread} in its {@code onCreate} method.
- * 
+ *
  * @author jfperren
  * @author hugo-S
  * @author SpicyCH
@@ -387,7 +387,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
     /**
      * Opens Information Activity (called from MenuItem on Item view)
-     * 
+     *
      * @author jfperren
      */
     public void openInformationActivity() {
@@ -404,7 +404,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
     /**
      * Zoom on item and sets Item menu
-     * 
+     *
      * @param item
      */
     public void performQuery(Displayable item) {
@@ -416,7 +416,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     /**
      * Sets the {@code ActionBar} to display informations about a Displayable Item. It sets the Title,
      * Subtitle and photo to those of the item.
-     * 
+     *
      * @param item
      *            Item to be displayed
      */
@@ -525,8 +525,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
     private void initializeMarkers() {
         if ((mFriendMarkerManager != null) && (mEventMarkerManager != null)) {
-            // TODO an assertion would be better to ensure that the marker
-            // managers are not null?
             mFriendMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
                 .getAllVisibleFriends()));
             mEventMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
@@ -534,6 +532,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             for (Marker marker : mEventMarkerManager.getDisplayedMarkers()) {
                 marker.setSnippet(DefaultMarkerManager.MarkerColor.ORANGE.toString());
             }
+        } else {
+            Log.e(TAG, "The friend marcker or the event marcker was null");
         }
     }
 
@@ -562,7 +562,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
     /**
      * Types of Menu that can be displayed on this activity
-     * 
+     *
      * @author jfperren
      */
     private enum MenuTheme {
@@ -574,7 +574,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     /**
      * A listener that reset events markers colors and info panel when clicking
      * on map
-     * 
+     *
      * @author hugo-S
      */
     private class ResetMarkerColorAndInfoPannelOnMapClick implements OnMapClickListener {
@@ -598,7 +598,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
     /**
      * A listener that shows info in action bar when a marker is clicked on
-     * 
+     *
      * @author hugo-S
      */
     private class ShowInfoOnMarkerClick implements OnMarkerClickListener {

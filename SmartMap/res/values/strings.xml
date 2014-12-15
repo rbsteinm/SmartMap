@@ -38,6 +38,7 @@
     <string name="settings_text">Settings</string>
     <string name="about_text">About</string>
     <string name="logout_text">Logout</string>
+
     <string-array name="sideMenuElements">
         <item>@string/profile_text</item>
         <item>@string/friends_text</item>
@@ -48,7 +49,6 @@
         <item>@string/logout_text</item>
     </string-array>
 
-    <string name="title_activity_pager">Friends</string>
     <string name="search_bar_hint">Search…</string>
     <string name="title_activity_map_fragment">MapFragment</string>
 
@@ -103,6 +103,11 @@
     <string name="welcome">W E L C O M E</string>
     <string name="loading_text">Logging in…</string>
     <string name="logo_description">logo</string>
+
+    <!-- FriendsPagerActivity -->
+    <string name="title_activity_pager">Friends</string>
+    <string name="friend_list">Friend list</string>
+    <string name="friends_invitations_list">Friend invitation list</string>
 
     <!-- ShowEventsActivity -->
     <string name="title_activity_show_events">Events</string>
@@ -376,7 +381,7 @@
     <string name="yes_accept">Yes, accept</string>
     <string name="no_decline">No, decline</string>
     <string name="decline_confirm">Invitation declined.</string>
-    
+
     <!-- AddEventOnMapLongClickListener -->
     <string name="map_long_clicked_dialog_title">Do you really want to create an event at this position?</string>
     <string name="map_long_clicked_dialog_message">This dialog is triggered by a long click on the map.</string>
