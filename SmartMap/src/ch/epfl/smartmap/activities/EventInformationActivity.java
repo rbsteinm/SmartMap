@@ -356,7 +356,7 @@ public class EventInformationActivity extends ListActivity {
         Log.d(TAG, "Event : " + mEvent);
         Log.d(TAG, "Participants id : " + mEvent.getParticipantIds());
 
-        ServiceContainer.getSearchEngine().findUserByIds(mEvent.getParticipantIds(),
+        ServiceContainer.getSearchEngine().findUsersByIds(mEvent.getParticipantIds(),
             new SearchRequestCallback<Set<User>>() {
                 @Override
                 public void onNetworkError(Exception e) {

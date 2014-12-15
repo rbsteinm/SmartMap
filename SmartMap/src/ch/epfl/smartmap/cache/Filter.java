@@ -15,7 +15,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Represents a filter in the application SmartMap
+ * Represents an User filter in the application SmartMap
  * 
  * @author agpmilli
  */
@@ -41,7 +41,9 @@ public abstract class Filter implements FilterInterface {
      * Constructor
      * 
      * @param id
+     *            Id of the Filter
      * @param ids
+     *            Ids contained in the Filter
      */
     protected Filter(long id, Set<Long> ids) {
         if (id < 0) {
@@ -62,6 +64,15 @@ public abstract class Filter implements FilterInterface {
 
     /*
      * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FilterInterface#getImmutableCopy()
+     */
+    @Override
+    public FilterContainer getContainerCopy() {
+        return new FilterContainer(this.getId(), this.getName(), this.getIds(), this.isActive());
+    }
+
+    /*
+     * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Filter#getId()
      */
     @Override
@@ -76,15 +87,6 @@ public abstract class Filter implements FilterInterface {
     @Override
     public Set<Long> getIds() {
         return new HashSet<Long>(mIds);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.FilterInterface#getImmutableCopy()
-     */
-    @Override
-    public FilterContainer getContainerCopy() {
-        return new FilterContainer(this.getId(), this.getName(), this.getIds(), this.isActive());
     }
 
     /*

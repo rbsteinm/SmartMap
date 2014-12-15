@@ -115,13 +115,13 @@ public class AddFriendActivity extends ListActivity {
         mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String newText) {
-                ServiceContainer.getSearchEngine().findUserByQuery(newText, new FindFriendsCallback());
+                ServiceContainer.getSearchEngine().findStrangersByName(newText, new FindFriendsCallback());
                 return true;
             }
 
             @Override
             public boolean onQueryTextSubmit(String newText) {
-                ServiceContainer.getSearchEngine().findUserByQuery(newText, new FindFriendsCallback());
+                ServiceContainer.getSearchEngine().findStrangersByName(newText, new FindFriendsCallback());
                 return true;
             }
         });
