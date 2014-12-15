@@ -3,6 +3,7 @@ package ch.epfl.smartmap.activities;
 import java.util.ArrayList;
 import java.util.Set;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -27,20 +28,23 @@ import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
 
 /**
  * This Activity displays a list of users from the DB and lets you send them friend requests
- * 
+ *
  * @author rbsteinm
  */
 public class AddFriendActivity extends ListActivity {
 
     private SearchView mSearchBar;
+    private Activity mActivty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_add_friend);
+
+        mActivty = this;
+
         // Set action bar color to main color
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
@@ -50,7 +54,7 @@ public class AddFriendActivity extends ListActivity {
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         String name = tv.getText().toString();
-        this.displayConfirmationDialog(name, userId);
+        displayConfirmationDialog(mActivty, name, userId);
     }
 
     @Override
@@ -77,39 +81,8 @@ public class AddFriendActivity extends ListActivity {
     }
 
     /**
-     * Display a confirmation dialog
-     * 
-     * @param name
-     * @param userId
-     */
-    private void displayConfirmationDialog(String name, final long userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(this.getResources().getString(R.string.add) + " " + name + " "
-            + this.getResources().getString(R.string.as_a_friend));
-
-        // Add positive button
-        builder.setPositiveButton(this.getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                // invite friend
-                ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
-            }
-        });
-        // Add negative button
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-
-        // display the AlertDialog
-        builder.create().show();
-    }
-
-    /**
-     * sets a listener on the searchbar that updates the views (users) displayed
-     * every time the text chnanges or is submitted
+     * sets a listener on the searchbar that updates the views (users) displayed every time the text chnanges or is
+     * submitted
      */
     private void setSearchBarListener() {
         mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
@@ -128,8 +101,78 @@ public class AddFriendActivity extends ListActivity {
     }
 
     /**
+     * Display a confirmation dialog.
+     *
+     * @param name
+     * @param userId
+     */
+    public static void displayConfirmationDialog(final Activity activity, String name, final long userId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(activity.getResources().getString(R.string.add) + " " + name + " "
+                + activity.getResources().getString(R.string.as_a_friend));
+
+        // Add positive button
+        builder.setPositiveButton(activity.getResources().getString(R.string.add),
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // invite friend
+                        ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback(activity));
+                    }
+                });
+        // Add negative button
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        // display the AlertDialog
+        builder.create().show();
+    }
+
+    /**
+     * Callback that describes connection with network
+     *
+     * @author agpmilli
+     */
+    private static class AddFriendCallback implements NetworkRequestCallback<Void> {
+
+        private final Activity mActivity;
+
+        public AddFriendCallback(Activity context) {
+            mActivity = context;
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mActivity, mActivity.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT)
+                            .show();
+                }
+            });
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mActivity, mActivity.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT)
+                            .show();
+                    mActivity.finish();
+                }
+            });
+        }
+    }
+
+    /**
      * Callback that describes connection with SearchRequest
-     * 
+     *
      * @author Pamoi
      */
     private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
@@ -140,8 +183,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this,
-                        AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
-                        Toast.LENGTH_LONG).show();
+                            AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
+                            Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -152,8 +195,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this,
-                        AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
-                        Toast.LENGTH_LONG).show();
+                            AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
+                            Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -164,39 +207,7 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                        new ArrayList<User>(result)));
-                }
-            });
-        }
-    }
-
-    /**
-     * Callback that describes connection with network
-     * 
-     * @author agpmilli
-     */
-    class AddFriendCallback implements NetworkRequestCallback<Void> {
-        @Override
-        public void onFailure(Exception e) {
-            AddFriendActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(AddFriendActivity.this,
-                        AddFriendActivity.this.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT)
-                        .show();
-                }
-            });
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-            AddFriendActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(AddFriendActivity.this,
-                        AddFriendActivity.this.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT)
-                        .show();
-                    AddFriendActivity.this.finish();
+                            new ArrayList<User>(result)));
                 }
             });
         }

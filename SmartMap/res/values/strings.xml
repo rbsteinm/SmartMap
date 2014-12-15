@@ -213,6 +213,12 @@
     <string name="remove_friend_success">Successfully removed friend</string>
     <string name="remove">Remove</string>
     <string name="from_your_friends">from your friends ?</string>
+    <string name="blocking_failure">Network error, couldn\'t (un)block friend</string>
+    <string name="friend_blocked">friend successfully blocked</string>
+    <string name="friend_unblocked">friend successfully unblocked</string>
+    <string name="user_shown_on_map">user shown on map</string>
+    <string name="user_not_shown_on_map">user not shown on map anymore</string>
+    <string name="unknown_user">unknown user</string>
 
     <!-- Notification texts -->
     <string name="notification_acceptedfriend_title">Friend invitation accepted</string>
