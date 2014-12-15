@@ -1,5 +1,8 @@
 package ch.epfl.smartmap.test.activities;
 
+import static ch.epfl.smartmap.test.database.MockContainers.ALAIN_CONTAINER;
+import static ch.epfl.smartmap.test.database.MockContainers.JULIEN_CONTAINER;
+import static ch.epfl.smartmap.test.database.MockContainers.ROBIN;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onData;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
@@ -24,7 +27,6 @@ import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.FilterContainer;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.test.database.MockContainers;
 
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
@@ -41,29 +43,6 @@ public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<Sh
 
     public ShowFiltersActivityTest() {
         super(ShowFiltersActivity.class);
-    }
-
-    private void createMockCache() {
-        Cache newCache = Mockito.mock(Cache.class);
-        Mockito.when(newCache.getFilter(filter.getId())).thenReturn(filter);
-        Mockito.when(newCache.getUser(user1.getId())).thenReturn(user1);
-        Mockito.when(newCache.getUser(user2.getId())).thenReturn(user2);
-        Mockito.when(newCache.getUser(user3.getId())).thenReturn(user3);
-        Mockito.when(newCache.getAllFriends()).thenReturn(allFriends);
-        Mockito.when(newCache.getAllCustomFilters()).thenReturn(filterSet);
-        ServiceContainer.setCache(newCache);
-    }
-
-    private void createMockItems() {
-        user1 = User.createFromContainer(MockContainers.ALAIN);
-        user2 = User.createFromContainer(MockContainers.JULIEN);
-        user3 = User.createFromContainer(MockContainers.ROBIN);
-        allFriends = new HashSet<User>(Arrays.asList(user1, user2, user3));
-        filter =
-            Filter.createFromContainer(new FilterContainer(3, "Family",
-                new HashSet<Long>(Arrays.asList(user1.getId())), true));
-        filterSet = new HashSet<Filter>();
-        filterSet.add(filter);
     }
 
     @Override
@@ -117,9 +96,20 @@ public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<Sh
     }
 
     public void testSwitchIsCheckedIfFilterIsActive() {
-        onView(withId(R.id.activity_show_filters_follow_switch))
-            .check(ViewAssertions.matches(ViewMatchers.isChecked()));
+        onView(withId(R.id.activity_show_filters_follow_switch)).check(
+            ViewAssertions.matches(ViewMatchers.isChecked()));
 
+    }
+
+    public void testSwitchIsClickable() {
+        onView(withId(R.id.activity_show_filters_follow_switch)).check(
+            ViewAssertions.matches(ViewMatchers.isClickable()));
+    }
+
+    public void testSwitchIsDisplayed() {
+        onView(withId(R.id.activity_show_filters_follow_switch)).check(
+            ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withText("Activate")).check(matches(isDisplayed()));
     }
 
     // public void testSwitchIsNotCheckedIfFilterIsNotActive(){
@@ -132,14 +122,33 @@ public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<Sh
     // onView(withId(R.id.activity_show_filters_follow_switch)).check(ViewAssertions.matches((ViewMatchers.isNotChecked())));
     // }
 
-    public void testSwitchIsClickable() {
-        onView(withId(R.id.activity_show_filters_follow_switch)).check(
-            ViewAssertions.matches(ViewMatchers.isClickable()));
+    private void createMockCache() {
+        Cache newCache = Mockito.mock(Cache.class);
+        Mockito.when(newCache.getFilter(filter.getId())).thenReturn(filter);
+        Mockito.when(newCache.getUser(user1.getId())).thenReturn(user1);
+        Mockito.when(newCache.getUser(user2.getId())).thenReturn(user2);
+        Mockito.when(newCache.getUser(user3.getId())).thenReturn(user3);
+        Mockito.when(newCache.getAllFriends()).thenReturn(allFriends);
+        Mockito.when(newCache.getAllCustomFilters()).thenReturn(filterSet);
+        ServiceContainer.setCache(newCache);
     }
 
-    public void testSwitchIsDisplayed() {
-        onView(withId(R.id.activity_show_filters_follow_switch)).check(
-            ViewAssertions.matches(ViewMatchers.isDisplayed()));
-        onView(withText("Activate")).check(matches(isDisplayed()));
+    private void createMockItems() {
+        Cache creator = new Cache();
+        creator.putUser(ALAIN_CONTAINER);
+        creator.putUser(JULIEN_CONTAINER);
+        creator.putUser(ROBIN);
+
+        FilterContainer filterContainer =
+            new FilterContainer(Filter.NO_ID, "Family", new HashSet<Long>(Arrays.asList(user1.getId())), true);
+        creator.putFilter(filterContainer);
+
+        user1 = creator.getUser(ALAIN_CONTAINER.getId());
+        user2 = creator.getUser(JULIEN_CONTAINER.getId());
+        user3 = creator.getUser(ROBIN.getId());
+        allFriends = new HashSet<User>(Arrays.asList(user1, user2, user3));
+        Filter filter = creator.getFilter(filterContainer.getId());
+        filterSet = new HashSet<Filter>();
+        filterSet.add(filter);
     }
 }

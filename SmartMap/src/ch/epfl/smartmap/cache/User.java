@@ -168,7 +168,7 @@ public abstract class User implements UserInterface {
      *            a Container that has all informations about the {@code User} you want to create.
      * @return the {@code User} live instance.
      */
-    public static User createFromContainer(UserContainer userContainer) {
+    protected static User createFromContainer(UserContainer userContainer) {
         switch (userContainer.getFriendship()) {
             case User.FRIEND:
                 return new Friend(userContainer.getId(), userContainer.getName(),

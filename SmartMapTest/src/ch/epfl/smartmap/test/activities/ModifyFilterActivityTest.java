@@ -18,9 +18,7 @@ import ch.epfl.smartmap.activities.ModifyFilterActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.FilterContainer;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.test.database.MockContainers;
 
 public class ModifyFilterActivityTest extends ActivityInstrumentationTestCase2<ModifyFilterActivity> {
 
@@ -35,11 +33,12 @@ public class ModifyFilterActivityTest extends ActivityInstrumentationTestCase2<M
         // ServiceContainer.forceInitSmartMapServices(this.getInstrumentation().getTargetContext());
         allFriends = new HashSet<User>(Arrays.asList(user1));
 
-        filter =
-            Filter.createFromContainer(new FilterContainer(3, "Family",
-                new HashSet<Long>(Arrays.asList(user1.getId())), true));
+        // filter =
+        // Filter.createFromContainer(new FilterContainer(3, "Family", new HashSet<Long>(Arrays.asList(user1
+        // .getId())), true));
         Intent intent =
-            new Intent(this.getInstrumentation().getTargetContext().getApplicationContext(), ModifyFilterActivity.class);
+            new Intent(this.getInstrumentation().getTargetContext().getApplicationContext(),
+                ModifyFilterActivity.class);
         intent.putExtra("FILTER", filter.getId());
         this.setActivityIntent(intent);
     }
@@ -49,15 +48,15 @@ public class ModifyFilterActivityTest extends ActivityInstrumentationTestCase2<M
         super.setUp();
         // this.getActivity();
 
-        // ServiceContainer.initSmartMapServices(this.getActivity());
-        ServiceContainer.forceInitSmartMapServices(this.getInstrumentation().getTargetContext());
-        user1 = User.createFromContainer(MockContainers.ALAIN);
-        user2 = User.createFromContainer(MockContainers.JULIEN);
-        user3 = User.createFromContainer(MockContainers.ROBIN);
-        allFriends = new HashSet<User>(Arrays.asList(user1, user2, user3));
+        // // ServiceContainer.initSmartMapServices(this.getActivity());
+        // ServiceContainer.forceInitSmartMapServices(this.getInstrumentation().getTargetContext());
+        // user1 = User.createFromContainer(MockContainers.ALAIN);
+        // user2 = User.createFromContainer(MockContainers.JULIEN);
+        // user3 = User.createFromContainer(MockContainers.ROBIN);
+        // allFriends = new HashSet<User>(Arrays.asList(user1, user2, user3));
+        // //
         //
-
-        //
+        // //
         Cache newCache = Mockito.mock(Cache.class);
         Mockito.when(newCache.getFilter(filter.getId())).thenReturn(filter);
         Mockito.when(newCache.getUser(user1.getId())).thenReturn(user1);

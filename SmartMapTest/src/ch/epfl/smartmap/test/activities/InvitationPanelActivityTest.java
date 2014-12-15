@@ -38,11 +38,11 @@ ActivityInstrumentationTestCase2<MainActivity> {
         this.getActivity();
         Cache newCache = Mockito.mock(Cache.class);
         SortedSet<Invitation> newSortedSet = new TreeSet<Invitation>();
-        InvitationContainer newEventInvitationContainer = MockContainers.POLYLAN_EVENT_INVITATION;
+        InvitationContainer newEventInvitationContainer = MockContainers.POLYLAN_EVENT_INVITATION_CONTAINER;
         newCache.putInvitation(newEventInvitationContainer);
-        InvitationContainer newFriendInvitationContainer = MockContainers.ROBIN_FRIEND_INVITATION;
+        InvitationContainer newFriendInvitationContainer = MockContainers.ROBIN_FRIEND_INVITATION_CONTANER;
         newCache.putInvitation(newFriendInvitationContainer);
-        InvitationContainer newAcceptedFriendInvitationContainer = MockContainers.ROBIN_FRIEND_ACCEPTED_INVITATION;
+        InvitationContainer newAcceptedFriendInvitationContainer = MockContainers.ROBIN_FRIEND_ACCEPTED_INVITATION_CONTAINER;
         newCache.putInvitation(newAcceptedFriendInvitationContainer);
 
         Invitation newEventInvitation = newCache.getInvitation(MockContainers.POLYLAN_EVENT_INVITATION_ID);
