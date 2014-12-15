@@ -176,7 +176,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
                 values.put(KEY_ID, event.getId());
                 values.put(KEY_NAME, event.getName());
                 values.put(KEY_EVTDESC, event.getDescription());
-                values.put(KEY_USER_ID, event.getCreatorId());
+                values.put(KEY_USER_ID, event.getCreatorContainer().getId());
                 if (event.getLocation() != null) {
                     values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
                     values.put(KEY_LATITUDE, event.getLocation().getLatitude());
@@ -812,7 +812,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
         values.put(KEY_ID, event.getId());
         values.put(KEY_NAME, event.getName());
         values.put(KEY_EVTDESC, event.getDescription());
-        values.put(KEY_USER_ID, event.getCreatorId());
+        values.put(KEY_USER_ID, event.getCreatorContainer().getId());
         values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
         values.put(KEY_LATITUDE, event.getLocation().getLatitude());
         values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
