@@ -11,6 +11,8 @@ import android.location.Location;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.EventContainer;
 import ch.epfl.smartmap.cache.FilterContainer;
+import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
 
@@ -205,5 +207,30 @@ public class MockContainers {
 
     static {
         FAMILY = new FilterContainer(FAMILY_ID, FAMILY_NAME, FAMILY_IDS, FAMILY_IS_VISIBLE);
+    }
+
+    public static final InvitationContainer ROBIN_FRIEND_INVITATION;
+    public static final long ROBIN_FRIEND_INVITATION_ID = 776;
+    public static final int ROBIN_FRIEND_INVITATION_STATUS = Invitation.UNREAD;
+    public static final long ROBIN_FRIEND_INVITATION_TIMESTAMP = 679086708;
+    public static final int ROBIN_FRIEND_INVITATION_TYPE = Invitation.FRIEND_INVITATION;
+
+    static {
+        ROBIN_FRIEND_INVITATION =
+            new InvitationContainer(ROBIN_FRIEND_INVITATION_ID, ROBIN, null, ROBIN_FRIEND_INVITATION_STATUS,
+                ROBIN_FRIEND_INVITATION_TIMESTAMP, ROBIN_FRIEND_INVITATION_TYPE);
+    }
+
+    public static final InvitationContainer POLYLAN_EVENT_INVITATION;
+    public static final long POLYLAN_EVENT_INVITATION_ID = 765;
+    public static final int POLYLAN_EVENT_INVITATION_STATUS = Invitation.READ;
+    public static final long POLYLAN_EVENT_INVITATION_TIMESTAMP = 6790867;
+    public static final int POLYLAN_EVENT_INVITATION_TYPE = Invitation.EVENT_INVITATION;
+
+    static {
+        POLYLAN_EVENT_INVITATION =
+            new InvitationContainer(POLYLAN_EVENT_INVITATION_ID, null, POLYLAN,
+                POLYLAN_EVENT_INVITATION_STATUS, POLYLAN_EVENT_INVITATION_TIMESTAMP,
+                POLYLAN_EVENT_INVITATION_TYPE);
     }
 }
