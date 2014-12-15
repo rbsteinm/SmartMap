@@ -29,9 +29,6 @@ import ch.epfl.smartmap.search.SearchEngineInterface.Type;
  */
 public class SearchLayout extends LinearLayout {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = "SEARCH_RESULT_SWIPEABLE_CONTAINER";
-
     // Margins & Paddings
     private static final int PADDING_LEFT = 20;
     private static final int PADDING_RIGHT = 20;
@@ -182,7 +179,7 @@ public class SearchLayout extends LinearLayout {
         for (Type searchType : searchTypes) {
             this.addSearchResultScrollView(searchType);
         }
-    };
+    }
 
     /**
      * @return Next Search Type in the Layout
@@ -190,8 +187,7 @@ public class SearchLayout extends LinearLayout {
     private Type nextSearchType() {
         int nextSearchTypeIndex =
             (mSearchTypeIndexes.get(mCurrentSearchType).intValue() + 1) % mActiveSearchTypes.size();
-        Type nextSearchType = mActiveSearchTypes.get(nextSearchTypeIndex);
-        return nextSearchType;
+        return mActiveSearchTypes.get(nextSearchTypeIndex);
     }
 
     /**
@@ -215,8 +211,7 @@ public class SearchLayout extends LinearLayout {
         int previousSearchTypeIndex =
             ((mSearchTypeIndexes.get(mCurrentSearchType).intValue() - 1) + mActiveSearchTypes.size())
                 % mActiveSearchTypes.size();
-        Type previousSearchType = mActiveSearchTypes.get(previousSearchTypeIndex);
-        return previousSearchType;
+        return mActiveSearchTypes.get(previousSearchTypeIndex);
     }
 
     /**
@@ -280,15 +275,14 @@ public class SearchLayout extends LinearLayout {
 
             float diffY = e2.getY() - e1.getY();
             float diffX = e2.getX() - e1.getX();
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if ((Math.abs(diffX) > SWIPE_THRESHOLD) && (Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD)) {
-                    if (diffX > 0) {
-                        SearchLayout.this.onSwipeRight();
-                    } else {
-                        SearchLayout.this.onSwipeLeft();
-                    }
-                    result = true;
+            if ((Math.abs(diffX) > Math.abs(diffY)) && (Math.abs(diffX) > SWIPE_THRESHOLD)
+                && (Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD)) {
+                if (diffX > 0) {
+                    SearchLayout.this.onSwipeRight();
+                } else {
+                    SearchLayout.this.onSwipeLeft();
                 }
+                result = true;
             }
             return result;
         }

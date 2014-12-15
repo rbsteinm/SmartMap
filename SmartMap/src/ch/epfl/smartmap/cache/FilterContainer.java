@@ -58,7 +58,7 @@ public class FilterContainer {
      * @return ids field
      */
     public Set<Long> getIds() {
-        return new HashSet<Long>(mIds);
+        return mIds;
     }
 
     /**
@@ -111,7 +111,7 @@ public class FilterContainer {
      * @return this
      */
     public FilterContainer setIds(Set<Long> newIds) {
-        mIds = new HashSet<Long>(newIds);
+        mIds = newIds;
         return this;
     }
 

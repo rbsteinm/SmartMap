@@ -21,9 +21,6 @@ import ch.epfl.smartmap.cache.Displayable;
  */
 public class SearchResultView extends RelativeLayout {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = "SEARCH RESULT VIEW";
-
     // Margins & Paddings
     private static final int PADDING_RIGHT = 20;
     private static final int PADDING_LEFT = 20;
@@ -103,33 +100,36 @@ public class SearchResultView extends RelativeLayout {
         this.addView(mTitleView);
         this.addView(mShortInfoView);
 
-        // This touch listener sends the query and displays the item
-        this.setOnTouchListener(new OnTouchListener() {
-            private float startX;
-            private float startY;
+        // This touch listener displays the item on click
+        this.setOnTouchListener(new ClickOnItemOnTouchListener());
+    }
 
-            @Override
-            public boolean onTouch(View v, MotionEvent ev) {
-                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-                    startX = ev.getAxisValue(MotionEvent.AXIS_X);
-                    startY = ev.getAxisValue(MotionEvent.AXIS_Y);
-                    v.setBackgroundColor(SearchResultView.this.getResources().getColor(
-                        R.color.searchResultOnSelect));
+    private class ClickOnItemOnTouchListener implements OnTouchListener {
+        private float startX;
+        private float startY;
 
-                } else if (ev.getAction() == MotionEvent.ACTION_UP) {
-                    float endX = ev.getAxisValue(MotionEvent.AXIS_X);
-                    float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
+        @Override
+        public boolean onTouch(View v, MotionEvent ev) {
+            if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+                startX = ev.getAxisValue(MotionEvent.AXIS_X);
+                startY = ev.getAxisValue(MotionEvent.AXIS_Y);
+                v.setBackgroundColor(SearchResultView.this.getResources().getColor(
+                    R.color.searchResultOnSelect));
 
-                    double clickDistance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-                    if (clickDistance < CLICK_DISTANCE_THRESHHOLD) {
-                        ((MainActivity) SearchResultView.this.getContext()).performQuery(mItem);
-                    }
-                    v.setBackgroundResource(0);
-                } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
-                    v.setBackgroundResource(0);
+            } else if (ev.getAction() == MotionEvent.ACTION_UP) {
+                float endX = ev.getAxisValue(MotionEvent.AXIS_X);
+                float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
+
+                // SonarQube : making 2 a constant is not useful here
+                double clickDistance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                if (clickDistance < CLICK_DISTANCE_THRESHHOLD) {
+                    ((MainActivity) SearchResultView.this.getContext()).performQuery(mItem);
                 }
-                return true;
+                v.setBackgroundResource(0);
+            } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
+                v.setBackgroundResource(0);
             }
-        });
+            return true;
+        }
     }
 }
