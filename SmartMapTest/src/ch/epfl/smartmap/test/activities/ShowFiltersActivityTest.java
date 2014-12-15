@@ -32,111 +32,114 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
 public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<ShowFiltersActivity> {
 
+    Filter filter;
+    User user1;
+    User user2;
+    User user3;
+    Set<User> allFriends;
+    Set<Filter> filterSet;
 
-	Filter filter;
-	User user1;
-	User user2;
-	User user3;
-	Set<User> allFriends;
-	Set<Filter> filterSet;
+    public ShowFiltersActivityTest() {
+        super(ShowFiltersActivity.class);
+    }
 
-	public ShowFiltersActivityTest() {
-		super(ShowFiltersActivity.class);
-	}
+    private void createMockCache() {
+        Cache newCache = Mockito.mock(Cache.class);
+        Mockito.when(newCache.getFilter(filter.getId())).thenReturn(filter);
+        Mockito.when(newCache.getUser(user1.getId())).thenReturn(user1);
+        Mockito.when(newCache.getUser(user2.getId())).thenReturn(user2);
+        Mockito.when(newCache.getUser(user3.getId())).thenReturn(user3);
+        Mockito.when(newCache.getAllFriends()).thenReturn(allFriends);
+        Mockito.when(newCache.getAllCustomFilters()).thenReturn(filterSet);
+        ServiceContainer.setCache(newCache);
+    }
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		ServiceContainer.forceInitSmartMapServices(this.getActivity());
-		this.createMockItems();
-		this.createMockCache();
-		this.getActivity();
+    private void createMockItems() {
+        user1 = User.createFromContainer(MockContainers.ALAIN);
+        user2 = User.createFromContainer(MockContainers.JULIEN);
+        user3 = User.createFromContainer(MockContainers.ROBIN);
+        allFriends = new HashSet<User>(Arrays.asList(user1, user2, user3));
+        filter =
+            Filter.createFromContainer(new FilterContainer(3, "Family",
+                new HashSet<Long>(Arrays.asList(user1.getId())), true));
+        filterSet = new HashSet<Filter>();
+        filterSet.add(filter);
+    }
 
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        ServiceContainer.forceInitSmartMapServices(this.getActivity());
+        this.createMockItems();
+        this.createMockCache();
+        this.getActivity();
 
-	}
+    }
 
-	public void testCancelCreateFilter(){
-		onView(withId(R.id.activity_show_filters_add_button)).perform(click());
-		onView(withId(android.R.id.button2)).perform(click());
-		onView(withId(R.id.show_filters_alert_dialog_edittext)).check((doesNotExist()));
-	}
+    public void testCancelCreateFilter() {
+        onView(withId(R.id.activity_show_filters_add_button)).perform(click());
+        onView(withId(android.R.id.button2)).perform(click());
+        onView(withId(R.id.show_filters_alert_dialog_edittext)).check((doesNotExist()));
+    }
 
-	public void testCanCreateFilterWithNonEmptyName() {
-		onView(withId(R.id.activity_show_filters_add_button)).perform(click());
-		onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(ViewActions.typeText("Family"));
-		onView(withId(android.R.id.button2)).perform(click());
-		onView(withId(R.id.activity_show_filters_follow_switch)).check(doesNotExist());
-		//pressBack();
-	}
+    public void testCanCreateFilterWithNonEmptyName() {
+        onView(withId(R.id.activity_show_filters_add_button)).perform(click());
+        onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(ViewActions.typeText("Family"));
+        onView(withId(android.R.id.button2)).perform(click());
+        onView(withId(R.id.activity_show_filters_follow_switch)).check(doesNotExist());
+        // pressBack();
+    }
 
-	public void testCannotCreateFilterWithEmptyName() {
-		onView(withId(R.id.activity_show_filters_add_button)).perform(click());
-		onView(withId(android.R.id.button1)).perform(click());
-		onView(withId(R.id.activity_show_filters_follow_switch)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-	}
+    public void testCannotCreateFilterWithEmptyName() {
+        onView(withId(R.id.activity_show_filters_add_button)).perform(click());
+        onView(withId(android.R.id.button1)).perform(click());
+        onView(withId(R.id.activity_show_filters_follow_switch)).check(
+            ViewAssertions.matches(ViewMatchers.isDisplayed()));
+    }
 
-	public void testCanOppenCreateFilerDialog(){
-		onView(withId(R.id.activity_show_filters_add_button)).perform(click());
-		onView(withText("New Filter")).check(matches(isDisplayed()));
-		//pressBack();
-	}
+    public void testCanOppenCreateFilerDialog() {
+        onView(withId(R.id.activity_show_filters_add_button)).perform(click());
+        onView(withText("New Filter")).check(matches(isDisplayed()));
+        // pressBack();
+    }
 
-	public void testFilterNameIsDisplayed(){
-		onView(withText(filter.getName())).check(matches(isDisplayed()));
-	}
+    public void testFilterNameIsDisplayed() {
+        onView(withText(filter.getName())).check(matches(isDisplayed()));
+    }
 
-	public void testRightNumberOfPeopleInsideFilerIsDisplayed(){
-		onView(withText(filter.getIds().size() + " people inside this filter")).check(matches(isDisplayed()));
-	}
+    public void testPerformClickOnFilterOpensModifyFilter() {
+        onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(0).perform(click());
+        onView(withText("Save")).check(matches(isDisplayed()));
+    }
 
-	public void testSwitchIsCheckedIfFilterIsActive(){
-		onView(withId(R.id.activity_show_filters_follow_switch)).check(ViewAssertions.matches(ViewMatchers.isChecked()));
+    public void testRightNumberOfPeopleInsideFilerIsDisplayed() {
+        onView(withText(filter.getIds().size() + " people inside this filter")).check(matches(isDisplayed()));
+    }
 
-	}
+    public void testSwitchIsCheckedIfFilterIsActive() {
+        onView(withId(R.id.activity_show_filters_follow_switch))
+            .check(ViewAssertions.matches(ViewMatchers.isChecked()));
 
-	public void testSwitchIsClickable(){
-		onView(withId(R.id.activity_show_filters_follow_switch)).check(ViewAssertions.matches(ViewMatchers.isClickable()));
-	}
+    }
 
-	public void testSwitchIsDisplayed(){
-		onView(withId(R.id.activity_show_filters_follow_switch)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-		onView(withText("Activate")).check(matches(isDisplayed()));
-	}
+    // public void testSwitchIsNotCheckedIfFilterIsNotActive(){
+    // Filter nonActiveFilter = Filter.createFromContainer(new
+    // FilterContainer(4, "Other", new HashSet<Long>(Arrays.asList((long) 2)),
+    // false));
+    // filterSet.remove(filter);
+    // this.createMockCacheWithMockFilter(nonActiveFilter);
+    // this.setActivity(this.getActivity());
+    // onView(withId(R.id.activity_show_filters_follow_switch)).check(ViewAssertions.matches((ViewMatchers.isNotChecked())));
+    // }
 
-	public void testPerformClickOnFilterOpensModifyFilter(){
-		onData(anything())
-		.inAdapterView(withId(android.R.id.list))
-		.atPosition(0).perform(click());
-		onView(withText("Save")).check(matches(isDisplayed()));
-	}
+    public void testSwitchIsClickable() {
+        onView(withId(R.id.activity_show_filters_follow_switch)).check(
+            ViewAssertions.matches(ViewMatchers.isClickable()));
+    }
 
-	//	public void testSwitchIsNotCheckedIfFilterIsNotActive(){
-	//		Filter nonActiveFilter = Filter.createFromContainer(new FilterContainer(4, "Other", new HashSet<Long>(Arrays.asList((long) 2)), false));
-	//		filterSet.remove(filter);
-	//		this.createMockCacheWithMockFilter(nonActiveFilter);
-	//		this.setActivity(this.getActivity());
-	//		onView(withId(R.id.activity_show_filters_follow_switch)).check(ViewAssertions.matches((ViewMatchers.isNotChecked())));
-	//	}
-
-	private void createMockCache(){
-		Cache newCache = Mockito.mock(Cache.class);
-		Mockito.when(newCache.getFilter(filter.getId())).thenReturn(filter);
-		Mockito.when(newCache.getUser(user1.getId())).thenReturn(user1);
-		Mockito.when(newCache.getUser(user2.getId())).thenReturn(user2);
-		Mockito.when(newCache.getUser(user3.getId())).thenReturn(user3);
-		Mockito.when(newCache.getAllFriends()).thenReturn(allFriends);
-		Mockito.when(newCache.getAllCustomFilters()).thenReturn(filterSet);
-		ServiceContainer.setCache(newCache);
-	}
-
-	private void createMockItems(){
-		user1=User.createFromContainer(MockContainers.ALAIN);
-		user2=User.createFromContainer(MockContainers.JULIEN);
-		user3=User.createFromContainer(MockContainers.ROBIN);
-		allFriends=new HashSet<User>(Arrays.asList(user1,user2,user3));
-		filter = Filter.createFromContainer(new FilterContainer(3, "Family",
-				new HashSet<Long>(Arrays.asList(user1.getId())), true));
-		filterSet = new HashSet<Filter>();
-		filterSet.add(filter);
-	}
+    public void testSwitchIsDisplayed() {
+        onView(withId(R.id.activity_show_filters_follow_switch)).check(
+            ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(withText("Activate")).check(matches(isDisplayed()));
+    }
 }

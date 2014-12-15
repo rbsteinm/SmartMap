@@ -98,17 +98,15 @@ public class MockContainers {
     public static final UserContainer NULL_USER_VALUES;
 
     static {
-        NULL_USER_VALUES =
-            new UserContainer(User.NO_ID, null, null, null, null, null, null, null, User.NO_FRIENDSHIP);
+        NULL_USER_VALUES = new UserContainer(User.NO_ID, null, null, null, null, null, null, null, User.NO_FRIENDSHIP);
     }
 
     public static final UserContainer UNSET_USER_VALUES;
 
     static {
         UNSET_USER_VALUES =
-            new UserContainer(User.NO_ID, User.NO_NAME, User.NO_PHONE_NUMBER, User.NO_EMAIL,
-                User.NO_LOCATION, User.NO_LOCATION_STRING, User.NO_IMAGE, User.BlockStatus.NOT_SET,
-                User.NO_FRIENDSHIP);
+            new UserContainer(User.NO_ID, User.NO_NAME, User.NO_PHONE_NUMBER, User.NO_EMAIL, User.NO_LOCATION,
+                User.NO_LOCATION_STRING, User.NO_IMAGE, User.BlockStatus.NOT_SET, User.NO_FRIENDSHIP);
     }
 
     public static final UserContainer WRONG_USER_VALUES;
@@ -135,11 +133,9 @@ public class MockContainers {
     public static final String POLYLAN_NAME = "Polylan";
     public static final String POLYLAN_DESCRIPTION = "This is Polylan";
     public static final long POLYLAN_START_TIME = 5809840;
-    public static final Calendar POLYLAN_START_DATE = GregorianCalendar.getInstance(TimeZone
-        .getTimeZone("GMT+01:00"));
+    public static final Calendar POLYLAN_START_DATE = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
     public static final long POLYLAN_END_TIME = 580985098;
-    public static final Calendar POLYLAN_END_DATE = GregorianCalendar.getInstance(TimeZone
-        .getTimeZone("GMT+01:00"));
+    public static final Calendar POLYLAN_END_DATE = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"));
     public static final Location POLYLAN_LOCATION = new Location(User.PROVIDER_NAME);
     public static final String POLYLAN_LOCATION_STRING = "Rolex";
     public static final double POLYLAN_LATITUDE = 59.94890;
@@ -170,8 +166,7 @@ public class MockContainers {
     public static final String FOOTBALL_TOURNAMENT_LOCATION_STRING = "Rolex";
     public static final double FOOTBALL_TOURNAMENT_LATITUDE = 59.94890;
     public static final double FOOTBALL_TOURNAMENT_LONGITUDE = 27.58984;
-    public static final Set<Long> FOOTBALL_TOURNAMENT_PARTICIPANTS = Sets.newHashSet((long) 5, (long) 6,
-        (long) 2);
+    public static final Set<Long> FOOTBALL_TOURNAMENT_PARTICIPANTS = Sets.newHashSet((long) 5, (long) 6, (long) 2);
 
     static {
         FOOTBALL_TOURNAMENT_LOCATION.setLatitude(FOOTBALL_TOURNAMENT_LATITUDE);
@@ -180,9 +175,8 @@ public class MockContainers {
         FOOTBALL_TOURNAMENT_END_DATE.setTimeInMillis(FOOTBALL_TOURNAMENT_END_TIME);
         FOOTBALL_TOURNAMENT =
             new EventContainer(FOOTBALL_TOURNAMENT_ID, FOOTBALL_TOURNAMENT_NAME, ALAIN,
-                FOOTBALL_TOURNAMENT_DESCRIPTION, FOOTBALL_TOURNAMENT_START_DATE,
-                FOOTBALL_TOURNAMENT_END_DATE, FOOTBALL_TOURNAMENT_LOCATION,
-                FOOTBALL_TOURNAMENT_LOCATION_STRING, FOOTBALL_TOURNAMENT_PARTICIPANTS);
+                FOOTBALL_TOURNAMENT_DESCRIPTION, FOOTBALL_TOURNAMENT_START_DATE, FOOTBALL_TOURNAMENT_END_DATE,
+                FOOTBALL_TOURNAMENT_LOCATION, FOOTBALL_TOURNAMENT_LOCATION_STRING, FOOTBALL_TOURNAMENT_PARTICIPANTS);
     }
 
     public static final EventContainer NULL_EVENT_VALUES;
@@ -195,9 +189,9 @@ public class MockContainers {
 
     static {
         UNSET_EVENT_VALUES =
-            new EventContainer(Event.NO_ID, Event.NO_NAME, User.NOBODY.getContainerCopy(),
-                Event.NO_DESCRIPTION, Event.NO_START_DATE, Event.NO_END_DATE, Event.NO_LOCATION,
-                Event.NO_LOCATION_STRING, Event.NO_PARTICIPANTIDS);
+            new EventContainer(Event.NO_ID, Event.NO_NAME, User.NOBODY.getContainerCopy(), Event.NO_DESCRIPTION,
+                Event.NO_START_DATE, Event.NO_END_DATE, Event.NO_LOCATION, Event.NO_LOCATION_STRING,
+                Event.NO_PARTICIPANTIDS);
     }
 
     public static final FilterContainer FAMILY;
@@ -232,6 +226,18 @@ public class MockContainers {
                 ROBIN_FRIEND_INVITATION_TIMESTAMP, ROBIN_FRIEND_INVITATION_TYPE);
     }
 
+    public static final InvitationContainer ROBIN_FRIEND_ACCEPTED_INVITATION;
+    public static final long ROBIN_FRIEND_ACCEPTED_INVITATION_ID = 782;
+    public static final int ROBIN_FRIEND_ACCEPTED_INVITATION_STATUS = Invitation.UNREAD;
+    public static final long ROBIN_FRIEND_ACCEPTED_INVITATION_TIMESTAMP = 6790546;
+    public static final int ROBIN_FRIEND_ACCEPTED_INVITATION_TYPE = Invitation.ACCEPTED_FRIEND_INVITATION;
+
+    static {
+        ROBIN_FRIEND_ACCEPTED_INVITATION =
+            new InvitationContainer(ROBIN_FRIEND_INVITATION_ID, ROBIN, null, ROBIN_FRIEND_INVITATION_STATUS,
+                ROBIN_FRIEND_INVITATION_TIMESTAMP, ROBIN_FRIEND_INVITATION_TYPE);
+    }
+
     public static final InvitationContainer POLYLAN_EVENT_INVITATION;
     public static final long POLYLAN_EVENT_INVITATION_ID = 765;
     public static final int POLYLAN_EVENT_INVITATION_STATUS = Invitation.READ;
@@ -240,8 +246,7 @@ public class MockContainers {
 
     static {
         POLYLAN_EVENT_INVITATION =
-            new InvitationContainer(POLYLAN_EVENT_INVITATION_ID, null, POLYLAN,
-                POLYLAN_EVENT_INVITATION_STATUS, POLYLAN_EVENT_INVITATION_TIMESTAMP,
-                POLYLAN_EVENT_INVITATION_TYPE);
+            new InvitationContainer(POLYLAN_EVENT_INVITATION_ID, null, POLYLAN, POLYLAN_EVENT_INVITATION_STATUS,
+                POLYLAN_EVENT_INVITATION_TIMESTAMP, POLYLAN_EVENT_INVITATION_TYPE);
     }
 }
