@@ -237,7 +237,7 @@ public class ModifyFilterActivity extends Activity {
             new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
-                    // TODO
+
                     ServiceContainer.getCache().removeFilter(mFilter.getId());
                     Toast.makeText(ModifyFilterActivity.this,
                         ModifyFilterActivity.this.getResources().getString(R.string.removed_filter),
@@ -252,7 +252,7 @@ public class ModifyFilterActivity extends Activity {
             new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
-
+                    // nothing
                 }
             });
 
@@ -274,6 +274,48 @@ public class ModifyFilterActivity extends Activity {
             if (!mFriendsInside.contains(friend)) {
                 mFriendsOutside.add(friend);
             }
+        }
+    }
+
+    /**
+     * Updates the inside and outside filter lists when an item is dragged from the outside list and dropped
+     * into the inside list, i.e when a friend is added to the filter
+     * 
+     * @param droppedItem
+     * @return true is the drop action was taken in account, false otherwise
+     */
+    private boolean updateFriendsListsWhenAddedFriend(User droppedItem) {
+        if (mFriendsOutside.contains(droppedItem)) {
+            mFriendsInside.add(droppedItem);
+            mFriendsOutside.remove(droppedItem);
+            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this, mFriendsInside));
+            mListViewOutside
+                .setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this, mFriendsOutside));
+
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    /**
+     * Updates the inside and outside filter lists when an item is dragged from the inside list and dropped
+     * into the outside list, i.e when a friend is removed from the filter
+     * 
+     * @param droppedItem
+     * @return true is the drop action was taken in account, false otherwise
+     */
+    private boolean updateFriendsListsWhenRemovedFriend(User droppedItem) {
+        if (mFriendsInside.contains(droppedItem)) {
+            mFriendsInside.remove(droppedItem);
+            mFriendsOutside.add(droppedItem);
+            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this, mFriendsInside));
+            mListViewOutside
+                .setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this, mFriendsOutside));
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -304,22 +346,11 @@ public class ModifyFilterActivity extends Activity {
                 case DragEvent.ACTION_DROP:
                     // Gets the item containing the dragged data
                     ClipData.Item item = event.getClipData().getItemAt(0);
-
                     // If apply only if drop on target layout
                     if (v.equals(mOutsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
                         User droppedItem = ServiceContainer.getCache().getUser(droppedItemId);
-                        if (mFriendsInside.contains(droppedItem)) {
-                            mFriendsInside.remove(droppedItem);
-                            mFriendsOutside.add(droppedItem);
-                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
-                                mFriendsInside));
-                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
-                                mFriendsOutside));
-                            return true;
-                        }
-
-                        return false;
+                        return ModifyFilterActivity.this.updateFriendsListsWhenRemovedFriend(droppedItem);
                     } else {
                         return false;
                     }
@@ -367,17 +398,7 @@ public class ModifyFilterActivity extends Activity {
                     if (v.equals(mInsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
                         User droppedItem = ServiceContainer.getCache().getUser(droppedItemId);
-                        if (mFriendsOutside.contains(droppedItem)) {
-                            mFriendsInside.add(droppedItem);
-                            mFriendsOutside.remove(droppedItem);
-                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
-                                mFriendsInside));
-                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
-                                mFriendsOutside));
-
-                            return true;
-                        }
-                        return false;
+                        return ModifyFilterActivity.this.updateFriendsListsWhenAddedFriend(droppedItem);
                     } else {
                         return false;
                     }
