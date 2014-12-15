@@ -43,7 +43,8 @@ public class SelfTest extends AndroidTestCase {
 
     @Test
     public void testReturnSettingsValues() {
-        Self self = (Self) ServiceContainer.getCache().getUser(ServiceContainer.getSettingsManager().getUserId());
+        Self self =
+            (Self) ServiceContainer.getCache().getUser(ServiceContainer.getSettingsManager().getUserId());
         assertTrue(self.getLatLng().latitude == MockContainers.JULIEN_LATITUDE);
         assertTrue(self.getLatLng().longitude == MockContainers.JULIEN_LONGITUDE);
         assertTrue(self.getLocation().getLongitude() == MockContainers.JULIEN_LATITUDE);
@@ -54,7 +55,8 @@ public class SelfTest extends AndroidTestCase {
 
     @Test
     public void testSelfConstruction() {
-        Self self = (Self) ServiceContainer.getCache().getUser(ServiceContainer.getSettingsManager().getUserId());
+        Self self =
+            (Self) ServiceContainer.getCache().getUser(ServiceContainer.getSettingsManager().getUserId());
         assertTrue(self.getId() == MockContainers.JULIEN_ID);
         assertTrue(self.getName().equals(MockContainers.JULIEN_NAME));
         assertTrue(self.getActionImage().sameAs(MockContainers.JULIEN_IMAGE));

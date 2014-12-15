@@ -1096,10 +1096,8 @@ public class Cache implements CacheInterface {
     /*
      * (non-Javadoc)
      * @see
-     * ch.epfl.smartmap.cache.CacheInterface#removeParticipantsFromEvent(java
-     * .util.Set,
-     * ch.epfl.smartmap.cache.Event,
-     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
+     * ch.epfl.smartmap.cache.CacheInterface#removeParticipantsFromEvent(java.util.Set,
+     * ch.epfl.smartmap.cache.Event, ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
     public synchronized void removeParticipantsFromEvent(Set<Long> ids, Event event,
