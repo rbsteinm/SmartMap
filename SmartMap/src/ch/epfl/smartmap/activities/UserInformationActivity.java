@@ -111,6 +111,9 @@ public class UserInformationActivity extends Activity {
      * @param view
      */
     public void displayRemoveFriendConfirmationDialog(View view) {
+
+        Log.d(TAG, "View with id " + view.getId() + " pressed.");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(this.getString(R.string.remove) + " " + mUser.getName() + " "
             + this.getString(R.string.from_your_friends));
