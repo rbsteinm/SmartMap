@@ -147,15 +147,10 @@ public class EventInformationActivity extends ListActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.show_event_information, menu);
 
-        if (mEvent == null) {
-            // We do nothing as the activity is going to finish (see
-            // initializeGUI).
-        } else {
-            // Disable the delete event button if we are not the creator
-            if (!mEvent.isOwn() || !DELETE_EVENTS_ENABLE) {
-                MenuItem item = menu.findItem(R.id.event_info_delete_button);
-                item.setVisible(false);
-            }
+        // Disable the delete event button if we are not the creator
+        if ((mEvent == null) || !mEvent.isOwn() || !DELETE_EVENTS_ENABLE) {
+            MenuItem item = menu.findItem(R.id.event_info_delete_button);
+            item.setVisible(false);
         }
         return true;
     }

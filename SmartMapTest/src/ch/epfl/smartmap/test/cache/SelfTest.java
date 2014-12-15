@@ -38,7 +38,7 @@ public class SelfTest extends AndroidTestCase {
         Mockito.when(settings.getContext()).thenReturn(this.getContext());
         Mockito.when(settings.getLocationName()).thenReturn(MockContainers.JULIEN_LOCATION_STRING);
         ServiceContainer.setSettingsManager(settings);
-        ServiceContainer.getCache().putUser(MockContainers.JULIEN);
+        ServiceContainer.getCache().putUser(MockContainers.JULIEN_CONTAINER);
     }
 
     @Test

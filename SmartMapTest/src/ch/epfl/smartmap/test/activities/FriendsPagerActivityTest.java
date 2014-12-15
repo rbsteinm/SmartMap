@@ -25,7 +25,6 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.Friend;
 import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.InvitationContainer;
@@ -45,23 +44,13 @@ public class FriendsPagerActivityTest extends ActivityInstrumentationTestCase2<F
         super(FriendsPagerActivity.class);
     }
 
-    private void createMockCache() throws SmartMapClientException {
-        Cache newCache = Mockito.mock(Cache.class);
-        InvitationContainer friendInvitationContainer = MockContainers.ROBIN_FRIEND_INVITATION;
-        newCache.putInvitation(friendInvitationContainer);
-        Invitation friendInvitation = newCache.getInvitation(MockContainers.ROBIN_FRIEND_INVITATION_ID);
-        UserContainer friendContainer = MockContainers.ALAIN;
-        newCache.putUser(friendContainer);
-        Friend friend = (Friend) newCache.getUser(MockContainers.ALAIN_ID);
-        friendSet = new HashSet<User>();
-        invitationSet = new TreeSet<Invitation>();
-        friendSet.add(friend);
-        invitationSet.add(friendInvitation);
-        Mockito.when(newCache.getAllFriends()).thenReturn(friendSet);
-        Mockito.when(newCache.getUnansweredFriendInvitations()).thenReturn(invitationSet);
-        Mockito.when(newCache.getUser(2)).thenReturn(friend);
-        Mockito.when(newCache.getDefaultFilter()).thenReturn(Filter.createFromContainer(MockContainers.FAMILY));
-        ServiceContainer.setCache(newCache);
+    // The standard JUnit 3 setUp method run for for every test
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        this.getActivity();
+        this.createMockCache();
+
     }
 
     // FIXME : cannot click on invitation in invitation list whereas can click
@@ -74,15 +63,6 @@ public class FriendsPagerActivityTest extends ActivityInstrumentationTestCase2<F
         onView(withId(R.id.myViewPager)).perform(swipeRight());
     }
 
-    // The standard JUnit 3 setUp method run for for every test
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        this.getActivity();
-        this.createMockCache();
-
-    }
-
     public void testAOpenAddFriendActivity() {
         onView(withId(R.id.activity_friends_add_button)).perform(click());
         onView(withId(R.id.add_friend_activity_searchBar)).check(matches(isDisplayed()));
@@ -91,7 +71,8 @@ public class FriendsPagerActivityTest extends ActivityInstrumentationTestCase2<F
 
     public void testClickOnFriendLeadsToFriendsInfo() {
         swipeRight();
-        onData(anything()).inAdapterView(withContentDescription("Friend list")).atPosition(0).perform(click());
+        onData(anything()).inAdapterView(withContentDescription("Friend list")).atPosition(0)
+            .perform(click());
         onView(withId(R.id.user_info_remove_button)).check(matches(isDisplayed()));
         pressBack();
     }
@@ -125,6 +106,33 @@ public class FriendsPagerActivityTest extends ActivityInstrumentationTestCase2<F
         onView(withId(R.id.layout_invitations_tab)).check(matches(isDisplayed()));
         onView(withId(R.id.myViewPager)).perform(swipeRight());
         onView(withId(R.id.layout_friends_tab)).check(matches(isDisplayed()));
+    }
+
+    private void createMockCache() throws SmartMapClientException {
+        Cache creator = new Cache();
+
+        Cache newCache = Mockito.mock(Cache.class);
+
+        InvitationContainer friendInvitationContainer = MockContainers.ROBIN_FRIEND_INVITATION_CONTANER;
+        creator.putInvitation(friendInvitationContainer);
+        Invitation friendInvitation = creator.getInvitation(MockContainers.ROBIN_FRIEND_INVITATION_ID);
+
+        UserContainer friendContainer = MockContainers.ALAIN_CONTAINER;
+        creator.putUser(friendContainer);
+        Friend friend = (Friend) creator.getUser(MockContainers.ALAIN_ID);
+
+        friendSet = new HashSet<User>();
+        invitationSet = new TreeSet<Invitation>();
+        friendSet.add(friend);
+        invitationSet.add(friendInvitation);
+
+        Mockito.when(newCache.getAllFriends()).thenReturn(friendSet);
+        Mockito.when(newCache.getUnansweredFriendInvitations()).thenReturn(invitationSet);
+        Mockito.when(newCache.getUser(2)).thenReturn(friend);
+        // Mockito.when(newCache.getDefaultFilter()).thenReturn(
+        // Filter.createFromContainer(MockContainers.FAMILY));
+
+        ServiceContainer.setCache(newCache);
     }
 
 }

@@ -83,7 +83,9 @@ public class InviteFriendsActivity extends ListActivity {
             case R.id.action_settings:
                 return true;
             case android.R.id.home:
-                this.onBackPressed();
+                mSelectedPositions = new ArrayList<Boolean>();
+                this.inviteFriends();
+                this.finish();
                 break;
             case R.id.invite_friend_send_button:
                 this.inviteFriends();

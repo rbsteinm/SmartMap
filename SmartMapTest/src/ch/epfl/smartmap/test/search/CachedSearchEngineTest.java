@@ -1,10 +1,16 @@
 package ch.epfl.smartmap.test.search;
 
+import static ch.epfl.smartmap.test.database.MockContainers.ALAIN;
+import static ch.epfl.smartmap.test.database.MockContainers.FOOTBALL_TOURNAMENT;
+import static ch.epfl.smartmap.test.database.MockContainers.POLYLAN;
+import static ch.epfl.smartmap.test.database.MockContainers.ROBIN;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -17,7 +23,6 @@ import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.EventContainer;
-import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
@@ -55,42 +60,43 @@ public class CachedSearchEngineTest extends AndroidTestCase {
         Mockito.when(settings.getUserId()).thenReturn((long) 1);
         ServiceContainer.setSettingsManager(settings);
 
-        alain = MockContainers.ALAIN;
-        robiche = MockContainers.ROBIN;
-        alain.setFriendship(User.STRANGER);
-        polylan = MockContainers.POLYLAN;
-        football = MockContainers.FOOTBALL_TOURNAMENT;
-
         client = Mockito.mock(NetworkSmartMapClient.class);
-        Mockito.when(client.findUsers("al")).thenReturn(Arrays.asList(alain));
+        Mockito.when(client.findUsers("al")).thenReturn(Arrays.asList(MockContainers.ALAIN));
         ServiceContainer.setNetworkClient(client);
 
         cache = Mockito.mock(Cache.class);
 
-        Event footballEvt =
-            new PublicEvent(football.getId(), football.getName(), football.getCreator(),
-                football.getStartDate(), football.getEndDate(), football.getLocation(),
-                football.getLocationString(), football.getDescription(), football.getParticipantIds());
+        // Used to get live instances
+        Cache creator = new Cache();
+        creator.putEvent(FOOTBALL_TOURNAMENT);
+        creator.putEvent(POLYLAN);
+        creator.putUser(ALAIN.setFriendship(User.STRANGER));
+        creator.putUser(ROBIN);
+        
+        Event football = creator.getEvent(FOOTBALL_TOURNAMENT.getId());
+        Event polylan = creator.getEvent(POLYLAN.getId());
+        User robin = creator.getUser(ROBIN.getId());
+        User alain = creator.getUser(ALAIN.getId());
+        
+        Mockito.when(cache.getEvent(polylan.getId())).thenReturn(polylan);
+        Mockito.when(cache.getEvent(football.getId())).thenReturn(football);
 
-        Event polylanEvt =
-            new PublicEvent(polylan.getId(), polylan.getName(), polylan.getCreator(), polylan.getStartDate(),
-                polylan.getEndDate(), polylan.getLocation(), polylan.getLocationString(),
-                polylan.getDescription(), polylan.getParticipantIds());
-
-        Mockito.when(cache.getEvent(polylan.getId())).thenReturn(polylanEvt);
-
-        Mockito.when(cache.getEvent(football.getId())).thenReturn(footballEvt);
-
-        Mockito.when(cache.getUser(alain.getId())).thenReturn(User.createFromContainer(alain));
-        Mockito.when(cache.getUser(robiche.getId())).thenReturn(User.createFromContainer(robiche));
+        Mockito.when(cache.getUser(ALAIN.getId())).thenReturn(alain);
+        Mockito.when(cache.getUser(ROBIN.getId())).thenReturn(robin);
         Mockito.when(cache.getAllEvents()).thenReturn(
-            new HashSet<Event>(Arrays.asList(footballEvt, polylanEvt)));
+            new HashSet<Event>(Arrays.asList(football, polylan)));
 
         ServiceContainer.setCache(cache);
 
         dbh = Mockito.mock(DatabaseHelper.class);
-        Mockito.when(dbh.getEvent(polylan.getId())).thenReturn(polylan);
+        Mockito.when(dbh.getEvent(polylan.getId())).thenReturn(POLYLAN);
         ServiceContainer.setDatabaseHelper(dbh);
+    }
+
+    @After
+    @Override
+    public void tearDown() {
+        MockContainers.ALAIN.setId(MockContainers.ALAIN_ID);
     }
 
     @Test

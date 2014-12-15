@@ -3,8 +3,8 @@
  */
 package ch.epfl.smartmap.test.cache;
 
-import static ch.epfl.smartmap.test.database.MockContainers.ALAIN;
-import static ch.epfl.smartmap.test.database.MockContainers.DEFAULT;
+import static ch.epfl.smartmap.test.database.MockContainers.ALAIN_CONTAINER;
+import static ch.epfl.smartmap.test.database.MockContainers.DEFAULT_CONTAINER;
 import static ch.epfl.smartmap.test.database.MockContainers.FAMILY;
 
 import org.junit.After;
@@ -43,7 +43,7 @@ public class FilterTest extends AndroidTestCase {
 
     @Test
     public void testCannotDesactivateDefaultFilter() {
-        cache.putFilter(DEFAULT);
+        cache.putFilter(DEFAULT_CONTAINER);
         cache.getDefaultFilter().update(cache.getDefaultFilter().getContainerCopy().setActive(false));
         assertEquals(true, cache.getDefaultFilter().isActive());
     }
@@ -59,9 +59,9 @@ public class FilterTest extends AndroidTestCase {
 
     @Test
     public void testDefaultFilterContainsAllFriends() {
-        cache.putFilter(DEFAULT);
-        cache.putUser(ALAIN);
-        assertEquals(Sets.newHashSet(ALAIN.getId()), cache.getDefaultFilter().getVisibleFriends());
+        cache.putFilter(DEFAULT_CONTAINER);
+        cache.putUser(ALAIN_CONTAINER);
+        assertEquals(Sets.newHashSet(ALAIN_CONTAINER.getId()), cache.getDefaultFilter().getVisibleFriends());
     }
 
     @Test
