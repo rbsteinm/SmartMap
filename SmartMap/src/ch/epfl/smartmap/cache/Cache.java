@@ -574,6 +574,7 @@ public class Cache implements CacheInterface {
 
         // Clear friend ids
         mFriendIds.clear();
+        mSelfId = User.NO_ID;
 
         // Fill with database values
         this.putUsers(database.getAllUsers());
@@ -995,15 +996,15 @@ public class Cache implements CacheInterface {
 
             if (newUser.getFriendship() == User.FRIEND) {
                 mFriendIds.add(newUser.getId());
+            } else if (newUser.getFriendship() == User.SELF) {
+                mSelfId = newUser.getId();
             }
+
             if (mUserInstances.get(newUser.getId()) == null) {
                 if ((newUser.getFriendship() == User.FRIEND) || (newUser.getFriendship() == User.STRANGER)
                     || (newUser.getFriendship() == User.SELF)) {
                     mUserInstances.put(newUser.getId(), User.createFromContainer(newUser));
                     needToCallListeners = true;
-                    if (newUser.getFriendship() == User.SELF) {
-                        mSelfId = newUser.getId();
-                    }
                 }
             } else {
                 // Put in set for update
