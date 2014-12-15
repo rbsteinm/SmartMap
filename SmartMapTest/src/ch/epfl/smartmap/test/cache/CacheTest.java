@@ -1,13 +1,13 @@
 package ch.epfl.smartmap.test.cache;
 
 import static ch.epfl.smartmap.test.database.MockContainers.ALAIN_CONTAINER;
-import static ch.epfl.smartmap.test.database.MockContainers.FAMILY;
+import static ch.epfl.smartmap.test.database.MockContainers.FAMILY_CONTAINER;
 import static ch.epfl.smartmap.test.database.MockContainers.FOOTBALL_TOURNAMENT_CONTAINER;
 import static ch.epfl.smartmap.test.database.MockContainers.JULIEN_CONTAINER;
 import static ch.epfl.smartmap.test.database.MockContainers.POLYLAN_CONTAINER;
 import static ch.epfl.smartmap.test.database.MockContainers.POLYLAN_EVENT_INVITATION_CONTAINER;
-import static ch.epfl.smartmap.test.database.MockContainers.ROBIN;
-import static ch.epfl.smartmap.test.database.MockContainers.ROBIN_FRIEND_INVITATION_CONTANER;
+import static ch.epfl.smartmap.test.database.MockContainers.ROBIN_CONTAINER;
+import static ch.epfl.smartmap.test.database.MockContainers.ROBIN_FRIEND_INVITATION_CONTAINER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,12 +80,12 @@ public class CacheTest extends AndroidTestCase {
         Mockito.doReturn(Arrays.asList(ALAIN_CONTAINER.getId())).when(clientForUsers).getFriendsIds();
         Mockito.doReturn(ALAIN_CONTAINER).when(clientForUsers).getUserInfo(ALAIN_CONTAINER.getId());
         Mockito.doReturn(JULIEN_CONTAINER).when(clientForUsers).getUserInfo(JULIEN_CONTAINER.getId());
-        Mockito.doReturn(ROBIN).when(clientForUsers).getUserInfo(ROBIN.getId());
+        Mockito.doReturn(ROBIN_CONTAINER).when(clientForUsers).getUserInfo(ROBIN_CONTAINER.getId());
         Mockito
             .doReturn(
                 Arrays.asList(UserContainer.newEmptyContainer().setLocation(ALAIN_CONTAINER.getLocation())
-                    .setId(ALAIN_CONTAINER.getId()).setName(ALAIN_CONTAINER.getName()).setFriendship(ALAIN_CONTAINER.getFriendship())))
-            .when(clientForUsers).listFriendsPos();
+                    .setId(ALAIN_CONTAINER.getId()).setName(ALAIN_CONTAINER.getName())
+                    .setFriendship(ALAIN_CONTAINER.getFriendship()))).when(clientForUsers).listFriendsPos();
         // Return own profile picture (otherwise NullPointers)
         Mockito.doReturn(Bitmap.createBitmap(1, 2, Config.ALPHA_8)).when(clientForUsers)
             .getProfilePicture(JULIEN_CONTAINER.getId());
@@ -102,14 +102,16 @@ public class CacheTest extends AndroidTestCase {
         Mockito.doReturn(Bitmap.createBitmap(1, 2, Config.ALPHA_8)).when(clientForEvents)
             .getProfilePicture(JULIEN_CONTAINER.getId());
         // Return events
-        Mockito.doReturn(Arrays.asList(POLYLAN_CONTAINER.getId(), FOOTBALL_TOURNAMENT_CONTAINER.getId())).when(clientForEvents)
-            .getPublicEvents(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong());
+        Mockito.doReturn(Arrays.asList(POLYLAN_CONTAINER.getId(), FOOTBALL_TOURNAMENT_CONTAINER.getId()))
+            .when(clientForEvents).getPublicEvents(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong());
         Mockito.doReturn(POLYLAN_CONTAINER).when(clientForEvents).getEventInfo(POLYLAN_CONTAINER.getId());
-        Mockito.doReturn(FOOTBALL_TOURNAMENT_CONTAINER).when(clientForEvents).getEventInfo(FOOTBALL_TOURNAMENT_CONTAINER.getId());
+        Mockito.doReturn(FOOTBALL_TOURNAMENT_CONTAINER).when(clientForEvents)
+            .getEventInfo(FOOTBALL_TOURNAMENT_CONTAINER.getId());
 
         // DATABASE FOR USERS ONLY
         databaseForUsers = Mockito.mock(DatabaseHelper.class);
-        Mockito.doReturn(Sets.newHashSet(JULIEN_CONTAINER, ALAIN_CONTAINER, ROBIN)).when(databaseForUsers).getAllUsers();
+        Mockito.doReturn(Sets.newHashSet(JULIEN_CONTAINER, ALAIN_CONTAINER, ROBIN_CONTAINER))
+            .when(databaseForUsers).getAllUsers();
         Mockito.doReturn(Sets.newHashSet()).when(databaseForUsers).getAllEvents();
         Mockito.doReturn(Sets.newHashSet()).when(databaseForUsers).getAllInvitations();
         Mockito.doReturn(Sets.newHashSet()).when(databaseForUsers).getAllFilters();
@@ -117,8 +119,8 @@ public class CacheTest extends AndroidTestCase {
         // DATABASE FOR EVENTS ONLY
         databaseForEvents = Mockito.mock(DatabaseHelper.class);
         Mockito.doReturn(Sets.newHashSet()).when(databaseForEvents).getAllUsers();
-        Mockito.doReturn(Sets.newHashSet(POLYLAN_CONTAINER, FOOTBALL_TOURNAMENT_CONTAINER)).when(databaseForEvents)
-            .getAllEvents();
+        Mockito.doReturn(Sets.newHashSet(POLYLAN_CONTAINER, FOOTBALL_TOURNAMENT_CONTAINER))
+            .when(databaseForEvents).getAllEvents();
         Mockito.doReturn(Sets.newHashSet()).when(databaseForEvents).getAllInvitations();
         Mockito.doReturn(Sets.newHashSet()).when(databaseForEvents).getAllFilters();
 
@@ -132,20 +134,20 @@ public class CacheTest extends AndroidTestCase {
         cache = new Cache();
 
         // Reset values in containers
-        FAMILY.setId(Filter.NO_ID);
+        FAMILY_CONTAINER.setId(Filter.NO_ID);
     }
 
     @Test
     public void testAcceptInvitation() throws SmartMapClientException, Exception {
         SmartMapClient mockNetClient = Mockito.mock(NetworkSmartMapClient.class);
-        Mockito.doReturn(ROBIN).when(mockNetClient).acceptInvitation(ROBIN.getId());
+        Mockito.doReturn(ROBIN_CONTAINER).when(mockNetClient).acceptInvitation(ROBIN_CONTAINER.getId());
 
         ServiceContainer.setNetworkClient(mockNetClient);
 
-        cache.putUser(ROBIN);
+        cache.putUser(ROBIN_CONTAINER);
 
         InvitationContainer invitRobin =
-            new InvitationContainer(1, ROBIN, null, Invitation.UNREAD,
+            new InvitationContainer(1, ROBIN_CONTAINER, null, Invitation.UNREAD,
                 new GregorianCalendar().getTimeInMillis(), Invitation.FRIEND_INVITATION);
 
         cache.putInvitation(invitRobin);
@@ -160,7 +162,7 @@ public class CacheTest extends AndroidTestCase {
 
             @Override
             public void onSuccess(Void result) {
-                assertEquals(User.FRIEND, cache.getUser(ROBIN.getId()).getFriendship());
+                assertEquals(User.FRIEND, cache.getUser(ROBIN_CONTAINER.getId()).getFriendship());
             }
         });
 
@@ -175,8 +177,8 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testGetExistingFiltersReturnSetWithOnlyValidUsers() {
-        cache.putFilter(FAMILY);
-        assertEquals(1, cache.getFilters(Sets.newHashSet(FAMILY.getId(), Filter.NO_ID)).size());
+        cache.putFilter(FAMILY_CONTAINER);
+        assertEquals(1, cache.getFilters(Sets.newHashSet(FAMILY_CONTAINER.getId(), Filter.NO_ID)).size());
     }
 
     @Test
@@ -185,7 +187,8 @@ public class CacheTest extends AndroidTestCase {
         assertEquals(
             1,
             cache.getInvitations(
-                Sets.newHashSet(POLYLAN_EVENT_INVITATION_CONTAINER.getId(), ROBIN_FRIEND_INVITATION_CONTANER.getId())).size());
+                Sets.newHashSet(POLYLAN_EVENT_INVITATION_CONTAINER.getId(),
+                    ROBIN_FRIEND_INVITATION_CONTAINER.getId())).size());
     }
 
     @Test
@@ -255,7 +258,7 @@ public class CacheTest extends AndroidTestCase {
 
         assertNotNull(cache.getUser(JULIEN_CONTAINER.getId()));
         assertNotNull(cache.getUser(ALAIN_CONTAINER.getId()));
-        assertNotNull(cache.getUser(ROBIN.getId()));
+        assertNotNull(cache.getUser(ROBIN_CONTAINER.getId()));
 
         assertNotNull(cache.getSelf());
     }
@@ -303,28 +306,28 @@ public class CacheTest extends AndroidTestCase {
     public void testPutFilterCallListeners() {
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
-        cache.putFilter(FAMILY);
+        cache.putFilter(FAMILY_CONTAINER);
         Mockito.verify(listener).onFilterListUpdate();
     }
 
     @Test
     public void testPutFilterCorrectlyGivesNextId() {
-        cache.putFilter(FAMILY);
-        assertEquals(FAMILY.getId(), Filter.DEFAULT_FILTER_ID + 1);
+        cache.putFilter(FAMILY_CONTAINER);
+        assertEquals(FAMILY_CONTAINER.getId(), Filter.DEFAULT_FILTER_ID + 1);
     }
 
     @Test
     public void testPutFilterDoesntReturnNull() {
-        cache.putFilter(FAMILY);
-        assertNotNull(cache.getFilter(FAMILY.getId()));
+        cache.putFilter(FAMILY_CONTAINER);
+        assertNotNull(cache.getFilter(FAMILY_CONTAINER.getId()));
     }
 
     @Test
     public void testPutFilterOnlyCallListenersWhenNeeded() {
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
-        cache.putFilter(FAMILY);
-        cache.putFilter(FAMILY);
+        cache.putFilter(FAMILY_CONTAINER);
+        cache.putFilter(FAMILY_CONTAINER);
         Mockito.verify(listener).onFilterListUpdate();
     }
 
@@ -337,9 +340,9 @@ public class CacheTest extends AndroidTestCase {
 
     @Test
     public void testPutInvitationAlsoAddUser() {
-        cache.putInvitation(ROBIN_FRIEND_INVITATION_CONTANER);
+        cache.putInvitation(ROBIN_FRIEND_INVITATION_CONTAINER);
 
-        assertNotNull(cache.getUser(ROBIN_FRIEND_INVITATION_CONTANER.getUserInfos().getId()));
+        assertNotNull(cache.getUser(ROBIN_FRIEND_INVITATION_CONTAINER.getUserInfos().getId()));
     }
 
     @Test
@@ -370,7 +373,7 @@ public class CacheTest extends AndroidTestCase {
     public void testPutUserCallListeners() {
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
-        cache.putUser(ROBIN);
+        cache.putUser(ROBIN_CONTAINER);
         Mockito.verify(listener).onUserListUpdate();
     }
 
@@ -385,8 +388,8 @@ public class CacheTest extends AndroidTestCase {
     public void testPutUserOnlyCallListenersWhenNeeded() {
         CacheListener listener = Mockito.mock(OnCacheListener.class);
         cache.addOnCacheListener(listener);
-        cache.putUser(ROBIN);
-        cache.putUser(ROBIN);
+        cache.putUser(ROBIN_CONTAINER);
+        cache.putUser(ROBIN_CONTAINER);
         Mockito.verify(listener).onUserListUpdate();
     }
 
@@ -408,7 +411,7 @@ public class CacheTest extends AndroidTestCase {
 
         assertNotNull(cache.getUser(JULIEN_CONTAINER.getId()));
         assertNotNull(cache.getUser(ALAIN_CONTAINER.getId()));
-        assertNull(cache.getUser(ROBIN.getId()));
+        assertNull(cache.getUser(ROBIN_CONTAINER.getId()));
 
         assertFalse(cache.getSelf().getActionImage().sameAs(User.NO_IMAGE));
 
