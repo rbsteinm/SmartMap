@@ -23,18 +23,16 @@ import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
+ * Provides search functions for classes {@code SearchLayout} and {@code AddFriendActivity}. Usually search in
+ * Cache, then in Database, then on Server. Use a small Cache to store the result of some previous queries.
+ * 
  * @author jfperren
  */
-public final class CachedSearchEngine implements SearchEngine {
-
-    private static final CachedSearchEngine ONE_INSTANCE = new CachedSearchEngine();
-
-    private static final float LOCATION_DISTANCE_THRESHHOLD = 0;
+public final class CachedSearchEngine implements SearchEngineInterface {
 
     private static final String TAG = CachedSearchEngine.class.getSimpleName();
 
     private final Map<String, Set<Long>> mPreviousOnlineStrangerSearches;
-
     private final List<Location> mPreviousOnlineEventSearchQueries;
     private final List<Set<Long>> mPreviousOnlineEventSearchResults;
 
@@ -45,16 +43,8 @@ public final class CachedSearchEngine implements SearchEngine {
         mPreviousOnlineEventSearchResults = new LinkedList<Set<Long>>();
     }
 
-    /**
-     * Search for a {@code Friend} with this id. For performance concerns, this
-     * method should be called in an {@code AsyncTask}.
-     * 
-     * @param id
-     *            long id of {@code Friend}
-     * @return the {@code Friend} with given id, or {@code null} if there was no
-     *         match.
-     */
-    public void findPublicEventById(final long id, final SearchRequestCallback<Event> callback) {
+    @Override
+    public void findEventById(final long id, final SearchRequestCallback<Event> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -108,13 +98,8 @@ public final class CachedSearchEngine implements SearchEngine {
         }.execute();
     }
 
-    /**
-     * Return an Event set containing a live instance for each id in the id set
-     * 
-     * @param ids
-     * @return
-     */
-    public void findPublicEventByIds(final Set<Long> ids, final SearchRequestCallback<Set<Event>> callback) {
+    @Override
+    public void findEventsByIds(final Set<Long> ids, final SearchRequestCallback<Set<Event>> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -171,15 +156,7 @@ public final class CachedSearchEngine implements SearchEngine {
         }.execute();
     }
 
-    /**
-     * Search for a {@code Friend} with this id. For performance concerns, this
-     * method should be called in an {@code AsyncTask}.
-     * 
-     * @param id
-     *            long id of {@code Friend}
-     * @return the {@code Friend} with given id, or {@code null} if there was no
-     *         match.
-     */
+    @Override
     public void findUserById(final long id, final SearchRequestCallback<User> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -237,53 +214,8 @@ public final class CachedSearchEngine implements SearchEngine {
         }.execute();
     }
 
-    public void findUserByIds(final Set<Long> ids, final SearchRequestCallback<Set<User>> callback) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                Set<UserContainer> immutableResult = new HashSet<UserContainer>();
-                Set<User> result = new HashSet<User>();
-
-                for (long id : ids) {
-                    // Check for live instance
-                    User stranger = ServiceContainer.getCache().getUser(id);
-
-                    if (stranger != null) {
-                        // Found in cache, add to set of live instances
-                        result.add(stranger);
-                    } else {
-                        // If not found, check on the server
-                        UserContainer networkResult;
-                        try {
-                            networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
-                        } catch (SmartMapClientException e) {
-                            Log.e(TAG, "Error while finding public users by Ids" + e);
-                            networkResult = null;
-                        }
-
-                        if (networkResult != null) {
-                            // Match on server, put it in cache
-                            immutableResult.add(networkResult);
-                        }
-                    }
-                }
-
-                ServiceContainer.getCache().putUsers(immutableResult);
-                // Retrieve live instances from cache
-                for (UserContainer user : immutableResult) {
-                    result.add(ServiceContainer.getCache().getUser(user.getId()));
-                }
-
-                // Give results to the caller
-                if (callback != null) {
-                    callback.onResult(result);
-                }
-                return null;
-            }
-        }.execute();
-    }
-
-    public void findUserByQuery(final String query, final SearchRequestCallback<Set<User>> callback) {
+    @Override
+    public void findStrangersByName(final String query, final SearchRequestCallback<Set<User>> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -327,41 +259,48 @@ public final class CachedSearchEngine implements SearchEngine {
         }.execute();
     }
 
-    public void getAllNearEvents(final Location location, final double radius,
-        final SearchRequestCallback<Set<Event>> callback) {
+    @Override
+    public void findUsersByIds(final Set<Long> ids, final SearchRequestCallback<Set<User>> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                // Search ids of nearby
-                Set<Long> resultIds = new HashSet<Long>();
+                Set<UserContainer> immutableResult = new HashSet<UserContainer>();
+                Set<User> result = new HashSet<User>();
 
-                // Look in cache
-                boolean foundInCache = false;
-                for (int i = 0; i < mPreviousOnlineEventSearchQueries.size(); i++) {
-                    if (mPreviousOnlineEventSearchQueries.get(i).distanceTo(location) < LOCATION_DISTANCE_THRESHHOLD) {
-                        resultIds = mPreviousOnlineEventSearchResults.get(i);
-                        foundInCache = true;
-                    }
-                }
+                for (long id : ids) {
+                    // Check for live instance
+                    User stranger = ServiceContainer.getCache().getUser(id);
 
-                if (!foundInCache) {
-                    // Search online
-                    try {
-                        resultIds =
-                            new HashSet<Long>(ServiceContainer.getNetworkClient().getPublicEvents(
-                                location.getLatitude(), location.getLongitude(), radius));
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Error while getting all near events by Ids" + e);
-                        if (callback != null) {
-                            if (callback != null) {
-                                callback.onNetworkError(e);
-                            }
+                    if (stranger != null) {
+                        // Found in cache, add to set of live instances
+                        result.add(stranger);
+                    } else {
+                        // If not found, check on the server
+                        UserContainer networkResult;
+                        try {
+                            networkResult = ServiceContainer.getNetworkClient().getUserInfo(id);
+                        } catch (SmartMapClientException e) {
+                            Log.e(TAG, "Error while finding public users by Ids" + e);
+                            networkResult = null;
+                        }
+
+                        if (networkResult != null) {
+                            // Match on server, put it in cache
+                            immutableResult.add(networkResult);
                         }
                     }
                 }
 
-                // Search events
-                CachedSearchEngine.this.findPublicEventByIds(resultIds, callback);
+                ServiceContainer.getCache().putUsers(immutableResult);
+                // Retrieve live instances from cache
+                for (UserContainer user : immutableResult) {
+                    result.add(ServiceContainer.getCache().getUser(user.getId()));
+                }
+
+                // Give results to the caller
+                if (callback != null) {
+                    callback.onResult(result);
+                }
                 return null;
             }
         }.execute();
@@ -409,9 +348,5 @@ public final class CachedSearchEngine implements SearchEngine {
                 break;
         }
         return results;
-    }
-
-    public static CachedSearchEngine getInstance() {
-        return ONE_INSTANCE;
     }
 }

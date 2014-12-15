@@ -1533,6 +1533,7 @@ public class Cache implements CacheInterface {
         return isListModified;
     }
 
+    @SuppressWarnings("unused")
     private synchronized boolean updateFilter(FilterContainer filterInfo) {
         Set<FilterContainer> singleton = new HashSet<FilterContainer>();
         singleton.add(filterInfo);

@@ -19,7 +19,7 @@ import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.search.SearchEngine.Type;
+import ch.epfl.smartmap.search.SearchEngineInterface.Type;
 
 /**
  * Layout that contains different SearchResult lists with different result
