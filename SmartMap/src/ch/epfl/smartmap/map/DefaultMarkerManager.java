@@ -56,6 +56,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     private final Map<String, Marker> mDictionnaryMarkers;
     private static final String DISPLAYABLE_ITEM = "Displayable item";
+    private static final String CONTEXT_STRING = "context";
 
     /**
      * Constructor
@@ -77,7 +78,7 @@ public class DefaultMarkerManager implements MarkerManager {
     @Override
     public Marker addMarker(Displayable item, Context context) {
         this.checkNonNull(item, DISPLAYABLE_ITEM);
-        this.checkNonNull(context, "context");
+        this.checkNonNull(context, CONTEXT_STRING);
         Marker marker =
             mGoogleMap.addMarker(new MarkerOptions().position(item.getLatLng()).title(item.getTitle())
                 .icon(item.getMarkerIcon(context)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
@@ -182,7 +183,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public void resetMarkersIcon(Context context) {
-        this.checkNonNull(context, "context");
+        this.checkNonNull(context, CONTEXT_STRING);
         for (Marker marker : this.getDisplayedMarkers()) {
             if (marker.getSnippet().equals(MarkerColor.RED.toString())) {
                 marker.setIcon(this.getItemForMarker(marker).getMarkerIcon(context));
@@ -202,7 +203,7 @@ public class DefaultMarkerManager implements MarkerManager {
     public void updateMarkers(Context context, Set<Displayable> itemsToDisplay) {
         long nowInMillis = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis();
         if ((nowInMillis - lastUpdateInMillis) < MIN_TIME_BETWEEN_UPDATES) {
-            this.checkNonNull(context, "context");
+            this.checkNonNull(context, CONTEXT_STRING);
             this.checkNonNull(itemsToDisplay, "items to display");
             Log.d(TAG, "updateMarkers");
             // In the list friendsToDisplay, search if each friend s already
