@@ -6,8 +6,6 @@ import java.util.List;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import ch.epfl.smartmap.R;
@@ -25,15 +23,15 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
  */
 public class InvitationPanelActivity extends ListActivity {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = InvitationPanelActivity.class.getSimpleName();
-
     private List<Invitation> mInvitationList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_notifications);
+
+        ServiceContainer.initSmartMapServices(this);
+
         Notifications.cancelNotification(this);
 
         mInvitationList = new ArrayList<Invitation>(ServiceContainer.getCache().getAllInvitations());
@@ -60,7 +58,7 @@ public class InvitationPanelActivity extends ListActivity {
 
         Intent invitationIntent = ((GenericInvitation) l.getItemAtPosition(position)).getIntent();
         if (invitationIntent != null) {
-            InvitationPanelActivity.this.startActivity(invitationIntent);
+            this.startActivity(invitationIntent);
         }
 
         super.onListItemClick(l, v, position, id);
@@ -69,30 +67,9 @@ public class InvitationPanelActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        InvitationPanelActivity.this.setListAdapter(new InvitationListItemAdapter(
-            InvitationPanelActivity.this, new ArrayList<Invitation>(ServiceContainer.getCache()
-                .getAllInvitations())));
+        this.setListAdapter(new InvitationListItemAdapter(this, new ArrayList<Invitation>(ServiceContainer.getCache()
+            .getAllInvitations())));
 
         ServiceContainer.getCache().readAllInvitations();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.show_events, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        if (id == android.R.id.home) {
-            this.finish();
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

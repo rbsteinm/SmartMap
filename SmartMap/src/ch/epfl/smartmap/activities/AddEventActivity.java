@@ -22,8 +22,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.ImmutableEvent;
+import ch.epfl.smartmap.cache.Event;
+import ch.epfl.smartmap.cache.EventContainer;
 import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.gui.DatePickerFragment;
@@ -41,36 +41,33 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * This activity lets the user create a new event.
- * 
+ *
  * @author SpicyCH
  * @author agpmilli
  */
 public class AddEventActivity extends FragmentActivity {
 
     /**
-     * Used as a key to pass LatLng through Intents
+     * Used as a key to pass LatLng through Intents.
      */
     public static final String LOCATION_EXTRA = "LOCATION";
 
     private static final String TAG = AddEventActivity.class.getSimpleName();
 
     private static final int GOOGLE_PLAY_REQUEST_CODE = 10;
+
     static final int PICK_LOCATION_REQUEST = 1;
-
     private static final int ELEMENTS_HH_MM = 2;
-    private static final int ELEMENTS_JJ_DD_YYYY = 3;
-    private static final int INDEX_YEAR = 2;
-
-    private static final int INDEX_MONTH = 1;
-    private static final int INDEX_DAY = 0;
-
     private static final String TIME_PICKER_DESCR = "timePicker";
+
     private static final String DATE_PICKER_DESCR = "datePicker";
+
     private static final int MAX_NAME_SIZE = 60;
-
     private static final int MIN_NAME_SIZE = 2;
-
     private static final int MAX_DESCRIPTION_SIZE = 255;
+
+    private static final int FIVE_MINUTES = 5;
+
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragmentMap;
     private LatLng mEventPosition;
@@ -79,15 +76,14 @@ public class AddEventActivity extends FragmentActivity {
     private EditText mPickEndDate;
     private EditText mPickEndTime;
     private EditText mPickStartDate;
-
     private EditText mPickStartTime;
-
     private EditText mPlaceName;
-
     private TextWatcher mTextChangedListener;
 
     private Calendar mStartDate;
     private Calendar mEndDate;
+
+    private boolean mCreatingEvent = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +94,7 @@ public class AddEventActivity extends FragmentActivity {
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
 
-        this.initializeGUIComponents();
+        this.initializeGUI();
 
         mGoogleMap.setOnMapClickListener(new OnMapClickListener() {
 
@@ -136,20 +132,23 @@ public class AddEventActivity extends FragmentActivity {
             dialog.show();
         } else {
             // Google Play Services are available.
-            // Getting reference to the SupportMapFragment of activity_main.xml
             mFragmentMap = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.add_event_map);
             // Getting GoogleMap object from the fragment
             mGoogleMap = mFragmentMap.getMap();
             // Enabling MyLocation Layer of Google Map
             mGoogleMap.setMyLocationEnabled(true);
-
+            // Enabling Zoom Layer of Google Map
             mGoogleMap.getUiSettings().setZoomControlsEnabled(false);
             mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
+            // We clear the current marker if there are already
             mGoogleMap.clear();
 
+            // And add a marker at Event Position
             mGoogleMap.addMarker(new MarkerOptions().position(mEventPosition));
 
+            // We set the placename to the current event position so it never
+            // equals ""
             mPlaceName.setText(ServiceContainer.getSettingsManager().getLocationName());
 
             new DefaultZoomManager(mFragmentMap).zoomWithAnimation(new LatLng(ServiceContainer.getSettingsManager()
@@ -184,12 +183,10 @@ public class AddEventActivity extends FragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
             case android.R.id.home:
                 this.finish();
                 break;
@@ -220,54 +217,44 @@ public class AddEventActivity extends FragmentActivity {
     /**
      * Ensures the end of the event is after its start and end of the event is not in the past. Displays a toast and
      * reset the bad field set by the user if necessary.
-     * 
-     * @param startDate
-     * @param startTime
-     * @param endDate
-     * @param endTime
+     *
      * @author SpicyCH
      */
-    private void checkDatesValidity(EditText startDate, EditText startTime, EditText endDate, EditText endTime) {
+    private void checkDatesValidity() {
 
-        if (this.isValidDate(endDate.getText().toString()) && this.isValidTime(endTime.getText().toString())) {
-            // The end of the event has been set by the user
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
 
-            Calendar start = this.getDateFromTextFormat(startDate.getText().toString(), startTime.getText().toString());
+        // Needed to let the user click the default time without errors.
+        now.add(GregorianCalendar.MINUTE, -1);
 
-            Calendar end = this.getDateFromTextFormat(endDate.getText().toString(), endTime.getText().toString());
+        if (mEndDate.before(mStartDate)) {
+            // The user is trying to create the end of the event before its
+            // start!
 
-            Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+            this.resetEndDate();
 
-            // Needed to let the user click the default time without errors.
-            now.add(GregorianCalendar.MINUTE, -1);
+            Toast.makeText(AddEventActivity.this,
+                    this.getString(R.string.add_event_toast_event_cannot_end_before_starting), Toast.LENGTH_LONG)
+                    .show();
+        } else if (mEndDate.before(now)) {
+            // The user is trying to create an event in the past
 
-            if (end.before(start)) {
-                // The user is trying to create the end of the event before its
-                // start!
+            this.resetEndDate();
 
-                this.resetFields(endDate, endTime);
-
-                Toast.makeText(AddEventActivity.this,
-                        this.getString(R.string.add_event_toast_event_cannot_end_before_starting), Toast.LENGTH_LONG)
-                        .show();
-            } else if (end.before(now)) {
-                // The user is trying to create an event in the past
-
-                this.resetFields(endDate, endTime);
-
-                Toast.makeText(AddEventActivity.this,
-                        this.getString(R.string.add_event_toast_event_end_cannot_be_in_past), Toast.LENGTH_LONG).show();
-            }
+            Toast.makeText(AddEventActivity.this, this.getString(R.string.add_event_toast_event_end_cannot_be_in_past),
+                    Toast.LENGTH_LONG).show();
         }
 
     }
 
     /**
      * Creates an event from the user specified parameters.
-     * 
+     *
      * @author SpicyCH
      */
-    private void createEvent() {
+    private synchronized void createEvent() {
+
+        Log.d(TAG, "Creating a new event...");
 
         if (!this.allFieldsSetByUser()) {
 
@@ -285,15 +272,23 @@ public class AddEventActivity extends FragmentActivity {
                     Toast.LENGTH_LONG).show();
         } else {
 
-            Location location = new Location("Location set by user");
-            location.setLatitude(mEventPosition.latitude);
-            location.setLongitude(mEventPosition.longitude);
+            if (!mCreatingEvent) {
+                // Handle the situation where the user is spamming the create button.
+                mCreatingEvent = true;
 
-            ImmutableEvent event = new ImmutableEvent(PublicEvent.NO_ID, mEventName.getText().toString(),
-                    ServiceContainer.getCache().getSelf().getImmutableCopy(), mDescription.getText().toString(),
-                    mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
+                Location location = new Location("Location set by user");
+                location.setLatitude(mEventPosition.latitude);
+                location.setLongitude(mEventPosition.longitude);
 
-            ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
+                EventContainer event = new EventContainer(PublicEvent.NO_ID, mEventName.getText().toString(),
+                        ServiceContainer.getCache().getSelf().getContainerCopy(), mDescription.getText().toString(),
+                        mStartDate, mEndDate, location, mPlaceName.getText().toString(), new HashSet<Long>());
+
+                ServiceContainer.getCache().createEvent(event, new CreateEventNetworkCallback());
+            } else {
+                Log.e(TAG, "Trying to create the same event twice! Operation aborted.");
+            }
+
         }
     }
 
@@ -316,39 +311,14 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * @param dayMonthYear
-     *            a String like "16/09/1993"
-     * @param hourMinute
-     *            a String like "17:03"
-     * @return a GregorianDate constructed from the given parameters
+     * Initialize the views and attach the needed listeners.
+     *
      * @author SpicyCH
      */
-    private Calendar getDateFromTextFormat(String dayMonthYear, String hourMinute) {
+    private void initializeGUI() {
 
-        assert this.isValidTime(hourMinute) : "The string hourMinute isn't in the expected format";
+        ServiceContainer.initSmartMapServices(this);
 
-        if (!this.isValidDate(dayMonthYear)) {
-            // The string is not of the form dd.mm.yyyy
-            Calendar output = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
-            if (this.getString(R.string.utils_today).equals(dayMonthYear)) {
-                return output;
-            }
-        }
-
-        String[] s1 = dayMonthYear.split(".");
-        String[] s2 = hourMinute.split(":");
-
-        final int month = Integer.parseInt(s1[INDEX_MONTH]) - 1;
-
-        return new GregorianCalendar(Integer.parseInt(s1[INDEX_YEAR]), month, Integer.parseInt(s1[INDEX_DAY]),
-                Integer.parseInt(s2[0]), Integer.parseInt(s2[1]), 0);
-
-    }
-
-    /**
-     * @author SpicyCH
-     */
-    private void initializeGUIComponents() {
         mEventName = (EditText) this.findViewById(R.id.addEventEventName);
         mPickStartDate = (EditText) this.findViewById(R.id.addEventEventDate);
         mPickStartTime = (EditText) this.findViewById(R.id.addEventEventTime);
@@ -358,11 +328,6 @@ public class AddEventActivity extends FragmentActivity {
         mPlaceName = (EditText) this.findViewById(R.id.addEventPlaceName);
 
         mPlaceName.setFocusable(true);
-
-        // Workaround to let espresso tests pass
-        if (ServiceContainer.getSettingsManager() == null) {
-            ServiceContainer.setSettingsManager(new SettingsManager(this));
-        }
 
         // Initialize mEventPosition to position of user
         mEventPosition = new LatLng(ServiceContainer.getSettingsManager().getLocation().getLatitude(), ServiceContainer
@@ -377,6 +342,7 @@ public class AddEventActivity extends FragmentActivity {
 
         mStartDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         mEndDate = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+        mEndDate.add(Calendar.MINUTE, FIVE_MINUTES);
 
         mPickStartTime.setText(Utils.getTimeString(mStartDate));
 
@@ -401,6 +367,8 @@ public class AddEventActivity extends FragmentActivity {
             }
         });
 
+        mPickEndDate.setText(Utils.getDateString(mEndDate));
+
         mPickEndDate.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -409,6 +377,8 @@ public class AddEventActivity extends FragmentActivity {
                 newFragment.show(AddEventActivity.this.getSupportFragmentManager(), DATE_PICKER_DESCR);
             }
         });
+
+        mPickEndTime.setText(Utils.getTimeString(mEndDate));
 
         mPickEndTime.setOnClickListener(new OnClickListener() {
 
@@ -421,26 +391,33 @@ public class AddEventActivity extends FragmentActivity {
         this.displayMap();
     }
 
-    private boolean isValidDate(String s) {
-        String[] sArray = s.split(".");
-        return sArray.length == ELEMENTS_JJ_DD_YYYY;
-    }
-
+    /**
+     * @param s
+     * @return <code>true</code> if the string is a valid time.
+     * @author SpicyCH
+     */
     private boolean isValidTime(String s) {
         String[] sArray = s.split(":");
         return sArray.length == ELEMENTS_HH_MM;
     }
 
     /**
-     * Reset the two given EditTexts.
-     * 
+     * Reset the end date to something possible.
+     *
      * @param first
      * @param second
      * @author SpicyCH
      */
-    private void resetFields(EditText first, EditText second) {
-        first.setText("");
-        second.setText("");
+    private void resetEndDate() {
+
+        mEndDate = (Calendar) mStartDate.clone();
+        Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
+
+        if (mStartDate.before(now)) {
+            mEndDate = (Calendar) now.clone();
+        }
+
+        mEndDate.add(Calendar.MINUTE, FIVE_MINUTES);
     }
 
     /**
@@ -478,16 +455,18 @@ public class AddEventActivity extends FragmentActivity {
     }
 
     /**
-     * Callback
-     * 
+     * Callback called after the respond responded to our event creation request.
+     *
      * @author SpicyCH
      */
-    private class CreateEventNetworkCallback implements NetworkRequestCallback {
+    private class CreateEventNetworkCallback implements NetworkRequestCallback<Event> {
         @Override
-        public void onFailure() {
+        public void onFailure(final Exception e) {
             AddEventActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
+                    Log.d(TAG, "Server error: " + e);
                     Toast.makeText(AddEventActivity.this,
                             AddEventActivity.this.getString(R.string.add_event_toast_couldnt_create_event_server),
                             Toast.LENGTH_SHORT).show();
@@ -496,38 +475,58 @@ public class AddEventActivity extends FragmentActivity {
         }
 
         @Override
-        public void onSuccess() {
+        public void onSuccess(final Event result) {
             AddEventActivity.this.runOnUiThread(new Runnable() {
+
                 @Override
                 public void run() {
                     Toast.makeText(AddEventActivity.this,
                             AddEventActivity.this.getString(R.string.add_event_toast_event_created), Toast.LENGTH_SHORT)
                             .show();
+                    // Display event details if we could retrieve it.
+                    if (null != result) {
+                        AddEventActivity.this.finish();
+                        Intent seeEvent = new Intent(AddEventActivity.this, EventInformationActivity.class);
+                        seeEvent.putExtra(EventInformationActivity.EVENT_KEY, result.getId());
+                        AddEventActivity.this.startActivity(seeEvent);
+                    } else {
+                        AddEventActivity.this.finish();
+                    }
 
-                    AddEventActivity.this.finish();
                 }
             });
         }
     }
 
     /**
-     * Listener on the TextViews used to display the dates
-     * 
+     * Listener on the TextViews that display the dates and the time.
+     *
      * @author SpicyCH
      */
     private class DateChangedListener implements TextWatcher {
+
+        private boolean mEditing;
+
+        public DateChangedListener() {
+            mEditing = false;
+        }
+
         @Override
-        public void afterTextChanged(Editable s) {
-            // Remove the TextChangedListener to avoid useless calls
-            // triggered by the following code
-            mPickEndDate.removeTextChangedListener(mTextChangedListener);
-            mPickStartDate.removeTextChangedListener(mTextChangedListener);
+        public synchronized void afterTextChanged(Editable s) {
 
-            AddEventActivity.this.checkDatesValidity(mPickStartDate, mPickStartTime, mPickEndDate, mPickEndTime);
+            if (!mEditing) {
+                Log.d(TAG, "Editing");
+                mEditing = true;
 
-            // Reset the TextChangedListener
-            mPickEndDate.addTextChangedListener(mTextChangedListener);
-            mPickStartDate.addTextChangedListener(mTextChangedListener);
+                AddEventActivity.this.checkDatesValidity();
+
+                mPickEndDate.setText(Utils.getDateString(mEndDate));
+                mPickEndTime.setText(Utils.getTimeString(mEndDate));
+
+                mEditing = false;
+
+            }
+
         }
 
         @Override

@@ -6,10 +6,12 @@ import java.util.Set;
 
 import android.location.Location;
 import android.util.Log;
-import ch.epfl.smartmap.cache.ImmutableEvent;
+import ch.epfl.smartmap.cache.EventContainer;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
+ * Periodically fetches nearby events
+ * 
  * @author jfperren
  */
 public class NearEventsThread extends Thread {
@@ -28,17 +30,18 @@ public class NearEventsThread extends Thread {
 
             Location pos = ServiceContainer.getSettingsManager().getLocation();
             try {
-                List<Long> nearEventIds = ServiceContainer.getNetworkClient().getPublicEvents(pos.getLatitude(),
+                List<Long> nearEventIds =
+                    ServiceContainer.getNetworkClient().getPublicEvents(pos.getLatitude(),
                         pos.getLongitude(), ServiceContainer.getSettingsManager().getNearEventsMaxDistance());
 
-                Set<ImmutableEvent> nearEvents = new HashSet<ImmutableEvent>();
+                Set<EventContainer> nearEvents = new HashSet<EventContainer>();
                 for (long id : nearEventIds) {
                     nearEvents.add(ServiceContainer.getNetworkClient().getEventInfo(id));
                 }
                 ServiceContainer.getCache().putEvents(nearEvents);
 
                 Log.d(TAG, "Fetch Near Events : " + nearEventIds + " radius "
-                        + ServiceContainer.getSettingsManager().getNearEventsMaxDistance());
+                    + ServiceContainer.getSettingsManager().getNearEventsMaxDistance());
 
             } catch (SmartMapClientException e) {
                 Log.e(TAG, "Couldn't retrieve public events: " + e);

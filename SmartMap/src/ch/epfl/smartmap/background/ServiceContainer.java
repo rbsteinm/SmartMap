@@ -3,22 +3,26 @@ package ch.epfl.smartmap.background;
 import android.content.Context;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.database.DatabaseHelper;
+import ch.epfl.smartmap.database.DatabaseHelperInterface;
 import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 
 /**
- * This class is a container for the different services used by the SmartMap app. It's member must be manually
+ * This class is a container for the different services used by the SmartMap
+ * app. It's member must be manually
  * set at
- * the starting of the app. It provides a common interface to get services and thus simplifies future changes.
+ * the starting of the app. It provides a common interface to get services and
+ * thus simplifies future changes.
  * It also
- * allows to switch the returned instances for behavior modification and testing.
+ * allows to switch the returned instances for behavior modification and
+ * testing.
  * 
  * @author Pamoi
  */
 public class ServiceContainer {
     private static SmartMapClient mNetworkClient;
-    private static DatabaseHelper mDBHelper;
+    private static DatabaseHelperInterface mDBHelper;
     private static Cache mCache;
     private static CachedSearchEngine mSearchEngine;
     private static SettingsManager mSettingsManager;
@@ -28,6 +32,14 @@ public class ServiceContainer {
      */
     private ServiceContainer() {
         super();
+    }
+
+    public static void forceInitSmartMapServices(Context context) {
+        setSettingsManager(new SettingsManager(context));
+        setNetworkClient(new NetworkSmartMapClient());
+        setDatabaseHelper(new DatabaseHelper(context));
+        setCache(new Cache());
+        setSearchEngine(new CachedSearchEngine());
     }
 
     /**
@@ -44,7 +56,7 @@ public class ServiceContainer {
      * 
      * @return DatabaseHelper
      */
-    public static DatabaseHelper getDatabase() {
+    public static DatabaseHelperInterface getDatabase() {
         return mDBHelper;
     }
 
@@ -76,11 +88,21 @@ public class ServiceContainer {
     }
 
     public static void initSmartMapServices(Context context) {
-        setSettingsManager(new SettingsManager(context));
-        setNetworkClient(new NetworkSmartMapClient());
-        setDatabaseHelper(new DatabaseHelper(context));
-        setCache(new Cache());
-        setSearchEngine(new CachedSearchEngine());
+        if (ServiceContainer.getSettingsManager() == null) {
+            setSettingsManager(new SettingsManager(context));
+        }
+        if (ServiceContainer.getNetworkClient() == null) {
+            setNetworkClient(new NetworkSmartMapClient());
+        }
+        if (ServiceContainer.getDatabase() == null) {
+            setDatabaseHelper(new DatabaseHelper(context));
+        }
+        if (ServiceContainer.getCache() == null) {
+            setCache(new Cache());
+        }
+        if (ServiceContainer.getSearchEngine() == null) {
+            setSearchEngine(new CachedSearchEngine());
+        }
     }
 
     /**
@@ -97,7 +119,7 @@ public class ServiceContainer {
      * 
      * @param db
      */
-    public static void setDatabaseHelper(DatabaseHelper db) {
+    public static void setDatabaseHelper(DatabaseHelperInterface db) {
         mDBHelper = db;
     }
 

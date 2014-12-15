@@ -164,8 +164,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     public void displayMap() {
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
         // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
+        if (status != ConnectionResult.SUCCESS) {
+            // Google Play Services are not available
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
         } else {
@@ -218,9 +218,11 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
+        ServiceContainer.initSmartMapServices(this);
         // starting the background service
         this.startService(new Intent(this, InvitationsService.class));
         this.startService(new Intent(this, OwnPositionService.class));
+
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         this.getActionBar().setHomeButtonEnabled(true);
@@ -234,9 +236,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
 
         mSideMenu = new SideMenu(this);
         mSideMenu.initializeDrawerLayout();
-
-        final SearchLayout mSearchLayout = (SearchLayout) this.findViewById(R.id.search_layout);
-        mSearchLayout.setSearchEngine(ServiceContainer.getSearchEngine());
 
         if (savedInstanceState == null) {
             this.displayMap();
@@ -273,6 +272,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.main, menu);
+
+        ServiceContainer.initSmartMapServices(this);
 
         // Get menu
         mMenu = menu;
@@ -340,7 +341,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 mEventMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(ServiceContainer
                     .getCache().getAllVisibleEvents()));
                 MainActivity.this.updateItemMenu();
@@ -390,16 +390,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                 }
                 break;
             case R.id.action_notifications:
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Update LayerDrawable's BadgeDrawable
-                        Utils.setBadgeCount(MainActivity.this, mIcon, 0);
-                    }
-                });
-                Intent pNotifIntent = new Intent(this, InvitationPanelActivity.class);
-                this.startActivity(pNotifIntent);
-
+                this.setNotificationBadgeCount();
                 return true;
             case R.id.action_hide_search:
                 this.setMainMenu();
@@ -423,9 +414,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     protected void onResume() {
         super.onResume();
         mFriendsPosThread.enable();
-        // startService(mUpdateServiceIntent);
-        // this.registerReceiver(mBroadcastReceiver, new
-        // IntentFilter(UpdateService.BROADCAST_POS));
         if (mGoogleMap != null) {
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
         }
@@ -526,7 +514,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             final ActionBar actionBar = this.getActionBar();
             actionBar.setTitle(item.getTitle());
             actionBar.setSubtitle(item.getSubtitle());
-            actionBar.setIcon(new BitmapDrawable(this.getResources(), item.getImage()));
+            actionBar.setIcon(new BitmapDrawable(this.getResources(), item.getActionImage()));
             // ActionBar HomeIndicator
             actionBar.setHomeAsUpIndicator(null);
 
@@ -562,6 +550,18 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         }
     }
 
+    private void setNotificationBadgeCount() {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Update LayerDrawable's BadgeDrawable
+                Utils.setBadgeCount(MainActivity.this, mIcon, 0);
+            }
+        });
+        Intent pNotifIntent = new Intent(this, InvitationPanelActivity.class);
+        this.startActivity(pNotifIntent);
+    }
+
     public void setSearchMenu() {
         final SlidingPanel mSearchPanel = (SlidingPanel) this.findViewById(R.id.search_panel);
         // Closes panel and change only if panel could close
@@ -585,7 +585,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             ActionBar actionBar = this.getActionBar();
             actionBar.setTitle(mCurrentItem.getTitle());
             actionBar.setSubtitle(mCurrentItem.getSubtitle());
-            actionBar.setIcon(new BitmapDrawable(this.getResources(), mCurrentItem.getImage()));
+            actionBar.setIcon(new BitmapDrawable(this.getResources(), mCurrentItem.getActionImage()));
         }
     }
 

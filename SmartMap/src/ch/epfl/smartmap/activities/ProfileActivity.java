@@ -11,12 +11,14 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
- * this Activity represents user's own profile
+ * this Activity represents user's own profile. Displays the user's name,
+ * picture and last seen
+ * informations (correctly updated if we open it with no network connection)
+ * Can be useful later on, for example to change profile picture
  * 
  * @author rbsteinm
  */
 public class ProfileActivity extends Activity {
-
     @SuppressWarnings("unused")
     private static final String TAG = ProfileActivity.class.getSimpleName();
 
@@ -28,9 +30,9 @@ public class ProfileActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_profile);
-
         this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
 
+        ServiceContainer.initSmartMapServices(this);
         mNameView = (TextView) this.findViewById(R.id.profile_name);
         mSubtitlesView = (TextView) this.findViewById(R.id.profile_subtitles);
         mPicture = (ImageView) this.findViewById(R.id.profile_picture);
@@ -60,8 +62,6 @@ public class ProfileActivity extends Activity {
         super.onResume();
         mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
         mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
-        // TODO fix pls
-        // mPicture.setImageBitmap(ServiceContainer.getCache().getUser(2).getImage());
-        mPicture.setImageBitmap(ServiceContainer.getCache().getSelf().getImage());
+        mPicture.setImageBitmap(ServiceContainer.getCache().getSelf().getActionImage());
     }
 }

@@ -6,46 +6,52 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import android.util.Log;
-import ch.epfl.smartmap.cache.ImmutableEvent;
-import ch.epfl.smartmap.cache.ImmutableInvitation;
+import ch.epfl.smartmap.cache.EventContainer;
 import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.util.Utils;
 
 /**
+ * THis class contains a list of events and returns the invitations for these
+ * events.
+ * 
  * @author jfperren
  */
 public class NetworkEventInvitationBag implements InvitationBag {
 
     private static final String TAG = NetworkEventInvitationBag.class.getSimpleName();
-    private final Set<ImmutableInvitation> invitations;
+    private final Set<InvitationContainer> invitations;
 
     /**
-     * The constructor takes List arguments for compliance with server communication code.
+     * The constructor takes List arguments for compliance with server
+     * communication code.
      */
-    public NetworkEventInvitationBag(HashSet<ImmutableEvent> hashSet) {
+    public NetworkEventInvitationBag(Set<EventContainer> set) {
 
-        if (hashSet == null) {
+        if (set == null) {
             throw new IllegalArgumentException("invitingEvents is null");
         }
 
-        invitations = new HashSet<ImmutableInvitation>();
-        long timeStamp = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis();
+        invitations = new HashSet<InvitationContainer>();
+        long timeStamp =
+            GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis();
 
-        for (ImmutableEvent event : hashSet) {
-            invitations.add(new ImmutableInvitation(Invitation.NO_ID, null, event, Invitation.UNREAD, timeStamp,
-                    Invitation.EVENT_INVITATION));
-            Log.d(TAG,
-                    "Network send invitation bag with event #" + event.getId() + "created by " + event.getImmCreator());
+        for (EventContainer event : set) {
+            invitations.add(new InvitationContainer(Invitation.NO_ID, null, event, Invitation.UNREAD,
+                timeStamp, Invitation.EVENT_INVITATION));
+            Log.d(
+                TAG,
+                "Network send invitation bag with event #" + event.getId() + "created by "
+                    + event.getImmCreator());
         }
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.servercom.NotificationBag#getInvitingUsers()
      */
     @Override
-    public Set<ImmutableInvitation> getInvitations() {
-        return new HashSet<ImmutableInvitation>(invitations);
+    public Set<InvitationContainer> getInvitations() {
+        return new HashSet<InvitationContainer>(invitations);
     }
 }

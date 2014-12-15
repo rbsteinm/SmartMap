@@ -5,7 +5,7 @@ package ch.epfl.smartmap.servercom;
 
 import java.util.Set;
 
-import ch.epfl.smartmap.cache.ImmutableInvitation;
+import ch.epfl.smartmap.cache.InvitationContainer;
 
 /**
  * An interface to encapsulate the informations given by the request
@@ -16,9 +16,9 @@ import ch.epfl.smartmap.cache.ImmutableInvitation;
 public interface InvitationBag {
 
     /**
-     * Get a list of the users that sent an invitation request.
+     * Get a set of {@link InvitationContainer} objects
      * 
-     * @return a list of the inviting users.
+     * @return a set of InvitationContainer objects
      */
-    Set<ImmutableInvitation> getInvitations();
+    Set<InvitationContainer> getInvitations();
 }

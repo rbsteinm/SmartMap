@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
@@ -25,30 +26,30 @@ import android.widget.ListView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Filter;
-import ch.epfl.smartmap.cache.ImmutableFilter;
+import ch.epfl.smartmap.cache.FilterContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 
 /**
+ * An activity that allows to modify a filter: add or remove people, rename filter, remove filter. The action
+ * of adding/removing a friend from the filter is done by drag and drop between two lists.
+ * 
  * @author marion-S
  */
+@SuppressLint("InflateParams")
 public class ModifyFilterActivity extends Activity {
 
     private LinearLayout mInsideFilterLayout;
-
     private LinearLayout mOutsideFilterLayout;
 
     private ListView mListViewInside;
-
     private ListView mListViewOutside;
 
     private List<User> mFriendsInside;
     private List<User> mFriendsOutside;
 
     private Filter mFilter;
-    private Cache mCache;
 
     private OnItemLongClickListener mOnInsideItemLongClickListener;
     private OnItemLongClickListener mOnOutsideItemLongClickListener;
@@ -61,8 +62,6 @@ public class ModifyFilterActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_modify_filter);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        mCache = ServiceContainer.getCache();
 
         mInsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_inside_layout);
         mOutsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_outside_layout);
@@ -86,7 +85,6 @@ public class ModifyFilterActivity extends Activity {
 
         mListViewOutside.setOnDragListener(mFromOutsideDragListener);
         mInsideFilterLayout.setOnDragListener(mFromOutsideDragListener);
-
     }
 
     /*
@@ -109,6 +107,10 @@ public class ModifyFilterActivity extends Activity {
 
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -116,6 +118,10 @@ public class ModifyFilterActivity extends Activity {
         return true;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -137,6 +143,7 @@ public class ModifyFilterActivity extends Activity {
                 break;
             case R.id.action_remove_filter:
                 this.removeFilterDialog();
+                break;
             default:
                 // No other menu items!
                 break;
@@ -145,6 +152,9 @@ public class ModifyFilterActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * A dialog to rename the filter.
+     */
     public void renameFilterDialog(MenuItem item) {
         // inflate the alertDialog
         LayoutInflater inflater = this.getLayoutInflater();
@@ -162,8 +172,8 @@ public class ModifyFilterActivity extends Activity {
                         (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                     String newName = editText.getText().toString();
 
-                    mCache.putFilter(new ImmutableFilter(mFilter.getId(), newName, mFilter.getIds(), mFilter
-                        .isActive()));
+                    ServiceContainer.getCache().putFilter(
+                        new FilterContainer(mFilter.getId(), newName, mFilter.getIds(), mFilter.isActive()));
 
                     Toast.makeText(ModifyFilterActivity.this,
                         ModifyFilterActivity.this.getResources().getString(R.string.new_name_saved),
@@ -187,14 +197,26 @@ public class ModifyFilterActivity extends Activity {
         builder.create().show();
     }
 
+    /**
+     * This method saves the updated filter in the {@code Cache}
+     */
     public void saveFilter() {
-        mCache.putFilter(new ImmutableFilter(mFilter.getId(), mFilter.getName(), ModifyFilterActivity.this
-            .friendListToIdSet(mFriendsInside), mFilter.isActive()));
+        ServiceContainer.getCache().putFilter(
+            new FilterContainer(mFilter.getId(), mFilter.getName(), ModifyFilterActivity.this
+                .friendListToIdSet(mFriendsInside), mFilter.isActive()));
         Toast.makeText(ModifyFilterActivity.this,
             ModifyFilterActivity.this.getResources().getString(R.string.changes_saved), Toast.LENGTH_LONG)
             .show();
     }
 
+    /**
+     * An utility method to convert a friend list to a set of corresponding ids, because the {@code Cache}
+     * methods
+     * uses sets of ids.
+     * 
+     * @param friendList
+     * @return a set of id corresponding to the list of friend
+     */
     private Set<Long> friendListToIdSet(List<User> friendList) {
         Set<Long> idSet = new HashSet<Long>();
         for (User friend : friendList) {
@@ -203,6 +225,9 @@ public class ModifyFilterActivity extends Activity {
         return idSet;
     }
 
+    /**
+     * A dialog to remove a filter.
+     */
     private void removeFilterDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(this.getResources().getString(R.string.remove_filter));
@@ -212,8 +237,8 @@ public class ModifyFilterActivity extends Activity {
             new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
-                    // TODO
-                    mCache.removeFilter(mFilter.getId());
+
+                    ServiceContainer.getCache().removeFilter(mFilter.getId());
                     Toast.makeText(ModifyFilterActivity.this,
                         ModifyFilterActivity.this.getResources().getString(R.string.removed_filter),
                         Toast.LENGTH_LONG).show();
@@ -227,7 +252,7 @@ public class ModifyFilterActivity extends Activity {
             new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
-
+                    // nothing
                 }
             });
 
@@ -235,18 +260,70 @@ public class ModifyFilterActivity extends Activity {
         builder.create().show();
     }
 
+    /**
+     * Set the filter that the activity displays by retrieving its id from the starting intent and using the
+     * {@code Cache}
+     */
     private void setFilter() {
-        mFilter = mCache.getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
+        mFilter =
+            ServiceContainer.getCache().getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
         for (long id : mFilter.getIds()) {
-            mFriendsInside.add(mCache.getUser(id));
+            mFriendsInside.add(ServiceContainer.getCache().getUser(id));
         }
-        for (User friend : mCache.getAllFriends()) {
+        for (User friend : ServiceContainer.getCache().getAllFriends()) {
             if (!mFriendsInside.contains(friend)) {
                 mFriendsOutside.add(friend);
             }
         }
     }
 
+    /**
+     * Updates the inside and outside filter lists when an item is dragged from the outside list and dropped
+     * into the inside list, i.e when a friend is added to the filter
+     * 
+     * @param droppedItem
+     * @return true is the drop action was taken in account, false otherwise
+     */
+    private boolean updateFriendsListsWhenAddedFriend(User droppedItem) {
+        if (mFriendsOutside.contains(droppedItem)) {
+            mFriendsInside.add(droppedItem);
+            mFriendsOutside.remove(droppedItem);
+            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this, mFriendsInside));
+            mListViewOutside
+                .setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this, mFriendsOutside));
+
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    /**
+     * Updates the inside and outside filter lists when an item is dragged from the inside list and dropped
+     * into the outside list, i.e when a friend is removed from the filter
+     * 
+     * @param droppedItem
+     * @return true is the drop action was taken in account, false otherwise
+     */
+    private boolean updateFriendsListsWhenRemovedFriend(User droppedItem) {
+        if (mFriendsInside.contains(droppedItem)) {
+            mFriendsInside.remove(droppedItem);
+            mFriendsOutside.add(droppedItem);
+            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this, mFriendsInside));
+            mListViewOutside
+                .setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this, mFriendsOutside));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * A drag listener for the outside filter list.
+     * 
+     * @author marion-S
+     */
     protected class ListInsideDragEventListener implements View.OnDragListener {
 
         @Override
@@ -255,9 +332,53 @@ public class ModifyFilterActivity extends Activity {
 
             switch (action) {
                 case DragEvent.ACTION_DRAG_STARTED:
-                    // All involved view accept ACTION_DRAG_STARTED for
-                    // MIMETYPE_TEXT_PLAIN
+                    return event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
 
+                case DragEvent.ACTION_DRAG_ENTERED:
+
+                    return true;
+                case DragEvent.ACTION_DRAG_LOCATION:
+
+                    return true;
+                case DragEvent.ACTION_DRAG_EXITED:
+
+                    return true;
+                case DragEvent.ACTION_DROP:
+                    // Gets the item containing the dragged data
+                    ClipData.Item item = event.getClipData().getItemAt(0);
+                    // If apply only if drop on target layout
+                    if (v.equals(mOutsideFilterLayout)) {
+                        Long droppedItemId = Long.valueOf(item.getText().toString());
+                        User droppedItem = ServiceContainer.getCache().getUser(droppedItemId);
+                        return ModifyFilterActivity.this.updateFriendsListsWhenRemovedFriend(droppedItem);
+                    } else {
+                        return false;
+                    }
+
+                case DragEvent.ACTION_DRAG_ENDED:
+
+                    return true;
+                default:
+
+                    return false;
+
+            }
+        }
+    }
+
+    /**
+     * A drag listener for the outside filter list.
+     * 
+     * @author marion-S
+     */
+    protected class ListOutsideDragEventListener implements View.OnDragListener {
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            final int action = event.getAction();
+
+            switch (action) {
+                case DragEvent.ACTION_DRAG_STARTED:
                     return event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
 
                 case DragEvent.ACTION_DRAG_ENTERED:
@@ -273,80 +394,11 @@ public class ModifyFilterActivity extends Activity {
                     // Gets the item containing the dragged data
                     ClipData.Item item = event.getClipData().getItemAt(0);
 
-                    // If apply only if drop on buttonTarget
-                    if (v.equals(mOutsideFilterLayout)) {
-                        Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mCache.getUser(droppedItemId);
-                        if (mFriendsInside.contains(droppedItem)) {
-                            mFriendsInside.remove(droppedItem);
-                            mFriendsOutside.add(droppedItem);
-                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
-                                mFriendsInside));
-                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
-                                mFriendsOutside));
-                            return true;
-                        }
-
-                        return false;
-                    } else {
-                        return false;
-                    }
-
-                case DragEvent.ACTION_DRAG_ENDED:
-
-                    return true;
-                default: // unknown case
-
-                    return false;
-
-            }
-        }
-    }
-
-    protected class ListOutsideDragEventListener implements View.OnDragListener {
-
-        @Override
-        public boolean onDrag(View v, DragEvent event) {
-            final int action = event.getAction();
-
-            switch (action) {
-                case DragEvent.ACTION_DRAG_STARTED:
-                    // All involved view accept ACTION_DRAG_STARTED for
-                    // MIMETYPE_TEXT_PLAIN
-                    if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-
-                case DragEvent.ACTION_DRAG_ENTERED:
-
-                    return true;
-                case DragEvent.ACTION_DRAG_LOCATION:
-
-                    return true;
-                case DragEvent.ACTION_DRAG_EXITED:
-
-                    return true;
-                case DragEvent.ACTION_DROP:
-                    // Gets the item containing the dragged data
-                    ClipData.Item item = event.getClipData().getItemAt(0);
-
-                    // If apply only if drop on buttonTarget
+                    // If apply only if drop on target layout
                     if (v.equals(mInsideFilterLayout)) {
                         Long droppedItemId = Long.valueOf(item.getText().toString());
-                        User droppedItem = mCache.getUser(droppedItemId);
-                        if (mFriendsOutside.contains(droppedItem)) {
-                            mFriendsInside.add(droppedItem);
-                            mFriendsOutside.remove(droppedItem);
-                            mListViewInside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
-                                mFriendsInside));
-                            mListViewOutside.setAdapter(new FriendListItemAdapter(ModifyFilterActivity.this,
-                                mFriendsOutside));
-
-                            return true;
-                        }
-                        return false;
+                        User droppedItem = ServiceContainer.getCache().getUser(droppedItemId);
+                        return ModifyFilterActivity.this.updateFriendsListsWhenAddedFriend(droppedItem);
                     } else {
                         return false;
                     }
@@ -354,7 +406,7 @@ public class ModifyFilterActivity extends Activity {
                 case DragEvent.ACTION_DRAG_ENDED:
 
                     return true;
-                default: // unknown case
+                default:
 
                     return false;
 
@@ -362,6 +414,11 @@ public class ModifyFilterActivity extends Activity {
         }
     }
 
+    /**
+     * A long click listener for items of the inside filter list.
+     * 
+     * @author marion-S
+     */
     private class OnInsideListItemLongClickListener implements OnItemLongClickListener {
 
         /*
@@ -380,16 +437,18 @@ public class ModifyFilterActivity extends Activity {
             String[] clipDescription = {ClipDescription.MIMETYPE_TEXT_PLAIN};
             ClipData dragData = new ClipData(null, clipDescription, item);
 
-            view.startDrag(dragData, // ClipData
-                new View.DragShadowBuilder(view), // View.DragShadowBuilder
-                null, // Object myLocalState
-                0); // flags
+            view.startDrag(dragData, new View.DragShadowBuilder(view), null, 0);
 
             return true;
         }
 
     }
 
+    /**
+     * A long click listener for items in the outside filter list.
+     * 
+     * @author marion-S
+     */
     private class OnOutsideListItemLongClickListener implements OnItemLongClickListener {
 
         /*
@@ -408,11 +467,7 @@ public class ModifyFilterActivity extends Activity {
             String[] clipDescription = {ClipDescription.MIMETYPE_TEXT_PLAIN};
             ClipData dragData = new ClipData(null, clipDescription, item);
 
-            view.startDrag(dragData, // ClipData
-                new View.DragShadowBuilder(view), // View.DragShadowBuilder
-                null, // Object myLocalState
-                0); // flags
-
+            view.startDrag(dragData, new View.DragShadowBuilder(view), null, 0);
             return true;
         }
 

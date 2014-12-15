@@ -28,23 +28,34 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
 public class InvitationsTab extends ListFragment {
 
     private List<Invitation> mInvitationList;
-    private Context mContext;
+    private final Context mContext;
 
+    /**
+     * Constructor
+     * 
+     * @param ctx
+     */
     public InvitationsTab(Context ctx) {
         mContext = ctx;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater,
+     * android.view.ViewGroup, android.os.Bundle)
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.list_fragment_friends_tab, container, false);
+        View view = inflater.inflate(R.layout.list_fragment_invitations_tab, container, false);
         mInvitationList =
             new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
 
         // Create custom Adapter and pass it to the Activity
         this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
 
-        // Initialize the listener
+        // Initialize the listener to update the diaplayed list when the invitation list is updated in the
+        // cache
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
             public void onInvitationListUpdate() {
@@ -100,10 +111,7 @@ public class InvitationsTab extends ListFragment {
      * A dialog to ask whether to accept or decline the invitation of the given
      * user
      * 
-     * @param name
-     *            the user's name
-     * @param userId
-     *            the user's id
+     * @param invitation
      */
     private void displayAcceptFriendDialog(final Invitation invitation) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
@@ -116,33 +124,8 @@ public class InvitationsTab extends ListFragment {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
                     // Accept invitation in Cache
-                    ServiceContainer.getCache().acceptInvitation(invitation, new NetworkRequestCallback() {
-                        @Override
-                        public void onFailure() {
-                            ((Activity) mContext).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast
-                                        .makeText(
-                                            mContext,
-                                            ((Activity) mContext)
-                                                .getString(R.string.accept_friend_network_error),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onSuccess() {
-                            // We need to get the invitation from the cache as
-                            // it
-                            // has been modified
-                            Invitation updated =
-                                ServiceContainer.getCache().getInvitation(invitation.getId());
-                            // We run it's intent
-                            InvitationsTab.this.startActivity(updated.getIntent());
-                        }
-                    });
+                    ServiceContainer.getCache().acceptInvitation(invitation,
+                        new AcceptInvitationRequestCallback(invitation));
                 }
             });
 
@@ -151,40 +134,125 @@ public class InvitationsTab extends ListFragment {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 // Decline invitation in Cache
-                ServiceContainer.getCache().declineInvitation(invitation, new NetworkRequestCallback() {
-                    @Override
-                    public void onFailure() {
-                        ((Activity) mContext).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(mContext,
-                                    ((Activity) mContext).getString(R.string.decline_friend_network_error),
-                                    Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onSuccess() {
-                        ((Activity) mContext).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Remove invitation from list
-                                mInvitationList.remove(invitation);
-                                InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(
-                                    mContext, mInvitationList));
-
-                                // Confirm decline
-                                Toast.makeText(mContext, mContext.getString(R.string.decline_confirm),
-                                    Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
+                ServiceContainer.getCache().declineInvitation(invitation,
+                    new DeclineInvitationRequestCallback(invitation));
             }
         });
 
         // display the AlertDialog
         builder.create().show();
+    }
+
+    /**
+     * An implementation of {@linkNetworkRequestCallback} executed with an accepting invitation request to the
+     * server
+     * 
+     * @author marion-S
+     */
+    private class AcceptInvitationRequestCallback implements NetworkRequestCallback<Void> {
+
+        private final Invitation mInvitation;
+
+        /**
+         * Constructor
+         * 
+         * @param invitation
+         */
+        public AcceptInvitationRequestCallback(Invitation invitation) {
+            mInvitation = invitation;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.callbacks.NetworkRequestCallback#onFailure(java.lang.Exception)
+         */
+        @Override
+        public void onFailure(Exception e) {
+            ((Activity) mContext).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext,
+                        ((Activity) mContext).getString(R.string.accept_friend_network_error),
+                        Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.callbacks.NetworkRequestCallback#onSuccess(java.lang.Object)
+         */
+        @Override
+        public void onSuccess(Void result) {
+            // We need to get the invitation from the cache as
+            // it
+            // has been modified
+            Invitation updated = ServiceContainer.getCache().getInvitation(mInvitation.getId());
+            // We run it's intent
+            InvitationsTab.this.startActivity(updated.getIntent());
+
+        }
+
+    }
+
+    /**
+     * An implementation of {@linkNetworkRequestCallback} executed with a declining invitation request to the
+     * server
+     * 
+     * @author marion-S
+     */
+    private class DeclineInvitationRequestCallback implements NetworkRequestCallback<Void> {
+
+        private final Invitation mInvitation;
+
+        /**
+         * Constructor
+         * 
+         * @param invitation
+         */
+        public DeclineInvitationRequestCallback(Invitation invitation) {
+            mInvitation = invitation;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.callbacks.NetworkRequestCallback#onFailure(java.lang.Exception)
+         */
+        @Override
+        public void onFailure(Exception e) {
+            ((Activity) mContext).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext,
+                        ((Activity) mContext).getString(R.string.decline_friend_network_error),
+                        Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.callbacks.NetworkRequestCallback#onSuccess(java.lang.Object)
+         */
+        @Override
+        public void onSuccess(Void result) {
+            ((Activity) mContext).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // Remove invitation from list
+                    mInvitationList.remove(mInvitation);
+                    InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
+                        mInvitationList));
+
+                    // Confirm decline
+                    Toast
+                        .makeText(mContext, mContext.getString(R.string.decline_confirm), Toast.LENGTH_SHORT)
+                        .show();
+                }
+            });
+        }
+
     }
 }

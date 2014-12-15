@@ -39,7 +39,8 @@ public class AddFriendActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_add_friend);
         // Set action bar color to main color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
@@ -91,10 +92,9 @@ public class AddFriendActivity extends ListActivity {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 // invite friend
-                AddFriendActivity.this.inviteUser(userId);
+                ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
             }
         });
-
         // Add negative button
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -108,16 +108,9 @@ public class AddFriendActivity extends ListActivity {
     }
 
     /**
-     * Invites a user to be your friend. Displays a toast describing if the invitation was sent or not.
-     * 
-     * @author agpmilli
+     * sets a listener on the searchbar that updates the views (users) displayed
+     * every time the text chnanges or is submitted
      */
-    private void inviteUser(long userId) {
-        // Send friend request to user
-        ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
-
-    }
-
     private void setSearchBarListener() {
         mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
@@ -142,7 +135,7 @@ public class AddFriendActivity extends ListActivity {
     private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
 
         @Override
-        public void onNetworkError() {
+        public void onNetworkError(Exception e) {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -182,9 +175,9 @@ public class AddFriendActivity extends ListActivity {
      * 
      * @author agpmilli
      */
-    class AddFriendCallback implements NetworkRequestCallback {
+    class AddFriendCallback implements NetworkRequestCallback<Void> {
         @Override
-        public void onFailure() {
+        public void onFailure(Exception e) {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -196,7 +189,7 @@ public class AddFriendActivity extends ListActivity {
         }
 
         @Override
-        public void onSuccess() {
+        public void onSuccess(Void result) {
             AddFriendActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

@@ -21,13 +21,14 @@ import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
- * Fragment displaying your friends in FriendsActivity
+ * Fragment (Tab) displaying your friends in FriendsActivity
  * 
  * @author rbsteinm
  */
 
 public class FriendsTab extends ListFragment {
 
+    @SuppressWarnings("unused")
     private static final String TAG = FriendsTab.class.getSimpleName();
 
     private List<User> mFriendList;
@@ -36,6 +37,7 @@ public class FriendsTab extends ListFragment {
 
     public FriendsTab(Context context) {
         mContext = context;
+        ServiceContainer.initSmartMapServices(context);
     }
 
     @Override

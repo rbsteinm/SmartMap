@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -20,7 +21,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
-import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
@@ -57,6 +57,8 @@ public class LoginFragment extends Fragment {
 
     private final List<String> mPermissions;
 
+    private Activity mActivity;
+
     private final Session.StatusCallback callback = new Session.StatusCallback() {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
@@ -65,8 +67,9 @@ public class LoginFragment extends Fragment {
     };
 
     public LoginFragment() {
-        // We will need to access the user's friends list
+        // We will need to access the user's friends list in the future.
         mPermissions = Arrays.asList("user_status", "user_friends");
+        mActivity = this.getActivity();
     }
 
     protected void makeMeRequest() {
@@ -84,7 +87,8 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUiHelper = new UiLifecycleHelper(this.getActivity(), callback);
+        mActivity = this.getActivity();
+        mUiHelper = new UiLifecycleHelper(mActivity, callback);
         mUiHelper.onCreate(savedInstanceState);
     }
 
@@ -181,7 +185,7 @@ public class LoginFragment extends Fragment {
         assert !params.get(FACEBOOK_NAME_POST_NAME).isEmpty() : "Facebook name is empty";
 
         ConnectivityManager connMgr =
-            (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            (ConnectivityManager) mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if ((networkInfo != null) && networkInfo.isConnected()) {
             // Send data
@@ -191,9 +195,8 @@ public class LoginFragment extends Fragment {
         } else {
             // An error occured
             Log.e(TAG, "Could not send user's data to server. Net down?");
-            Toast.makeText(this.getActivity(),
-                this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet), Toast.LENGTH_LONG)
-                .show();
+            Toast.makeText(mActivity, this.getString(R.string.fb_fragment_toast_cannot_connect_to_internet),
+                Toast.LENGTH_LONG).show();
             return false;
         }
 
@@ -201,13 +204,13 @@ public class LoginFragment extends Fragment {
 
     private void startMainActivity() {
         Log.d(TAG, "START MAIN ACTIVITY");
-        Intent intent = new Intent(this.getActivity(), MainActivity.class);
-        this.getActivity().finish();
-        this.startActivity(intent);
+        Intent intent = new Intent(mActivity, MainActivity.class);
+        mActivity.finish();
+        mActivity.startActivity(intent);
     }
 
     /**
-     * This callback uses the retrived facebook data to connect to our server.
+     * This callback uses the retrieved facebook data to connect to our server.
      * 
      * @author SpicyCH
      */
@@ -236,26 +239,14 @@ public class LoginFragment extends Fragment {
 
                 if (!LoginFragment.this.sendDataToServer(params)) {
                     Toast.makeText(
-                        LoginFragment.this.getActivity(),
+                        mActivity,
                         LoginFragment.this
                             .getString(R.string.fb_fragment_toast_cannot_connect_to_smartmap_server),
                         Toast.LENGTH_LONG).show();
                 } else {
                     // If all is ok, start filling Cache
                     ServiceContainer.getCache().initFromDatabase(ServiceContainer.getDatabase());
-                    ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient(),
-                        new NetworkRequestCallback() {
-                            @Override
-                            public void onFailure() {
-                                Log.e(TAG, "Cannot update Cache from Network");
-                                LoginFragment.this.startMainActivity();
-                            }
-
-                            @Override
-                            public void onSuccess() {
-                                LoginFragment.this.startMainActivity();
-                            }
-                        });
+                    new UpdateCacheTask().execute();
                 }
 
             } else if (response.getError() != null) {
@@ -276,7 +267,11 @@ public class LoginFragment extends Fragment {
         private final Map<String, String> mParams;
 
         /**
+         * Constructor
+         * 
          * @param params
+         *            the post parameters to send (must be <code>FACEBOOK_NAME_POST_NAME</code>,
+         *            <code>FACEBOOK_ID_POST_NAME</code>, <code>FACEBOOK_TOKEN_POST_NAME</code>.
          */
         public SendDataTask(Map<String, String> params) {
             mParams = params;
@@ -304,8 +299,29 @@ public class LoginFragment extends Fragment {
             }
 
             Log.i(TAG, "User' infos sent to SmartMap server");
+
             return true;
 
+        }
+    }
+
+    /**
+     * Updates cache and launch MainActivity
+     * 
+     * @author jfperren
+     */
+    private class UpdateCacheTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                ServiceContainer.getCache().updateFromNetwork(ServiceContainer.getNetworkClient());
+                LoginFragment.this.startMainActivity();
+            } catch (SmartMapClientException e) {
+                Log.e(TAG, "Cannot update from network : " + e);
+                LoginFragment.this.startMainActivity();
+            }
+
+            return null;
         }
     }
 }

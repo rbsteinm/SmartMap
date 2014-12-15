@@ -2,10 +2,11 @@ package ch.epfl.smartmap.test.activities;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
-import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.pressBack;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.allOf;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.StartActivity;
@@ -13,79 +14,68 @@ import ch.epfl.smartmap.activities.StartActivity;
 import com.facebook.Session;
 
 /**
- * @author Alain
+ * @author agpmilli
  */
-public class StartActivityTest extends
-ActivityInstrumentationTestCase2<StartActivity> {
-	public StartActivityTest() {
-		super(StartActivity.class);
-	}
+public class StartActivityTest extends ActivityInstrumentationTestCase2<StartActivity> {
+    public StartActivityTest() {
+        super(StartActivity.class);
+    }
 
-	// The standard JUnit 3 setUp method run for for every test
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.getActivity(); // prevent error
-		// "No activities found. Did you forget to launch the activity by calling getActivity()"
-	}
+    // The standard JUnit 3 setUp method run for for every test
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        this.getActivity(); // prevent error
+        // "No activities found. Did you forget to launch the activity by calling getActivity()"
+    }
 
-	@Override
-	protected void tearDown() throws Exception {
-		this.getActivity().finish();
-	}
+    @Override
+    protected void tearDown() throws Exception {
+        this.getActivity().finish();
+    }
 
-	/**
-	 * Click on startActivity shouldn't do anything
-	 * 
-	 * @throws Exception
-	 */
-	public void testContainerClick() throws Exception {
-		if ((Session.getActiveSession() == null)
-				|| Session.getActiveSession().getPermissions().isEmpty()) {
-			onView(withId(R.id.container)).perform(click()).check(
-					matches(isDisplayed()));
-		} else {
-			// OK
-		}
-		pressBack();
-	}
+    /**
+     * Welcome text should always be displayed (but sometimes with alpha 0.0
+     */
+    public void testAWelcomeApparence() {
+        if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
+            onView(withId(R.id.welcome)).check(matches(isDisplayed()));
+        }
+    }
 
-	/*
-	 * Test if facebook button is displayed or not (depends if first log in or
-	 * not)
-	 */
-	public void testFacebookButtonVisibility() throws Exception {
-		// Same as TestLogoClick()
-		// if (Session.getActiveSession() == null
-		// || Session.getActiveSession().getPermissions().isEmpty()) {
-		// onView(withId(R.id.loginButton)).check(matches(isDisplayed()));
-		// }
-	}
+    /**
+     * Click on startActivity shouldn't do anything
+     * 
+     * @throws Exception
+     */
+    public void testContainerClick() {
+        if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
+            onView(withId(R.id.container)).perform(click()).check(matches(isDisplayed()));
+        } else {
+            // OK
+        }
+    }
 
-	/**
-	 * Click on logo shouldn't do anything
-	 * 
-	 * @throws Exception
-	 */
-	public void testLogoClick() throws Exception {
-		// this methods doesn't start properly because device get stuck in
-		// mainActivity after first test (ISSUE)
-		// if (Session.getActiveSession() == null
-		// || Session.getActiveSession().getPermissions().isEmpty()) {
-		// onView(withId(R.id.logo)).perform(click()).check(
-		// matches(isDisplayed()));
-		// }
-	}
+    /**
+     * Test if Facebook button is displayed or not (depends if first log in or
+     * not)
+     */
+    public void testFacebookButtonVisibility() throws InterruptedException {
+        if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
+            Thread.sleep(1000);
+            onView(allOf(withId(R.id.loginButton), isCompletelyDisplayed())).check(matches(isDisplayed()));
+        } else {
+            // no facebook button
+        }
+    }
 
-	/**
-	 * Welcome text should never be displayed, it is display during animation
-	 * but not before neither after
-	 * 
-	 * @throws Exception
-	 */
-	public void testWelcomeApparence() throws Exception {
-		// Same as TestLogoClick()
-		// onView(withId(R.id.welcome)).check(matches(not(isDisplayed())));
-	}
+    /**
+     * Click on logo shouldn't do anything
+     */
+    public void testLogoClick() {
+        if ((Session.getActiveSession() == null) || Session.getActiveSession().getPermissions().isEmpty()) {
+            onView(withId(R.id.logo)).check(matches(isDisplayed()));
+        }
+    }
 
 }

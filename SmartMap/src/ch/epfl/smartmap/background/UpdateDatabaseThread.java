@@ -3,6 +3,8 @@ package ch.epfl.smartmap.background;
 import android.util.Log;
 
 /**
+ * Periodically updates the database from the cache
+ * 
  * @author jfperren
  */
 public class UpdateDatabaseThread extends Thread {

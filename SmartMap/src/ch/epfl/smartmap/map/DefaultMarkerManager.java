@@ -36,6 +36,7 @@ public class DefaultMarkerManager implements MarkerManager {
     public static final float MARKER_ANCHOR_X = (float) 0.5;
     public static final float MARKER_ANCHOR_Y = 1;
     public static final long HANDLER_DELAY = 16;
+    public static final long ANIMATE_MARKER_DURATION = 1000;
 
     private final GoogleMap mGoogleMap;
 
@@ -49,7 +50,13 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     private final Map<String, Marker> mDictionnaryMarkers;
 
+    /**
+     * Constructor
+     * 
+     * @param googleMap
+     */
     public DefaultMarkerManager(GoogleMap googleMap) {
+        this.checkNonNull(googleMap, "GoogleMap");
         mGoogleMap = googleMap;
         mDisplayedItems = new HashMap<String, Displayable>();
         mDictionnaryMarkers = new HashMap<String, Marker>();
@@ -62,7 +69,8 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker addMarker(Displayable item, Context context) {
-
+        this.checkNonNull(item, "Displayable item");
+        this.checkNonNull(context, "context");
         Marker marker =
             mGoogleMap.addMarker(new MarkerOptions().position(item.getLatLng()).title(item.getTitle())
                 .icon(item.getMarkerIcon(context)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
@@ -128,6 +136,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Displayable getItemForMarker(Marker marker) {
+        this.checkNonNull(marker, "marker");
         return mDisplayedItems.get(marker.getId());
     }
 
@@ -139,7 +148,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker getMarkerForItem(Displayable item) {
-
+        this.checkNonNull(item, "Displayable item");
         for (Entry<String, Displayable> entry : mDisplayedItems.entrySet()) {
             if (entry.getValue().equals(item)) {
                 return mDictionnaryMarkers.get(entry.getKey());
@@ -156,6 +165,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public boolean isDisplayedItem(Displayable item) {
+        this.checkNonNull(item, "Displayable item");
         return mDisplayedItems.containsValue(item);
     }
 
@@ -167,6 +177,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public boolean isDisplayedMarker(Marker marker) {
+        this.checkNonNull(marker, "marker");
         return mDisplayedItems.containsKey(marker.getId());
     }
 
@@ -178,6 +189,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker removeMarker(Displayable item) {
+        this.checkNonNull(item, "Displayable item");
         Marker marker = this.getMarkerForItem(item);
         mDisplayedItems.remove(marker.getId());
         mDictionnaryMarkers.remove(marker.getId());
@@ -193,6 +205,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public void resetMarkersIcon(Context context) {
+        this.checkNonNull(context, "context");
         for (Marker marker : this.getDisplayedMarkers()) {
             if (marker.getSnippet().equals(MarkerColor.RED.toString())) {
                 marker.setIcon(this.getItemForMarker(marker).getMarkerIcon(context));
@@ -210,7 +223,8 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public void updateMarkers(Context context, Set<Displayable> itemsToDisplay) {
-
+        this.checkNonNull(context, "context");
+        this.checkNonNull(itemsToDisplay, "items to display");
         Log.d(TAG, "updateMarkers");
         // In the list friendsToDisplay, search if each friend s already
         // displayed
@@ -224,22 +238,15 @@ public class DefaultMarkerManager implements MarkerManager {
                 marker = this.addMarker(item, context);
             }
 
-            // Log.d("markers", "marker's position for " + item.getTitle() +
-            // " is " + marker.getPosition());
             if ((marker.getPosition().latitude != item.getLatLng().latitude)
                 || (marker.getPosition().longitude != item.getLatLng().longitude)) {
 
-                this.animateMarker(marker, item.getLatLng(), false, item, context);
+                this.animateMarker(marker, item.getLatLng());
             }
-            // Log.d("markers", "final position of marker of " + item.getTitle()
-            // + " before setIcon is "
-            // + marker.getPosition());
+
+            // set the marker's icon
             marker.setIcon(item.getMarkerIcon(context));
-            // Log.d(
-            // "markers",
-            // "final position of marker of " + item.getTitle() +
-            // " after setIcon is "
-            // + marker.getPosition());
+
         }
 
         // remove the markers that are not longer in the list to display
@@ -258,17 +265,14 @@ public class DefaultMarkerManager implements MarkerManager {
      * 
      * @param marker
      * @param toPosition
-     * @param hideMarker
-     * @param map
      */
-    private void animateMarker(final Marker marker, final LatLng toPosition, final boolean hideMarker,
-        final Displayable item, final Context context) {
+    private void animateMarker(final Marker marker, final LatLng toPosition) {
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
         Projection proj = mGoogleMap.getProjection();
         Point startPoint = proj.toScreenLocation(marker.getPosition());
         final LatLng startLatLng = proj.fromScreenLocation(startPoint);
-        final long duration = 1000;
+        final long duration = ANIMATE_MARKER_DURATION;
 
         final Interpolator interpolator = new LinearInterpolator();
 
@@ -284,18 +288,23 @@ public class DefaultMarkerManager implements MarkerManager {
                 if (t < 1.0) {
                     // Post again 16ms later.
                     handler.postDelayed(this, HANDLER_DELAY);
-                } else {
-                    if (hideMarker) {
-                        marker.setVisible(false);
-                    } else {
-                        marker.setVisible(true);
-                    }
                 }
             }
         });
 
     }
 
+    private void checkNonNull(Object object, String name) {
+        if (object == null) {
+            throw new IllegalArgumentException("Null " + name);
+        }
+    }
+
+    /**
+     * An enum that represents possible markers color for events
+     * 
+     * @author hugo-S
+     */
     public enum MarkerColor {
         RED,
         ORANGE

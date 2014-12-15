@@ -31,7 +31,11 @@ import ch.epfl.smartmap.util.Utils;
  */
 public class CircularMarkerIconMaker implements MarkerIconMaker {
 
-    private static final String TAG = CircularMarkerIconMaker.class.getSimpleName();
+    /**
+     * The base (white and circular) marker shape
+     */
+    public static final Bitmap BASE_MARKER_SHAPE = BitmapFactory.decodeResource(ServiceContainer
+        .getSettingsManager().getContext().getResources(), R.drawable.marker_form_2_38);
 
     /**
      * the user that the icon represents
@@ -41,11 +45,11 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     /**
      * Several composants of the marker icon saved in fields for performance purposes
      */
-    private Bitmap mBaseMarkerShape;
     private Bitmap mCurrentMarkerShape;
     private Bitmap mDefaultProfilePicture;
     private Bitmap mProfilePicture;
-    private Bitmap mMarkerIcon; // the combined icon (marker shape + profile picture)
+    // the combined icon (marker shape + profile picture)
+    private Bitmap mMarkerIcon;
     private Canvas mCanvasCurrentShape;
     private Bitmap mBaseOverlay;
 
@@ -54,27 +58,38 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     public static final int SHAPE_BORDER_WIDTH = 44;
     public static final float SCALE_MARKER = 0.56f;
     public static final int SHAPE_TAIL_LENGTH = 20;
-    public static final float SATURATION_BEGIN = 2f;
-    public static final float SATURATION_END = -0.08f;
+
     public static final long TIMEOUT_COLOR = 30; // minutes
     public static final int SECONDS_IN_MINUTE = 60;
     public static final int MILLISECONDS_IN_SECOND = 1000;
+    public static final int DOUBLE_RATIO = 2;
 
+    /**
+     * Constructor
+     * 
+     * @param friend
+     *            the user for whom a marker icon is created
+     */
     public CircularMarkerIconMaker(Friend friend) {
+        if (friend == null) {
+            throw new IllegalArgumentException("null Friend");
+        }
         mFriend = friend;
-
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see ch.epfl.smartmap.map.MarkerIconMaker#getMarkerIcon(android.graphics.Bitmap)
      */
     @Override
     public Bitmap getMarkerIcon(Context context) {
+        if (context == null) {
+            throw new IllegalArgumentException("null context");
+        }
         this.initializeIconComponents(context);
 
-        long timeElapsed = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis()
+        long timeElapsed =
+            GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND)).getTimeInMillis()
                 - mFriend.getLastSeen().getTimeInMillis();
         this.setColorOfMarkerShape(timeElapsed);
 
@@ -82,7 +97,8 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     }
 
     /**
-     * This function creates a bitmap with right dimensions, in preparation to be an overlay of the two given bitmaps
+     * This function creates a bitmap with right dimensions, in preparation to be an overlay of the two given
+     * bitmaps
      * 
      * @param bmp1
      * @param bmp2
@@ -90,6 +106,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      */
 
     private Bitmap createDimensionedOverlay(Bitmap bmp1, Bitmap bmp2) {
+        assert (bmp1 != null) && (bmp2 != null);
         int maxWidth = bmp1.getWidth() > bmp2.getWidth() ? bmp1.getWidth() : bmp2.getWidth();
         int maxHeight = bmp1.getHeight() > bmp2.getHeight() ? bmp1.getHeight() : bmp2.getHeight();
         return Bitmap.createBitmap(maxWidth, maxHeight, bmp1.getConfig());
@@ -103,12 +120,14 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @return the cropped image
      */
     private Bitmap cropCircle(Bitmap image, int radius) {
+        assert image != null;
+
         Paint color = new Paint();
         color.setColor(Color.BLACK);
         Bitmap preOut;
 
         if ((image.getWidth() != radius) || (image.getHeight() != radius)) {
-            preOut = Bitmap.createScaledBitmap(image, 2 * radius, 2 * radius, true);
+            preOut = Bitmap.createScaledBitmap(image, DOUBLE_RATIO * radius, DOUBLE_RATIO * radius, true);
         } else {
             preOut = image;
         }
@@ -119,16 +138,17 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, preOut.getWidth(), preOut.getHeight());
 
-        paint.setAntiAlias(true); // AntiAliasing smooths out the edges of what is being drawn
-        paint.setFilterBitmap(true); // Filtering affects the sampling of bitmaps when they are transformed.
-        paint.setDither(true); // Dithering affects how colors that are higher precision than the device are
-                               // down-sampled
+        // improve the bitmap's quality
+        paint.setAntiAlias(true);
+        paint.setFilterBitmap(true);
+        paint.setDither(true);
+
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(Color.parseColor("#BAB399"));
-        canvas.drawCircle((preOut.getWidth() / 2) + CIRCLE_CENTER_INCREMENT, (preOut.getHeight() / 2)
-                + CIRCLE_CENTER_INCREMENT, (preOut.getWidth() / 2) + CIRCLE_RADIUS_INCREMENT, paint);
-        paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN)); // crop the image depending on the drawn //
-                                                                // object
+        canvas.drawCircle((preOut.getWidth() / DOUBLE_RATIO) + CIRCLE_CENTER_INCREMENT,
+            (preOut.getHeight() / DOUBLE_RATIO) + CIRCLE_CENTER_INCREMENT, (preOut.getWidth() / DOUBLE_RATIO)
+                + CIRCLE_RADIUS_INCREMENT, paint);
+        paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
         canvas.drawBitmap(preOut, rect, rect, paint);
 
         return output;
@@ -136,12 +156,14 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
     }
 
     /**
-     * This function initializes the default profile picture (the one with User.NO_IMAGE), by retrieving it from
+     * This function initializes the default profile picture (the one with User.NO_IMAGE), by retrieving it
+     * from
      * resources and cropping it in a circle form
      */
     private void initializeDefaultProfilePicture() {
-        mDefaultProfilePicture = Bitmap.createScaledBitmap(User.NO_IMAGE, mBaseMarkerShape.getWidth()
-                - SHAPE_BORDER_WIDTH, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
+        mDefaultProfilePicture =
+            Bitmap.createScaledBitmap(User.NO_IMAGE, BASE_MARKER_SHAPE.getWidth() - SHAPE_BORDER_WIDTH,
+                BASE_MARKER_SHAPE.getWidth() - SHAPE_BORDER_WIDTH, true);
 
         mDefaultProfilePicture = this.cropCircle(mDefaultProfilePicture, mDefaultProfilePicture.getWidth());
     }
@@ -152,7 +174,8 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @param context
      */
     private void initializeIconComponents(Context context) {
-        if ((mBaseMarkerShape == null) || (mCurrentMarkerShape == null)) {
+        assert context != null;
+        if (mCurrentMarkerShape == null) {
             this.initializeMarkerShape(context);
         }
 
@@ -172,8 +195,8 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * This function initializes the marker
      */
     private void initializeMarkerIcon() {
-        mBaseOverlay = this.createDimensionedOverlay(mBaseMarkerShape, mProfilePicture);
-        mMarkerIcon = this.overlay(mCurrentMarkerShape, mProfilePicture);
+        mBaseOverlay = this.createDimensionedOverlay(BASE_MARKER_SHAPE, mProfilePicture);
+        mMarkerIcon = this.overlay(mCurrentMarkerShape, mProfilePicture, mBaseOverlay);
         mMarkerIcon = this.scaleMarker(mMarkerIcon, SCALE_MARKER);
     }
 
@@ -183,44 +206,48 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @param context
      */
     private void initializeMarkerShape(Context context) {
-        int idForm = R.drawable.marker_form_2_38;
-        mBaseMarkerShape = BitmapFactory.decodeResource(context.getResources(), idForm);
-        mCurrentMarkerShape = mBaseMarkerShape.copy(mBaseMarkerShape.getConfig(), true);
+        assert context != null;
+
+        mCurrentMarkerShape = BASE_MARKER_SHAPE.copy(BASE_MARKER_SHAPE.getConfig(), true);
         mCanvasCurrentShape = new Canvas(mCurrentMarkerShape);
     }
 
     /**
-     * This function initializes the profile picture, by retrieving it from resources and cropping it in a circle form
+     * This function initializes the profile picture, by retrieving it from resources and cropping it in a
+     * circle form
      */
     private void initializeProfilePicture() {
 
-        mProfilePicture = Bitmap.createScaledBitmap(mFriend.getImage(), mBaseMarkerShape.getWidth()
-                - SHAPE_BORDER_WIDTH, mBaseMarkerShape.getWidth() - SHAPE_BORDER_WIDTH, true);
+        mProfilePicture =
+            Bitmap.createScaledBitmap(mFriend.getActionImage(), BASE_MARKER_SHAPE.getWidth()
+                - SHAPE_BORDER_WIDTH, BASE_MARKER_SHAPE.getWidth() - SHAPE_BORDER_WIDTH, true);
 
         mProfilePicture = this.cropCircle(mProfilePicture, mProfilePicture.getWidth());
 
     }
 
-    private long minutesToMilliseconds(long minutes) {
-        return minutes * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND;
-    }
-
     /**
-     * this function combines the center of the second image on the center of the first image, on the base on the
-     * already prepared base bitmap mBmOverlay
+     * this function combines the center of the second image on the center of the first image, on the base on
+     * an
+     * already prepared base bitmap
      * 
      * @param bmp1
      * @param bmp2
+     * @param base
      * @return the combined bitmap
      */
-    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2, Bitmap base) {
+        assert (bmp1 != null) && (bmp2 != null) && (base != null);
+        int maxWidth = bmp1.getWidth() > bmp2.getWidth() ? bmp1.getWidth() : bmp2.getWidth();
+        int maxHeight = bmp1.getHeight() > bmp2.getHeight() ? bmp1.getHeight() : bmp2.getHeight();
+        assert (base.getWidth() == maxWidth) && (base.getHeight() == maxHeight);
 
-        Canvas canvas = new Canvas(mBaseOverlay);
+        Canvas canvas = new Canvas(base);
         canvas.drawBitmap(bmp1, 0, 0, null);
-        int cx = (bmp1.getWidth() / 2) - (bmp2.getWidth() / 2);
-        int cy = ((bmp1.getHeight() / 2) - (bmp2.getHeight() / 2)) - SHAPE_TAIL_LENGTH;
+        int cx = (bmp1.getWidth() / DOUBLE_RATIO) - (bmp2.getWidth() / DOUBLE_RATIO);
+        int cy = ((bmp1.getHeight() / DOUBLE_RATIO) - (bmp2.getHeight() / DOUBLE_RATIO)) - SHAPE_TAIL_LENGTH;
         canvas.drawBitmap(bmp2, cx, cy, null);
-        return mBaseOverlay;
+        return base;
 
     }
 
@@ -232,6 +259,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @return the scaled image
      */
     private Bitmap scaleMarker(Bitmap img, float coeff) {
+        assert (img != null) && (coeff > 0);
         int newWidth = Math.round(coeff * img.getWidth());
         int newHeight = Math.round(coeff * img.getHeight());
         return Bitmap.createScaledBitmap(img, newWidth, newHeight, true);
@@ -244,21 +272,15 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
      * @param elapsedTime
      */
     private void setColorOfMarkerShape(long elapsedTime) {
-        mCanvasCurrentShape.drawBitmap(mBaseMarkerShape, 0, 0, null);
-        long timeoutInMillis = this.minutesToMilliseconds(TIMEOUT_COLOR);
+        mCanvasCurrentShape.drawBitmap(BASE_MARKER_SHAPE, 0, 0, null);
+        long timeoutInMillis = TIMEOUT_COLOR * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND;
 
         Canvas canvas = new Canvas(mCurrentMarkerShape);
-        // ColorMatrix cm = new ColorMatrix();
-        // if (elapsedTime < timeoutInMillis) {
-        // cm.setSaturation((((SATURATION_BEGIN * timeoutInMillis) - elapsedTime) + (SATURATION_END *
-        // elapsedTime))
-        // / timeoutInMillis);
-        // } else {
-        // cm.setSaturation(SATURATION_END);
-        // }
 
-        int green = ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_green);
-        int blue = ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_blue);
+        int green =
+            ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_green);
+        int blue =
+            ServiceContainer.getSettingsManager().getContext().getResources().getColor(R.color.main_blue);
 
         int color = Utils.getColorInInterval(elapsedTime, 0, timeoutInMillis, green, blue);
         ColorMatrix cm = Utils.getMatrixForColor(color);
@@ -269,7 +291,7 @@ public class CircularMarkerIconMaker implements MarkerIconMaker {
         canvas.drawBitmap(mCurrentMarkerShape, 0, 0, paintLightening);
 
         // update the marker icon with the new marker shape
-        mMarkerIcon = this.overlay(mCurrentMarkerShape, mProfilePicture);
+        mMarkerIcon = this.overlay(mCurrentMarkerShape, mProfilePicture, mBaseOverlay);
         mMarkerIcon = this.scaleMarker(mMarkerIcon, SCALE_MARKER);
     }
 }

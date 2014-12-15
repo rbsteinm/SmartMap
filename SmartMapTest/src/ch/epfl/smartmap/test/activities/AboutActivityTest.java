@@ -18,6 +18,8 @@ import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertio
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
 /**
+ * Tests that important informations are shown on AboutActivity.
+ * 
  * @author SpicyCH
  */
 public class AboutActivityTest extends ActivityInstrumentationTestCase2<AboutActivity> {
@@ -35,6 +37,11 @@ public class AboutActivityTest extends ActivityInstrumentationTestCase2<AboutAct
         super.setUp();
         this.getActivity();
         mContext = this.getActivity().getApplicationContext();
+    }
+
+    public void testAppNameDisplayed() {
+        String appName = mContext.getString(R.string.app_name);
+        onView(ViewMatchers.withText(appName)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     public void testOurNamesDisplayed() {

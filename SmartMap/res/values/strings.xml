@@ -18,6 +18,7 @@
         <item>Prof. James Larus</item>
         <item>Călin Iorgulescu</item>
         <item>Lukas Kellenberger</item>
+        <item>Laura Perrenoud for the logo</item>
     </string-array>
 
     <string name="app_name">SmartMap</string>
@@ -30,14 +31,21 @@
     <string name="add_friend">Add a friend</string>
 
     <!-- Side menu Strings -->
+    <string name="profile_text">Profile</string>
+    <string name="friends_text">Friends</string>
+    <string name="events_text">Events</string>
+    <string name="filters_text">Filters</string>
+    <string name="settings_text">Settings</string>
+    <string name="about_text">About</string>
+    <string name="logout_text">Logout</string>
     <string-array name="sideMenuElements">
-        <item>Profile</item>
-        <item>Friends</item>
-        <item>Events</item>
-        <item>Filters</item>
-        <item>Settings</item>
-        <item>About</item>
-        <item>Logout</item>
+        <item>@string/profile_text</item>
+        <item>@string/friends_text</item>
+        <item>@string/events_text</item>
+        <item>@string/filters_text</item>
+        <item>@string/settings_text</item>
+        <item>@string/about_text</item>
+        <item>@string/logout_text</item>
     </string-array>
 
     <string name="title_activity_pager">Friends</string>
@@ -117,7 +125,7 @@
     <string name="show_event_disabled_warning_button_goto_settings">Take me to the settings</string>
     <string name="show_event_disabled_warning_button_return_to_main">OK</string>
     <string name="symbol_km">km</string>
-    
+
     <!-- EventsListItemAdapter -->
     <string name="events_list_item_adapter_event_live">Event is live!</string>
     <string name="events_list_item_adapter_today">Today</string>
@@ -218,6 +226,7 @@
     <string name="notification_open_event_list">Click here to open your list of events.</string>
 
     <!-- Invitation Activity -->
+    <string name="notification_list_description">notification list description</string>
     <string name="notification_img_content_description">Image of notification</string>
     <string name="title_activity_notifications">Invitations</string>
     <string name="notification_open_friend_invitation_list">Click here to open your list of invitations.</string>
@@ -255,6 +264,13 @@
     <string name="show_on_map">Activate</string>
     <string name="add_filter">Add new filter</string>
     <string name="new_filter_alert_dialog_text">Name </string>
+    <string name="switch_On">YES</string>
+    <string name="switch_Off">NO</string>
+    <string name="people_inside_filter">people inside this filter</string>
+    <string name="new_filter">New Filter</string>
+    <string name="create_filter">Create</string>
+    <string name="cancel_create_filter">Cancel</string>
+    <string name="create_filter_empty_name">Enter a non empty name</string>
 
     <!-- ModifyFilterActivity -->
     <string name="title_activity_modify_filter">ModifyFilterActivity</string>
@@ -309,6 +325,12 @@
     <string name="about_dummy_copyright">© 2014</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <!-- LogoutManager -->
+    <string name="logout_dialog_title">Logging out</string>
+    <string name="logout_dialog_message">Do you really want to logout from SmartMap?</string>
+    <string name="logout_toast_confirm">Logging out…</string>
+    <string name="logout_confirm">Logout</string>
 
     <!-- Utils -->
     <string name="utils_never_seen_on_smartmap">Never seen on SmartMap</string>

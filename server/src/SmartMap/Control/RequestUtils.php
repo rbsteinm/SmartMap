@@ -58,7 +58,7 @@ class RequestUtils
         $session = $request->getSession();
 
         // The userId is set in the session when successfully authenticated
-        $id = $session->get('userId');
+        $id = (int) $session->get('userId');
 
         if ($id == null)
         {

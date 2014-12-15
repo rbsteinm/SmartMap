@@ -36,6 +36,12 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     private static final int INDEX_ABOUT = 5;
     private static final int INDEX_LOGOUT = 6;
 
+    /**
+     * Public constructor returning a new listener for the left menu.
+     * Supposedly called only once
+     * 
+     * @param context
+     */
     public DrawerItemClickListener(Context context) {
         mContext = context;
         mDrawer = (DrawerLayout) ((Activity) mContext).findViewById(R.id.drawer_layout);
@@ -49,6 +55,7 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
                 break;
             case INDEX_FRIENDS:
                 view.getContext().startActivity(new Intent(view.getContext(), FriendsPagerActivity.class));
+                view.setContentDescription("Friends");
                 break;
             case INDEX_EVENTS:
                 view.getContext().startActivity(new Intent(view.getContext(), ShowEventsActivity.class));
@@ -69,8 +76,6 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
             default:
                 break;
         }
-        // TODO here the view loses the focus
-        parent.clearChildFocus(view);
         mDrawer.closeDrawers();
     }
 }
