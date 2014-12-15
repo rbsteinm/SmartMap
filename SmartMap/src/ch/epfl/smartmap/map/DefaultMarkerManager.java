@@ -4,11 +4,13 @@
 package ch.epfl.smartmap.map;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -38,7 +40,11 @@ public class DefaultMarkerManager implements MarkerManager {
     public static final long HANDLER_DELAY = 16;
     public static final long ANIMATE_MARKER_DURATION = 1000;
 
+    public static final int MIN_TIME_BETWEEN_UPDATES = 15000;
+
     private final GoogleMap mGoogleMap;
+    private long lastUpdateInMillis = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00"))
+        .getTimeInMillis();
 
     /**
      * A map that contains the displayed markers' ids, associated with the
@@ -223,41 +229,46 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public void updateMarkers(Context context, Set<Displayable> itemsToDisplay) {
-        this.checkNonNull(context, "context");
-        this.checkNonNull(itemsToDisplay, "items to display");
-        Log.d(TAG, "updateMarkers");
-        // In the list friendsToDisplay, search if each friend s already
-        // displayed
-        for (Displayable item : itemsToDisplay) {
-            Marker marker;
-            // if the item is already displayed, get the marker for this
-            // item, else add a new marker
-            if (this.isDisplayedItem(item)) {
-                marker = this.getMarkerForItem(item);
-            } else {
-                marker = this.addMarker(item, context);
+        long nowInMillis = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis();
+        if ((nowInMillis - lastUpdateInMillis) < MIN_TIME_BETWEEN_UPDATES) {
+            this.checkNonNull(context, "context");
+            this.checkNonNull(itemsToDisplay, "items to display");
+            Log.d(TAG, "updateMarkers");
+            // In the list friendsToDisplay, search if each friend s already
+            // displayed
+            for (Displayable item : itemsToDisplay) {
+                Marker marker;
+                // if the item is already displayed, get the marker for this
+                // item, else add a new marker
+                if (this.isDisplayedItem(item)) {
+                    marker = this.getMarkerForItem(item);
+                } else {
+                    marker = this.addMarker(item, context);
+                }
+
+                if ((marker.getPosition().latitude != item.getLatLng().latitude)
+                    || (marker.getPosition().longitude != item.getLatLng().longitude)) {
+
+                    this.animateMarker(marker, item.getLatLng());
+                }
+
+                // set the marker's icon
+                marker.setIcon(item.getMarkerIcon(context));
+
             }
 
-            if ((marker.getPosition().latitude != item.getLatLng().latitude)
-                || (marker.getPosition().longitude != item.getLatLng().longitude)) {
+            // remove the markers that are not longer in the list to display
+            for (Displayable item : this.getDisplayedItems()) {
+                if (!itemsToDisplay.contains(item)) {
 
-                this.animateMarker(marker, item.getLatLng());
+                    this.removeMarker(item);
+
+                }
             }
 
-            // set the marker's icon
-            marker.setIcon(item.getMarkerIcon(context));
-
+            // Update last time
+            lastUpdateInMillis = nowInMillis;
         }
-
-        // remove the markers that are not longer in the list to display
-        for (Displayable item : this.getDisplayedItems()) {
-            if (!itemsToDisplay.contains(item)) {
-
-                this.removeMarker(item);
-
-            }
-        }
-
     }
 
     /**
