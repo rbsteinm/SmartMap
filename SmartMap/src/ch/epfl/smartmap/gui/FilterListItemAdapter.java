@@ -74,7 +74,8 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
             viewHolder.getFilterName().setText(filter.getName());
 
             viewHolder.getSubtitle().setText(
-                filter.getIds().size() + mContext.getResources().getString(R.string.people_inside_filter));
+                filter.getIds().size() + " "
+                    + mContext.getResources().getString(R.string.people_inside_filter));
 
             viewHolder.getFollowSwitch().setChecked(filter.isActive());
             viewHolder.getFollowSwitch().setOnCheckedChangeListener(

@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Filter;
@@ -55,14 +56,19 @@ public class ShowFiltersActivity extends ListActivity {
                 EditText editText =
                     (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                 String filterName = editText.getText().toString();
-                Long newFilterId =
-                    ServiceContainer.getCache().putFilter(
-                        new FilterContainer(Filter.NO_ID, filterName, new HashSet<Long>(), true));
-                // Start a new instance of ModifyFilterActivity passing it the
-                // new filter's name
-                Intent intent = new Intent(ShowFiltersActivity.this, ModifyFilterActivity.class);
-                intent.putExtra("FILTER", newFilterId);
-                ShowFiltersActivity.this.startActivity(intent);
+                if (filterName.isEmpty()) {
+                    Toast.makeText(ShowFiltersActivity.this.getBaseContext(), "Enter a non empty name",
+                        Toast.LENGTH_LONG).show();
+                } else {
+                    Long newFilterId =
+                        ServiceContainer.getCache().putFilter(
+                            new FilterContainer(Filter.NO_ID, filterName, new HashSet<Long>(), true));
+                    // Start a new instance of ModifyFilterActivity passing it the
+                    // new filter's name
+                    Intent intent = new Intent(ShowFiltersActivity.this, ModifyFilterActivity.class);
+                    intent.putExtra("FILTER", newFilterId);
+                    ShowFiltersActivity.this.startActivity(intent);
+                }
             }
         });
 
@@ -86,7 +92,7 @@ public class ShowFiltersActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_show_filters);
-
+        ServiceContainer.initSmartMapServices(this);
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
 
