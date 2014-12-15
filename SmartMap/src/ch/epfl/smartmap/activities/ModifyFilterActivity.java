@@ -63,7 +63,7 @@ public class ModifyFilterActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_modify_filter);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-        ServiceContainer.forceInitSmartMapServices(this.getBaseContext());
+        // ServiceContainer.initSmartMapServices(this.getBaseContext());
 
         mInsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_inside_layout);
         mOutsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_outside_layout);
