@@ -418,9 +418,6 @@ public class AddEventActivity extends FragmentActivity {
         }
 
         mEndDate.add(Calendar.MINUTE, FIVE_MINUTES);
-
-        mPickEndDate.setText(Utils.getDateString(mEndDate));
-        mPickEndTime.setText(Utils.getTimeString(mEndDate));
     }
 
     /**
@@ -507,10 +504,28 @@ public class AddEventActivity extends FragmentActivity {
      * @author SpicyCH
      */
     private class DateChangedListener implements TextWatcher {
-        @Override
-        public void afterTextChanged(Editable s) {
 
-            AddEventActivity.this.checkDatesValidity();
+        private boolean mEditing;
+
+        public DateChangedListener() {
+            mEditing = false;
+        }
+
+        @Override
+        public synchronized void afterTextChanged(Editable s) {
+
+            if (!mEditing) {
+                Log.d(TAG, "Editing");
+                mEditing = true;
+
+                AddEventActivity.this.checkDatesValidity();
+
+                mPickEndDate.setText(Utils.getDateString(mEndDate));
+                mPickEndTime.setText(Utils.getTimeString(mEndDate));
+
+                mEditing = false;
+
+            }
 
         }
 
