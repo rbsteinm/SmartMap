@@ -283,7 +283,7 @@
     <string name="new_filter">New Filter</string>
     <string name="create_filter">Create</string>
     <string name="cancel_create_filter">Cancel</string>
-    <string name="create_filter_empty_name">Enter a non empty name</string>
+    <string name="create_filter_invalid_name">Please enter a name between 1 and 25 characters</string>
 
     <!-- ModifyFilterActivity -->
     <string name="title_activity_modify_filter">ModifyFilterActivity</string>
