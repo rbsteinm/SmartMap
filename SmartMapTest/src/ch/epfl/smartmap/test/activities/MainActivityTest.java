@@ -32,6 +32,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         this.getActivity();
     }
 
+    public void testClickOnSearchItem() {
+        onView(withId(R.id.action_search)).perform(click());
+    }
+
     public void testCloseSearchViewWithBackButton() {
         onView(withId(R.id.action_search)).perform(click());
         pressBack();
@@ -163,6 +167,5 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     public void testWrongSearchQuery() {
         onView(withId(R.id.action_search)).perform(click());
         onView(withId(R.id.action_search)).perform(ViewActions.typeText("flksdh�fjkslkfshdfljkshfd"));
-        // TODO : Check no result is displayed
     }
 }
