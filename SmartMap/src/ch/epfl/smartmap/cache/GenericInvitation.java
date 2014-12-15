@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.EventInformationActivity;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
@@ -184,10 +183,6 @@ public class GenericInvitation extends Invitation {
     @Override
     public boolean update(InvitationContainer invitation) {
         boolean hasChanged = super.update(invitation);
-        Log.d("INVITATION TEST", "mUser : " + mUser + " invitation.getUser() : " + invitation.getUser());
-        Log.d("INVITATION TEST", "mEvent : " + mEvent + " invitation.getEvent() : " + invitation.getEvent());
-        Log.d("INVITATION TEST", "mType : " + mType + " invitation.getType() : " + invitation.getType());
-
         if ((invitation.getUser() != null) && (invitation.getUser() != mUser)) {
             mUser = invitation.getUser();
             hasChanged = true;

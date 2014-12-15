@@ -33,22 +33,34 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class Cache implements CacheInterface {
 
-    static final public String TAG = Cache.class.getSimpleName();
+    /**
+     * Allows to search efficiently through the Cache, by providing a filtering
+     * method
+     * 
+     * @param <T>
+     *            Type of items searched
+     * @author jfperren
+     */
+    public interface SearchFilter<T> {
+        boolean filter(T item);
+    }
 
+    public static final String TAG = Cache.class.getSimpleName();
     // SparseArrays containing live instances
     private final LongSparseArray<User> mUserInstances;
     private final LongSparseArray<Event> mEventInstances;
     private final LongSparseArray<Filter> mFilterInstances;
-    private final LongSparseArray<Invitation> mInvitationInstances;
 
+    private final LongSparseArray<Invitation> mInvitationInstances;
     // These sets are the keys for the LongSparseArrays
     private final Set<Long> mUserIds;
     private final Set<Long> mEventIds;
     private final Set<Long> mFilterIds;
-    private final Set<Long> mInvitationIds;
 
+    private final Set<Long> mInvitationIds;
     // Contains the ids of the friends
     private final Set<Long> mFriendIds;
+
     private long mSelfId;
 
     // Id for the next filter to be added
@@ -88,42 +100,53 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void acceptInvitation(final Invitation invitation,
-        final NetworkRequestCallback<Void> callback) {
+    public synchronized void acceptInvitation(final Invitation invitation, final NetworkRequestCallback<Void> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                try {
-                    switch (invitation.getType()) {
-                        case Invitation.FRIEND_INVITATION:
-                            UserContainer newFriend =
-                                ServiceContainer.getNetworkClient().acceptInvitation(
-                                    invitation.getUser().getId());
-                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
-                            newFriend.setFriendship(User.FRIEND);
-                            Cache.this.putUser(newFriend);
-                            break;
-                        case Invitation.EVENT_INVITATION:
-                            long eventId = ((GenericInvitation) invitation).getEvent().getId();
-                            ServiceContainer.getNetworkClient().joinEvent(eventId);
-                            Cache.this.putEvent(ServiceContainer.getNetworkClient().getEventInfo(eventId));
-                            break;
-                        default:
-                            assert false;
-                            break;
-                    }
-
-                    Cache.this.updateInvitation(invitation.getContainerCopy().setStatus(Invitation.ACCEPTED));
-
-                    callback.onSuccess(null);
-                } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Error while accepting invitation: " + e);
-                    callback.onFailure(e);
-                }
-                return null;
+                return Cache.this.acceptInvitationTaskInBackground(invitation, callback);
             }
 
         }.execute();
+    }
+
+    /**
+     * Body of doInBackground in acceptInvitation asyncTask
+     * 
+     * @param invitation
+     *            the invitation to accept
+     * @param callback
+     *            the callback to network request
+     * @return Void
+     */
+    private Void acceptInvitationTaskInBackground(Invitation invitation, NetworkRequestCallback<Void> callback) {
+        try {
+            switch (invitation.getType()) {
+                case Invitation.FRIEND_INVITATION:
+                    UserContainer newFriend =
+                        ServiceContainer.getNetworkClient().acceptInvitation(invitation.getUser().getId());
+                    ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
+                    newFriend.setFriendship(User.FRIEND);
+                    Cache.this.putUser(newFriend);
+                    break;
+                case Invitation.EVENT_INVITATION:
+                    long eventId = ((GenericInvitation) invitation).getEvent().getId();
+                    ServiceContainer.getNetworkClient().joinEvent(eventId);
+                    Cache.this.putEvent(ServiceContainer.getNetworkClient().getEventInfo(eventId));
+                    break;
+                default:
+                    assert false;
+                    break;
+            }
+
+            Cache.this.updateInvitation(invitation.getContainerCopy().setStatus(Invitation.ACCEPTED));
+
+            callback.onSuccess(null);
+        } catch (SmartMapClientException e) {
+            Log.e(TAG, "Error while accepting invitation: " + e);
+            callback.onFailure(e);
+        }
+        return null;
     }
 
     /*
@@ -151,8 +174,7 @@ public class Cache implements CacheInterface {
         Set<Long> newParticipantIds = event.getContainerCopy().getParticipantIds();
         newParticipantIds.addAll(ids);
 
-        final EventContainer newImmutableEvent =
-            event.getContainerCopy().setParticipantIds(newParticipantIds);
+        final EventContainer newImmutableEvent = event.getContainerCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -181,30 +203,43 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void createEvent(final EventContainer createdEvent,
-        final NetworkRequestCallback<Event> callback) {
+    public synchronized void
+        createEvent(final EventContainer createdEvent, final NetworkRequestCallback<Event> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                try {
-                    long eventId;
-                    eventId = ServiceContainer.getNetworkClient().createPublicEvent(createdEvent);
-                    // Add ID to event
-                    createdEvent.setId(eventId);
-                    // Puts event in Cache
-                    Cache.this.putEvent(createdEvent);
-                    if (callback != null) {
-                        callback.onSuccess(Cache.this.getEvent(eventId));
-                    }
-                } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Error while creating event: " + e);
-                    if (callback != null) {
-                        callback.onFailure(e);
-                    }
-                }
-                return null;
+                return Cache.this.createEventTaskInBackground(createdEvent, callback);
             }
         }.execute();
+    }
+
+    /**
+     * Body of doInBackground in createEvent asyncTask
+     * 
+     * @param createdEvent
+     *            the created event
+     * @param callback
+     *            the callback to network request
+     * @return Void
+     */
+    private Void createEventTaskInBackground(EventContainer createdEvent, NetworkRequestCallback<Event> callback) {
+        try {
+            long eventId;
+            eventId = ServiceContainer.getNetworkClient().createPublicEvent(createdEvent);
+            // Add ID to event
+            createdEvent.setId(eventId);
+            // Puts event in Cache
+            Cache.this.putEvent(createdEvent);
+            if (callback != null) {
+                callback.onSuccess(Cache.this.getEvent(eventId));
+            }
+        } catch (SmartMapClientException e) {
+            Log.e(TAG, "Error while creating event: " + e);
+            if (callback != null) {
+                callback.onFailure(e);
+            }
+        }
+        return null;
     }
 
     /*
@@ -215,38 +250,50 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void declineInvitation(final Invitation invitation,
-        final NetworkRequestCallback<Void> callback) {
+    public synchronized void
+        declineInvitation(final Invitation invitation, final NetworkRequestCallback<Void> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                try {
-                    switch (invitation.getType()) {
-                        case Invitation.FRIEND_INVITATION:
-                            // Decline online
-                            ServiceContainer.getNetworkClient().declineInvitation(
-                                invitation.getUser().getId());
-                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
-                            break;
-                        case Invitation.EVENT_INVITATION:
-                            // No interaction needed here
-                            break;
-                        default:
-                            assert false;
-                            break;
-                    }
-
-                    Cache.this.updateInvitation(invitation.getContainerCopy().setStatus(Invitation.DECLINED));
-
-                    callback.onSuccess(null);
-                } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Error while declining invitation: " + e);
-                    callback.onFailure(e);
-                }
-                return null;
+                return Cache.this.declineInvitationTaskInBackground(invitation, callback);
             }
 
         }.execute();
+    }
+
+    /**
+     * Body of doInBackground in declineInvitation asyncTask
+     * 
+     * @param invitation
+     *            the invitation to be declined
+     * @param callback
+     *            the callback to network request
+     * @return Void
+     */
+    private Void declineInvitationTaskInBackground(Invitation invitation, NetworkRequestCallback<Void> callback) {
+        try {
+            switch (invitation.getType()) {
+                case Invitation.FRIEND_INVITATION:
+                    // Decline online
+                    ServiceContainer.getNetworkClient().declineInvitation(invitation.getUser().getId());
+                    ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
+                    break;
+                case Invitation.EVENT_INVITATION:
+                    // No interaction needed here
+                    break;
+                default:
+                    assert false;
+                    break;
+            }
+
+            Cache.this.updateInvitation(invitation.getContainerCopy().setStatus(Invitation.DECLINED));
+
+            callback.onSuccess(null);
+        } catch (SmartMapClientException e) {
+            Log.e(TAG, "Error while declining invitation: " + e);
+            callback.onFailure(e);
+        }
+        return null;
     }
 
     /*
@@ -598,15 +645,15 @@ public class Cache implements CacheInterface {
         });
     }
 
-    @Override
-    public synchronized User getUser(long id) {
-        return mUserInstances.get(id);
-    }
-
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.CacheInterface#getUser(long)
      */
+
+    @Override
+    public synchronized User getUser(long id) {
+        return mUserInstances.get(id);
+    }
 
     /*
      * (non-Javadoc)
@@ -675,8 +722,7 @@ public class Cache implements CacheInterface {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId,
-                        new ArrayList<Long>(usersIds));
+                    ServiceContainer.getNetworkClient().inviteUsersToEvent(eventId, new ArrayList<Long>(usersIds));
                     callback.onSuccess(null);
                 } catch (SmartMapClientException e) {
                     callback.onFailure(e);
@@ -708,6 +754,19 @@ public class Cache implements CacheInterface {
         }.execute(id);
     }
 
+    private synchronized void keepOnlyTheseEvents(Set<EventContainer> events) {
+        mEventIds.clear();
+        mEventInstances.clear();
+        this.putEvents(events);
+    }
+
+    private synchronized void keepOnlyTheseUsers(Set<UserContainer> users) {
+        mFriendIds.clear();
+        mUserIds.clear();
+        mUserInstances.clear();
+        this.putUsers(users);
+    }
+
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.CacheInterface#logState()
@@ -719,8 +778,8 @@ public class Cache implements CacheInterface {
         Log.d(TAG, "CACHE STATE : Events : " + mEventIds);
         Set<String> filters = new HashSet<String>();
         for (long id : mFilterIds) {
-            filters.add("" + this.getFilter(id).getName() + "(" + this.getFilter(id).getVisibleFriends()
-                + ")" + this.getFilter(id).getId() + this.getFilter(id).isActive());
+            filters.add("" + this.getFilter(id).getName() + "(" + this.getFilter(id).getVisibleFriends() + ")"
+                + this.getFilter(id).getId() + this.getFilter(id).isActive());
         }
         Log.d(TAG, "CACHE STATE : Filters : " + filters);
         Set<Long> invitingUsers = new HashSet<Long>();
@@ -1014,8 +1073,7 @@ public class Cache implements CacheInterface {
                 Invitation invitation = Invitation.createFromContainer(invitationInfo);
                 mInvitationInstances.put(invitationInfo.getId(), invitation);
                 if (invitationId != Invitation.ALREADY_RECEIVED) {
-                    Notifications.createNotification(invitation, ServiceContainer.getSettingsManager()
-                        .getContext());
+                    Notifications.createNotification(invitation, ServiceContainer.getSettingsManager().getContext());
                 }
             }
 
@@ -1256,8 +1314,7 @@ public class Cache implements CacheInterface {
         Set<Long> newParticipantIds = event.getContainerCopy().getParticipantIds();
         newParticipantIds.removeAll(ids);
 
-        final EventContainer newImmutableEvent =
-            event.getContainerCopy().setParticipantIds(newParticipantIds);
+        final EventContainer newImmutableEvent = event.getContainerCopy().setParticipantIds(newParticipantIds);
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -1310,36 +1367,98 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void setBlockedStatus(final UserContainer user,
-        final NetworkRequestCallback<Void> callback) {
+    public synchronized void setBlockedStatus(final UserContainer user, final NetworkRequestCallback<Void> callback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                try {
-                    boolean changed = false;
-                    if (user.isBlocked() == User.BlockStatus.UNBLOCKED) {
-                        ServiceContainer.getNetworkClient().unblockFriend(user.getId());
-                        changed = Cache.this.updateUser(user);
-                    } else {
-                        ServiceContainer.getNetworkClient().blockFriend(user.getId());
-                        changed = Cache.this.updateUser(user);
-                    }
-                    if (changed) {
-                        for (CacheListener listener : mListeners) {
-                            listener.onUserListUpdate();
-                        }
-                    }
-                    if (callback != null) {
-                        callback.onSuccess(null);
-                    }
-                } catch (SmartMapClientException e) {
-                    if (callback != null) {
-                        callback.onFailure(e);
-                    }
-                }
-                return null;
+                return Cache.this.setBlockedStatusTaskInBackground(user, callback);
             }
         }.execute();
+    }
+
+    /**
+     * Body of doInBackground in setBlockedStatus asyncTask
+     * 
+     * @param user
+     *            the user to be blocked/unblocked
+     * @param callback
+     *            the callback to network request
+     * @return Void
+     */
+    private Void setBlockedStatusTaskInBackground(UserContainer user, NetworkRequestCallback<Void> callback) {
+        try {
+            boolean changed = false;
+            if (user.isBlocked() == User.BlockStatus.UNBLOCKED) {
+                ServiceContainer.getNetworkClient().unblockFriend(user.getId());
+                changed = Cache.this.updateUser(user);
+            } else {
+                ServiceContainer.getNetworkClient().blockFriend(user.getId());
+                changed = Cache.this.updateUser(user);
+            }
+            if (changed) {
+                for (CacheListener listener : mListeners) {
+                    listener.onUserListUpdate();
+                }
+            }
+            if (callback != null) {
+                callback.onSuccess(null);
+            }
+        } catch (SmartMapClientException e) {
+            if (callback != null) {
+                callback.onFailure(e);
+            }
+        }
+        return null;
+    }
+
+    private synchronized boolean updateEvent(EventContainer eventInfo) {
+        Set<EventContainer> singleton = new HashSet<EventContainer>();
+        singleton.add(eventInfo);
+        return this.updateEvents(singleton);
+    }
+
+    private synchronized boolean updateEvents(Set<EventContainer> eventInfos) {
+        boolean isListModified = false;
+        for (EventContainer eventInfo : eventInfos) {
+            Event event = this.getEvent(eventInfo.getId());
+            if ((event != null) && event.update(eventInfo)) {
+                isListModified = true;
+            }
+        }
+
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onEventListUpdate();
+            }
+        }
+
+        return isListModified;
+    }
+
+    @SuppressWarnings("unused")
+    private synchronized boolean updateFilter(FilterContainer filterInfo) {
+        Set<FilterContainer> singleton = new HashSet<FilterContainer>();
+        singleton.add(filterInfo);
+        return this.updateFilters(singleton);
+    }
+
+    private synchronized boolean updateFilters(Set<FilterContainer> filterInfos) {
+        boolean isListModified = false;
+
+        for (FilterContainer filterInfo : filterInfos) {
+            Filter filter = this.getFilter(filterInfo.getId());
+            if ((filter != null) && filter.update(filterInfo)) {
+                isListModified = true;
+            }
+        }
+
+        if (isListModified) {
+            for (CacheListener listener : mListeners) {
+                listener.onFilterListUpdate();
+            }
+        }
+
+        return isListModified;
     }
 
     /*
@@ -1350,8 +1469,7 @@ public class Cache implements CacheInterface {
      * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
-    public synchronized void updateFromNetwork(final SmartMapClient networkClient)
-        throws SmartMapClientException {
+    public synchronized void updateFromNetwork(final SmartMapClient networkClient) throws SmartMapClientException {
 
         // Get settings
         SettingsManager settingsManager = ServiceContainer.getSettingsManager();
@@ -1456,90 +1574,6 @@ public class Cache implements CacheInterface {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#updateUserInfos(long)
-     */
-    @Override
-    public synchronized void updateUserInfos(long id) {
-        new AsyncTask<Long, Void, Void>() {
-            @Override
-            protected Void doInBackground(Long... params) {
-                try {
-                    UserContainer userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
-                    userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
-                    Cache.this.updateUser(userInfos);
-                } catch (SmartMapClientException e) {
-                    Log.e(TAG, "SmartMapClientException : " + e);
-                }
-                return null;
-            }
-        }.execute(id);
-    }
-
-    private synchronized void keepOnlyTheseEvents(Set<EventContainer> events) {
-        mEventIds.clear();
-        mEventInstances.clear();
-        this.putEvents(events);
-    }
-
-    private synchronized void keepOnlyTheseUsers(Set<UserContainer> users) {
-        mFriendIds.clear();
-        mUserIds.clear();
-        mUserInstances.clear();
-        this.putUsers(users);
-    }
-
-    private synchronized boolean updateEvent(EventContainer eventInfo) {
-        Set<EventContainer> singleton = new HashSet<EventContainer>();
-        singleton.add(eventInfo);
-        return this.updateEvents(singleton);
-    }
-
-    private synchronized boolean updateEvents(Set<EventContainer> eventInfos) {
-        boolean isListModified = false;
-        for (EventContainer eventInfo : eventInfos) {
-            Event event = this.getEvent(eventInfo.getId());
-            if ((event != null) && event.update(eventInfo)) {
-                isListModified = true;
-            }
-        }
-
-        if (isListModified) {
-            for (CacheListener listener : mListeners) {
-                listener.onEventListUpdate();
-            }
-        }
-
-        return isListModified;
-    }
-
-    @SuppressWarnings("unused")
-    private synchronized boolean updateFilter(FilterContainer filterInfo) {
-        Set<FilterContainer> singleton = new HashSet<FilterContainer>();
-        singleton.add(filterInfo);
-        return this.updateFilters(singleton);
-    }
-
-    private synchronized boolean updateFilters(Set<FilterContainer> filterInfos) {
-        boolean isListModified = false;
-
-        for (FilterContainer filterInfo : filterInfos) {
-            Filter filter = this.getFilter(filterInfo.getId());
-            if ((filter != null) && filter.update(filterInfo)) {
-                isListModified = true;
-            }
-        }
-
-        if (isListModified) {
-            for (CacheListener listener : mListeners) {
-                listener.onFilterListUpdate();
-            }
-        }
-
-        return isListModified;
-    }
-
     private boolean updateInvitation(InvitationContainer invitation) {
         Set<InvitationContainer> singleton = new HashSet<InvitationContainer>();
         singleton.add(invitation);
@@ -1570,6 +1604,27 @@ public class Cache implements CacheInterface {
         Set<UserContainer> singleton = new HashSet<UserContainer>();
         singleton.add(userInfo);
         return this.updateUsers(singleton);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.CacheInterface#updateUserInfos(long)
+     */
+    @Override
+    public synchronized void updateUserInfos(long id) {
+        new AsyncTask<Long, Void, Void>() {
+            @Override
+            protected Void doInBackground(Long... params) {
+                try {
+                    UserContainer userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
+                    userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
+                    Cache.this.updateUser(userInfos);
+                } catch (SmartMapClientException e) {
+                    Log.e(TAG, "SmartMapClientException : " + e);
+                }
+                return null;
+            }
+        }.execute(id);
     }
 
     /**
@@ -1611,17 +1666,5 @@ public class Cache implements CacheInterface {
         }
 
         return isListModified;
-    }
-
-    /**
-     * Allows to search efficiently through the Cache, by providing a filtering
-     * method
-     * 
-     * @param <T>
-     *            Type of items searched
-     * @author jfperren
-     */
-    public interface SearchFilter<T> {
-        boolean filter(T item);
     }
 }

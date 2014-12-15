@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.cache;
 
-
 /**
  * Describes a generic invitation on the application SmartMap
  * 
