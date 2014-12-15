@@ -291,7 +291,7 @@
     <string name="activity_modify_filter_outside_title">Outside filter</string>
     <string name="action_save_filter_button">Save</string>
     <string name="action_rename_filter_button">Rename</string>
-    <string name="action_cancel_button">Rename</string>
+    <string name="action_cancel_button">Cancel</string>
     <string name="rename_filter">Rename filter</string>
     <string name="new_name_saved">New name saved</string>
     <string name="save_changes">Save changes?</string>
