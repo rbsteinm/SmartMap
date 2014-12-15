@@ -12,7 +12,8 @@ import android.graphics.drawable.Drawable;
 import ch.epfl.smartmap.R;
 
 /**
- * Creates drawable that we can add on our action bar's app icon
+ * Creates drawable that we can add on our action bar's notification icon
+ * Taken from : http://www.jmhend.me/layerdrawable-menuitems
  * 
  * @author agpmilli
  */
@@ -26,6 +27,12 @@ public class BadgeDrawable extends Drawable {
     private String mCount = "";
     private boolean mWillDraw = false;
 
+    /**
+     * Constructor of the badge
+     * 
+     * @param context
+     *            the current context
+     */
     public BadgeDrawable(Context context) {
         mTextSize = context.getResources().getDimension(R.dimen.badge_text_size);
 
@@ -83,9 +90,10 @@ public class BadgeDrawable extends Drawable {
     }
 
     /**
-     * Sets the count (i.e notifications) to display.
+     * Sets the count (i.e number of notifications) to display.
      * 
      * @param count
+     *            the number
      */
     public void setCount(int count) {
         mCount = Integer.toString(count);

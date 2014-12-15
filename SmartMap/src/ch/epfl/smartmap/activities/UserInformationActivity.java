@@ -32,9 +32,11 @@ import ch.epfl.smartmap.util.Utils;
  */
 public class UserInformationActivity extends Activity {
 
-    private Activity mActivity;
-
     private static final String TAG = UserInformationActivity.class.getSimpleName();
+    private static final boolean SHOW_ON_MAP_ENABLED = false;
+    private static final boolean BLOCK_ENABLED = false;
+
+    private Activity mActivity;
 
     private User mUser;
     private long mUserId;
@@ -45,20 +47,22 @@ public class UserInformationActivity extends Activity {
     private TextView mNameView;
     private ImageView mPictureView;
     private TextView mDistanceView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_user_information);
 
+
         // Get views
         mActivity = this;
+
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
         mNameView = (TextView) this.findViewById(R.id.user_info_name);
         mSubtitlesView = (TextView) this.findViewById(R.id.user_info_subtitles);
         mShowOnMapSwitch = (Switch) this.findViewById(R.id.user_info_show_on_map_switch);
         mBlockSwitch = (Switch) this.findViewById(R.id.user_info_blocking_switch);
         mDistanceView = (TextView) this.findViewById(R.id.user_info_distance);
-
         // Set actionbar color
         this.getActionBar().setBackgroundDrawable(
             new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
@@ -88,7 +92,17 @@ public class UserInformationActivity extends Activity {
         mUser = ServiceContainer.getCache().getUser(mUserId);
         this.updateInformations(mUser);
 
+        //Note: these two functionalities caused several problems, so we decided we
+        //wouldn't implement them yet. Will be fixed before google play release
+        if (!SHOW_ON_MAP_ENABLED) {
+            mShowOnMapSwitch.setVisibility(View.GONE);
+        }
+        if (!BLOCK_ENABLED) {
+            mBlockSwitch.setVisibility(View.GONE);
+        }
+
     }
+
 
     /**
      * displays a confirmation dialog when the user tries to
@@ -146,7 +160,6 @@ public class UserInformationActivity extends Activity {
         builder.create().show();
     }
 
-
     @Override
     public void onBackPressed() {
         this.onNotificationOpen();
@@ -184,11 +197,11 @@ public class UserInformationActivity extends Activity {
     public void setBlockedStatus(View view) {
         UserContainer modified = mUser.getContainerCopy();
         if (mBlockSwitch.isChecked()) {
-            Log.d(TAG, "HERE IM BLOCKING");
+            Log.d(TAG, "blocking user");
             modified.setBlocked(User.BlockStatus.BLOCKED);
         } else {
             modified.setBlocked(User.BlockStatus.UNBLOCKED);
-            Log.d(TAG, "HERE IM UNBLOCKING");
+            Log.d(TAG, "unblocking user");
         }
 
         ServiceContainer.getCache().setBlockedStatus(modified, new NetworkRequestCallback<Void>() {
@@ -199,8 +212,8 @@ public class UserInformationActivity extends Activity {
                     @Override
                     public void run() {
                         mBlockSwitch.setChecked(UserInformationActivity.this.statusToBool(mUser.getBlockStatus()));
-                        Toast.makeText(UserInformationActivity.this, "Network error, couldn't (un)block friend",
-                            Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UserInformationActivity.this, UserInformationActivity.
+                            this.getString(R.string.blocking_failure), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -212,10 +225,12 @@ public class UserInformationActivity extends Activity {
                     public void run() {
                         mShowOnMapSwitch.setEnabled(!UserInformationActivity.this.statusToBool(mUser.getBlockStatus()));
                         if (UserInformationActivity.this.statusToBool(mUser.getBlockStatus())) {
-                            Toast.makeText(UserInformationActivity.this, "friend successfully blocked",
+                            Toast.makeText(UserInformationActivity.this, UserInformationActivity.
+                                this.getString(R.string.friend_blocked),
                                 Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(UserInformationActivity.this, "friend successfully unblocked",
+                            Toast.makeText(UserInformationActivity.this, UserInformationActivity.
+                                this.getString(R.string.friend_unblocked),
                                 Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -238,14 +253,14 @@ public class UserInformationActivity extends Activity {
      */
     public void showOnMap(View view) {
         String toastString = "";
-        if (mIsVisible) {
+        if (!ServiceContainer.getCache().getDefaultFilter().getVisibleFriends().contains(mUser)) {
             ServiceContainer.getCache().putFilter(
                 ServiceContainer.getCache().getDefaultFilter().getContainerCopy().addId(mUserId));
-            toastString = "user not shown on map anymore";
+            toastString = UserInformationActivity.this.getString(R.string.user_not_shown_on_map);
         } else {
             ServiceContainer.getCache().putFilter(
                 ServiceContainer.getCache().getDefaultFilter().getContainerCopy().removeId(mUserId));
-            toastString = "user shown on map";
+            toastString = UserInformationActivity.this.getString(R.string.user_shown_on_map);
         }
         Toast.makeText(UserInformationActivity.this, toastString, Toast.LENGTH_SHORT).show();
     }
@@ -285,7 +300,7 @@ public class UserInformationActivity extends Activity {
 
                 // Defensive case, should never happen
                 if (user == null) {
-                    mNameView.setText("Unknown user");
+                    mNameView.setText(UserInformationActivity.this.getString(R.string.unknown_user));
 
                     mShowOnMapSwitch.setVisibility(View.INVISIBLE);
                     mBlockSwitch.setVisibility(View.INVISIBLE);
@@ -294,8 +309,7 @@ public class UserInformationActivity extends Activity {
                     UserInformationActivity.this.findViewById(R.id.user_info_remove_button).setVisibility(
                         View.INVISIBLE);
                 } else {
-                    // Ugly instanceof, case classes would be helpful TODO
-                    if (user instanceof Friend) {
+                    if (user.getFriendship() == User.FRIEND) {
                         Friend friend = (Friend) user;
 
                         mNameView.setText(friend.getName());
@@ -331,14 +345,12 @@ public class UserInformationActivity extends Activity {
                         Button button =
                             (Button) UserInformationActivity.this.findViewById(R.id.user_info_remove_button);
                         button.setVisibility(View.VISIBLE);
-
                         button.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 AddFriendActivity.displayConfirmationDialog(mActivity, mUser.getName(), user.getId());
                             }
                         });
-
                         button.setText(UserInformationActivity.this.getResources().getString(
                             R.string.add_friend_button_text));
                         button.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
