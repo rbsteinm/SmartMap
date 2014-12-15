@@ -20,7 +20,7 @@ import ch.epfl.smartmap.servercom.SmartMapClient;
  * 
  * @author Pamoi
  */
-public class ServiceContainer {
+public final class ServiceContainer {
     private static SmartMapClient mNetworkClient;
     private static DatabaseHelperInterface mDBHelper;
     private static Cache mCache;
@@ -34,6 +34,12 @@ public class ServiceContainer {
         super();
     }
 
+    /**
+     * Initializes the services, overwriting any existing ones
+     * 
+     * @param context
+     *            The app's context
+     */
     public static void forceInitSmartMapServices(Context context) {
         setSettingsManager(new SettingsManager(context));
         setNetworkClient(new NetworkSmartMapClient());
@@ -72,7 +78,7 @@ public class ServiceContainer {
     /**
      * Get the search engine service.
      * 
-     * @return
+     * @return CachedSearchEngine
      */
     public static CachedSearchEngine getSearchEngine() {
         return mSearchEngine;
@@ -81,12 +87,18 @@ public class ServiceContainer {
     /**
      * Get the settings manager service.
      * 
-     * @return
+     * @return SettingsManager
      */
     public static SettingsManager getSettingsManager() {
         return mSettingsManager;
     }
 
+    /**
+     * Initializes the uninitialized services
+     * 
+     * @param context
+     *            The app's context
+     */
     public static void initSmartMapServices(Context context) {
         if (ServiceContainer.getSettingsManager() == null) {
             setSettingsManager(new SettingsManager(context));
