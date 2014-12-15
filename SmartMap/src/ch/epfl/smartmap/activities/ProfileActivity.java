@@ -15,12 +15,10 @@ import ch.epfl.smartmap.background.ServiceContainer;
  * picture and last seen
  * informations (correctly updated if we open it with no network connection)
  * Can be useful later on, for example to change profile picture
- * 
+ *
  * @author rbsteinm
  */
 public class ProfileActivity extends Activity {
-    @SuppressWarnings("unused")
-    private static final String TAG = ProfileActivity.class.getSimpleName();
 
     private TextView mNameView;
     private TextView mSubtitlesView;
@@ -36,6 +34,14 @@ public class ProfileActivity extends Activity {
         mNameView = (TextView) this.findViewById(R.id.profile_name);
         mSubtitlesView = (TextView) this.findViewById(R.id.profile_subtitles);
         mPicture = (ImageView) this.findViewById(R.id.profile_picture);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
+        mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
+        mPicture.setImageBitmap(ServiceContainer.getCache().getSelf().getActionImage());
     }
 
     @Override
@@ -55,13 +61,5 @@ public class ProfileActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mNameView.setText(ServiceContainer.getSettingsManager().getUserName());
-        mSubtitlesView.setText(ServiceContainer.getSettingsManager().getSubtitle());
-        mPicture.setImageBitmap(ServiceContainer.getCache().getSelf().getActionImage());
     }
 }
