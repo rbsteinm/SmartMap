@@ -432,8 +432,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
             do {
                 events.add(this.getEvent(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
             } while (cursor.moveToNext());
+
+            cursor.close();
         }
-        cursor.close();
+
         return events;
     }
 
@@ -456,6 +458,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
                 // using getFilter to add this row's filter to the list
                 filters.add(this.getFilter(cursor.getLong(cursor.getColumnIndex(KEY_ID))));
             } while (cursor.moveToNext());
+
+            cursor.close();
         }
 
         for (FilterContainer filter : filters) {
@@ -468,8 +472,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
             Log.d(TAG, "database contains no default filter");
             filters.add(new FilterContainer(Filter.DEFAULT_FILTER_ID, "", new HashSet<Long>(), true));
         }
-
-        cursor.close();
 
         return filters;
     }
@@ -501,9 +503,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
                 invitations.add(new InvitationContainer(id, user, event, status, date, type));
 
             } while (cursor.moveToNext());
+
+            cursor.close();
         }
 
-        cursor.close();
         return invitations;
     }
 
@@ -524,8 +527,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
                 Log.d(TAG, "" + cursor);
                 users.add(this.getUser(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID))));
             } while (cursor.moveToNext());
+
+            cursor.close();
         }
-        cursor.close();
+
         return users;
     }
 
@@ -568,16 +573,16 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
                 mDatabase.query(TABLE_EVENT_USER, EVENT_USER_COLUMNS, KEY_EVENT_ID + " = ?",
                     new String[]{String.valueOf(id)}, null, null, null, null);
 
-            if (cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst()) {
                 do {
                     ids.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
                 } while (cursor.moveToNext());
+
+                cursor.close();
             }
 
             event.setParticipantIds(ids);
         }
-
-        cursor.close();
         return event;
     }
 
@@ -612,11 +617,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
             do {
                 ids.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
             } while (cursor.moveToNext());
+
+            cursor.close();
         }
 
         FilterContainer filter = new FilterContainer(id, name, ids, isActive);
-
-        cursor.close();
 
         return filter;
     }
@@ -636,9 +641,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
             do {
                 filterIds.add(cursor.getLong(cursor.getColumnIndex(KEY_ID)));
             } while (cursor.moveToNext());
+
+            cursor.close();
         }
 
-        cursor.close();
         return filterIds;
     }
 
@@ -660,9 +666,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
                     friendIds.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
                 }
             } while (cursor.moveToNext());
+
+            cursor.close();
         }
 
-        cursor.close();
         return friendIds;
     }
 
@@ -682,9 +689,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
             do {
                 friends.add(cursor.getLong(cursor.getColumnIndex(KEY_USER_ID)));
             } while (cursor.moveToNext());
+
+            cursor.close();
         }
 
-        cursor.close();
         return friends;
     }
 
