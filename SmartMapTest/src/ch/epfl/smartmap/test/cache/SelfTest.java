@@ -18,7 +18,7 @@ import ch.epfl.smartmap.test.database.MockContainers;
  * @author ritterni
  */
 public class SelfTest extends AndroidTestCase {
-    Location location;
+    Location location = new Location("");
     String locationName = "Ecublens";
     UserContainer selfValues;
 
