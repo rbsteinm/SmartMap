@@ -12,7 +12,6 @@ import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -268,7 +267,6 @@ public class ModifyFilterActivity extends Activity {
      * {@code Cache}
      */
     private void setFilter() {
-        Log.d("Filter", "Try to get filter number : " + this.getIntent().getLongExtra("FILTER", 89));
         mFilter =
             ServiceContainer.getCache().getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
 

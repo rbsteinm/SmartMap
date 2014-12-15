@@ -1,7 +1,6 @@
 package ch.epfl.smartmap.test.activities;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
-import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.AddFriendActivity;
@@ -16,12 +15,6 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  */
 public class AddFriendActivityTest extends ActivityInstrumentationTestCase2<AddFriendActivity> {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = AboutActivityTest.class.getSimpleName();
-    @SuppressWarnings("unused")
-    private Context mContext;
-    private static final String STRANGER_NAME = "Smartmap Stranger";
-
     public AddFriendActivityTest() {
         super(AddFriendActivity.class);
     }
@@ -31,7 +24,6 @@ public class AddFriendActivityTest extends ActivityInstrumentationTestCase2<AddF
     protected void setUp() throws Exception {
         super.setUp();
         this.getActivity();
-        mContext = this.getActivity().getApplicationContext();
         String token =
             "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
         long facebookId = 1482245642055847L;
