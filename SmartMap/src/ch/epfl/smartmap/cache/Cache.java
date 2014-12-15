@@ -271,7 +271,6 @@ public class Cache implements CacheInterface {
     public synchronized Set<Filter> getAllCustomFilters() {
         Set<Long> customFilterIds = new HashSet<Long>(mFilterIds);
         customFilterIds.remove(Filter.DEFAULT_FILTER_ID);
-        Log.d(TAG, "custom filters : " + customFilterIds);
         return this.getFilters(customFilterIds);
     }
 
@@ -633,7 +632,6 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void initFromDatabase(DatabaseHelperInterface database) {
-        Log.d(TAG, "init from database");
         // Clear previous values
         mEventInstances.clear();
         mUserInstances.clear();
@@ -653,7 +651,6 @@ public class Cache implements CacheInterface {
         this.putUsers(database.getAllUsers());
         this.putEvents(database.getAllEvents());
         this.putFilters(database.getAllFilters());
-        Log.d(TAG, "Invits : " + database.getAllInvitations());
         this.putInvitations(database.getAllInvitations());
 
         // Notify listeners
@@ -682,7 +679,6 @@ public class Cache implements CacheInterface {
                         new ArrayList<Long>(usersIds));
                     callback.onSuccess(null);
                 } catch (SmartMapClientException e) {
-                    Log.e(TAG, "Couldn't invite friends to event:" + e);
                     callback.onFailure(e);
                 }
                 return null;
@@ -770,7 +766,6 @@ public class Cache implements CacheInterface {
      */
     @Override
     public synchronized void notifyEventListeners() {
-        Log.d(TAG, "notifying event listeners");
         for (CacheListener listener : mListeners) {
             listener.onEventListUpdate();
         }
@@ -802,10 +797,6 @@ public class Cache implements CacheInterface {
         Set<EventContainer> eventsToAdd = new HashSet<EventContainer>();
 
         for (final EventContainer newEvent : newEvents) {
-            Log.d(
-                TAG,
-                "putEvents, process event #" + newEvent.getId() + "with creator "
-                    + newEvent.getCreatorContainer());
             // Get id
             long eventId = newEvent.getId();
 
@@ -838,7 +829,6 @@ public class Cache implements CacheInterface {
             // Update Listeners if needed
             if (needToCallListeners) {
                 for (CacheListener listener : mListeners) {
-                    Log.d(TAG, "Called listeners on Events");
                     listener.onEventListUpdate();
                 }
             }
@@ -871,7 +861,6 @@ public class Cache implements CacheInterface {
         Set<FilterContainer> filtersToUpdate = new HashSet<FilterContainer>();
 
         for (FilterContainer newFilter : newFilters) {
-            Log.d(TAG, "Put filter " + newFilter.getId() + " in Cache");
             if (!mFilterIds.contains(newFilter.getId())) {
                 long filterId = newFilter.getId();
                 // if not default
@@ -895,7 +884,6 @@ public class Cache implements CacheInterface {
 
         // Notify listeners
         if (needToCallListeners) {
-            Log.d(TAG, "Called listeners on Filters");
             for (CacheListener listener : mListeners) {
                 listener.onFilterListUpdate();
             }
@@ -961,7 +949,6 @@ public class Cache implements CacheInterface {
                             @Override
                             protected Void doInBackground(Long... params) {
                                 try {
-                                    Log.d(TAG, "Acknoledging accpeted invitation");
                                     ServiceContainer.getNetworkClient().ackAcceptedInvitation(params[0]);
                                 } catch (SmartMapClientException e) {
                                     Log.e(TAG, "Error while acknowledging accpeted invitation : " + e);
@@ -981,7 +968,6 @@ public class Cache implements CacheInterface {
                             @Override
                             protected Void doInBackground(Long... params) {
                                 try {
-                                    Log.d(TAG, "Acknoledging event invitation");
                                     ServiceContainer.getNetworkClient().ackEventInvitation(params[0]);
                                 } catch (SmartMapClientException e) {
                                     Log.e(TAG, "Error while acknowledging event invitation : " + e);
@@ -1014,16 +1000,13 @@ public class Cache implements CacheInterface {
                     isSetCorrectly = invitationInfo.getUser() != null;
                     break;
                 case Invitation.EVENT_INVITATION:
-                    Log.d(TAG, "Invitation tries to put event " + invitationInfo.getEventInfos().getId());
                     invitationInfo.setEvent(this.getEvent(invitationInfo.getEventInfos().getId()));
-                    isSetCorrectly = (invitationInfo.getEvent() != null);
+                    isSetCorrectly = invitationInfo.getEvent() != null;
                     break;
                 default:
                     assert false;
                     break;
             }
-            Log.d(TAG, "Adding instance of invitation type " + invitationInfo.getType() + " with User "
-                + invitationInfo.getUser() + " or Event " + invitationInfo.getEvent());
 
             if (isSetCorrectly) {
                 mInvitationIds.add(invitationInfo.getId());
@@ -1031,10 +1014,6 @@ public class Cache implements CacheInterface {
                 Invitation invitation = Invitation.createFromContainer(invitationInfo);
                 mInvitationInstances.put(invitationInfo.getId(), invitation);
                 if (invitationId != Invitation.ALREADY_RECEIVED) {
-                    Log.d(TAG, "Invitation event " + invitation.getEvent());
-                    if (invitation.getEvent() != null) {
-                        Log.d(TAG, "Invitation event id " + invitation.getEvent().getId());
-                    }
                     Notifications.createNotification(invitation, ServiceContainer.getSettingsManager()
                         .getContext());
                 }
@@ -1044,7 +1023,6 @@ public class Cache implements CacheInterface {
         }
 
         if (needToCallListeners) {
-            Log.d(TAG, "Called listeners on Invitations");
             for (CacheListener listener : mListeners) {
                 listener.onInvitationListUpdate();
             }
@@ -1102,7 +1080,6 @@ public class Cache implements CacheInterface {
 
         // Notify listeners if needed
         if (needToCallListeners) {
-            Log.d(TAG, "Called listeners on User");
             for (CacheListener listener : mListeners) {
                 listener.onUserListUpdate();
             }
@@ -1241,7 +1218,6 @@ public class Cache implements CacheInterface {
                             ServiceContainer.getNetworkClient().removeFriend(params[0]);
                             callback.onSuccess(null);
                         } catch (SmartMapClientException e) {
-                            Log.e(TAG, "Error while removing friend: " + e);
                             callback.onFailure(e);
                         }
                         return null;
@@ -1357,7 +1333,6 @@ public class Cache implements CacheInterface {
                         callback.onSuccess(null);
                     }
                 } catch (SmartMapClientException e) {
-                    Log.e("TAG", "Error while (un)blocking friend: " + e);
                     if (callback != null) {
                         callback.onFailure(e);
                     }
@@ -1405,7 +1380,6 @@ public class Cache implements CacheInterface {
             long id = positionInfos.getId();
             // Get other online info
             UserContainer onlineInfos = networkClient.getUserInfo(id);
-            Log.d(TAG, "onlineInfos has name " + onlineInfos.getName());
             // Get picture
             Bitmap image = networkClient.getProfilePicture(id);
             // Put all inside container
@@ -1479,7 +1453,6 @@ public class Cache implements CacheInterface {
             @Override
             protected Void doInBackground(Long... params) {
                 try {
-                    Log.d(TAG, "need to update user " + params[0]);
                     UserContainer userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
                     userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
                     Cache.this.updateUser(userInfos);
@@ -1492,14 +1465,12 @@ public class Cache implements CacheInterface {
     }
 
     private synchronized void keepOnlyTheseEvents(Set<EventContainer> events) {
-        Log.d(TAG, "keep only these events");
         mEventIds.clear();
         mEventInstances.clear();
         this.putEvents(events);
     }
 
     private synchronized void keepOnlyTheseUsers(Set<UserContainer> users) {
-        Log.d(TAG, "keep only these users");
         mFriendIds.clear();
         mUserIds.clear();
         mUserInstances.clear();
@@ -1513,13 +1484,10 @@ public class Cache implements CacheInterface {
     }
 
     private synchronized boolean updateEvents(Set<EventContainer> eventInfos) {
-        Log.d(TAG, "updateEvents(" + eventInfos + ")");
         boolean isListModified = false;
         for (EventContainer eventInfo : eventInfos) {
             Event event = this.getEvent(eventInfo.getId());
             if ((event != null) && event.update(eventInfo)) {
-                Log.d(TAG, "updateEvents successfully updated event " + event.getId() + " with participants "
-                    + event.getParticipantIds());
                 isListModified = true;
             }
         }
