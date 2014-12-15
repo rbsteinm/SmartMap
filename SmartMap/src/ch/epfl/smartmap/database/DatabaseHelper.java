@@ -168,10 +168,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
 
         // We check if the event is already there
         if (!cursor.moveToFirst()) {
-            this.addUser(event.getImmCreator());
+            this.addUser(event.getCreatorContainer());
 
             // Doesn't add event if we can't store the user
-            if (this.getUser(event.getImmCreator().getId()) != null) {
+            if (this.getUser(event.getCreatorContainer().getId()) != null) {
                 ContentValues values = new ContentValues();
                 values.put(KEY_ID, event.getId());
                 values.put(KEY_NAME, event.getName());

@@ -1,6 +1,9 @@
 package ch.epfl.smartmap.listeners;
 
 /**
+ * Basic implementation of {@code CacheListener} that does nothing on any notify call. Use it as a superclass
+ * to avoid needing to implement all methods if not needed.
+ * 
  * @author jfperren
  */
 public class OnCacheListener implements CacheListener {
@@ -11,8 +14,7 @@ public class OnCacheListener implements CacheListener {
      */
     @Override
     public void onEventListUpdate() {
-        // TODO Auto-generated method stub
-
+        // Nothing
     }
 
     /*
@@ -21,14 +23,12 @@ public class OnCacheListener implements CacheListener {
      */
     @Override
     public void onFilterListUpdate() {
-        // TODO Auto-generated method stub
-
+        // Nothing
     }
 
     @Override
     public void onInvitationListUpdate() {
-        // TODO Auto-generated method stub
-
+        // Nothing
     }
 
     /*
@@ -37,7 +37,6 @@ public class OnCacheListener implements CacheListener {
      */
     @Override
     public void onUserListUpdate() {
-        // TODO Auto-generated method stub
-
+        // Nothing
     }
 }

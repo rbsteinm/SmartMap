@@ -28,7 +28,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  * the database on creation, and
  * then
  * updates the database as changes are made.
- *
+ * 
  * @author jfperren
  */
 public class Cache implements CacheInterface {
@@ -802,8 +802,10 @@ public class Cache implements CacheInterface {
         Set<EventContainer> eventsToAdd = new HashSet<EventContainer>();
 
         for (final EventContainer newEvent : newEvents) {
-            Log.d(TAG,
-                "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getImmCreator());
+            Log.d(
+                TAG,
+                "putEvents, process event #" + newEvent.getId() + "with creator "
+                    + newEvent.getCreatorContainer());
             // Get id
             long eventId = newEvent.getId();
 
@@ -812,9 +814,9 @@ public class Cache implements CacheInterface {
                 eventsToUpdate.add(newEvent);
             } else {
                 // Need to add to Cache, check if contains all informations
-                if (newEvent.getImmCreator() != null) {
+                if (newEvent.getCreatorContainer() != null) {
                     eventsToAdd.add(newEvent);
-                    usersToAdd.add(newEvent.getImmCreator());
+                    usersToAdd.add(newEvent.getCreatorContainer());
                 }
             }
 
@@ -824,7 +826,7 @@ public class Cache implements CacheInterface {
             // Add user to Container for new Events & Add to SparseArray
             for (EventContainer eventInfo : eventsToAdd) {
                 needToCallListeners = true;
-                eventInfo.setCreator(this.getUser(eventInfo.getCreatorId()));
+                eventInfo.setCreator(this.getUser(eventInfo.getCreatorContainer().getId()));
                 mEventIds.add(eventInfo.getId());
                 mEventInstances.put(eventInfo.getId(), Event.createFromContainer(eventInfo));
             }
@@ -1322,7 +1324,6 @@ public class Cache implements CacheInterface {
                 listener.onUserListUpdate();
             }
         }
-
     }
 
     /*
@@ -1437,11 +1438,11 @@ public class Cache implements CacheInterface {
             // Get event infos
             EventContainer onlineInfos = networkClient.getEventInfo(id);
             // Check if event needs to be kept
-            if (nearEventIds.contains(id) || (onlineInfos.getCreatorId() == myId)
+            if (nearEventIds.contains(id) || (onlineInfos.getCreatorContainer().getId() == myId)
                 || onlineInfos.getParticipantIds().contains(myId)) {
                 // if so, put it in Set
                 updatedEvents.add(onlineInfos);
-                updatedUsers.add(onlineInfos.getImmCreator());
+                updatedUsers.add(onlineInfos.getCreatorContainer());
             }
         }
 
@@ -1580,7 +1581,7 @@ public class Cache implements CacheInterface {
 
     /**
      * OK
-     *
+     * 
      * @param userInfo
      */
     private synchronized boolean updateUser(UserContainer userInfo) {
@@ -1591,7 +1592,7 @@ public class Cache implements CacheInterface {
 
     /**
      * OK
-     *
+     * 
      * @param userInfos
      */
     private synchronized boolean updateUsers(Set<UserContainer> userInfos) {
@@ -1633,7 +1634,7 @@ public class Cache implements CacheInterface {
     /**
      * Allows to search efficiently through the Cache, by providing a filtering
      * method
-     *
+     * 
      * @param <T>
      *            Type of items searched
      * @author jfperren
