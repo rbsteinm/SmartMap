@@ -48,6 +48,7 @@ public abstract class User implements UserInterface {
      *            User's profile picture
      */
     protected User(long id, String name, Bitmap image) {
+
         mId = (id >= 0) ? id : User.NO_ID;
         mName = (name != null) ? name : User.NO_NAME;
         mImage = (image != null) ? Bitmap.createBitmap(image) : User.NO_IMAGE;
@@ -164,8 +165,7 @@ public abstract class User implements UserInterface {
      * OUTSIDE CACHE.
      * 
      * @param userContainer
-     *            a Container that has all informations about the {@code User}
-     *            you want to create.
+     *            a Container that has all informations about the {@code User} you want to create.
      * @return the {@code User} live instance.
      */
     public static User createFromContainer(UserContainer userContainer) {
