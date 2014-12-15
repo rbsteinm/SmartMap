@@ -25,7 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Offers different static utility methods.
- *
+ * 
  * @author agpmilli
  * @author jfperren
  * @author SpicyCH
@@ -53,7 +53,6 @@ public final class Utils {
 
     /**
      * Private constructor so that Utils cannot be instantiated.
-     *
      */
     private Utils() {
         super();
@@ -94,10 +93,12 @@ public final class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder =
+            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
 
             return cityOrCountryFromAddresses(addresses);
 
@@ -110,7 +111,7 @@ public final class Utils {
     /**
      * Mixes startColor and endColor with value/(endValue - startValue) fraction
      * of startColor.
-     *
+     * 
      * @param value
      * @param startValue
      * @param endValue
@@ -118,8 +119,8 @@ public final class Utils {
      * @param endColor
      * @return the mixed colors
      */
-    public static int
-        getColorInInterval(double value, double startValue, double endValue, int startColor, int endColor) {
+    public static int getColorInInterval(double value, double startValue, double endValue, int startColor,
+        int endColor) {
         if (startValue > endValue) {
             return getColorInInterval(value, endValue, startValue, endColor, startColor);
         } else {
@@ -129,13 +130,14 @@ public final class Utils {
                 double percentageEnd = -(startValue - value) / intervalLength;
                 double percentageStart = -(value - endValue) / intervalLength;
 
-                int red = (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
+                int red =
+                    (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
                 int green =
-                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color.green(endColor)));
-                int blue = (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
+                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color
+                        .green(endColor)));
+                int blue =
+                    (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
 
-                Log.d(TAG, "start : " + percentageStart + "end : " + percentageEnd);
-                Log.d(TAG, "Middle color/ R : " + red + " B : " + blue + " G : " + green);
                 return Color.rgb(red, green, blue);
             } else if (value < startValue) {
                 return startColor;
@@ -155,10 +157,12 @@ public final class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder =
+            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {
@@ -172,7 +176,7 @@ public final class Utils {
 
     /**
      * Gets a human readable String fromt the given date.
-     *
+     * 
      * @param calendar
      * @return a String of the form "Today", "25.12.2014", etc...
      */
@@ -190,8 +194,8 @@ public final class Utils {
             // Do not forget that the first month in a GregorianCalendar is 0!
             // bug #82
             int month = calendar.get(Calendar.MONTH) + 1;
-            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
-                + calendar.get(Calendar.YEAR);
+            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month)
+                + "." + calendar.get(Calendar.YEAR);
         }
     }
 
@@ -227,14 +231,15 @@ public final class Utils {
 
         } else {
 
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
+            return ServiceContainer.getSettingsManager().getContext()
+                .getString(R.string.utils_never_seen_on_smartmap);
         }
     }
 
     /**
      * Creates a matrix for a given color to be used to transform a Bitmap's
      * color.
-     *
+     * 
      * @param color
      * @return the matrix
      */
@@ -249,7 +254,7 @@ public final class Utils {
 
     /**
      * Get a string representation of the day's time of a Calendar
-     *
+     * 
      * @param calendar
      * @return
      */
@@ -271,13 +276,18 @@ public final class Utils {
             distance = distance / ONE_THOUSAND_METERS;
             distance = Math.round(distance * TEN) / TEN;
             textDistance =
-                distance + " " + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km) + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you);
+                distance
+                    + " "
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km)
+                    + " "
+                    + ServiceContainer.getSettingsManager().getContext()
+                        .getString(R.string.utils_away_from_you);
         } else {
             distance = Math.round(distance);
             textDistance =
                 (((int) distance) + " ")
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you);
+                    + ServiceContainer.getSettingsManager().getContext()
+                        .getString(R.string.utils_meters_away_from_you);
         }
         return textDistance;
     }
@@ -286,7 +296,7 @@ public final class Utils {
      * Set the badge count on a LayerDrawable (mainly the notification icon in
      * main activity).
      * Taken from : http://www.jmhend.me/layerdrawable-menuitems
-     *
+     * 
      * @param context
      *            current context
      * @param icon
@@ -403,7 +413,8 @@ public final class Utils {
         if (days == 1) {
             return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
         } else {
-            return days + " " + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
+            return days + " "
+                + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
         }
     }
 
