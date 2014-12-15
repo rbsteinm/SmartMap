@@ -24,7 +24,7 @@ import com.google.common.collect.Sets;
 public class MockContainers {
 
     public static final UserContainer JULIEN;
-    public static final long JULIEN_ID = 5;
+    public static final long JULIEN_ID = 5675675;
     public static final String JULIEN_NAME = "Julien";
     public static final String JULIEN_EMAIL = "julien@epfl.ch";
     public static final String JULIEN_PHONE_NUMBER = "1234";
@@ -47,7 +47,7 @@ public class MockContainers {
     }
 
     public static final UserContainer ALAIN;
-    public static final long ALAIN_ID = 6;
+    public static final long ALAIN_ID = 5675676;
     public static final String ALAIN_NAME = "Alain";
     public static final String ALAIN_EMAIL = "alain@epfl.ch";
     public static final String ALAIN_PHONE_NUMBER = "12345";
@@ -70,7 +70,7 @@ public class MockContainers {
     }
 
     public static final UserContainer ROBIN;
-    public static final long ROBIN_ID = 2;
+    public static final long ROBIN_ID = 65762;
     public static final String ROBIN_NAME = "Robin";
     public static final String ROBIN_EMAIL = "robin@epfl.ch";
     public static final String ROBIN_PHONE_NUMBER = "12346";

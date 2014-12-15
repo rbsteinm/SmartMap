@@ -110,26 +110,12 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     /**
-     * Test open profile activity using side menu
-     */
-    public void testOpenProfileMenu() {
-        onView(withId(android.R.id.home)).perform(click());
-        onView(allOf(withId(R.id.side_menu_text_view), withText(R.string.profile_text))).perform(click());
-        onView(withId(R.id.profile_header)).check(matches(isDisplayed()));
-    }
-
-    public void testOpenSearchView() {
-        onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.search_panel)).check(matches(isDisplayed()));
-    }
-
-    /**
      * Test open settings activity using side menu
      */
     public void testOpenSettingsMenu() {
         onView(withId(android.R.id.home)).perform(click());
         onView(withText(R.string.settings_text)).perform(click());
-        onView(withId(R.id.pref_general_offline)).check(matches(isDisplayed()));
+        onView(withText(R.string.settings_offline)).check(matches(isDisplayed()));
     }
 
     public void testOpenSideMenu() {
@@ -143,5 +129,19 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.drawer_layout)).check(matches(isOpen()));
         onView(withId(android.R.id.home)).perform(click());
         onView(withId(R.id.drawer_layout)).check(matches(isClosed()));
+    }
+
+    /**
+     * Test open profile activity using side menu
+     */
+    public void testZOpenProfileMenu() {
+        onView(withId(android.R.id.home)).perform(click());
+        onView(allOf(withId(R.id.side_menu_text_view), withText(R.string.profile_text))).perform(click());
+        onView(withId(R.id.profile_header)).check(matches(isDisplayed()));
+    }
+
+    public void testZOpenSearchView() {
+        onView(withId(R.id.action_search)).perform(click());
+        onView(withId(R.id.search_panel)).check(matches(isDisplayed()));
     }
 }

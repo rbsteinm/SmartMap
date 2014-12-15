@@ -303,6 +303,7 @@
     <string name="settings_key_notifications_event_proximity">notifications_event_proximity</string>
     <string name="settings_key_notifications_vibrate">notifications_vibrate</string>
     <string name="settings_key_general_offline">general_offline</string>
+    <string name="settings_offline">Offline mode</string>
     <string name="settings_key_refresh_frequency">refresh_frequency</string>
     <string name="settings_key_last_seen_max">last_seen_max</string>
     <string name="settings_key_events_show_public">events_show_public</string>
