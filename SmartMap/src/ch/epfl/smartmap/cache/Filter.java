@@ -27,6 +27,8 @@ public abstract class Filter implements FilterInterface {
 
     // Default values
     public static final long NO_ID = -1;
+    public static final String NO_NAME = "Unknown filter";
+    public static final Set<Long> NO_IDS = new HashSet<Long>();
     public static final Bitmap DEFAULT_WHITE_IMAGE = BitmapFactory.decodeResource(ServiceContainer
         .getSettingsManager().getContext().getResources(), R.drawable.ic_filter_white);
     public static final Bitmap DEFAULT_BLUE_IMAGE = BitmapFactory.decodeResource(ServiceContainer
@@ -45,8 +47,8 @@ public abstract class Filter implements FilterInterface {
         if (id < 0) {
             throw new IllegalArgumentException();
         }
-        mId = id;
-        mIds = new HashSet<Long>(ids);
+        mId = (id >= 0) ? id : Filter.NO_ID;
+        mIds = (ids != null) ? new HashSet<Long>(ids) : Filter.NO_IDS;
     }
 
     /*

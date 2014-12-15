@@ -802,8 +802,10 @@ public class Cache implements CacheInterface {
         Set<EventContainer> eventsToAdd = new HashSet<EventContainer>();
 
         for (final EventContainer newEvent : newEvents) {
-            Log.d(TAG,
-                "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getCreatorContainer());
+            Log.d(
+                TAG,
+                "putEvents, process event #" + newEvent.getId() + "with creator "
+                    + newEvent.getCreatorContainer());
             // Get id
             long eventId = newEvent.getId();
 
@@ -824,7 +826,7 @@ public class Cache implements CacheInterface {
             // Add user to Container for new Events & Add to SparseArray
             for (EventContainer eventInfo : eventsToAdd) {
                 needToCallListeners = true;
-                eventInfo.setCreator(this.getUser(eventInfo.getCreatorId()));
+                eventInfo.setCreator(this.getUser(eventInfo.getCreatorContainer().getId()));
                 mEventIds.add(eventInfo.getId());
                 mEventInstances.put(eventInfo.getId(), Event.createFromContainer(eventInfo));
             }
@@ -1436,7 +1438,7 @@ public class Cache implements CacheInterface {
             // Get event infos
             EventContainer onlineInfos = networkClient.getEventInfo(id);
             // Check if event needs to be kept
-            if (nearEventIds.contains(id) || (onlineInfos.getCreatorId() == myId)
+            if (nearEventIds.contains(id) || (onlineInfos.getCreatorContainer().getId() == myId)
                 || onlineInfos.getParticipantIds().contains(myId)) {
                 // if so, put it in Set
                 updatedEvents.add(onlineInfos);
