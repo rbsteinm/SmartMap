@@ -30,10 +30,20 @@ public class InvitationsTab extends ListFragment {
     private List<Invitation> mInvitationList;
     private final Context mContext;
 
+    /**
+     * Constructor
+     * 
+     * @param ctx
+     */
     public InvitationsTab(Context ctx) {
         mContext = ctx;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater,
+     * android.view.ViewGroup, android.os.Bundle)
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -44,7 +54,8 @@ public class InvitationsTab extends ListFragment {
         // Create custom Adapter and pass it to the Activity
         this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
 
-        // Initialize the listener
+        // Initialize the listener to update the diaplayed list when the invitation list is updated in the
+        // cache
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
             @Override
             public void onInvitationListUpdate() {
