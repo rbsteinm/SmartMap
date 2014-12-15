@@ -9,69 +9,70 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mockito.Mockito;
-
 import android.content.Intent;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ModifyFilterActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.FilterContainer;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.test.database.MockContainers;
 
-public class ModifyFilterActivityTest extends ActivityInstrumentationTestCase2<ModifyFilterActivity> {
+public class ModifyFilterActivityTest extends
+ActivityInstrumentationTestCase2<ModifyFilterActivity> {
 
-    Filter filter;
-    User user1;
-    User user2;
-    User user3;
-    Set<User> allFriends;
+	FilterContainer filter;
+	UserContainer user1;
+	UserContainer user2;
+	UserContainer user3;
+	Set<UserContainer> allFriends;
 
-    public ModifyFilterActivityTest() {
-        super(ModifyFilterActivity.class);
-        // ServiceContainer.forceInitSmartMapServices(this.getInstrumentation().getTargetContext());
-        allFriends = new HashSet<User>(Arrays.asList(user1));
+	public ModifyFilterActivityTest() {
+		super(ModifyFilterActivity.class);
 
-        filter =
-            Filter.createFromContainer(new FilterContainer(3, "Family",
-                new HashSet<Long>(Arrays.asList(user1.getId())), true));
-        Intent intent =
-            new Intent(this.getInstrumentation().getTargetContext().getApplicationContext(), ModifyFilterActivity.class);
-        intent.putExtra("FILTER", filter.getId());
-        this.setActivityIntent(intent);
-    }
+	}
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        // this.getActivity();
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
 
-        // ServiceContainer.initSmartMapServices(this.getActivity());
-        ServiceContainer.forceInitSmartMapServices(this.getInstrumentation().getTargetContext());
-        user1 = User.createFromContainer(MockContainers.ALAIN);
-        user2 = User.createFromContainer(MockContainers.JULIEN);
-        user3 = User.createFromContainer(MockContainers.ROBIN);
-        allFriends = new HashSet<User>(Arrays.asList(user1, user2, user3));
-        //
+		ServiceContainer.forceInitSmartMapServices(this.getInstrumentation()
+				.getTargetContext());
 
-        //
-        Cache newCache = Mockito.mock(Cache.class);
-        Mockito.when(newCache.getFilter(filter.getId())).thenReturn(filter);
-        Mockito.when(newCache.getUser(user1.getId())).thenReturn(user1);
-        Mockito.when(newCache.getUser(user2.getId())).thenReturn(user2);
-        Mockito.when(newCache.getUser(user3.getId())).thenReturn(user3);
-        Mockito.when(newCache.getAllFriends()).thenReturn(allFriends);
-        ServiceContainer.setCache(newCache);
-        //
+		this.createMockItems();
+		this.createMockCache();
 
-        this.getActivity();
+		Intent intent = new Intent(this.getInstrumentation().getTargetContext()
+				.getApplicationContext(), ModifyFilterActivity.class);
+		intent.putExtra("FILTER", filter.getId());
+		this.setActivityIntent(intent);
 
-    }
+		this.getActivity();
 
-    public void test1() {
-        onView(withId(R.id.action_remove_filter)).check(matches(isDisplayed()));
-    }
+	}
+
+	public void test1() {
+		onView(withId(R.id.action_remove_filter)).check(matches(isDisplayed()));
+	}
+
+	private void createMockCache() {
+		Cache newCache = new Cache();
+		newCache.putFilter(filter);
+		newCache.putUser(user1);
+		newCache.putUser(user2);
+		newCache.putUser(user3);
+		ServiceContainer.setCache(newCache);
+	}
+
+	private void createMockItems() {
+		user1 = MockContainers.ALAIN;
+		user2 = MockContainers.JULIEN;
+		user3 = MockContainers.ROBIN;
+		allFriends = new HashSet<UserContainer>(Arrays.asList(user1, user2,
+				user3));
+		filter = new FilterContainer(3, "Family", new HashSet<Long>(
+				Arrays.asList(user1.getId())), true);
+
+	}
 }
