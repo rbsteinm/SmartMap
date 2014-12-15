@@ -27,44 +27,17 @@ import ch.epfl.smartmap.util.Utils;
 
 /**
  * Activity that shows full informations about a Displayable Object.
- * 
+ *
  * @author rbsteinm
  */
 public class UserInformationActivity extends Activity {
 
-    /**
-     * Callback that describes connection with network
-     * 
-     * @author agpmilli
-     */
-    class AddFriendCallback implements NetworkRequestCallback<Void> {
-        @Override
-        public void onFailure(Exception e) {
-            UserInformationActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(UserInformationActivity.this,
-                        UserInformationActivity.this.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT)
-                        .show();
-                }
-            });
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-            UserInformationActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(UserInformationActivity.this,
-                        UserInformationActivity.this.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT)
-                        .show();
-                    UserInformationActivity.this.finish();
-                }
-            });
-        }
-    }
-
     private static final String TAG = UserInformationActivity.class.getSimpleName();
+    private static final boolean SHOW_ON_MAP_ENABLED = false;
+    private static final boolean BLOCK_ENABLED = false;
+
+    private Activity mActivity;
+
     private User mUser;
     private long mUserId;
     private boolean mIsVisible;
@@ -74,14 +47,16 @@ public class UserInformationActivity extends Activity {
     private TextView mNameView;
     private ImageView mPictureView;
     private TextView mDistanceView;
-    private static final boolean SHOW_ON_MAP_ENABLED = false;
-    private static final boolean BLOCK_ENABLED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_user_information);
+
+
         // Get views
+        mActivity = this;
+
         mPictureView = (ImageView) this.findViewById(R.id.user_info_picture);
         mNameView = (TextView) this.findViewById(R.id.user_info_name);
         mSubtitlesView = (TextView) this.findViewById(R.id.user_info_subtitles);
@@ -130,44 +105,15 @@ public class UserInformationActivity extends Activity {
 
 
     /**
-     * Display a confirmation dialog to send a friend request to a non-friend
-     * user
-     * 
-     * @param name
-     * @param userId
-     */
-    public void displayConfirmationDialog(View v, final long userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(this.getResources().getString(R.string.add) + " " + mUser.getName() + " "
-            + this.getResources().getString(R.string.as_a_friend));
-
-        // Add positive button
-        builder.setPositiveButton(this.getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback());
-            }
-        });
-
-        // Add negative button
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-
-        // display the AlertDialog
-        builder.create().show();
-    }
-
-    /**
      * displays a confirmation dialog when the user tries to
      * remove a friend from his friendlist
-     * 
+     *
      * @param view
      */
     public void displayRemoveFriendConfirmationDialog(View view) {
+
+        Log.d(TAG, "View with id " + view.getId() + " pressed.");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(this.getString(R.string.remove) + " " + mUser.getName() + " "
             + this.getString(R.string.from_your_friends));
@@ -230,15 +176,6 @@ public class UserInformationActivity extends Activity {
         return true;
     }
 
-    /**
-     * When this tab is open by a notification
-     */
-    private void onNotificationOpen() {
-        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
-            this.startActivity(new Intent(this, MainActivity.class));
-        }
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -254,11 +191,10 @@ public class UserInformationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-
     /**
      * called when switching the "block" switch
      * blocks the concerned friend and disables the "show on map" button
-     * 
+     *
      * @param view
      */
     public void setBlockedStatus(View view) {
@@ -315,7 +251,7 @@ public class UserInformationActivity extends Activity {
      * pay attention: the default filter works in a reverse-fashion
      * compared to the other classical filters, which means the users contained
      * in it are NOT displayed on the map
-     * 
+     *
      * @param view
      */
     public void showOnMap(View view) {
@@ -332,6 +268,16 @@ public class UserInformationActivity extends Activity {
         Toast.makeText(UserInformationActivity.this, toastString, Toast.LENGTH_SHORT).show();
     }
 
+
+    /**
+     * When this tab is open by a notification
+     */
+    private void onNotificationOpen() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
+    }
+
     /**
      * @param status
      *            blocked status
@@ -345,7 +291,7 @@ public class UserInformationActivity extends Activity {
     /**
      * Updates the user's informations when we resume the activity
      * called in the onResume() method
-     * 
+     *
      * @param user
      */
     private void updateInformations(final User user) {
@@ -405,7 +351,7 @@ public class UserInformationActivity extends Activity {
                         button.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                UserInformationActivity.this.displayConfirmationDialog(v, user.getId());
+                                AddFriendActivity.displayConfirmationDialog(mActivity, mUser.getName(), user.getId());
                             }
                         });
                         button.setText(UserInformationActivity.this.getResources().getString(
@@ -415,5 +361,37 @@ public class UserInformationActivity extends Activity {
                 }
             }
         });
+    }
+
+    /**
+     * Callback that describes connection with network
+     *
+     * @author agpmilli
+     */
+    class AddFriendCallback implements NetworkRequestCallback<Void> {
+        @Override
+        public void onFailure(Exception e) {
+            UserInformationActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(UserInformationActivity.this,
+                        UserInformationActivity.this.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT)
+                        .show();
+                }
+            });
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+            UserInformationActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(UserInformationActivity.this,
+                        UserInformationActivity.this.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT)
+                        .show();
+                    UserInformationActivity.this.finish();
+                }
+            });
+        }
     }
 }
