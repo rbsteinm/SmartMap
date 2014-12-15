@@ -366,8 +366,7 @@ public class UserInformationActivity extends Activity {
                     UserInformationActivity.this.findViewById(R.id.user_info_remove_button).setVisibility(
                         View.INVISIBLE);
                 } else {
-                    // Ugly instanceof, case classes would be helpful TODO
-                    if (user instanceof Friend) {
+                    if (user.getFriendship() == User.FRIEND) {
                         Friend friend = (Friend) user;
 
                         mNameView.setText(friend.getName());
