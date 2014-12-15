@@ -35,6 +35,52 @@ public class ShowFiltersActivity extends ListActivity {
 
     private List<Filter> mFilterList;
 
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_show_filters);
+        ServiceContainer.initSmartMapServices(this);
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+
+        this.updateGUI();
+
+        // Add listener that updates the displayed filters list when it changes
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onFilterListUpdate() {
+                ShowFiltersActivity.this.updateGUI();
+            }
+        });
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mFilterList = new ArrayList<Filter>(ServiceContainer.getCache().getAllCustomFilters());
+        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onStart()
+     */
+    @Override
+    protected void onStart() {
+
+        super.onStart();
+        mFilterList = new ArrayList<Filter>(ServiceContainer.getCache().getAllCustomFilters());
+        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
+    }
+
     /**
      * Display a dialog that asks for a filter name and creates a new filter
      * 
@@ -63,13 +109,13 @@ public class ShowFiltersActivity extends ListActivity {
                             ShowFiltersActivity.this.getResources().getString(
                                 R.string.create_filter_empty_name), Toast.LENGTH_LONG).show();
                     } else {
-                        Long newFilterId =
-                            ServiceContainer.getCache().putFilter(
-                                new FilterContainer(Filter.NO_ID, filterName, new HashSet<Long>(), true));
+                        FilterContainer filterInfos =
+                            new FilterContainer(Filter.NO_ID, filterName, new HashSet<Long>(), true);
+                        ServiceContainer.getCache().putFilter(filterInfos);
                         // Start a new instance of ModifyFilterActivity passing it the
                         // new filter's name
                         Intent intent = new Intent(ShowFiltersActivity.this, ModifyFilterActivity.class);
-                        intent.putExtra("FILTER", newFilterId);
+                        intent.putExtra("FILTER", filterInfos.getId());
                         ShowFiltersActivity.this.startActivity(intent);
                     }
                 }
@@ -86,29 +132,6 @@ public class ShowFiltersActivity extends ListActivity {
 
         // display the AlertDialog
         builder.create().show();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_show_filters);
-        ServiceContainer.initSmartMapServices(this);
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
-
-        this.updateGUI();
-
-        // Add listener that updates the displayed filters list when it changes
-        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
-            @Override
-            public void onFilterListUpdate() {
-                ShowFiltersActivity.this.updateGUI();
-            }
-        });
     }
 
     /*
@@ -150,29 +173,6 @@ public class ShowFiltersActivity extends ListActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onResume()
-     */
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mFilterList = new ArrayList<Filter>(ServiceContainer.getCache().getAllCustomFilters());
-        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onStart()
-     */
-    @Override
-    protected void onStart() {
-
-        super.onStart();
-        mFilterList = new ArrayList<Filter>(ServiceContainer.getCache().getAllCustomFilters());
-        this.setListAdapter(new FilterListItemAdapter(this.getBaseContext(), mFilterList));
     }
 
     /**
