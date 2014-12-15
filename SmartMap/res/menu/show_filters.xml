@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ch.epfl.smartmap.ShowFiltersActivity" >
+
+    <item
+        android:title="@string/add_filter"
+        android:id="@+id/activity_show_filters_add_button"
+        android:icon="@drawable/ic_action_new"
+        android:showAsAction="collapseActionView|ifRoom"
+        android:onClick="addNewFilterDialog"/>
+
+</menu>

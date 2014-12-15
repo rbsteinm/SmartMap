@@ -5,8 +5,7 @@ namespace SmartMap\Control;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use SmartMap\DBInterface\User;
-use SmartMap\DBInterface\UserRepository;
+use SmartMap\DBInterface\UserRepositoryInterface;
 use SmartMap\DBInterface\DatabaseException;
 
 /**
@@ -16,11 +15,11 @@ use SmartMap\DBInterface\DatabaseException;
  *
  * @author SpicyCH (code reviewed - 03.11.2014) : good logic, but need unit testing!
  */
-class DataController
+class DataController implements DataControllerInterface
 {
     private $mRepo;
     
-    function __construct(UserRepository $repo)
+    function __construct(UserRepositoryInterface $repo)
     {
         $this->mRepo = $repo;
     }
@@ -87,6 +86,8 @@ class DataController
         
         try
         {
+            $user = $this->mRepo->getUser($userId);
+
             $friendIds = $this->mRepo->getFriendsIds($userId, array('ALLOWED'), array('FOLLOWED'));
             
             $friends = $this->mRepo->getUsers($friendIds, array('VISIBLE'));
@@ -97,15 +98,19 @@ class DataController
         }
         
         $list = array();
-        
-        foreach ($friends as $friend)
+
+        // The user must be visible to see it's friends positions.
+        if ($user->getVisibility() == 'VISIBLE')
         {
-            $list[] = array(
-                'id' => $friend->getId(),
-                'longitude' => $friend->getLongitude(),
-                'latitude' => $friend->getLatitude(),
-                'lastUpdate' => $friend->getLastUpdate()
-            );
+            foreach ($friends as $friend) {
+                $list[] = array(
+                    'id' => $friend->getId(),
+                    'longitude' => $friend->getLongitude(),
+                    'latitude' => $friend->getLatitude(),
+                    'lastUpdate' => $friend->getLastUpdate(),
+                    'isFriend' => 1
+                );
+            }
         }
         
         $response = array(
@@ -153,29 +158,46 @@ class DataController
      */
     public function getUserInfo(Request $request)
     {
+        $userId = RequestUtils::getIdFromRequest($request);
+
         $id = RequestUtils::getPostParam($request, 'user_id');
         
         try
         {
             $user = $this->mRepo->getUser($id);
+
+            $friendsIds = $this->mRepo->getFriendsIds($userId);
         }
         catch (DatabaseException $e)
         {
             throw new ControlLogicException('Error in getUserInfo.', 2, $e);
         }
+
+        $isFriend = 0;
+
+        if (in_array($id, $friendsIds))
+        {
+            $isFriend = 1;
+        }
+        else if ($userId == $id)
+        {
+            $isFriend = 2;
+        }
+
         // We only send public data
         $response = array(
             'status' => 'Ok',
             'message' => 'Fetched user info !',
             'id' => $user->getId(),
             'name' => $user->getName(),
+            'isFriend' => $isFriend
         );
         
         return new JsonResponse($response);
     }
 
     /**
-     * Sends an invitation to the user with id request parameter.
+     * Sends an invitation to the user with id in post parameter.
      *
      * @param Request $request
      * @return JsonResponse
@@ -198,7 +220,7 @@ class DataController
         {
             // Check if the user is already friend or already invited or already inviting
             $friendsIds = $this->mRepo->getFriendsIds($userId,
-                                                      array('BLOCKED', 'ALLOWED', 'DISALLOWED'));
+                array('BLOCKED', 'ALLOWED', 'DISALLOWED'));
             
             $userInvitingIds = $this->mRepo->getInvitationIds($userId);
             $friendInvitingIds = $this->mRepo->getInvitationIds($friendId);
@@ -259,7 +281,7 @@ class DataController
         
         foreach ($inviters as $inviter)
         {
-            $invitersList[] = array('id' => $inviter->getId(), 'name' => $inviter->getName());
+            $invitersList[] = array('id' => $inviter->getId(), 'name' => $inviter->getName(), 'isFriend' => 0);
         }
         
         $friendsList = array();
@@ -271,7 +293,8 @@ class DataController
                 'name' => $friend->getName(),
                 'longitude' => $friend->getLongitude(),
                 'latitude' => $friend->getLatitude(),
-                'lastUpdate' => $friend->getLastUpdate()
+                'lastUpdate' => $friend->getLastUpdate(),
+                'isFriend' => 1
             );
         }
         
@@ -330,7 +353,8 @@ class DataController
             'name' => $user->getName(),
             'longitude' => $user->getLongitude(),
             'latitude' => $user->getLatitude(),
-            'lastUpdate' => $user->getLastUpdate()
+            'lastUpdate' => $user->getLastUpdate(),
+            'isFriend' => 1
         );
         
         return new JsonResponse($response);
@@ -475,11 +499,18 @@ class DataController
         
         try
         {
-            $friendsIds = $this->mRepo->getFriendsIds($id);
+            // We do not return friends
+            $nonDisplayedUsers = $this->mRepo->getFriendsIds($id);
 
-            $friendsIds[] = $id; // We do not want to show the user in the search results.
+            $nonDisplayedUsers[] = $id; // We do not want to show the user in the search results.
+
+            // We do not return invited users
+            $nonDisplayedUsers = array_merge($nonDisplayedUsers, $this->mRepo->getInvitedIds($id));
+
+            // We do not want to return inviting users
+            $nonDisplayedUsers = array_merge($nonDisplayedUsers, $this->mRepo->getInvitationIds($id));
             
-            $users = $this->mRepo->findUsersByPartialName($partialName, $friendsIds);
+            $users = $this->mRepo->findUsersByPartialName($partialName, $nonDisplayedUsers);
         }
         catch (DatabaseException $e)
         {

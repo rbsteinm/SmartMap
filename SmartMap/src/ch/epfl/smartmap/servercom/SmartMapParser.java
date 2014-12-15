@@ -2,8 +2,8 @@ package ch.epfl.smartmap.servercom;
 
 import java.util.List;
 
-import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.UserContainer;
 
 /**
  * A SmartMapParser knows how to translate text into friends, server error
@@ -40,7 +40,7 @@ public interface SmartMapParser {
      * @return the event
      * @throws SmartMapParseException
      */
-    Event parseEvent(String s) throws SmartMapParseException;
+    EventContainer parseEvent(String s) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns a list of events
@@ -50,7 +50,7 @@ public interface SmartMapParser {
      * @return the list of events
      * @throws SmartMapParseException
      */
-    List<Event> parseEventList(String s) throws SmartMapParseException;
+    List<EventContainer> parseEventList(String s) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns a friend
@@ -61,7 +61,7 @@ public interface SmartMapParser {
      * @throws SmartMapParseException
      */
 
-    User parseFriend(String s) throws SmartMapParseException;
+    UserContainer parseFriend(String s) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns the list of friends
@@ -75,7 +75,7 @@ public interface SmartMapParser {
      *             if s does not represent a valid list of friends (according to
      *             the format that the parser supports)
      */
-    List<User> parseFriends(String s, String key) throws SmartMapParseException;
+    List<UserContainer> parseFriendList(String s, String key) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns the id
@@ -96,7 +96,7 @@ public interface SmartMapParser {
      * @return the list of ids
      * @throws SmartMapParseException
      */
-    List<Long> parseIds(String s, String key) throws SmartMapParseException;
+    List<Long> parseIdList(String s, String key) throws SmartMapParseException;
 
     /**
      * Parses some text, and returns a map that maps id to positions
@@ -108,6 +108,6 @@ public interface SmartMapParser {
      *             if s does not represent a valid list of positions (according
      *             to the format that the parser supports)
      */
-    List<User> parsePositions(String s) throws SmartMapParseException;
+    List<UserContainer> parsePositions(String s) throws SmartMapParseException;
 
 }

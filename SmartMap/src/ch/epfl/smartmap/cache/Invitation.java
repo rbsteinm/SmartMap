@@ -1,81 +1,162 @@
 package ch.epfl.smartmap.cache;
 
-import android.content.Intent;
-
 /**
- * Describes a generic invitation of the app
+ * Describes a generic invitation on the application SmartMap
  * 
  * @author agpmilli
  */
-public interface Invitation {
-    /**
-     * @return invitation's id
+public abstract class Invitation implements InvitationInterface, Comparable<Invitation> {
+
+    public static final long NO_ID = -1;
+    public static final long ALREADY_RECEIVED = -2;
+    public static final User NO_USER = null;
+    public static final Event NO_EVENT = null;
+    public static final long NO_TIMESTAMP = -1;
+    public static final int NO_STATUS = -1;
+    public static final int NO_TYPE = -1;
+
+    // Default Invitation
+    public static final Invitation NO_INVITATION = new GenericInvitation(NO_ID, NO_TIMESTAMP, NO_STATUS, NO_USER,
+        NO_EVENT, NO_TYPE);
+
+    /*
+     * int representing invitation status
      */
-    long getID();
+    public static final int UNREAD = 0;
+    public static final int READ = 1;
+    public static final int ACCEPTED = 2;
+    public static final int DECLINED = 3;
+
+    /*
+     * int representing types of invitation
+     */
+    public static final int FRIEND_INVITATION = 0;
+    public static final int EVENT_INVITATION = 1;
+    public static final int ACCEPTED_FRIEND_INVITATION = 2;
 
     /**
-     * @return invitation's intent
-     */
-    Intent getIntent();
-
-    /**
-     * @return invitation's text
-     */
-    String getText();
-
-    /**
-     * @return invitation's title
-     */
-    String getTitle();
-
-    /**
-     * @return invitation's creator
-     */
-    User getUser();
-
-    /**
-     * @return True if invitation has been read
-     */
-    boolean isRead();
-
-    /**
-     * Set invitation's intent
+     * Create an invitation from a Container
      * 
-     * @param intent
-     *            the invitation's intent
+     * @param container
+     *            container used to build the invitation
+     * @return
+     *         built invitation
      */
-    void setIntent(Intent intent);
+    public static Invitation createFromContainer(InvitationContainer container) {
+        long id = container.getId();
+        long timeStamp = container.getTimeStamp();
+        int status = container.getStatus();
+        User user = container.getUser();
+        Event event = container.getEvent();
+        int type = container.getType();
+
+        return new GenericInvitation(id, timeStamp, status, user, event, type);
+    }
+
+    private int mStatus;
+    private final long mId;
+    private long mTimeStamp;
 
     /**
-     * Sets whether or not the user has read the invitation
+     * Constructor
      * 
-     * @param isRead
-     *            True if invitation has been read
+     * @param id
+     *            id of invitation
+     * @param timeStamp
+     *            timeStamp of invitation
+     * @param status
+     *            status of invitation
      */
-    void setRead(boolean isRead);
+    public Invitation(long id, long timeStamp, int status) {
+        if (id < 0) {
+            mId = Invitation.NO_ID;
+        } else {
+            mId = id;
+        }
 
-    /**
-     * Set invitation's text
-     * 
-     * @param text
-     *            the invitation's text
+        if (timeStamp < 0) {
+            mTimeStamp = Invitation.NO_TIMESTAMP;
+        } else {
+            mTimeStamp = timeStamp;
+        }
+
+        if ((status != Invitation.UNREAD) && (status != Invitation.READ) && (status != Invitation.DECLINED)
+            && (status != Invitation.ACCEPTED)) {
+            mStatus = Invitation.NO_STATUS;
+        } else {
+            mStatus = status;
+        }
+    }
+
+    @Override
+    public int compareTo(Invitation that) {
+        return Long.valueOf(Long.valueOf(that.getTimeStamp())).compareTo(this.getTimeStamp());
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        return (that != null) && (that instanceof GenericInvitation)
+            && (this.getId() == ((GenericInvitation) that).getId());
+    }
+
+    @Override
+    public InvitationContainer getContainerCopy() {
+        return new InvitationContainer(mId, null, null, mStatus, mTimeStamp, NO_TYPE);
+    }
+
+    @Override
+    public long getId() {
+        return mId;
+    }
+
+    @Override
+    public int getStatus() {
+        return mStatus;
+    }
+
+    @Override
+    public long getTimeStamp() {
+        return mTimeStamp;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) this.getId();
+    }
+
+    @Override
+    public String toString() {
+        return "Invitation[type(" + this.getType() + "), status(" + this.getStatus() + "), timestamp("
+            + this.getTimeStamp() + "), user(" + this.getUser() + "), event(" + this.getEvent() + ")]";
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Invitation#update(ch.epfl.smartmap.cache.
+     * ImmutableInvitation)
      */
-    void setText(String text);
+    @Override
+    public boolean update(InvitationContainer invitation) {
+        boolean hasChanged = false;
+        if (invitation.getId() != mId) {
+            throw new IllegalArgumentException("Cannot change Id of an invitation.");
+        }
 
-    /**
-     * Set invitation's title
-     * 
-     * @param title
-     *            the invitation's title
-     */
-    void setTitle(String title);
+        if (invitation.getType() != this.getType()) {
+            throw new IllegalArgumentException("Cannot change type of invitation");
+        }
 
-    /**
-     * Set invitation's creator
-     * 
-     * @param user
-     *            the invitation's creator
-     */
-    void setUser(User user);
+        if (!((invitation.getStatus() != Invitation.ACCEPTED) && (invitation.getStatus() != Invitation.DECLINED)
+            && (invitation.getStatus() != Invitation.READ) && (invitation.getStatus() != Invitation.UNREAD))
+            && (invitation.getStatus() != mStatus)) {
+            mStatus = invitation.getStatus();
+            hasChanged = true;
+        }
+        if (!(invitation.getTimeStamp() < 0) && (invitation.getTimeStamp() != mTimeStamp)) {
+            mTimeStamp = invitation.getTimeStamp();
+            hasChanged = true;
+        }
 
+        return hasChanged;
+    }
 }

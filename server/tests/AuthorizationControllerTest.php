@@ -23,9 +23,7 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        $this->mockRepo = $this->getMockBuilder('SmartMap\DBInterface\UserRepository')
-                               ->disableOriginalConstructor()
-                               ->getMock();
+        $this->mockRepo = $this->getMock('SmartMap\DBInterface\UserRepositoryInterface');
     }
     
     public function testValidAllowFriend()
@@ -359,5 +357,204 @@ class AuthorizationControllerTest extends PHPUnit_Framework_TestCase
         $controller = new AuthorizationController($this->mockRepo);
         
         $controller->unfollowFriend($request);
+    }
+
+    public function testValidSetVisibility()
+    {
+        $user = new User(14, 12345, 'Toto', 'VISIBLE', 1.0, 2.0, '2014-09-03 22:34:59');
+
+        $modifiedUser = new User(14, 12345, 'Toto', 'INVISIBLE', 1.0, 2.0, '2014-09-03 22:34:59');
+
+        $this->mockRepo
+             ->method('getUser')
+             ->willReturn($user);
+
+        $this->mockRepo->expects($this->once())
+             ->method('getUser')
+             ->with($this->equalTo(14));
+
+        $this->mockRepo->expects($this->once())
+             ->method('updateUser')
+             ->with($modifiedUser);
+
+        $request = new Request($query = array(), $request = array('visibility' => 'INVISIBLE'));
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $response = $controller->setVisibility($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Visibility changed.');
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\InvalidRequestException
+     * @expectedExceptionMessage Visibility must be VISIBLE or INVISIBLE.
+     */
+    public function testInvalidParamSetVisibility()
+    {
+        $user = new User(14, 12345, 'Toto', 'VISIBLE', 1.0, 2.0, '2014-09-03 22:34:59');
+
+        $this->mockRepo
+            ->method('getUser')
+            ->willReturn($user);
+
+        $request = new Request($query = array(), $request = array('visibility' => 'Toto'));
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $controller->setVisibility($request);
+    }
+
+    // Setting the same visibility should not result in an error.
+    public function testSetSameVisibility()
+    {
+        $user = new User(14, 12345, 'Toto', 'INVISIBLE', 1.0, 2.0, '2014-09-03 22:34:59');
+
+        $modifiedUser = new User(14, 12345, 'Toto', 'INVISIBLE', 1.0, 2.0, '2014-09-03 22:34:59');
+
+        $this->mockRepo
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getUser')
+            ->with($this->equalTo(14));
+
+        $this->mockRepo->expects($this->once())
+            ->method('updateUser')
+            ->with($modifiedUser);
+
+        $request = new Request($query = array(), $request = array('visibility' => 'INVISIBLE'));
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $response = $controller->setVisibility($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Visibility changed.');
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in setVisibility method.
+     */
+    public function testSetVisibilityDBException()
+    {
+        $this->mockRepo
+            ->method('getUser')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('visibility' => 'INVISIBLE'));
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $controller->setVisibility($request);
+    }
+
+    public function testBlockFriend()
+    {
+        $this->mockRepo->expects($this->once())
+             ->method('setFriendshipStatus')
+             ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('DISALLOWED'));
+
+        $this->mockRepo->expects($this->once())
+             ->method('setFriendshipFollow')
+             ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('UNFOLLOWED'));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $response = $controller->blockFriend($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Blocked friend.');
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in blockFriend.
+     */
+    public function testBlockFriendDBException()
+    {
+        $this->mockRepo
+             ->method('setFriendshipStatus')
+             ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $controller->blockFriend($request);
+    }
+
+    public function testUnblockFriend()
+    {
+        $this->mockRepo->expects($this->once())
+            ->method('setFriendshipStatus')
+            ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('ALLOWED'));
+
+        $this->mockRepo->expects($this->once())
+            ->method('setFriendshipFollow')
+            ->with($this->equalTo(14), $this->equalTo(15), $this->equalTo('FOLLOWED'));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $response = $controller->unblockFriend($request);
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Unblocked friend.');
+
+        $this->assertEquals(json_encode($validResponse), $response->getContent());
+    }
+
+    /**
+     * @expectedException SmartMap\Control\ControlLogicException
+     * @expectedExceptionMessage Error in unblockFriend.
+     */
+    public function testUnblockFriendDBException()
+    {
+        $this->mockRepo
+            ->method('setFriendshipStatus')
+            ->will($this->throwException(new \SmartMap\DBInterface\DatabaseException()));
+
+        $request = new Request($query = array(), $request = array('friend_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new AuthorizationController($this->mockRepo);
+
+        $controller->unblockFriend($request);
     }
 }

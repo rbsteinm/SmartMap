@@ -8,59 +8,52 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.SettingsManager;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.gui.PagerAdapter;
 
 /**
- * This activity displays your friends in one tab, and your friend request (both sent and received) in another
- * tab
+ * This activity displays your friends in one tab, and your friend request in another tab
  * 
+ * @author marion-S
  * @author rbsteinm
  */
 public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 
-    @SuppressWarnings("unused")
     private static final String TAG = FriendsPagerActivity.class.getSimpleName();
 
     private ViewPager mPager;
     private ActionBar mActionBar;
-    private final String[] mTabs = {"Friends", "Invitations"};
+    private static final String[] TABS = {"Friends", "Invitations"};
+    private static final int INVITATION_INDEX = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        DatabaseHelper.initialize(this.getApplicationContext());
-        SettingsManager.initialize(this.getApplicationContext());
-
-        // Makes the logo clickable (clicking it returns to previous activity)
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
-
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_friends_pager);
 
-        mPager = (ViewPager) this.findViewById(R.id.myViewPager);
         mActionBar = this.getActionBar();
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        PagerAdapter pageAdapter = new PagerAdapter(this, this.getSupportFragmentManager());
-
         // Set action bar and tab color to main color
         mActionBar.setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         mActionBar.setStackedBackgroundDrawable(new ColorDrawable(this.getResources().getColor(
             R.color.main_blue)));
 
+        mPager = (ViewPager) this.findViewById(R.id.myViewPager);
+        PagerAdapter pageAdapter = new PagerAdapter(this, this.getSupportFragmentManager());
         mPager.setAdapter(pageAdapter);
-        mActionBar.setHomeButtonEnabled(false);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
+        mActionBar.setHomeButtonEnabled(true);
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         // Adding Tabs
-        for (String tabName : mTabs) {
+        for (String tabName : TABS) {
             mActionBar.addTab(mActionBar.newTab().setText(tabName).setTabListener(this));
         }
-
+        Log.d(TAG, "5 : " + ServiceContainer.getCache().getFriendIds());
         /**
          * on swiping, the viewpager makes respective tab selected
          */
@@ -68,10 +61,12 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
             @Override
             public void onPageScrolled(int arg0, float arg1, int arg2) {
+                // nothing
             }
 
             @Override
             public void onPageScrollStateChanged(int arg0) {
+                // nothing
             }
 
             @Override
@@ -81,7 +76,24 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
                 mActionBar.setSelectedNavigationItem(position);
             }
         });
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (this.getIntent().getBooleanExtra("INVITATION", false)) {
+            mPager.setCurrentItem(INVITATION_INDEX);
+        }
+    }
+
+    public ViewPager getViewPager() {
+        return mPager;
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.onNotificationOpen();
+        this.finish();
     }
 
     @Override
@@ -93,17 +105,20 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
 
-        switch (item.getItemId()) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.activity_friends_add_button:
+                this.startAddFriendActivity(null);
+                break;
             case android.R.id.home:
+                this.onNotificationOpen();
                 this.finish();
                 break;
             default:
-                // No other menu items!
                 break;
         }
 
@@ -134,8 +149,13 @@ public class FriendsPagerActivity extends FragmentActivity implements ActionBar.
         this.startActivity(displayActivityIntent);
     }
 
-    public ViewPager getViewPager() {
-        return mPager;
+    /**
+     * When this tab is open by a notification
+     */
+    private void onNotificationOpen() {
+        if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
+            this.startActivity(new Intent(this, MainActivity.class));
+        }
     }
 
 }

@@ -4,53 +4,67 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * Objects that can be displayed on the bottom menu, and as a marker on the map
+ * Objects that can be displayed in the ActionBar with image, title and subtitle, and eventually displayed on
+ * the map
  * 
+ * @author jfperren
  * @author ritterni
  */
-public interface Displayable {
+public interface Displayable extends Stockable {
+
+    // Default values
+    String NO_TITLE = "";
+    String NO_SUBTITLE = "";
+
+    String PROVIDER_NAME = "SmartMapServers";
+    double NO_LATITUDE = 0.0;
+    double NO_LONGITUDE = 0.0;
+    Location NO_LOCATION = new Location(PROVIDER_NAME);
+    String NO_LOCATION_STRING = "Unknown Location";
 
     /**
-     * @return The user's ID
+     * @return the Bitmap image that will be displayed in the Action Bar
      */
-    long getID();
+    Bitmap getActionImage();
 
     /**
-     * @return the position of the displayable, encapsulated in a LatLng object
+     * @return a LatLng containing the latitude and longitude of the displayable object
      */
     LatLng getLatLng();
 
     /**
-     * @return GoogleMap Location of the Displayable
+     * @return the GoogleMap Location of the Displayable
      */
     Location getLocation();
 
     /**
-     * @param context
-     *            , the application's context
-     * @return the options to display the marker
+     * @return a String containing infos about the location of the displayable object
      */
-    MarkerOptions getMarkerOptions(Context context);
-
-    /**
-     * @return A name for the panel (e.g. the username, event name, etc.)
-     */
-    String getName();
+    String getLocationString();
 
     /**
      * @param context
-     *            The application's context, needed to access the memory
-     * @return The object's picture
+     *            Context in which it will be displayed
+     * @return a Descriptor containing informations about how to display the marker of the displayable object
      */
-    Bitmap getPicture(Context context);
+    BitmapDescriptor getMarkerIcon(Context context);
 
     /**
-     * @return Text containing various information (description, last seen,
-     *         etc.)
+     * @return the Bitmap image that will be displayed in Search Layout
      */
-    String getShortInfos();
+    Bitmap getSearchImage();
+
+    /**
+     * @return a String that will be displayed as subtitle for this object in ActionBar
+     */
+    String getSubtitle();
+
+    /**
+     * @return a String that will be displayed as title for this object in ActionBar
+     */
+    String getTitle();
 }

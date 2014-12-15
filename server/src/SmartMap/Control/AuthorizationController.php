@@ -5,8 +5,7 @@ namespace SmartMap\Control;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use SmartMap\DBInterface\UserRepository;
-use SmartMap\DBInterface\User;
+use SmartMap\DBInterface\UserRepositoryInterface;
 use SmartMap\DBInterface\DatabaseException;
 
 /**
@@ -16,11 +15,11 @@ use SmartMap\DBInterface\DatabaseException;
  * 
  * @author SpicyCH (code reviewed - 02.11.2014) : code looks fine, just added javadoc
  */
-class AuthorizationController
+class AuthorizationController implements AuthorizationControllerInterface
 {
     private $mRepo;
     
-    function __construct(UserRepository $repo)
+    function __construct(UserRepositoryInterface $repo)
     {
         $this->mRepo = $repo;
     }
@@ -96,7 +95,7 @@ class AuthorizationController
         
         $friendsIds = RequestUtils::getPostParam($request, 'friend_ids');
         
-        $friendsIds = $this->getIntArrayFromString($friendsIds);
+        $friendsIds = RequestUtils::getIntArrayFromString($friendsIds);
         
         try
         {
@@ -127,7 +126,7 @@ class AuthorizationController
         
         $friendsIds = RequestUtils::getPostParam($request, 'friend_ids');
         
-        $friendsIds = $this->getIntArrayFromString($friendsIds);
+        $friendsIds = RequestUtils::getIntArrayFromString($friendsIds);
         
         try
         {
@@ -198,23 +197,101 @@ class AuthorizationController
         
         return new JsonResponse($response);
     }
-    
-    /** 
-     * Utility function transforming a list of numbers separated by commas
-     * in an array of integers.
-     * 
-     * @param string $string
-     * @return array
+
+    /**
+     * Set the visibility of the user.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
      */
-    private function getIntArrayFromString($string)
+    public function setVisibility(Request $request)
     {
-        $array = explode(',', $string);
-        
-        for ($i = 0; $i < count($array); $i++)
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        $visibility = RequestUtils::getPostParam($request, 'visibility');
+
+        try
         {
-            $array[$i] = (int) $array[$i];
+            $user = $this->mRepo->getUser($userId);
+
+            $user->setVisibility($visibility);
+
+            $this->mRepo->updateUser($user);
         }
-        
-        return $array;
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in setVisibility method.', 2, $e);
+        }
+        catch (\InvalidArgumentException $e)
+        {
+            throw new InvalidRequestException($e->getMessage());
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Visibility changed.');
+
+        return new JsonResponse($response);
+    }
+
+    /**
+     * Block a friend with id in post parameter friend_id.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
+    public function blockFriend(Request $request)
+    {
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
+
+        try
+        {
+            $this->mRepo->setFriendshipStatus($userId, $friendId, 'DISALLOWED');
+
+            $this->mRepo->setFriendshipFollow($userId, $friendId, 'UNFOLLOWED');
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in blockFriend.', 2, $e);
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Blocked friend.');
+
+        return new JsonResponse($response);
+    }
+
+    /**
+     * Unblock a friend with id in post parameter friend_id.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ControlLogicException
+     * @throws InvalidRequestException
+     */
+    public function unblockFriend(Request $request)
+    {
+        $userId = RequestUtils::getIdFromRequest($request);
+
+        $friendId = RequestUtils::getPostParam($request, 'friend_id');
+
+        try
+        {
+            $this->mRepo->setFriendshipStatus($userId, $friendId, 'ALLOWED');
+
+            $this->mRepo->setFriendshipFollow($userId, $friendId, 'FOLLOWED');
+        }
+        catch (DatabaseException $e)
+        {
+            throw new ControlLogicException('Error in unblockFriend.', 2, $e);
+        }
+
+        $response = array('status' => 'Ok', 'message' => 'Unblocked friend.');
+
+        return new JsonResponse($response);
     }
 }
+

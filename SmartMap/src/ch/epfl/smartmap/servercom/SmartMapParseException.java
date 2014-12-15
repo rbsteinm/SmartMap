@@ -1,7 +1,7 @@
 package ch.epfl.smartmap.servercom;
 
 /**
- * An exception to be thrown when server's answers to parse violate their
+ * An exception to be thrown when server's answers violate the required
  * format.
  * 
  * @author marion-S

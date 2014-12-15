@@ -1,6 +1,5 @@
 package ch.epfl.smartmap.gui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -12,9 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
-import ch.epfl.smartmap.cache.DatabaseHelper;
 import ch.epfl.smartmap.cache.Displayable;
-import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
 
 /**
  * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
@@ -24,21 +21,18 @@ import ch.epfl.smartmap.listeners.OnDisplayableInformationsChangeListener;
  */
 public class SearchResultView extends RelativeLayout {
 
-    private static final String TAG = "SEARCH RESULT VIEW";
-    @SuppressWarnings("unused")
-    private final static String AUDIT_TAG = "AuditError : " + TAG;
-
-    // TODO : Image size should depend on size of layout without image
-    private static final int IMAGE_SIZE = 150;
-    private final static int PHOTO_RIGHT_MARGIN = 40;
     // Margins & Paddings
     private static final int PADDING_RIGHT = 20;
     private static final int PADDING_LEFT = 20;
     private static final int PADDING_TOP = 20;
     private static final int PADDING_BOTTOM = 20;
-    private final static int TITLE_BOTTOM_PADDING = 5;
+    private static final int TITLE_BOTTOM_PADDING = 5;
+    private static final int PHOTO_RIGHT_MARGIN = 40;
+    private static final int IMAGE_SIZE = 150;
+
     // Text Sizes
-    private final static float TITLE_TEXT_SIZE = 17f;
+    private static final float TITLE_TEXT_SIZE = 17f;
+
     // Distances
     private static final int CLICK_DISTANCE_THRESHHOLD = 10;
 
@@ -47,6 +41,7 @@ public class SearchResultView extends RelativeLayout {
     private final TextView mTitleView;
     private final TextView mShortInfoView;
 
+    // Informations about the current state
     private Displayable mItem;
     private final Bitmap mImage;
 
@@ -60,10 +55,9 @@ public class SearchResultView extends RelativeLayout {
         super(context);
 
         mItem = item;
-        mImage = item.getPicture(context);
+        mImage = item.getSearchImage();
 
         // Layout Parameters
-
         this.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         this.setPadding(PADDING_LEFT, PADDING_TOP, PADDING_RIGHT, PADDING_BOTTOM);
 
@@ -82,7 +76,7 @@ public class SearchResultView extends RelativeLayout {
         // Create mTitleView
         mTitleView = new TextView(context);
         mTitleView.setId(R.id.search_result_title);
-        mTitleView.setText(mItem.getName());
+        mTitleView.setText(mItem.getTitle());
         mTitleView.setTextSize(TITLE_TEXT_SIZE);
         mTitleView.setTypeface(null, Typeface.BOLD);
         mTitleView.setPadding(0, 0, 0, TITLE_BOTTOM_PADDING);
@@ -94,7 +88,7 @@ public class SearchResultView extends RelativeLayout {
         // Create mShortInfoView
         mShortInfoView = new TextView(context);
         mShortInfoView.setId(R.id.search_result_short_info);
-        mShortInfoView.setText(item.getShortInfos());
+        mShortInfoView.setText(item.getSubtitle());
         mShortInfoView.setTextColor(this.getResources().getColor(R.color.lastSeenConnectionTextColor));
         LayoutParams shortInfoParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         shortInfoParams.addRule(RIGHT_OF, R.id.search_result_image);
@@ -106,71 +100,36 @@ public class SearchResultView extends RelativeLayout {
         this.addView(mTitleView);
         this.addView(mShortInfoView);
 
-        // This touch listener sends the query and displays the item
-        this.setOnTouchListener(new OnTouchListener() {
-            private float startX;
-            private float startY;
+        // This touch listener displays the item on click
+        this.setOnTouchListener(new ClickOnItemOnTouchListener());
+    }
 
-            @Override
-            public boolean onTouch(View v, MotionEvent ev) {
-                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-                    startX = ev.getAxisValue(MotionEvent.AXIS_X);
-                    startY = ev.getAxisValue(MotionEvent.AXIS_Y);
-                    v.setBackgroundColor(SearchResultView.this.getResources().getColor(
-                        R.color.searchResultOnSelect));
+    private class ClickOnItemOnTouchListener implements OnTouchListener {
+        private float startX;
+        private float startY;
 
-                } else if (ev.getAction() == MotionEvent.ACTION_UP) {
-                    float endX = ev.getAxisValue(MotionEvent.AXIS_X);
-                    float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
+        @Override
+        public boolean onTouch(View v, MotionEvent ev) {
+            if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+                startX = ev.getAxisValue(MotionEvent.AXIS_X);
+                startY = ev.getAxisValue(MotionEvent.AXIS_Y);
+                v.setBackgroundColor(SearchResultView.this.getResources().getColor(
+                    R.color.searchResultOnSelect));
 
-                    double clickDistance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-                    if (clickDistance < CLICK_DISTANCE_THRESHHOLD) {
-                        ((MainActivity) SearchResultView.this.getContext()).performQuery(mItem);
-                    }
-                    v.setBackgroundResource(0);
-                } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
-                    v.setBackgroundResource(0);
+            } else if (ev.getAction() == MotionEvent.ACTION_UP) {
+                float endX = ev.getAxisValue(MotionEvent.AXIS_X);
+                float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
+
+                // SonarQube : making 2 a constant is not useful here
+                double clickDistance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                if (clickDistance < CLICK_DISTANCE_THRESHHOLD) {
+                    ((MainActivity) SearchResultView.this.getContext()).performQuery(mItem);
                 }
-                return true;
+                v.setBackgroundResource(0);
+            } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {
+                v.setBackgroundResource(0);
             }
-        });
-
-        DatabaseHelper.initialize(context).addOnDisplayableInformationsChangeListener(mItem,
-            new OnDisplayableInformationsChangeListener() {
-                @Override
-                public void onDisplayableInformationsChange() {
-                    mItem = DatabaseHelper.getInstance().getUser(mItem.getID());
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mTitleView.setText(mItem.getName());
-                            mShortInfoView.setText(mItem.getShortInfos());
-                            mImageView.setImageBitmap(mItem.getPicture(context));
-                        }
-
-                    });
-                }
-            });
-    }
-
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
+            return true;
         }
-
-        int auditErrors = 0;
-        // auditErrors += mFriend.auditErrors(depth - 1);
-
-        return auditErrors;
     }
-
 }

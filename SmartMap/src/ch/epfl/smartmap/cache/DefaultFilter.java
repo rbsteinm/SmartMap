@@ -1,148 +1,55 @@
 package ch.epfl.smartmap.cache;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.location.Location;
-import android.util.LongSparseArray;
-import ch.epfl.smartmap.R;
-
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
- * Describes a clientside, custom friend list (e.g. friends, family, etc.)
+ * Class to represent the default filter, that contains all the friends for whom the user enabled the show on
+ * map feature in {@code UserInformationActivity} . This filter is not visible to the user
+ * and is used for programming
+ * purposes. This should not be instanciated directly, but from the method
+ * {@code Filter.createFromContainer(...)}
  * 
- * @author ritterni
+ * @author agpmilli
+ * @author jfperren
  */
-public class DefaultFilter implements Filter {
-
-    private final List<Long> idList; // list of the friends' IDs
-    private String listName;
-    private long databaseID;
+public class DefaultFilter extends Filter {
 
     /**
-     * @param name
-     *            The name of the friend list
-     * @param friendsDatabase
-     *            Whole database of friends referenced by the friendlist
+     * @param excludedIds
      */
-    public DefaultFilter(String name) {
-        // The friendlist needs a reference to the whole friend database in
-        // order to find users from their ID
-        listName = name;
-        idList = new ArrayList<Long>();
-    }
-
-    @Override
-    public void addUser(long id) {
-        if (!idList.contains(id)) {
-            idList.add(id);
-        }
-    }
-
-    @Override
-    public long getID() {
-        return databaseID;
+    protected DefaultFilter(Set<Long> excludedIds) {
+        super(Filter.DEFAULT_FILTER_ID, excludedIds);
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getLatLng()
-     */
-    @Override
-    public LatLng getLatLng() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Long> getList() {
-        return new ArrayList<Long>(idList);
-    }
-
-    @Override
-    public String getListName() {
-        return listName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getLocation()
-     */
-    @Override
-    public Location getLocation() {
-        return new Location("Lausanne");
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context)
-     */
-    @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getName()
+     * @see ch.epfl.smartmap.cache.FilterInterface#getName()
      */
     @Override
     public String getName() {
-        return listName;
+        return "Default Filter (this shouldn't be displayed)";
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getPicture(android.content.Context)
+     * @see ch.epfl.smartmap.cache.FilterInterface#getVisibleFriends()
      */
     @Override
-    public Bitmap getPicture(Context context) {
-
-        Bitmap pic = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_default_user);
-
-        return pic;
+    public Set<Long> getVisibleFriends() {
+        Set<Long> nonBlockedFriends = ServiceContainer.getCache().getFriendIds();
+        nonBlockedFriends.removeAll(this.getIds());
+        return nonBlockedFriends;
     }
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getShortInfos()
+     * @see ch.epfl.smartmap.cache.FilterInterface#isActive()
+     * The default filter is always active
      */
     @Override
-    public String getShortInfos() {
-        return "This is a Family Filter";
-    }
-
-    @Override
-    public List<User> getUserList(LongSparseArray<User> friends) {
-        List<User> uList = new ArrayList<User>();
-        for (long id : idList) {
-            uList.add(friends.get(id));
-        }
-
-        Collections.sort(uList, new UserComparator());
-
-        return uList;
-    }
-
-    @Override
-    public void removeUser(long id) {
-        idList.remove(id);
-    }
-
-    @Override
-    public void setID(long newID) {
-        databaseID = newID;
-    }
-
-    @Override
-    public void setListName(String newName) {
-        listName = newName;
+    public boolean isActive() {
+        return true;
     }
 }

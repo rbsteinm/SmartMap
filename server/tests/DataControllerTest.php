@@ -23,9 +23,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        $this->mockRepo = $this->getMockBuilder('SmartMap\DBInterface\UserRepository')
-                               ->disableOriginalConstructor()
-                               ->getMock();
+        $this->mockRepo = $this->getMock('SmartMap\DBInterface\UserRepositoryInterface');
     }
     
     public function testValidUpdatePos()
@@ -122,15 +120,25 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $controller->updatePos($request);
     }
     
-    public function testValidListFriendPos()
+    public function testValidListFriendsPos()
     {
         $friendsIds = array(1, 2);
-        
+
+        $user = new User(14, 1234, 'Me', 'VISIBLE', 10, 20, '2014-11-21 21:44:54');
+
         $returnUsers = array(
             new User(1, 2, 'Toto', 'VISIBLE', 1.0, 2.0, '2014-11-12 13:33:45'),
             new User(2, 3, 'Titi', 'VISIBLE', 3.0, 4.0, '2014-11-13 01:56:22'),
         );
-        
+
+        $this->mockRepo
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getUser')
+            ->with($this->equalTo(14));
+
         $this->mockRepo
              ->method('getFriendsIds')
              ->willReturn($friendsIds);
@@ -158,12 +166,66 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $response = $controller->listFriendsPos($request);
         
         $list = array(
-            array('id' => 1, 'longitude' => 1.0, 'latitude' => 2.0, 'lastUpdate' => '2014-11-12 13:33:45'),
-            array('id' => 2, 'longitude' => 3.0, 'latitude' => 4.0, 'lastUpdate' => '2014-11-13 01:56:22')
+            array('id' => 1, 'longitude' => 1.0, 'latitude' => 2.0,
+                'lastUpdate' => '2014-11-12 13:33:45', 'isFriend' => 1),
+            array('id' => 2, 'longitude' => 3.0, 'latitude' => 4.0,
+                'lastUpdate' => '2014-11-13 01:56:22', 'isFriend' => 1)
         );
         
         $validResponse = array('status' => 'Ok', 'message' => 'Fetched friends positions !', 'positions' => $list);
         
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    public function testInvisibleListFriendsPos()
+    {
+        $friendsIds = array(1, 2);
+
+        $user = new User(14, 1234, 'Me', 'INVISIBLE', 10, 20, '2014-11-21 21:44:54');
+
+        $returnUsers = array(
+            new User(1, 2, 'Toto', 'VISIBLE', 1.0, 2.0, '2014-11-12 13:33:45'),
+            new User(2, 3, 'Titi', 'VISIBLE', 3.0, 4.0, '2014-11-13 01:56:22'),
+        );
+
+        $this->mockRepo
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getUser')
+            ->with($this->equalTo(14));
+
+        $this->mockRepo
+            ->method('getFriendsIds')
+            ->willReturn($friendsIds);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getFriendsIds')
+            ->with($this->equalTo(14), $this->equalTo(array('ALLOWED')), $this->equalTo(array('FOLLOWED')));
+
+        $this->mockRepo
+            ->method('getUsers')
+            ->willReturn($returnUsers);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getUsers')
+            ->with($this->equalTo($friendsIds), $this->equalTo(array('VISIBLE')));
+
+        $request = new Request();
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new DataController($this->mockRepo);
+
+        $response = $controller->listFriendsPos($request);
+
+        $list = array();
+
+        $validResponse = array('status' => 'Ok', 'message' => 'Fetched friends positions !', 'positions' => $list);
+
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
     
@@ -194,7 +256,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
     
-    public function testValidGetUserInfo()
+    public function testValidGetNotFriendUserInfo()
     {
         $returnUser = new User(15, 12345, 'Toto', 'VISIBLE', 1.0, 2.0);
         
@@ -205,15 +267,112 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $this->mockRepo->expects($this->once())
              ->method('getUser')
              ->with($this->equalTo(15));
+
+        $this->mockRepo
+             ->method('getFriendsIds')
+             ->willReturn(array(11, 12));
+
+        $this->mockRepo->expects($this->once())
+             ->method('getFriendsIds')
+             ->with($this->equalTo(14));
         
         $request = new Request($query = array(), $request = array('user_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
         
         $controller = new DataController($this->mockRepo);
         
         $response = $controller->getUserInfo($request);
         
-        $validResponse = array('status' => 'Ok', 'message' => 'Fetched user info !', 'id' => 15, 'name' => 'Toto');
+        $validResponse = array('status' => 'Ok',
+            'message' => 'Fetched user info !',
+            'id' => 15,
+            'name' => 'Toto',
+            'isFriend' => 0
+        );
         
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    public function testValidGetFriendUserInfo()
+    {
+        $returnUser = new User(15, 12345, 'Toto', 'VISIBLE', 1.0, 2.0);
+
+        $this->mockRepo
+            ->method('getUser')
+            ->willReturn($returnUser);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getUser')
+            ->with($this->equalTo(15));
+
+        $this->mockRepo
+            ->method('getFriendsIds')
+            ->willReturn(array(11, 12, 15));
+
+        $this->mockRepo->expects($this->once())
+            ->method('getFriendsIds')
+            ->with($this->equalTo(14));
+
+        $request = new Request($query = array(), $request = array('user_id' => 15));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new DataController($this->mockRepo);
+
+        $response = $controller->getUserInfo($request);
+
+        $validResponse = array('status' => 'Ok',
+            'message' => 'Fetched user info !',
+            'id' => 15,
+            'name' => 'Toto',
+            'isFriend' => 1
+        );
+
+        $this->assertEquals($response->getContent(), json_encode($validResponse));
+    }
+
+    public function testValidGetSelfUserInfo()
+    {
+        $returnUser = new User(14, 12345, 'Toto', 'VISIBLE', 1.0, 2.0);
+
+        $this->mockRepo
+            ->method('getUser')
+            ->willReturn($returnUser);
+
+        $this->mockRepo->expects($this->once())
+            ->method('getUser')
+            ->with($this->equalTo(14));
+
+        $this->mockRepo
+            ->method('getFriendsIds')
+            ->willReturn(array(11, 12));
+
+        $this->mockRepo->expects($this->once())
+            ->method('getFriendsIds')
+            ->with($this->equalTo(14));
+
+        $request = new Request($query = array(), $request = array('user_id' => 14));
+
+        $session =  new Session(new MockArraySessionStorage());
+        $session->set('userId', 14);
+        $request->setSession($session);
+
+        $controller = new DataController($this->mockRepo);
+
+        $response = $controller->getUserInfo($request);
+
+        $validResponse = array('status' => 'Ok',
+            'message' => 'Fetched user info !',
+            'id' => 14,
+            'name' => 'Toto',
+            'isFriend' => 2
+        );
+
         $this->assertEquals($response->getContent(), json_encode($validResponse));
     }
     
@@ -371,8 +530,8 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $response = $controller->getInvitations($request);
 
         $invitations = array(
-            array('id' => 1, 'name' => 'Toto'),
-            array('id' => 2, 'name' => 'Titi')
+            array('id' => 1, 'name' => 'Toto', 'isFriend' => 0),
+            array('id' => 2, 'name' => 'Titi', 'isFriend' => 0)
         );
 
         $newFriends = array(
@@ -380,7 +539,8 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
                 'name' => 'Tutu',
                 'longitude' => 5.0,
                 'latitude' => 6.0,
-                'lastUpdate' => '2014-11-12 13:33:45'
+                'lastUpdate' => '2014-11-12 13:33:45',
+                'isFriend' => 1
             ));
 
         $validResponse = array(
@@ -445,7 +605,8 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
             'name' => 'Toto',
             'longitude' => 1.0,
             'latitude' => 2.0,
-            'lastUpdate' => '2014-11-12 13:33:45'
+            'lastUpdate' => '2014-11-12 13:33:45',
+            'isFriend' => 1
         );
         
         $this->assertEquals($response->getContent(), json_encode($validResponse));
@@ -656,7 +817,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
     {
         $returnUsers = array(
             new User(1, 2, 'Toto', 'VISIBLE', 1.0, 2.0),
-            new User(2, 3, 'Titi', 'VISIBLE', 3.0, 4.0)
+            new User(2, 3, 'Titi', 'VISIBLE', 3.0, 4.0),
         );
         
         $this->mockRepo
@@ -666,6 +827,22 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         $this->mockRepo->expects($this->once())
              ->method('getFriendsIds')
              ->with($this->equalTo(14));
+
+        $this->mockRepo
+            ->method('getInvitedIds')
+            ->willReturn(array(15));
+
+        $this->mockRepo->expects($this->once())
+             ->method('getInvitedIds')
+             ->with($this->equalTo(14));
+
+        $this->mockRepo
+            ->method('getInvitationIds')
+            ->willReturn(array(20, 34));
+
+        $this->mockRepo->expects($this->once())
+            ->method('getInvitationIds')
+            ->with($this->equalTo(14));
         
         $this->mockRepo
              ->method('findUsersByPartialName')
@@ -673,7 +850,7 @@ class DataControllerTest extends PHPUnit_Framework_TestCase
         
         $this->mockRepo->expects($this->once())
              ->method('findUsersByPartialName')
-             ->with($this->equalTo('t'), $this->equalTo(array(3, 4, 14)));
+             ->with($this->equalTo('t'), $this->equalTo(array(3, 4, 14, 15, 20, 34)));
         
         $request = new Request($query = array(), $request = array('search_text' => 't'));
         

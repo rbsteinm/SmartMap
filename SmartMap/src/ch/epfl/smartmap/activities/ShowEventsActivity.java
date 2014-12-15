@@ -1,10 +1,9 @@
 package ch.epfl.smartmap.activities;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
+import java.util.Calendar;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
@@ -12,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,42 +22,38 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.DatabaseHelper;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.SettingsManager;
 import ch.epfl.smartmap.gui.EventViewHolder;
 import ch.epfl.smartmap.gui.EventsListItemAdapter;
+import ch.epfl.smartmap.listeners.OnCacheListener;
+import ch.epfl.smartmap.util.Utils;
 
 /**
  * This activity shows the events and offers to filter them.
- * 
+ *
  * @author SpicyCH
  */
 public class ShowEventsActivity extends ListActivity {
 
-    @SuppressWarnings("unused")
-    private final static String TAG = ShowEventsActivity.class.getSimpleName();
+    private static final String TAG = ShowEventsActivity.class.getSimpleName();
 
-    private final static double EARTH_RADIUS_KM = 6378.1;
-    private final static int SEEK_BAR_MIN_VALUE = 2;
-    private final static int ONE_HUNDRED = 100;
+    private static final int SEEK_BAR_MIN_VALUE = 2;
+
+    private static final int METERS_IN_ONE_KM = 1000;
+
+    private static final double THREE_AND_A_HALF = 0.75;
 
     private SeekBar mSeekBar;
-
     private TextView mShowKilometers;
 
-    private Context mContext;
-
-    private DatabaseHelper mDbHelper;
-
     private boolean mMyEventsChecked;
+
     private boolean mOngoingChecked;
     private boolean mNearMeChecked;
-
     private List<Event> mEventsList;
-    private List<Event> mCurrentList;
-    private static String mMyName;
-    private Location mMyLocation;
+
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,82 +63,70 @@ public class ShowEventsActivity extends ListActivity {
         // Makes the logo clickable (clicking it returns to previous activity)
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-        this.initializeGUI();
 
-        // Create custom Adapter and pass it to the Activity
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mEventsList, mMyLocation);
-        this.setListAdapter(adapter);
+        mContext = this.getApplicationContext();
+
+        ServiceContainer.initSmartMapServices(this);
+
+        if (ServiceContainer.getSettingsManager().getNearEventsMaxDistance() == 0) {
+            // The user has disabled events fetching in the settings, hence he
+            // has no chance to see events in this list.
+            // We warn him with an AlertDialog.
+
+            this.noEventsFetchedWarning();
+        }
+
+        // Initialize the listener
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onEventListUpdate() {
+                ShowEventsActivity.this.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        ShowEventsActivity.this.initializeGUI();
+                    }
+
+                });
+            }
+        });
+
     }
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
+        Log.d(TAG, "Event at position " + position + " with id " + id + " (view id " + v.getId() + ")");
         super.onListItemClick(l, v, position, id);
-
-        final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
-        final Event event = eventViewHolder.getEvent();
-
-        String message =
-            EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "start") + " - "
-                + EventsListItemAdapter.getTextFromDate(event.getStartDate(), event.getEndDate(), "end")
-                + "\nCreated by " + event.getCreatorName() + "\n\n" + event.getDescription();
-
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle(event.getName()
-            + " @ "
-            + event.getPositionName()
-            + "\n"
-            + distance(mMyLocation.getLatitude(), mMyLocation.getLongitude(), event.getLocation()
-                .getLatitude(), event.getLocation().getLongitude()) + " km away");
-        alertDialog.setMessage(message);
-        final Activity activity = this;
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
-            this.getString(R.string.show_event_on_the_map_button), new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-
-                    Toast.makeText(activity,
-                        ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
-                        Toast.LENGTH_SHORT).show();
-
-                    Intent showEventIntent = new Intent(mContext, MainActivity.class);
-                    showEventIntent.putExtra("location", event.getLocation());
-                    ShowEventsActivity.this.startActivity(showEventIntent);
-
-                }
-            });
-
-        alertDialog.show();
+        this.displayInfoDialog(position);
     }
 
+    /**
+     * Triggered when a checkbox is clicked. Updates the displayed list of events.
+     *
+     * @param v
+     *            the checkbox whose status changed
+     * @author SpicyCH
+     */
     public void onCheckboxClicked(View v) {
+        if (!(v instanceof CheckBox)) {
+            throw new IllegalArgumentException("This method requires v to be a CheckBox");
+        }
+
         CheckBox checkBox = (CheckBox) v;
 
         switch (v.getId()) {
             case R.id.ShowEventsCheckBoxNearMe:
-                if (checkBox.isChecked()) {
-                    mNearMeChecked = true;
-                    // Show the seek bar
-                    mSeekBar.setEnabled(true);
-                } else {
-                    mNearMeChecked = false;
-                    // Hide the seek bar
-                    mSeekBar.setEnabled(false);
-                }
+
+                mNearMeChecked = checkBox.isChecked();
+                mSeekBar.setEnabled(mNearMeChecked);
                 break;
             case R.id.ShowEventsCheckBoxMyEv:
-                if (checkBox.isChecked()) {
-                    mMyEventsChecked = true;
-                } else {
-                    mMyEventsChecked = false;
-                }
+
+                mMyEventsChecked = checkBox.isChecked();
                 break;
             case R.id.ShowEventscheckBoxStatus:
-                if (checkBox.isChecked()) {
-                    mOngoingChecked = true;
-                } else {
-                    mOngoingChecked = false;
-                }
+
+                mOngoingChecked = checkBox.isChecked();
                 break;
             default:
                 break;
@@ -160,20 +144,21 @@ public class ShowEventsActivity extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
             case android.R.id.home:
                 this.finish();
                 break;
             case R.id.showEventsMenuNewEvent:
-                Intent showEventIntent = new Intent(mContext, AddEventActivity.class);
+                Intent showEventIntent = new Intent(ShowEventsActivity.this, AddEventActivity.class);
                 this.startActivity(showEventIntent);
+                break;
+            case R.id.show_events_menu_refresh:
+                this.updateCurrentList();
+                break;
             default:
-                // No other menu items!
                 break;
         }
 
@@ -183,136 +168,242 @@ public class ShowEventsActivity extends ListActivity {
     @Override
     public void onResume() {
         super.onResume();
+
         // This is needed to show an update of the events' list after having
-        // created an event
-        this.updateCurrentList();
+        // created one.
+        this.initializeGUI();
     }
 
+    /**
+     * Displays the AlertDialog with events infos.
+     *
+     * @param event
+     *            the event to show a dialog for
+     * @param creatorName
+     *            the name of the creator of the event
+     * @author SpicyCH
+     */
+    private void displayDialog(final Event event, String creatorName) {
+        AlertDialog alertDialog = new AlertDialog.Builder(ShowEventsActivity.this).create();
+
+        Calendar start = event.getStartDate();
+        Calendar end = event.getEndDate();
+
+        final String message = Utils.getDateString(start) + " " + Utils.getTimeString(start) + " - "
+                + Utils.getDateString(end) + " " + Utils.getTimeString(end) + "\n"
+                + ShowEventsActivity.this.getString(R.string.show_event_by) + " " + creatorName + "\n\n"
+                + event.getDescription();
+
+        alertDialog.setTitle(event.getName() + " " + this.getResources().getString(R.string.near) + " "
+                + event.getLocationString());
+
+        alertDialog.setMessage(message);
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
+                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_button),
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(ShowEventsActivity.this,
+                                ShowEventsActivity.this.getString(R.string.show_event_on_the_map_loading),
+                                Toast.LENGTH_SHORT).show();
+                        Intent showEventIntent = new Intent(ShowEventsActivity.this, MainActivity.class);
+                        showEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, event.getLocation());
+                        ShowEventsActivity.this.startActivity(showEventIntent);
+                    }
+                });
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,
+                ShowEventsActivity.this.getString(R.string.show_event_details_button),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent showEventIntent = new Intent(ShowEventsActivity.this, EventInformationActivity.class);
+                        showEventIntent.putExtra("EVENT", event.getId());
+                        ShowEventsActivity.this.startActivity(showEventIntent);
+                    }
+                });
+        alertDialog.show();
+    }
+
+    /**
+     * <p>
+     * Displays an AlertDialog with details about the event and two buttons: <br />
+     * -Show on map: opens the map at the location of the event<br />
+     * -See details: opens a new activity and display all the event's info
+     * </p>
+     *
+     * @param position
+     * @author SpicyCH
+     */
+    private void displayInfoDialog(int position) {
+
+        Toast.makeText(ShowEventsActivity.this, this.getString(R.string.show_event_loading_info), Toast.LENGTH_SHORT)
+                .show();
+
+        final EventViewHolder eventViewHolder = (EventViewHolder) this.findViewById(position).getTag();
+
+        this.getEvent(eventViewHolder.getEventId());
+
+    }
+
+    /**
+     * Gets an event from its id.
+     *
+     * @param eventId
+     * @author SpicyCH
+     */
+    private void getEvent(long eventId) {
+
+        Log.d(TAG, "Retrieving event...");
+
+        Event evt = ServiceContainer.getCache().getEvent(eventId);
+        String creatorName = evt.getCreator().getName();
+
+        Log.d(TAG, "Processing event...");
+
+        if ((evt == null) || (creatorName == null)) {
+            Log.e(TAG, "The server returned a null event or creatorName");
+
+            Toast.makeText(ShowEventsActivity.this,
+                    ShowEventsActivity.this.getString(R.string.show_event_server_error), Toast.LENGTH_SHORT).show();
+        } else {
+            // Construct the dialog that display more detailed infos and
+            // offers to show event on the map or to show more details.
+            this.displayDialog(evt, creatorName);
+        }
+    }
+
+    /**
+     * Initializes the activity.
+     *
+     * @author SpicyCH
+     */
     private void initializeGUI() {
-        // We need to intialize the two following Singletons to let espresso
-        // tests pass.
-        mContext = this.getApplicationContext();
-        SettingsManager.initialize(mContext);
-        DatabaseHelper.initialize(mContext);
-
-        mMyName = SettingsManager.getInstance().getUserName();
-
-        mMyLocation = SettingsManager.getInstance().getLocation();
 
         mMyEventsChecked = false;
         mOngoingChecked = false;
         mNearMeChecked = false;
 
-        mShowKilometers = (TextView) this.findViewById(R.id.showEventKilometers);
+        mShowKilometers = (TextView) ShowEventsActivity.this.findViewById(R.id.showEventKilometers);
 
-        // By default, the seek bar is disabled. This is done programmatically
-        // as android:enabled="false" doesn't work
-        // out in xml
-        mSeekBar = (SeekBar) this.findViewById(R.id.showEventSeekBar);
+        mSeekBar = (SeekBar) ShowEventsActivity.this.findViewById(R.id.showEventSeekBar);
+        int max = ServiceContainer.getSettingsManager().getNearEventsMaxDistance() / METERS_IN_ONE_KM;
+        mSeekBar.setMax(max);
         mSeekBar.setEnabled(false);
-        mSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+        mSeekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
 
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
-                    seekBar.setProgress(SEEK_BAR_MIN_VALUE);
-                }
-                mShowKilometers.setText(mSeekBar.getProgress() + " km");
-                ShowEventsActivity.this.updateCurrentList();
-            }
+        if (max > 0) {
+            int defaultPosition = (int) Math.floor(THREE_AND_A_HALF * max);
+            mSeekBar.setProgress(defaultPosition);
+        }
+        ShowEventsActivity.this.updateCurrentList();
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-
-        });
-
-        mDbHelper = DatabaseHelper.getInstance();
-
-        mEventsList = mDbHelper.getAllEvents();
     }
 
     /**
-     * This runs in O(n), can we do better?
-     */
-    private void updateCurrentList() {
-
-        mMyLocation = SettingsManager.getInstance().getLocation();
-        mEventsList = mDbHelper.getAllEvents();
-        mCurrentList = new ArrayList<Event>();
-
-        // Copy complete list into current list
-        for (Event e : mEventsList) {
-            mCurrentList.add(e);
-        }
-
-        for (Event e : mEventsList) {
-            if (mMyEventsChecked) {
-                if (!e.getCreatorName().equals(mMyName)) {
-                    mCurrentList.remove(e);
-                }
-            }
-
-            if (mOngoingChecked) {
-                if (!e.getStartDate().before(new GregorianCalendar())) {
-                    mCurrentList.remove(e);
-                }
-            }
-
-            if (mNearMeChecked) {
-                if (mMyLocation != null) {
-                    double distanceMeEvent =
-                        distance(e.getLocation().getLatitude(), e.getLocation().getLongitude(),
-                            mMyLocation.getLatitude(), mMyLocation.getLongitude());
-                    String[] showKMContent = mShowKilometers.getText().toString().split(" ");
-                    double distanceMax = Double.parseDouble(showKMContent[0]);
-                    if (!(distanceMeEvent < distanceMax)) {
-                        mCurrentList.remove(e);
-                    }
-                } else {
-                    Toast.makeText(this.getApplicationContext(),
-                        this.getString(R.string.show_event_cannot_retrieve_current_location),
-                        Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-
-        EventsListItemAdapter adapter = new EventsListItemAdapter(this, mCurrentList, mMyLocation);
-        this.setListAdapter(adapter);
-    }
-
-    /**
-     * Computes the distance between two GPS locations (takes into consideration the earth radius), inspired
-     * by
-     * wikipedia. This is costly as there are several library calls to sin, cos, etc...
-     * 
-     * @param lat1
-     *            latitude of point 1
-     * @param lon1
-     *            longitude of point 1
-     * @param lat2
-     *            latitude of point 2
-     * @param lon2
-     *            longitude of point 2
-     * @return the distance between the two locations in km, rounded to 2 digits
+     * Warn the user with an <code>AlertDialog</code> that he has disabled events fetching in the settings.
+     *
      * @author SpicyCH
      */
-    public static double distance(double lat1, double lon1, double lat2, double lon2) {
-        double radLat1 = Math.toRadians(lat1);
-        double radLong1 = Math.toRadians(lon1);
-        double radLat2 = Math.toRadians(lat2);
-        double radLong2 = Math.toRadians(lon2);
+    private void noEventsFetchedWarning() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
-        double sec1 = Math.sin(radLat1) * Math.sin(radLat2);
-        double dl = Math.abs(radLong1 - radLong2);
-        double sec2 = Math.cos(radLat1) * Math.cos(radLat2);
-        double centralAngle = Math.acos(sec1 + (sec2 * Math.cos(dl)));
-        double distance = centralAngle * EARTH_RADIUS_KM;
+        // Set title
+        alertDialogBuilder.setTitle(this.getString(R.string.show_event_disabled_warning_title));
 
-        return Math.floor(distance * ONE_HUNDRED) / ONE_HUNDRED;
+        // Set dialog message
+        alertDialogBuilder
+                .setMessage(this.getString(R.string.show_event_disabled_warning_message))
+                .setCancelable(false)
+                .setPositiveButton(this.getString(R.string.show_event_disabled_warning_button_goto_settings),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Go to the settings
+                                ShowEventsActivity.this.startActivity(new Intent(ShowEventsActivity.this,
+                                        SettingsActivity.class));
+                            }
+                        })
+                .setNegativeButton(this.getString(R.string.show_event_disabled_warning_button_return_to_main),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                ShowEventsActivity.this.finish();
+                            }
+                        });
+
+        // show alert dialog
+        alertDialogBuilder.create().show();
     }
+
+    /**
+     * Remove from mEventsList the events that are further than the distance set in the <code>SeekBar</code>.
+     *
+     * @author SpicyCH
+     */
+    private void removeEventsToofar() {
+
+        int maximumDistanceKM = mSeekBar.getProgress() * METERS_IN_ONE_KM;
+        Location myLocation = ServiceContainer.getSettingsManager().getLocation();
+
+        List<Event> copy = new ArrayList<Event>(mEventsList);
+
+        for (Event e : copy) {
+            if (e.getLocation().distanceTo(myLocation) > maximumDistanceKM) {
+                mEventsList.remove(e);
+            }
+        }
+    }
+
+    /**
+     * Updates the list displayed to the user.
+     *
+     * @author SpicyCH
+     */
+    private void updateCurrentList() {
+        mEventsList = new ArrayList<Event>(ServiceContainer.getCache().getAllEvents());
+        if (mNearMeChecked) {
+            this.removeEventsToofar();
+        }
+
+        if (mMyEventsChecked) {
+            mEventsList.retainAll(ServiceContainer.getCache().getMyEvents());
+        }
+
+        if (mOngoingChecked) {
+            mEventsList.retainAll(ServiceContainer.getCache().getLiveEvents());
+        }
+
+        ShowEventsActivity.this.setListAdapter(new EventsListItemAdapter(ShowEventsActivity.this, mEventsList));
+    }
+
+    /**
+     * Listens for the progress change of the Seekbar and updates the list accordingly.
+     *
+     * @author SpicyCH
+     */
+    private class SeekBarChangeListener implements OnSeekBarChangeListener {
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if (seekBar.getProgress() < SEEK_BAR_MIN_VALUE) {
+                seekBar.setProgress(SEEK_BAR_MIN_VALUE);
+            }
+            mShowKilometers.setText(mSeekBar.getProgress() + " " + mContext.getString(R.string.symbol_km));
+            ShowEventsActivity.this.updateCurrentList();
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            // Nothing
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            // Nothing
+        }
+    }
+
 }

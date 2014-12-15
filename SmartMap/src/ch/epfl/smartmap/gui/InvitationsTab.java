@@ -1,59 +1,76 @@
 package ch.epfl.smartmap.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-import ch.epfl.smartmap.servercom.NotificationBag;
-import ch.epfl.smartmap.servercom.SmartMapClientException;
+import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
+import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
- * FIXME What to do with this class? Remove it? If not, should implement FriendsListener instead of sending
- * its
- * own requests?
- * Fragment diplaying your invitations in FriendsActivity
+ * Fragment displaying your invitations in FriendsActivity
  * 
  * @author marion-S
  */
 public class InvitationsTab extends ListFragment {
 
+    private List<Invitation> mInvitationList;
     private final Context mContext;
 
-    private final NetworkSmartMapClient mNetworkClient;
-
-    private final DatabaseHelper mDataBaseHelper;
-
-    @SuppressWarnings("deprecation")
-    public InvitationsTab(Context context) {
-        mContext = context;
-        mNetworkClient = NetworkSmartMapClient.getInstance();
-        mDataBaseHelper = new DatabaseHelper(mContext);
+    /**
+     * Constructor
+     * 
+     * @param ctx
+     */
+    public InvitationsTab(Context ctx) {
+        mContext = ctx;
     }
 
     /*
      * (non-Javadoc)
-     * @see
-     * android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater
-     * , android.view.ViewGroup, android.os.Bundle)
+     * @see android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater,
+     * android.view.ViewGroup, android.os.Bundle)
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.list_fragment_invitations_tab, container, false);
-        new RefreshInvitationsList().execute();
+        mInvitationList =
+            new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
+
+        // Create custom Adapter and pass it to the Activity
+        this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
+
+        // Initialize the listener to update the diaplayed list when the invitation list is updated in the
+        // cache
+        ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
+            @Override
+            public void onInvitationListUpdate() {
+                mInvitationList =
+                    new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
+                ((Activity) mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
+                            mInvitationList));
+                    }
+                });
+
+            }
+        });
         return view;
     }
 
@@ -66,12 +83,9 @@ public class InvitationsTab extends ListFragment {
      */
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
-        long userId = (Long) view.getTag();
-        RelativeLayout rl = (RelativeLayout) view;
-        TextView tv = (TextView) rl.getChildAt(1);
-        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
-        String name = tv.getText().toString();
-        this.displayAcceptFriendDialog(name, userId);
+        Invitation invitation = mInvitationList.get(position);
+
+        this.displayAcceptFriendDialog(invitation);
     }
 
     /*
@@ -81,35 +95,47 @@ public class InvitationsTab extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        new RefreshInvitationsList().execute();
+
+        mInvitationList =
+            new ArrayList<Invitation>(ServiceContainer.getCache().getUnansweredFriendInvitations());
+        this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
     }
 
+    /*
+     * (non-Javadoc)
+     * @see
+     * android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater
+     * , android.view.ViewGroup, android.os.Bundle)
+     */
     /**
      * A dialog to ask whether to accept or decline the invitation of the given
      * user
      * 
-     * @param name
-     *            the user's name
-     * @param userId
-     *            the user's id
+     * @param invitation
      */
-    private void displayAcceptFriendDialog(String name, final long userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
-        builder.setMessage("Accept " + name + " to become your friend?");
+    private void displayAcceptFriendDialog(final Invitation invitation) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setMessage(mContext.getString(R.string.add) + " " + invitation.getUser().getName() + " "
+            + mContext.getString(R.string.as_a_friend));
 
         // Add positive button
-        builder.setPositiveButton("Yes, accept", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                new AcceptInvitation().execute(userId);
-            }
-        });
+        builder.setPositiveButton(mContext.getString(R.string.yes_accept),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // Accept invitation in Cache
+                    ServiceContainer.getCache().acceptInvitation(invitation,
+                        new AcceptInvitationRequestCallback(invitation));
+                }
+            });
 
         // Add negative button
-        builder.setNegativeButton("No, decline", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.no_decline, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                new DeclineInvitation().execute(userId);
+                // Decline invitation in Cache
+                ServiceContainer.getCache().declineInvitation(invitation,
+                    new DeclineInvitationRequestCallback(invitation));
             }
         });
 
@@ -118,111 +144,114 @@ public class InvitationsTab extends ListFragment {
     }
 
     /**
-     * AsyncTask that notifies the server when the user accepts a friend request
-     * also stores the new friend in the application cache
+     * An implementation of {@linkNetworkRequestCallback} executed with an accepting invitation request to the
+     * server
      * 
-     * @author Marion-S
+     * @author marion-S
      */
-    private class AcceptInvitation extends AsyncTask<Long, Void, String> {
+    private class AcceptInvitationRequestCallback implements NetworkRequestCallback<Void> {
 
-        @Override
-        protected String doInBackground(Long... params) {
-            String confirmString = "";
-            try {
-                mNetworkClient.acceptInvitation(params[0]);
-                mDataBaseHelper.addUser(NetworkSmartMapClient.getInstance().getUserInfo(params[0]));
-                confirmString = "Accepted";
-            } catch (SmartMapClientException e) {
-                confirmString = "Error";
-            }
-            return confirmString;
+        private final Invitation mInvitation;
+
+        /**
+         * Constructor
+         * 
+         * @param invitation
+         */
+        public AcceptInvitationRequestCallback(Invitation invitation) {
+            mInvitation = invitation;
         }
 
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.callbacks.NetworkRequestCallback#onFailure(java.lang.Exception)
+         */
         @Override
-        protected void onPostExecute(String confirmString) {
-            Toast.makeText(InvitationsTab.this.getActivity(), confirmString, Toast.LENGTH_LONG).show();
-            new RefreshInvitationsList().execute();
+        public void onFailure(Exception e) {
+            ((Activity) mContext).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext,
+                        ((Activity) mContext).getString(R.string.accept_friend_network_error),
+                        Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.callbacks.NetworkRequestCallback#onSuccess(java.lang.Object)
+         */
+        @Override
+        public void onSuccess(Void result) {
+            // We need to get the invitation from the cache as
+            // it
+            // has been modified
+            Invitation updated = ServiceContainer.getCache().getInvitation(mInvitation.getId());
+            // We run it's intent
+            InvitationsTab.this.startActivity(updated.getIntent());
+
         }
 
     }
 
     /**
-     * AsyncTask that confirms the server that accepted invitations were
-     * received
+     * An implementation of {@linkNetworkRequestCallback} executed with a declining invitation request to the
+     * server
      * 
      * @author marion-S
      */
-    private class AckAcceptedInvitations extends AsyncTask<Long, Void, Void> {
+    private class DeclineInvitationRequestCallback implements NetworkRequestCallback<Void> {
 
-        @Override
-        protected Void doInBackground(Long... params) {
-            try {
-                mNetworkClient.ackAcceptedInvitation(params[0]);
-            } catch (SmartMapClientException e) {
-            }
-            return null;
+        private final Invitation mInvitation;
+
+        /**
+         * Constructor
+         * 
+         * @param invitation
+         */
+        public DeclineInvitationRequestCallback(Invitation invitation) {
+            mInvitation = invitation;
         }
 
-    }
-
-    /**
-     * AsyncTask that notifies the server when the user declines a friend
-     * request
-     * 
-     * @author marion-S
-     */
-    private class DeclineInvitation extends AsyncTask<Long, Void, String> {
-
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.callbacks.NetworkRequestCallback#onFailure(java.lang.Exception)
+         */
         @Override
-        protected String doInBackground(Long... params) {
-            String confirmString = "";
-            try {
-                NetworkSmartMapClient.getInstance().declineInvitation(params[0]);
-                confirmString = "Declined";
-            } catch (SmartMapClientException e) {
-                confirmString = "Error";
-            }
-            return confirmString;
+        public void onFailure(Exception e) {
+            ((Activity) mContext).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext,
+                        ((Activity) mContext).getString(R.string.decline_friend_network_error),
+                        Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
 
+        /*
+         * (non-Javadoc)
+         * @see ch.epfl.smartmap.callbacks.NetworkRequestCallback#onSuccess(java.lang.Object)
+         */
         @Override
-        protected void onPostExecute(String confirmString) {
-            Toast.makeText(InvitationsTab.this.getActivity(), confirmString, Toast.LENGTH_LONG).show();
-            new RefreshInvitationsList().execute();
-        }
+        public void onSuccess(Void result) {
+            ((Activity) mContext).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // Remove invitation from list
+                    mInvitationList.remove(mInvitation);
+                    InvitationsTab.this.setListAdapter(new FriendInvitationListItemAdapter(mContext,
+                        mInvitationList));
 
-    }
-
-    /**
-     * AsyncTask that refreshes the invitations list after the user answered to
-     * an invitation and each time the activity is resumed. It also retrieves
-     * accepted invitations and store them in the application cache.
-     * 
-     * @author marion-S
-     */
-    private class RefreshInvitationsList extends AsyncTask<String, Void, NotificationBag> {
-
-        @Override
-        protected NotificationBag doInBackground(String... params) {
-            try {
-
-                return mNetworkClient.getInvitations();
-
-            } catch (SmartMapClientException e) {
-                // FIXME what to return??
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(NotificationBag notificationBag) {
-            super.onPostExecute(notificationBag);
-            InvitationsTab.this.setListAdapter(new FriendListItemAdapter(mContext, notificationBag
-                .getInvitingUsers()));
-            for (User newFriend : notificationBag.getNewFriends()) {
-                mDataBaseHelper.addUser(newFriend);
-                new AckAcceptedInvitations().execute(newFriend.getID());
-            }
+                    // Confirm decline
+                    Toast
+                        .makeText(mContext, mContext.getString(R.string.decline_confirm), Toast.LENGTH_SHORT)
+                        .show();
+                }
+            });
         }
 
     }

@@ -1,174 +1,196 @@
 package ch.epfl.smartmap.cache;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.location.Location;
-import android.os.Parcelable;
-
-import com.google.android.gms.maps.model.LatLng;
+import android.graphics.BitmapFactory;
+import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
- * Describes a generic user of the app
+ * Represents an User on the application SmartMap.
  * 
- * @author ritterni
+ * @author jfperren
  */
-public interface User extends Parcelable, Displayable {
+public abstract class User implements UserInterface {
+
+    // Default values
+    public static final long NO_ID = -1;
+    public static final String NO_NAME = "Unknown User";
+    public static final Bitmap NO_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
+        .getContext().getResources(), R.drawable.ic_default_user);
+    public static final String NO_PHONE_NUMBER = "No phone Number";
+    public static final String NO_EMAIL = "No email";
+    public static final Calendar NO_LAST_SEEN = GregorianCalendar.getInstance();
+
+    // Default User
+    public static final User NOBODY = new Stranger(NO_ID, NO_NAME, NO_IMAGE);
+
+    // Possible type of friendship
+    public static final int STRANGER = 0;
+    public static final int FRIEND = 1;
+    public static final int SELF = 2;
+    public static final int NO_FRIENDSHIP = -1;
+
+    private final long mId;
+    private String mName;
+    private Bitmap mImage;
 
     /**
-     *
+     * Constructor
+     * 
+     * @param id
+     *            User's id
+     * @param name
+     *            User's name
+     * @param image
+     *            User's profile picture
      */
-    void deletePicture(Context context);
+    protected User(long id, String name, Bitmap image) {
+        mId = (id >= 0) ? id : User.NO_ID;
+        mName = (name != null) ? name : User.NO_NAME;
+        mImage = (image != null) ? Bitmap.createBitmap(image) : User.NO_IMAGE;
 
-    /**
-     * @return The user's email address
-     */
-    String getEmail();
+        if ((mId != User.NO_ID) && ((mName == User.NO_NAME) || (mImage == User.NO_IMAGE))) {
+            // If missing informations, tell cache to ask the client
+            ServiceContainer.getCache().updateUserInfos(id);
+        }
+    }
 
-    /**
-     * @return The user's ID
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    long getID();
+    public boolean equals(Object that) {
+        return (that != null) && (that instanceof User) && (mId == ((User) that).getId());
+    }
 
-    /**
-     * @return The date/hour at which the user was last seen
-     */
-    GregorianCalendar getLastSeen();
-
-    /**
-     * @return The user's latitude and longitude
-     */
-
-    @Override
-    LatLng getLatLng();
-
-    /**
-     * @return The user's position
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getPicture(android.content.Context)
      */
     @Override
-    Location getLocation();
+    public Bitmap getActionImage() {
+        return mImage;
+    }
 
-    /**
-     * @return The user's position as a String (e.g. 'Lausanne')
-     */
-    String getLocationString();
-
-    /**
-     * @return The user's name
-     */
-
-    @Override
-    String getName();
-
-    /**
-     * @return The user's phone number
-     */
-    String getNumber();
-
-    /**
-     * @return A user picture to display
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getContainerCopy()
      */
     @Override
-    Bitmap getPicture(Context context);
+    public UserContainer getContainerCopy() {
+        return new UserContainer(mId, mName, null, null, null, null, mImage, User.BlockStatus.UNBLOCKED,
+            this.getFriendship());
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getID()
+     */
+    @Override
+    public long getId() {
+        return mId;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getName()
+     */
+    @Override
+    public String getName() {
+        return mName;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getSearchImage()
+     */
+    @Override
+    public Bitmap getSearchImage() {
+        return this.getActionImage();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getTitle()
+     */
+    @Override
+    public String getTitle() {
+        return this.getName();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#hashcode
+     */
+    @Override
+    public int hashCode() {
+        return (int) mId;
+    }
+
+    @Override
+    public boolean update(UserContainer newValues) {
+        boolean hasChanged = false;
+
+        if (newValues.getId() != mId) {
+            throw new IllegalArgumentException("Cannot change Id of an User.");
+        }
+
+        if ((newValues.getFriendship() != this.getFriendship())
+            && (newValues.getFriendship() != User.NO_FRIENDSHIP)) {
+            throw new IllegalArgumentException("Cannot change friendship, you need to create a new instance.");
+        }
+
+        if ((newValues.getName() != null) && (newValues.getName() != User.NO_NAME)
+            && !newValues.getName().equals(mName)) {
+            mName = newValues.getName();
+            hasChanged = true;
+        }
+
+        if ((newValues.getImage() != null) && (newValues.getImage() != User.NO_IMAGE)
+            && !newValues.getImage().sameAs(mImage)) {
+            mImage = newValues.getImage();
+            hasChanged = true;
+        }
+
+        return hasChanged;
+    }
 
     /**
-     * Deprecated. Use getLastSeen() instead.
+     * Does the conversion container -> live instance. DO NOT CALL THIS METHOD
+     * OUTSIDE CACHE.
      * 
-     * @return True if the user is online
+     * @param userContainer
+     *            a Container that has all informations about the {@code User}
+     *            you want to create.
+     * @return the {@code User} live instance.
      */
-    @Deprecated
-    boolean isOnline();
+    public static User createFromContainer(UserContainer userContainer) {
+        switch (userContainer.getFriendship()) {
+            case User.FRIEND:
+                return new Friend(userContainer.getId(), userContainer.getName(),
+                    userContainer.getPhoneNumber(), userContainer.getEmail(), userContainer.getImage(),
+                    userContainer.getLocation(), userContainer.getLocationString(), userContainer.isBlocked());
+            case User.STRANGER:
+                return new Stranger(userContainer.getId(), userContainer.getName(), userContainer.getImage());
+            case User.SELF:
+                return new Self(userContainer.getImage());
+            default:
+                throw new IllegalArgumentException("Unknown type of user");
+        }
+    }
 
     /**
-     * @return True if the user's location is visible
-     */
-    boolean isVisible();
-
-    /**
-     * Sets the user's email
+     * Possible Block values
      * 
-     * @param newEmail
-     *            The new email
+     * @author rbsteinm
      */
-    void setEmail(String newEmail);
-
-    /**
-     * @param date
-     *            The date/hour at which the user was last seen
-     */
-    void setLastSeen(GregorianCalendar date);
-
-    /**
-     * Sets the user's latitude
-     * 
-     * @param y
-     *            The latitude
-     */
-    void setLatitude(double y);
-
-    /**
-     * Sets the user's position (x and y)
-     * 
-     * @param p
-     *            The new position
-     */
-    void setLocation(Location p);
-
-    /**
-     * Sets the user's longitude
-     * 
-     * @param x
-     *            The longitude
-     */
-    void setLongitude(double x);
-
-    /**
-     * Sets the user's name
-     * 
-     * @param newName
-     *            The new name
-     */
-    void setName(String newName);
-
-    /**
-     * Sets the user's phone number
-     * 
-     * @param newNumber
-     *            The new phone number
-     */
-    void setNumber(String newNumber);
-
-    /**
-     * Sets whether or not the user is online. (Deprecated, use setLastSeen()
-     * instead)
-     * 
-     * @param isOnline
-     *            True if the user is online
-     */
-    @Deprecated
-    void setOnline(boolean isOnline);
-
-    /**
-     * Stores a new profile picture for the user
-     * 
-     * @param pic
-     *            The picture as a Bitmap object
-     */
-    void setPicture(Bitmap pic, Context context);
-
-    /**
-     * Sets the user position's name
-     * 
-     * @param posName
-     *            The user's position
-     */
-    void setPositionName(String posName);
-
-    /**
-     * @param isVisible
-     *            True if the user is visible
-     */
-    void setVisible(boolean isVisible);
+    public enum BlockStatus {
+        BLOCKED,
+        UNBLOCKED,
+        NOT_SET
+    }
 }

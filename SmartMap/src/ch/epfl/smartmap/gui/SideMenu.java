@@ -35,8 +35,8 @@ public class SideMenu extends DrawerLayout {
      * Called to set up the left side menu. Supposedly called only once.
      */
     public void initializeDrawerLayout() {
-        // Set the adapter for the listView
         mDrawerListView.setAdapter(new SideMenuAdapter(mContext, mListItemsNames));
-        mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerListView.setOnItemClickListener(new DrawerItemClickListener(mContext));
     }
+
 }

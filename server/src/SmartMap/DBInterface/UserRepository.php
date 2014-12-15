@@ -12,7 +12,7 @@ use Doctrine\DBAL\Connection;
  * @author SpicyCH (code reviewed - 03.11.2014) : added javadoc, need to unit test, corrected a typo:
  * it was getLatitude, it is now getLongitude.
  */
-class UserRepository
+class UserRepository implements UserRepositoryInterface
 {
     private static $TABLE_USER = 'users';
     private static $TABLE_FRIENDSHIP = 'friendships';
@@ -106,7 +106,7 @@ class UserRepository
         }
         catch (\InvalidArgumentException $e)
         {
-            throw new DatabaseException('User with invalid state in database with id ' . $id . '.');
+            throw new DatabaseException('User with invalid state in database with id ' . $id . '.', 1, $e);
         }
                         
         return $user;
@@ -414,8 +414,8 @@ class UserRepository
     /**
      * Sets the status of a friendship link.
      * 
-     * @param long $idUser
-     * @param long $idFriend
+     * @param int $idUser
+     * @param int $idFriend
      * @param string $status
      * @throws DatabaseException when the status is invalid, i.e. not ALLOWED, DISALLOWED or BLOCKED
      */
@@ -441,10 +441,10 @@ class UserRepository
     
     /**
      * Sets the status of a list of friendship links.
-     * @param long $idUser
+     * @param int $idUser
      * @param array $idsFriends
      * @param array $status
-     * @throws DatabaseException when either $status or $idsFreinds is invalid.
+     * @throws DatabaseException when either $status or $idsFriends is invalid.
      */
     public function setFriendshipsStatus($idUser, $idsFriends, $status)
     {
@@ -478,8 +478,8 @@ class UserRepository
     
     /**
      * Sets the follow status of a friendship link.
-     * @param long $idUser
-     * @param long $friendId
+     * @param int $idUser
+     * @param int $friendId
      * @param string $follow
      * @throws DatabaseException when $follow is invalid.
      */
@@ -499,7 +499,7 @@ class UserRepository
         }
         catch (\Exception $e)
         {
-            throw new DatabaseException('Error setting frienship follow status in setFreindshipFollow.', 1, $e);
+            throw new DatabaseException('Error setting friendship follow status in setFriendshipFollow.', 1, $e);
         }
     }
     
@@ -535,6 +535,36 @@ class UserRepository
         
         return $ids;
     }
+
+    /**
+     * Get a list of the ids of users who are invited by the user with id $userId.
+     *
+     * @param $userId
+     * @return array
+     * @throws DatabaseException
+     */
+    public function getInvitedIds($userId)
+    {
+        $req = "SELECT id2 FROM " . self::$TABLE_INVITATIONS .  " WHERE id1 = ?";
+
+        try
+        {
+            $stmt = $this->mDb->executeQuery($req, array((int) $userId));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error getting invitations ids in getInvitedIds.', 1, $e);
+        }
+
+        $ids = array();
+
+        while ($id = $stmt->fetch())
+        {
+            $ids[] = (int) $id['id2'];
+        }
+
+        return $ids;
+    }
     
     /**
      * Adds an nvitation from the user with id $idUser to the user with
@@ -546,6 +576,21 @@ class UserRepository
      */
     public function addInvitation($idUser, $idFriend)
     {
+        try
+        {
+            $req = "SELECT * FROM " . self::$TABLE_USER . " WHERE idusers = ?";
+            $user = $this->mDb->fetchAssoc($req, array((int) $idFriend));
+        }
+        catch (\Exception $e)
+        {
+            throw new DatabaseException('Error adding invitation in addInvitations.', 1, $e);
+        }
+
+        if (!$user)
+        {
+            throw new DatabaseException('Trying to add a non existing user as a friend.');
+        }
+
         try
         {
             $this->mDb->insert(self::$TABLE_INVITATIONS, array(
@@ -757,9 +802,10 @@ class UserRepository
                     $userData['last_update']
                 );
             }
-            catch (\Exception $e)
+            catch (\InvaliArgumentException $e)
             {
-                throw DatabaseException('User with invalid state in database with id ' . $userData['idusers'] . '.');
+                throw DatabaseException('User with invalid state in database with id ' . $userData['idusers'] . '.',
+                    1, $e);
             }
         }
         

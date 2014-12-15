@@ -10,27 +10,28 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.Invitation;
 
 /**
- * Customized adapter that displays a list of notification in a target activity
- * This adapter dynamically creates a row in the activity for each notification
- * It displays in each row: user name, user status
+ * Customized adapter that displays a list of invitation in a target activity
+ * This adapter dynamically creates a row in the activity for each invitation
+ * It displays in each row: a title, a picture and a text
  * 
  * @author agpmilli
  */
-public class InvitationListItemAdapter extends ArrayAdapter<User> {
-
+public class InvitationListItemAdapter extends ArrayAdapter<Invitation> {
     private final Context mContext;
-    private final List<User> mItemsArrayList;
+    private final List<Invitation> mItemsArrayList;
 
     /**
+     * Adapter used to display the invitations in a list view
+     * 
      * @param context
      *            Context of the Activity where we want to display the user list
      * @param userList
      *            list of users to display
      */
-    public InvitationListItemAdapter(Context context, List<User> itemsArrayList) {
+    public InvitationListItemAdapter(Context context, List<Invitation> itemsArrayList) {
 
         super(context, R.layout.gui_notification_list_item, itemsArrayList);
 
@@ -38,12 +39,6 @@ public class InvitationListItemAdapter extends ArrayAdapter<User> {
         mItemsArrayList = itemsArrayList;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-     * android.view.ViewGroup)
-     * callback function automatically called one time for each user in the list
-     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -54,16 +49,14 @@ public class InvitationListItemAdapter extends ArrayAdapter<User> {
         // Get FriendItem fields
         TextView title = (TextView) convertView.findViewById(R.id.activity_notification_title);
         TextView text = (TextView) convertView.findViewById(R.id.activity_notification_text);
-        ImageView picture = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
+        ImageView image = (ImageView) convertView.findViewById(R.id.activity_notification_picture);
 
         // Set the User's ID to the tag of its View
-        convertView.setTag(mItemsArrayList.get(position).getID());
+        convertView.setTag(mItemsArrayList.get(position).getId());
 
-        // Set fields with friend attributes
-        title.setText(mContext.getString(R.string.notification_invitefriend_title));
-        picture.setImageBitmap(mItemsArrayList.get(position).getPicture(mContext));
-        text.setText(mItemsArrayList.get(position).getName() + " "
-            + mContext.getString(R.string.notification_friend_invitation));
+        title.setText(mItemsArrayList.get(position).getTitle());
+        text.setText(mItemsArrayList.get(position).getSubtitle());
+        image.setImageBitmap(mItemsArrayList.get(position).getImage());
 
         return convertView;
     }

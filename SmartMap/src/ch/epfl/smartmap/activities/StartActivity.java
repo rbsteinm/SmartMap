@@ -18,15 +18,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.cache.DatabaseHelper;
-import ch.epfl.smartmap.cache.SettingsManager;
-import ch.epfl.smartmap.gui.FacebookFragment;
+import ch.epfl.smartmap.background.ServiceContainer;
 
 import com.facebook.Session;
 
 /**
- * This Activity displays the introduction to the app and the authentication if you are not already logged in,
- * in the other case it just loads mainActivity
+ * This Activity displays the introduction to the app and the authentication if
+ * you are not already logged in, in the
+ * other case it just loads mainActivity
  * 
  * @author agpmilli
  * @author SpicyCH
@@ -35,32 +34,16 @@ public class StartActivity extends FragmentActivity {
 
     private static final String TAG = StartActivity.class.getSimpleName();
 
-    private FacebookFragment mFacebookFragment;
     private ImageView mLogoImage;
     private TextView mWelcomeText;
     private ProgressBar mProgressBar;
     private TextView mProgressText;
     private com.facebook.widget.LoginButton mLoginButton;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        // Displays the facebook app hash in LOG.d
-        try {
-            Log.d(TAG, "Retrieving sha1 app hash...");
-            PackageInfo info =
-                this.getPackageManager().getPackageInfo("ch.epfl.smartmap", PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-            }
-        } catch (NameNotFoundException e) {
-            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
-        } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)");
-        }
-
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_start);
+    /**
+     * Iniatilizes the user interface.
+     */
+    private void initializeGUI() {
 
         // Set background color of activity
         this.setActivityBackgroundColor(this.getResources().getColor(R.color.main_blue));
@@ -94,10 +77,8 @@ public class StartActivity extends FragmentActivity {
             mWelcomeText.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mFacebookFragment = new FacebookFragment();
                     StartActivity.this.getSupportFragmentManager().beginTransaction()
-                        .add(android.R.id.content, mFacebookFragment).commit();
-                    Log.d(TAG, "facebook session is open");
+                        .add(android.R.id.content, new LoginFragment()).commit();
                 }
             }, timeOut);
         } else {
@@ -106,34 +87,18 @@ public class StartActivity extends FragmentActivity {
             mWelcomeText.setVisibility(View.INVISIBLE);
             mLogoImage.setVisibility(View.INVISIBLE);
 
-            mFacebookFragment = new FacebookFragment();
-            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, mFacebookFragment)
-                .commit();
+            this.getSupportFragmentManager().beginTransaction().add(android.R.id.content, new LoginFragment()).commit();
         }
-
-        SettingsManager.initialize(this.getApplicationContext());
-        DatabaseHelper.initialize(this.getApplicationContext());
     }
 
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
-        }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_start);
 
-        int auditErrors = 0;
-        // auditErrors += mSearchEngine.auditErrors(depth - 1);
-        // What are the rep invariants?
-
-        return auditErrors;
+        ServiceContainer.initSmartMapServices(this);
+        this.printSha1InLogcat();
+        this.initializeGUI();
     }
 
     @Override
@@ -153,6 +118,28 @@ public class StartActivity extends FragmentActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Displays the facebook app hash in LOG.d. This hash must match the one
+     * defined in facebook and google developer.
+     * 
+     * @author SpicyCH
+     */
+    private void printSha1InLogcat() {
+        try {
+            Log.d(TAG, "Retrieving sha1 app hash...");
+            PackageInfo info =
+                this.getPackageManager().getPackageInfo("ch.epfl.smartmap", PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+            }
+        } catch (NameNotFoundException e) {
+            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)" + e);
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(TAG, "Cannot retrieve the sha1 hash for this app (used by fb)" + e);
+        }
     }
 
     /**

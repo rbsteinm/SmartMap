@@ -12,7 +12,7 @@ use Silex\Application;
 
 $app = new Application();
 
-// Options
+// Loading options
 $options = json_decode(file_get_contents(__DIR__ . '/../config.json'), true);
 
 $app['debug'] = $options['debug'];
@@ -29,8 +29,9 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     )
 ));
 
-// Enabling sessions
+// Starting session service
 $app->register(new Silex\Provider\SessionServiceProvider());
+
 
 // Injecting repositories
 $app['user.repository'] = $app->share(function() use($app) {
@@ -41,7 +42,8 @@ $app['event.repository'] = $app->share(function() use($app) {
     return new SmartMap\DBInterface\EventRepository($app['db']);
 });
 
-// Injecting logging service
+
+// Starting logging service
 $app['logging'] = $app->share(function() use($app, $options) {
     $logger = new Logger('logging');
     $logger->pushHandler(new StreamHandler('../' . $options['monolog']['logfile'], Logger::INFO));
@@ -70,16 +72,11 @@ $app['profile.controller'] = $app->share(function() use($app) {
 });
 
 $app['event.controller'] = $app->share(function() use($app) {
-    return new SmartMap\Control\EventController($app['event.repository']);
+    return new SmartMap\Control\EventController($app['event.repository'], $app['user.repository']);
 });
+
 
 // Error management
-$app->error(function (SmartMap\Control\ControlException $e, $code) use ($app) {
-    $app['logging']->addDebug('Deprecated ControlException thrown: ' . $e->__toString());
-    return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occurred.', 500,
-        array('X-Status-Code' => 200)));
-});
-
 $app->error(function (SmartMap\Control\InvalidRequestException $e, $code) use ($app) {
     $app['logging']->addWarning('Invalid request: ' . $e->__toString());
     return new JsonResponse(array('status' => 'error', 'message' => $e->getMessage()), 200,
@@ -92,13 +89,20 @@ $app->error(function (SmartMap\Control\ServerFeedbackException $e, $code) use ($
         array('X-Status-Code' => 200));
 });
 
+$app->error(function (Symfony\Component\Routing\Exception\RouteNotFoundException $e, $code) use ($app) {
+    $app['logging']->addWarning('Request for invalid route: ' . $e->__toString());
+    return new JsonResponse(array('status' => 'error', 'message' => 'Invalid URI.'), 200,
+        array('X-Status-Code' => 200));
+});
+
+
 $app->error(function (SmartMap\Control\ControlLogicException $e, $code) use ($app) {
     $app['logging']->addError($e->__toString());
     if ($app['debug'] == true) {
         return;
     }
     return new JsonResponse(array('status' => 'error', 'message' => 'An internal server error occurred.'), 500,
-        array('X-Status-Code' => 200));
+        array('X-Status-Code' => 500));
 });
 
 $app->error(function (\Exception $e, $code) use ($app) {
@@ -107,7 +111,7 @@ $app->error(function (\Exception $e, $code) use ($app) {
         return;
     }
     return new JsonResponse(array('status' => 'error', 'message' => 'An internal error occurred'), 500,
-        array('X-Status-Code' => 200));
+        array('X-Status-Code' => 500));
 });
 
 
@@ -124,9 +128,11 @@ $app->post('/allowFriendList', 'authorization.controller:allowFriendList');
 
 $app->post('/disallowFriendList', 'authorization.controller:disallowFriendList');
 
-$app->post('/followFriend', 'authorization.controller:followFriend');
+$app->post('/blockFriend', 'authorization.controller:blockFriend');
 
-$app->post('/unfollowFriend', 'authorization.controller:unfollowFriend');
+$app->post('/unblockFriend', 'authorization.controller:unblockFriend');
+
+$app->post('/setVisibility', 'authorization.controller:setVisibility');
 
 $app->post('/getUserInfo', 'data.controller:getUserInfo');
 
@@ -160,6 +166,19 @@ $app->post('/updateEvent', 'event.controller:updateEvent');
 
 $app->post('/getPublicEvents', 'event.controller:getPublicEvents');
 
+$app->post('/joinEvent', 'event.controller:joinEvent');
+
+$app->post('/leaveEvent', 'event.controller:leaveEvent');
+
+$app->post('/inviteUsersToEvent', 'event.controller:inviteUsersToEvent');
+
+$app->post('/getEventInvitations', 'event.controller:getEventInvitations');
+
+$app->post('/ackEventInvitation', 'event.controller:ackEventInvitation');
+
+$app->post('/getEventInfo', 'event.controller:getEventInfo');
+
+// Easy authentication for testing
 if ($app['debug'] == true)
 {
     $app->post('/fakeAuth', 'authentication.controller:fakeAuth');

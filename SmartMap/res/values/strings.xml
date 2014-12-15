@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- NOTE: The app authors are shown in AboutActivity -->
+    <string-array name="app_authors">
+        <item>Robin Genolet</item>
+        <item>Julien Perrenoud</item>
+        <item>Matthieu Girod</item>
+        <item>Alain Milliet</item>
+        <item>Nicolas Ritter</item>
+        <item>Raphaël Steinmann</item>
+        <item>Hugo Sbai</item>
+        <item>Marion Sbai</item>
+    </string-array>
+
+    <!-- NOTE: The special thanks list is also shown in AboutActivity -->
+    <string-array name="app_special_thanks">
+        <item>Prof. James Larus</item>
+        <item>Călin Iorgulescu</item>
+        <item>Lukas Kellenberger</item>
+        <item>Laura Perrenoud for the logo</item>
+    </string-array>
+
     <string name="app_name">SmartMap</string>
     <string name="action_settings">Settings</string>
     <string name="action_showfriends">Show friends</string>
@@ -9,20 +29,27 @@
     <string name="greet_user">Log In successful!</string>
     <string name="search_text">Search</string>
     <string name="add_friend">Add a friend</string>
-    
-    
-	<!-- Side menu Strings -->
+
+    <!-- Side menu Strings -->
+    <string name="profile_text">Profile</string>
+    <string name="friends_text">Friends</string>
+    <string name="events_text">Events</string>
+    <string name="filters_text">Filters</string>
+    <string name="settings_text">Settings</string>
+    <string name="about_text">About</string>
+    <string name="logout_text">Logout</string>
     <string-array name="sideMenuElements">
-        <item>Profile</item>
-        <item>Friends</item>
-        <item>Events</item>
-        <item>Filters</item>
-        <item>Settings</item>
+        <item>@string/profile_text</item>
+        <item>@string/friends_text</item>
+        <item>@string/events_text</item>
+        <item>@string/filters_text</item>
+        <item>@string/settings_text</item>
+        <item>@string/about_text</item>
+        <item>@string/logout_text</item>
     </string-array>
 
-    
     <string name="title_activity_pager">Friends</string>
-    <string name="search_bar_hint">Search...</string>
+    <string name="search_bar_hint">Search…</string>
     <string name="title_activity_map_fragment">MapFragment</string>
 
     <!-- User interface labels and strings -->
@@ -64,19 +91,19 @@
     <string name="resolved">Error resolved. Please re-try operation.</string>
     <string name="no_resolution">Google Play services: unable to resolve connection error.</string>
     <string name="periodic_update_stop">Stopping periodic updates</string>
-    <string name="play_services_available">Google Play services is available</string>
+    <string name="play_services_available">Google Play services are available</string>
     <string name="request_location_updates_in_progress">        Can\'t request location updates, previous request hasn\'t finished</string>
     <string name="start_updates">Start Updates</string>
     <string name="stop_updates">Stop Updates</string>
     <string name="unknown">--Unknown--</string>
     <string name="unknown_activity_request_code">        Received an unknown activity request code %1$d in onActivityResult.</string>
     <string name="title_activity_add_friend">Add a friend</string>
-	
+
     <!-- StartActivity -->
     <string name="welcome">W E L C O M E</string>
-    <string name="loading_text">Logging In...</string>
+    <string name="loading_text">Logging in…</string>
     <string name="logo_description">logo</string>
-    
+
     <!-- ShowEventsActivity -->
     <string name="title_activity_show_events">Events</string>
     <string name="ShowEventsCheckBoxMyEv">My events</string>
@@ -84,10 +111,65 @@
     <string name="ShowEventsCheckBoxStatus">Ongoing</string>
     <string name="showEventsMenuNewEvent">Create a new event</string>
     <string name="show_event_on_the_map_button">Show on the map</string>
-    <string name="show_event_on_the_map_loading">Opening event on the map...</string>
+    <string name="show_event_on_the_map_loading">Opening event on the map…</string>
     <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
+    <string name="show_event_details_button">See details</string>
+    <string name="show_event_server_error">Couldn\'t fetch wished content from our server</string>
+    <string name="show_event_loading_info">Loading information…</string>
+    <string name="show_events_menu_refresh">Refresh</string>
+    <string name="ten_letters">aaaaaaaaaa</string>
+    <string name="show_event_default_seekbar_text">45 km</string>
+    <string name="show_event_listview_description">listview</string>
+    <string name="show_event_disabled_warning_title">Events disabled</string>
+    <string name="show_event_disabled_warning_message">You have disabled events fetching in the settings.\nIf you want to see events, please set the max distance to fetch events to something else.</string>
+    <string name="show_event_disabled_warning_button_goto_settings">Take me to the settings</string>
+    <string name="show_event_disabled_warning_button_return_to_main">OK</string>
+    <string name="symbol_km">km</string>
+
+    <!-- EventsListItemAdapter -->
+    <string name="events_list_item_adapter_event_live">Event is live!</string>
+    <string name="events_list_item_adapter_today">Today</string>
+    <string name="events_list_item_adapter_tomorrow">Tomorrow</string>
+    <string name="events_list_item_adapter_ends_today_at">Ends today at</string>
+    <string name="events_list_item_adapter_ends_tomorrow_at">Ends tomorrow at</string>
+    <string name="events_list_item_adapter_starts">Starts</string>
+    <string name="events_list_item_adapter_ends">Ends</string>
+    <string name="events_list_item_adapter_from">from</string>
+    <string name="events_list_item_adapter_to">to</string>
+    <string name="events_list_item_adapter_near_with_first_uppercase">Near</string>
+
+    <!-- EventInformationActivity -->
+    <string name="event_info_title_text">Title</string>
+    <string name="event_info_when_text">When</string>
+    <string name="event_info_by_text">Created by</string>
+    <string name="event_info_description_text">Description</string>
+    <string name="event_info_where_text">Where</string>
+    <string name="event_info_going_text">Attending</string>
+    <string name="event_info_participants_text">Participants</string>
+    <string name="title_activity_show_event_information">Show event</string>
+    <string name="show_event_info_invite_friends_button">Invite friends</string>
+    <string name="show_event_by">By</string>
+    <string name="show_event_info_event_no_description">No Description given</string>
+    <string name="participant_img_content_description">participant image</string>
+    <string name="add_participant_failure">Failure while adding participants</string>
+    <string name="add_participant_success">Successfully added participants</string>
+    <string name="event_quit_success">Event left</string>
+    <string name="event_quit_failure">Error while trying to quit event</string>
+    <string name="event_going_success">Event joined</string>
+    <string name="event_going_failure">Error while trying to join event</string>
+    <string name="refresh_participants_network_error">Network Error while getting participants</string>
+    <string name="refresh_participants_not_found">Couldn\'t find participants</string>
+    <string name="event_info_delete_button">Delete event</string>
+
+    <!-- Error Messages -->
+    <string name="error_client_side">An error occurred on our side, sorry :(</string>
 
     <!-- AddEventActivity -->
+    <string name="add_event_title_text">Title</string>
+    <string name="add_event_when_text">When</string>
+    <string name="add_event_where_text">Where</string>
+    <string name="add_event_map_text">Click on the map to set location</string>
+    <string name="add_event_what_text">What</string>
     <string name="title_activity_add_event">Create a new event</string>
     <string name="addEventEventName">Event name</string>
     <string name="addEventButtonCreateEvent">Done</string>
@@ -97,7 +179,7 @@
     <string name="addEventEventTime">Event is now!</string>
     <string name="addEventLatitude">Latitude</string>
     <string name="addEventLongitude">Longitude</string>
-    <string name="addEventPlaceName">Place (town, canton, etc...)</string>
+    <string name="addEventPlaceName">Name of the place</string>
     <string name="addEventDescription">Description (optional)</string>
     <string name="addEventButtonPickLocation">Set location</string>
     <string name="add_event_toast_event_cannot_end_before_starting">The event cannot end before it begins!</string>
@@ -107,15 +189,36 @@
     <string name="add_event_toast_couldnt_retrieve_location">Sorry, couldn\'t get the location of your event. Please try again!</string>
     <string name="add_event_toast_couldnt_retrieve_location_name">Sorry, couldn\'t retrieve the name of your event\'s place. Please specify it manually.</string>
     <string name="add_event_toast_indication_long_click_map_to_create_event">Long click the map at the location of your event</string>
+    <string name="add_event_toast_couldnt_create_event_server">Couldn\'t create your event. The error occurred on our server and we are sorry :(</string>
+    <string name="add_event_toast_fields_bad_size">Couldn\'t create your event because at least one of the field was too short or too long.</string>
+
+    <!-- InviteFriendsActivity -->
+    <string name="title_activity_invite_friends">Select friends</string>
+    <string name="invite_friend_send_button">Invite</string>
+    <string name="invite_friend_success">Invitation sent!</string>
+    <string name="invite_friends_success">Invitations sent!</string>
+    <string name="invite_friends_no_items_selected">No invitations sent! Did you select any friends?</string>
+    <string name="invite_friend_failure">Error while inviting friend</string>
+    <string name="invite_friends_failure">Error while inviting friends</string>
 
     <!-- FacebookFragment -->
     <string name="fb_fragment_toast_cannot_connect_to_smartmap_server">Failed to log in to the SmartMap server</string>
     <string name="fb_fragment_toast_cannot_connect_to_internet">Your internet connection seems down. Please try again!</string>
 
     <!-- UserInformationActivity -->
-    <string name="title_activity_user_information">Friend Informations</string>
+    <string name="title_activity_user_information">Friend Information</string>
     <string name="user_information_picture_description">Profile Picture</string>
     <string name="title_activity_search">SearchActivity</string>
+    <string name="remove_friend_failure">Error while trying to remove a friend</string>
+    <string name="remove_friend_success">Successfully removed friend</string>
+    <string name="remove">Remove</string>
+    <string name="from_your_friends">from your friends ?</string>
+    <string name="blocking_failure">Network error, couldn\'t (un)block friend</string>
+    <string name="friend_blocked">friend successfully blocked</string>
+    <string name="friend_unblocked">friend successfully unblocked</string>
+    <string name="user_shown_on_map">user shown on map</string>
+    <string name="user_not_shown_on_map">user not shown on map anymore</string>
+    <string name="unknown_user">unknown user</string>
 
     <!-- Notification texts -->
     <string name="notification_acceptedfriend_title">Friend invitation accepted</string>
@@ -127,13 +230,157 @@
     <string name="notification_invitation_accepted"> accepted your invitation</string>
     <string name="notification_open_friend_list">Click here to open your list of friends.</string>
     <string name="notification_open_event_list">Click here to open your list of events.</string>
-    
-    <!-- Notification Activity -->
+
+    <!-- Invitation Activity -->
+    <string name="notification_list_description">notification list description</string>
     <string name="notification_img_content_description">Image of notification</string>
     <string name="title_activity_notifications">Invitations</string>
+    <string name="notification_open_friend_invitation_list">Click here to open your list of invitations.</string>
+    <string name="notification_open_event_invitation_list">Click here to open event description.</string>
+    <string name="notification_friend_request_title">Friend request from </string>
+    <string name="notification_event_request_title">Event request from </string>
+    <string name="notification_accepted_friend_title">accepted your invitation</string>
+
+    <!-- Invitation Titles -->
+    <string name="invitation_want_to_be_your_friend"> wants to be your friend.</string>
+    <string name="invitation_invites_your_to"> invites you to </string>
+    <string name="invitation_accepted_your_friend_request"> accepted your friend request.</string>
+
+    <!-- Invitation Subtitles -->
+    <string name="invitation_click_here_to_open_your_list_of_invitations">Click here to open your list of invitations.</string>
+    <string name="invitation_click_here_to_see_the_event">Click here to see the event.</string>
+    <string name="invitation_click_here_for_informations">Click here for more information.</string>
+    <string name="invitation_accepted">Accepted</string>
+    <string name="invitation_declined">Declined</string>
+
+    <!-- Set Location Activity -->
+    <string name="title_activity_set_location">Set Location</string>
+    <string name="set_location_toast">Drag Marker where your event will take place and press "Done"</string>
+    <string name="set_location_done_button">Done</string>
 
     <!-- FriendInformationActivity -->
-    <string name="removeFriendDialogMessage">Remove from friends</string>
-    <string name="follow_checkbox">Follow</string>
+    <string name="remove_friend_button_text">Remove</string>
+    <string name="add_friend_button_text">Add</string>
+    <string name="block_button_text">Block</string>
+    <string name="show_on_map_switch">Show on map</string>
+    <string name="block_switch">Block</string>
+
+    <!-- ShowFiltersActivity -->
+    <string name="title_activity_show_filters">Filters</string>
+    <string name="show_on_map">Activate</string>
+    <string name="add_filter">Add new filter</string>
+    <string name="new_filter_alert_dialog_text">Name </string>
+    <string name="switch_On">YES</string>
+    <string name="switch_Off">NO</string>
+    <string name="people_inside_filter">people inside this filter</string>
+    <string name="new_filter">New Filter</string>
+    <string name="create_filter">Create</string>
+    <string name="cancel_create_filter">Cancel</string>
+    <string name="create_filter_empty_name">Enter a non empty name</string>
+
+    <!-- ModifyFilterActivity -->
+    <string name="title_activity_modify_filter">ModifyFilterActivity</string>
+    <string name="activity_modify_filter_inside_title">Inside filter</string>
+    <string name="activity_modify_filter_outside_title">Outside filter</string>
+    <string name="action_save_filter_button">Save</string>
+    <string name="action_rename_filter_button">Rename</string>
+    <string name="action_cancel_button">Rename</string>
+    <string name="rename_filter">Rename filter</string>
+    <string name="new_name_saved">New name saved</string>
+    <string name="save_changes">Save changes?</string>
+    <string name="changes_saved">Changes saved</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="remove_filter">Remove filter?</string>
+    <string name="removed_filter">Removed filter</string>
+
+    <!-- Settings -->
+    <!-- NOTE: Each string value must be unique, as it is a key for one specific preference. -->
+    <string name="settings_key_notifications_enabled">notifications_enabled</string>
+    <string name="settings_key_notifications_friend_requests">notifications_friend_requests</string>
+    <string name="settings_key_notifications_friendship_confirmations">notifications_friendship_confirmations</string>
+    <string name="settings_key_notifications_event_invitations">notifications_event_invitations</string>
+    <string name="settings_key_notifications_event_proximity">notifications_event_proximity</string>
+    <string name="settings_key_notifications_vibrate">notifications_vibrate</string>
+    <string name="settings_key_general_offline">general_offline</string>
+    <string name="settings_offline">Offline mode</string>
+    <string name="settings_key_refresh_frequency">refresh_frequency</string>
+    <string name="settings_key_last_seen_max">last_seen_max</string>
+    <string name="settings_key_events_show_public">events_show_public</string>
+    <string name="settings_key_events_show_private">events_show_private</string>
+    <string name="settings_key_max_distance_fetch_events">events_fetch_distance</string>
+
+    <!-- SettingsManager -->
+    <string name="settings_manager_default_name">No name</string>
+    <string name="settings_manager_default_number">No number</string>
+    <string name="settings_manager_default_email">No email</string>
+    <string name="settings_manager_default_subtitle">unknown</string>
+    <string name="settings_manager_default_token">No token</string>
+    <string name="settings_manager_default_cookie">No cookie</string>
+    <string name="settings_manager_default_locname">unknown</string>
+    <string name="settings_manager_near">near</string>
+
+    <!-- AboutActivity -->
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="about_version">Version</string>
+    <string name="about_release">release</string>
+    <string name="about_unkown_version">unknown</string>
+    <string name="about_all_rights_reserved">All rights reserved</string>
+    <string name="about_special_thanks_to">Special thanks to</string>
+    <string name="about_dummy_names">Name 1\nName 2\nName 3</string>
+    <string name="about_dev_by">Developed by</string>
+    <string name="about_dummy_copyright">© 2014</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <!-- LogoutManager -->
+    <string name="logout_dialog_title">Logging out</string>
+    <string name="logout_dialog_message">Do you really want to logout from SmartMap?</string>
+    <string name="logout_toast_confirm">Logging out…</string>
+    <string name="logout_confirm">Logout</string>
+
+    <!-- Utils -->
+    <string name="utils_never_seen_on_smartmap">Never seen on SmartMap</string>
+    <string name="utils_next">Next</string>
+    <string name="utils_tomorrow">Tomorrow</string>
+    <string name="utils_today">Today</string>
+    <string name="utils_yesterday">Yesterday</string>
+    <string name="utils_last">Last</string>
+    <string name="utils_now">Now</string>
+    <string name="utils_one_min">1 minute ago</string>
+    <string name="utils_minutes_ago">minutes ago</string>
+    <string name="utils_one_hour_ago">1 hour ago</string>
+    <string name="utils_hours_ago">hours ago</string>
+    <string name="utils_days_ago">days ago</string>
+    <string name="utils_away_from_you">away from you</string>
+    <string name="utils_meters_away_from_you">meters away from you</string>
+
+    <!-- SettingsManager -->
+    <string name="near">near</string>
+
+    <!-- ProfileActivity -->
+    <string name="title_activity_profile">Your Profile</string>
+
+    <!-- AddfriendActivity -->
+    <string name="add">Add</string>
+    <string name="as_a_friend">as a friend ?</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_friend_network_error">Couldn\'t find friends due to a network error. Please try again later</string>
+    <string name="add_friend_not_found">No user found for this query</string>
+    <string name="add_friend_request_not_sent">Friend request sent couldn\'t be sent</string>
+    <string name="add_friend_request_sent">Friend request sent !</string>
+
+    <!-- InvitationsTab -->
+    <string name="accept_friend_network_error">The invitation couldn\'t be accepted. Please try again later.</string>
+    <string name="decline_friend_network_error">The invitation couldn\'t be declined. Please try again later.</string>
+    <string name="yes_accept">Yes, accept</string>
+    <string name="no_decline">No, decline</string>
+    <string name="decline_confirm">Invitation declined.</string>
+    
+    <!-- AddEventOnMapLongClickListener -->
+    <string name="map_long_clicked_dialog_title">Do you really want to create an event at this position?</string>
+    <string name="map_long_clicked_dialog_message">This dialog is triggered by a long click on the map.</string>
+
+    <!-- Nothing below this line! -->
 
 </resources>

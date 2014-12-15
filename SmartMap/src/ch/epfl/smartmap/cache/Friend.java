@@ -1,346 +1,240 @@
 package ch.epfl.smartmap.cache;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.os.Parcel;
-import android.os.Parcelable;
-import ch.epfl.smartmap.R;
-import ch.epfl.smartmap.gui.Utils;
+import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.map.CircularMarkerIconMaker;
+import ch.epfl.smartmap.map.MarkerIconMaker;
+import ch.epfl.smartmap.util.Utils;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * A class to represent the user's friends
+ * Represents an {@code User} that is listed on the server as your Friend. There
+ * is therefore more
+ * informations that are accessible. Friends should not be instanciated
+ * directly, but from the method {@code User.createFromContainer(...)}
  * 
+ * @author jfperren
  * @author ritterni
  */
-public class Friend implements User, Displayable, Parcelable {
 
-    private final long mId; // the user's unique ID
-    private String mName; // the user's name as it will be displayed
+public final class Friend extends User {
+
     private String mPhoneNumber;
     private String mEmail;
     private String mLocationString;
-    private GregorianCalendar mLastSeen;
-    private final Location mLocation;
-    private boolean mVisible;
-
-    public static final String NO_NAME = "";
-    public static final String NO_NUMBER = "No phone number specified";
-    public static final String NO_EMAIL = "No email address specified";
-    public static final int DEFAULT_PICTURE = R.drawable.ic_default_user; // placeholder
-    public static final int IMAGE_QUALITY = 100;
-    public static final String PROVIDER_NAME = "SmartMapServers";
-    public static final long ONLINE_TIMEOUT = 1000 * 60 * 3; // time in millis
-    // until a user is
-    // considered
-    // offline
-
-    public static final float MARKER_ANCHOR_X = (float) 0.5;
-    public static final float MARKER_ANCHOR_Y = 1;
-    public static final int PICTURE_WIDTH = 50;
-    public static final int PICTURE_HEIGHT = 50;
-
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
-        @Override
-        public Friend createFromParcel(Parcel source) {
-            return new Friend(source);
-        }
-
-        @Override
-        public Friend[] newArray(int size) {
-            return new Friend[size];
-        }
-    };
+    private Location mLocation;
+    private User.BlockStatus mIsBlocked;
+    private final MarkerIconMaker mMarkerIconMaker;
 
     /**
-     * Friend constructor
+     * Constructor
      * 
-     * @param userID
-     *            The id of the contact we're creating
-     * @param userName
-     *            The name of the friend
-     * @param userNumber
-     *            The friend's phone number
-     * @author ritterni
+     * @param id
+     *            Friend's id
+     * @param name
+     *            Friend's name
+     * @param phoneNumber
+     *            Friend's phone number
+     * @param email
+     *            Friend's email
+     * @param image
+     *            Friend's profile picture
+     * @param location
+     *            Friend's GoogleMap Location
+     * @param locationString
+     *            a String about the Location
+     * @param isBlocked
+     *            Block status of this Friend
      */
-    public Friend(long userID, String userName) {
-        if (userID < 0) {
-            throw new IllegalArgumentException("Invalid user ID!");
+    protected Friend(long id, String name, String phoneNumber, String email, Bitmap image, Location location,
+        String locationString, User.BlockStatus isBlocked) {
+        super(id, name, image);
+
+        if (locationString == null) {
+            mLocationString = User.NO_LOCATION_STRING;
+        } else {
+            mLocationString = locationString;
         }
-        if (userName == null) {
-            throw new IllegalArgumentException("Invalid user name!");
+
+        if (location == null) {
+            mLocation = User.NO_LOCATION;
+            mLocation.setTime(User.NO_LAST_SEEN.getTimeInMillis());
+            mLocation.setLatitude(User.NO_LATITUDE);
+            mLocation.setLongitude(User.NO_LONGITUDE);
+        } else {
+            mLocation = new Location(location);
         }
-        mId = userID;
-        mName = userName;
-        mPhoneNumber = NO_NUMBER;
-        mEmail = NO_EMAIL;
-        mLocationString = Utils.UNKNOWN_LOCATION;
-        mLastSeen = new GregorianCalendar();
-        mLastSeen.setTimeInMillis(0);
-        mLocation = new Location(PROVIDER_NAME);
-        mVisible = true;
-    }
 
-    public Friend(long userID, String userName, double longitude, double latitude) {
-        this(userID, userName);
+        if (email == null) {
+            mEmail = NO_EMAIL;
+        } else {
+            mEmail = email;
+        }
 
-        this.setLatitude(latitude);
-        this.setLongitude(longitude);
-    }
+        if (phoneNumber == null) {
+            mPhoneNumber = NO_PHONE_NUMBER;
+        } else {
+            mPhoneNumber = phoneNumber;
+        }
 
-    public Friend(Parcel in) {
-        mId = in.readLong();
-        mName = in.readString();
-        mPhoneNumber = in.readString();
-        mEmail = in.readString();
-        mLocation = in.readParcelable(Location.class.getClassLoader());
-        mLocationString = in.readString();
-        mLastSeen = new GregorianCalendar();
-        mLastSeen.setTimeInMillis(in.readLong());
-        boolean[] booleans = new boolean[1];
-        in.readBooleanArray(booleans);
-        mVisible = booleans[0];
+        if ((isBlocked == BlockStatus.NOT_SET) || (isBlocked == null)) {
+            mIsBlocked = BlockStatus.UNBLOCKED;
+        } else {
+            mIsBlocked = isBlocked;
+        }
+
+        mMarkerIconMaker = new CircularMarkerIconMaker(this);
     }
 
     @Override
-    public void deletePicture(Context context) {
-        File file = new File(context.getFilesDir(), mId + ".png");
-        if (file.exists()) {
-            file.delete();
-        }
+    public User.BlockStatus getBlockStatus() {
+        return mIsBlocked;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.os.Parcelable#describeContents()
+    @Override
+    public UserContainer getContainerCopy() {
+        return super.getContainerCopy().setPhoneNumber(mPhoneNumber).setEmail(mEmail).setLocation(mLocation)
+            .setLocationString(mLocationString).setBlocked(mIsBlocked);
+    }
+
+    /**
+     * @return Friend's email
      */
-    @Override
-    public int describeContents() {
-        return 1;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object that) {
-        return (that != null) && (that instanceof Friend) && (mId == ((Friend) that).mId);
-    }
-
-    @Override
     public String getEmail() {
         return mEmail;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getFriendship()
+     */
     @Override
-    public long getID() {
-        return mId;
+    public int getFriendship() {
+        return User.FRIEND;
     }
 
-    @Override
-    public GregorianCalendar getLastSeen() {
-        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        g.setTimeInMillis(mLastSeen.getTimeInMillis());
-        return g;
+    /**
+     * @return a Calendar set to the Friend's last position timestamp
+     */
+    public Calendar getLastSeen() {
+        Calendar lastSeen = GregorianCalendar.getInstance(TimeZone.getDefault());
+        lastSeen.setTimeInMillis(mLocation.getTime());
+        return lastSeen;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Localisable#getLatLng()
+     */
     @Override
     public LatLng getLatLng() {
         return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getLocation()
+     */
     @Override
     public Location getLocation() {
-        return mLocation;
+        Location location = new Location(mLocation.getProvider());
+        location.setLatitude(mLocation.getLatitude());
+        location.setLongitude(mLocation.getLongitude());
+        return location;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.User#getLocationString()
+     */
     @Override
     public String getLocationString() {
         return mLocationString;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * ch.epfl.smartmap.cache.Displayable#getMarkerOptions(android.content.Context
-     * )
-     * @author hugo-S
+    @Override
+    public BitmapDescriptor getMarkerIcon(Context context) {
+        return BitmapDescriptorFactory.fromBitmap(mMarkerIconMaker.getMarkerIcon(context));
+    }
+
+    /**
+     * @return Friend's phone number
      */
-    @Override
-    public MarkerOptions getMarkerOptions(Context context) {
-        Bitmap friendProfilePicture =
-            Bitmap.createScaledBitmap(this.getPicture(context), PICTURE_WIDTH, PICTURE_HEIGHT, false);
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(this.getLatLng()).title(this.getName())
-            .icon(BitmapDescriptorFactory.fromBitmap(friendProfilePicture))
-            .anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y);
-        return markerOptions;
-    }
-
-    @Override
-    public String getName() {
-        return mName;
-    }
-
-    @Override
-    public String getNumber() {
+    public String getPhoneNumber() {
         return mPhoneNumber;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.Displayable#getShortInfos()
+     */
     @Override
-    public Bitmap getPicture(Context context) {
-
-        File file = new File(context.getFilesDir(), mId + ".png");
-
-        Bitmap pic = null;
-
-        if (file.exists()) {
-            pic = BitmapFactory.decodeFile(file.getAbsolutePath());
-        } else {
-            pic = BitmapFactory.decodeResource(context.getResources(), DEFAULT_PICTURE);
+    public String getSubtitle() {
+        String infos = Utils.getLastSeenStringFromCalendar(this.getLastSeen());
+        if (!infos.equals(Utils.NEVER_SEEN)) {
+            infos += " near " + mLocationString;
         }
-        return pic;
-    }
-
-    @Override
-    public String getShortInfos() {
-        String infos = "";
-        infos += Utils.getLastSeenStringFromCalendar(this.getLastSeen());
-        infos += " near ";
-        infos += mLocationString;
 
         return infos;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#hashCode()
+    /**
+     * @return True if the Friend should be displayed on the Map
      */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-
-        return ((int) mId) * prime;
-    }
-
-    @Override
-    public boolean isOnline() {
-        return (new GregorianCalendar().getTimeInMillis() - mLastSeen.getTimeInMillis()) < ONLINE_TIMEOUT;
-    }
-
-    @Override
     public boolean isVisible() {
-        return mVisible;
+        return ServiceContainer.getCache().getAllActiveFilters().contains(this)
+            && !mLocation.equals(NO_LOCATION);
     }
 
     @Override
-    public void setEmail(String newEmail) {
-        mEmail = newEmail;
-    }
+    public boolean update(UserContainer newValues) {
+        boolean hasChanged = super.update(newValues);
 
-    @Override
-    public void setLastSeen(GregorianCalendar date) {
-        GregorianCalendar g = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"));
-        g.setTimeInMillis(date.getTimeInMillis());
-        mLastSeen = g;
-    }
+        if ((newValues.getLocation() != null)
+            && (newValues.getLocation() != User.NO_LOCATION)
+            && ((newValues.getLocation().getLatitude() != mLocation.getLatitude())
+                || (newValues.getLocation().getLongitude() != mLocation.getLongitude()) || (newValues
+                .getLocation().getTime() != mLocation.getTime()))) {
+            mLocation = new Location(newValues.getLocation());
+            mLocation.setLatitude(newValues.getLocation().getLatitude());
+            mLocation.setLongitude(newValues.getLocation().getLongitude());
 
-    @Override
-    public void setLatitude(double latitude) {
-        mLocation.setLatitude(latitude);
-    }
-
-    @Override
-    public void setLocation(Location p) {
-        mLocation.set(p);
-    }
-
-    @Override
-    public void setLongitude(double longitude) {
-        mLocation.setLongitude(longitude);
-
-    }
-
-    @Override
-    public void setName(String newName) {
-        if (newName.isEmpty() || (newName == null)) {
-            throw new IllegalArgumentException("Invalid user name!");
-        }
-        mName = newName;
-    }
-
-    @Override
-    public void setNumber(String newNumber) {
-        mPhoneNumber = newNumber;
-    }
-
-    @Override
-    @Deprecated
-    public void setOnline(boolean status) {
-        // deprecated
-    }
-
-    @Override
-    public void setPicture(Bitmap pic, Context context) {
-
-        File file = new File(context.getFilesDir(), mId + ".png");
-
-        if (file.exists()) {
-            file.delete();
+            hasChanged = true;
         }
 
-        try {
-            FileOutputStream out = context.openFileOutput(mId + ".png", Context.MODE_PRIVATE);
-            pic.compress(Bitmap.CompressFormat.PNG, IMAGE_QUALITY, out);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if ((newValues.getLocationString() != null)
+            && (newValues.getLocationString() != User.NO_LOCATION_STRING)
+            && !newValues.getLocationString().equals(mLocationString)) {
+            mLocationString = newValues.getLocationString();
+            hasChanged = true;
         }
-    }
 
-    @Override
-    public void setPositionName(String posName) {
-        mLocationString = posName;
-    }
+        if ((newValues.isBlocked() != null) && (newValues.isBlocked() != User.BlockStatus.NOT_SET)
+            && (newValues.isBlocked() != mIsBlocked)) {
+            mIsBlocked = newValues.isBlocked();
+            hasChanged = true;
+        }
 
-    @Override
-    public void setVisible(boolean isVisible) {
-        mVisible = isVisible;
-    }
+        if ((newValues.getEmail() != null) && (newValues.getEmail() != User.NO_EMAIL)
+            && !newValues.getEmail().equals(mEmail)) {
+            mEmail = newValues.getEmail();
+            hasChanged = true;
+        }
 
-    /*
-     * (non-Javadoc)
-     * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
-     */
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(mId);
-        dest.writeString(mName);
-        dest.writeString(mPhoneNumber);
-        dest.writeString(mEmail);
-        dest.writeParcelable(mLocation, flags);
-        dest.writeString(mLocationString);
-        dest.writeLong(mLastSeen.getTimeInMillis());
-        boolean[] booleans = new boolean[]{mVisible};
-        dest.writeBooleanArray(booleans);
-    }
+        if ((newValues.getPhoneNumber() != null) && (newValues.getPhoneNumber() != User.NO_PHONE_NUMBER)
+            && !newValues.getPhoneNumber().equals(mPhoneNumber)) {
+            mPhoneNumber = newValues.getPhoneNumber();
+        }
 
-    private void updateLocationString() {
-        mLocationString = Utils.getCityFromLocation(this.getLocation());
+        return hasChanged;
     }
 }

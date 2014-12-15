@@ -1,13 +1,13 @@
 package ch.epfl.smartmap.activities;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,41 +19,42 @@ import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
+import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
+import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-import ch.epfl.smartmap.servercom.SmartMapClientException;
+import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
 
 /**
- * This Activity displays a list of users from the DB and lets you send them
- * friend requests
- * 
+ * This Activity displays a list of users from the DB and lets you send them friend requests
+ *
  * @author rbsteinm
  */
 public class AddFriendActivity extends ListActivity {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = AddFriendActivity.class.getSimpleName();
-
     private SearchView mSearchBar;
+    private Activity mActivty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_add_friend);
+
+        mActivty = this;
+
         // Set action bar color to main color
-        this.getActionBar().setBackgroundDrawable(
-            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
     protected void onListItemClick(ListView listView, View view, int position, long id) {
-        long userId = (Long) view.getTag();
+        long userId = ((FriendViewHolder) view.getTag()).getUserId();
         RelativeLayout rl = (RelativeLayout) view;
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         String name = tv.getText().toString();
-        this.displayConfirmationDialog(name, userId);
+        displayConfirmationDialog(mActivty, name, userId);
     }
 
     @Override
@@ -62,6 +63,8 @@ public class AddFriendActivity extends ListActivity {
         this.getMenuInflater().inflate(R.menu.add_friend, menu);
         mSearchBar = (SearchView) menu.findItem(R.id.add_friend_activity_searchBar).getActionView();
         this.setSearchBarListener();
+        MenuItem searchMenuItem = menu.findItem(R.id.add_friend_activity_searchBar);
+        searchMenuItem.expandActionView();
         return true;
     }
 
@@ -77,18 +80,47 @@ public class AddFriendActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void displayConfirmationDialog(String name, final long userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Add " + name + " as a friend?");
-
-        // Add positive button
-        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+    /**
+     * sets a listener on the searchbar that updates the views (users) displayed every time the text chnanges or is
+     * submitted
+     */
+    private void setSearchBarListener() {
+        mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
-            public void onClick(DialogInterface dialog, int id) {
-                new SendFriendRequest().execute(userId);
+            public boolean onQueryTextChange(String newText) {
+                ServiceContainer.getSearchEngine().findStrangersByName(newText, new FindFriendsCallback());
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String newText) {
+                ServiceContainer.getSearchEngine().findStrangersByName(newText, new FindFriendsCallback());
+                return true;
             }
         });
+    }
 
+    /**
+     * Display a confirmation dialog.
+     *
+     * @param name
+     * @param userId
+     */
+    public static void displayConfirmationDialog(final Activity activity, String name, final long userId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(activity.getResources().getString(R.string.add) + " " + name + " "
+                + activity.getResources().getString(R.string.as_a_friend));
+
+        // Add positive button
+        builder.setPositiveButton(activity.getResources().getString(R.string.add),
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // invite friend
+                        ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback(activity));
+                    }
+                });
         // Add negative button
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -101,79 +133,83 @@ public class AddFriendActivity extends ListActivity {
         builder.create().show();
     }
 
-    private void setSearchBarListener() {
-        mSearchBar.setOnQueryTextListener(new OnQueryTextListener() {
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                new RefreshUserList().execute(newText);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextSubmit(String newText) {
-                new RefreshUserList().execute(newText);
-                return true;
-            }
-        });
-    }
-
     /**
-     * Asynchronous task that refreshes the list of users displayed every time a
-     * new character is typed in the searchbar
-     * 
-     * @author rbsteinm
+     * Callback that describes connection with network
+     *
+     * @author agpmilli
      */
-    private class RefreshUserList extends AsyncTask<String, Void, List<User>> {
+    private static class AddFriendCallback implements NetworkRequestCallback<Void> {
+
+        private final Activity mActivity;
+
+        public AddFriendCallback(Activity context) {
+            mActivity = context;
+        }
 
         @Override
-        protected List<User> doInBackground(String... params) {
-            try {
-                if (params[0].equals("")) {
-                    return Collections.emptyList();
-                } else {
-                    return NetworkSmartMapClient.getInstance().findUsers(params[0]);
+        public void onFailure(Exception e) {
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mActivity, mActivity.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT)
+                            .show();
                 }
-            } catch (SmartMapClientException e) {
-                return Collections.emptyList();
-            }
+            });
         }
 
         @Override
-        protected void onPostExecute(List<User> refreshedList) {
-            super.onPostExecute(refreshedList);
-            AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                refreshedList));
+        public void onSuccess(Void result) {
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mActivity, mActivity.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT)
+                            .show();
+                    mActivity.finish();
+                }
+            });
         }
     }
 
     /**
-     * Asynchronous task that sends a friend request to the friend whose id is
-     * given in parameter
-     * 
-     * @author rbsteinm
+     * Callback that describes connection with SearchRequest
+     *
+     * @author Pamoi
      */
-    private class SendFriendRequest extends AsyncTask<Long, Void, String> {
+    private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {
 
         @Override
-        protected String doInBackground(Long... params) {
-            String confirmString = "";
-            try {
-                NetworkSmartMapClient.getInstance().inviteFriend(params[0]);
-                confirmString =
-                    "You sent a friend request to "
-                        + NetworkSmartMapClient.getInstance().getUserInfo(params[0]).getName();
-            } catch (SmartMapClientException e) {
-                // confirmString = "Error, friend request wasn't sent";
-                confirmString = e.getMessage();
-            }
-            return confirmString;
+        public void onNetworkError(Exception e) {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(AddFriendActivity.this,
+                            AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
+                            Toast.LENGTH_LONG).show();
+                }
+            });
         }
 
         @Override
-        protected void onPostExecute(String confirmString) {
-            Toast.makeText(AddFriendActivity.this.getApplicationContext(), confirmString, Toast.LENGTH_LONG)
-                .show();
+        public void onNotFound() {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(AddFriendActivity.this,
+                            AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @Override
+        public void onResult(final Set<User> result) {
+            AddFriendActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
+                            new ArrayList<User>(result)));
+                }
+            });
         }
     }
 }

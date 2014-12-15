@@ -2,160 +2,77 @@ package ch.epfl.smartmap.test.severcom;
 
 import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
-
-import junit.framework.TestCase;
+import java.util.Set;
 
 import org.junit.Test;
 
+import android.content.Context;
 import android.location.Location;
-import ch.epfl.smartmap.cache.Event;
-import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.PublicEvent;
+import android.test.AndroidTestCase;
+import android.test.RenamingDelegatingContext;
+import ch.epfl.smartmap.background.ServiceContainer;
+import ch.epfl.smartmap.cache.EventContainer;
+import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.User;
-import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
-import ch.epfl.smartmap.servercom.NotificationBag;
+import ch.epfl.smartmap.cache.UserContainer;
+import ch.epfl.smartmap.servercom.InvitationBag;
+import ch.epfl.smartmap.servercom.NetworkFriendInvitationBag;
 import ch.epfl.smartmap.servercom.ServerFeedbackException;
+import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
-// import org.junit.FixMethodOrder;
-// import org.junit.runners.MethodSorters;
-
 /**
- * Tests whether we can interact with the real quiz server.
+ * Tests whether we can interact with the real SmartMap server.
  * 
  * @author marion-S
  */
 
-// @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class NetworkEndToEndTest extends TestCase {
+public class NetworkEndToEndTest extends AndroidTestCase {
 
-    private final static long VALID_FACEBOOK_ID = 1482245642055847L;
-    private final static String VALID_NAME = "SmartMap SwEng";
-    private final static String VALID_FB_ACCESS_TOKEN =
+    private final static long SMARTMAP_SWENG_FACEBOOK_ID = 1482245642055847L;
+    private final static String SMARTMAP_SWENG_NAME = "SmartMap SwEng";
+    private final static String SMARTMAP_SWENG_FB_ACCESS_TOKEN =
         "CAAEWMqbRPIkBAJjvxMI0zNXLgzxYJURV5frWkDu8T60EfWup92GNEE7xDIVohfpa43Qm7FNbZCvZB7bXVTd0ZC0qLHZCju2zZBR3mc8mQH0OskEe7X5mZAWOlLZCIzsAWnfEy1ZAzz2JgYPKjaIwhIpI9OvJkQNWkJnX3rIwv4v9lL7hr9yx8LKuOegEHfZCcCNp491jewilZCz69ZA2ohryEYy";
+    private static final long SMARTMAP_SWENG_ID = 3;
+    private UserContainer Smartmap_Sweng;
+
+    private static final long SMART_MAP_ID = 11;
+
     private final static Location LOCATION = new Location("SmartMapServers");
     private static final double LATITUDE = 45;
     private static final double LONGITUDE = 46;
     private static final long VALID_ID_1 = 1;
-    private static final long VALID_ID_2 = 2;
-    private static final long MY_ID = 3;
-    private static final User VALID_PEOPLE = new Friend(MY_ID, VALID_NAME);
-    private static final Event FOOTBALL_TOURNAMENT = new PublicEvent("Football Tournament",
-        VALID_PEOPLE.getID(), VALID_PEOPLE.getName(), new GregorianCalendar(2014, 11, 23),
-        new GregorianCalendar(2014, 11, 27), LOCATION);
-    private static final long VALID_EVENT_ID = 3;
+    private static final long VALID_EVENT_ID = 96;
+    private static long CREATED_EVENT_ID;
+
+    private EventContainer footballTournament;
+
+    private Context mContext;
+    private SmartMapClient networkClient;
 
     @Override
     protected void setUp() throws Exception {
 
         super.setUp();
+
+        mContext = new RenamingDelegatingContext(this.getContext(), "test_");
+        ServiceContainer.initSmartMapServices(mContext);
+        networkClient = ServiceContainer.getNetworkClient();
+        this.initContainers();
+
         LOCATION.setLatitude(LATITUDE);
         LOCATION.setLongitude(LONGITUDE);
-        FOOTBALL_TOURNAMENT.setPositionName("Paris");
-        FOOTBALL_TOURNAMENT.setID(VALID_EVENT_ID);
+
+        networkClient.authServer(SMARTMAP_SWENG_NAME, SMARTMAP_SWENG_FACEBOOK_ID,
+            SMARTMAP_SWENG_FB_ACCESS_TOKEN);
 
     }
 
     @Test
-    public void testA_AuthServer() throws SmartMapClientException {
-
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-
-        networkClient.authServer(VALID_NAME, VALID_FACEBOOK_ID, VALID_FB_ACCESS_TOKEN);
-
-    }
-
-    @Test
-    public void testB_UpdatePos() throws SmartMapClientException {
-
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-
-        networkClient.updatePos(LOCATION);
-    }
-
-    @Test
-    public void testC_InviteFriend() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        try {
-            networkClient.inviteFriend(VALID_ID_1);
-        } catch (SmartMapClientException e) {
-            // ok, cannot invite yourself
-        }
-
-    }
-
-    @Test
-    public void testD_FollowFriend() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.followFriend(MY_ID);
-    }
-
-    @Test
-    public void testE_UnfollowFriend() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.unfollowFriend(MY_ID);
-    }
-
-    @Test
-    public void ignoredtestF_AllowFriend() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.allowFriend(MY_ID);
-    }
-
-    @Test
-    public void testG_DisallowFriend() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.disallowFriend(MY_ID);
-    }
-
-    @Test
-    public void ignoredtestH_AllowFriendList() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.allowFriendList(Arrays.asList(VALID_ID_1, VALID_ID_2, MY_ID));
-    }
-
-    @Test
-    public void testI_DisallowFriendList() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.disallowFriendList(Arrays.asList(VALID_ID_1, VALID_ID_2, MY_ID));
-    }
-
-    @Test
-    public void testJ_GetUserInfo() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        User friend = networkClient.getUserInfo(VALID_ID_1);
-        this.assertValidIdAndName(friend);
-
-    }
-
-    @Test
-    public void testK_GetInvitations() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        NotificationBag notificationBag = networkClient.getInvitations();
-        List<User> inviters = notificationBag.getInvitingUsers();
-        assertTrue("Null inviter list", inviters != null);
-        List<User> newFriends = notificationBag.getNewFriends();
-        assertTrue("Null new friends list", newFriends != null);
-        List<Long> removedFriends = notificationBag.getRemovedFriendsIds();
-        assertTrue("Null removed friends list", removedFriends != null);
-
-        for (User user : inviters) {
-            this.assertValidIdAndName(user);
-        }
-        for (User user : newFriends) {
-            this.assertValidIdAndName(user);
-        }
-        for (long id : removedFriends) {
-            assertTrue("Unexpected id", id >= 0);
-        }
-
-    }
-
-    // FIXME should simulate an invitation on server side??
-    @Test
-    public void testQ_AcceptInvitation() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+    public void testAcceptInvitation() throws SmartMapClientException {
 
         try {
             networkClient.acceptInvitation(VALID_ID_1);
@@ -166,112 +83,233 @@ public class NetworkEndToEndTest extends TestCase {
     }
 
     @Test
-    public void testL_ListFriendPos() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        List<User> users = networkClient.listFriendsPos();
+    public void testAckAcceptedInvitation() throws SmartMapClientException {
 
-        assertTrue("Null list", users != null);
+        networkClient.ackAcceptedInvitation(SMARTMAP_SWENG_ID);
+    }
 
-        for (User user : users) {
-            Location location = user.getLocation();
-            assertTrue("Invalid id", user.getID() > 0);
-            assertTrue("Unexpected latitude", (-90 <= location.getLatitude())
-                && (location.getLatitude() <= 90));
-            assertTrue("Unexpected longitude", (-180 <= location.getLongitude())
-                && (location.getLongitude() <= 180));
-        }
+    public void testAckEventInvitation() throws SmartMapClientException {
+        networkClient.ackEventInvitation(VALID_EVENT_ID);
+    }
+
+    public void testAckRemovedFriends() throws SmartMapClientException {
+
+        networkClient.ackRemovedFriend(SMARTMAP_SWENG_ID);
     }
 
     @Test
-    public void testM_FindUsers() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        List<User> friends = networkClient.findUsers("s");
+    public void testAuthServer() throws SmartMapClientException {
+        networkClient.authServer(SMARTMAP_SWENG_NAME, SMARTMAP_SWENG_FACEBOOK_ID,
+            SMARTMAP_SWENG_FB_ACCESS_TOKEN);
+
+    }
+
+    public void testCreateEvent() throws SmartMapClientException {
+
+        long eventId = networkClient.createPublicEvent(footballTournament);
+        assertTrue("Unexpected event id.", eventId >= 0);
+        CREATED_EVENT_ID = eventId;
+
+    }
+
+    @Test
+    public void testDeclineInvitation() throws SmartMapClientException {
+
+        networkClient.declineInvitation(SMARTMAP_SWENG_ID);
+    }
+
+    @Test
+    public void testFindUsers() throws SmartMapClientException {
+
+        List<UserContainer> friends = networkClient.findUsers("s");
 
         assertTrue("Null list", friends != null);
-        for (User user : friends) {
+        for (UserContainer user : friends) {
             this.assertValidIdAndName(user);
         }
     }
 
-    // FIXME normal that no error whereas no invitation to decline?
-    @Test
-    public void testN_declineInvitation() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.declineInvitation(MY_ID);
+    public void testGetEventInfo() throws SmartMapClientException {
+        EventContainer event = networkClient.getEventInfo(CREATED_EVENT_ID);
+        this.assertValidEvent(event);
     }
 
-    @Test
-    public void testO_removeFriend() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        try {
-            networkClient.removeFriend(MY_ID);
-        } catch (ServerFeedbackException e) {
-            // ok because I cannot remove myself
+    public void testGetEventInvitations() throws SmartMapClientException {
+        InvitationBag invitationBag = networkClient.getEventInvitations();
+
+        Set<InvitationContainer> invitations = invitationBag.getInvitations();
+        assertTrue("Null invitations set", invitations != null);
+        for (InvitationContainer invitation : invitations) {
+            this.assertValidEventInvitation(invitation);
         }
     }
 
-    // FIXME normal that no error whereas no accepted invitation to ack?
     @Test
-    public void testP_AckAcceptedInvitation() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.ackAcceptedInvitation(MY_ID);
+    public void testGetFriendInvitations() throws SmartMapClientException {
+
+        NetworkFriendInvitationBag invitationBag =
+            (NetworkFriendInvitationBag) networkClient.getFriendInvitations();
+        Set<InvitationContainer> invitations = invitationBag.getInvitations();
+        assertTrue("Null invitations set", invitations != null);
+        for (InvitationContainer invitation : invitations) {
+            this.assertValidFriendInvitation(invitation);
+        }
+
+        for (long id : invitationBag.getRemovedFriendsIds()) {
+            assertTrue("Unexpected id", id >= 0);
+        }
+
     }
 
-    public void testQ_GetFriendsIds() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
+    public void testGetFriendsIds() throws SmartMapClientException {
+
         List<Long> ids = networkClient.getFriendsIds();
         for (long id : ids) {
             assertTrue("Unexpected id", id >= 0);
         }
     }
 
-    public void testR_AckRemovedFriends() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.ackRemovedFriend(MY_ID);
+    public void testGetProfilePicture() throws SmartMapClientException {
+
+        networkClient.getProfilePicture(SMARTMAP_SWENG_ID);
     }
 
-    public void testS_GetProfilePicture() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.getProfilePicture(MY_ID);
-    }
+    public void testGetPublicEvents() throws SmartMapClientException {
 
-    public void testT_createEvent() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        networkClient.createPublicEvent(FOOTBALL_TOURNAMENT);
-    }
-
-    public void testU_updateEvent() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        FOOTBALL_TOURNAMENT.setName("Exposition");
-        networkClient.updateEvent(FOOTBALL_TOURNAMENT);
-    }
-
-    // TODO To complete
-    public void testV_getPublicEvents() throws SmartMapClientException {
-        NetworkSmartMapClient networkClient = NetworkSmartMapClient.getInstance();
-        List<Event> events = networkClient.getPublicEvents(45, 46, 1000);
-        for (Event event : events) {
-            assertTrue("Unexpected event id", event.getID() >= 0);
-            assertTrue("Unexpected creator id", event.getCreator() >= 0);
-            assertTrue("Unexpected end and start dates", event.getEndDate().after(event.getStartDate()));
-            assertTrue("Unexpected latitude", (-90 <= event.getLocation().getLatitude())
-                && (event.getLocation().getLatitude() <= 90));
-            assertTrue("Unexpected longitude", (-180 <= event.getLocation().getLongitude())
-                && (event.getLocation().getLongitude() <= 180));
-            assertTrue("Unexpected position name", ((2 < event.getPositionName().length()) && (event
-                .getPositionName().length() <= 60)));
-            assertTrue("Unexpected event name",
-                ((2 < event.getName().length()) && (event.getName().length() <= 60)));
-            assertTrue("Unexpected creator name", ((2 < event.getCreatorName().length()) && (event
-                .getCreatorName().length() <= 60)));
-            assertTrue("Unexpected event description", (event.getName().length() <= 255));
-
+        List<Long> events = networkClient.getPublicEvents(45, 46, 1000);
+        for (Long eventId : events) {
+            assertTrue("Ivalid event Id.", eventId > 0);
         }
     }
 
-    private void assertValidIdAndName(User user) {
-        assertTrue("Unexpected id", user.getID() >= 0);
+    @Test
+    public void testGetUserInfo() throws SmartMapClientException {
+
+        UserContainer friend = networkClient.getUserInfo(VALID_ID_1);
+        this.assertValidIdAndName(friend);
+
+    }
+
+    @Test
+    public void testInviteFriend() throws SmartMapClientException {
+
+        try {
+            networkClient.inviteFriend(SMARTMAP_SWENG_ID);
+        } catch (SmartMapClientException e) {
+            // ok, cannot invite yourself
+        }
+
+    }
+
+    public void testInviteUsersToEvent() throws SmartMapClientException {
+        networkClient.inviteUsersToEvent(CREATED_EVENT_ID, Arrays.asList(VALID_ID_1, SMART_MAP_ID));
+    }
+
+    public void testJoinEvent() throws SmartMapClientException {
+        networkClient.joinEvent(CREATED_EVENT_ID);
+    }
+
+    public void testLeaveEvent() throws SmartMapClientException {
+        networkClient.leaveEvent(VALID_EVENT_ID);
+    }
+
+    @Test
+    public void testListFriendPos() throws SmartMapClientException {
+
+        List<UserContainer> users = networkClient.listFriendsPos();
+
+        assertTrue("Null list", users != null);
+
+        for (UserContainer user : users) {
+
+            assertTrue("Invalid id", user.getId() > 0);
+            this.assertValidLocation(user.getLocation());
+        }
+    }
+
+    @Test
+    public void testRemoveFriend() throws SmartMapClientException {
+
+        try {
+            networkClient.removeFriend(SMARTMAP_SWENG_ID);
+        } catch (ServerFeedbackException e) {
+            // ok because I cannot remove myself
+        }
+    }
+
+    @Test
+    public void testUpdateEventName() throws SmartMapClientException {
+
+        EventContainer update =
+            new EventContainer(CREATED_EVENT_ID, "Toto", Smartmap_Sweng, "Not a basketball tournament !",
+                new GregorianCalendar(2014, 11, 23), new GregorianCalendar(2014, 11, 27), LOCATION,
+                "Stade de la Pontaise", new HashSet<Long>(Arrays.asList((long) 3)));
+        networkClient.updateEvent(update);
+
+        EventContainer modifiedEvent = networkClient.getEventInfo(CREATED_EVENT_ID);
+        assertEquals("Updated event name does not match", modifiedEvent.getName(), "Toto");
+
+    }
+
+    @Test
+    public void testUpdatePos() throws SmartMapClientException {
+        networkClient.updatePos(LOCATION);
+    }
+
+    private void assertValidEvent(EventContainer event) {
+        assertTrue("Unexpected event id", event.getId() >= 0);
+        assertTrue("Unexpected creator id", event.getCreatorContainer().getId() >= 0);
+        assertTrue("Unexpected end and start dates", event.getEndDate().after(event.getStartDate()));
+        this.assertValidLocation(event.getLocation());
+        assertTrue("Unexpected position name", ((2 < event.getLocationString().length()) && (event
+            .getLocationString().length() <= 60)));
+        assertTrue("Unexpected event name",
+            ((2 < event.getName().length()) && (event.getName().length() <= 60)));
+        assertTrue("Unexpected creator id.", event.getCreatorContainer().getId() > 0);
+        assertTrue("Unexpected event description", (event.getName().length() <= 255));
+        assertTrue("Unexpected participants list", event.getParticipantIds() != null);
+        for (long id : event.getParticipantIds()) {
+            assertTrue("Unexpected participants id", id >= 0);
+        }
+    }
+
+    private void assertValidEventInvitation(InvitationContainer invitation) {
+        assertNotNull("Null TimeStamp", invitation.getTimeStamp());
+        assertTrue("Unexpected invitation type", (invitation.getType() == Invitation.EVENT_INVITATION));
+        this.assertValidEvent(invitation.getEventInfos());
+    }
+
+    private void assertValidFriendInvitation(InvitationContainer invitation) {
+        assertNotNull("Null TimeStamp", invitation.getTimeStamp());
+        assertTrue("Unexpected invitation type",
+            (invitation.getType() == Invitation.ACCEPTED_FRIEND_INVITATION)
+                || (invitation.getType() == Invitation.FRIEND_INVITATION));
+        this.assertValidIdAndName(invitation.getUserInfos());
+        if (invitation.getType() == Invitation.ACCEPTED_FRIEND_INVITATION) {
+            this.assertValidLocation(invitation.getUserInfos().getLocation());
+        }
+
+    }
+
+    private void assertValidIdAndName(UserContainer user) {
+        assertTrue("Unexpected id", user.getId() >= 0);
         assertTrue("Unexpected name", (2 < user.getName().length()) && (user.getName().length() <= 60));
     }
 
+    private void assertValidLocation(Location location) {
+        assertNotNull(location);
+        assertTrue("Unexpected latitude", (-90 <= location.getLatitude()) && (location.getLatitude() <= 90));
+        assertTrue("Unexpected longitude", (-180 <= location.getLongitude())
+            && (location.getLongitude() <= 180));
+    }
+
+    private void initContainers() {
+        Smartmap_Sweng =
+            new UserContainer(SMARTMAP_SWENG_ID, SMARTMAP_SWENG_NAME, null, null, null, null, null,
+                User.BlockStatus.BLOCKED, User.FRIEND);
+        footballTournament =
+            new EventContainer(0, "Football Tournament", Smartmap_Sweng, "Not a basketball tournament !",
+                new GregorianCalendar(2014, 11, 23), new GregorianCalendar(2014, 11, 27), LOCATION,
+                "Stade de la Pontaise", new HashSet<Long>(Arrays.asList((long) 3)));
+    }
 }
