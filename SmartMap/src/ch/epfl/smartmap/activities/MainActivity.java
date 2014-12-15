@@ -539,7 +539,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     private void zoomAccordingToAllMarkers() {
-
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
         allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
 
