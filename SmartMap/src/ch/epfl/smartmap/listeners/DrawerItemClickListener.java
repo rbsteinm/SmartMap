@@ -18,13 +18,11 @@ import ch.epfl.smartmap.background.LogoutManager;
 
 /**
  * Listener handling the clicks on each element in the left drawer menu.
- * 
+ *
  * @author rbsteinm
  */
 public class DrawerItemClickListener implements ListView.OnItemClickListener {
 
-    @SuppressWarnings("unused")
-    private final static String TAG = DrawerItemClickListener.class.getSimpleName();
     private final Context mContext;
     private final DrawerLayout mDrawer;
 
@@ -39,7 +37,7 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     /**
      * Public constructor returning a new listener for the left menu.
      * Supposedly called only once
-     * 
+     *
      * @param context
      */
     public DrawerItemClickListener(Context context) {

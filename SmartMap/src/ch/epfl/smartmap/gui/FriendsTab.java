@@ -22,7 +22,7 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
  * Fragment (Tab) displaying your friends in FriendsActivity
- * 
+ *
  * @author rbsteinm
  */
 

@@ -276,7 +276,7 @@ interface CacheInterface {
      * @param newFilter
      *            Filter's informations
      */
-    long putFilter(FilterContainer newFilter);
+    void putFilter(FilterContainer newFilter);
 
     /**
      * Creates for each {@code FilterContainer} a new live Filter instance with corresponding values. Update

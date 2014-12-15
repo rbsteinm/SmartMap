@@ -14,9 +14,8 @@ import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.cache.Displayable;
 
 /**
- * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is
- * immutable.
- * 
+ * This class is a basic Layout that will be used to display search results in {@code SearchLayout}. It is immutable.
+ *
  * @author jfperren
  */
 public class SearchResultView extends RelativeLayout {
@@ -41,13 +40,15 @@ public class SearchResultView extends RelativeLayout {
     private final TextView mTitleView;
     private final TextView mShortInfoView;
 
+    private static final int SQUARE_POWER = 2;
+
     // Informations about the current state
-    private Displayable mItem;
+    private final Displayable mItem;
     private final Bitmap mImage;
 
     /**
      * Constructor
-     * 
+     *
      * @param context
      *            Context of the Application
      */
@@ -100,10 +101,15 @@ public class SearchResultView extends RelativeLayout {
         this.addView(mTitleView);
         this.addView(mShortInfoView);
 
-        // This touch listener displays the item on click
+        // Displays the item on click
         this.setOnTouchListener(new ClickOnItemOnTouchListener());
     }
 
+    /**
+     *
+     * This touch listener displays the item on click.
+     *
+     */
     private class ClickOnItemOnTouchListener implements OnTouchListener {
         private float startX;
         private float startY;
@@ -113,15 +119,14 @@ public class SearchResultView extends RelativeLayout {
             if (ev.getAction() == MotionEvent.ACTION_DOWN) {
                 startX = ev.getAxisValue(MotionEvent.AXIS_X);
                 startY = ev.getAxisValue(MotionEvent.AXIS_Y);
-                v.setBackgroundColor(SearchResultView.this.getResources().getColor(
-                    R.color.searchResultOnSelect));
+                v.setBackgroundColor(SearchResultView.this.getResources().getColor(R.color.searchResultOnSelect));
 
             } else if (ev.getAction() == MotionEvent.ACTION_UP) {
                 float endX = ev.getAxisValue(MotionEvent.AXIS_X);
                 float endY = ev.getAxisValue(MotionEvent.AXIS_Y);
 
-                // SonarQube : making 2 a constant is not useful here
-                double clickDistance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                double clickDistance = Math.sqrt(Math.pow(endX - startX, SQUARE_POWER)
+                        + Math.pow(endY - startY, SQUARE_POWER));
                 if (clickDistance < CLICK_DISTANCE_THRESHHOLD) {
                     ((MainActivity) SearchResultView.this.getContext()).performQuery(mItem);
                 }

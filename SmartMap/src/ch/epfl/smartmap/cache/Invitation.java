@@ -55,6 +55,7 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
 
     private int mStatus;
     private final long mId;
+
     private long mTimeStamp;
 
     /**
@@ -124,6 +125,16 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
         return (int) this.getId();
     }
 
+    private boolean isLegalStatus(InvitationContainer invitation) {
+        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)
+            || (invitation.getStatus() == Invitation.READ) || (invitation.getStatus() == Invitation.UNREAD)) {
+            mStatus = invitation.getStatus();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public String toString() {
         return "Invitation[type(" + this.getType() + "), status(" + this.getStatus() + "), timestamp("
@@ -146,12 +157,10 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
             throw new IllegalArgumentException("Cannot change type of invitation");
         }
 
-        if (!((invitation.getStatus() != Invitation.ACCEPTED) && (invitation.getStatus() != Invitation.DECLINED)
-            && (invitation.getStatus() != Invitation.READ) && (invitation.getStatus() != Invitation.UNREAD))
-            && (invitation.getStatus() != mStatus)) {
-            mStatus = invitation.getStatus();
-            hasChanged = true;
+        if (invitation.getStatus() != mStatus) {
+            this.isLegalStatus(invitation);
         }
+
         if (!(invitation.getTimeStamp() < 0) && (invitation.getTimeStamp() != mTimeStamp)) {
             mTimeStamp = invitation.getTimeStamp();
             hasChanged = true;
