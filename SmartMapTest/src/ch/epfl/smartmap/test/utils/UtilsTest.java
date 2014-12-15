@@ -33,6 +33,19 @@ public class UtilsTest extends AndroidTestCase {
 
     private Location epfl;
 
+    private boolean floatArrayEquals(float[] a1, float[] a2) {
+        if (a1.length != a2.length) {
+            return false;
+        } else {
+            for (int i = 0; i < a1.length; i++) {
+                if (a1[i] != a2[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -189,10 +202,8 @@ public class UtilsTest extends AndroidTestCase {
         Calendar hundredYearsAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         hundredYearsAgo.add(Calendar.YEAR, -100);
 
-        assertEquals(
-            ServiceContainer.getSettingsManager().getContext()
-                .getString(R.string.utils_never_seen_on_smartmap),
-            Utils.getLastSeenStringFromCalendar(hundredYearsAgo));
+        assertEquals(ServiceContainer.getSettingsManager().getContext()
+            .getString(R.string.utils_never_seen_on_smartmap), Utils.getLastSeenStringFromCalendar(hundredYearsAgo));
     }
 
     @Test
@@ -200,8 +211,7 @@ public class UtilsTest extends AndroidTestCase {
         Calendar fiveMinsAgo = GregorianCalendar.getInstance(TimeZone.getTimeZone(Utils.GMT_SWITZERLAND));
         fiveMinsAgo.add(Calendar.MINUTE, -5);
 
-        assertEquals(
-            "5 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago),
+        assertEquals("5 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago),
             Utils.getLastSeenStringFromCalendar(fiveMinsAgo));
     }
 
@@ -213,8 +223,7 @@ public class UtilsTest extends AndroidTestCase {
 
     @Test
     public void testLastSeenTenDays() {
-        assertEquals(
-            "10 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago),
+        assertEquals("10 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago),
             Utils.getLastSeenStringFromCalendar(tenDaysAgo));
     }
 
@@ -231,8 +240,7 @@ public class UtilsTest extends AndroidTestCase {
 
         ServiceContainer.getSettingsManager().setLocation(me);
 
-        assertEquals("6.7 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km)
-            + " "
+        assertEquals("6.7 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km) + " "
             + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you),
             Utils.printDistanceToMe(epfl));
     }
@@ -246,9 +254,8 @@ public class UtilsTest extends AndroidTestCase {
         ServiceContainer.getSettingsManager().setLocation(me);
 
         assertEquals(
-            "227 "
-                + ServiceContainer.getSettingsManager().getContext()
-                    .getString(R.string.utils_meters_away_from_you), Utils.printDistanceToMe(epfl));
+            "227 " + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you),
+            Utils.printDistanceToMe(epfl));
     }
 
     @Test
@@ -277,18 +284,5 @@ public class UtilsTest extends AndroidTestCase {
     public void testYesterday() {
         assertEquals(ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday),
             Utils.getDateString(yesterday));
-    }
-
-    private boolean floatArrayEquals(float[] a1, float[] a2) {
-        if (a1.length != a2.length) {
-            return false;
-        } else {
-            for (int i = 0; i < a1.length; i++) {
-                if (a1[i] != a2[i]) {
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 }
