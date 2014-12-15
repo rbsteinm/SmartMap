@@ -19,7 +19,7 @@ public class Self extends User {
      * @param image
      *            The user's profile picture
      */
-    protected Self(Bitmap image) {
+    public Self(Bitmap image) {
         super(ServiceContainer.getSettingsManager().getUserId(), ServiceContainer.getSettingsManager()
             .getUserName(), image);
     }
