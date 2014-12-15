@@ -16,7 +16,7 @@ import ch.epfl.smartmap.cache.User;
  * Customized adapter that displays a list of users in a target activity This
  * adapter dynamically creates a row in the activity for each user It displays
  * in each row: user name, user status, user picture
- * 
+ *
  * @author rbsteinm
  */
 public class FriendListItemAdapter extends ArrayAdapter<User> {
@@ -52,21 +52,24 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
         FriendViewHolder viewHolder;
         User user = mItemsArrayList.get(position);
 
+        View newConvertView;
+
         if (convertView == null) {
             LayoutInflater inflater =
                 (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
+            newConvertView = inflater.inflate(R.layout.gui_friend_list_item, parent, false);
             viewHolder = new FriendViewHolder();
 
-            viewHolder.setName((TextView) convertView.findViewById(R.id.activity_friends_name));
-            viewHolder.setLastSeen((TextView) convertView.findViewById(R.id.activity_friends_lastSeen));
-            viewHolder.setPicture((ImageView) convertView.findViewById(R.id.activity_friends_picture));
+            viewHolder.setName((TextView) newConvertView.findViewById(R.id.activity_friends_name));
+            viewHolder.setLastSeen((TextView) newConvertView.findViewById(R.id.activity_friends_lastSeen));
+            viewHolder.setPicture((ImageView) newConvertView.findViewById(R.id.activity_friends_picture));
             viewHolder.setUserId(user.getId());
 
-            convertView.setTag(viewHolder);
+            newConvertView.setTag(viewHolder);
 
         } else {
-            viewHolder = (FriendViewHolder) convertView.getTag();
+            newConvertView = convertView;
+            viewHolder = (FriendViewHolder) newConvertView.getTag();
         }
 
         // Set fields with user attributes
@@ -76,7 +79,7 @@ public class FriendListItemAdapter extends ArrayAdapter<User> {
             viewHolder.getLastSeen().setText(user.getSubtitle());
         }
 
-        return convertView;
+        return newConvertView;
     }
 
     /**
