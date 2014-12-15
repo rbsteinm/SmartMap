@@ -22,12 +22,6 @@ public class NearEventsThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            try {
-                sleep(REFRESH_DELAY);
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Can't sleep: " + e);
-            }
-
             Location pos = ServiceContainer.getSettingsManager().getLocation();
             try {
                 List<Long> nearEventIds =
@@ -45,6 +39,11 @@ public class NearEventsThread extends Thread {
 
             } catch (SmartMapClientException e) {
                 Log.e(TAG, "Couldn't retrieve public events: " + e);
+            }
+            try {
+                sleep(REFRESH_DELAY);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Can't sleep: " + e);
             }
         }
     }
