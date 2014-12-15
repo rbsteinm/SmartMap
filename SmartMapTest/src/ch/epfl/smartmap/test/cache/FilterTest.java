@@ -3,15 +3,13 @@
  */
 package ch.epfl.smartmap.test.cache;
 
+import static ch.epfl.smartmap.test.database.MockContainers.ALAIN;
 import static ch.epfl.smartmap.test.database.MockContainers.DEFAULT;
 import static ch.epfl.smartmap.test.database.MockContainers.FAMILY;
-
-import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import android.test.AndroidTestCase;
 import ch.epfl.smartmap.background.ServiceContainer;
@@ -44,6 +42,13 @@ public class FilterTest extends AndroidTestCase {
     }
 
     @Test
+    public void testCannotDesactivateDefaultFilter() {
+        cache.putFilter(DEFAULT);
+        cache.getDefaultFilter().update(cache.getDefaultFilter().getContainerCopy().setActive(false));
+        assertEquals(true, cache.getDefaultFilter().isActive());
+    }
+
+    @Test
     public void testCreateCorrectSubclass() {
         cache.putFilter(FAMILY.setId(Filter.DEFAULT_FILTER_ID));
         cache.putFilter(FAMILY.setId(Filter.NO_ID));
@@ -54,11 +59,9 @@ public class FilterTest extends AndroidTestCase {
 
     @Test
     public void testDefaultFilterContainsAllFriends() {
-        Set<Long> friendIds = Sets.newHashSet((long) 1, (long) 2, (long) 3);
-        Cache mockCache = Mockito.mock(Cache.class);
-        Mockito.doReturn(friendIds).when(mockCache).getFriendIds();
-        mockCache.putFilter(DEFAULT);
-        assertEquals(friendIds, mockCache.getDefaultFilter().getVisibleFriends());
+        cache.putFilter(DEFAULT);
+        cache.putUser(ALAIN);
+        assertEquals(Sets.newHashSet(ALAIN.getId()), cache.getDefaultFilter().getVisibleFriends());
     }
 
     @Test
