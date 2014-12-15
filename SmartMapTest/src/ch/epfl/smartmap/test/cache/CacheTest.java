@@ -18,11 +18,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.test.AndroidTestCase;
+import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
@@ -39,6 +43,7 @@ public class CacheTest extends AndroidTestCase {
     private DatabaseHelper incorrectDB;
     private NetworkSmartMapClient correctClient;
     private NetworkSmartMapClient incorrectClient;
+    private static final String TAG = CacheTest.class.getSimpleName();
 
     @Override
     protected void setUp() throws Exception {
@@ -89,6 +94,38 @@ public class CacheTest extends AndroidTestCase {
         incorrectDB = Mockito.mock(DatabaseHelper.class);
         Mockito.doReturn(Sets.newHashSet(WRONG_USER_VALUES)).when(incorrectDB).getAllUsers();
         Mockito.doReturn(Sets.newHashSet(NULL_EVENT_VALUES)).when(incorrectDB).getAllEvents();
+    }
+
+    @Test
+    public void testAcceptInvitation() {
+        try {
+            Mockito.when(correctClient.acceptInvitation(ALAIN.getId())).thenReturn(ALAIN);
+        } catch (SmartMapClientException e) {
+            Log.e(TAG, "Error: " + e);
+        }
+        ServiceContainer.setNetworkClient(correctClient);
+        ServiceContainer.setDatabaseHelper(correctDB);
+        Cache cache = new Cache();
+        InvitationContainer invit =
+            new InvitationContainer(123, ALAIN, null, Invitation.UNREAD, 1234, Invitation.FRIEND_INVITATION);
+        cache.putInvitation(invit);
+        cache.acceptInvitation(cache.getInvitation(invit.getId()), new NetworkRequestCallback<Void>() {
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+
+            }
+        });
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertTrue(cache.getInvitation(invit.getId()).getStatus() == Invitation.ACCEPTED);
     }
 
     @Test
