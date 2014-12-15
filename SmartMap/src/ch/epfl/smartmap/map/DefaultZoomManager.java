@@ -1,5 +1,6 @@
 package ch.epfl.smartmap.map;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -7,13 +8,11 @@ import java.util.Set;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.util.Utils;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -93,54 +92,8 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
      */
     @Override
     public void zoomAccordingToMarkers(final List<Marker> markers) {
-        Log.d(TAG, "ZOOM");
-        if (!markers.isEmpty()) {
-
-            if (mMapView.getViewTreeObserver().isAlive()) {
-                mMapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-                    @SuppressWarnings("deprecation")
-                    @SuppressLint("NewApi")
-                    @Override
-                    public void onGlobalLayout() {
-
-                        /*
-                         * @author jfperren
-                         * Did this quick fix to remove extreme values and have
-                         * a more accurate zoom
-                         */
-                        double average = 0;
-                        for (Marker marker : markers) {
-                            average += Utils.distanceToMe(marker.getPosition());
-                        }
-                        average /= markers.size();
-                        Set<Marker> importantMarkers = new HashSet<Marker>();
-                        for (Marker marker : markers) {
-                            if (Utils.distanceToMe(marker.getPosition()) < (average * 2)) {
-                                importantMarkers.add(marker);
-                            }
-                        }
-
-                        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-                        for (Marker marker : importantMarkers) {
-                            boundsBuilder.include(marker.getPosition());
-                        }
-                        // Include own pos in case there is no marker
-                        boundsBuilder.include(new LatLng(ServiceContainer.getSettingsManager().getLocation()
-                            .getLatitude(), ServiceContainer.getSettingsManager().getLocation()
-                            .getLongitude()));
-                        LatLngBounds bounds = boundsBuilder.build();
-                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                            mMapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                        } else {
-                            mMapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        }
-
-                        CameraUpdate camUpdate = CameraUpdateFactory.newLatLngBounds(bounds, PADDING);
-                        mGoogleMap.animateCamera(camUpdate);
-
-                    }
-                });
-            }
+        if (!markers.isEmpty() && mMapView.getViewTreeObserver().isAlive()) {
+            mMapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnMapGlobalLayoutListener(markers));
 
         }
     }
@@ -155,11 +108,7 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
     public void zoomWithAnimation(LatLng latLng) {
 
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, GMAP_ZOOM_LEVEL));
-        /*
-         * Clarifications: for GMAP_ZOOM_LEVEL GMAP_ZOOM_LEVEL = 20 represents a
-         * exact address. = 11 represents a town = 6 represents a country We can
-         * make some functionality to define the asked precision.
-         */
+
     }
 
     /*
@@ -172,4 +121,55 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
     public void zoomWithoutAnimation(LatLng latLng) {
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, GMAP_ZOOM_LEVEL));
     }
+
+    /**
+     * @author hugo-S
+     */
+    private class OnMapGlobalLayoutListener implements OnGlobalLayoutListener {
+        private final List<Marker> mMarkerList;
+
+        public OnMapGlobalLayoutListener(List<Marker> markers) {
+            mMarkerList = new ArrayList<Marker>(markers);
+        }
+
+        @SuppressWarnings("deprecation")
+        @SuppressLint("NewApi")
+        @Override
+        public void onGlobalLayout() {
+
+            /*
+             * @author jfperren
+             * Did this quick fix to remove extreme values and have
+             * a more accurate zoom
+             */
+            double average = 0;
+            for (Marker marker : mMarkerList) {
+                average += Utils.distanceToMe(marker.getPosition());
+            }
+            average /= mMarkerList.size();
+            Set<Marker> importantMarkers = new HashSet<Marker>();
+            for (Marker marker : mMarkerList) {
+                if (Utils.distanceToMe(marker.getPosition()) < (average * 2)) {
+                    importantMarkers.add(marker);
+                }
+            }
+
+            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+            for (Marker marker : importantMarkers) {
+                boundsBuilder.include(marker.getPosition());
+            }
+            // Include own pos in case there is no marker
+            boundsBuilder.include(new LatLng(ServiceContainer.getSettingsManager().getLocation()
+                .getLatitude(), ServiceContainer.getSettingsManager().getLocation().getLongitude()));
+            LatLngBounds bounds = boundsBuilder.build();
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                mMapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+            } else {
+                mMapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, PADDING));
+
+        }
+    }
+
 }

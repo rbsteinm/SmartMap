@@ -168,15 +168,15 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
 
         // We check if the event is already there
         if (!cursor.moveToFirst()) {
-            this.addUser(event.getImmCreator());
+            this.addUser(event.getCreatorContainer());
 
             // Doesn't add event if we can't store the user
-            if (this.getUser(event.getImmCreator().getId()) != null) {
+            if (this.getUser(event.getCreatorContainer().getId()) != null) {
                 ContentValues values = new ContentValues();
                 values.put(KEY_ID, event.getId());
                 values.put(KEY_NAME, event.getName());
                 values.put(KEY_EVTDESC, event.getDescription());
-                values.put(KEY_USER_ID, event.getCreatorId());
+                values.put(KEY_USER_ID, event.getCreatorContainer().getId());
                 if (event.getLocation() != null) {
                     values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
                     values.put(KEY_LATITUDE, event.getLocation().getLatitude());
@@ -812,7 +812,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
         values.put(KEY_ID, event.getId());
         values.put(KEY_NAME, event.getName());
         values.put(KEY_EVTDESC, event.getDescription());
-        values.put(KEY_USER_ID, event.getCreatorId());
+        values.put(KEY_USER_ID, event.getCreatorContainer().getId());
         values.put(KEY_LONGITUDE, event.getLocation().getLongitude());
         values.put(KEY_LATITUDE, event.getLocation().getLatitude());
         values.put(KEY_DATE, event.getStartDate().getTimeInMillis());
@@ -936,7 +936,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseHelperIn
         }
         for (Event event : events) {
             Log.d(TAG, "Store event " + event.getId());
-            this.addEvent(event.getImmutableCopy());
+            this.addEvent(event.getContainerCopy());
         }
         for (Filter filter : filters) {
             Log.d(TAG, "Store filter " + filter.getId());

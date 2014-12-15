@@ -97,6 +97,7 @@ public class FilterContainer {
 
     /**
      * @param newId
+     *            new value for Id
      * @return this
      */
     public FilterContainer setId(long newId) {
@@ -106,6 +107,7 @@ public class FilterContainer {
 
     /**
      * @param newIds
+     *            new {@code Set} of contained ids
      * @return this
      */
     public FilterContainer setIds(Set<Long> newIds) {
@@ -115,6 +117,7 @@ public class FilterContainer {
 
     /**
      * @param newName
+     *            new value for Name
      * @return this
      */
     public FilterContainer setName(String newName) {

@@ -164,8 +164,8 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     public void displayMap() {
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this.getBaseContext());
         // Showing status
-        if (status != ConnectionResult.SUCCESS) { // Google Play Services are
-            // not available
+        if (status != ConnectionResult.SUCCESS) {
+            // Google Play Services are not available
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, GOOGLE_PLAY_REQUEST_CODE);
             dialog.show();
         } else {
@@ -341,7 +341,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 mEventMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(ServiceContainer
                     .getCache().getAllVisibleEvents()));
                 MainActivity.this.updateItemMenu();
@@ -391,16 +390,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
                 }
                 break;
             case R.id.action_notifications:
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Update LayerDrawable's BadgeDrawable
-                        Utils.setBadgeCount(MainActivity.this, mIcon, 0);
-                    }
-                });
-                Intent pNotifIntent = new Intent(this, InvitationPanelActivity.class);
-                this.startActivity(pNotifIntent);
-
+                this.setNotificationBadgeCount();
                 return true;
             case R.id.action_hide_search:
                 this.setMainMenu();
@@ -424,9 +414,6 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     protected void onResume() {
         super.onResume();
         mFriendsPosThread.enable();
-        // startService(mUpdateServiceIntent);
-        // this.registerReceiver(mBroadcastReceiver, new
-        // IntentFilter(UpdateService.BROADCAST_POS));
         if (mGoogleMap != null) {
             mGoogleMap.setOnMapLongClickListener(new AddEventOnMapLongClickListener(this));
         }
@@ -561,6 +548,18 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
             actionBar.setHomeAsUpIndicator(this.getResources().getDrawable(R.drawable.ic_drawer));
             mMenuTheme = MenuTheme.MAP;
         }
+    }
+
+    private void setNotificationBadgeCount() {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Update LayerDrawable's BadgeDrawable
+                Utils.setBadgeCount(MainActivity.this, mIcon, 0);
+            }
+        });
+        Intent pNotifIntent = new Intent(this, InvitationPanelActivity.class);
+        this.startActivity(pNotifIntent);
     }
 
     public void setSearchMenu() {

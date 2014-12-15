@@ -23,9 +23,6 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
  */
 public class InvitationPanelActivity extends ListActivity {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = InvitationPanelActivity.class.getSimpleName();
-
     private List<Invitation> mInvitationList;
 
     @Override

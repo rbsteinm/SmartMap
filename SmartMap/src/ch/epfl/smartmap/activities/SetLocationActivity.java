@@ -127,9 +127,7 @@ public class SetLocationActivity extends FragmentActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.set_location_done:
-                Intent addEventIntent = new Intent(this, AddEventActivity.class);
-                addEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, mEventPosition);
-                this.setResult(RESULT_OK, addEventIntent);
+                this.setResultBackToAddEvent();
                 this.finish();
                 break;
             case android.R.id.home:
@@ -140,5 +138,11 @@ public class SetLocationActivity extends FragmentActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setResultBackToAddEvent() {
+        Intent addEventIntent = new Intent(this, AddEventActivity.class);
+        addEventIntent.putExtra(AddEventActivity.LOCATION_EXTRA, mEventPosition);
+        this.setResult(RESULT_OK, addEventIntent);
     }
 }

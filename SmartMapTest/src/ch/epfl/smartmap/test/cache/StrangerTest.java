@@ -49,7 +49,7 @@ public class StrangerTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        ServiceContainer.initSmartMapServices(this.getContext());
+        ServiceContainer.forceInitSmartMapServices(this.getContext());
 
         this.initContainers();
     }

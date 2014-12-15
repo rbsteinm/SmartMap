@@ -42,7 +42,7 @@ public class NetworkEventInvitationBag implements InvitationBag {
             Log.d(
                 TAG,
                 "Network send invitation bag with event #" + event.getId() + "created by "
-                    + event.getImmCreator());
+                    + event.getCreatorContainer());
         }
     }
 

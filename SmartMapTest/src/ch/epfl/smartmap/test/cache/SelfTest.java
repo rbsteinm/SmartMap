@@ -30,7 +30,7 @@ public class SelfTest extends AndroidTestCase {
     @Before
     @Override
     protected void setUp() {
-        ServiceContainer.initSmartMapServices(this.getContext());
+        ServiceContainer.forceInitSmartMapServices(this.getContext());
     }
 
     @Test

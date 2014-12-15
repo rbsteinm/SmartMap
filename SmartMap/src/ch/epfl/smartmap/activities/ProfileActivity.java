@@ -11,7 +11,8 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
- * this Activity represents user's own profile. Displays the user's name, picture and last seen
+ * this Activity represents user's own profile. Displays the user's name,
+ * picture and last seen
  * informations (correctly updated if we open it with no network connection)
  * Can be useful later on, for example to change profile picture
  * 
@@ -31,6 +32,7 @@ public class ProfileActivity extends Activity {
         this.setContentView(R.layout.activity_profile);
         this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
 
+        ServiceContainer.initSmartMapServices(this);
         mNameView = (TextView) this.findViewById(R.id.profile_name);
         mSubtitlesView = (TextView) this.findViewById(R.id.profile_subtitles);
         mPicture = (ImageView) this.findViewById(R.id.profile_picture);

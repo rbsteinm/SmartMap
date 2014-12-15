@@ -39,6 +39,7 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     /**
      * Public constructor returning a new listener for the left menu.
      * Supposedly called only once
+     * 
      * @param context
      */
     public DrawerItemClickListener(Context context) {
@@ -54,6 +55,7 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
                 break;
             case INDEX_FRIENDS:
                 view.getContext().startActivity(new Intent(view.getContext(), FriendsPagerActivity.class));
+                view.setContentDescription("Friends");
                 break;
             case INDEX_EVENTS:
                 view.getContext().startActivity(new Intent(view.getContext(), ShowEventsActivity.class));
