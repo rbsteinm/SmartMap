@@ -10,17 +10,16 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
+import android.location.Location;
+import android.test.AndroidTestCase;
+import android.util.Log;
 import ch.epfl.smartmap.background.NearEventsThread;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.EventContainer;
-import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClient;
-import android.location.Location;
-import android.test.AndroidTestCase;
-import android.util.Log;
 
 public class NearEventsThreadTest extends AndroidTestCase {
     
