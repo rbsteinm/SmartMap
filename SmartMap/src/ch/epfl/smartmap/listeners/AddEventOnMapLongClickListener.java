@@ -34,17 +34,17 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
         // The user was in MainActivity and long clicked to create an event (?)
         Log.d(TAG, "Map longclicked at latLng : " + latLng);
 
-
+        // Ask user if he really wants to create an event.
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mActivity);
 
-        // Set title
-        alertDialogBuilder.setTitle(mActivity.getString(R.string.show_event_disabled_warning_title));
+        // Set title.
+        alertDialogBuilder.setTitle(mActivity.getString(R.string.map_long_clicked_dialog_title));
 
-        // Set dialog message
+        // Set dialog message.
         alertDialogBuilder
-                .setMessage(mActivity.getString(R.string.show_event_disabled_warning_message))
+                .setMessage(mActivity.getString(R.string.map_long_clicked_dialog_message))
                 .setCancelable(false)
-                .setPositiveButton(mActivity.getString(R.string.show_event_disabled_warning_button_goto_settings),
+                .setPositiveButton(mActivity.getString(R.string.yes),
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
@@ -56,7 +56,7 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
 
                             }
                         })
-                .setNegativeButton(mActivity.getString(R.string.show_event_disabled_warning_button_return_to_main),
+                .setNegativeButton(mActivity.getString(R.string.cancel),
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
@@ -64,7 +64,7 @@ public class AddEventOnMapLongClickListener implements OnMapLongClickListener {
                             }
                         });
 
-        // show alert dialog
+        // show alert dialog.
         alertDialogBuilder.create().show();
 
     }

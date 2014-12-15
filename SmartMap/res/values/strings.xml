@@ -369,6 +369,10 @@
     <string name="yes_accept">Yes, accept</string>
     <string name="no_decline">No, decline</string>
     <string name="decline_confirm">Invitation declined.</string>
+    
+    <!-- AddEventOnMapLongClickListener -->
+    <string name="map_long_clicked_dialog_title">Do you really want to create an event at this position?</string>
+    <string name="map_long_clicked_dialog_message">This dialog is triggered by a long click on the map.</string>
 
     <!-- Nothing below this line! -->
 
