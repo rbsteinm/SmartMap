@@ -25,9 +25,8 @@ public interface FilterInterface extends Displayable {
     String getName();
 
     /**
-     *
+     * @return //FIXME
      */
-    // FIXME Difference with getIds?
     Set<Long> getVisibleFriends();
 
     /**

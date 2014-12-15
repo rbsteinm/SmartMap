@@ -21,7 +21,11 @@ public class CustomFilter extends Filter {
      */
     protected CustomFilter(long id, Set<Long> ids, String name, boolean isActive) {
         super(id, ids);
-        mName = name;
+        if (name == null) {
+            mName = Filter.NO_NAME;
+        } else {
+            mName = name;
+        }
         mIsActive = isActive;
     }
 
