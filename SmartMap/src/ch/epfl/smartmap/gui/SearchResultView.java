@@ -21,21 +21,21 @@ import ch.epfl.smartmap.cache.Displayable;
  */
 public class SearchResultView extends RelativeLayout {
 
-    private static final String TAG = "SEARCH RESULT VIEW";
     @SuppressWarnings("unused")
-    private static final String AUDIT_TAG = "AuditError : " + TAG;
+    private static final String TAG = "SEARCH RESULT VIEW";
 
-    // TODO : Image size should depend on size of layout without image
-    private static final int IMAGE_SIZE = 150;
-    private static final int PHOTO_RIGHT_MARGIN = 40;
     // Margins & Paddings
     private static final int PADDING_RIGHT = 20;
     private static final int PADDING_LEFT = 20;
     private static final int PADDING_TOP = 20;
     private static final int PADDING_BOTTOM = 20;
     private static final int TITLE_BOTTOM_PADDING = 5;
+    private static final int PHOTO_RIGHT_MARGIN = 40;
+    private static final int IMAGE_SIZE = 150;
+
     // Text Sizes
     private static final float TITLE_TEXT_SIZE = 17f;
+
     // Distances
     private static final int CLICK_DISTANCE_THRESHHOLD = 10;
 
@@ -44,6 +44,7 @@ public class SearchResultView extends RelativeLayout {
     private final TextView mTitleView;
     private final TextView mShortInfoView;
 
+    // Informations about the current state
     private Displayable mItem;
     private final Bitmap mImage;
 
@@ -130,25 +131,5 @@ public class SearchResultView extends RelativeLayout {
                 return true;
             }
         });
-    }
-
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        // TODO : Decomment when auditErrors coded for other classes
-        if (depth == 0) {
-            return 0;
-        }
-
-        int auditErrors = 0;
-        // auditErrors += mFriend.auditErrors(depth - 1);
-
-        return auditErrors;
     }
 }

@@ -24,20 +24,22 @@ public class SearchResultViewGroup extends LinearLayout {
 
     // Margins & Paddings
     private static final int NO_RESULT_VIEW_VERTICAL_PADDING = 150;
-
     private static final int SEPARATOR_LEFT_PADDING = 10;
-
     private static final int SEPARATOR_RIGHT_PADDING = 10;
+
     // Colors
     private static final int SEPARATOR_BACKGROUND_COLOR = R.color.bottomSliderBackground;
+
     // Text Sizes
     private static final float NO_RESULT_VIEW_TEXT_SIZE = 25f;
+
     // Others
     private static final int ITEMS_PER_PAGE = 10;
+
     // Children Views
     private final Button mMoreResultsButton;
-
     private final TextView mEmptyListTextView;
+
     // Informations about current state
     private int mCurrentItemNb;
     private List<Displayable> mCurrentResultList;
