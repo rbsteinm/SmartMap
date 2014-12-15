@@ -2,7 +2,7 @@ package ch.epfl.smartmap.cache;
 
 /**
  * Describes a generic invitation on the application SmartMap
- * 
+ *
  * @author agpmilli
  */
 public abstract class Invitation implements InvitationInterface, Comparable<Invitation> {
@@ -34,32 +34,13 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
     public static final int EVENT_INVITATION = 1;
     public static final int ACCEPTED_FRIEND_INVITATION = 2;
 
-    /**
-     * Create an invitation from a Container
-     * 
-     * @param container
-     *            container used to build the invitation
-     * @return
-     *         built invitation
-     */
-    public static Invitation createFromContainer(InvitationContainer container) {
-        long id = container.getId();
-        long timeStamp = container.getTimeStamp();
-        int status = container.getStatus();
-        User user = container.getUser();
-        Event event = container.getEvent();
-        int type = container.getType();
-
-        return new GenericInvitation(id, timeStamp, status, user, event, type);
-    }
-
     private int mStatus;
     private final long mId;
     private long mTimeStamp;
 
     /**
      * Constructor
-     * 
+     *
      * @param id
      *            id of invitation
      * @param timeStamp
@@ -124,6 +105,15 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
         return (int) this.getId();
     }
 
+    private boolean notSameStatus(InvitationContainer invitation) {
+        if (invitation.getStatus() != mStatus) {
+            mStatus = invitation.getStatus();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public String toString() {
         return "Invitation[type(" + this.getType() + "), status(" + this.getStatus() + "), timestamp("
@@ -146,17 +136,35 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
             throw new IllegalArgumentException("Cannot change type of invitation");
         }
 
-        if (!((invitation.getStatus() != Invitation.ACCEPTED) && (invitation.getStatus() != Invitation.DECLINED)
-            && (invitation.getStatus() != Invitation.READ) && (invitation.getStatus() != Invitation.UNREAD))
-            && (invitation.getStatus() != mStatus)) {
-            mStatus = invitation.getStatus();
-            hasChanged = true;
+        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)
+            || (invitation.getStatus() == Invitation.READ) || (invitation.getStatus() == Invitation.UNREAD)) {
+            this.notSameStatus(invitation);
         }
+
         if (!(invitation.getTimeStamp() < 0) && (invitation.getTimeStamp() != mTimeStamp)) {
             mTimeStamp = invitation.getTimeStamp();
             hasChanged = true;
         }
 
         return hasChanged;
+    }
+
+    /**
+     * Create an invitation from a Container
+     *
+     * @param container
+     *            container used to build the invitation
+     * @return
+     *         built invitation
+     */
+    public static Invitation createFromContainer(InvitationContainer container) {
+        long id = container.getId();
+        long timeStamp = container.getTimeStamp();
+        int status = container.getStatus();
+        User user = container.getUser();
+        Event event = container.getEvent();
+        int type = container.getType();
+
+        return new GenericInvitation(id, timeStamp, status, user, event, type);
     }
 }

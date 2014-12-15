@@ -51,6 +51,7 @@ public class CacheTest extends AndroidTestCase {
     private DatabaseHelper incorrectDB;
     private NetworkSmartMapClient correctClient;
     private NetworkSmartMapClient incorrectClient;
+    private static final String TAG = CacheTest.class.getSimpleName();
 
     @Override
     protected void setUp() throws Exception {
