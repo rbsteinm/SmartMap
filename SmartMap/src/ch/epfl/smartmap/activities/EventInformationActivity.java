@@ -145,7 +145,7 @@ public class EventInformationActivity extends ListActivity {
         this.getMenuInflater().inflate(R.menu.show_event_information, menu);
 
         // Disable the delete event button if we are not the creator
-        if (!mEvent.isOwn() || !DELETE_EVENTS_ENABLE) {
+        if ((mEvent == null) || !mEvent.isOwn() || !DELETE_EVENTS_ENABLE) {
             MenuItem item = menu.findItem(R.id.event_info_delete_button);
             item.setVisible(false);
         }
