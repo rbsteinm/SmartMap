@@ -34,14 +34,14 @@ import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
 public class AddFriendActivity extends ListActivity {
 
     private SearchView mSearchBar;
-    private Activity mActivty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_add_friend);
 
-        mActivty = this;
+        ServiceContainer.initSmartMapServices(this);
+
 
         // Set action bar color to main color
         this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
@@ -54,7 +54,7 @@ public class AddFriendActivity extends ListActivity {
         TextView tv = (TextView) rl.getChildAt(1);
         assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         String name = tv.getText().toString();
-        displayConfirmationDialog(mActivty, name, userId);
+        displayConfirmationDialog(this, name, userId);
     }
 
     @Override
@@ -109,18 +109,18 @@ public class AddFriendActivity extends ListActivity {
     public static void displayConfirmationDialog(final Activity activity, String name, final long userId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(activity.getResources().getString(R.string.add) + " " + name + " "
-                + activity.getResources().getString(R.string.as_a_friend));
+            + activity.getResources().getString(R.string.as_a_friend));
 
         // Add positive button
         builder.setPositiveButton(activity.getResources().getString(R.string.add),
-                new DialogInterface.OnClickListener() {
+            new DialogInterface.OnClickListener() {
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // invite friend
-                        ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback(activity));
-                    }
-                });
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // invite friend
+                ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback(activity));
+            }
+        });
         // Add negative button
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -142,8 +142,8 @@ public class AddFriendActivity extends ListActivity {
 
         private final Activity mActivity;
 
-        public AddFriendCallback(Activity context) {
-            mActivity = context;
+        public AddFriendCallback(Activity activity) {
+            mActivity = activity;
         }
 
         @Override
@@ -151,8 +151,8 @@ public class AddFriendActivity extends ListActivity {
             mActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(mActivity, mActivity.getString(R.string.invite_friend_failure), Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(mActivity, mActivity.getString(R.string.invite_friend_failure),
+                        Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -162,8 +162,8 @@ public class AddFriendActivity extends ListActivity {
             mActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(mActivity, mActivity.getString(R.string.invite_friend_success), Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(mActivity, mActivity.getString(R.string.invite_friend_success),
+                        Toast.LENGTH_SHORT).show();
                     mActivity.finish();
                 }
             });
@@ -183,8 +183,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this,
-                            AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
-                            Toast.LENGTH_LONG).show();
+                        AddFriendActivity.this.getResources().getString(R.string.add_friend_network_error),
+                        Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -195,8 +195,8 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(AddFriendActivity.this,
-                            AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
-                            Toast.LENGTH_LONG).show();
+                        AddFriendActivity.this.getResources().getString(R.string.add_friend_not_found),
+                        Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -207,7 +207,7 @@ public class AddFriendActivity extends ListActivity {
                 @Override
                 public void run() {
                     AddFriendActivity.this.setListAdapter(new FriendListItemAdapter(AddFriendActivity.this,
-                            new ArrayList<User>(result)));
+                        new ArrayList<User>(result)));
                 }
             });
         }
