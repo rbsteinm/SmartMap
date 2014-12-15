@@ -8,7 +8,6 @@ import static com.google.android.apps.common.testing.ui.espresso.contrib.DrawerA
 import static com.google.android.apps.common.testing.ui.espresso.contrib.DrawerActions.openDrawer;
 import static com.google.android.apps.common.testing.ui.espresso.contrib.DrawerMatchers.isClosed;
 import static com.google.android.apps.common.testing.ui.espresso.contrib.DrawerMatchers.isOpen;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
@@ -41,6 +40,9 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         this.getActivity().finish();
     }
 
+    /**
+     * Test close search view using pressBack()
+     */
     public void testCloseSearchViewWithBackButton() {
         onView(withId(R.id.action_search)).perform(click());
         pressBack();
@@ -48,6 +50,9 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
     }
 
+    /**
+     * Test close search view using home
+     */
     public void testCloseSearchViewWithMenuItem() {
         onView(withId(R.id.action_search)).perform(click());
         onView(withId(R.id.action_hide_search)).perform(click());
@@ -63,6 +68,9 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.about_header)).check(matches(isDisplayed()));
     }
 
+    /**
+     * Test open and close notification activity
+     */
     public void testOpenAndCloseNotificationActivityUsingHome() {
         onView(withId(R.id.action_notifications)).perform(click());
         onView(withId(R.id.notification_activity)).check(matches(isDisplayed()));
@@ -70,6 +78,9 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
 
+    /**
+     * Test open and close side menu using slide
+     */
     public void testOpenAndCloseSideMenu() {
         openDrawer(R.id.drawer_layout);
         onView(withId(R.id.drawer_layout)).check(matches(isOpen()));
@@ -104,9 +115,20 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.friends_pager_activity)).check(matches(isDisplayed()));
     }
 
+    /**
+     * Test open notification activity by clicking button
+     */
     public void testOpenNotificationActivity() {
         onView(withId(R.id.action_notifications)).perform(click());
-        onView(withId(R.id.notification_activity)).check(matches(isCompletelyDisplayed()));
+        onView(withId(R.id.notification_activity)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test open search view
+     */
+    public void testOpenSearchView() {
+        onView(withId(R.id.action_search)).perform(click());
+        onView(withId(R.id.search_panel)).check(matches(isDisplayed()));
     }
 
     /**
@@ -118,11 +140,9 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withText(R.string.settings_offline)).check(matches(isDisplayed()));
     }
 
-    public void testOpenSideMenu() {
-        openDrawer(R.id.drawer_layout);
-        onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()));
-    }
-
+    /**
+     * Test open side menu using button
+     */
     public void testOpenSideMenuUsingButton() {
         onView(withId(R.id.drawer_layout)).check(matches(isClosed()));
         onView(withId(android.R.id.home)).perform(click());
@@ -132,16 +152,13 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     /**
-     * Test open profile activity using side menu
+     * Test open side menu by sliding
+     * When we launch all tests it doesn't pass but it pass alone because of
+     * openDrawer issue :
+     * https://code.google.com/p/android-test-kit/issues/detail?id=64
      */
-    public void testZOpenProfileMenu() {
-        onView(withId(android.R.id.home)).perform(click());
-        onView(allOf(withId(R.id.side_menu_text_view), withText(R.string.profile_text))).perform(click());
-        onView(withId(R.id.profile_header)).check(matches(isDisplayed()));
-    }
-
-    public void testZOpenSearchView() {
-        onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.search_panel)).check(matches(isDisplayed()));
+    public void testZOpenSideMenu() {
+        openDrawer(R.id.drawer_layout);
+        onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()));
     }
 }
