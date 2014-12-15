@@ -25,7 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Offers different static utility methods.
- *
+ * 
  * @author agpmilli
  * @author jfperren
  * @author SpicyCH
@@ -43,7 +43,7 @@ public final class Utils {
     public static final long ONE_YEAR = 365 * ONE_DAY;
     public static final int DAYS_IN_A_WEEK = 7;
     public static final String NEVER_SEEN = ServiceContainer.getSettingsManager().getContext()
-            .getString(R.string.utils_never_seen_on_smartmap);
+        .getString(R.string.utils_never_seen_on_smartmap);
 
     private static final String TAG = Utils.class.getSimpleName();
 
@@ -52,10 +52,39 @@ public final class Utils {
     private static final double TEN = 10.0;
 
     /**
-     * Private constructor so that Utils cannot be instantiated.
+     * @param addresses
+     * @return
+     * @author SpicyCH
      */
-    private Utils() {
-        super();
+    private static String cityOrCountryFromAddresses(List<Address> addresses) {
+        if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
+            return addresses.get(0).getLocality();
+        } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
+            return addresses.get(0).getCountryName();
+        } else {
+            return Displayable.NO_LOCATION_STRING;
+        }
+    }
+
+    /**
+     * @param calendar
+     * @return
+     * @author SpicyCH
+     */
+    private static String customizedDateString(Calendar calendar, int daysDiff) {
+        if (daysDiff > 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
+                + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        } else if (daysDiff == 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
+        } else if (daysDiff == 0) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
+        } else if (daysDiff == -1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
+        } else {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
+                + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        }
     }
 
     /**
@@ -82,9 +111,27 @@ public final class Utils {
     }
 
     /**
+     * @param time
+     *            a second, minute, hour, day or month
+     * @return the time prefixed with 0 if it was < 10
+     * @author SpicyCH
+     */
+    private static String formatForDisplay(int time) {
+        String hourOfDayString = "";
+        if (time < TEN) {
+            hourOfDayString += "0" + time;
+        } else {
+            hourOfDayString += time;
+        }
+
+        return hourOfDayString;
+    }
+
+    /**
      * @param location
-     * @return a String of the city associated with the given coordinates, the country name if city not found,
-     *         <code>NO_LOCATION_STRING</code> if nothing could be found.
+     * @return a String of the city associated with the given coordinates, the
+     *         country name if city not found, <code>NO_LOCATION_STRING</code>
+     *         if nothing could be found.
      */
     public static String getCityFromLocation(Location location) {
 
@@ -106,8 +153,9 @@ public final class Utils {
     }
 
     /**
-     * Mixes startColor and endColor with value/(endValue - startValue) fraction of startColor.
-     *
+     * Mixes startColor and endColor with value/(endValue - startValue) fraction
+     * of startColor.
+     * 
      * @param value
      * @param startValue
      * @param endValue
@@ -115,8 +163,8 @@ public final class Utils {
      * @param endColor
      * @return the mixed colors
      */
-    public static int getColorInInterval(double value, double startValue, double endValue, int startColor,
-            int endColor) {
+    public static int
+        getColorInInterval(double value, double startValue, double endValue, int startColor, int endColor) {
         if (startValue > endValue) {
             return getColorInInterval(value, endValue, startValue, endColor, startColor);
         } else {
@@ -127,8 +175,8 @@ public final class Utils {
                 double percentageStart = -(value - endValue) / intervalLength;
 
                 int red = (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
-                int green = (int) ((percentageStart * Color.green(startColor))
-                        + (percentageEnd * Color.green(endColor)));
+                int green =
+                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color.green(endColor)));
                 int blue = (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
 
                 Log.d(TAG, "start : " + percentageStart + "end : " + percentageEnd);
@@ -143,8 +191,21 @@ public final class Utils {
     }
 
     /**
+     * @param calendar
+     * @return the date, in the form dd.mm.yyyy
+     * @author SpicyCH
+     */
+    private static String getCompleteDate(Calendar calendar) {
+        int month = calendar.get(Calendar.MONTH) + 1;
+
+        return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
+            + calendar.get(Calendar.YEAR);
+    }
+
+    /**
      * @param location
-     * @return the country associated to the coordinates or <code>NO_LOCATION_STRING</code>.
+     * @return the country associated to the coordinates or
+     *         <code>NO_LOCATION_STRING</code>.
      */
     public static String getCountryFromLocation(Location location) {
         if (location == null) {
@@ -168,7 +229,7 @@ public final class Utils {
 
     /**
      * Gets a human readable String fromt the given date.
-     *
+     * 
      * @param calendar
      * @return a String of the form "Today", "25.12.2014", etc...
      */
@@ -187,18 +248,37 @@ public final class Utils {
             // bug #82
             int month = calendar.get(Calendar.MONTH) + 1;
             return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
-                    + calendar.get(Calendar.YEAR);
+                + calendar.get(Calendar.YEAR);
         }
     }
 
     /**
      * @param calendar
-     * @return A String representing the time since we last saw the user on SmartMap. For example "Now" or
+     * @param daysDiff
+     * @return
+     * @author SpicyCH
+     */
+    private static String getDateStringForNoYearDiff(Calendar calendar, int daysDiff) {
+
+        if ((daysDiff > -DAYS_IN_A_WEEK) && (daysDiff < DAYS_IN_A_WEEK)) {
+
+            return customizedDateString(calendar, daysDiff);
+
+        } else {
+            return getCompleteDate(calendar);
+        }
+    }
+
+    /**
+     * @param calendar
+     * @return A String representing the time since we last saw the user on
+     *         SmartMap. For example "Now" or
      *         "1 minute ago".
      */
     public static String getLastSeenStringFromCalendar(Calendar calendar) {
 
-        long diff = GregorianCalendar.getInstance(TimeZone.getTimeZone(GMT_SWITZERLAND)).getTimeInMillis()
+        long diff =
+            GregorianCalendar.getInstance(TimeZone.getTimeZone(GMT_SWITZERLAND)).getTimeInMillis()
                 - calendar.getTimeInMillis();
 
         if (diff < ONE_MINUTE) {
@@ -226,8 +306,9 @@ public final class Utils {
     }
 
     /**
-     * Creates a matrix for a given color to be used to transform a Bitmap's color.
-     *
+     * Creates a matrix for a given color to be used to transform a Bitmap's
+     * color.
+     * 
      * @param color
      * @return the matrix
      */
@@ -242,13 +323,13 @@ public final class Utils {
 
     /**
      * Get a string representation of the day's time of a Calendar
-     *
+     * 
      * @param calendar
      * @return
      */
     public static String getTimeString(Calendar calendar) {
         return formatForDisplay(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
-                + formatForDisplay(calendar.get(Calendar.MINUTE));
+            + formatForDisplay(calendar.get(Calendar.MINUTE));
     }
 
     /**
@@ -263,23 +344,29 @@ public final class Utils {
         if (distance >= ONE_THOUSAND_METERS) {
             distance = distance / ONE_THOUSAND_METERS;
             distance = Math.round(distance * TEN) / TEN;
-            textDistance = distance + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km) + " "
+            textDistance =
+                distance + " " + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km) + " "
                     + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you);
         } else {
             distance = Math.round(distance);
-            textDistance = (((int) distance) + " ")
+            textDistance =
+                (((int) distance) + " ")
                     + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you);
         }
         return textDistance;
     }
 
     /**
-     * Set the badge count on a LayerDrawable (mainly the notification icon in main activity).
-     *
+     * Set the badge count on a LayerDrawable (mainly the notification icon in
+     * main activity).
+     * Taken from : http://www.jmhend.me/layerdrawable-menuitems
+     * 
      * @param context
+     *            current context
      * @param icon
+     *            the icon
      * @param count
+     *            the number to draw
      */
     public static void setBadgeCount(Context context, LayerDrawable icon, int count) {
 
@@ -299,95 +386,8 @@ public final class Utils {
     }
 
     /**
-     * @param addresses
-     * @return
-     *
-     * @author SpicyCH
-     */
-    private static String cityOrCountryFromAddresses(List<Address> addresses) {
-        if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
-            return addresses.get(0).getLocality();
-        } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
-            return addresses.get(0).getCountryName();
-        } else {
-            return Displayable.NO_LOCATION_STRING;
-        }
-    }
-
-    /**
-     * @param calendar
-     * @return
-     *
-     * @author SpicyCH
-     */
-    private static String customizedDateString(Calendar calendar, int daysDiff) {
-        if (daysDiff > 1) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
-                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-        } else if (daysDiff == 1) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
-        } else if (daysDiff == 0) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
-        } else if (daysDiff == -1) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
-        } else {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
-                    + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-        }
-    }
-
-    /**
-     * @param time
-     *            a second, minute, hour, day or month
-     * @return the time prefixed with 0 if it was < 10
-     * @author SpicyCH
-     */
-    private static String formatForDisplay(int time) {
-        String hourOfDayString = "";
-        if (time < TEN) {
-            hourOfDayString += "0" + time;
-        } else {
-            hourOfDayString += time;
-        }
-
-        return hourOfDayString;
-    }
-
-    /**
-     * @param calendar
-     * @return the date, in the form dd.mm.yyyy
-     *
-     * @author SpicyCH
-     */
-    private static String getCompleteDate(Calendar calendar) {
-        int month = calendar.get(Calendar.MONTH) + 1;
-
-        return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
-                + calendar.get(Calendar.YEAR);
-    }
-
-    /**
-     * @param calendar
-     * @param daysDiff
-     * @return
-     *
-     * @author SpicyCH
-     */
-    private static String getDateStringForNoYearDiff(Calendar calendar, int daysDiff) {
-
-        if ((daysDiff > -DAYS_IN_A_WEEK) && (daysDiff < DAYS_IN_A_WEEK)) {
-
-            return customizedDateString(calendar, daysDiff);
-
-        } else {
-            return getCompleteDate(calendar);
-        }
-    }
-
-    /**
      * @param diff
      * @return
-     *
      * @author SpicyCH
      */
     private static String timeInDays(long diff) {
@@ -402,7 +402,6 @@ public final class Utils {
     /**
      * @param diff
      * @return
-     *
      * @author SpicyCH
      */
     private static String timeInHours(long diff) {
@@ -411,14 +410,13 @@ public final class Utils {
             return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_hour_ago);
         } else {
             return "" + hours + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
+                + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_hours_ago);
         }
     }
 
     /**
      * @param diff
      * @return
-     *
      * @author SpicyCH
      */
     private static String timeInMinutes(long diff) {
@@ -427,7 +425,14 @@ public final class Utils {
             return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_one_min);
         } else {
             return minutes + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
+                + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
         }
+    }
+
+    /**
+     * Private constructor so that Utils cannot be instantiated.
+     */
+    private Utils() {
+        super();
     }
 }
