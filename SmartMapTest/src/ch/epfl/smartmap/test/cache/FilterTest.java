@@ -5,7 +5,7 @@ package ch.epfl.smartmap.test.cache;
 
 import static ch.epfl.smartmap.test.database.MockContainers.ALAIN_CONTAINER;
 import static ch.epfl.smartmap.test.database.MockContainers.DEFAULT_CONTAINER;
-import static ch.epfl.smartmap.test.database.MockContainers.FAMILY;
+import static ch.epfl.smartmap.test.database.MockContainers.FAMILY_CONTAINER;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +38,7 @@ public class FilterTest extends AndroidTestCase {
         // new cache
         ServiceContainer.setCache(new Cache());
         cache = ServiceContainer.getCache();
-        FAMILY.setId(Filter.NO_ID);
+        FAMILY_CONTAINER.setId(Filter.NO_ID);
     }
 
     @Test
@@ -50,11 +50,11 @@ public class FilterTest extends AndroidTestCase {
 
     @Test
     public void testCreateCorrectSubclass() {
-        cache.putFilter(FAMILY.setId(Filter.DEFAULT_FILTER_ID));
-        cache.putFilter(FAMILY.setId(Filter.NO_ID));
+        cache.putFilter(FAMILY_CONTAINER.setId(Filter.DEFAULT_FILTER_ID));
+        cache.putFilter(FAMILY_CONTAINER.setId(Filter.NO_ID));
 
         assertEquals(Filter.DEFAULT, cache.getDefaultFilter().getType());
-        assertEquals(Filter.CUSTOM, cache.getFilter(FAMILY.getId()).getType());
+        assertEquals(Filter.CUSTOM, cache.getFilter(FAMILY_CONTAINER.getId()).getType());
     }
 
     @Test
@@ -66,23 +66,23 @@ public class FilterTest extends AndroidTestCase {
 
     @Test
     public void testGetValues() {
-        cache.putFilter(FAMILY);
-        Filter family = ServiceContainer.getCache().getFilter(FAMILY.getId());
+        cache.putFilter(FAMILY_CONTAINER);
+        Filter family = ServiceContainer.getCache().getFilter(FAMILY_CONTAINER.getId());
 
-        assertEquals(FAMILY.getId(), family.getId());
-        assertEquals(FAMILY.getName(), family.getName());
-        assertEquals(FAMILY.getIds(), family.getIds());
+        assertEquals(FAMILY_CONTAINER.getId(), family.getId());
+        assertEquals(FAMILY_CONTAINER.getName(), family.getName());
+        assertEquals(FAMILY_CONTAINER.getIds(), family.getIds());
     }
 
     @Test
     public void testUpdateWithGoodParameters() {
-        cache.putFilter(FAMILY);
-        Filter family = cache.getFilter(FAMILY.getId());
+        cache.putFilter(FAMILY_CONTAINER);
+        Filter family = cache.getFilter(FAMILY_CONTAINER.getId());
 
-        family.update(new FilterContainer(FAMILY.getId(), "New name", Sets.newHashSet((long) 4, (long) 6,
-            (long) 7), false));
+        family.update(new FilterContainer(FAMILY_CONTAINER.getId(), "New name", Sets.newHashSet((long) 4,
+            (long) 6, (long) 7), false));
 
-        assertEquals(FAMILY.getId(), family.getId());
+        assertEquals(FAMILY_CONTAINER.getId(), family.getId());
         assertEquals("New name", family.getName());
         assertEquals(Sets.newHashSet((long) 4, (long) 6, (long) 7), family.getIds());
         assertEquals(false, family.isActive());
@@ -90,17 +90,17 @@ public class FilterTest extends AndroidTestCase {
 
     @Test
     public void testUpdateWithSameParameters() {
-        cache.putFilter(FAMILY);
-        Filter family = cache.getFilter(FAMILY.getId());
+        cache.putFilter(FAMILY_CONTAINER);
+        Filter family = cache.getFilter(FAMILY_CONTAINER.getId());
         assertFalse(family.update(family.getContainerCopy()));
     }
 
     @Test
     public void testUpdateWithWrongId() {
-        cache.putFilter(FAMILY);
-        Filter family = cache.getFilter(FAMILY.getId());
+        cache.putFilter(FAMILY_CONTAINER);
+        Filter family = cache.getFilter(FAMILY_CONTAINER.getId());
         try {
-            family.update(FAMILY.setId(6));
+            family.update(FAMILY_CONTAINER.setId(6));
             fail();
         } catch (IllegalArgumentException e) {
             // Success

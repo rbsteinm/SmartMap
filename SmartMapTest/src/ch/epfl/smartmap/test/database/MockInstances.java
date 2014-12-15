@@ -40,20 +40,21 @@ public class MockInstances {
         CREATOR.putFilter(FAMILY_CONTAINER);
         CREATOR.putFilter(DEFAULT_CONTAINER);
     }
+    public static final User JULIEN = CREATOR.getUser(JULIEN_CONTAINER.getId());
+    public static final User ROBIN = CREATOR.getUser(ROBIN_CONTAINER.getId());
+    public static final User ALAIN = CREATOR.getUser(ALAIN_CONTAINER.getId());
 
-    User JULIEN = CREATOR.getUser(JULIEN_CONTAINER.getId());
-    User ROBIN = CREATOR.getUser(ROBIN_CONTAINER.getId());
-    User ALAIN = CREATOR.getUser(ALAIN_CONTAINER.getId());
+    public static final Event POLYLAN = CREATOR.getEvent(POLYLAN_CONTAINER.getId());
+    public static final Event FOOTBALL_TOURNAMENT = CREATOR.getEvent(FOOTBALL_TOURNAMENT_CONTAINER.getId());
 
-    Event POLYLAN = CREATOR.getEvent(POLYLAN_CONTAINER.getId());
-    Event FOOTBALL_TOURNAMENT = CREATOR.getEvent(FOOTBALL_TOURNAMENT_CONTAINER.getId());
-
-    Invitation ROBIN_FRIEND_INVITATION = CREATOR.getInvitation(ROBIN_FRIEND_INVITATION_CONTAINER.getId());
-    Invitation ROBIN_FRIEND_ACCEPTED_INVITATION = CREATOR
+    public static final Invitation ROBIN_FRIEND_INVITATION = CREATOR.getInvitation(ROBIN_FRIEND_INVITATION_CONTAINER
+        .getId());
+    public static final Invitation ROBIN_FRIEND_ACCEPTED_INVITATION = CREATOR
         .getInvitation(ROBIN_FRIEND_ACCEPTED_INVITATION_CONTAINER.getId());
-    Invitation POLYLAN_EVENT_INVITATION = CREATOR.getInvitation(POLYLAN_EVENT_INVITATION_CONTAINER.getId());
+    public static final Invitation POLYLAN_EVENT_INVITATION = CREATOR.getInvitation(POLYLAN_EVENT_INVITATION_CONTAINER
+        .getId());
 
-    Filter FAMILY = CREATOR.getFilter(FAMILY_CONTAINER.getId());
-    Filter DEFAULT = CREATOR.getDefaultFilter();
+    public static final Filter FAMILY = CREATOR.getFilter(FAMILY_CONTAINER.getId());
+    public static final Filter DEFAULT = CREATOR.getDefaultFilter();
 
 }
