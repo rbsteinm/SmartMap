@@ -23,6 +23,10 @@ public abstract class Filter implements FilterInterface {
 
     private static final String TAG = Filter.class.getSimpleName();
 
+    // Type of filters
+    public static final int DEFAULT = 0;
+    public static final int CUSTOM = 1;
+
     public static final long DEFAULT_FILTER_ID = 1;
 
     // Default values
@@ -168,13 +172,11 @@ public abstract class Filter implements FilterInterface {
     public boolean update(FilterContainer filter) {
         boolean hasChanged = false;
 
-        if ((filter.getId() >= 0) && (filter.getId() != mId)) {
-            mId = filter.getId();
-            hasChanged = true;
+        if (filter.getId() != mId) {
+            throw new IllegalArgumentException();
         }
 
-        if (filter.getIds() != null) {
-            Log.d(TAG, "set ids : " + filter.getIds());
+        if ((filter.getIds() != null) && !filter.getIds().equals(mIds)) {
             mIds.clear();
             mIds.addAll(filter.getIds());
             hasChanged = true;

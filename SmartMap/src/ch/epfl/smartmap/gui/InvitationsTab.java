@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +54,7 @@ public class InvitationsTab extends ListFragment {
 
         // Create custom Adapter and pass it to the Activity
         this.setListAdapter(new FriendInvitationListItemAdapter(mContext, mInvitationList));
-
+        Log.d("inv tab", "nb displayed inv " + mInvitationList.size());
         // Initialize the listener to update the diaplayed list when the invitation list is updated in the
         // cache
         ServiceContainer.getCache().addOnCacheListener(new OnCacheListener() {
@@ -84,7 +85,7 @@ public class InvitationsTab extends ListFragment {
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         Invitation invitation = mInvitationList.get(position);
-
+        Log.d("inv tab", "item clicked");
         this.displayAcceptFriendDialog(invitation);
     }
 

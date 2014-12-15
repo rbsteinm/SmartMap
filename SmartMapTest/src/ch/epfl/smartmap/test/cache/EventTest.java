@@ -18,7 +18,7 @@ import ch.epfl.smartmap.cache.PublicEvent;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
 
-public class PublicEventTest extends AndroidTestCase {
+public class EventTest extends AndroidTestCase {
 
     @Before
     @Override

@@ -26,6 +26,7 @@ public class MockGenerator {
         } else if (type == Invitation.ACCEPTED_FRIEND_INVITATION) {
             return new GenericInvitation(2, 3, Invitation.UNREAD, getFriend(), null, type);
         } else {
+
             return null;
 
         }
@@ -33,5 +34,6 @@ public class MockGenerator {
 
     public static User getStranger() {
         return new Stranger(2, "Mock Stranger", null);
+
     }
 }

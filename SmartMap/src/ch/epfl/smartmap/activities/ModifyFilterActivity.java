@@ -63,6 +63,7 @@ public class ModifyFilterActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_modify_filter);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+        ServiceContainer.forceInitSmartMapServices(this.getBaseContext());
 
         mInsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_inside_layout);
         mOutsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_outside_layout);
@@ -86,6 +87,7 @@ public class ModifyFilterActivity extends Activity {
 
         mListViewOutside.setOnDragListener(mFromOutsideDragListener);
         mInsideFilterLayout.setOnDragListener(mFromOutsideDragListener);
+
     }
 
     /*
@@ -271,10 +273,14 @@ public class ModifyFilterActivity extends Activity {
             ServiceContainer.getCache().getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
 
         for (long id : mFilter.getIds()) {
-            mFriendsInside.add(ServiceContainer.getCache().getUser(id));
+            User user = ServiceContainer.getCache().getUser(id);
+            if (!mFriendsInside.contains(user)) {
+                mFriendsInside.add(user);
+            }
+
         }
         for (User friend : ServiceContainer.getCache().getAllFriends()) {
-            if (!mFriendsInside.contains(friend)) {
+            if (!mFriendsInside.contains(friend) && !mFriendsOutside.contains(friend)) {
                 mFriendsOutside.add(friend);
             }
         }
