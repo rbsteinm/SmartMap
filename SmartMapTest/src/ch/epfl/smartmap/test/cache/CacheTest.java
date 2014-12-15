@@ -9,6 +9,7 @@ import static ch.epfl.smartmap.test.database.MockContainers.ROBIN;
 import static ch.epfl.smartmap.test.database.MockContainers.WRONG_USER_VALUES;
 
 import java.util.Arrays;
+import java.util.GregorianCalendar;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,10 +22,14 @@ import android.test.AndroidTestCase;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 import com.google.common.collect.Sets;
@@ -218,5 +223,38 @@ public class CacheTest extends AndroidTestCase {
         assertEquals(0, cache.getAllFriends().size());
 
         assertNull(cache.getUser(WRONG_USER_VALUES.getId()));
+    }
+    
+    @Test
+    public void testAcceptInvitation() throws SmartMapClientException, Exception {
+        SmartMapClient mockNetClient = Mockito.mock(NetworkSmartMapClient.class);
+        Mockito.doReturn(ROBIN).when(mockNetClient).acceptInvitation(ROBIN.getId());
+        
+        ServiceContainer.setNetworkClient(mockNetClient);
+        
+        final Cache cache = new Cache();
+        
+        cache.putUser(ROBIN);
+        
+        InvitationContainer invitRobin = new InvitationContainer(1, ROBIN, null, Invitation.UNREAD,
+            new GregorianCalendar().getTimeInMillis(), Invitation.FRIEND_INVITATION);
+        
+        cache.putInvitation(invitRobin);
+        
+        Invitation invitation = cache.getInvitation(1);
+        
+        cache.acceptInvitation(invitation, new NetworkRequestCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                assertEquals(User.FRIEND, cache.getUser(ROBIN.getId()).getFriendship());
+            }
+            
+            @Override
+            public void onFailure(Exception e) {
+                fail(); // Should not fail !
+            }
+        });
+        
+        Thread.sleep(500);
     }
 }

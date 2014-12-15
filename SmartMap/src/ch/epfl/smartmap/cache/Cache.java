@@ -33,7 +33,7 @@ import ch.epfl.smartmap.servercom.SmartMapClientException;
  */
 public class Cache implements CacheInterface {
 
-    static final public String TAG = Cache.class.getSimpleName();
+    private static final String TAG = Cache.class.getSimpleName();
 
     // SparseArrays containing live instances
     private final LongSparseArray<User> mUserInstances;
@@ -96,12 +96,7 @@ public class Cache implements CacheInterface {
                 try {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
-                            UserContainer newFriend =
-                                ServiceContainer.getNetworkClient().acceptInvitation(
-                                    invitation.getUser().getId());
-                            ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
-                            newFriend.setFriendship(User.FRIEND);
-                            Cache.this.putUser(newFriend);
+                            Cache.this.acceptFriendInvitation(invitation);
                             break;
                         case Invitation.EVENT_INVITATION:
                             long eventId = ((GenericInvitation) invitation).getEvent().getId();
@@ -223,7 +218,6 @@ public class Cache implements CacheInterface {
                 try {
                     switch (invitation.getType()) {
                         case Invitation.FRIEND_INVITATION:
-                            // Decline online
                             ServiceContainer.getNetworkClient().declineInvitation(
                                 invitation.getUser().getId());
                             ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
@@ -917,71 +911,7 @@ public class Cache implements CacheInterface {
         Set<EventContainer> eventsToAdd = new HashSet<EventContainer>();
         Set<InvitationContainer> invitationsToAdd = new HashSet<InvitationContainer>();
 
-        for (final InvitationContainer invitationInfo : invitationInfos) {
-
-            // Get Id
-            if (invitationInfo.getId() == Invitation.NO_ID) {
-                // Get Id from database
-                long id = ServiceContainer.getDatabase().addInvitation(invitationInfo);
-                invitationInfo.setId(id);
-            }
-
-            if ((invitationInfo.getId() != Invitation.ALREADY_RECEIVED)
-                && (this.getInvitation(invitationInfo.getId()) == null)) {
-                switch (invitationInfo.getType()) {
-                    case Invitation.FRIEND_INVITATION:
-                        // Check that it contains all informations
-                        if (invitationInfo.getUserInfos() != null) {
-                            invitationsToAdd.add(invitationInfo);
-                            usersToAdd.add(invitationInfo.getUserInfos());
-                        }
-                        break;
-                    case Invitation.ACCEPTED_FRIEND_INVITATION:
-                        // Check that it contains all informations
-                        UserContainer newFriend = invitationInfo.getUserInfos();
-                        if (newFriend != null) {
-                            newFriend.setFriendship(User.FRIEND);
-                            usersToAdd.add(newFriend);
-                            invitationsToAdd.add(invitationInfo);
-                        }
-                        // Acknowledge new friend
-                        new AsyncTask<Long, Void, Void>() {
-                            @Override
-                            protected Void doInBackground(Long... params) {
-                                try {
-                                    ServiceContainer.getNetworkClient().ackAcceptedInvitation(params[0]);
-                                } catch (SmartMapClientException e) {
-                                    Log.e(TAG, "Error while acknowledging accpeted invitation : " + e);
-                                }
-                                return null;
-                            }
-                        }.execute(invitationInfo.getUserId());
-                        break;
-                    case Invitation.EVENT_INVITATION:
-                        // Check that it contains all informations
-                        if (invitationInfo.getEventInfos() != null) {
-                            invitationsToAdd.add(invitationInfo);
-                            eventsToAdd.add(invitationInfo.getEventInfos());
-                        }
-                        // Acknowledge event invitation
-                        new AsyncTask<Long, Void, Void>() {
-                            @Override
-                            protected Void doInBackground(Long... params) {
-                                try {
-                                    ServiceContainer.getNetworkClient().ackEventInvitation(params[0]);
-                                } catch (SmartMapClientException e) {
-                                    Log.e(TAG, "Error while acknowledging event invitation : " + e);
-                                }
-                                return null;
-                            }
-                        }.execute(invitationInfo.getEventId());
-                        break;
-                    default:
-                        assert false;
-                        break;
-                }
-            }
-        }
+        this.processInvitations(invitationInfos, usersToAdd, eventsToAdd, invitationsToAdd);
 
         // Add all users
         this.putUsers(usersToAdd);
@@ -1540,13 +1470,13 @@ public class Cache implements CacheInterface {
         return isListModified;
     }
 
-    private boolean updateInvitation(InvitationContainer invitation) {
+    private synchronized boolean updateInvitation(InvitationContainer invitation) {
         Set<InvitationContainer> singleton = new HashSet<InvitationContainer>();
         singleton.add(invitation);
         return this.updateInvitations(singleton);
     }
 
-    private boolean updateInvitations(Set<InvitationContainer> invitations) {
+    private synchronized boolean updateInvitations(Set<InvitationContainer> invitations) {
         boolean isListModified = false;
         for (InvitationContainer invitation : invitations) {
             isListModified = isListModified || this.getInvitation(invitation.getId()).update(invitation);
@@ -1611,6 +1541,90 @@ public class Cache implements CacheInterface {
         }
 
         return isListModified;
+    }
+
+    /**
+     * Accepts a friend invitation by sending a request to the server and
+     * updating the cache
+     * 
+     * @param invitation
+     * @throws SmartMapClientException
+     */
+    private synchronized void acceptFriendInvitation(Invitation invitation) throws SmartMapClientException {
+        UserContainer newFriend =
+            ServiceContainer.getNetworkClient().acceptInvitation(invitation.getUser().getId());
+        ServiceContainer.getDatabase().deletePendingFriend(invitation.getUser().getId());
+        newFriend.setFriendship(User.FRIEND);
+        this.putUser(newFriend);
+    }
+
+    public void processInvitations(Set<InvitationContainer> invitationInfos, Set<UserContainer> usersToAdd,
+        Set<EventContainer> eventsToAdd, Set<InvitationContainer> invitationsToAdd) {
+        for (final InvitationContainer invitationInfo : invitationInfos) {
+
+            // Get Id
+            if (invitationInfo.getId() == Invitation.NO_ID) {
+                // Get Id from database
+                long id = ServiceContainer.getDatabase().addInvitation(invitationInfo);
+                invitationInfo.setId(id);
+            }
+
+            if ((invitationInfo.getId() != Invitation.ALREADY_RECEIVED)
+                && (this.getInvitation(invitationInfo.getId()) == null)) {
+                switch (invitationInfo.getType()) {
+                    case Invitation.FRIEND_INVITATION:
+                        // Check that it contains all informations
+                        if (invitationInfo.getUserInfos() != null) {
+                            invitationsToAdd.add(invitationInfo);
+                            usersToAdd.add(invitationInfo.getUserInfos());
+                        }
+                        break;
+                    case Invitation.ACCEPTED_FRIEND_INVITATION:
+                        // Check that it contains all informations
+                        UserContainer newFriend = invitationInfo.getUserInfos();
+                        if (newFriend != null) {
+                            newFriend.setFriendship(User.FRIEND);
+                            usersToAdd.add(newFriend);
+                            invitationsToAdd.add(invitationInfo);
+                        }
+                        // Acknowledge new friend
+                        new AsyncTask<Long, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Long... params) {
+                                try {
+                                    ServiceContainer.getNetworkClient().ackAcceptedInvitation(params[0]);
+                                } catch (SmartMapClientException e) {
+                                    Log.e(TAG, "Error while acknowledging accpeted invitation : " + e);
+                                }
+                                return null;
+                            }
+                        }.execute(invitationInfo.getUserId());
+                        break;
+                    case Invitation.EVENT_INVITATION:
+                        // Check that it contains all informations
+                        if (invitationInfo.getEventInfos() != null) {
+                            invitationsToAdd.add(invitationInfo);
+                            eventsToAdd.add(invitationInfo.getEventInfos());
+                        }
+                        // Acknowledge event invitation
+                        new AsyncTask<Long, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Long... params) {
+                                try {
+                                    ServiceContainer.getNetworkClient().ackEventInvitation(params[0]);
+                                } catch (SmartMapClientException e) {
+                                    Log.e(TAG, "Error while acknowledging event invitation : " + e);
+                                }
+                                return null;
+                            }
+                        }.execute(invitationInfo.getEventId());
+                        break;
+                    default:
+                        assert false;
+                        break;
+                }
+            }
+        }
     }
 
     /**
