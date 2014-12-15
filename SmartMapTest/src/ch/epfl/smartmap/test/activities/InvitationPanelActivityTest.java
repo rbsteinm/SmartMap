@@ -45,7 +45,6 @@ ActivityInstrumentationTestCase2<MainActivity> {
         newSortedSet.add(newAcceptedFriendInvitation);
         Mockito.when(newCache.getAllInvitations()).thenReturn(newSortedSet);
         ServiceContainer.setCache(newCache);
-        onView(withId(R.id.action_notifications)).perform(click());
     }
 
     @Override
@@ -57,6 +56,7 @@ ActivityInstrumentationTestCase2<MainActivity> {
      * Pressback shows main map
      */
     public void testAPressBack() {
+        onView(withId(R.id.action_notifications)).perform(click());
         onView(withId(R.id.notification_activity)).check(matches(isDisplayed()));
         pressBack();
         onView(withId(R.id.map)).check(matches(isDisplayed()));
@@ -66,23 +66,16 @@ ActivityInstrumentationTestCase2<MainActivity> {
      * Click on accepted invitation open show event information activity
      */
     public void testClickOnAcceptedInvitation() {
+        onView(withId(R.id.action_notifications)).perform(click());
         onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(0).perform(click());
         onView(withId(R.id.user_info_header)).check(matches(isDisplayed()));
-    }
-
-    /**
-     * Click on event invitation open show event information activity
-     */
-    public void testClickOnEventInvitation() {
-        // Create a real Event ?
-        // onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(2).perform(click());
-        // onView(withId(R.id.show_event_info_header)).check(matches(isDisplayed()));
     }
 
     /**
      * Click on friend invitation open invitation tabs
      */
     public void testClickOnFriendInvitation() {
+        onView(withId(R.id.action_notifications)).perform(click());
         onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(1).perform(click());
         onView(withId(R.id.layout_invitations_tab)).check(matches(isDisplayed()));
     }

@@ -26,14 +26,14 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
  * @author SpicyCH
  * @author agpmilli
  */
-public class InformationActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
+public class EventInformationActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
 
     private static final String CREATOR_NAME = "SmartMap SwEng";
     private static final String EVENT_NAME = "Some other test event";
     private Context mContext;
     private ListActivity mActivity;
 
-    public InformationActivityTest() {
+    public EventInformationActivityTest() {
         super(AddEventActivity.class);
     }
 
