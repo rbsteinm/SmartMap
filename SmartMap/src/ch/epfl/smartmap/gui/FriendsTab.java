@@ -20,7 +20,7 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
  * Fragment (Tab) displaying your friends in FriendsActivity
- *
+ * 
  * @author rbsteinm
  */
 
@@ -32,7 +32,7 @@ public class FriendsTab extends ListFragment {
 
     public FriendsTab(Context context) {
         mContext = context;
-        ServiceContainer.initSmartMapServices(context);
+
     }
 
     @Override

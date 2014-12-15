@@ -37,7 +37,6 @@ ActivityInstrumentationTestCase2<MainActivity> {
         this.getActivity();
         Cache newCache = Mockito.mock(Cache.class);
         SortedSet<Invitation> newSortedSet = new TreeSet<Invitation>();
-        newSortedSet.add(MockInstances.POLYLAN_EVENT_INVITATION);
         newSortedSet.add(MockInstances.ROBIN_FRIEND_INVITATION);
         newSortedSet.add(MockInstances.ROBIN_FRIEND_ACCEPTED_INVITATION);
         Mockito.when(newCache.getAllInvitations()).thenReturn(newSortedSet);
@@ -60,11 +59,14 @@ ActivityInstrumentationTestCase2<MainActivity> {
     }
 
     /**
-     * Click on accepted invitation open show event information activity
+     * Click on accepted invitation open user information activity
+     * 
+     * @throws InterruptedException
      */
-    public void testClickOnAcceptedInvitation() {
+    public void testClickOnAcceptedInvitation() throws InterruptedException {
         onView(withId(R.id.action_notifications)).perform(click());
-        onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(0).perform(click());
+        onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(1).perform(click());
+        Thread.sleep(1000);
         onView(withId(R.id.user_info_header)).check(matches(isDisplayed()));
     }
 
@@ -73,7 +75,7 @@ ActivityInstrumentationTestCase2<MainActivity> {
      */
     public void testClickOnFriendInvitation() {
         onView(withId(R.id.action_notifications)).perform(click());
-        onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(1).perform(click());
+        onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(0).perform(click());
         onView(withId(R.id.layout_invitations_tab)).check(matches(isDisplayed()));
     }
 }

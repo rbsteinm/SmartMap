@@ -12,6 +12,8 @@ import ch.epfl.smartmap.activities.AddEventActivity;
 
 public class SetLocationActivityTest extends ActivityInstrumentationTestCase2<AddEventActivity> {
 
+    private static final int ESPRESSO_WAIT_DELAY = 1000;
+
     public SetLocationActivityTest() {
         super(AddEventActivity.class);
     }
@@ -30,7 +32,7 @@ public class SetLocationActivityTest extends ActivityInstrumentationTestCase2<Ad
     }
 
     public void testDoneButtonGoesToAddEvent() throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(ESPRESSO_WAIT_DELAY);
         onView(withId(R.id.set_location_done)).perform(click());
         onView(withId(R.id.add_event_activity)).check(matches(isDisplayed()));
     }
