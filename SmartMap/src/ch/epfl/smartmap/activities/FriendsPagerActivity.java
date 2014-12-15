@@ -16,10 +16,10 @@ import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.gui.PagerAdapter;
 
 /**
- * This activity displays your friends in one tab, and your friend request (both
- * sent and received) in another tab
+ * This activity displays your friends in one tab, and your friend request in another tab
  * 
  * @author marion-S
+ * @author rbsteinm
  */
 public class FriendsPagerActivity extends FragmentActivity implements ActionBar.TabListener {
 
