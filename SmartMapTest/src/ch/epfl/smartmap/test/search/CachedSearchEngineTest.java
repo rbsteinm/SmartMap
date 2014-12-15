@@ -1,10 +1,5 @@
 package ch.epfl.smartmap.test.search;
 
-import static ch.epfl.smartmap.test.database.MockContainers.ALAIN;
-import static ch.epfl.smartmap.test.database.MockContainers.FOOTBALL_TOURNAMENT;
-import static ch.epfl.smartmap.test.database.MockContainers.POLYLAN;
-import static ch.epfl.smartmap.test.database.MockContainers.ROBIN;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -42,10 +37,10 @@ public class CachedSearchEngineTest extends AndroidTestCase {
     private DatabaseHelper dbh = null;
     private SettingsManager settings = null;
     private final CachedSearchEngine searchEngine = new CachedSearchEngine();
-    private UserContainer alain = null;
-    private UserContainer robiche = null;
-    private EventContainer polylan = null;
-    private EventContainer football = null;
+    private final UserContainer alain = null;
+    private final UserContainer robiche = null;
+    private final EventContainer polylan = null;
+    private final EventContainer football = null;
     private Event event = null;
     private User user = null;
     private Set<User> users = null;
@@ -61,42 +56,41 @@ public class CachedSearchEngineTest extends AndroidTestCase {
         ServiceContainer.setSettingsManager(settings);
 
         client = Mockito.mock(NetworkSmartMapClient.class);
-        Mockito.when(client.findUsers("al")).thenReturn(Arrays.asList(MockContainers.ALAIN));
+        Mockito.when(client.findUsers("al")).thenReturn(Arrays.asList(MockContainers.ALAIN_CONTAINER));
         ServiceContainer.setNetworkClient(client);
 
         cache = Mockito.mock(Cache.class);
 
         // Used to get live instances
         Cache creator = new Cache();
-        creator.putEvent(FOOTBALL_TOURNAMENT);
-        creator.putEvent(POLYLAN);
-        creator.putUser(ALAIN.setFriendship(User.STRANGER));
-        creator.putUser(ROBIN);
-        
-        Event football = creator.getEvent(FOOTBALL_TOURNAMENT.getId());
-        Event polylan = creator.getEvent(POLYLAN.getId());
-        User robin = creator.getUser(ROBIN.getId());
-        User alain = creator.getUser(ALAIN.getId());
-        
+        creator.putEvent(MockContainers.FOOTBALL_TOURNAMENT_CONTAINER);
+        creator.putEvent(MockContainers.POLYLAN_CONTAINER);
+        creator.putUser(MockContainers.ALAIN_CONTAINER.setFriendship(User.STRANGER));
+        creator.putUser(MockContainers.ROBIN_CONTAINER);
+
+        Event football = creator.getEvent(MockContainers.FOOTBALL_TOURNAMENT_CONTAINER.getId());
+        Event polylan = creator.getEvent(MockContainers.POLYLAN_CONTAINER.getId());
+        User robin = creator.getUser(MockContainers.ROBIN_CONTAINER.getId());
+        User alain = creator.getUser(MockContainers.ALAIN_CONTAINER.getId());
+
         Mockito.when(cache.getEvent(polylan.getId())).thenReturn(polylan);
         Mockito.when(cache.getEvent(football.getId())).thenReturn(football);
 
-        Mockito.when(cache.getUser(ALAIN.getId())).thenReturn(alain);
-        Mockito.when(cache.getUser(ROBIN.getId())).thenReturn(robin);
-        Mockito.when(cache.getAllEvents()).thenReturn(
-            new HashSet<Event>(Arrays.asList(football, polylan)));
+        Mockito.when(cache.getUser(MockContainers.ALAIN_CONTAINER.getId())).thenReturn(alain);
+        Mockito.when(cache.getUser(MockContainers.ROBIN_CONTAINER.getId())).thenReturn(robin);
+        Mockito.when(cache.getAllEvents()).thenReturn(new HashSet<Event>(Arrays.asList(football, polylan)));
 
         ServiceContainer.setCache(cache);
 
         dbh = Mockito.mock(DatabaseHelper.class);
-        Mockito.when(dbh.getEvent(polylan.getId())).thenReturn(POLYLAN);
+        Mockito.when(dbh.getEvent(polylan.getId())).thenReturn(MockContainers.POLYLAN_CONTAINER);
         ServiceContainer.setDatabaseHelper(dbh);
     }
 
     @After
     @Override
     public void tearDown() {
-        MockContainers.ALAIN.setId(MockContainers.ALAIN_ID);
+        MockContainers.ALAIN_CONTAINER.setId(MockContainers.ALAIN_ID);
     }
 
     @Test
