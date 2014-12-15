@@ -124,6 +124,15 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
         return (int) this.getId();
     }
 
+    private boolean notSameStatus(InvitationContainer invitation) {
+        if (invitation.getStatus() != mStatus) {
+            mStatus = invitation.getStatus();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public String toString() {
         return "Invitation[type(" + this.getType() + "), status(" + this.getStatus() + "), timestamp("
@@ -146,12 +155,11 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
             throw new IllegalArgumentException("Cannot change type of invitation");
         }
 
-        if (!((invitation.getStatus() != Invitation.ACCEPTED) && (invitation.getStatus() != Invitation.DECLINED)
-            && (invitation.getStatus() != Invitation.READ) && (invitation.getStatus() != Invitation.UNREAD))
-            && (invitation.getStatus() != mStatus)) {
-            mStatus = invitation.getStatus();
-            hasChanged = true;
+        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)
+            || (invitation.getStatus() == Invitation.READ) || (invitation.getStatus() == Invitation.UNREAD)) {
+            this.notSameStatus(invitation);
         }
+
         if (!(invitation.getTimeStamp() < 0) && (invitation.getTimeStamp() != mTimeStamp)) {
             mTimeStamp = invitation.getTimeStamp();
             hasChanged = true;
