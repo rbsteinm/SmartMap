@@ -221,40 +221,40 @@ public class MockContainers {
         DEFAULT_CONTAINER = new FilterContainer(DEFAULT_ID, DEFAULT_NAME, DEFAULT_IDS, DEFAULT_IS_VISIBLE);
     }
 
-    public static final InvitationContainer ROBIN_FRIEND_INVITATION_CONTANER;
+    public static final InvitationContainer ROBIN_FRIEND_INVITATION_CONTAINER;
     public static final long ROBIN_FRIEND_INVITATION_ID = 776;
     public static final int ROBIN_FRIEND_INVITATION_STATUS = Invitation.UNREAD;
     public static final long ROBIN_FRIEND_INVITATION_TIMESTAMP = 679086708;
     public static final int ROBIN_FRIEND_INVITATION_TYPE = Invitation.FRIEND_INVITATION;
 
     static {
-        ROBIN_FRIEND_INVITATION_CONTANER =
+        ROBIN_FRIEND_INVITATION_CONTAINER =
             new InvitationContainer(ROBIN_FRIEND_INVITATION_ID, ROBIN_CONTAINER, null,
                 ROBIN_FRIEND_INVITATION_STATUS, ROBIN_FRIEND_INVITATION_TIMESTAMP,
                 ROBIN_FRIEND_INVITATION_TYPE);
     }
 
-    public static final InvitationContainer ROBIN_FRIEND_ACCEPTED_INVITATION;
+    public static final InvitationContainer ROBIN_FRIEND_ACCEPTED_INVITATION_CONTAINER;
     public static final long ROBIN_FRIEND_ACCEPTED_INVITATION_ID = 782;
     public static final int ROBIN_FRIEND_ACCEPTED_INVITATION_STATUS = Invitation.UNREAD;
     public static final long ROBIN_FRIEND_ACCEPTED_INVITATION_TIMESTAMP = 6790546;
     public static final int ROBIN_FRIEND_ACCEPTED_INVITATION_TYPE = Invitation.ACCEPTED_FRIEND_INVITATION;
 
     static {
-        ROBIN_FRIEND_ACCEPTED_INVITATION =
+        ROBIN_FRIEND_ACCEPTED_INVITATION_CONTAINER =
             new InvitationContainer(ROBIN_FRIEND_INVITATION_ID, ROBIN_CONTAINER, null,
                 ROBIN_FRIEND_INVITATION_STATUS, ROBIN_FRIEND_INVITATION_TIMESTAMP,
                 ROBIN_FRIEND_INVITATION_TYPE);
     }
 
-    public static final InvitationContainer POLYLAN_EVENT_INVITATION;
+    public static final InvitationContainer POLYLAN_EVENT_INVITATION_CONTAINER;
     public static final long POLYLAN_EVENT_INVITATION_ID = 765;
     public static final int POLYLAN_EVENT_INVITATION_STATUS = Invitation.READ;
     public static final long POLYLAN_EVENT_INVITATION_TIMESTAMP = 6790867;
     public static final int POLYLAN_EVENT_INVITATION_TYPE = Invitation.EVENT_INVITATION;
 
     static {
-        POLYLAN_EVENT_INVITATION =
+        POLYLAN_EVENT_INVITATION_CONTAINER =
             new InvitationContainer(POLYLAN_EVENT_INVITATION_ID, null, POLYLAN_CONTAINER,
                 POLYLAN_EVENT_INVITATION_STATUS, POLYLAN_EVENT_INVITATION_TIMESTAMP,
                 POLYLAN_EVENT_INVITATION_TYPE);

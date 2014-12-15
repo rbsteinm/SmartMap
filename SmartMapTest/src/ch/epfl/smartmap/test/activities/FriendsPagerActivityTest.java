@@ -113,7 +113,7 @@ public class FriendsPagerActivityTest extends ActivityInstrumentationTestCase2<F
 
         Cache newCache = Mockito.mock(Cache.class);
 
-        InvitationContainer friendInvitationContainer = MockContainers.ROBIN_FRIEND_INVITATION_CONTANER;
+        InvitationContainer friendInvitationContainer = MockContainers.ROBIN_FRIEND_INVITATION_CONTAINER;
         creator.putInvitation(friendInvitationContainer);
         Invitation friendInvitation = creator.getInvitation(MockContainers.ROBIN_FRIEND_INVITATION_ID);
 
