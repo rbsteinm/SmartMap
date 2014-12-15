@@ -20,7 +20,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.test.AndroidTestCase;
-import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
@@ -102,35 +101,37 @@ public class CacheTest extends AndroidTestCase {
     }
 
     @Test
-    public void testAcceptInvitation() {
-        try {
-            Mockito.when(correctClient.acceptInvitation(ALAIN.getId())).thenReturn(ALAIN);
-        } catch (SmartMapClientException e) {
-            Log.e(TAG, "Error: " + e);
-        }
-        ServiceContainer.setNetworkClient(correctClient);
-        ServiceContainer.setDatabaseHelper(correctDB);
-        Cache cache = new Cache();
-        InvitationContainer invit =
-            new InvitationContainer(123, ALAIN, null, Invitation.UNREAD, 1234, Invitation.FRIEND_INVITATION);
-        cache.putInvitation(invit);
-        cache.acceptInvitation(cache.getInvitation(invit.getId()), new NetworkRequestCallback<Void>() {
+    public void testAcceptInvitation() throws SmartMapClientException, Exception {
+        SmartMapClient mockNetClient = Mockito.mock(NetworkSmartMapClient.class);
+        Mockito.doReturn(ROBIN).when(mockNetClient).acceptInvitation(ROBIN.getId());
+
+        ServiceContainer.setNetworkClient(mockNetClient);
+
+        final Cache cache = new Cache();
+
+        cache.putUser(ROBIN);
+
+        InvitationContainer invitRobin =
+            new InvitationContainer(1, ROBIN, null, Invitation.UNREAD,
+                new GregorianCalendar().getTimeInMillis(), Invitation.FRIEND_INVITATION);
+
+        cache.putInvitation(invitRobin);
+
+        Invitation invitation = cache.getInvitation(1);
+
+        cache.acceptInvitation(invitation, new NetworkRequestCallback<Void>() {
             @Override
             public void onFailure(Exception e) {
-
+                fail(); // Should not fail !
             }
 
             @Override
             public void onSuccess(Void result) {
-
+                assertEquals(User.FRIEND, cache.getUser(ROBIN.getId()).getFriendship());
             }
         });
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        assertTrue(cache.getInvitation(invit.getId()).getStatus() == Invitation.ACCEPTED);
+
+        Thread.sleep(500);
     }
 
     @Test
@@ -260,38 +261,5 @@ public class CacheTest extends AndroidTestCase {
         assertEquals(0, cache.getAllFriends().size());
 
         assertNull(cache.getUser(WRONG_USER_VALUES.getId()));
-    }
-    
-    @Test
-    public void testAcceptInvitation() throws SmartMapClientException, Exception {
-        SmartMapClient mockNetClient = Mockito.mock(NetworkSmartMapClient.class);
-        Mockito.doReturn(ROBIN).when(mockNetClient).acceptInvitation(ROBIN.getId());
-        
-        ServiceContainer.setNetworkClient(mockNetClient);
-        
-        final Cache cache = new Cache();
-        
-        cache.putUser(ROBIN);
-        
-        InvitationContainer invitRobin = new InvitationContainer(1, ROBIN, null, Invitation.UNREAD,
-            new GregorianCalendar().getTimeInMillis(), Invitation.FRIEND_INVITATION);
-        
-        cache.putInvitation(invitRobin);
-        
-        Invitation invitation = cache.getInvitation(1);
-        
-        cache.acceptInvitation(invitation, new NetworkRequestCallback<Void>() {
-            @Override
-            public void onSuccess(Void result) {
-                assertEquals(User.FRIEND, cache.getUser(ROBIN.getId()).getFriendship());
-            }
-            
-            @Override
-            public void onFailure(Exception e) {
-                fail(); // Should not fail !
-            }
-        });
-        
-        Thread.sleep(500);
     }
 }
