@@ -62,7 +62,7 @@ public class CustomFilter extends Filter {
      */
     @Override
     public boolean update(FilterContainer filterInfos) {
-        boolean hasChanged = false;
+        boolean hasChanged = super.update(filterInfos);
 
         if ((filterInfos.getName() != null) && !filterInfos.getName().equals(mName)) {
             mName = filterInfos.getName();
@@ -73,7 +73,7 @@ public class CustomFilter extends Filter {
             hasChanged = true;
         }
 
-        return super.update(filterInfos) || hasChanged;
+        return hasChanged;
     }
 
 }

@@ -19,7 +19,7 @@ public class Notifications {
     private static final int VIBRATE_NOTIFICATION_TIME = 500;
 
     private static final int SILENT_NOTIFICATION_TIME = 100;
-    private final static long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME, SILENT_NOTIFICATION_TIME,
+    private static final long[] PATTERN = {0, VIBRATE_NOTIFICATION_TIME, SILENT_NOTIFICATION_TIME,
         VIBRATE_NOTIFICATION_TIME};
     private static long notificationID = 0;
 
@@ -133,5 +133,4 @@ public class Notifications {
             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify((int) notificationId, notification);
     }
-
 }

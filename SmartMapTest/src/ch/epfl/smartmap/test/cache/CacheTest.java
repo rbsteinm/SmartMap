@@ -8,6 +8,7 @@ import static ch.epfl.smartmap.test.database.MockContainers.POLYLAN;
 import static ch.epfl.smartmap.test.database.MockContainers.ROBIN;
 import static ch.epfl.smartmap.test.database.MockContainers.WRONG_USER_VALUES;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 
@@ -77,6 +78,8 @@ public class CacheTest extends AndroidTestCase {
         // Return image
         Mockito.doReturn(Bitmap.createBitmap(1, 2, Config.ALPHA_8)).when(correctClient)
             .getProfilePicture(JULIEN.getId());
+        Mockito.doReturn(new ArrayList<Long>()).when(correctClient)
+            .getPublicEvents(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong());
 
         // create Mock incorrect network client
         incorrectClient = Mockito.mock(NetworkSmartMapClient.class);

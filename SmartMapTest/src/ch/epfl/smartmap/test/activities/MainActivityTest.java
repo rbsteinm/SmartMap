@@ -18,8 +18,12 @@ import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.MainActivity;
 
-import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
-
+/**
+ * Test for mainActivity
+ * These tests pass one by one but not everytime you launch them all together
+ * 
+ * @author agpmilli
+ */
 public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
     public MainActivityTest() {
         super(MainActivity.class);
@@ -30,6 +34,11 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     protected void setUp() throws Exception {
         super.setUp();
         this.getActivity();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        this.getActivity().finish();
     }
 
     public void testCloseSearchViewWithBackButton() {
@@ -45,21 +54,13 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.search_panel)).check(matches(not(isDisplayed())));
     }
 
-    public void testNormalSearchQuery() {
-        onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.action_search)).perform(ViewActions.typeText("Julien Perrenoud"));
-        // TODO : Check there is only one result
-    }
-
     /**
      * Test open about activity using side menu
-     * Known issue with Drawer :
-     * https://code.google.com/p/android-test-kit/issues/detail?id=64
      */
     public void testOpenAboutMenu() {
-        openDrawer(R.id.drawer_layout);
+        onView(withId(android.R.id.home)).perform(click());
         onView(allOf(withId(R.id.side_menu_text_view), withText(R.string.about_text))).perform(click());
-        // onView(withId(R.id.about_header)).check(matches(isDisplayed()));
+        onView(withId(R.id.about_header)).check(matches(isDisplayed()));
     }
 
     public void testOpenAndCloseNotificationActivityUsingHome() {
@@ -78,39 +79,29 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
     /**
      * Test open events activity using side menu
-     * Known issue with Drawer :
-     * https://code.google.com/p/android-test-kit/issues/detail?id=64
-     * 
-     * @throws InterruptedException
      */
     public void testOpenEventMenu() throws InterruptedException {
-        openDrawer(R.id.drawer_layout);
+        onView(withId(android.R.id.home)).perform(click());
         onView(allOf(withId(R.id.side_menu_text_view), withText(R.string.events_text))).perform(click());
-        // onView(withId(R.id.show_event_header)).check(matches(isDisplayed()));
+        onView(withId(R.id.show_event_header)).check(matches(isDisplayed()));
     }
 
     /**
      * Test open filters activity using side menu
-     * Known issue with Drawer :
-     * https://code.google.com/p/android-test-kit/issues/detail?id=64
      */
     public void testOpenFilterMenu() {
-        openDrawer(R.id.drawer_layout);
+        onView(withId(android.R.id.home)).perform(click());
         onView(allOf(withId(R.id.side_menu_text_view), withText(R.string.filters_text))).perform(click());
-        pressBack();
-        // onView(withId(R.id.show_filter_header)).check(matches(isDisplayed()));
+        onView(withId(R.id.show_filter_header)).check(matches(isDisplayed()));
     }
 
     /**
      * Test open friends activity using side menu
-     * Known issue with Drawer :
-     * https://code.google.com/p/android-test-kit/issues/detail?id=64
      */
     public void testOpenFriendMenu() {
-        openDrawer(R.id.drawer_layout);
+        onView(withId(android.R.id.home)).perform(click());
         onView(allOf(withId(R.id.side_menu_text_view), withText(R.string.friends_text))).perform(click());
-        pressBack();
-        // onView(withId(R.id.friends_pager_activity)).check(matches(isDisplayed()));
+        onView(withId(R.id.friends_pager_activity)).check(matches(isDisplayed()));
     }
 
     public void testOpenNotificationActivity() {
@@ -119,32 +110,12 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     /**
-     * Test open profile activity using side menu
-     * Known issue with Drawer :
-     * https://code.google.com/p/android-test-kit/issues/detail?id=64
-     */
-    public void testOpenProfileMenu() {
-        openDrawer(R.id.drawer_layout);
-        onView(allOf(withId(R.id.side_menu_text_view), withText(R.string.profile_text))).perform(click());
-        pressBack();
-        // onView(withId(R.id.profile_header)).check(matches(isDisplayed()));
-    }
-
-    public void testOpenSearchView() {
-        onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.search_panel)).check(matches(isDisplayed()));
-    }
-
-    /**
      * Test open settings activity using side menu
-     * Known issue with Drawer :
-     * https://code.google.com/p/android-test-kit/issues/detail?id=64
      */
     public void testOpenSettingsMenu() {
-        openDrawer(R.id.drawer_layout);
+        onView(withId(android.R.id.home)).perform(click());
         onView(withText(R.string.settings_text)).perform(click());
-        pressBack();
-        // onView(withId(R.id.pref_general_offline)).check(matches(isDisplayed()));
+        onView(withText(R.string.settings_offline)).check(matches(isDisplayed()));
     }
 
     public void testOpenSideMenu() {
@@ -160,9 +131,17 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(withId(R.id.drawer_layout)).check(matches(isClosed()));
     }
 
-    public void testWrongSearchQuery() {
+    /**
+     * Test open profile activity using side menu
+     */
+    public void testZOpenProfileMenu() {
+        onView(withId(android.R.id.home)).perform(click());
+        onView(allOf(withId(R.id.side_menu_text_view), withText(R.string.profile_text))).perform(click());
+        onView(withId(R.id.profile_header)).check(matches(isDisplayed()));
+    }
+
+    public void testZOpenSearchView() {
         onView(withId(R.id.action_search)).perform(click());
-        onView(withId(R.id.action_search)).perform(ViewActions.typeText("flksdh�fjkslkfshdfljkshfd"));
-        // TODO : Check no result is displayed
+        onView(withId(R.id.search_panel)).check(matches(isDisplayed()));
     }
 }
