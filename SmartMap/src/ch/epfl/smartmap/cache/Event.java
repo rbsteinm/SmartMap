@@ -281,7 +281,7 @@ public abstract class Event implements Displayable, EventInterface {
         }
 
         if ((event.getCreator() != null) && (event.getCreator() != User.NOBODY)
-            && (event.getCreatorId() != mCreator.getId())) {
+            && (event.getCreatorContainer().getId() != mCreator.getId())) {
             mCreator = event.getCreator();
         }
 

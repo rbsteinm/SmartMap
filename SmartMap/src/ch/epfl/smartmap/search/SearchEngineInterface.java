@@ -9,8 +9,7 @@ import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
 
 /**
- * Provides a method {@code sendQuery(String query)} that returns a list of
- * Friends.
+ * Provides some useful search functions for {@code AddFriendActivity} or {@code SearchLayout}
  * 
  * @author jfperren
  */
