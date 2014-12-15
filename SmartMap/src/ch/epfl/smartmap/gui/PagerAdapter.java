@@ -7,10 +7,10 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import ch.epfl.smartmap.activities.FriendsPagerActivity;
 
 /**
- * A FragmentPagerAdapter to display two tabs in {@link FriendsPagerActivity} : a tab to display the friends,
+ * A FragmentPagerAdapter to display two tabs in FriendsPagerActivity :
+ * a tab to display the friends,
  * and a tab to display the received invitations
  * 
  * @author marion-S

@@ -74,5 +74,4 @@ public class ModifyFilterActivityTest extends ActivityInstrumentationTestCase2<M
     public void test1() {
         onView(withId(R.id.action_remove_filter)).check(matches(isDisplayed()));
     }
-
 }

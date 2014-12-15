@@ -16,8 +16,8 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
     public static final int NO_TYPE = -1;
 
     // Default Invitation
-    public static final Invitation NO_INVITATION = new GenericInvitation(NO_ID, NO_TIMESTAMP, NO_STATUS, NO_USER,
-        NO_EVENT, NO_TYPE);
+    public static final Invitation NO_INVITATION = new GenericInvitation(NO_ID, NO_TIMESTAMP, NO_STATUS,
+        NO_USER, NO_EVENT, NO_TYPE);
 
     /*
      * int representing invitation status
@@ -34,28 +34,9 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
     public static final int EVENT_INVITATION = 1;
     public static final int ACCEPTED_FRIEND_INVITATION = 2;
 
-    /**
-     * Create an invitation from a Container
-     * 
-     * @param container
-     *            container used to build the invitation
-     * @return
-     *         built invitation
-     */
-    public static Invitation createFromContainer(InvitationContainer container) {
-        long id = container.getId();
-        long timeStamp = container.getTimeStamp();
-        int status = container.getStatus();
-        User user = container.getUser();
-        Event event = container.getEvent();
-        int type = container.getType();
-
-        return new GenericInvitation(id, timeStamp, status, user, event, type);
-    }
-
     private int mStatus;
-    private final long mId;
 
+    private final long mId;
     private long mTimeStamp;
 
     /**
@@ -68,7 +49,7 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
      * @param status
      *            status of invitation
      */
-    public Invitation(long id, long timeStamp, int status) {
+    protected Invitation(long id, long timeStamp, int status) {
         if (id < 0) {
             mId = Invitation.NO_ID;
         } else {
@@ -125,16 +106,6 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
         return (int) this.getId();
     }
 
-    private boolean isLegalStatus(InvitationContainer invitation) {
-        if ((invitation.getStatus() == Invitation.ACCEPTED) || (invitation.getStatus() == Invitation.DECLINED)
-            || (invitation.getStatus() == Invitation.READ) || (invitation.getStatus() == Invitation.UNREAD)) {
-            mStatus = invitation.getStatus();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     @Override
     public String toString() {
         return "Invitation[type(" + this.getType() + "), status(" + this.getStatus() + "), timestamp("
@@ -167,5 +138,35 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
         }
 
         return hasChanged;
+    }
+
+    private boolean isLegalStatus(InvitationContainer invitation) {
+        if ((invitation.getStatus() == Invitation.ACCEPTED)
+            || (invitation.getStatus() == Invitation.DECLINED) || (invitation.getStatus() == Invitation.READ)
+            || (invitation.getStatus() == Invitation.UNREAD)) {
+            mStatus = invitation.getStatus();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Create an invitation from a Container
+     * 
+     * @param container
+     *            container used to build the invitation
+     * @return
+     *         built invitation
+     */
+    protected static Invitation createFromContainer(InvitationContainer container) {
+        long id = container.getId();
+        long timeStamp = container.getTimeStamp();
+        int status = container.getStatus();
+        User user = container.getUser();
+        Event event = container.getEvent();
+        int type = container.getType();
+
+        return new GenericInvitation(id, timeStamp, status, user, event, type);
     }
 }

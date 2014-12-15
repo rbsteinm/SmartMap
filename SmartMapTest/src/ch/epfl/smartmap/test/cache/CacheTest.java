@@ -399,23 +399,6 @@ public class CacheTest extends AndroidTestCase {
     }
 
     @Test
-    public void testUpdateFromNetworkWithCorrectEvents() throws SmartMapClientException {
-        ServiceContainer.setNetworkClient(clientForEvents);
-        ServiceContainer.setSettingsManager(mockSettings);
-        cache.updateFromNetwork(clientForEvents);
-
-        assertEquals(1, cache.getAllEvents().size());
-
-        assertNotNull(cache.getUser(JULIEN.getId()));
-        assertNotNull(cache.getUser(ALAIN.getId()));
-        assertNull(cache.getUser(ROBIN.getId()));
-
-        assertFalse(cache.getSelf().getActionImage().sameAs(User.NO_IMAGE));
-
-        assertNotNull(cache.getSelf());
-    }
-
-    @Test
     public void testUpdateFromNetworkWithCorrectUsers() throws SmartMapClientException {
         ServiceContainer.setNetworkClient(clientForUsers);
         cache.updateFromNetwork(clientForUsers);
