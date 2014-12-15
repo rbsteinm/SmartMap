@@ -74,6 +74,8 @@ public class UserInformationActivity extends Activity {
     private TextView mNameView;
     private ImageView mPictureView;
     private TextView mDistanceView;
+    private static final boolean SHOW_ON_MAP_ENABLED = false;
+    private static final boolean BLOCK_ENABLED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +116,15 @@ public class UserInformationActivity extends Activity {
         mUserId = this.getIntent().getLongExtra("USER", User.NO_ID);
         mUser = ServiceContainer.getCache().getUser(mUserId);
         this.updateInformations(mUser);
+
+        //Note: these two functionalities caused several problems, so we decided we
+        //wouldn't implement them yet. Will be fixed before google play release
+        if (!SHOW_ON_MAP_ENABLED) {
+            mShowOnMapSwitch.setVisibility(View.GONE);
+        }
+        if (!BLOCK_ENABLED) {
+            mBlockSwitch.setVisibility(View.GONE);
+        }
 
     }
 
@@ -307,7 +318,7 @@ public class UserInformationActivity extends Activity {
      */
     public void showOnMap(View view) {
         String toastString = "";
-        if (mIsVisible) {
+        if (!ServiceContainer.getCache().getDefaultFilter().getVisibleFriends().contains(mUser)) {
             ServiceContainer.getCache().putFilter(
                 ServiceContainer.getCache().getDefaultFilter().getContainerCopy().addId(mUserId));
             toastString = "user not shown on map anymore";
