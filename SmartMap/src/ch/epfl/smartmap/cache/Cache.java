@@ -803,7 +803,7 @@ public class Cache implements CacheInterface {
 
         for (final EventContainer newEvent : newEvents) {
             Log.d(TAG,
-                "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getImmCreator());
+                "putEvents, process event #" + newEvent.getId() + "with creator " + newEvent.getCreatorContainer());
             // Get id
             long eventId = newEvent.getId();
 
@@ -812,9 +812,9 @@ public class Cache implements CacheInterface {
                 eventsToUpdate.add(newEvent);
             } else {
                 // Need to add to Cache, check if contains all informations
-                if (newEvent.getImmCreator() != null) {
+                if (newEvent.getCreatorContainer() != null) {
                     eventsToAdd.add(newEvent);
-                    usersToAdd.add(newEvent.getImmCreator());
+                    usersToAdd.add(newEvent.getCreatorContainer());
                 }
             }
 
@@ -1305,7 +1305,7 @@ public class Cache implements CacheInterface {
      * @see ch.epfl.smartmap.cache.CacheInterface#removeUsers(java.util.Set)
      */
     @Override
-    public synchronized boolean removeUsers(Set<Long> userIds) {
+    public synchronized void removeUsers(Set<Long> userIds) {
         boolean isListModified = false;
 
         for (long id : userIds) {
@@ -1322,8 +1322,6 @@ public class Cache implements CacheInterface {
                 listener.onUserListUpdate();
             }
         }
-
-        return isListModified;
     }
 
     /*
@@ -1442,7 +1440,7 @@ public class Cache implements CacheInterface {
                 || onlineInfos.getParticipantIds().contains(myId)) {
                 // if so, put it in Set
                 updatedEvents.add(onlineInfos);
-                updatedUsers.add(onlineInfos.getImmCreator());
+                updatedUsers.add(onlineInfos.getCreatorContainer());
             }
         }
 
