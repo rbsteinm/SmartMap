@@ -46,24 +46,27 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
 
         FilterViewHolder viewHolder;
         final Filter filter = mItemsArrayList.get(position);
+        View newConvertView;
 
         if (convertView == null) {
             // Create inflater,get item to construct
             LayoutInflater inflater =
                 (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.gui_filter_list_item, parent, false);
+            newConvertView = inflater.inflate(R.layout.gui_filter_list_item, parent, false);
             viewHolder = new FilterViewHolder();
 
             // set view holder attributes
-            viewHolder.setFilterName((TextView) convertView.findViewById(R.id.activity_show_filters_name));
+            viewHolder.setFilterName((TextView) newConvertView.findViewById(R.id.activity_show_filters_name));
             viewHolder.setFilterId(filter.getId());
-            viewHolder.setFollowSwitch((Switch) convertView
+            viewHolder.setFollowSwitch((Switch) newConvertView
                 .findViewById(R.id.activity_show_filters_follow_switch));
-            viewHolder.setSubtitle((TextView) convertView.findViewById(R.id.activity_show_filters_subtitle));
+            viewHolder.setSubtitle((TextView) newConvertView
+                .findViewById(R.id.activity_show_filters_subtitle));
 
-            convertView.setTag(viewHolder);
+            newConvertView.setTag(viewHolder);
 
         } else {
+            newConvertView = convertView;
             viewHolder = (FilterViewHolder) convertView.getTag();
         }
 
@@ -91,7 +94,7 @@ public class FilterListItemAdapter extends ArrayAdapter<Filter> {
                 });
         }
 
-        return convertView;
+        return newConvertView;
     }
 
     /**
