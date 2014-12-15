@@ -271,10 +271,14 @@ public class ModifyFilterActivity extends Activity {
             ServiceContainer.getCache().getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
 
         for (long id : mFilter.getIds()) {
-            mFriendsInside.add(ServiceContainer.getCache().getUser(id));
+            User user = ServiceContainer.getCache().getUser(id);
+            if (!mFriendsInside.contains(user)) {
+                mFriendsInside.add(user);
+            }
+
         }
         for (User friend : ServiceContainer.getCache().getAllFriends()) {
-            if (!mFriendsInside.contains(friend)) {
+            if (!mFriendsInside.contains(friend) && !mFriendsOutside.contains(friend)) {
                 mFriendsOutside.add(friend);
             }
         }
