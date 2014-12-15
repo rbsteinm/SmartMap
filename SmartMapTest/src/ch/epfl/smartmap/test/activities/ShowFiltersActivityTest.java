@@ -1,8 +1,5 @@
 package ch.epfl.smartmap.test.activities;
 
-import static ch.epfl.smartmap.test.database.MockContainers.ALAIN_CONTAINER;
-import static ch.epfl.smartmap.test.database.MockContainers.JULIEN_CONTAINER;
-import static ch.epfl.smartmap.test.database.MockContainers.ROBIN;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onData;
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
@@ -17,16 +14,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mockito.Mockito;
-
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ShowFiltersActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.Filter;
 import ch.epfl.smartmap.cache.FilterContainer;
-import ch.epfl.smartmap.cache.User;
+import ch.epfl.smartmap.cache.UserContainer;
+import ch.epfl.smartmap.test.database.MockContainers;
 
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
@@ -34,12 +29,12 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
 public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<ShowFiltersActivity> {
 
-    Filter filter;
-    User user1;
-    User user2;
-    User user3;
-    Set<User> allFriends;
-    Set<Filter> filterSet;
+    FilterContainer filter;
+    UserContainer user1;
+    UserContainer user2;
+    UserContainer user3;
+    Set<UserContainer> allFriends;
+    Set<FilterContainer> filterSet;
 
     public ShowFiltersActivityTest() {
         super(ShowFiltersActivity.class);
@@ -48,7 +43,7 @@ public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<Sh
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        ServiceContainer.forceInitSmartMapServices(this.getActivity());
+        ServiceContainer.forceInitSmartMapServices(this.getInstrumentation().getTargetContext());
         this.createMockItems();
         this.createMockCache();
         this.getActivity();
@@ -63,15 +58,14 @@ public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<Sh
 
     public void testCanCreateFilterWithNonEmptyName() {
         onView(withId(R.id.activity_show_filters_add_button)).perform(click());
-        onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(ViewActions.typeText("Family"));
-        onView(withId(android.R.id.button2)).perform(click());
-        onView(withId(R.id.activity_show_filters_follow_switch)).check(doesNotExist());
-        // pressBack();
+        onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(ViewActions.typeText("Filter"));
+        onView(withId(android.R.id.button1)).perform(click());
+        onView(withText("Save")).check(matches(isDisplayed()));
     }
 
     public void testCannotCreateFilterWithEmptyName() {
         onView(withId(R.id.activity_show_filters_add_button)).perform(click());
-        onView(withId(android.R.id.button1)).perform(click());
+        onView(withId(android.R.id.button2)).perform(click());
         onView(withId(R.id.activity_show_filters_follow_switch)).check(
             ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
@@ -112,43 +106,23 @@ public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<Sh
         onView(withText("Activate")).check(matches(isDisplayed()));
     }
 
-    // public void testSwitchIsNotCheckedIfFilterIsNotActive(){
-    // Filter nonActiveFilter = Filter.createFromContainer(new
-    // FilterContainer(4, "Other", new HashSet<Long>(Arrays.asList((long) 2)),
-    // false));
-    // filterSet.remove(filter);
-    // this.createMockCacheWithMockFilter(nonActiveFilter);
-    // this.setActivity(this.getActivity());
-    // onView(withId(R.id.activity_show_filters_follow_switch)).check(ViewAssertions.matches((ViewMatchers.isNotChecked())));
-    // }
-
     private void createMockCache() {
-        Cache newCache = Mockito.mock(Cache.class);
-        Mockito.when(newCache.getFilter(filter.getId())).thenReturn(filter);
-        Mockito.when(newCache.getUser(user1.getId())).thenReturn(user1);
-        Mockito.when(newCache.getUser(user2.getId())).thenReturn(user2);
-        Mockito.when(newCache.getUser(user3.getId())).thenReturn(user3);
-        Mockito.when(newCache.getAllFriends()).thenReturn(allFriends);
-        Mockito.when(newCache.getAllCustomFilters()).thenReturn(filterSet);
+        Cache newCache = new Cache();
+        newCache.putFilter(filter);
+        newCache.putUser(user1);
+        newCache.putUser(user2);
+        newCache.putUser(user3);
         ServiceContainer.setCache(newCache);
     }
 
     private void createMockItems() {
-        Cache creator = new Cache();
-        creator.putUser(ALAIN_CONTAINER);
-        creator.putUser(JULIEN_CONTAINER);
-        creator.putUser(ROBIN);
-
-        FilterContainer filterContainer =
-            new FilterContainer(Filter.NO_ID, "Family", new HashSet<Long>(Arrays.asList(user1.getId())), true);
-        creator.putFilter(filterContainer);
-
-        user1 = creator.getUser(ALAIN_CONTAINER.getId());
-        user2 = creator.getUser(JULIEN_CONTAINER.getId());
-        user3 = creator.getUser(ROBIN.getId());
-        allFriends = new HashSet<User>(Arrays.asList(user1, user2, user3));
-        Filter filter = creator.getFilter(filterContainer.getId());
-        filterSet = new HashSet<Filter>();
+        user1 = MockContainers.ALAIN_CONTAINER;
+        user2 = MockContainers.JULIEN_CONTAINER;
+        user3 = MockContainers.ROBIN_CONTAINER;
+        allFriends = new HashSet<UserContainer>(Arrays.asList(user1, user2, user3));
+        filter = new FilterContainer(3, "Family", new HashSet<Long>(Arrays.asList(user1.getId())), true);
+        filterSet = new HashSet<FilterContainer>();
         filterSet.add(filter);
     }
+
 }

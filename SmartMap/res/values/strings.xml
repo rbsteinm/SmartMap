@@ -165,6 +165,7 @@
     <string name="refresh_participants_network_error">Network Error while getting participants</string>
     <string name="refresh_participants_not_found">Couldn\'t find participants</string>
     <string name="event_info_delete_button">Delete event</string>
+    <string name="event_info_toast_eventno_longer_exists">The event you are trying to see doesn\'t exist anymore, sorry.</string>
 
     <!-- Error Messages -->
     <string name="error_client_side">An error occurred on our side, sorry :(</string>
