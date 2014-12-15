@@ -6,11 +6,11 @@ import static com.google.android.apps.common.testing.ui.espresso.Espresso.pressB
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.swipeLeft;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.swipeRight;
-import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.doesNotExist;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withContentDescription;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.anything;
 
 import java.util.HashSet;
@@ -49,6 +49,8 @@ ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 	private InvitationsTab mInvitationsTab;
 	private ListView mInvitationsListView;
 
+	private static final int ESPRESSO_WAIT_DELAY = 1000;
+
 	User friend;
 	Set<User> friendSet;
 	Invitation invitation;
@@ -68,7 +70,6 @@ ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 		this.initializeMockFriendsAndInvitations();
 		this.createMockCache();
 
-		// TODO find a way to retrieve the FriendsTab fragment
 		mViewPager = (ViewPager) mActivity.findViewById(R.id.myViewPager);
 		mPagerAdapter = (PagerAdapter) mViewPager.getAdapter();
 		mFriendsTab = (FriendsTab) mPagerAdapter.getItem(0);
@@ -78,28 +79,62 @@ ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 
 	}
 
-	public void testZClickViewLeadsToFriendsInfo() {
-		//onView(withId(R.id.activity_friends_layout)).perform(click());
-		//		onView(withId(R.id.user_info_remove_button)).check(
-		//				matches(isDisplayed()));
+	public void testClickOnFriendLeadsToFriendsInfo() {
 		swipeRight();
 		onData(anything()).inAdapterView(withContentDescription("Friend list")).atPosition(0).perform(click());
-		onView(withId(R.id.activity_friends_add_button)).check(
-				(doesNotExist()));
+		//		onView(withId(R.id.activity_friends_add_button)).check(
+		//				(doesNotExist()));
+		onView(withId(R.id.user_info_remove_button)).check(
+				matches(isDisplayed()));
 		pressBack();
 	}
 
-	public void testOpenAddFriendActivity() {
+	public void testAOpenAddFriendActivity() {
 		onView(withId(R.id.activity_friends_add_button)).perform(click());
 		onView(withId(R.id.add_friend_activity_searchBar)).check(
 				matches(isDisplayed()));
 		pressBack();
 	}
 
-	public void testSwipeLeftLeadsToInvitationsTab() {
+	public void testSwipeLeftAndRight() {
 		onView(withId(R.id.myViewPager)).perform(swipeLeft());
 		onView(withId(R.id.layout_invitations_tab)).check(
 				matches(isDisplayed()));
+		onView(withId(R.id.myViewPager)).perform(swipeRight());
+		onView(withId(R.id.layout_friends_tab)).check(
+				matches(isDisplayed()));
+	}
+
+	public void testFriendsNamesAreDisplayed(){
+		onView(withText(friend.getName())).check(matches(isDisplayed()));
+	}
+
+	public void testFriendsSubtitlesAreDisplayed(){
+		onView(withText(friend.getSubtitle())).check(matches(isDisplayed()));
+	}
+
+	public void testFriendsProfilePicturesAreDisplayed(){
+		onView(withId(R.id.activity_friends_picture)).check(matches(isDisplayed()));
+	}
+
+	public void testInvitingUsersAreDisplayed(){
+		onView(withId(R.id.myViewPager)).perform(swipeLeft());
+		onView(withText(invitation.getUser().getName())).check(matches(isDisplayed()));
+		onView(withId(R.id.myViewPager)).perform(swipeRight());
+	}
+
+	public void testInvitingUsersPicturesAreDisplayed(){
+		onView(withId(R.id.myViewPager)).perform(swipeLeft());
+		onView(withId(R.id.activity_friends_inviter_picture)).check(matches(isDisplayed()));
+		onView(withId(R.id.myViewPager)).perform(swipeRight());
+	}
+
+	public void testClickOnInvitingUsersOpensDialog() throws InterruptedException{
+		onView(withId(R.id.myViewPager)).perform(swipeLeft());
+		onData(anything()).inAdapterView(withContentDescription("Invitation list")).atPosition(0).perform(click());
+		Thread.sleep(ESPRESSO_WAIT_DELAY);
+		onView(withText("accept")).check(matches(isDisplayed()));
+		onView(withId(R.id.myViewPager)).perform(swipeRight());
 	}
 
 	private void initializeMockFriendsAndInvitations() {
