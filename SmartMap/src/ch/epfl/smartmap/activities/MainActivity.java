@@ -403,6 +403,17 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     /**
+     * Zoom on item and sets Item menu
+     * 
+     * @param item
+     */
+    public void performQuery(Displayable item) {
+        // Focus on Friend & Sets menu
+        mMapZoomer.zoomWithAnimation(item.getLatLng());
+        this.setItemMenu(item);
+    }
+
+    /**
      * Sets the {@code ActionBar} to display informations about a Displayable Item. It sets the Title,
      * Subtitle and photo to those of the item.
      * 
@@ -539,6 +550,7 @@ public class MainActivity extends FragmentActivity implements CacheListener, OnI
     }
 
     private void zoomAccordingToAllMarkers() {
+
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
         allMarkers.addAll(mEventMarkerManager.getDisplayedMarkers());
 
