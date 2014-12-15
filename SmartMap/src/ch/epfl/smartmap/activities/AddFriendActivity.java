@@ -7,16 +7,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
-import android.widget.TextView;
 import android.widget.Toast;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.background.ServiceContainer;
@@ -50,11 +49,10 @@ public class AddFriendActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView listView, View view, int position, long id) {
         long userId = ((FriendViewHolder) view.getTag()).getUserId();
-        RelativeLayout rl = (RelativeLayout) view;
-        TextView tv = (TextView) rl.getChildAt(1);
-        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
-        String name = tv.getText().toString();
-        displayConfirmationDialog(this, name, userId);
+        Intent intent = new Intent(AddFriendActivity.this.getApplicationContext(), UserInformationActivity.class);
+        intent.putExtra("USER", userId);
+        this.startActivity(intent);
+        this.finish();
     }
 
     @Override
