@@ -12,127 +12,116 @@ import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMat
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.anything;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.mockito.Mockito;
-
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.FriendsPagerActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.Friend;
-import ch.epfl.smartmap.cache.Invitation;
 import ch.epfl.smartmap.cache.InvitationContainer;
-import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
-import ch.epfl.smartmap.servercom.SmartMapClientException;
 import ch.epfl.smartmap.test.database.MockContainers;
 
-public class FriendsPagerActivityTest extends ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 
-    User friend;
-    Set<User> friendSet;
-    Invitation invitation;
-    SortedSet<Invitation> invitationSet;
+public class FriendsPagerActivityTest extends
+ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 
-    public FriendsPagerActivityTest() {
-        super(FriendsPagerActivity.class);
-    }
+	UserContainer friendContainer;
+	InvitationContainer invitation;
 
-    // The standard JUnit 3 setUp method run for for every test
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        this.getActivity();
-        this.createMockCache();
+	public FriendsPagerActivityTest() {
+		super(FriendsPagerActivity.class);
+	}
 
-    }
+	// The standard JUnit 3 setUp method run for for every test
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+		ServiceContainer.forceInitSmartMapServices(this.getInstrumentation().getTargetContext());
 
-    // FIXME : cannot click on invitation in invitation list whereas can click
-    // on friend in friend list by doing the same way
-    public void ignoredtestClickOnInvitingUsersOpensDialog() throws InterruptedException {
-        onView(withId(R.id.myViewPager)).perform(swipeLeft());
-        onData(anything()).inAdapterView(withContentDescription("Friend invitation list")).atPosition(0)
-            .perform(click());
-        onView(withText("Accept")).check(matches(isDisplayed()));
-        onView(withId(R.id.myViewPager)).perform(swipeRight());
-    }
+		this.createMockItems();
+		this.createMockCache();
+		this.getActivity();
 
-    public void testAOpenAddFriendActivity() {
-        onView(withId(R.id.activity_friends_add_button)).perform(click());
-        onView(withId(R.id.add_friend_activity_searchBar)).check(matches(isDisplayed()));
-        pressBack();
-    }
+	}
 
-    public void testClickOnFriendLeadsToFriendsInfo() {
-        swipeRight();
-        onData(anything()).inAdapterView(withContentDescription("Friend list")).atPosition(0)
-            .perform(click());
-        onView(withId(R.id.user_info_remove_button)).check(matches(isDisplayed()));
-        pressBack();
-    }
+	// FIXME : cannot click on invitation in invitation list whereas can click
+	// on friend in friend list by doing the same way
+	public void ignoredtestClickOnInvitingUsersOpensDialog()
+			throws InterruptedException {
+		onView(withId(R.id.myViewPager)).perform(swipeLeft());
+		onData(anything())
+		.inAdapterView(withContentDescription("Friend invitation list"))
+		.atPosition(0).perform(click());
+		onView(withText("Accept")).check(matches(isDisplayed()));
+		onView(withId(R.id.myViewPager)).perform(swipeRight());
+	}
 
-    public void testFriendsNamesAreDisplayed() {
-        onView(withText(friend.getName())).check(matches(isDisplayed()));
-    }
+	public void testAOpenAddFriendActivity() {
+		onView(withId(R.id.activity_friends_add_button)).perform(click());
+		onView(withId(R.id.add_friend_activity_searchBar)).check(
+				matches(isDisplayed()));
+		pressBack();
+	}
 
-    public void testFriendsProfilePicturesAreDisplayed() {
-        onView(withId(R.id.activity_friends_picture)).check(matches(isDisplayed()));
-    }
+	public void testClickOnFriendLeadsToFriendsInfo() {
+		swipeRight();
+		onData(anything()).inAdapterView(withContentDescription("Friend list"))
+		.atPosition(0).perform(click());
+		onView(withId(R.id.user_info_remove_button)).check(
+				matches(isDisplayed()));
+		pressBack();
+	}
 
-    public void testFriendsSubtitlesAreDisplayed() {
-        onView(withText(friend.getSubtitle())).check(matches(isDisplayed()));
-    }
+	public void testFriendsNamesAreDisplayed() {
+		onView(withText(friendContainer.getName())).check(matches(isDisplayed()));
+	}
 
-    public void testInvitingUsersAreDisplayed() {
-        onView(withId(R.id.myViewPager)).perform(swipeLeft());
-        onView(withText(invitation.getUser().getName())).check(matches(isDisplayed()));
-        onView(withId(R.id.myViewPager)).perform(swipeRight());
-    }
+	public void testFriendsProfilePicturesAreDisplayed() {
+		onView(withId(R.id.activity_friends_picture)).check(
+				matches(isDisplayed()));
+	}
 
-    public void testInvitingUsersPicturesAreDisplayed() {
-        onView(withId(R.id.myViewPager)).perform(swipeLeft());
-        onView(withId(R.id.activity_friends_inviter_picture)).check(matches(isDisplayed()));
-        onView(withId(R.id.myViewPager)).perform(swipeRight());
-    }
+	//TODO when live instances will be ready
+	//	public void testFriendsSubtitlesAreDisplayed() {
+	//		onView(withText(friendContainer.getLocationString())).check(matches(isDisplayed()));
+	//	}
 
-    public void testSwipeLeftAndRight() {
-        onView(withId(R.id.myViewPager)).perform(swipeLeft());
-        onView(withId(R.id.layout_invitations_tab)).check(matches(isDisplayed()));
-        onView(withId(R.id.myViewPager)).perform(swipeRight());
-        onView(withId(R.id.layout_friends_tab)).check(matches(isDisplayed()));
-    }
+	public void testInvitingUsersAreDisplayed() {
+		onView(withId(R.id.myViewPager)).perform(swipeLeft());
+		onView(withText(invitation.getUser().getName())).check(
+				matches(isDisplayed()));
+		onView(withId(R.id.myViewPager)).perform(swipeRight());
+	}
 
-    private void createMockCache() throws SmartMapClientException {
-        Cache creator = new Cache();
+	public void testInvitingUsersPicturesAreDisplayed() {
+		onView(withId(R.id.myViewPager)).perform(swipeLeft());
+		onView(withId(R.id.activity_friends_inviter_picture)).check(
+				matches(isDisplayed()));
+		onView(withId(R.id.myViewPager)).perform(swipeRight());
+	}
 
-        Cache newCache = Mockito.mock(Cache.class);
+	public void testSwipeLeftAndRight() {
+		onView(withId(R.id.myViewPager)).perform(swipeLeft());
+		onView(withId(R.id.layout_invitations_tab)).check(
+				matches(isDisplayed()));
+		onView(withId(R.id.myViewPager)).perform(swipeRight());
+		onView(withId(R.id.layout_friends_tab)).check(matches(isDisplayed()));
+	}
 
-        InvitationContainer friendInvitationContainer = MockContainers.ROBIN_FRIEND_INVITATION_CONTAINER;
-        creator.putInvitation(friendInvitationContainer);
-        Invitation friendInvitation = creator.getInvitation(MockContainers.ROBIN_FRIEND_INVITATION_ID);
+	private void createMockItems() {
+		friendContainer = MockContainers.ALAIN_CONTAINER;
+		invitation = MockContainers.ROBIN_FRIEND_INVITATION_CONTAINER;
 
-        UserContainer friendContainer = MockContainers.ALAIN_CONTAINER;
-        creator.putUser(friendContainer);
-        Friend friend = (Friend) creator.getUser(MockContainers.ALAIN_ID);
+	}
 
-        friendSet = new HashSet<User>();
-        invitationSet = new TreeSet<Invitation>();
-        friendSet.add(friend);
-        invitationSet.add(friendInvitation);
+	private void createMockCache() {
+		Cache newCache = new Cache();
 
-        Mockito.when(newCache.getAllFriends()).thenReturn(friendSet);
-        Mockito.when(newCache.getUnansweredFriendInvitations()).thenReturn(invitationSet);
-        Mockito.when(newCache.getUser(2)).thenReturn(friend);
-        // Mockito.when(newCache.getDefaultFilter()).thenReturn(
-        // Filter.createFromContainer(MockContainers.FAMILY));
+		newCache.putInvitation(invitation);
+		newCache.putUser(friendContainer);
+		newCache.putFilter(MockContainers.DEFAULT_CONTAINER);
+		ServiceContainer.setCache(newCache);
 
-        ServiceContainer.setCache(newCache);
-    }
+	}
 
 }
