@@ -14,7 +14,8 @@ public class MockGenerator {
     }
 
     public static User getFriend() {
-        return new Friend(1, "Mock Friend", "", "", null, new Location("Provider"), "Not here", BlockStatus.UNBLOCKED);
+        return new Friend(1, "Mock Friend", "", "", null, new Location("Provider"), "Not here",
+            BlockStatus.UNBLOCKED);
     }
 
     public static Invitation getInvitation(int type) {
@@ -26,6 +27,7 @@ public class MockGenerator {
             return new GenericInvitation(2, 3, Invitation.UNREAD, getFriend(), null, type);
         } else {
             return null;
+
         }
     }
 

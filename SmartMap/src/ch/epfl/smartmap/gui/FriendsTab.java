@@ -28,9 +28,6 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
 
 public class FriendsTab extends ListFragment {
 
-    @SuppressWarnings("unused")
-    private static final String TAG = FriendsTab.class.getSimpleName();
-
     private List<User> mFriendList;
 
     private final Context mContext;
