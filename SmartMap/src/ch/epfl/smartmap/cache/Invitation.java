@@ -49,7 +49,7 @@ public abstract class Invitation implements InvitationInterface, Comparable<Invi
      * @param status
      *            status of invitation
      */
-    public Invitation(long id, long timeStamp, int status) {
+    protected Invitation(long id, long timeStamp, int status) {
         if (id < 0) {
             mId = Invitation.NO_ID;
         } else {
