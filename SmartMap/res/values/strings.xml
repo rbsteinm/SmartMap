@@ -107,7 +107,7 @@
     <!-- FriendsPagerActivity -->
     <string name="title_activity_pager">Friends</string>
     <string name="friend_list">Friend list</string>
-    <string name="friend_invitations_list">Invitation list</string>
+    <string name="friends_invitations_list">Friend invitation list</string>
 
     <!-- ShowEventsActivity -->
     <string name="title_activity_show_events">Events</string>
