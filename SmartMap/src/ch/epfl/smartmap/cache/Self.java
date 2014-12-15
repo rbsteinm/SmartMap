@@ -14,14 +14,15 @@ import com.google.android.gms.maps.model.LatLng;
 public class Self extends User {
 
     /**
-     * Constructor. Constructs a new {@code User} based on info from the {@code SettingsManager}
+     * Constructor. Constructs a new {@code User} based on info from the
+     * {@code SettingsManager}
      * 
      * @param image
      *            The user's profile picture
      */
-    public Self(Bitmap image) {
-        super(ServiceContainer.getSettingsManager().getUserId(), ServiceContainer.getSettingsManager()
-            .getUserName(), image);
+    protected Self(Bitmap image) {
+        super(ServiceContainer.getSettingsManager().getUserId(), ServiceContainer.getSettingsManager().getUserName(),
+            image);
     }
 
     /*
@@ -72,7 +73,8 @@ public class Self extends User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerIcon(android.content.Context)
+     * @see
+     * ch.epfl.smartmap.cache.Displayable#getMarkerIcon(android.content.Context)
      */
     @Override
     public BitmapDescriptor getMarkerIcon(Context context) {

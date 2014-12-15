@@ -12,7 +12,6 @@ import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,8 +32,10 @@ import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 
 /**
- * An activity that allows to modify a filter: add or remove people, rename filter, remove filter. The action
- * of adding/removing a friend from the filter is done by drag and drop between two lists.
+ * An activity that allows to modify a filter: add or remove people, rename
+ * filter, remove filter. The action
+ * of adding/removing a friend from the filter is done by drag and drop between
+ * two lists.
  * 
  * @author marion-S
  */
@@ -213,8 +214,8 @@ public class ModifyFilterActivity extends Activity {
     }
 
     /**
-     * An utility method to convert a friend list to a set of corresponding ids, because the {@code Cache}
-     * methods
+     * An utility method to convert a friend list to a set of corresponding ids,
+     * because the {@code Cache} methods
      * uses sets of ids.
      * 
      * @param friendList
@@ -264,11 +265,10 @@ public class ModifyFilterActivity extends Activity {
     }
 
     /**
-     * Set the filter that the activity displays by retrieving its id from the starting intent and using the
-     * {@code Cache}
+     * Set the filter that the activity displays by retrieving its id from the
+     * starting intent and using the {@code Cache}
      */
     private void setFilter() {
-        Log.d("Filter", "Try to get filter number : " + this.getIntent().getLongExtra("FILTER", 89));
         mFilter =
             ServiceContainer.getCache().getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
 
@@ -287,7 +287,8 @@ public class ModifyFilterActivity extends Activity {
     }
 
     /**
-     * Updates the inside and outside filter lists when an item is dragged from the outside list and dropped
+     * Updates the inside and outside filter lists when an item is dragged from
+     * the outside list and dropped
      * into the inside list, i.e when a friend is added to the filter
      * 
      * @param droppedItem
@@ -309,7 +310,8 @@ public class ModifyFilterActivity extends Activity {
     }
 
     /**
-     * Updates the inside and outside filter lists when an item is dragged from the inside list and dropped
+     * Updates the inside and outside filter lists when an item is dragged from
+     * the inside list and dropped
      * into the outside list, i.e when a friend is removed from the filter
      * 
      * @param droppedItem

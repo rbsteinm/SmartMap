@@ -13,7 +13,8 @@ import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.cache.User;
 
 /**
- * Displays each user in a row. The friend items are clickable to signify they are invited. Use ViewHolder
+ * Displays each user in a row. The friend items are clickable to signify they
+ * are invited. Use ViewHolder
  * pattern as in {@link ch.epfl.smartmap.gui.EventsListItemAdapter}.
  * 
  * @author SpicyCH
@@ -65,10 +66,12 @@ public class FriendPickerListAdapter extends ArrayAdapter<User> {
     }
 
     /**
-     * A <code>ViewHolder</code> to store views and avoid useless findViewById().
+     * A <code>ViewHolder</code> to store views and avoid useless
+     * findViewById().
      * 
      * @see <a
-     *      href="http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder">developer.android</a>
+     *      href="http://developer.android.com/training/improving-layouts/smooth-scrolling.html#ViewHolder">
+     *      developer.android</a>
      */
     public static class ViewHolder {
         private TextView mName;

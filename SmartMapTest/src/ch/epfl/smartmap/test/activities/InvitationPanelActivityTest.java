@@ -20,7 +20,8 @@ import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Invitation;
-import ch.epfl.smartmap.cache.MockGenerator;
+import ch.epfl.smartmap.cache.InvitationContainer;
+import ch.epfl.smartmap.test.database.MockContainers;
 
 public class InvitationPanelActivityTest extends
 
@@ -37,9 +38,17 @@ ActivityInstrumentationTestCase2<MainActivity> {
         this.getActivity();
         Cache newCache = Mockito.mock(Cache.class);
         SortedSet<Invitation> newSortedSet = new TreeSet<Invitation>();
-        Invitation newEventInvitation = MockGenerator.getInvitation(Invitation.EVENT_INVITATION);
-        Invitation newAcceptedFriendInvitation = MockGenerator.getInvitation(Invitation.ACCEPTED_FRIEND_INVITATION);
-        Invitation newFriendInvitation = MockGenerator.getInvitation(Invitation.FRIEND_INVITATION);
+        InvitationContainer newEventInvitationContainer = MockContainers.POLYLAN_EVENT_INVITATION;
+        newCache.putInvitation(newEventInvitationContainer);
+        InvitationContainer newFriendInvitationContainer = MockContainers.ROBIN_FRIEND_INVITATION;
+        newCache.putInvitation(newFriendInvitationContainer);
+        InvitationContainer newAcceptedFriendInvitationContainer = MockContainers.ROBIN_FRIEND_ACCEPTED_INVITATION;
+        newCache.putInvitation(newAcceptedFriendInvitationContainer);
+
+        Invitation newEventInvitation = newCache.getInvitation(MockContainers.POLYLAN_EVENT_INVITATION_ID);
+        Invitation newAcceptedFriendInvitation =
+            newCache.getInvitation(MockContainers.ROBIN_FRIEND_ACCEPTED_INVITATION_ID);
+        Invitation newFriendInvitation = newCache.getInvitation(MockContainers.ROBIN_FRIEND_INVITATION_ID);
         newSortedSet.add(newEventInvitation);
         newSortedSet.add(newFriendInvitation);
         newSortedSet.add(newAcceptedFriendInvitation);

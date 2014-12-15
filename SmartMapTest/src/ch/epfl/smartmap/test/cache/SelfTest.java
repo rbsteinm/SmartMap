@@ -4,70 +4,62 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.location.Location;
 import android.test.AndroidTestCase;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
-import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Self;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
+import ch.epfl.smartmap.test.database.MockContainers;
 
 /**
  * @author jfperren
  * @author ritterni
  */
 public class SelfTest extends AndroidTestCase {
-
-    long selfId = 5;
-    String name = "Julien";
-    String phoneNumber = "0217465647";
-    String email = "julien@epfl.ch";
-    Bitmap image = Bitmap.createBitmap(1, 1, Config.ALPHA_8);
-    Location location = new Location(Displayable.PROVIDER_NAME);
-    double latitude = 43.54574354;
-    double longitude = 23.5479584;
-    long lastSeen = 47587985;
+    Location location;
     String locationName = "Ecublens";
     UserContainer selfValues;
 
     @Before
     @Override
     protected void setUp() {
-        location.setLatitude(latitude);
-        location.setLongitude(longitude);
+        location.setLatitude(MockContainers.JULIEN_LATITUDE);
+        location.setLongitude(MockContainers.JULIEN_LONGITUDE);
 
         SettingsManager settings = Mockito.mock(SettingsManager.class);
-        Mockito.when(settings.getUserId()).thenReturn(selfId);
-        Mockito.when(settings.getUserName()).thenReturn(name);
-        Mockito.when(settings.getUPhoneNumber()).thenReturn(phoneNumber);
-        Mockito.when(settings.getEmail()).thenReturn(email);
-        Mockito.when(settings.getLocation()).thenReturn(location);
-        Mockito.when(settings.getLastSeen()).thenReturn(lastSeen);
+        Mockito.when(settings.getUserId()).thenReturn(MockContainers.JULIEN_ID);
+        Mockito.when(settings.getUserName()).thenReturn(MockContainers.JULIEN_NAME);
+        Mockito.when(settings.getUPhoneNumber()).thenReturn(MockContainers.JULIEN_PHONE_NUMBER);
+        Mockito.when(settings.getEmail()).thenReturn(MockContainers.JULIEN_EMAIL);
+        Mockito.when(settings.getLocation()).thenReturn(MockContainers.JULIEN_LOCATION);
+        Mockito.when(settings.getLastSeen()).thenReturn(MockContainers.JULIEN_LAST_SEEN);
         Mockito.when(settings.getContext()).thenReturn(this.getContext());
-        Mockito.when(settings.getLocationName()).thenReturn(locationName);
+        Mockito.when(settings.getLocationName()).thenReturn(MockContainers.JULIEN_LOCATION_STRING);
         ServiceContainer.setSettingsManager(settings);
+        ServiceContainer.getCache().putUser(MockContainers.JULIEN);
     }
 
     @Test
     public void testReturnSettingsValues() {
-        Self self = new Self(image);
-        assertTrue(self.getLatLng().latitude == latitude);
-        assertTrue(self.getLatLng().longitude == longitude);
-        assertTrue(self.getLocation().getLongitude() == longitude);
-        assertTrue(self.getLocation().getLatitude() == latitude);
+        Self self =
+            (Self) ServiceContainer.getCache().getUser(ServiceContainer.getSettingsManager().getUserId());
+        assertTrue(self.getLatLng().latitude == MockContainers.JULIEN_LATITUDE);
+        assertTrue(self.getLatLng().longitude == MockContainers.JULIEN_LONGITUDE);
+        assertTrue(self.getLocation().getLongitude() == MockContainers.JULIEN_LATITUDE);
+        assertTrue(self.getLocation().getLatitude() == MockContainers.JULIEN_LONGITUDE);
         assertTrue(self.getLocationString().equals(locationName));
         assertTrue(self.getSubtitle().equals("You are near " + locationName));
     }
 
     @Test
     public void testSelfConstruction() {
-        Self self = new Self(image);
-        assertTrue(self.getId() == selfId);
-        assertTrue(self.getName().equals(name));
-        assertTrue(self.getActionImage().sameAs(image));
+        Self self =
+            (Self) ServiceContainer.getCache().getUser(ServiceContainer.getSettingsManager().getUserId());
+        assertTrue(self.getId() == MockContainers.JULIEN_ID);
+        assertTrue(self.getName().equals(MockContainers.JULIEN_NAME));
+        assertTrue(self.getActionImage().sameAs(MockContainers.JULIEN_IMAGE));
         assertTrue(self.getBlockStatus().equals(User.BlockStatus.UNBLOCKED));
         assertTrue(self.getFriendship() == User.SELF);
     }

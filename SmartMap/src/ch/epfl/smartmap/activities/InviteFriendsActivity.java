@@ -24,52 +24,81 @@ import ch.epfl.smartmap.gui.FriendPickerListAdapter;
  * This activity lets the user invite friends to an event. Launched from
  * {@link ch.epfl.smartmap.activities.EventInformationActivity} or the search
  * panel.
- * 
+ *
  * @author SpicyCH
  */
 public class InviteFriendsActivity extends ListActivity {
 
-    /**
-     * Callback
-     * 
-     * @author SpicyCH
-     */
-    class InviteFriendsCallback implements NetworkRequestCallback<Void> {
-        @Override
-        public void onFailure(Exception e) {
-            InviteFriendsActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(InviteFriendsActivity.this,
-                        InviteFriendsActivity.this.getString(R.string.invite_friends_failure), Toast.LENGTH_SHORT)
-                        .show();
-                }
-            });
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-            InviteFriendsActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(InviteFriendsActivity.this,
-                        InviteFriendsActivity.this.getString(R.string.invite_friends_success), Toast.LENGTH_SHORT)
-                        .show();
-                }
-            });
-        }
-    }
-
     private static final String TAG = InviteFriendsActivity.class.getSimpleName();
+
     private FriendPickerListAdapter mAdapter;
     private List<Boolean> mSelectedPositions;
-
     private List<User> mUserList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.activity_invite_friends);
+
+        ServiceContainer.initSmartMapServices(this);
+
+        this.getActionBar().setHomeButtonEnabled(true);
+        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+
+        this.setAdapter();
+
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        if (!mSelectedPositions.get(position)) {
+            Log.d(TAG, "Friend at position " + position + " set to true");
+
+            mSelectedPositions.set(position, true);
+            v.setBackgroundColor(this.getResources().getColor(R.color.on_friend_clicked));
+        } else {
+            Log.d(TAG, "Friend at position " + position + " set to false");
+
+            mSelectedPositions.set(position, false);
+            v.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.getMenuInflater().inflate(R.menu.invite_friends, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            case android.R.id.home:
+                this.onBackPressed();
+                break;
+            case R.id.invite_friend_send_button:
+                this.inviteFriends();
+                this.finish();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     /**
      * Invites the selected friends. Displays a toast describing if the
      * invitations were sent or not.
-     * 
+     *
      * @author SpicyCH
      */
     private void inviteFriends() {
@@ -103,69 +132,9 @@ public class InviteFriendsActivity extends ListActivity {
 
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_invite_friends);
-
-        ServiceContainer.initSmartMapServices(this);
-
-        this.getActionBar().setHomeButtonEnabled(true);
-        this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
-
-        this.setAdapter();
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.invite_friends, menu);
-        return true;
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        if (!mSelectedPositions.get(position)) {
-            Log.d(TAG, "Friend at position " + position + " set to true");
-
-            mSelectedPositions.set(position, true);
-            v.setBackgroundColor(this.getResources().getColor(R.color.on_friend_clicked));
-        } else {
-            Log.d(TAG, "Friend at position " + position + " set to false");
-
-            mSelectedPositions.set(position, false);
-            v.setBackgroundColor(Color.TRANSPARENT);
-        }
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                return true;
-            case android.R.id.home:
-                this.finish();
-                break;
-            case R.id.invite_friend_send_button:
-                this.inviteFriends();
-                this.finish();
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     /**
      * Sets the list adapter of this class.
-     * 
+     *
      * @author SpicyCH
      */
     private void setAdapter() {
@@ -182,5 +151,36 @@ public class InviteFriendsActivity extends ListActivity {
         // Create custom Adapter and pass it to the Activity.
         mAdapter = new FriendPickerListAdapter(this, mUserList);
         this.setListAdapter(mAdapter);
+    }
+
+    /**
+     * Callback
+     *
+     * @author SpicyCH
+     */
+    class InviteFriendsCallback implements NetworkRequestCallback<Void> {
+        @Override
+        public void onFailure(Exception e) {
+            InviteFriendsActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(InviteFriendsActivity.this,
+                        InviteFriendsActivity.this.getString(R.string.invite_friends_failure), Toast.LENGTH_SHORT)
+                        .show();
+                }
+            });
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+            InviteFriendsActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(InviteFriendsActivity.this,
+                        InviteFriendsActivity.this.getString(R.string.invite_friends_success), Toast.LENGTH_SHORT)
+                        .show();
+                }
+            });
+        }
     }
 }

@@ -26,8 +26,9 @@ import ch.epfl.smartmap.gui.FriendListItemAdapter;
 import ch.epfl.smartmap.gui.FriendListItemAdapter.FriendViewHolder;
 
 /**
- * This Activity displays a list of users from the DB and lets you send them friend requests
- *
+ * This Activity displays a list of users from the DB and lets you send them
+ * friend requests
+ * 
  * @author rbsteinm
  */
 public class AddFriendActivity extends ListActivity {
@@ -41,15 +42,16 @@ public class AddFriendActivity extends ListActivity {
 
         ServiceContainer.initSmartMapServices(this);
 
-
         // Set action bar color to main color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
     }
 
     @Override
     protected void onListItemClick(ListView listView, View view, int position, long id) {
         long userId = ((FriendViewHolder) view.getTag()).getUserId();
-        Intent intent = new Intent(AddFriendActivity.this.getApplicationContext(), UserInformationActivity.class);
+        Intent intent =
+            new Intent(AddFriendActivity.this.getApplicationContext(), UserInformationActivity.class);
         intent.putExtra("USER", userId);
         this.startActivity(intent);
         this.finish();
@@ -79,7 +81,8 @@ public class AddFriendActivity extends ListActivity {
     }
 
     /**
-     * sets a listener on the searchbar that updates the views (users) displayed every time the text chnanges or is
+     * sets a listener on the searchbar that updates the views (users) displayed
+     * every time the text chnanges or is
      * submitted
      */
     private void setSearchBarListener() {
@@ -100,7 +103,7 @@ public class AddFriendActivity extends ListActivity {
 
     /**
      * Display a confirmation dialog.
-     *
+     * 
      * @param name
      * @param userId
      */
@@ -112,13 +115,12 @@ public class AddFriendActivity extends ListActivity {
         // Add positive button
         builder.setPositiveButton(activity.getResources().getString(R.string.add),
             new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                // invite friend
-                ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback(activity));
-            }
-        });
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // invite friend
+                    ServiceContainer.getCache().inviteUser(userId, new AddFriendCallback(activity));
+                }
+            });
         // Add negative button
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -133,7 +135,7 @@ public class AddFriendActivity extends ListActivity {
 
     /**
      * Callback that describes connection with network
-     *
+     * 
      * @author agpmilli
      */
     private static class AddFriendCallback implements NetworkRequestCallback<Void> {
@@ -170,7 +172,7 @@ public class AddFriendActivity extends ListActivity {
 
     /**
      * Callback that describes connection with SearchRequest
-     *
+     * 
      * @author Pamoi
      */
     private class FindFriendsCallback implements SearchRequestCallback<Set<User>> {

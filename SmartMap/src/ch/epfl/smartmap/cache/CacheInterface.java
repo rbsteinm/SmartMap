@@ -243,8 +243,6 @@ interface CacheInterface {
 
     void inviteUser(long id, NetworkRequestCallback<Void> callback);
 
-    void logState();
-
     void modifyOwnEvent(EventContainer createdEvent, NetworkRequestCallback<Void> callback);
 
     void notifyEventListeners();

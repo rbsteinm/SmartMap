@@ -27,6 +27,7 @@ import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
+
 public class ShowFiltersActivityTest extends
 ActivityInstrumentationTestCase2<ShowFiltersActivity> {
 
@@ -132,4 +133,5 @@ ActivityInstrumentationTestCase2<ShowFiltersActivity> {
 		filterSet = new HashSet<FilterContainer>();
 		filterSet.add(filter);
 	}
+
 }
