@@ -2,13 +2,11 @@ package ch.epfl.smartmap.cache;
 
 import java.util.Set;
 
-import android.util.Log;
-import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 
 /**
  * Class to represent the default filter, that contains all the friends for whom the user enabled the show on
- * map feature in {@link UserInformationActivity} . This filter is not visible to the user
+ * map feature in {@code UserInformationActivity} . This filter is not visible to the user
  * and is used for programming
  * purposes. This should not be instanciated directly, but from the method
  * {@code Filter.createFromContainer(...)}
@@ -31,7 +29,6 @@ public class DefaultFilter extends Filter {
      */
     @Override
     public String getName() {
-        Log.d("Filter", "Return default name");
         return "Default Filter (this shouldn't be displayed)";
     }
 
@@ -43,8 +40,6 @@ public class DefaultFilter extends Filter {
     public Set<Long> getVisibleFriends() {
         Set<Long> nonBlockedFriends = ServiceContainer.getCache().getFriendIds();
         nonBlockedFriends.removeAll(this.getIds());
-        Log.d("Default", "excluded : " + this.getIds());
-        Log.d("Default", "visible : " + nonBlockedFriends);
         return nonBlockedFriends;
     }
 

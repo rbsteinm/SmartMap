@@ -15,7 +15,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Represents a filter in the application SmartMap
+ * Represents an User filter in the application SmartMap
  * 
  * @author agpmilli
  */
@@ -27,6 +27,8 @@ public abstract class Filter implements FilterInterface {
 
     // Default values
     public static final long NO_ID = -1;
+    public static final String NO_NAME = "Unknown filter";
+    public static final Set<Long> NO_IDS = new HashSet<Long>();
     public static final Bitmap DEFAULT_WHITE_IMAGE = BitmapFactory.decodeResource(ServiceContainer
         .getSettingsManager().getContext().getResources(), R.drawable.ic_filter_white);
     public static final Bitmap DEFAULT_BLUE_IMAGE = BitmapFactory.decodeResource(ServiceContainer
@@ -39,14 +41,16 @@ public abstract class Filter implements FilterInterface {
      * Constructor
      * 
      * @param id
+     *            Id of the Filter
      * @param ids
+     *            Ids contained in the Filter
      */
     protected Filter(long id, Set<Long> ids) {
         if (id < 0) {
             throw new IllegalArgumentException();
         }
-        mId = id;
-        mIds = new HashSet<Long>(ids);
+        mId = (id >= 0) ? id : Filter.NO_ID;
+        mIds = (ids != null) ? new HashSet<Long>(ids) : Filter.NO_IDS;
     }
 
     /*
@@ -56,6 +60,15 @@ public abstract class Filter implements FilterInterface {
     @Override
     public Bitmap getActionImage() {
         return Filter.DEFAULT_WHITE_IMAGE;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.FilterInterface#getImmutableCopy()
+     */
+    @Override
+    public FilterContainer getContainerCopy() {
+        return new FilterContainer(this.getId(), this.getName(), this.getIds(), this.isActive());
     }
 
     /*
@@ -74,15 +87,6 @@ public abstract class Filter implements FilterInterface {
     @Override
     public Set<Long> getIds() {
         return new HashSet<Long>(mIds);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.FilterInterface#getImmutableCopy()
-     */
-    @Override
-    public FilterContainer getContainerCopy() {
-        return new FilterContainer(this.getId(), this.getName(), this.getIds(), this.isActive());
     }
 
     /*

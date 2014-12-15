@@ -27,7 +27,6 @@ public class SettingsManager {
     public static final String TOKEN = "Token";
     public static final String FB_ID = "FacebookID";
     public static final String COOKIE = "Cookie";
-    public static final String HIDDEN = "Hidden";
     public static final String LONGITUDE = "Longitude";
     public static final String LATITUDE = "Latitude";
     public static final String LOCATION_NAME = "LocName";
@@ -156,11 +155,10 @@ public class SettingsManager {
         }
 
         GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTimeInMillis(ServiceContainer.getSettingsManager().getLastSeen());
+        calendar.setTimeInMillis(this.getLastSeen());
 
         return Utils.getLastSeenStringFromCalendar(calendar) + " "
-            + ServiceContainer.getSettingsManager().getContext().getString(R.string.settings_manager_near)
-            + " " + this.getLocationName();
+            + this.getContext().getString(R.string.settings_manager_near) + " " + this.getLocationName();
     }
 
     /**
@@ -201,13 +199,6 @@ public class SettingsManager {
      */
     public String getUserName() {
         return mSharedPref.getString(USER_NAME, defaultName);
-    }
-
-    /**
-     * @return True if hidden mode is enabled
-     */
-    public boolean isHidden() {
-        return mSharedPref.getBoolean(HIDDEN, false);
     }
 
     /**
@@ -320,18 +311,6 @@ public class SettingsManager {
      */
     public boolean setFacebookID(long newID) {
         mEditor.putLong(FB_ID, newID);
-        return mEditor.commit();
-    }
-
-    /**
-     * Sets whether or not the local user is in hidden mode.
-     * 
-     * @param isHidden
-     *            True to enable hidden mode
-     * @return True if the new value was successfully saved
-     */
-    public boolean setHidden(boolean isHidden) {
-        mEditor.putBoolean(HIDDEN, isHidden);
         return mEditor.commit();
     }
 

@@ -91,7 +91,7 @@
     <string name="resolved">Error resolved. Please re-try operation.</string>
     <string name="no_resolution">Google Play services: unable to resolve connection error.</string>
     <string name="periodic_update_stop">Stopping periodic updates</string>
-    <string name="play_services_available">Google Play services is available</string>
+    <string name="play_services_available">Google Play services are available</string>
     <string name="request_location_updates_in_progress">        Can\'t request location updates, previous request hasn\'t finished</string>
     <string name="start_updates">Start Updates</string>
     <string name="stop_updates">Stop Updates</string>
@@ -115,7 +115,7 @@
     <string name="show_event_cannot_retrieve_current_location">Your current location cannot be retrieved. Please try again!</string>
     <string name="show_event_details_button">See details</string>
     <string name="show_event_server_error">Couldn\'t fetch wished content from our server</string>
-    <string name="show_event_loading_info">Loading informations…</string>
+    <string name="show_event_loading_info">Loading information…</string>
     <string name="show_events_menu_refresh">Refresh</string>
     <string name="ten_letters">aaaaaaaaaa</string>
     <string name="show_event_default_seekbar_text">45 km</string>
@@ -206,7 +206,7 @@
     <string name="fb_fragment_toast_cannot_connect_to_internet">Your internet connection seems down. Please try again!</string>
 
     <!-- UserInformationActivity -->
-    <string name="title_activity_user_information">Friend Informations</string>
+    <string name="title_activity_user_information">Friend Information</string>
     <string name="user_information_picture_description">Profile Picture</string>
     <string name="title_activity_search">SearchActivity</string>
     <string name="remove_friend_failure">Error while trying to remove a friend</string>
@@ -243,7 +243,7 @@
     <!-- Invitation Subtitles -->
     <string name="invitation_click_here_to_open_your_list_of_invitations">Click here to open your list of invitations.</string>
     <string name="invitation_click_here_to_see_the_event">Click here to see the event.</string>
-    <string name="invitation_click_here_for_informations">Click here for informations.</string>
+    <string name="invitation_click_here_for_informations">Click here for more information.</string>
     <string name="invitation_accepted">Accepted</string>
     <string name="invitation_declined">Declined</string>
 
@@ -267,6 +267,10 @@
     <string name="switch_On">YES</string>
     <string name="switch_Off">NO</string>
     <string name="people_inside_filter">people inside this filter</string>
+    <string name="new_filter">New Filter</string>
+    <string name="create_filter">Create</string>
+    <string name="cancel_create_filter">Cancel</string>
+    <string name="create_filter_empty_name">Enter a non empty name</string>
 
     <!-- ModifyFilterActivity -->
     <string name="title_activity_modify_filter">ModifyFilterActivity</string>
@@ -365,6 +369,10 @@
     <string name="yes_accept">Yes, accept</string>
     <string name="no_decline">No, decline</string>
     <string name="decline_confirm">Invitation declined.</string>
+    
+    <!-- AddEventOnMapLongClickListener -->
+    <string name="map_long_clicked_dialog_title">Do you really want to create an event at this position?</string>
+    <string name="map_long_clicked_dialog_message">This dialog is triggered by a long click on the map.</string>
 
     <!-- Nothing below this line! -->
 

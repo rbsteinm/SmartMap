@@ -8,7 +8,12 @@ package ch.epfl.smartmap.cache;
  */
 public interface Stockable {
 
+    // Default value
     long NO_ID = -1;
 
+    /**
+     * @return the unique ID of this object, as set on the Server (or inside the Database for Filters and
+     *         Invitations)
+     */
     long getId();
 }

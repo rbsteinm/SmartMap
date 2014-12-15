@@ -30,15 +30,14 @@ public abstract class Event implements Displayable, EventInterface {
 
     public static final String TAG = Event.class.getSimpleName();
 
+    // Default values
     public static final String NO_NAME = "Unknown Event";
     public static final String NO_DESCRIPTION = "This event currently has no description";
-
     public static final Calendar NO_START_DATE = GregorianCalendar.getInstance(TimeZone.getDefault());
     public static final Calendar NO_END_DATE = GregorianCalendar.getInstance(TimeZone.getDefault());
-
     public static final Set<User> NO_PARTICIPANTS = new HashSet<User>();
     public static final Set<Long> NO_PARTICIPANTIDS = new HashSet<Long>();
-
+    // Default image
     public static final Bitmap DEFAULT_WHITE_IMAGE = BitmapFactory.decodeResource(ServiceContainer
         .getSettingsManager().getContext().getResources(), R.drawable.ic_event_white);
     public static final Bitmap DEFAULT_BLUE_IMAGE = BitmapFactory.decodeResource(ServiceContainer
@@ -46,14 +45,13 @@ public abstract class Event implements Displayable, EventInterface {
 
     private final long mId;
     private String mName;
+    private User mCreator;
     private Set<Long> mParticipantIds;
     private Calendar mStartDate;
     private Calendar mEndDate;
     private Location mLocation;
     private String mDescription;
     private String mLocationString;
-
-    private final User mCreator;
 
     /**
      * Constructor
@@ -98,6 +96,17 @@ public abstract class Event implements Displayable, EventInterface {
             && (this.getId() == ((Event) obj).getId());
     }
 
+    @Override
+    public Bitmap getActionImage() {
+        return Event.DEFAULT_WHITE_IMAGE;
+    }
+
+    @Override
+    public EventContainer getContainerCopy() {
+        return new EventContainer(mId, mName, mCreator.getContainerCopy(), mDescription, mStartDate,
+            mEndDate, mLocation, mLocationString, mParticipantIds);
+    }
+
     /*
      * (non-Javadoc)
      * @see ch.epfl.smartmap.cache.Event#getCreator()
@@ -120,17 +129,6 @@ public abstract class Event implements Displayable, EventInterface {
     @Override
     public long getId() {
         return mId;
-    }
-
-    @Override
-    public Bitmap getActionImage() {
-        return Event.DEFAULT_WHITE_IMAGE;
-    }
-
-    @Override
-    public EventContainer getContainerCopy() {
-        return new EventContainer(mId, mName, mCreator.getContainerCopy(), mDescription, mStartDate,
-            mEndDate, mLocation, mLocationString, mParticipantIds);
     }
 
     /*
@@ -270,42 +268,86 @@ public abstract class Event implements Displayable, EventInterface {
 
     @Override
     public boolean update(EventContainer event) {
-        // TODO Modify hasChanged to work correctly
         boolean hasChanged = false;
 
-        if ((event.getName() != null) && !event.getName().equals("") && (event.getName() != Event.NO_NAME)) {
-            hasChanged = true;
+        if (event.getId() != mId) {
+            throw new IllegalArgumentException("Cannot update an Event with a different ID !");
+        }
+
+        if ((event.getName() != null) && !event.getName().equals("") && (event.getName() != Event.NO_NAME)
+            && !event.getName().equals(mName)) {
             mName = event.getName();
+            hasChanged = true;
         }
 
-        if (event.getStartDate() != null) {
+        if ((event.getCreator() != null) && (event.getCreator() != User.NOBODY)
+            && (event.getCreatorContainer().getId() != mCreator.getId())) {
+            mCreator = event.getCreator();
+        }
+
+        if ((event.getCreatorContainer() != null) && (event.getCreatorContainer().getId() != User.NO_ID)
+            && (event.getCreatorContainer().getId() != mCreator.getId())) {
+            ServiceContainer.getCache().putUser(event.getCreatorContainer());
+            if (ServiceContainer.getCache().getUser(event.getCreatorContainer().getId()) != null) {
+                mCreator = ServiceContainer.getCache().getUser(event.getCreatorContainer().getId());
+                hasChanged = true;
+            }
+        }
+
+        if ((event.getStartDate() != null)
+            && (event.getStartDate().getTimeInMillis() != Event.NO_START_DATE.getTimeInMillis())
+            && (event.getStartDate().getTimeInMillis() != mStartDate.getTimeInMillis())) {
             mStartDate = (Calendar) event.getStartDate().clone();
+            hasChanged = true;
         }
 
-        if (event.getStartDate() != null) {
+        if ((event.getEndDate() != null)
+            && (event.getEndDate().getTimeInMillis() != Event.NO_END_DATE.getTimeInMillis())
+            && (event.getEndDate().getTimeInMillis() != mEndDate.getTimeInMillis())) {
             mEndDate = (Calendar) event.getEndDate().clone();
+            hasChanged = true;
         }
 
-        if ((event.getLocation() != null) && (event.getLocation() != Event.NO_LOCATION)) {
+        if ((event.getLocation() != null)
+            && (event.getLocation() != Event.NO_LOCATION)
+            && ((event.getLocation().getLatitude() != mLocation.getLatitude()) || (event.getLocation()
+                .getLongitude() != mLocation.getLongitude()))) {
             mLocation = new Location(event.getLocation());
+            hasChanged = true;
         }
 
-        if ((event.getLocationString() != null) && (event.getLocationString() != Event.NO_LOCATION_STRING)) {
+        if ((event.getLocationString() != null) && (event.getLocationString() != Event.NO_LOCATION_STRING)
+            && !event.getLocationString().equals(mLocationString)) {
             mLocationString = event.getLocationString();
+            hasChanged = true;
         }
 
-        if ((event.getDescription() == null) && (event.getDescription() != Event.NO_DESCRIPTION)) {
+        if ((event.getDescription() == null) && (event.getDescription() != Event.NO_DESCRIPTION)
+            && !event.getDescription().equals(mDescription)) {
             mDescription = event.getDescription();
+            hasChanged = true;
         }
 
-        if ((event.getParticipantIds() != null) && (event.getParticipantIds() != Event.NO_PARTICIPANTIDS)) {
-            mParticipantIds = event.getParticipantIds();
+        if ((event.getParticipantIds() != null) && (event.getParticipantIds() != Event.NO_PARTICIPANTIDS)
+            && !event.getParticipantIds().equals(mParticipantIds)) {
+            Log.d("EVENT", "" + event.getParticipantIds());
+            Log.d("EVENT", "" + mParticipantIds);
+            mParticipantIds = new HashSet<Long>(event.getParticipantIds());
+            hasChanged = false;
         }
 
-        return true;
+        return hasChanged;
     }
 
-    public static Event createFromContainer(EventContainer container) {
+    /**
+     * Create a new Live instance of {@code Event} from the values inside the {@code EventContainer}. DO NOT
+     * CALL THIS OUTSIDE CACHE !
+     * 
+     * @param container
+     *            Informations about the Event
+     * @return the live instance of the Event
+     */
+    protected static Event createFromContainer(EventContainer container) {
         long id = container.getId();
         String name = container.getName();
         User creator = container.getCreator();

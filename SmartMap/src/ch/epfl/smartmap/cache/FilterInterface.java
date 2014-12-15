@@ -10,14 +10,18 @@ import java.util.Set;
 public interface FilterInterface extends Displayable {
 
     /**
-     * @return The whole list of IDs of the friends that are inside the {@code Filter}
-     */
-    Set<Long> getIds();
-
-    /**
      * @return a {@code FilterContainer} instance containing all informations about this {@code Filter}
      */
     FilterContainer getContainerCopy();
+
+    /**
+     * @return a {@code Set} of ids that is contained in the Filter. For a {@code CustomFilter}, it gives you
+     *         the list of ids contained allowed, and for a {@code DefaultFilter}, it returns the ids that are
+     *         excluded. This is the {@code Set} that should be stored in the {@code DatabaseHelper}, but if
+     *         you want to see wether a {@code Filter} contains someone, you should use
+     *         {@code getVisibleFriends}.
+     */
+    Set<Long> getIds();
 
     /**
      * @return The name of the {@code Filter}
@@ -25,9 +29,8 @@ public interface FilterInterface extends Displayable {
     String getName();
 
     /**
-     *
+     * @return a {@code Set} containing all ids that should be left visible when this filter is activated
      */
-    // FIXME Difference with getIds?
     Set<Long> getVisibleFriends();
 
     /**

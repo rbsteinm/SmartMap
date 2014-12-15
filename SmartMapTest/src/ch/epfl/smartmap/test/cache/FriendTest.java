@@ -81,7 +81,7 @@ public class FriendTest extends AndroidTestCase {
         assertEquals(friend.getLocation().getLongitude(), User.NO_LONGITUDE);
         assertEquals(friend.getLastSeen(), User.NO_LAST_SEEN);
         assertEquals(friend.getLocationString(), User.NO_LOCATION_STRING);
-        assertEquals(friend.getBlockStatus(), User.NO_BLOCK_STATUS);
+        assertEquals(friend.getBlockStatus(), User.BlockStatus.UNBLOCKED);
     }
 
     @Test(expected = IllegalArgumentException.class)

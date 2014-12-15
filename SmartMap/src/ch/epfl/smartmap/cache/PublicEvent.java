@@ -30,6 +30,5 @@ public class PublicEvent extends Event {
     public PublicEvent(long id, String name, User creator, Calendar startDate, Calendar endDate,
         Location location, String locationString, String description, Set<Long> participantIds) {
         super(id, name, creator, startDate, endDate, location, locationString, description, participantIds);
-
     }
 }

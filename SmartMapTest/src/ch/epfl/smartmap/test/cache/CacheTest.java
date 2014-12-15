@@ -135,8 +135,8 @@ public class CacheTest extends AndroidTestCase {
         assertNotNull(cache.getEvent(POLYLAN.getId()));
         assertNotNull(cache.getEvent(FOOTBALL_TOURNAMENT.getId()));
 
-        assertNotNull(cache.getUser(POLYLAN.getCreatorId()));
-        assertNotNull(cache.getUser(FOOTBALL_TOURNAMENT.getCreatorId()));
+        assertNotNull(cache.getUser(POLYLAN.getCreatorContainer().getId()));
+        assertNotNull(cache.getUser(FOOTBALL_TOURNAMENT.getCreatorContainer().getId()));
 
         assertNotNull(cache.getSelf());
     }

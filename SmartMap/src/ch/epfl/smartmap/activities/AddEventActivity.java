@@ -418,15 +418,12 @@ public class AddEventActivity extends FragmentActivity {
         }
 
         mEndDate.add(Calendar.MINUTE, FIVE_MINUTES);
-
-        mPickEndDate.setText(Utils.getDateString(mEndDate));
-        mPickEndTime.setText(Utils.getTimeString(mEndDate));
     }
 
     /**
      * @param data
      *            the intent containing the extras. The position (LatLgn) is retrieved from the
-     *            getParcelable(LOCATION_SERVICE).
+     *            getParcelable(LOCATION_EXTRA).
      * @author SpicyCH
      */
     private void updateLocation(Intent data) {
@@ -507,10 +504,26 @@ public class AddEventActivity extends FragmentActivity {
      * @author SpicyCH
      */
     private class DateChangedListener implements TextWatcher {
-        @Override
-        public void afterTextChanged(Editable s) {
 
-            AddEventActivity.this.checkDatesValidity();
+        private boolean mEditing;
+
+        public DateChangedListener() {
+            mEditing = false;
+        }
+
+        @Override
+        public synchronized void afterTextChanged(Editable s) {
+
+            if (!mEditing) {
+                mEditing = true;
+
+                AddEventActivity.this.checkDatesValidity();
+
+                mPickEndDate.setText(Utils.getDateString(mEndDate));
+                mPickEndTime.setText(Utils.getTimeString(mEndDate));
+
+                mEditing = false;
+            }
 
         }
 

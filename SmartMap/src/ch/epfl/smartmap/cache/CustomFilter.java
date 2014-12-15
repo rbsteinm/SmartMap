@@ -21,7 +21,11 @@ public class CustomFilter extends Filter {
      */
     protected CustomFilter(long id, Set<Long> ids, String name, boolean isActive) {
         super(id, ids);
-        mName = name;
+        if (name == null) {
+            mName = Filter.NO_NAME;
+        } else {
+            mName = name;
+        }
         mIsActive = isActive;
     }
 
@@ -58,7 +62,7 @@ public class CustomFilter extends Filter {
      */
     @Override
     public boolean update(FilterContainer filterInfos) {
-        boolean hasChanged = false;
+        boolean hasChanged = super.update(filterInfos);
 
         if ((filterInfos.getName() != null) && !filterInfos.getName().equals(mName)) {
             mName = filterInfos.getName();
@@ -69,7 +73,7 @@ public class CustomFilter extends Filter {
             hasChanged = true;
         }
 
-        return super.update(filterInfos) || hasChanged;
+        return hasChanged;
     }
 
 }

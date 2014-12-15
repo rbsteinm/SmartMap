@@ -58,7 +58,7 @@ public class FilterContainer {
      * @return ids field
      */
     public Set<Long> getIds() {
-        return new HashSet<Long>(mIds);
+        return mIds;
     }
 
     /**
@@ -97,6 +97,7 @@ public class FilterContainer {
 
     /**
      * @param newId
+     *            new value for Id
      * @return this
      */
     public FilterContainer setId(long newId) {
@@ -106,15 +107,17 @@ public class FilterContainer {
 
     /**
      * @param newIds
+     *            new {@code Set} of contained ids
      * @return this
      */
     public FilterContainer setIds(Set<Long> newIds) {
-        mIds = new HashSet<Long>(newIds);
+        mIds = newIds;
         return this;
     }
 
     /**
      * @param newName
+     *            new value for Name
      * @return this
      */
     public FilterContainer setName(String newName) {

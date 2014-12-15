@@ -116,7 +116,7 @@ public class StrangerTest extends AndroidTestCase {
         assertEquals(User.NO_LONGITUDE, stranger.getLocation().getLongitude());
         assertTrue(otherImage.sameAs(stranger.getActionImage()));
         assertEquals(User.NO_LOCATION_STRING, stranger.getLocationString());
-        assertEquals(User.NO_BLOCK_STATUS, stranger.getBlockStatus());
+        assertEquals(User.BlockStatus.UNBLOCKED, stranger.getBlockStatus()); // Strangers are never blocked
     }
 
     @Test
