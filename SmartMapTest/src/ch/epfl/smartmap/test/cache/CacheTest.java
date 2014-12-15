@@ -10,6 +10,7 @@ import static ch.epfl.smartmap.test.database.MockContainers.WRONG_USER_VALUES;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.GregorianCalendar;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,10 +23,14 @@ import android.test.AndroidTestCase;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
+import ch.epfl.smartmap.cache.Invitation;
+import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.cache.UserContainer;
+import ch.epfl.smartmap.callbacks.NetworkRequestCallback;
 import ch.epfl.smartmap.database.DatabaseHelper;
 import ch.epfl.smartmap.servercom.NetworkSmartMapClient;
+import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 import com.google.common.collect.Sets;
@@ -40,6 +45,7 @@ public class CacheTest extends AndroidTestCase {
     private DatabaseHelper incorrectDB;
     private NetworkSmartMapClient correctClient;
     private NetworkSmartMapClient incorrectClient;
+    private static final String TAG = CacheTest.class.getSimpleName();
 
     @Override
     protected void setUp() throws Exception {
@@ -92,6 +98,40 @@ public class CacheTest extends AndroidTestCase {
         incorrectDB = Mockito.mock(DatabaseHelper.class);
         Mockito.doReturn(Sets.newHashSet(WRONG_USER_VALUES)).when(incorrectDB).getAllUsers();
         Mockito.doReturn(Sets.newHashSet(NULL_EVENT_VALUES)).when(incorrectDB).getAllEvents();
+    }
+
+    @Test
+    public void testAcceptInvitation() throws SmartMapClientException, Exception {
+        SmartMapClient mockNetClient = Mockito.mock(NetworkSmartMapClient.class);
+        Mockito.doReturn(ROBIN).when(mockNetClient).acceptInvitation(ROBIN.getId());
+
+        ServiceContainer.setNetworkClient(mockNetClient);
+
+        final Cache cache = new Cache();
+
+        cache.putUser(ROBIN);
+
+        InvitationContainer invitRobin =
+            new InvitationContainer(1, ROBIN, null, Invitation.UNREAD,
+                new GregorianCalendar().getTimeInMillis(), Invitation.FRIEND_INVITATION);
+
+        cache.putInvitation(invitRobin);
+
+        Invitation invitation = cache.getInvitation(1);
+
+        cache.acceptInvitation(invitation, new NetworkRequestCallback<Void>() {
+            @Override
+            public void onFailure(Exception e) {
+                fail(); // Should not fail !
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                assertEquals(User.FRIEND, cache.getUser(ROBIN.getId()).getFriendship());
+            }
+        });
+
+        Thread.sleep(500);
     }
 
     @Test
