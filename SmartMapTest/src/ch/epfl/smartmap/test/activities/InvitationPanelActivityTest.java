@@ -72,10 +72,13 @@ ActivityInstrumentationTestCase2<MainActivity> {
 
     /**
      * Click on friend invitation open invitation tabs
+     * 
+     * @throws InterruptedException
      */
-    public void testClickOnFriendInvitation() {
+    public void testClickOnFriendInvitation() throws InterruptedException {
         onView(withId(R.id.action_notifications)).perform(click());
         onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(0).perform(click());
+        Thread.sleep(1000);
         onView(withId(R.id.layout_invitations_tab)).check(matches(isDisplayed()));
     }
 }
