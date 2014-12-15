@@ -423,7 +423,7 @@ public class AddEventActivity extends FragmentActivity {
     /**
      * @param data
      *            the intent containing the extras. The position (LatLgn) is retrieved from the
-     *            getParcelable(LOCATION_SERVICE).
+     *            getParcelable(LOCATION_EXTRA).
      * @author SpicyCH
      */
     private void updateLocation(Intent data) {
@@ -515,7 +515,6 @@ public class AddEventActivity extends FragmentActivity {
         public synchronized void afterTextChanged(Editable s) {
 
             if (!mEditing) {
-                Log.d(TAG, "Editing");
                 mEditing = true;
 
                 AddEventActivity.this.checkDatesValidity();
@@ -524,7 +523,6 @@ public class AddEventActivity extends FragmentActivity {
                 mPickEndTime.setText(Utils.getTimeString(mEndDate));
 
                 mEditing = false;
-
             }
 
         }
