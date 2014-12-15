@@ -3,13 +3,11 @@ package ch.epfl.smartmap.search;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
@@ -32,15 +30,11 @@ public final class CachedSearchEngine implements SearchEngineInterface {
 
     private static final String TAG = CachedSearchEngine.class.getSimpleName();
 
+    // Contains the server result for previous queries
     private final Map<String, Set<Long>> mPreviousOnlineStrangerSearches;
-    private final List<Location> mPreviousOnlineEventSearchQueries;
-    private final List<Set<Long>> mPreviousOnlineEventSearchResults;
 
     public CachedSearchEngine() {
         mPreviousOnlineStrangerSearches = new HashMap<String, Set<Long>>();
-
-        mPreviousOnlineEventSearchQueries = new LinkedList<Location>();
-        mPreviousOnlineEventSearchResults = new LinkedList<Set<Long>>();
     }
 
     @Override
@@ -140,13 +134,56 @@ public final class CachedSearchEngine implements SearchEngineInterface {
                 }
 
                 // Get all results that weren't in cache and add them all at
-                // once (Avoid to send multiple
-                // listener
-                // calls)
+                // once (Avoid to send multiple listener calls)
                 ServiceContainer.getCache().putEvents(immutableResult);
                 // Retrieve live instances from cache
                 for (EventContainer event : immutableResult) {
                     result.add(ServiceContainer.getCache().getEvent(event.getId()));
+                }
+                if (callback != null) {
+                    callback.onResult(result);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    @Override
+    public void findStrangersByName(final String query, final SearchRequestCallback<Set<User>> callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                Set<User> result = new HashSet<User>();
+
+                if (mPreviousOnlineStrangerSearches.get(query) != null) {
+                    // Fetch in cache
+                    Set<Long> localResult = mPreviousOnlineStrangerSearches.get(query);
+                    for (Long id : localResult) {
+                        User cachedUser = ServiceContainer.getCache().getUser(id);
+                        if (cachedUser != null) {
+                            if ((cachedUser.getFriendship() != User.FRIEND)
+                                && (cachedUser.getFriendship() != User.SELF)) {
+                                result.add(cachedUser);
+                            }
+                        }
+                    }
+                } else {
+                    // Fetch online
+                    List<UserContainer> networkResult;
+                    try {
+                        networkResult = ServiceContainer.getNetworkClient().findUsers(query);
+                        for (UserContainer user : networkResult) {
+                            if (user != null) {
+                                ServiceContainer.getCache().putUser(user);
+                                result.add(ServiceContainer.getCache().getUser(user.getId()));
+                            }
+                        }
+                    } catch (SmartMapClientException e) {
+                        Log.e(TAG, "Error while finding strangers by query" + e);
+                        if (callback != null) {
+                            callback.onNetworkError(e);
+                        }
+                    }
                 }
                 if (callback != null) {
                     callback.onResult(result);
@@ -210,51 +247,6 @@ public final class CachedSearchEngine implements SearchEngineInterface {
                         }
                     }
                 }
-            }
-        }.execute();
-    }
-
-    @Override
-    public void findStrangersByName(final String query, final SearchRequestCallback<Set<User>> callback) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                Set<User> result = new HashSet<User>();
-
-                if (mPreviousOnlineStrangerSearches.get(query) != null) {
-                    // Fetch in cache
-                    Set<Long> localResult = mPreviousOnlineStrangerSearches.get(query);
-                    for (Long id : localResult) {
-                        User cachedUser = ServiceContainer.getCache().getUser(id);
-                        if (cachedUser != null) {
-                            if ((cachedUser.getFriendship() != User.FRIEND)
-                                && (cachedUser.getFriendship() != User.SELF)) {
-                                result.add(cachedUser);
-                            }
-                        }
-                    }
-                } else {
-                    // Fetch online
-                    List<UserContainer> networkResult;
-                    try {
-                        networkResult = ServiceContainer.getNetworkClient().findUsers(query);
-                        for (UserContainer user : networkResult) {
-                            if (user != null) {
-                                ServiceContainer.getCache().putUser(user);
-                                result.add(ServiceContainer.getCache().getUser(user.getId()));
-                            }
-                        }
-                    } catch (SmartMapClientException e) {
-                        Log.e(TAG, "Error while finding strangers by query" + e);
-                        if (callback != null) {
-                            callback.onNetworkError(e);
-                        }
-                    }
-                }
-                if (callback != null) {
-                    callback.onResult(result);
-                }
-                return null;
             }
         }.execute();
     }
