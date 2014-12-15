@@ -30,16 +30,18 @@ import ch.epfl.smartmap.search.CachedSearchEngine;
 import ch.epfl.smartmap.util.Utils;
 
 /**
- * This activity shows an event in a complete screens. It display in addition two buttons: one to invite friends, and
+ * This activity shows an event in a complete screens. It display in addition
+ * two buttons: one to invite friends, and
  * one to see the event on the map.
- *
+ * 
  * @author SpicyCH
  * @author agpmilli
  */
 public class EventInformationActivity extends ListActivity {
 
     /**
-     * Used to get the event id the getExtra of the starting intent, and to pass the retrieved event from doInBackground
+     * Used to get the event id the getExtra of the starting intent, and to pass
+     * the retrieved event from doInBackground
      * to onPostExecute.
      */
     public static final String EVENT_KEY = "EVENT";
@@ -91,7 +93,7 @@ public class EventInformationActivity extends ListActivity {
     /**
      * Triggered when the user clicks the "Invite friends" button.<br />
      * It launches InviteFriendsActivity for a result.
-     *
+     * 
      * @param v
      * @author SpicyCH
      */
@@ -110,8 +112,9 @@ public class EventInformationActivity extends ListActivity {
     }
 
     /**
-     * Triggered when "Attending" checkbox is clicked. Updates the displayed list of participants.
-     *
+     * Triggered when "Attending" checkbox is clicked. Updates the displayed
+     * list of participants.
+     * 
      * @param v
      *            the checkbox whose status changed
      * @author agpmilli
@@ -127,12 +130,12 @@ public class EventInformationActivity extends ListActivity {
         if (v.getId() == R.id.event_info_going_checkbox) {
             if (checkBox.isChecked()) {
                 ServiceContainer.getCache().addParticipantsToEvent(
-                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
-                        new EventInscriptionCallback());
+                    new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())),
+                    mEvent, new EventInscriptionCallback());
             } else {
                 ServiceContainer.getCache().removeParticipantsFromEvent(
-                        new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())), mEvent,
-                        new EventUnsubscriptionCallback());
+                    new HashSet<Long>(Arrays.asList(ServiceContainer.getSettingsManager().getUserId())),
+                    mEvent, new EventUnsubscriptionCallback());
             }
 
         }
@@ -184,30 +187,29 @@ public class EventInformationActivity extends ListActivity {
 
             mEvent = ServiceContainer.getCache().getEvent(eventId);
 
-            if (null == mEvent) {
-                // The user was probably invited to a finished event. In this case we notify him of this and send him
-                // back on the main activity.
-
-                Log.d(TAG, "The event we are trying to display doesn't exist.");
-                Toast.makeText(this,
-                        this.getString(R.string.event_info_toast_eventno_longer_exists), Toast.LENGTH_LONG).show();
+            if (mEvent == null) {
+                // This may occur when opening an invitation to a finished event
+                Toast.makeText(this, this.getString(R.string.event_info_toast_eventno_longer_exists),
+                    Toast.LENGTH_LONG).show();
                 this.finish();
+            } else {
+                this.initializeGUI();
             }
-
-            this.initializeGUI();
 
         } else {
             Log.e(TAG, "No event id put in the putextra of the intent that started this activity.");
             Toast.makeText(EventInformationActivity.this,
-                    EventInformationActivity.this.getString(R.string.error_client_side), Toast.LENGTH_SHORT).show();
+                EventInformationActivity.this.getString(R.string.error_client_side), Toast.LENGTH_SHORT)
+                .show();
             this.finish();
         }
 
     }
 
     /**
-     * Triggered when the button 'Shop on the map' is pressed. Opens the map at the location of the event.
-     *
+     * Triggered when the button 'Shop on the map' is pressed. Opens the map at
+     * the location of the event.
+     * 
      * @author SpicyCH
      */
     public void openMapAtEventLocation(View v) {
@@ -219,58 +221,71 @@ public class EventInformationActivity extends ListActivity {
 
     /**
      * Initializes the different views of this activity.
-     *
+     * 
      * @author SpicyCH
      */
     private void initializeGUI() {
-        EventInformationActivity.this.setTitle(mEvent.getName());
-
-        mEventTitle = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_event_name);
-        mEventTitle.setText(mEvent.getName());
-
-        mEventCreator = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_creator);
-        mEventCreator.setText(mEvent.getCreator().getName());
-
-        mStartDate = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_start_date);
-        mStartHour = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_start_hour);
-        mEndDate = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_end_date);
-        mEndHour = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_end_hour);
-
-        mGoingCheckBox = (CheckBox) EventInformationActivity.this.findViewById(R.id.event_info_going_checkbox);
-
-        if (mEvent.isGoing()) {
-            mGoingChecked = true;
-            mGoingCheckBox.setChecked(mGoingChecked);
-        }
-
-        String startDate = Utils.getDateString(mEvent.getStartDate());
-        String startHour = Utils.getTimeString(mEvent.getStartDate());
-        String endDate = Utils.getDateString(mEvent.getEndDate());
-        String endHour = Utils.getTimeString(mEvent.getEndDate());
-
-        mStartDate.setText(startDate);
-        mStartHour.setText(startHour);
-        mEndDate.setText(endDate);
-        mEndHour.setText(endHour);
-
-        mEventDescription = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_description);
-        if ((mEvent.getDescription() == null) || mEvent.getDescription().isEmpty()) {
-            mEventDescription.setText(EventInformationActivity.this
-                    .getString(R.string.show_event_info_event_no_description));
+        if (mEvent == null) {
+            // This may occur when cache listener updates the activity as it is
+            // not destroyed when the activity finishes
+            this.finish();
         } else {
-            mEventDescription.setText(mEvent.getDescription());
-        }
+            EventInformationActivity.this.setTitle(mEvent.getName());
 
-        mPlaceNameAndCountry = (TextView) EventInformationActivity.this
-                .findViewById(R.id.show_event_info_town_and_country);
-        mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", "
+            mEventTitle =
+                (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_event_name);
+            mEventTitle.setText(mEvent.getName());
+
+            mEventCreator =
+                (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_creator);
+            mEventCreator.setText(mEvent.getCreator().getName());
+
+            mStartDate =
+                (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_start_date);
+            mStartHour =
+                (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_start_hour);
+            mEndDate = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_end_date);
+            mEndHour = (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_end_hour);
+
+            mGoingCheckBox =
+                (CheckBox) EventInformationActivity.this.findViewById(R.id.event_info_going_checkbox);
+
+            if (mEvent.isGoing()) {
+                mGoingChecked = true;
+                mGoingCheckBox.setChecked(mGoingChecked);
+            }
+
+            String startDate = Utils.getDateString(mEvent.getStartDate());
+            String startHour = Utils.getTimeString(mEvent.getStartDate());
+            String endDate = Utils.getDateString(mEvent.getEndDate());
+            String endHour = Utils.getTimeString(mEvent.getEndDate());
+
+            mStartDate.setText(startDate);
+            mStartHour.setText(startHour);
+            mEndDate.setText(endDate);
+            mEndHour.setText(endHour);
+
+            mEventDescription =
+                (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_description);
+            if ((mEvent.getDescription() == null) || mEvent.getDescription().isEmpty()) {
+                mEventDescription.setText(EventInformationActivity.this
+                    .getString(R.string.show_event_info_event_no_description));
+            } else {
+                mEventDescription.setText(mEvent.getDescription());
+            }
+
+            mPlaceNameAndCountry =
+                (TextView) EventInformationActivity.this.findViewById(R.id.show_event_info_town_and_country);
+            mPlaceNameAndCountry.setText(mEvent.getLocationString() + ", "
                 + Utils.getCountryFromLocation(mEvent.getLocation()));
 
-        EventInformationActivity.this.updateCurrentList();
+            EventInformationActivity.this.updateCurrentList();
+        }
     }
 
     /**
-     * Called when we want to quit this tab and if it was open by a notification.
+     * Called when we want to quit this tab and if it was open by a
+     * notification.
      */
     private void onNotificationOpen() {
         if (this.getIntent().getBooleanExtra("NOTIFICATION", false)) {
@@ -292,14 +307,15 @@ public class EventInformationActivity extends ListActivity {
         Log.d(TAG, "Participants id : " + mEvent.getParticipantIds());
 
         ServiceContainer.getSearchEngine().findUsersByIds(mEvent.getParticipantIds(),
-                new FindUsersIdSearchRequestCallback());
+            new FindUsersIdSearchRequestCallback());
 
     }
 
     /**
-     * Listener on cache changes used to update the event's <code>ListView</code> when new events are added in the
+     * Listener on cache changes used to update the event's
+     * <code>ListView</code> when new events are added in the
      * cache.
-     *
+     * 
      * @author SpicyCH
      */
     private class CacheChangesListener extends OnCacheListener {
@@ -330,7 +346,7 @@ public class EventInformationActivity extends ListActivity {
 
     /**
      * Called after the server responded to the event joining request.
-     *
+     * 
      * @author SpicyCH
      */
     private class EventInscriptionCallback implements NetworkRequestCallback<Void> {
@@ -340,8 +356,8 @@ public class EventInformationActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(EventInformationActivity.this,
-                            EventInformationActivity.this.getString(R.string.event_going_failure), Toast.LENGTH_SHORT)
-                            .show();
+                        EventInformationActivity.this.getString(R.string.event_going_failure),
+                        Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -352,8 +368,8 @@ public class EventInformationActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(EventInformationActivity.this,
-                            EventInformationActivity.this.getString(R.string.event_going_success), Toast.LENGTH_SHORT)
-                            .show();
+                        EventInformationActivity.this.getString(R.string.event_going_success),
+                        Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -361,7 +377,7 @@ public class EventInformationActivity extends ListActivity {
 
     /**
      * Called after the server responded to the event leaving request.
-     *
+     * 
      * @author SpicyCH
      */
     private class EventUnsubscriptionCallback implements NetworkRequestCallback<Void> {
@@ -371,8 +387,8 @@ public class EventInformationActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(EventInformationActivity.this,
-                            EventInformationActivity.this.getString(R.string.event_quit_failure), Toast.LENGTH_SHORT)
-                            .show();
+                        EventInformationActivity.this.getString(R.string.event_quit_failure),
+                        Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -383,8 +399,8 @@ public class EventInformationActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(EventInformationActivity.this,
-                            EventInformationActivity.this.getString(R.string.event_quit_success), Toast.LENGTH_SHORT)
-                            .show();
+                        EventInformationActivity.this.getString(R.string.event_quit_success),
+                        Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -392,7 +408,7 @@ public class EventInformationActivity extends ListActivity {
 
     /**
      * Called when the result has arrived.
-     *
+     * 
      * @author SpicyCH
      */
     private class FindUsersIdSearchRequestCallback implements SearchRequestCallback<Set<User>> {
@@ -402,8 +418,8 @@ public class EventInformationActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(EventInformationActivity.this,
-                            EventInformationActivity.this.getString(R.string.refresh_participants_network_error),
-                            Toast.LENGTH_SHORT).show();
+                        EventInformationActivity.this.getString(R.string.refresh_participants_network_error),
+                        Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -414,8 +430,8 @@ public class EventInformationActivity extends ListActivity {
                 @Override
                 public void run() {
                     Toast.makeText(EventInformationActivity.this,
-                            EventInformationActivity.this.getString(R.string.refresh_participants_not_found),
-                            Toast.LENGTH_SHORT).show();
+                        EventInformationActivity.this.getString(R.string.refresh_participants_not_found),
+                        Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -428,7 +444,7 @@ public class EventInformationActivity extends ListActivity {
                 @Override
                 public void run() {
                     EventInformationActivity.this.setListAdapter(new FriendPickerListAdapter(
-                            EventInformationActivity.this, mParticipantsList));
+                        EventInformationActivity.this, mParticipantsList));
                 }
             });
         }

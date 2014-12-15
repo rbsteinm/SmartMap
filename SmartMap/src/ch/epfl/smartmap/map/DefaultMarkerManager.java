@@ -16,7 +16,6 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import ch.epfl.smartmap.cache.Displayable;
@@ -29,7 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * A default implementation of {@link MarkerManager}.
- *
+ * 
  * @author hugo-S
  */
 public class DefaultMarkerManager implements MarkerManager {
@@ -60,7 +59,7 @@ public class DefaultMarkerManager implements MarkerManager {
 
     /**
      * Constructor
-     *
+     * 
      * @param googleMap
      */
     public DefaultMarkerManager(GoogleMap googleMap) {
@@ -177,8 +176,10 @@ public class DefaultMarkerManager implements MarkerManager {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.map.MarkerManager#resetMarkersIcon(java.lang.String)
-     * The marker attribute snippet is used to store the marker's color. The marker icon will be reset only if
+     * @see
+     * ch.epfl.smartmap.map.MarkerManager#resetMarkersIcon(java.lang.String)
+     * The marker attribute snippet is used to store the marker's color. The
+     * marker icon will be reset only if
      * it's color was red
      */
     @Override
@@ -205,7 +206,7 @@ public class DefaultMarkerManager implements MarkerManager {
         if ((nowInMillis - lastUpdateInMillis) < MIN_TIME_BETWEEN_UPDATES) {
             this.checkNonNull(context, CONTEXT_STRING);
             this.checkNonNull(itemsToDisplay, "items to display");
-            Log.d(TAG, "updateMarkers");
+
             // In the list friendsToDisplay, search if each friend s already
             // displayed
             for (Displayable item : itemsToDisplay) {
@@ -245,7 +246,7 @@ public class DefaultMarkerManager implements MarkerManager {
 
     /**
      * Animate the given marker from it's position to the given one
-     *
+     * 
      * @param marker
      * @param toPosition
      */
@@ -285,7 +286,7 @@ public class DefaultMarkerManager implements MarkerManager {
 
     /**
      * An enum that represents possible markers color for events
-     *
+     * 
      * @author hugo-S
      */
     public enum MarkerColor {

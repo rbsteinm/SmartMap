@@ -21,6 +21,7 @@ import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.test.database.MockContainers;
 
+
 public class FriendsPagerActivityTest extends
 ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 
@@ -109,7 +110,7 @@ ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 
 	private void createMockItems() {
 		friendContainer = MockContainers.ALAIN_CONTAINER;
-		invitation = MockContainers.ROBIN_FRIEND_INVITATION_CONTANER;
+		invitation = MockContainers.ROBIN_FRIEND_INVITATION_CONTAINER;
 
 	}
 
