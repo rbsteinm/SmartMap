@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package ch.epfl.smartmap.map;
 
@@ -28,8 +28,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
- * A default implementation of {@link MarkerManager}
- * 
+ * A default implementation of {@link MarkerManager}.
+ *
  * @author hugo-S
  */
 public class DefaultMarkerManager implements MarkerManager {
@@ -55,10 +55,12 @@ public class DefaultMarkerManager implements MarkerManager {
      * A map that maps each marker with its id
      */
     private final Map<String, Marker> mDictionnaryMarkers;
+    private static final String DISPLAYABLE_ITEM = "Displayable item";
+    private static final String CONTEXT_STRING = "context";
 
     /**
      * Constructor
-     * 
+     *
      * @param googleMap
      */
     public DefaultMarkerManager(GoogleMap googleMap) {
@@ -75,8 +77,8 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker addMarker(Displayable item, Context context) {
-        this.checkNonNull(item, "Displayable item");
-        this.checkNonNull(context, "context");
+        this.checkNonNull(item, DISPLAYABLE_ITEM);
+        this.checkNonNull(context, CONTEXT_STRING);
         Marker marker =
             mGoogleMap.addMarker(new MarkerOptions().position(item.getLatLng()).title(item.getTitle())
                 .icon(item.getMarkerIcon(context)).anchor(MARKER_ANCHOR_X, MARKER_ANCHOR_Y));
@@ -84,36 +86,6 @@ public class DefaultMarkerManager implements MarkerManager {
         mDictionnaryMarkers.put(marker.getId(), marker);
         marker.setSnippet(MarkerColor.ORANGE.toString());
         return marker;
-    }
-
-    /**
-     * Checks that the Representation Invariant is not violated.
-     * 
-     * @param depth
-     *            represents how deep the audit check is done (use 1 to check
-     *            this object only)
-     * @return The number of audit errors in this object
-     */
-    public int auditErrors(int depth) {
-        if (depth == 0) {
-            return 0;
-        }
-
-        int auditErrors = 0;
-
-        if (mGoogleMap == null) {
-            auditErrors++;
-        }
-
-        if (mDictionnaryMarkers == null) {
-            auditErrors++;
-        }
-
-        if (mDisplayedItems == null) {
-            auditErrors++;
-        }
-
-        return auditErrors;
     }
 
     /*
@@ -154,7 +126,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker getMarkerForItem(Displayable item) {
-        this.checkNonNull(item, "Displayable item");
+        this.checkNonNull(item, DISPLAYABLE_ITEM);
         for (Entry<String, Displayable> entry : mDisplayedItems.entrySet()) {
             if (entry.getValue().equals(item)) {
                 return mDictionnaryMarkers.get(entry.getKey());
@@ -195,7 +167,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public Marker removeMarker(Displayable item) {
-        this.checkNonNull(item, "Displayable item");
+        this.checkNonNull(item, DISPLAYABLE_ITEM);
         Marker marker = this.getMarkerForItem(item);
         mDisplayedItems.remove(marker.getId());
         mDictionnaryMarkers.remove(marker.getId());
@@ -211,7 +183,7 @@ public class DefaultMarkerManager implements MarkerManager {
      */
     @Override
     public void resetMarkersIcon(Context context) {
-        this.checkNonNull(context, "context");
+        this.checkNonNull(context, CONTEXT_STRING);
         for (Marker marker : this.getDisplayedMarkers()) {
             if (marker.getSnippet().equals(MarkerColor.RED.toString())) {
                 marker.setIcon(this.getItemForMarker(marker).getMarkerIcon(context));
@@ -231,7 +203,7 @@ public class DefaultMarkerManager implements MarkerManager {
     public void updateMarkers(Context context, Set<Displayable> itemsToDisplay) {
         long nowInMillis = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT+01:00")).getTimeInMillis();
         if ((nowInMillis - lastUpdateInMillis) < MIN_TIME_BETWEEN_UPDATES) {
-            this.checkNonNull(context, "context");
+            this.checkNonNull(context, CONTEXT_STRING);
             this.checkNonNull(itemsToDisplay, "items to display");
             Log.d(TAG, "updateMarkers");
             // In the list friendsToDisplay, search if each friend s already
@@ -273,7 +245,7 @@ public class DefaultMarkerManager implements MarkerManager {
 
     /**
      * Animate the given marker from it's position to the given one
-     * 
+     *
      * @param marker
      * @param toPosition
      */
@@ -313,7 +285,7 @@ public class DefaultMarkerManager implements MarkerManager {
 
     /**
      * An enum that represents possible markers color for events
-     * 
+     *
      * @author hugo-S
      */
     public enum MarkerColor {

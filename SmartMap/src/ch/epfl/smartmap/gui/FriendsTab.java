@@ -12,8 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.UserInformationActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
@@ -65,9 +63,6 @@ public class FriendsTab extends ListFragment {
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         User user = mFriendList.get(position);
-        RelativeLayout rl = (RelativeLayout) view;
-        TextView tv = (TextView) rl.getChildAt(1);
-        assert (tv instanceof TextView) && (tv.getId() == R.id.activity_friends_name);
         Intent intent = new Intent(mContext, UserInformationActivity.class);
         intent.putExtra("USER", user.getId());
         this.startActivity(intent);

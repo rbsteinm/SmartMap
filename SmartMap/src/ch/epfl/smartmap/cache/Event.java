@@ -21,7 +21,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Describes an event
- * 
+ *
  * @author jfperren
  * @author ritterni
  */
@@ -38,10 +38,10 @@ public abstract class Event implements Displayable, EventInterface {
     public static final Set<User> NO_PARTICIPANTS = new HashSet<User>();
     public static final Set<Long> NO_PARTICIPANTIDS = new HashSet<Long>();
     // Default image
-    public static final Bitmap DEFAULT_WHITE_IMAGE = BitmapFactory.decodeResource(ServiceContainer
-        .getSettingsManager().getContext().getResources(), R.drawable.ic_event_white);
-    public static final Bitmap DEFAULT_BLUE_IMAGE = BitmapFactory.decodeResource(ServiceContainer
-        .getSettingsManager().getContext().getResources(), R.drawable.ic_event_blue);
+    public static final Bitmap DEFAULT_WHITE_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
+            .getContext().getResources(), R.drawable.ic_event_white);
+    public static final Bitmap DEFAULT_BLUE_IMAGE = BitmapFactory.decodeResource(ServiceContainer.getSettingsManager()
+            .getContext().getResources(), R.drawable.ic_event_blue);
 
     private final long mId;
     private String mName;
@@ -55,7 +55,7 @@ public abstract class Event implements Displayable, EventInterface {
 
     /**
      * Constructor
-     * 
+     *
      * @param id
      * @param name
      * @param creator
@@ -67,15 +67,14 @@ public abstract class Event implements Displayable, EventInterface {
      * @param participantIds
      */
     public Event(long id, String name, User creator, Calendar startDate, Calendar endDate, Location location,
-        String locationString, String description, Set<Long> participantIds) {
-        // Set id
-        if (id >= 0) {
-            mId = id;
-        } else {
+            String locationString, String description, Set<Long> participantIds) {
+
+        if (id < 0) {
             throw new IllegalArgumentException("Trying to create an Event with incorrect Id");
         }
 
-        // Set other values
+        // Set values
+        mId = id;
         mName = (name != null) ? name : NO_NAME;
         mCreator = (creator != null) ? creator : User.NOBODY;
         mStartDate = (startDate != null) ? (Calendar) startDate.clone() : NO_START_DATE;
@@ -88,12 +87,12 @@ public abstract class Event implements Displayable, EventInterface {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj != null) && (this.getClass() == obj.getClass())
-            && (this.getId() == ((Event) obj).getId());
+        return (obj != null) && (this.getClass() == obj.getClass()) && (this.getId() == ((Event) obj).getId());
     }
 
     @Override
@@ -103,12 +102,13 @@ public abstract class Event implements Displayable, EventInterface {
 
     @Override
     public EventContainer getContainerCopy() {
-        return new EventContainer(mId, mName, mCreator.getContainerCopy(), mDescription, mStartDate,
-            mEndDate, mLocation, mLocationString, mParticipantIds);
+        return new EventContainer(mId, mName, mCreator.getContainerCopy(), mDescription, mStartDate, mEndDate,
+                mLocation, mLocationString, mParticipantIds);
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Event#getCreator()
      */
     @Override
@@ -133,6 +133,7 @@ public abstract class Event implements Displayable, EventInterface {
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Localisable#getLatLng()
      */
     @Override
@@ -147,6 +148,7 @@ public abstract class Event implements Displayable, EventInterface {
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Localisable#getLocationString()
      */
     @Override
@@ -166,6 +168,7 @@ public abstract class Event implements Displayable, EventInterface {
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Event#getParticipants()
      */
     @Override
@@ -175,6 +178,7 @@ public abstract class Event implements Displayable, EventInterface {
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Displayable#getSearchImage()
      */
     @Override
@@ -189,16 +193,18 @@ public abstract class Event implements Displayable, EventInterface {
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Displayable#getSubtitle()
      */
     @Override
     public String getSubtitle() {
         return Utils.getDateString(mStartDate) + " at " + Utils.getTimeString(mStartDate) + ", near "
-            + Utils.getCityFromLocation(mLocation);
+                + Utils.getCityFromLocation(mLocation);
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Displayable#getTitle()
      */
     @Override
@@ -208,6 +214,7 @@ public abstract class Event implements Displayable, EventInterface {
 
     /*
      * (non-Javadoc)
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -217,6 +224,7 @@ public abstract class Event implements Displayable, EventInterface {
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Event#isGoing()
      */
     @Override
@@ -226,6 +234,7 @@ public abstract class Event implements Displayable, EventInterface {
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Event#isLive()
      */
     @Override
@@ -237,28 +246,30 @@ public abstract class Event implements Displayable, EventInterface {
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Event#isNear()
      */
     @Override
     public boolean isNear() {
         Location ourLocation = ServiceContainer.getSettingsManager().getLocation();
-        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager()
-            .getNearEventsMaxDistance();
+        return ourLocation.distanceTo(mLocation) <= ServiceContainer.getSettingsManager().getNearEventsMaxDistance();
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Event#isOwn()
      */
     @Override
     public boolean isOwn() {
         Log.d(TAG, "creator id : " + mCreator.getId() + "  my id : "
-            + ServiceContainer.getSettingsManager().getUserId());
+                + ServiceContainer.getSettingsManager().getUserId());
         return mCreator.getId() == ServiceContainer.getSettingsManager().getUserId();
     }
 
     /*
      * (non-Javadoc)
+     *
      * @see ch.epfl.smartmap.cache.Localisable#isShown()
      */
     @Override
@@ -274,19 +285,19 @@ public abstract class Event implements Displayable, EventInterface {
             throw new IllegalArgumentException("Cannot update an Event with a different ID !");
         }
 
-        if ((event.getName() != null) && !event.getName().equals("") && (event.getName() != Event.NO_NAME)
-            && !event.getName().equals(mName)) {
+        if ((event.getName() != null) && !"".equals(event.getName()) && !(event.getName().equals(Event.NO_NAME))
+                && !event.getName().equals(mName)) {
             mName = event.getName();
             hasChanged = true;
         }
 
         if ((event.getCreator() != null) && (event.getCreator() != User.NOBODY)
-            && (event.getCreatorContainer().getId() != mCreator.getId())) {
+                && (event.getCreatorContainer().getId() != mCreator.getId())) {
             mCreator = event.getCreator();
         }
 
         if ((event.getCreatorContainer() != null) && (event.getCreatorContainer().getId() != User.NO_ID)
-            && (event.getCreatorContainer().getId() != mCreator.getId())) {
+                && (event.getCreatorContainer().getId() != mCreator.getId())) {
             ServiceContainer.getCache().putUser(event.getCreatorContainer());
             if (ServiceContainer.getCache().getUser(event.getCreatorContainer().getId()) != null) {
                 mCreator = ServiceContainer.getCache().getUser(event.getCreatorContainer().getId());
@@ -295,41 +306,41 @@ public abstract class Event implements Displayable, EventInterface {
         }
 
         if ((event.getStartDate() != null)
-            && (event.getStartDate().getTimeInMillis() != Event.NO_START_DATE.getTimeInMillis())
-            && (event.getStartDate().getTimeInMillis() != mStartDate.getTimeInMillis())) {
+                && (event.getStartDate().getTimeInMillis() != Event.NO_START_DATE.getTimeInMillis())
+                && (event.getStartDate().getTimeInMillis() != mStartDate.getTimeInMillis())) {
             mStartDate = (Calendar) event.getStartDate().clone();
             hasChanged = true;
         }
 
         if ((event.getEndDate() != null)
-            && (event.getEndDate().getTimeInMillis() != Event.NO_END_DATE.getTimeInMillis())
-            && (event.getEndDate().getTimeInMillis() != mEndDate.getTimeInMillis())) {
+                && (event.getEndDate().getTimeInMillis() != Event.NO_END_DATE.getTimeInMillis())
+                && (event.getEndDate().getTimeInMillis() != mEndDate.getTimeInMillis())) {
             mEndDate = (Calendar) event.getEndDate().clone();
             hasChanged = true;
         }
 
         if ((event.getLocation() != null)
-            && (event.getLocation() != Event.NO_LOCATION)
-            && ((event.getLocation().getLatitude() != mLocation.getLatitude()) || (event.getLocation()
-                .getLongitude() != mLocation.getLongitude()))) {
+                && (event.getLocation() != Event.NO_LOCATION)
+                && ((event.getLocation().getLatitude() != mLocation.getLatitude()) || (event.getLocation()
+                        .getLongitude() != mLocation.getLongitude()))) {
             mLocation = new Location(event.getLocation());
             hasChanged = true;
         }
 
         if ((event.getLocationString() != null) && (event.getLocationString() != Event.NO_LOCATION_STRING)
-            && !event.getLocationString().equals(mLocationString)) {
+                && !event.getLocationString().equals(mLocationString)) {
             mLocationString = event.getLocationString();
             hasChanged = true;
         }
 
         if ((event.getDescription() == null) && (event.getDescription() != Event.NO_DESCRIPTION)
-            && !event.getDescription().equals(mDescription)) {
+                && !event.getDescription().equals(mDescription)) {
             mDescription = event.getDescription();
             hasChanged = true;
         }
 
         if ((event.getParticipantIds() != null) && (event.getParticipantIds() != Event.NO_PARTICIPANTIDS)
-            && !event.getParticipantIds().equals(mParticipantIds)) {
+                && !event.getParticipantIds().equals(mParticipantIds)) {
             Log.d("EVENT", "" + event.getParticipantIds());
             Log.d("EVENT", "" + mParticipantIds);
             mParticipantIds = new HashSet<Long>(event.getParticipantIds());
@@ -340,9 +351,9 @@ public abstract class Event implements Displayable, EventInterface {
     }
 
     /**
-     * Create a new Live instance of {@code Event} from the values inside the {@code EventContainer}. DO NOT
-     * CALL THIS OUTSIDE CACHE !
-     * 
+     * Create a new Live instance of {@code Event} from the values inside the {@code EventContainer}. DO NOT CALL THIS
+     * OUTSIDE CACHE !
+     *
      * @param container
      *            Informations about the Event
      * @return the live instance of the Event
@@ -359,6 +370,6 @@ public abstract class Event implements Displayable, EventInterface {
         Set<Long> participantIds = container.getParticipantIds();
 
         return new PublicEvent(id, name, creator, startDate, endDate, location, locationString, description,
-            participantIds);
+                participantIds);
     }
 }
