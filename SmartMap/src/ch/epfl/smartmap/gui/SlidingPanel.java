@@ -14,12 +14,10 @@ import ch.epfl.smartmap.R;
 /**
  * Provides a Sliding Panel that slides from the bottom of the app, and fades in
  * component.
- * 
+ *
  * @author jfperren
  */
 public class SlidingPanel extends FrameLayout {
-    @SuppressWarnings("unused")
-    private static final String TAG = "INFORMATION_PANEL";
 
     private static final int EXTEND_DURATION = 600;
 
@@ -53,7 +51,7 @@ public class SlidingPanel extends FrameLayout {
 
     /**
      * Hide panel
-     * 
+     *
      * @return true if panel was open and now closes
      */
     public boolean close() {
@@ -93,7 +91,7 @@ public class SlidingPanel extends FrameLayout {
 
     /**
      * Handle the event onBackPressed
-     * 
+     *
      * @return true if the event is handled and should not go further
      */
     public boolean onBackPressed() {
@@ -114,7 +112,7 @@ public class SlidingPanel extends FrameLayout {
 
     /**
      * Show full screen view
-     * 
+     *
      * @return true is panel was closed and now opens
      */
     public boolean open() {
@@ -141,7 +139,7 @@ public class SlidingPanel extends FrameLayout {
 
     /**
      * Creates a Fade Animation on a View
-     * 
+     *
      * @param view
      *            View to be fade in/out
      * @param fadeState
@@ -233,7 +231,7 @@ public class SlidingPanel extends FrameLayout {
 
     /**
      * Type of FadeAnimation
-     * 
+     *
      * @author jfperren
      */
     private enum Fade {
@@ -255,7 +253,7 @@ public class SlidingPanel extends FrameLayout {
 
     /**
      * Visual State of a SlidingPanel
-     * 
+     *
      * @author jfperren
      */
     private enum VisualState {

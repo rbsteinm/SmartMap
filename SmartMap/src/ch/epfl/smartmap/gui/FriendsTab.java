@@ -22,14 +22,11 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
 
 /**
  * Fragment (Tab) displaying your friends in FriendsActivity
- * 
+ *
  * @author rbsteinm
  */
 
 public class FriendsTab extends ListFragment {
-
-    @SuppressWarnings("unused")
-    private static final String TAG = FriendsTab.class.getSimpleName();
 
     private List<User> mFriendList;
 
