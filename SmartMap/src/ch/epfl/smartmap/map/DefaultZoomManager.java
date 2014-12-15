@@ -126,7 +126,7 @@ public class DefaultZoomManager extends FragmentActivity implements ZoomManager 
      * @author hugo-S
      */
     private class OnMapGlobalLayoutListener implements OnGlobalLayoutListener {
-        List<Marker> mMarkerList;
+        private final List<Marker> mMarkerList;
 
         public OnMapGlobalLayoutListener(List<Marker> markers) {
             mMarkerList = new ArrayList<Marker>(markers);
