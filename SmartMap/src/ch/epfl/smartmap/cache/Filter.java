@@ -192,7 +192,7 @@ public abstract class Filter implements FilterInterface {
      *            a Container that has all informations about the {@code Filter} you want to create.
      * @return the {@code Filter} live instance.
      */
-    public static Filter createFromContainer(FilterContainer filterInfos) {
+    protected static Filter createFromContainer(FilterContainer filterInfos) {
         long id = filterInfos.getId();
         Set<Long> ids = filterInfos.getIds();
         Boolean isActive = filterInfos.isActive();

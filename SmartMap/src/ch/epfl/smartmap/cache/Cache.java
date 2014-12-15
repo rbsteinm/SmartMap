@@ -21,13 +21,23 @@ import ch.epfl.smartmap.servercom.SmartMapClient;
 import ch.epfl.smartmap.servercom.SmartMapClientException;
 
 /**
- * The Cache contains all instances of network objects that are used by the GUI.
- * Therefore, every request to
- * find an
- * user or an event should go through it. It will automatically fill itself with
- * the database on creation, and
- * then
- * updates the database as changes are made.
+ * Note from @jfperren
+ * Since the architecture change (which was really needed otherwise we
+ * wouldn't have been able to continue this project) happened 4 weeks after the start of the project, I had to
+ * create Containers to carry the informations about the live instance and transform them in the
+ * Cache into live instances. This allows us to have only one live instance of anything at the time.
+ * Since a lot of classes already in place were all modifying these instances all at the time, I couldn't
+ * implement unique-instance listeners, and therefore had to implement them in the Cache which results in a
+ * loss of speed and several useless costful updates. The problem with this architecture is that all methods
+ * that modify the cache need to be called from the cache and thus there is a lot of code in here.
+ */
+
+/**
+ * The {@code Cache} contains every instance of {@code User}, {@code Event}, {@code Invitation} and
+ * {@code Filter} that is used by the GUI. You can initialize the Cache from a DatabaseHelper with
+ * {@code initFromDatabase}, and then update it with a SmartMapClient using {@code updateFromNetwork}. All
+ * methods in the Cache that call the {@code SmartMapClient} use {@code AsyncTask}s and then update the
+ * {@code Cache} with the results
  * 
  * @author jfperren
  */
@@ -57,6 +67,9 @@ public class Cache implements CacheInterface {
     // Contains all listeners
     private final List<CacheListener> mListeners;
 
+    /**
+     * Constructor
+     */
     public Cache() {
         // Init Data structures
         mUserInstances = new LongSparseArray<User>();
@@ -643,30 +656,6 @@ public class Cache implements CacheInterface {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.CacheInterface#logState()
-     */
-    @Override
-    public void logState() {
-        Log.d(TAG, "CACHE STATE : Users : " + mUserIds);
-        Log.d(TAG, "CACHE STATE : Friends : " + mFriendIds);
-        Log.d(TAG, "CACHE STATE : Events : " + mEventIds);
-        Set<String> filters = new HashSet<String>();
-        for (long id : mFilterIds) {
-            filters.add("" + this.getFilter(id).getName() + "(" + this.getFilter(id).getVisibleFriends()
-                + ")" + this.getFilter(id).getId() + this.getFilter(id).isActive());
-        }
-        Log.d(TAG, "CACHE STATE : Filters : " + filters);
-        Set<Long> invitingUsers = new HashSet<Long>();
-        for (long id : mInvitationIds) {
-            if (this.getInvitation(id).getUser() != null) {
-                invitingUsers.add(this.getInvitation(id).getUser().getId());
-            }
-        }
-        Log.d(TAG, "CACHE STATE : Invits : " + invitingUsers);
-    }
-
-    /*
-     * (non-Javadoc)
      * @see
      * ch.epfl.smartmap.cache.CacheInterface#modifyOwnEvent(ch.epfl.smartmap
      * .cache.ImmutableEvent,
@@ -765,7 +754,6 @@ public class Cache implements CacheInterface {
                     listener.onEventListUpdate();
                 }
             }
-            this.logState();
         }
     }
 
@@ -819,7 +807,6 @@ public class Cache implements CacheInterface {
                 listener.onFilterListUpdate();
             }
         }
-        this.logState();
     }
 
     /*
@@ -894,8 +881,6 @@ public class Cache implements CacheInterface {
                 listener.onInvitationListUpdate();
             }
         }
-
-        this.logState();
     }
 
     /*
@@ -951,7 +936,6 @@ public class Cache implements CacheInterface {
                 listener.onUserListUpdate();
             }
         }
-        this.logState();
     }
 
     /*
@@ -1112,10 +1096,8 @@ public class Cache implements CacheInterface {
     /*
      * (non-Javadoc)
      * @see
-     * ch.epfl.smartmap.cache.CacheInterface#removeParticipantsFromEvent(java
-     * .util.Set,
-     * ch.epfl.smartmap.cache.Event,
-     * ch.epfl.smartmap.callbacks.NetworkRequestCallback)
+     * ch.epfl.smartmap.cache.CacheInterface#removeParticipantsFromEvent(java.util.Set,
+     * ch.epfl.smartmap.cache.Event, ch.epfl.smartmap.callbacks.NetworkRequestCallback)
      */
     @Override
     public synchronized void removeParticipantsFromEvent(Set<Long> ids, Event event,
