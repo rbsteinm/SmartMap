@@ -17,9 +17,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Represents an {@code User} that is listed on the server as your Friend. There is therefore more
- * informations that are accessible. Friends should not be instanciated directly, but from the method
- * {@code User.createFromContainer(...)}
+ * Represents an {@code User} that is listed on the server as your Friend. There
+ * is therefore more
+ * informations that are accessible. Friends should not be instanciated
+ * directly, but from the method {@code User.createFromContainer(...)}
  * 
  * @author jfperren
  * @author ritterni
@@ -86,7 +87,7 @@ public final class Friend extends User {
         }
 
         if ((isBlocked == BlockStatus.NOT_SET) || (isBlocked == null)) {
-            mIsBlocked = BlockStatus.BLOCKED;
+            mIsBlocked = BlockStatus.UNBLOCKED;
         } else {
             mIsBlocked = isBlocked;
         }
