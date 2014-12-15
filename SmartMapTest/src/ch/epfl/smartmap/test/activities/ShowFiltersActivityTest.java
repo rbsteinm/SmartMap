@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.mockito.Mockito;
 
-import android.app.ListActivity;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
 import ch.epfl.smartmap.activities.ShowFiltersActivity;
@@ -30,7 +29,7 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
 public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<ShowFiltersActivity> {
 
-	private ListActivity mActivity;
+
 	Filter filter;
 	Set<Filter> filterSet;
 
@@ -42,7 +41,7 @@ public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<Sh
 	protected void setUp() throws Exception {
 		super.setUp();
 		ServiceContainer.forceInitSmartMapServices(this.getActivity());
-		mActivity = this.getActivity();
+		this.getActivity();
 		filter=Filter.createFromContainer(new FilterContainer(3, "Family", new HashSet<Long>(Arrays.asList((long) 2)), true));
 		this.createMockCacheWithMockFilter(filter);
 	}

@@ -267,6 +267,10 @@
     <string name="switch_On">YES</string>
     <string name="switch_Off">NO</string>
     <string name="people_inside_filter">people inside this filter</string>
+    <string name="new_filter">New Filter</string>
+    <string name="create_filter">Create</string>
+    <string name="cancel_create_filter">Cancel</string>
+    <string name="create_filter_empty_name">Enter a non empty name</string>
 
     <!-- ModifyFilterActivity -->
     <string name="title_activity_modify_filter">ModifyFilterActivity</string>

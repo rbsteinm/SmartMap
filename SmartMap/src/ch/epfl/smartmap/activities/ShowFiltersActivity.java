@@ -46,39 +46,43 @@ public class ShowFiltersActivity extends ListActivity {
         LayoutInflater inflater = this.getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.new_filter_alert_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("New filter");
+        builder.setTitle(this.getResources().getString(R.string.new_filter));
         builder.setView(alertLayout);
 
         // Add positive button
-        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                EditText editText =
-                    (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
-                String filterName = editText.getText().toString();
-                if (filterName.isEmpty()) {
-                    Toast.makeText(ShowFiltersActivity.this.getBaseContext(), "Enter a non empty name",
-                        Toast.LENGTH_LONG).show();
-                } else {
-                    Long newFilterId =
-                        ServiceContainer.getCache().putFilter(
-                            new FilterContainer(Filter.NO_ID, filterName, new HashSet<Long>(), true));
-                    // Start a new instance of ModifyFilterActivity passing it the
-                    // new filter's name
-                    Intent intent = new Intent(ShowFiltersActivity.this, ModifyFilterActivity.class);
-                    intent.putExtra("FILTER", newFilterId);
-                    ShowFiltersActivity.this.startActivity(intent);
+        builder.setPositiveButton(this.getResources().getString(R.string.create_filter),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    EditText editText =
+                        (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
+                    String filterName = editText.getText().toString();
+                    if (filterName.isEmpty()) {
+                        Toast.makeText(
+                            ShowFiltersActivity.this.getBaseContext(),
+                            ShowFiltersActivity.this.getResources().getString(
+                                R.string.create_filter_empty_name), Toast.LENGTH_LONG).show();
+                    } else {
+                        Long newFilterId =
+                            ServiceContainer.getCache().putFilter(
+                                new FilterContainer(Filter.NO_ID, filterName, new HashSet<Long>(), true));
+                        // Start a new instance of ModifyFilterActivity passing it the
+                        // new filter's name
+                        Intent intent = new Intent(ShowFiltersActivity.this, ModifyFilterActivity.class);
+                        intent.putExtra("FILTER", newFilterId);
+                        ShowFiltersActivity.this.startActivity(intent);
+                    }
                 }
-            }
-        });
+            });
 
         // Add negative button
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton(this.getResources().getString(R.string.cancel_create_filter),
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                }
+            });
 
         // display the AlertDialog
         builder.create().show();
