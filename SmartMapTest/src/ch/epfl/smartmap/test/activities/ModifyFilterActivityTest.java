@@ -6,6 +6,11 @@ import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewA
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import android.content.Intent;
 import android.test.ActivityInstrumentationTestCase2;
 import ch.epfl.smartmap.R;
@@ -17,18 +22,14 @@ import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.test.database.MockContainers;
 
 import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
-
-/**
- * @author marion-S
- * @author hugo-S
- * 
- */
 public class ModifyFilterActivityTest extends
 ActivityInstrumentationTestCase2<ModifyFilterActivity> {
 
 	FilterContainer filter;
 	UserContainer user1;
 	UserContainer user2;
+	UserContainer user3;
+	Set<UserContainer> allFriends;
 
 	public ModifyFilterActivityTest() {
 		super(ModifyFilterActivity.class);
@@ -54,30 +55,30 @@ ActivityInstrumentationTestCase2<ModifyFilterActivity> {
 
 	}
 
-	public void testCannotRenameFilterWithEmptyName() {
+	public void testCannotRenameFilterWithEmptyName(){
 		onView(withId(R.id.action_rename_filter)).perform(click());
 		onView(withId(android.R.id.button1)).perform(click());
 		onView(withText(filter.getName())).check(matches(isDisplayed()));
 	}
 
-	public void testCannotRenameFilterWithTooLongName() {
+	public void testCannotRenameFilterWithTooLongName(){
 		onView(withId(R.id.action_rename_filter)).perform(click());
-		onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(
-				ViewActions
-				.typeText("Nejsisisisisisisioososososososososososos"));
+		onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(ViewActions.typeText("Nejsisisisisisisioososososososososososos"));
 		onView(withId(android.R.id.button1)).perform(click());
 		onView(withText(filter.getName())).check(matches(isDisplayed()));
 	}
 
-	public void testClickOnRenameOpensDialog() {
+	public void testClickOnRenameOpensDialog(){
 		onView(withId(R.id.action_rename_filter)).perform(click());
 		onView(withText("Cancel")).check(matches(isDisplayed()));
 	}
 
-	public void testClickRemoveOpensDialog() {
+	public void testClickRemoveOpensDialog(){
 		onView(withId(R.id.action_remove_filter)).perform(click());
 		onView(withText("Remove filter?")).check(matches(isDisplayed()));
 	}
+
+
 
 	public void testRemoveButtonIsDisplayed() {
 		onView(withId(R.id.action_remove_filter)).check(matches(isDisplayed()));
@@ -87,10 +88,9 @@ ActivityInstrumentationTestCase2<ModifyFilterActivity> {
 		onView(withId(R.id.action_rename_filter)).check(matches(isDisplayed()));
 	}
 
-	public void testRenameFilterChangesActivityTitle() {
+	public void testRenameFilterChangesActivityTitle(){
 		onView(withId(R.id.action_rename_filter)).perform(click());
-		onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(
-				ViewActions.typeText("New name"));
+		onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(ViewActions.typeText("New name"));
 		onView(withId(android.R.id.button1)).perform(click());
 		onView(withText("New name")).check(matches(isDisplayed()));
 	}
@@ -99,23 +99,25 @@ ActivityInstrumentationTestCase2<ModifyFilterActivity> {
 		onView(withId(R.id.action_save_filter)).check(matches(isDisplayed()));
 	}
 
-	public void testFilterNameIsDisplayed() {
-		onView(withText(filter.getName())).check(matches(isDisplayed()));
-	}
+
 
 	private void createMockCache() {
 		Cache newCache = new Cache();
 		newCache.putFilter(filter);
 		newCache.putUser(user1);
 		newCache.putUser(user2);
-		newCache.putFilter(MockContainers.DEFAULT_CONTAINER);
+		newCache.putUser(user3);
 		ServiceContainer.setCache(newCache);
 	}
 
 	private void createMockItems() {
 		user1 = MockContainers.ALAIN_CONTAINER;
-		user2 = MockContainers.NICOLAS_CONTAINER;
-		filter = MockContainers.FAMILY_CONTAINER;
+		user2 = MockContainers.JULIEN_CONTAINER;
+		user3 = MockContainers.ROBIN_CONTAINER;
+		allFriends = new HashSet<UserContainer>(Arrays.asList(user1, user2,
+				user3));
+		filter = new FilterContainer(3, "Family", new HashSet<Long>(
+				Arrays.asList(user1.getId())), true);
 
 	}
 }

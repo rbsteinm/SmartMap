@@ -22,10 +22,6 @@ import com.google.android.apps.common.testing.ui.espresso.action.ViewActions;
 import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
 import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
-/**
- * @author hugo-S
- *
- */
 public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<ShowFiltersActivity> {
 
 	FilterContainer filter;
@@ -79,7 +75,7 @@ public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<Sh
 	public void testCanOppenCreateFilerDialog() {
 		onView(withId(R.id.activity_show_filters_add_button)).perform(click());
 		onView(withText("New Filter")).check(matches(isDisplayed()));
-
+		// pressBack();
 	}
 
 	public void testFilterNameIsDisplayed() {
