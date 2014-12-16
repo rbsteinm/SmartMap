@@ -52,39 +52,10 @@ public final class Utils {
     private static final double TEN = 10.0;
 
     /**
-     * @param addresses
-     * @return
-     * @author SpicyCH
+     * Private constructor so that Utils cannot be instantiated.
      */
-    private static String cityOrCountryFromAddresses(List<Address> addresses) {
-        if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
-            return addresses.get(0).getLocality();
-        } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
-            return addresses.get(0).getCountryName();
-        } else {
-            return Displayable.NO_LOCATION_STRING;
-        }
-    }
-
-    /**
-     * @param calendar
-     * @return
-     * @author SpicyCH
-     */
-    private static String customizedDateString(Calendar calendar, int daysDiff) {
-        if (daysDiff > 1) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
-                + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-        } else if (daysDiff == 1) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
-        } else if (daysDiff == 0) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
-        } else if (daysDiff == -1) {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
-        } else {
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
-                + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-        }
+    private Utils() {
+        super();
     }
 
     /**
@@ -111,23 +82,6 @@ public final class Utils {
     }
 
     /**
-     * @param time
-     *            a second, minute, hour, day or month
-     * @return the time prefixed with 0 if it was < 10
-     * @author SpicyCH
-     */
-    private static String formatForDisplay(int time) {
-        String hourOfDayString = "";
-        if (time < TEN) {
-            hourOfDayString += "0" + time;
-        } else {
-            hourOfDayString += time;
-        }
-
-        return hourOfDayString;
-    }
-
-    /**
      * @param location
      * @return a String of the city associated with the given coordinates, the
      *         country name if city not found, <code>NO_LOCATION_STRING</code>
@@ -139,10 +93,12 @@ public final class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder =
+            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
 
             return cityOrCountryFromAddresses(addresses);
 
@@ -163,8 +119,8 @@ public final class Utils {
      * @param endColor
      * @return the mixed colors
      */
-    public static int
-        getColorInInterval(double value, double startValue, double endValue, int startColor, int endColor) {
+    public static int getColorInInterval(double value, double startValue, double endValue, int startColor,
+        int endColor) {
         if (startValue > endValue) {
             return getColorInInterval(value, endValue, startValue, endColor, startColor);
         } else {
@@ -174,13 +130,14 @@ public final class Utils {
                 double percentageEnd = -(startValue - value) / intervalLength;
                 double percentageStart = -(value - endValue) / intervalLength;
 
-                int red = (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
+                int red =
+                    (int) ((percentageStart * Color.red(startColor)) + (percentageEnd * Color.red(endColor)));
                 int green =
-                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color.green(endColor)));
-                int blue = (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
+                    (int) ((percentageStart * Color.green(startColor)) + (percentageEnd * Color
+                        .green(endColor)));
+                int blue =
+                    (int) ((percentageStart * Color.blue(startColor)) + (percentageEnd * Color.blue(endColor)));
 
-                Log.d(TAG, "start : " + percentageStart + "end : " + percentageEnd);
-                Log.d(TAG, "Middle color/ R : " + red + " B : " + blue + " G : " + green);
                 return Color.rgb(red, green, blue);
             } else if (value < startValue) {
                 return startColor;
@@ -188,18 +145,6 @@ public final class Utils {
                 return endColor;
             }
         }
-    }
-
-    /**
-     * @param calendar
-     * @return the date, in the form dd.mm.yyyy
-     * @author SpicyCH
-     */
-    private static String getCompleteDate(Calendar calendar) {
-        int month = calendar.get(Calendar.MONTH) + 1;
-
-        return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
-            + calendar.get(Calendar.YEAR);
     }
 
     /**
@@ -212,10 +157,12 @@ public final class Utils {
             return Displayable.NO_LOCATION_STRING;
         }
 
-        Geocoder geocoder = new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
+        Geocoder geocoder =
+            new Geocoder(ServiceContainer.getSettingsManager().getContext(), Locale.getDefault());
 
         try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            List<Address> addresses =
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
                 return addresses.get(0).getCountryName();
             } else {
@@ -247,25 +194,8 @@ public final class Utils {
             // Do not forget that the first month in a GregorianCalendar is 0!
             // bug #82
             int month = calendar.get(Calendar.MONTH) + 1;
-            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
-                + calendar.get(Calendar.YEAR);
-        }
-    }
-
-    /**
-     * @param calendar
-     * @param daysDiff
-     * @return
-     * @author SpicyCH
-     */
-    private static String getDateStringForNoYearDiff(Calendar calendar, int daysDiff) {
-
-        if ((daysDiff > -DAYS_IN_A_WEEK) && (daysDiff < DAYS_IN_A_WEEK)) {
-
-            return customizedDateString(calendar, daysDiff);
-
-        } else {
-            return getCompleteDate(calendar);
+            return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month)
+                + "." + calendar.get(Calendar.YEAR);
         }
     }
 
@@ -301,7 +231,8 @@ public final class Utils {
 
         } else {
 
-            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_never_seen_on_smartmap);
+            return ServiceContainer.getSettingsManager().getContext()
+                .getString(R.string.utils_never_seen_on_smartmap);
         }
     }
 
@@ -345,13 +276,18 @@ public final class Utils {
             distance = distance / ONE_THOUSAND_METERS;
             distance = Math.round(distance * TEN) / TEN;
             textDistance =
-                distance + " " + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km) + " "
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_away_from_you);
+                distance
+                    + " "
+                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.symbol_km)
+                    + " "
+                    + ServiceContainer.getSettingsManager().getContext()
+                        .getString(R.string.utils_away_from_you);
         } else {
             distance = Math.round(distance);
             textDistance =
                 (((int) distance) + " ")
-                    + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_meters_away_from_you);
+                    + ServiceContainer.getSettingsManager().getContext()
+                        .getString(R.string.utils_meters_away_from_you);
         }
         return textDistance;
     }
@@ -386,6 +322,88 @@ public final class Utils {
     }
 
     /**
+     * @param addresses
+     * @return
+     * @author SpicyCH
+     */
+    private static String cityOrCountryFromAddresses(List<Address> addresses) {
+        if (!addresses.isEmpty() && (addresses.get(0).getLocality() != null)) {
+            return addresses.get(0).getLocality();
+        } else if (!addresses.isEmpty() && (addresses.get(0).getCountryName() != null)) {
+            return addresses.get(0).getCountryName();
+        } else {
+            return Displayable.NO_LOCATION_STRING;
+        }
+    }
+
+    /**
+     * @param calendar
+     * @return
+     * @author SpicyCH
+     */
+    private static String customizedDateString(Calendar calendar, int daysDiff) {
+        if (daysDiff > 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_next) + " "
+                + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        } else if (daysDiff == 1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_tomorrow);
+        } else if (daysDiff == 0) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_today);
+        } else if (daysDiff == -1) {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
+        } else {
+            return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_last) + " "
+                + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        }
+    }
+
+    /**
+     * @param time
+     *            a second, minute, hour, day or month
+     * @return the time prefixed with 0 if it was < 10
+     * @author SpicyCH
+     */
+    private static String formatForDisplay(int time) {
+        String hourOfDayString = "";
+        if (time < TEN) {
+            hourOfDayString += "0" + time;
+        } else {
+            hourOfDayString += time;
+        }
+
+        return hourOfDayString;
+    }
+
+    /**
+     * @param calendar
+     * @return the date, in the form dd.mm.yyyy
+     * @author SpicyCH
+     */
+    private static String getCompleteDate(Calendar calendar) {
+        int month = calendar.get(Calendar.MONTH) + 1;
+
+        return formatForDisplay(calendar.get(Calendar.DAY_OF_MONTH)) + "." + formatForDisplay(month) + "."
+            + calendar.get(Calendar.YEAR);
+    }
+
+    /**
+     * @param calendar
+     * @param daysDiff
+     * @return
+     * @author SpicyCH
+     */
+    private static String getDateStringForNoYearDiff(Calendar calendar, int daysDiff) {
+
+        if ((daysDiff > -DAYS_IN_A_WEEK) && (daysDiff < DAYS_IN_A_WEEK)) {
+
+            return customizedDateString(calendar, daysDiff);
+
+        } else {
+            return getCompleteDate(calendar);
+        }
+    }
+
+    /**
      * @param diff
      * @return
      * @author SpicyCH
@@ -395,7 +413,8 @@ public final class Utils {
         if (days == 1) {
             return ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_yesterday);
         } else {
-            return days + " " + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
+            return days + " "
+                + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_days_ago);
         }
     }
 
@@ -427,12 +446,5 @@ public final class Utils {
             return minutes + " "
                 + ServiceContainer.getSettingsManager().getContext().getString(R.string.utils_minutes_ago);
         }
-    }
-
-    /**
-     * Private constructor so that Utils cannot be instantiated.
-     */
-    private Utils() {
-        super();
     }
 }

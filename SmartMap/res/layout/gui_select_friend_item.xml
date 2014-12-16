@@ -9,13 +9,12 @@
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_alignParentLeft="true"
+        android:contentDescription="@string/invite_friends_image_descr"
         />
     <TextView
         android:id="@+id/activity_friends_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/img"
-        android:layout_toRightOf="@+id/img"
         android:textStyle="bold"
         android:layout_marginLeft="50dp" />
  
@@ -27,9 +26,8 @@
         android:layout_gravity="center"
         android:layout_marginTop="2dip"
         android:layout_marginLeft="50dp"
-        android:layout_toRightOf="@id/img"
         android:gravity="right"
-        android:textSize="15dp"
+        android:textSize="15sp"
         android:textStyle="italic" />
 
 </RelativeLayout>

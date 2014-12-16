@@ -14,15 +14,21 @@ import com.google.android.gms.maps.model.LatLng;
 public class Self extends User {
 
     /**
-     * Constructor
+     * Constructor. Constructs a new {@code User} based on info from the
+     * {@code SettingsManager}
      * 
-     * @param user
+     * @param image
+     *            The user's profile picture
      */
     protected Self(Bitmap image) {
-        super(ServiceContainer.getSettingsManager().getUserId(), ServiceContainer.getSettingsManager()
-            .getUserName(), image);
+        super(ServiceContainer.getSettingsManager().getUserId(), ServiceContainer.getSettingsManager().getUserName(),
+            image);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see ch.epfl.smartmap.cache.UserInterface#getBlockStatus()
+     */
     @Override
     public User.BlockStatus getBlockStatus() {
         return User.BlockStatus.UNBLOCKED;
@@ -67,7 +73,8 @@ public class Self extends User {
 
     /*
      * (non-Javadoc)
-     * @see ch.epfl.smartmap.cache.Displayable#getMarkerIcon(android.content.Context)
+     * @see
+     * ch.epfl.smartmap.cache.Displayable#getMarkerIcon(android.content.Context)
      */
     @Override
     public BitmapDescriptor getMarkerIcon(Context context) {

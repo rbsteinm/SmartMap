@@ -32,13 +32,17 @@ import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.gui.FriendListItemAdapter;
 
 /**
- * An activity that allows to modify a filter: add or remove people, rename filter, remove filter. The action
- * of adding/removing a friend from the filter is done by drag and drop between two lists.
+ * An activity that allows to modify a filter: add or remove people, rename
+ * filter, remove filter. The action
+ * of adding/removing a friend from the filter is done by drag and drop between
+ * two lists.
  * 
  * @author marion-S
  */
 @SuppressLint("InflateParams")
 public class ModifyFilterActivity extends Activity {
+
+    public static final int MAX_NAME_LENGTH = 25;
 
     private LinearLayout mInsideFilterLayout;
     private LinearLayout mOutsideFilterLayout;
@@ -62,6 +66,7 @@ public class ModifyFilterActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_modify_filter);
         this.getActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.color.main_blue));
+        // ServiceContainer.initSmartMapServices(this.getBaseContext());
 
         mInsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_inside_layout);
         mOutsideFilterLayout = (LinearLayout) this.findViewById(R.id.activity_modify_filter_outside_layout);
@@ -85,6 +90,7 @@ public class ModifyFilterActivity extends Activity {
 
         mListViewOutside.setOnDragListener(mFromOutsideDragListener);
         mInsideFilterLayout.setOnDragListener(mFromOutsideDragListener);
+
     }
 
     /*
@@ -171,14 +177,21 @@ public class ModifyFilterActivity extends Activity {
                     EditText editText =
                         (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                     String newName = editText.getText().toString();
+                    if (newName.isEmpty() || (newName.length() > MAX_NAME_LENGTH)) {
+                        Toast.makeText(
+                            ModifyFilterActivity.this.getBaseContext(),
+                            ModifyFilterActivity.this.getResources().getString(
+                                R.string.create_filter_invalid_name), Toast.LENGTH_LONG).show();
+                    } else {
+                        ServiceContainer.getCache().putFilter(
+                            new FilterContainer(mFilter.getId(), newName, mFilter.getIds(), mFilter
+                                .isActive()));
 
-                    ServiceContainer.getCache().putFilter(
-                        new FilterContainer(mFilter.getId(), newName, mFilter.getIds(), mFilter.isActive()));
-
-                    Toast.makeText(ModifyFilterActivity.this,
-                        ModifyFilterActivity.this.getResources().getString(R.string.new_name_saved),
-                        Toast.LENGTH_LONG).show();
-                    ModifyFilterActivity.this.setTitle(newName);
+                        Toast.makeText(ModifyFilterActivity.this,
+                            ModifyFilterActivity.this.getResources().getString(R.string.new_name_saved),
+                            Toast.LENGTH_LONG).show();
+                        ModifyFilterActivity.this.setTitle(newName);
+                    }
 
                 }
             });
@@ -210,8 +223,8 @@ public class ModifyFilterActivity extends Activity {
     }
 
     /**
-     * An utility method to convert a friend list to a set of corresponding ids, because the {@code Cache}
-     * methods
+     * An utility method to convert a friend list to a set of corresponding ids,
+     * because the {@code Cache} methods
      * uses sets of ids.
      * 
      * @param friendList
@@ -261,24 +274,30 @@ public class ModifyFilterActivity extends Activity {
     }
 
     /**
-     * Set the filter that the activity displays by retrieving its id from the starting intent and using the
-     * {@code Cache}
+     * Set the filter that the activity displays by retrieving its id from the
+     * starting intent and using the {@code Cache}
      */
     private void setFilter() {
         mFilter =
             ServiceContainer.getCache().getFilter(this.getIntent().getLongExtra("FILTER", Filter.NO_ID));
+
         for (long id : mFilter.getIds()) {
-            mFriendsInside.add(ServiceContainer.getCache().getUser(id));
+            User user = ServiceContainer.getCache().getUser(id);
+            if (!mFriendsInside.contains(user)) {
+                mFriendsInside.add(user);
+            }
+
         }
         for (User friend : ServiceContainer.getCache().getAllFriends()) {
-            if (!mFriendsInside.contains(friend)) {
+            if (!mFriendsInside.contains(friend) && !mFriendsOutside.contains(friend)) {
                 mFriendsOutside.add(friend);
             }
         }
     }
 
     /**
-     * Updates the inside and outside filter lists when an item is dragged from the outside list and dropped
+     * Updates the inside and outside filter lists when an item is dragged from
+     * the outside list and dropped
      * into the inside list, i.e when a friend is added to the filter
      * 
      * @param droppedItem
@@ -300,7 +319,8 @@ public class ModifyFilterActivity extends Activity {
     }
 
     /**
-     * Updates the inside and outside filter lists when an item is dragged from the inside list and dropped
+     * Updates the inside and outside filter lists when an item is dragged from
+     * the inside list and dropped
      * into the outside list, i.e when a friend is removed from the filter
      * 
      * @param droppedItem

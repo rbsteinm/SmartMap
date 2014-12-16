@@ -191,8 +191,12 @@ public final class Friend extends User {
      * @return True if the Friend should be displayed on the Map
      */
     public boolean isVisible() {
-        return ServiceContainer.getCache().getAllActiveFilters().contains(this)
-            && !mLocation.equals(NO_LOCATION);
+        boolean isInFilters = false;
+        for (Filter filter : ServiceContainer.getCache().getAllActiveFilters()) {
+            // This friend was found in a previous filter OR is contained in the current one
+            isInFilters = isInFilters || filter.getIds().contains(this.getId());
+        }
+        return isInFilters && !mLocation.equals(NO_LOCATION);
     }
 
     @Override

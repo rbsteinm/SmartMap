@@ -38,6 +38,7 @@
     <string name="settings_text">Settings</string>
     <string name="about_text">About</string>
     <string name="logout_text">Logout</string>
+
     <string-array name="sideMenuElements">
         <item>@string/profile_text</item>
         <item>@string/friends_text</item>
@@ -48,7 +49,6 @@
         <item>@string/logout_text</item>
     </string-array>
 
-    <string name="title_activity_pager">Friends</string>
     <string name="search_bar_hint">Search…</string>
     <string name="title_activity_map_fragment">MapFragment</string>
 
@@ -103,6 +103,11 @@
     <string name="welcome">W E L C O M E</string>
     <string name="loading_text">Logging in…</string>
     <string name="logo_description">logo</string>
+
+    <!-- FriendsPagerActivity -->
+    <string name="title_activity_pager">Friends</string>
+    <string name="friend_list">Friend list</string>
+    <string name="friends_invitations_list">Friend invitation list</string>
 
     <!-- ShowEventsActivity -->
     <string name="title_activity_show_events">Events</string>
@@ -160,6 +165,7 @@
     <string name="refresh_participants_network_error">Network Error while getting participants</string>
     <string name="refresh_participants_not_found">Couldn\'t find participants</string>
     <string name="event_info_delete_button">Delete event</string>
+    <string name="event_info_toast_eventno_longer_exists">The event you are trying to see doesn\'t exist anymore, sorry.</string>
 
     <!-- Error Messages -->
     <string name="error_client_side">An error occurred on our side, sorry :(</string>
@@ -200,6 +206,7 @@
     <string name="invite_friends_no_items_selected">No invitations sent! Did you select any friends?</string>
     <string name="invite_friend_failure">Error while inviting friend</string>
     <string name="invite_friends_failure">Error while inviting friends</string>
+    <string name="invite_friends_image_descr">profile picture</string>
 
     <!-- FacebookFragment -->
     <string name="fb_fragment_toast_cannot_connect_to_smartmap_server">Failed to log in to the SmartMap server</string>
@@ -243,7 +250,7 @@
 
     <!-- Invitation Titles -->
     <string name="invitation_want_to_be_your_friend"> wants to be your friend.</string>
-    <string name="invitation_invites_your_to"> invites you to </string>
+    <string name="invitation_invites_your_to">You are invited to </string>
     <string name="invitation_accepted_your_friend_request"> accepted your friend request.</string>
 
     <!-- Invitation Subtitles -->
@@ -276,7 +283,7 @@
     <string name="new_filter">New Filter</string>
     <string name="create_filter">Create</string>
     <string name="cancel_create_filter">Cancel</string>
-    <string name="create_filter_empty_name">Enter a non empty name</string>
+    <string name="create_filter_invalid_name">Please enter a name between 1 and 25 characters</string>
 
     <!-- ModifyFilterActivity -->
     <string name="title_activity_modify_filter">ModifyFilterActivity</string>
@@ -284,7 +291,7 @@
     <string name="activity_modify_filter_outside_title">Outside filter</string>
     <string name="action_save_filter_button">Save</string>
     <string name="action_rename_filter_button">Rename</string>
-    <string name="action_cancel_button">Rename</string>
+    <string name="action_cancel_button">Cancel</string>
     <string name="rename_filter">Rename filter</string>
     <string name="new_name_saved">New name saved</string>
     <string name="save_changes">Save changes?</string>
@@ -376,7 +383,7 @@
     <string name="yes_accept">Yes, accept</string>
     <string name="no_decline">No, decline</string>
     <string name="decline_confirm">Invitation declined.</string>
-    
+
     <!-- AddEventOnMapLongClickListener -->
     <string name="map_long_clicked_dialog_title">Do you really want to create an event at this position?</string>
     <string name="map_long_clicked_dialog_message">This dialog is triggered by a long click on the map.</string>

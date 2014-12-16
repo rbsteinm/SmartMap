@@ -29,6 +29,11 @@ public interface FilterInterface extends Displayable {
     String getName();
 
     /**
+     * @return The type of Filter (Can be {@code Filter.CUSTOM} or {@code Filter.DEFAULT})
+     */
+    int getType();
+
+    /**
      * @return a {@code Set} containing all ids that should be left visible when this filter is activated
      */
     Set<Long> getVisibleFriends();

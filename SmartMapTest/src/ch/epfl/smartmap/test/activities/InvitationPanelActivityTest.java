@@ -20,7 +20,7 @@ import ch.epfl.smartmap.activities.MainActivity;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.cache.Cache;
 import ch.epfl.smartmap.cache.Invitation;
-import ch.epfl.smartmap.cache.MockGenerator;
+import ch.epfl.smartmap.test.database.MockInstances;
 
 public class InvitationPanelActivityTest extends
 
@@ -37,15 +37,10 @@ ActivityInstrumentationTestCase2<MainActivity> {
         this.getActivity();
         Cache newCache = Mockito.mock(Cache.class);
         SortedSet<Invitation> newSortedSet = new TreeSet<Invitation>();
-        Invitation newEventInvitation = MockGenerator.getInvitation(Invitation.EVENT_INVITATION);
-        Invitation newAcceptedFriendInvitation = MockGenerator.getInvitation(Invitation.ACCEPTED_FRIEND_INVITATION);
-        Invitation newFriendInvitation = MockGenerator.getInvitation(Invitation.FRIEND_INVITATION);
-        newSortedSet.add(newEventInvitation);
-        newSortedSet.add(newFriendInvitation);
-        newSortedSet.add(newAcceptedFriendInvitation);
+        newSortedSet.add(MockInstances.ROBIN_FRIEND_INVITATION);
+        newSortedSet.add(MockInstances.ROBIN_FRIEND_ACCEPTED_INVITATION);
         Mockito.when(newCache.getAllInvitations()).thenReturn(newSortedSet);
         ServiceContainer.setCache(newCache);
-        onView(withId(R.id.action_notifications)).perform(click());
     }
 
     @Override
@@ -57,33 +52,33 @@ ActivityInstrumentationTestCase2<MainActivity> {
      * Pressback shows main map
      */
     public void testAPressBack() {
+        onView(withId(R.id.action_notifications)).perform(click());
         onView(withId(R.id.notification_activity)).check(matches(isDisplayed()));
         pressBack();
         onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
 
     /**
-     * Click on accepted invitation open show event information activity
+     * Click on accepted invitation open user information activity
+     * 
+     * @throws InterruptedException
      */
-    public void testClickOnAcceptedInvitation() {
-        onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(0).perform(click());
+    public void testClickOnAcceptedInvitation() throws InterruptedException {
+        onView(withId(R.id.action_notifications)).perform(click());
+        onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(1).perform(click());
+        Thread.sleep(1000);
         onView(withId(R.id.user_info_header)).check(matches(isDisplayed()));
     }
 
     /**
-     * Click on event invitation open show event information activity
-     */
-    public void testClickOnEventInvitation() {
-        // Create a real Event ?
-        // onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(2).perform(click());
-        // onView(withId(R.id.show_event_info_header)).check(matches(isDisplayed()));
-    }
-
-    /**
      * Click on friend invitation open invitation tabs
+     * 
+     * @throws InterruptedException
      */
-    public void testClickOnFriendInvitation() {
-        onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(1).perform(click());
+    public void testClickOnFriendInvitation() throws InterruptedException {
+        onView(withId(R.id.action_notifications)).perform(click());
+        onData(anything()).inAdapterView(withId(android.R.id.list)).atPosition(0).perform(click());
+        Thread.sleep(1000);
         onView(withId(R.id.layout_invitations_tab)).check(matches(isDisplayed()));
     }
 }

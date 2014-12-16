@@ -17,7 +17,7 @@ import ch.epfl.smartmap.cache.Invitation;
  * Customized adapter that displays a list of invitations in a target activity. This
  * adapter dynamically creates a row in the activity for each invitation. It displays
  * in each row: inviting user name, and user picture
- * 
+ *
  * @author marion-S
  */
 public class FriendInvitationListItemAdapter extends ArrayAdapter<Invitation> {
@@ -51,22 +51,25 @@ public class FriendInvitationListItemAdapter extends ArrayAdapter<Invitation> {
         FriendInvitationViewHolder viewHolder;
         Invitation invitation = mItemsArrayList.get(position);
 
+        View newConvertView;
+
         if (convertView == null) {
             LayoutInflater inflater =
                 (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.gui_friend_invitation_list_item, parent, false);
+            newConvertView = inflater.inflate(R.layout.gui_friend_invitation_list_item, parent, false);
             viewHolder = new FriendInvitationViewHolder();
 
-            viewHolder.setUserName((TextView) convertView.findViewById(R.id.activity_friends_inviter_name));
+            viewHolder.setUserName((TextView) newConvertView.findViewById(R.id.activity_friends_inviter_name));
             viewHolder
-                .setPicture((ImageView) convertView.findViewById(R.id.activity_friends_inviter_picture));
+                .setPicture((ImageView) newConvertView.findViewById(R.id.activity_friends_inviter_picture));
             viewHolder.setUserId(invitation.getUser().getId());
             viewHolder.setInvitationId(invitation.getId());
 
-            convertView.setTag(viewHolder);
+            newConvertView.setTag(viewHolder);
 
         } else {
-            viewHolder = (FriendInvitationViewHolder) convertView.getTag();
+            newConvertView = convertView;
+            viewHolder = (FriendInvitationViewHolder) newConvertView.getTag();
         }
 
         if (invitation != null) {
@@ -75,13 +78,13 @@ public class FriendInvitationListItemAdapter extends ArrayAdapter<Invitation> {
                 ServiceContainer.getCache().getUser(invitation.getUser().getId()).getActionImage());
         }
 
-        return convertView;
+        return newConvertView;
     }
 
     /**
      * ViewHolder pattern implementation for smoother scrolling
      * in lists populated by {@link ch.epfl.smartmap.gui.FriendInvitationListItemAdapter}
-     * 
+     *
      * @author marion-S
      */
     static class FriendInvitationViewHolder {

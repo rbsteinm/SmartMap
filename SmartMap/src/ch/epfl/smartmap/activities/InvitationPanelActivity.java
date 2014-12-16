@@ -59,6 +59,7 @@ public class InvitationPanelActivity extends ListActivity {
         Intent invitationIntent = ((GenericInvitation) l.getItemAtPosition(position)).getIntent();
         if (invitationIntent != null) {
             this.startActivity(invitationIntent);
+            this.finish();
         }
 
         super.onListItemClick(l, v, position, id);
