@@ -18,13 +18,15 @@ import ch.epfl.smartmap.test.database.MockContainers;
  * @author ritterni
  */
 public class SelfTest extends AndroidTestCase {
-    Location location;
+    Location location = new Location("");
     String locationName = "Ecublens";
     UserContainer selfValues;
 
     @Before
     @Override
     protected void setUp() {
+        ServiceContainer.forceInitSmartMapServices(getContext());
+
         location.setLatitude(MockContainers.JULIEN_LATITUDE);
         location.setLongitude(MockContainers.JULIEN_LONGITUDE);
 
@@ -47,10 +49,10 @@ public class SelfTest extends AndroidTestCase {
             (Self) ServiceContainer.getCache().getUser(ServiceContainer.getSettingsManager().getUserId());
         assertTrue(self.getLatLng().latitude == MockContainers.JULIEN_LATITUDE);
         assertTrue(self.getLatLng().longitude == MockContainers.JULIEN_LONGITUDE);
-        assertTrue(self.getLocation().getLongitude() == MockContainers.JULIEN_LATITUDE);
-        assertTrue(self.getLocation().getLatitude() == MockContainers.JULIEN_LONGITUDE);
-        assertTrue(self.getLocationString().equals(locationName));
-        assertTrue(self.getSubtitle().equals("You are near " + locationName));
+        assertTrue(self.getLocation().getLongitude() == MockContainers.JULIEN_LONGITUDE);
+        assertTrue(self.getLocation().getLatitude() == MockContainers.JULIEN_LATITUDE);
+        assertTrue(self.getLocationString().equals(MockContainers.JULIEN_LOCATION_STRING));
+        assertTrue(self.getSubtitle().equals("You are near " + MockContainers.JULIEN_LOCATION_STRING));
     }
 
     @Test

@@ -50,7 +50,7 @@ public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<Sh
 		onView(withId(R.id.show_filters_alert_dialog_edittext)).check((doesNotExist()));
 	}
 
-	public void testCanCreateFilterWithNonEmptyName() {
+	public void testCanCreateFilterWithValidName() {
 		onView(withId(R.id.activity_show_filters_add_button)).perform(click());
 		onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(ViewActions.typeText("Filter"));
 		onView(withId(android.R.id.button1)).perform(click());
@@ -59,6 +59,14 @@ public class ShowFiltersActivityTest extends ActivityInstrumentationTestCase2<Sh
 
 	public void testCannotCreateFilterWithEmptyName() {
 		onView(withId(R.id.activity_show_filters_add_button)).perform(click());
+		onView(withId(android.R.id.button2)).perform(click());
+		onView(withId(R.id.activity_show_filters_follow_switch)).check(
+				ViewAssertions.matches(ViewMatchers.isDisplayed()));
+	}
+
+	public void testCannotCreateFilterWithTooLongName() {
+		onView(withId(R.id.activity_show_filters_add_button)).perform(click());
+		onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(ViewActions.typeText("sldfkjssfhhhhhhhhhhhhhhhhhhhhf"));
 		onView(withId(android.R.id.button2)).perform(click());
 		onView(withId(R.id.activity_show_filters_follow_switch)).check(
 				ViewAssertions.matches(ViewMatchers.isDisplayed()));
