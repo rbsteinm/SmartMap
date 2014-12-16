@@ -103,11 +103,11 @@ public class ShowFiltersActivity extends ListActivity {
                     EditText editText =
                         (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                     String filterName = editText.getText().toString();
-                    if (filterName.isEmpty()) {
+                    if (filterName.isEmpty() || (filterName.length() > 25)) {
                         Toast.makeText(
                             ShowFiltersActivity.this.getBaseContext(),
                             ShowFiltersActivity.this.getResources().getString(
-                                R.string.create_filter_empty_name), Toast.LENGTH_LONG).show();
+                                R.string.create_filter_invalid_name), Toast.LENGTH_LONG).show();
                     } else {
                         FilterContainer filterInfos =
                             new FilterContainer(Filter.NO_ID, filterName, new HashSet<Long>(), true);

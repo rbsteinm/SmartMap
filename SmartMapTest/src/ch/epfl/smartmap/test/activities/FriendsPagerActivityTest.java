@@ -21,7 +21,6 @@ import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.test.database.MockContainers;
 
-
 public class FriendsPagerActivityTest extends
 ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 
@@ -36,7 +35,8 @@ ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		ServiceContainer.forceInitSmartMapServices(this.getInstrumentation().getTargetContext());
+		ServiceContainer.forceInitSmartMapServices(this.getInstrumentation()
+				.getTargetContext());
 
 		this.createMockItems();
 		this.createMockCache();
@@ -73,18 +73,14 @@ ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 	}
 
 	public void testFriendsNamesAreDisplayed() {
-		onView(withText(friendContainer.getName())).check(matches(isDisplayed()));
+		onView(withText(friendContainer.getName())).check(
+				matches(isDisplayed()));
 	}
 
 	public void testFriendsProfilePicturesAreDisplayed() {
 		onView(withId(R.id.activity_friends_picture)).check(
 				matches(isDisplayed()));
 	}
-
-	//TODO when live instances will be ready
-	//	public void testFriendsSubtitlesAreDisplayed() {
-	//		onView(withText(friendContainer.getLocationString())).check(matches(isDisplayed()));
-	//	}
 
 	public void testInvitingUsersAreDisplayed() {
 		onView(withId(R.id.myViewPager)).perform(swipeLeft());
