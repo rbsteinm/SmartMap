@@ -2,7 +2,6 @@ package ch.epfl.smartmap.test.search;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
@@ -15,7 +14,6 @@ import android.util.Log;
 import ch.epfl.smartmap.background.ServiceContainer;
 import ch.epfl.smartmap.background.SettingsManager;
 import ch.epfl.smartmap.cache.Cache;
-import ch.epfl.smartmap.cache.Displayable;
 import ch.epfl.smartmap.cache.Event;
 import ch.epfl.smartmap.cache.User;
 import ch.epfl.smartmap.callbacks.SearchRequestCallback;
@@ -240,11 +238,4 @@ public class CachedSearchEngineTest extends AndroidTestCase {
         }
         assertTrue(gotAlain);
     }
-
-    @Test
-    public void testSendQuery() {
-        List<Displayable> list = searchEngine.sendQuery("poly", CachedSearchEngine.Type.EVENTS);
-        assertTrue(list.get(0).getId() == polylan.getId());
-    }
-
 }
