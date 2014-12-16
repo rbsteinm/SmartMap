@@ -25,7 +25,7 @@ public class SelfTest extends AndroidTestCase {
     @Before
     @Override
     protected void setUp() {
-        ServiceContainer.forceInitSmartMapServices(getContext());
+        ServiceContainer.forceInitSmartMapServices(this.getContext());
 
         location.setLatitude(MockContainers.JULIEN_LATITUDE);
         location.setLongitude(MockContainers.JULIEN_LONGITUDE);

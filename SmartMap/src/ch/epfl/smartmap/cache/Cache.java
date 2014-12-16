@@ -1294,7 +1294,9 @@ public class Cache implements CacheInterface {
             protected Void doInBackground(Long... params) {
                 try {
                     UserContainer userInfos = ServiceContainer.getNetworkClient().getUserInfo(params[0]);
-                    userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
+                    if ((userInfos != null) && (ServiceContainer.getNetworkClient() != null)) {
+                        userInfos.setImage(ServiceContainer.getNetworkClient().getProfilePicture(params[0]));
+                    }
                     Cache.this.updateUser(userInfos);
                 } catch (SmartMapClientException e) {
                     Log.e(TAG, "SmartMapClientException : " + e);
