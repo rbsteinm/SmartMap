@@ -25,6 +25,7 @@ public class SelfTest extends AndroidTestCase {
     @Before
     @Override
     protected void setUp() {
+
         location.setLatitude(MockContainers.JULIEN_LATITUDE);
         location.setLongitude(MockContainers.JULIEN_LONGITUDE);
 
