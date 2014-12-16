@@ -42,6 +42,8 @@ import ch.epfl.smartmap.gui.FriendListItemAdapter;
 @SuppressLint("InflateParams")
 public class ModifyFilterActivity extends Activity {
 
+    public static final int MAX_NAME_LENGTH = 25;
+
     private LinearLayout mInsideFilterLayout;
     private LinearLayout mOutsideFilterLayout;
 
@@ -175,14 +177,21 @@ public class ModifyFilterActivity extends Activity {
                     EditText editText =
                         (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                     String newName = editText.getText().toString();
+                    if (newName.isEmpty() || (newName.length() > MAX_NAME_LENGTH)) {
+                        Toast.makeText(
+                            ModifyFilterActivity.this.getBaseContext(),
+                            ModifyFilterActivity.this.getResources().getString(
+                                R.string.create_filter_invalid_name), Toast.LENGTH_LONG).show();
+                    } else {
+                        ServiceContainer.getCache().putFilter(
+                            new FilterContainer(mFilter.getId(), newName, mFilter.getIds(), mFilter
+                                .isActive()));
 
-                    ServiceContainer.getCache().putFilter(
-                        new FilterContainer(mFilter.getId(), newName, mFilter.getIds(), mFilter.isActive()));
-
-                    Toast.makeText(ModifyFilterActivity.this,
-                        ModifyFilterActivity.this.getResources().getString(R.string.new_name_saved),
-                        Toast.LENGTH_LONG).show();
-                    ModifyFilterActivity.this.setTitle(newName);
+                        Toast.makeText(ModifyFilterActivity.this,
+                            ModifyFilterActivity.this.getResources().getString(R.string.new_name_saved),
+                            Toast.LENGTH_LONG).show();
+                        ModifyFilterActivity.this.setTitle(newName);
+                    }
 
                 }
             });
