@@ -53,11 +53,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 /**
- * This Activity displays the core features of the App. It dispays the
- * {@code GoogleMap}, contains the {@code SideMenu}, as well as the
- * {@code SearchLayout}. Starts {@code FriendsPositionsThread},
- * {@code NearEventsThread} and {@code UpdateDatabaseThread} in its
- * {@code onCreate} method.
+ * This Activity displays the core features of the App. It dispays the {@code GoogleMap}, contains the
+ * {@code SideMenu}, as well as the {@code SearchLayout}. Starts {@code FriendsPositionsThread},
+ * {@code NearEventsThread} and {@code UpdateDatabaseThread} in its {@code onCreate} method.
  * 
  * @author jfperren
  * @author hugo-S
@@ -186,6 +184,9 @@ public class MainActivity extends FragmentActivity implements CacheListener {
         return mMenuTheme;
     }
 
+    /**
+     * Initialize the markers
+     */
     private void initializeMarkers() {
         if ((mFriendMarkerManager != null) && (mEventMarkerManager != null)) {
             mFriendMarkerManager.updateMarkers(this, new HashSet<Displayable>(ServiceContainer.getCache()
@@ -227,7 +228,8 @@ public class MainActivity extends FragmentActivity implements CacheListener {
         this.startService(new Intent(this, OwnPositionService.class));
 
         // Set actionbar color
-        this.getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
+        this.getActionBar().setBackgroundDrawable(
+            new ColorDrawable(this.getResources().getColor(R.color.main_blue)));
         this.getActionBar().setHomeButtonEnabled(true);
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
         this.getActionBar().setHomeAsUpIndicator(this.getResources().getDrawable(R.drawable.ic_drawer));
@@ -344,8 +346,8 @@ public class MainActivity extends FragmentActivity implements CacheListener {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mEventMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(ServiceContainer
-                    .getCache().getAllVisibleEvents()));
+                mEventMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(
+                    ServiceContainer.getCache().getAllVisibleEvents()));
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -425,7 +427,8 @@ public class MainActivity extends FragmentActivity implements CacheListener {
         // get the value of the user string
         Location eventLocation = startingIntent.getParcelableExtra(AddEventActivity.LOCATION_EXTRA);
         if (eventLocation != null) {
-            mMapZoomer.zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
+            mMapZoomer
+                .zoomWithAnimation(new LatLng(eventLocation.getLatitude(), eventLocation.getLongitude()));
             eventLocation = null;
         }
 
@@ -455,8 +458,8 @@ public class MainActivity extends FragmentActivity implements CacheListener {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mFriendMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(ServiceContainer
-                    .getCache().getAllVisibleFriends()));
+                mFriendMarkerManager.updateMarkers(MainActivity.this, new HashSet<Displayable>(
+                    ServiceContainer.getCache().getAllVisibleFriends()));
                 MainActivity.this.updateItemMenu();
             }
         });
@@ -566,8 +569,7 @@ public class MainActivity extends FragmentActivity implements CacheListener {
     }
 
     /**
-     * Sets the {@code ActionBar} to search theme. The {@code SearchPanel}
-     * slides up, the searchBar collapses
+     * Sets the {@code ActionBar} to search theme. The {@code SearchPanel} slides up, the searchBar collapses
      * and the {@code MenuItem} to close the search appears.
      */
     public void setSearchMenu() {
@@ -622,6 +624,9 @@ public class MainActivity extends FragmentActivity implements CacheListener {
         });
     }
 
+    /**
+     * Zoom according to all the markers that are on the map
+     */
     private void zoomAccordingToAllMarkers() {
 
         List<Marker> allMarkers = new ArrayList<Marker>(mFriendMarkerManager.getDisplayedMarkers());
