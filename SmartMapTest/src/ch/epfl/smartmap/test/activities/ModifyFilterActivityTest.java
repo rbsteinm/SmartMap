@@ -55,16 +55,22 @@ ActivityInstrumentationTestCase2<ModifyFilterActivity> {
 
 	}
 
-	public void testRemoveButtonIsDisplayed() {
-		onView(withId(R.id.action_remove_filter)).check(matches(isDisplayed()));
+	public void testCannotRenameFilterWithEmptyName(){
+		onView(withId(R.id.action_rename_filter)).perform(click());
+		onView(withId(android.R.id.button1)).perform(click());
+		onView(withText(filter.getName())).check(matches(isDisplayed()));
 	}
 
-	public void testSaveButtonIsDisplayed() {
-		onView(withId(R.id.action_save_filter)).check(matches(isDisplayed()));
+	public void testCannotRenameFilterWithTooLongName(){
+		onView(withId(R.id.action_rename_filter)).perform(click());
+		onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(ViewActions.typeText("Nejsisisisisisisioososososososososososos"));
+		onView(withId(android.R.id.button1)).perform(click());
+		onView(withText(filter.getName())).check(matches(isDisplayed()));
 	}
 
-	public void testRenameButtonIsDisplayed() {
-		onView(withId(R.id.action_rename_filter)).check(matches(isDisplayed()));
+	public void testClickOnRenameOpensDialog(){
+		onView(withId(R.id.action_rename_filter)).perform(click());
+		onView(withText("Cancel")).check(matches(isDisplayed()));
 	}
 
 	public void testClickRemoveOpensDialog(){
@@ -74,9 +80,12 @@ ActivityInstrumentationTestCase2<ModifyFilterActivity> {
 
 
 
-	public void testClickOnRenameOpensDialog(){
-		onView(withId(R.id.action_rename_filter)).perform(click());
-		onView(withText("Cancel")).check(matches(isDisplayed()));
+	public void testRemoveButtonIsDisplayed() {
+		onView(withId(R.id.action_remove_filter)).check(matches(isDisplayed()));
+	}
+
+	public void testRenameButtonIsDisplayed() {
+		onView(withId(R.id.action_rename_filter)).check(matches(isDisplayed()));
 	}
 
 	public void testRenameFilterChangesActivityTitle(){
@@ -84,6 +93,10 @@ ActivityInstrumentationTestCase2<ModifyFilterActivity> {
 		onView(withId(R.id.show_filters_alert_dialog_edittext)).perform(ViewActions.typeText("New name"));
 		onView(withId(android.R.id.button1)).perform(click());
 		onView(withText("New name")).check(matches(isDisplayed()));
+	}
+
+	public void testSaveButtonIsDisplayed() {
+		onView(withId(R.id.action_save_filter)).check(matches(isDisplayed()));
 	}
 
 

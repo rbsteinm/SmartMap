@@ -34,6 +34,7 @@ import ch.epfl.smartmap.listeners.OnCacheListener;
 public class ShowFiltersActivity extends ListActivity {
 
     private List<Filter> mFilterList;
+    public static final int MAX_NAME_LENGTH = 25;
 
     /*
      * (non-Javadoc)
@@ -103,7 +104,7 @@ public class ShowFiltersActivity extends ListActivity {
                     EditText editText =
                         (EditText) alertLayout.findViewById(R.id.show_filters_alert_dialog_edittext);
                     String filterName = editText.getText().toString();
-                    if (filterName.isEmpty() || (filterName.length() > 25)) {
+                    if (filterName.isEmpty() || (filterName.length() > MAX_NAME_LENGTH)) {
                         Toast.makeText(
                             ShowFiltersActivity.this.getBaseContext(),
                             ShowFiltersActivity.this.getResources().getString(
