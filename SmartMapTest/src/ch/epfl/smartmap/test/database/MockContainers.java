@@ -49,6 +49,29 @@ public class MockContainers {
 						JULIEN_LOCATION_STRING, JULIEN_IMAGE, JULIEN_BLOCK_STATUS, JULIEN_FRIENDSHIP);
 	}
 
+	public static final UserContainer NICOLAS_CONTAINER;
+	public static final long NICOLAS_ID = 160;
+	public static final String NICOLAS_NAME = "Nicolas";
+	public static final String NICOLAS_EMAIL = "nicolas@epfl.ch";
+	public static final String NICOLAS_PHONE_NUMBER = "12934";
+	public static final Bitmap NICOLAS_IMAGE = Bitmap.createBitmap(1, 2, Config.ALPHA_8);
+	public static final User.BlockStatus NICOLAS_BLOCK_STATUS = User.BlockStatus.UNBLOCKED;
+	public static final Location NICOLAS_LOCATION = new Location(User.PROVIDER_NAME);
+	public static final String NICOLAS_LOCATION_STRING = "London";
+	public static final double NICOLAS_LATITUDE = 59.94890;
+	public static final double NICOLAS_LONGITUDE = 60.58984;
+	public static final long NICOLAS_LAST_SEEN = 52;
+	public static final int NICOLAS_FRIENDSHIP = User.FRIEND;
+
+	static {
+		NICOLAS_LOCATION.setLatitude(NICOLAS_LATITUDE);
+		NICOLAS_LOCATION.setLongitude(NICOLAS_LONGITUDE);
+		NICOLAS_LOCATION.setTime(NICOLAS_LAST_SEEN);
+		NICOLAS_CONTAINER =
+				new UserContainer(NICOLAS_ID, NICOLAS_NAME, NICOLAS_PHONE_NUMBER, NICOLAS_EMAIL, NICOLAS_LOCATION,
+						NICOLAS_LOCATION_STRING, NICOLAS_IMAGE, NICOLAS_BLOCK_STATUS, NICOLAS_FRIENDSHIP);
+	}
+
 	public static final UserContainer ALAIN_CONTAINER;
 	public static final long ALAIN_ID = 5675676;
 	public static final String ALAIN_NAME = "Alain";
@@ -207,7 +230,7 @@ public class MockContainers {
 	public static final FilterContainer DEFAULT_CONTAINER;
 	public static final long DEFAULT_ID = Filter.DEFAULT_FILTER_ID;
 	public static final String DEFAULT_NAME = "Default";
-	public static final Set<Long> DEFAULT_IDS = Sets.newHashSet((long) 1, (long) 2);
+	public static final Set<Long> DEFAULT_IDS = Sets.newHashSet(ALAIN_CONTAINER.getId());
 	public static final boolean DEFAULT_IS_VISIBLE = true;
 
 	static {

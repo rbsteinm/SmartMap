@@ -21,6 +21,10 @@ import ch.epfl.smartmap.cache.InvitationContainer;
 import ch.epfl.smartmap.cache.UserContainer;
 import ch.epfl.smartmap.test.database.MockContainers;
 
+/**
+ * @author marion-S
+ *
+ */
 public class FriendsPagerActivityTest extends
 ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 
@@ -44,7 +48,7 @@ ActivityInstrumentationTestCase2<FriendsPagerActivity> {
 
 	}
 
-	// FIXME : cannot click on invitation in invitation list whereas can click
+	// cannot click on invitation in invitation list whereas can click
 	// on friend in friend list by doing the same way
 	public void ignoredtestClickOnInvitingUsersOpensDialog()
 			throws InterruptedException {
