@@ -13,7 +13,7 @@ import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 
 /**
  * Test the logout feature.
- *
+ * 
  * @author SpicyCH
  */
 public class LogoutManagerTest extends ActivityInstrumentationTestCase2<MainActivity> {
