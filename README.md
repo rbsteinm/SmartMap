@@ -25,6 +25,8 @@ Authors : [Julien Perrenoud](https://github.com/jfperren), [Alain Milliet](https
 
 Date of Creation : Fall 2014
 
+This project was developped in the scope of Prof. Larus' *Software Engineering* course at EPFL.
+
 More information to be found on the [Wiki](https://github.com/RobinGenolet/smartmap/wiki)
 
 Special thanks to Lukas Kellenberger & Calin Iorgolescu.
